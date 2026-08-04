@@ -116,3 +116,30 @@ def test_vector_collision_detects_duplicate_complete_outputs():
 def test_collision_metrics_are_null_without_real_quantizer():
     metrics = collision_metrics(torch.zeros((5, 2)), None)
     assert all(value is None for value in metrics.values())
+
+
+def test_collision_metrics_apply_the_models_actual_activation():
+    values = torch.tensor([[-1.0, -2.0], [-3.0, -4.0]], dtype=torch.float64)
+    assert collision_metrics(values, "float64", "relu")["vector_collision_rate"] == 0.5
+    assert collision_metrics(values, "float64", "leaky_relu")["vector_collision_rate"] == 0.0
+    assert collision_metrics(values, "float64", "tanh")["vector_collision_rate"] == 0.0
+
+
+def test_fixed_point_collision_rejects_unbounded_activations():
+    with pytest.raises(ValueError, match="only for bounded tanh"):
+        collision_metrics(torch.zeros((2, 2)), "fixed-4", "relu")
+
+
+def test_collision_group_purity_and_size_distribution():
+    values = torch.tensor(
+        [[0.01, 0.01], [0.02, 0.02], [0.80, -0.80], [0.81, -0.81]],
+        dtype=torch.float64,
+    )
+    labels = torch.tensor([0, 0, 0, 1])
+    metrics = collision_metrics(values, "fixed-4", "tanh", labels)
+    assert metrics["collision_group_count"] == 2.0
+    assert metrics["collision_group_pure_fraction"] == 0.5
+    assert metrics["collision_group_size_mean"] == 2.0
+    assert metrics["collision_group_size_median"] == 2.0
+    assert metrics["collision_group_size_max"] == 2.0
+    assert metrics["fraction_inputs_in_collision_groups"] == 1.0

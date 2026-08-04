@@ -15,6 +15,7 @@ import torch
 
 
 Criterion = Literal["paper", "exact"]
+Activation = Literal["tanh", "relu", "leaky_relu"]
 
 
 @dataclass(frozen=True)
@@ -170,16 +171,38 @@ def quantize_values(values: torch.Tensor, quantizer: str) -> torch.Tensor:
     return -1.0 + spacing / 2.0 + indices * spacing
 
 
-def quantized_tanh(preactivations: torch.Tensor, quantizer: str) -> torch.Tensor:
-    """Evaluate tanh in float64, then apply the specified real quantizer."""
+def quantized_activation(
+    preactivations: torch.Tensor,
+    quantizer: str,
+    activation: Activation = "tanh",
+) -> torch.Tensor:
+    """Apply the model's activation in float64, then its real quantizer."""
 
     values = torch.as_tensor(preactivations, dtype=torch.float64, device="cpu")
-    return quantize_values(torch.tanh(values), quantizer)
+    if activation == "tanh":
+        activated = torch.tanh(values)
+    elif activation == "relu":
+        activated = torch.relu(values)
+    elif activation == "leaky_relu":
+        activated = torch.nn.functional.leaky_relu(values, negative_slope=0.01)
+    else:
+        raise ValueError(f"unsupported activation: {activation}")
+    if quantizer.startswith("fixed-") and activation != "tanh":
+        raise ValueError("fixed-point collision metrics are defined only for bounded tanh outputs")
+    return quantize_values(activated, quantizer)
+
+
+def quantized_tanh(preactivations: torch.Tensor, quantizer: str) -> torch.Tensor:
+    """Backward-compatible explicit tanh quantization helper."""
+
+    return quantized_activation(preactivations, quantizer, "tanh")
 
 
 def collision_metrics(
     preactivations: torch.Tensor,
     quantizer: str | None,
+    activation: Activation = "tanh",
+    labels: torch.Tensor | None = None,
 ) -> dict[str, float | None]:
     """Measure scalar collisions per unit and true vector-level collisions.
 
@@ -196,16 +219,63 @@ def collision_metrics(
         "per_unit_collision_median",
         "per_unit_collision_max",
         "vector_collision_rate",
+        "collision_group_count",
+        "collision_group_pure_fraction",
+        "collision_group_size_mean",
+        "collision_group_size_std",
+        "collision_group_size_min",
+        "collision_group_size_median",
+        "collision_group_size_max",
+        "fraction_inputs_in_collision_groups",
     )
     if quantizer is None:
         return {name: None for name in metric_names}
     if preactivations.ndim != 2 or preactivations.shape[0] == 0 or preactivations.shape[1] == 0:
         raise ValueError("preactivations must have non-empty shape (inputs, units)")
 
-    outputs = quantized_tanh(preactivations, quantizer)
+    outputs = quantized_activation(preactivations, quantizer, activation)
     n_inputs = outputs.shape[0]
     per_unit = _per_unit_rates_from_outputs(outputs)
-    vector_rate = 1.0 - float(torch.unique(outputs, dim=0).shape[0]) / float(n_inputs)
+    _, inverse, counts = torch.unique(outputs, dim=0, return_inverse=True, return_counts=True)
+    vector_rate = 1.0 - float(counts.numel()) / float(n_inputs)
+    collision_sizes = counts[counts > 1].to(torch.float64)
+    if labels is not None:
+        label_values = torch.as_tensor(labels, dtype=torch.int64, device="cpu").reshape(-1)
+        if label_values.shape[0] != n_inputs:
+            raise ValueError("labels must contain one entry per input")
+    else:
+        label_values = None
+
+    if collision_sizes.numel() == 0:
+        group_metrics: dict[str, float | None] = {
+            "collision_group_count": 0.0,
+            "collision_group_pure_fraction": None,
+            "collision_group_size_mean": None,
+            "collision_group_size_std": None,
+            "collision_group_size_min": None,
+            "collision_group_size_median": None,
+            "collision_group_size_max": None,
+            "fraction_inputs_in_collision_groups": 0.0,
+        }
+    else:
+        pure_fraction = None
+        if label_values is not None:
+            collision_group_ids = torch.nonzero(counts > 1, as_tuple=False).reshape(-1)
+            pure_groups = sum(
+                int(torch.unique(label_values[inverse == group_id]).numel() == 1)
+                for group_id in collision_group_ids
+            )
+            pure_fraction = pure_groups / int(collision_group_ids.numel())
+        group_metrics = {
+            "collision_group_count": float(collision_sizes.numel()),
+            "collision_group_pure_fraction": pure_fraction,
+            "collision_group_size_mean": float(collision_sizes.mean().item()),
+            "collision_group_size_std": float(collision_sizes.std(correction=0).item()),
+            "collision_group_size_min": float(collision_sizes.min().item()),
+            "collision_group_size_median": float(torch.quantile(collision_sizes, 0.5).item()),
+            "collision_group_size_max": float(collision_sizes.max().item()),
+            "fraction_inputs_in_collision_groups": float(collision_sizes.sum().item()) / n_inputs,
+        }
     return {
         "per_unit_collision_mean": float(per_unit.mean().item()),
         "per_unit_collision_std": float(per_unit.std(correction=0).item()),
@@ -213,6 +283,7 @@ def collision_metrics(
         "per_unit_collision_median": float(torch.quantile(per_unit, 0.5).item()),
         "per_unit_collision_max": float(per_unit.max().item()),
         "vector_collision_rate": vector_rate,
+        **group_metrics,
     }
 
 
@@ -230,6 +301,7 @@ def _per_unit_rates_from_outputs(outputs: torch.Tensor) -> torch.Tensor:
 def per_unit_collision_rates(
     preactivations: torch.Tensor,
     quantizer: str | None,
+    activation: Activation = "tanh",
 ) -> torch.Tensor | None:
     """Return one scalar collision rate per unit, preserving unit identity."""
 
@@ -237,4 +309,4 @@ def per_unit_collision_rates(
         return None
     if preactivations.ndim != 2 or preactivations.shape[0] == 0 or preactivations.shape[1] == 0:
         raise ValueError("preactivations must have non-empty shape (inputs, units)")
-    return _per_unit_rates_from_outputs(quantized_tanh(preactivations, quantizer))
+    return _per_unit_rates_from_outputs(quantized_activation(preactivations, quantizer, activation))

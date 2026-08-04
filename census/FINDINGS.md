@@ -1,6 +1,9 @@
 # Findings
 
-The measured findings will be written after the census has run.
+In the preregistered pilot, the trained final tanh layer retained 1,225 of 2,000
+distinct evaluation vectors at bfloat16 (38.75% vector collision), versus 2,000
+of 2,000 at float32 and at bfloat16 initialization; all 248 collision groups
+were class-pure. Full-sweep findings will replace the pilot-only interpretation.
 
 ## Specification corrections
 
@@ -15,6 +18,18 @@ numerator is bounded by format cardinality while its denominator pooled every
 input-unit pair. It measured a pigeonhole artifact. Collision measurements use
 within-unit distributions and complete-vector duplication instead, with the
 untrained network on identical inputs as the baseline.
+
+Simulated fixed-point collision metrics are reported only for tanh. ReLU and
+leaky-ReLU outputs are unbounded, so fixed-point quantization would require a
+free per-tensor scale; those rows are omitted rather than made incomparable by
+an improvised scale.
+
+## Paper proxy versus exact rounding
+
+In the pilot's final hidden layer, the paper threshold counted 10.355% of
+pre-activations while the exact-rounding threshold counted 1.105%, a nearly
+tenfold gap. Both definitions remain primary because this ambiguity is
+load-bearing rather than cosmetic.
 
 ## Reasons this result might be wrong
 
