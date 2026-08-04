@@ -68,6 +68,16 @@ def test_saturation_known_outside_is_exactly_one(criterion):
     assert metrics["fraction_units_over_50pct_saturation"] == 1.0
 
 
+def test_float32_values_are_compared_against_unrounded_float64_threshold():
+    threshold = threshold_comparison(2.0**-8, "paper").exact
+    nearest_float32 = torch.tensor([[threshold]], dtype=torch.float32)
+    assert float(nearest_float32.item()) > threshold
+    # A direct float32 tensor/scalar comparison rounds the threshold and is false.
+    assert not bool((nearest_float32 > threshold).item())
+    metrics = saturation_metrics(nearest_float32, 2.0**-8, "paper")
+    assert metrics["upper_saturation_fraction"] == 1.0
+
+
 def test_per_unit_median_uses_standard_even_sample_interpolation():
     values = torch.tensor(
         [

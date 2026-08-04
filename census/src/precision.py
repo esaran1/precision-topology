@@ -117,8 +117,12 @@ def saturation_metrics(
         raise ValueError("preactivations must be non-empty")
 
     threshold = threshold_comparison(delta, criterion).exact
-    upper = preactivations > threshold
-    lower = preactivations < -threshold
+    # Preactivations are stored in their genuine training dtype (float32), but
+    # comparison must occur in float64. PyTorch otherwise treats the Python
+    # scalar as wrapped and rounds the threshold to float32 at the boundary.
+    comparison_values = preactivations.to(dtype=torch.float64, device="cpu")
+    upper = comparison_values > threshold
+    lower = comparison_values < -threshold
     saturated = upper | lower
     per_unit = saturated.to(torch.float64).mean(dim=0)
 
