@@ -1,0 +1,2 @@
+plateau_step,seed_count,collision_at_plateau_mean,collision_at_plateau_std,collision_at_final_mean,collision_at_final_std,fraction_collision_increase_after_plateau_mean,fraction_collision_increase_after_plateau_std
+200,5,0.2674,0.10690556580459222,0.4344,0.10829150474529387,0.4051762340210721,0.11593880753000632

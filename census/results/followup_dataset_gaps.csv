@@ -1,0 +1,4 @@
+analysis,format,metric,pairing,matched_row_count,seed_count,blobs_mean,blobs_std,linked_tori_mean,linked_tori_std,blobs_minus_tori_mean,blobs_minus_tori_std,clears_half_mean_rule
+all-layer paper saturation,bfloat16,paper_total_saturation_fraction,paired by seed and matched accepted architecture-layer rows,526,5,0.23529561245882,0.034718494901493126,0.03036335942647499,0.0054820779809254365,0.20493225303234502,0.03775163559108104,True
+final-layer vector collision excess,bfloat16,excess_vector_collision_rate,paired by seed and matched accepted architecture-layer rows,75,5,0.82490875,0.0653465864069021,0.43015625,0.030951409436304346,0.3947525,0.05636221983817536,True
+final-layer vector collision,float32,vector_collision_rate,paired by seed and matched accepted architecture-layer rows,75,5,0.541285,0.020078619205980013,0.0034549999999999976,0.003487963118891882,0.5378299999999999,0.020083168578594636,True
