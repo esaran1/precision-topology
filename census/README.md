@@ -32,3 +32,13 @@ Kaiming-uniform weights with `a=sqrt(5)` (gain `1/sqrt(3)`, equivalent bound
 `1/sqrt(fan_in)`) and uniform biases with the same bound. Inputs are not
 standardized. Initialization metadata is recorded with census results because
 it directly controls initial pre-activation scale.
+
+## Training criterion
+
+Models train in float32 on CPU with deterministic, full-batch Adam
+(`learning_rate=0.01`) for 2,000 fixed steps. A run enters the census only if
+final training accuracy is exactly 100% and evaluation accuracy is at least
+99% (evaluation error at most 1%). Failures are recorded and excluded.
+Checkpoints are captured before training at step 0 and after 10%, 25%, 50%, and
+100% of updates. Each checkpoint stores evaluation-set hidden pre-activations,
+not post-activation values.
