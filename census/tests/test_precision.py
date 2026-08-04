@@ -32,6 +32,21 @@ def test_threshold_log_form_has_expected_asymptotic_error(spec, criterion):
     assert result.asymptotic_error <= result.effective_delta / 2.0 + rounding_allowance
 
 
+@pytest.mark.parametrize(
+    ("delta", "criterion", "expected"),
+    [
+        (2.0**-6, "paper", 2.4220935432292956),
+        (2.0**-6, "exact", 2.770631772579213),
+        (2.0**-4, "paper", 1.7169936022425731),
+        (2.0**-4, "exact", 2.0715673631957663),
+    ],
+)
+def test_coarse_fixed_thresholds_are_exact_not_asymptotic(delta, criterion, expected):
+    assert threshold_comparison(delta, criterion).exact == pytest.approx(
+        expected, rel=0.0, abs=2e-15
+    )
+
+
 @pytest.mark.parametrize("criterion", ["paper", "exact"])
 def test_saturation_known_inside_is_exactly_zero(criterion):
     values = torch.zeros((7, 3), dtype=torch.float64)
