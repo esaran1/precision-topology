@@ -5,7 +5,7 @@ import torch
 
 from src.precision import (
     DELTA_TABLE,
-    collision_rate,
+    collision_metrics,
     quantize_values,
     saturation_metrics,
     threshold_comparison,
@@ -98,7 +98,21 @@ def test_fixed4_has_exactly_16_levels_on_closed_unit_interval():
     assert quantized.max().item() == 0.9375
 
 
-def test_collision_rate_counts_repeated_quantized_outputs():
-    values = torch.zeros((5, 2), dtype=torch.float64)
-    assert collision_rate(values, "float64") == pytest.approx(0.9)
-    assert collision_rate(values, None) is None
+def test_per_unit_collisions_do_not_pool_scalars_across_units():
+    values = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0]], dtype=torch.float64)
+    metrics = collision_metrics(values, "float64")
+    assert metrics["per_unit_collision_mean"] == pytest.approx(1.0 / 3.0)
+    assert metrics["per_unit_collision_min"] == pytest.approx(1.0 / 3.0)
+    assert metrics["per_unit_collision_max"] == pytest.approx(1.0 / 3.0)
+    assert metrics["vector_collision_rate"] == 0.0
+
+
+def test_vector_collision_detects_duplicate_complete_outputs():
+    values = torch.tensor([[0.01, 0.01], [0.02, 0.02], [0.8, -0.8]], dtype=torch.float64)
+    metrics = collision_metrics(values, "fixed-4")
+    assert metrics["vector_collision_rate"] == pytest.approx(1.0 / 3.0)
+
+
+def test_collision_metrics_are_null_without_real_quantizer():
+    metrics = collision_metrics(torch.zeros((5, 2)), None)
+    assert all(value is None for value in metrics.values())

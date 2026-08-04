@@ -177,16 +177,64 @@ def quantized_tanh(preactivations: torch.Tensor, quantizer: str) -> torch.Tensor
     return quantize_values(torch.tanh(values), quantizer)
 
 
-def collision_rate(preactivations: torch.Tensor, quantizer: str | None) -> float | None:
-    """Return 1 - distinct quantized tanh outputs / scalar inputs.
+def collision_metrics(
+    preactivations: torch.Tensor,
+    quantizer: str | None,
+) -> dict[str, float | None]:
+    """Measure scalar collisions per unit and true vector-level collisions.
 
-    The measure is pooled over all input-unit pairs.  ``None`` denotes a delta
-    row without a corresponding real quantizer (the paper's 2^-9 half value).
+    No scalar values are pooled across units: doing so makes format cardinality,
+    rather than the network, dominate the result.  Vector collisions count
+    duplicate complete layer-output rows and are the primary injectivity metric.
+    ``None`` values denote a delta row without a real quantizer.
     """
+
+    metric_names = (
+        "per_unit_collision_mean",
+        "per_unit_collision_std",
+        "per_unit_collision_min",
+        "per_unit_collision_median",
+        "per_unit_collision_max",
+        "vector_collision_rate",
+    )
+    if quantizer is None:
+        return {name: None for name in metric_names}
+    if preactivations.ndim != 2 or preactivations.shape[0] == 0 or preactivations.shape[1] == 0:
+        raise ValueError("preactivations must have non-empty shape (inputs, units)")
+
+    outputs = quantized_tanh(preactivations, quantizer)
+    n_inputs = outputs.shape[0]
+    per_unit = _per_unit_rates_from_outputs(outputs)
+    vector_rate = 1.0 - float(torch.unique(outputs, dim=0).shape[0]) / float(n_inputs)
+    return {
+        "per_unit_collision_mean": float(per_unit.mean().item()),
+        "per_unit_collision_std": float(per_unit.std(correction=0).item()),
+        "per_unit_collision_min": float(per_unit.min().item()),
+        "per_unit_collision_median": float(torch.quantile(per_unit, 0.5).item()),
+        "per_unit_collision_max": float(per_unit.max().item()),
+        "vector_collision_rate": vector_rate,
+    }
+
+
+def _per_unit_rates_from_outputs(outputs: torch.Tensor) -> torch.Tensor:
+    n_inputs = outputs.shape[0]
+    return torch.tensor(
+        [
+            1.0 - float(torch.unique(outputs[:, unit]).numel()) / float(n_inputs)
+            for unit in range(outputs.shape[1])
+        ],
+        dtype=torch.float64,
+    )
+
+
+def per_unit_collision_rates(
+    preactivations: torch.Tensor,
+    quantizer: str | None,
+) -> torch.Tensor | None:
+    """Return one scalar collision rate per unit, preserving unit identity."""
 
     if quantizer is None:
         return None
-    if preactivations.numel() == 0:
-        raise ValueError("preactivations must be non-empty")
-    outputs = quantized_tanh(preactivations, quantizer).reshape(-1)
-    return 1.0 - float(torch.unique(outputs).numel()) / float(outputs.numel())
+    if preactivations.ndim != 2 or preactivations.shape[0] == 0 or preactivations.shape[1] == 0:
+        raise ValueError("preactivations must have non-empty shape (inputs, units)")
+    return _per_unit_rates_from_outputs(quantized_tanh(preactivations, quantizer))

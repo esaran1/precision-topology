@@ -10,6 +10,12 @@ asymptotic form `0.5 * ln(2 / delta)` was rejected as the primary calculation.
 Its largest deviation in the configured table is 0.0159 at fixed-4. Direct
 `atanh` and the asymptotic form are retained only as documented cross-checks.
 
+The initially specified pooled scalar collision rate was rejected because its
+numerator is bounded by format cardinality while its denominator pooled every
+input-unit pair. It measured a pigeonhole artifact. Collision measurements use
+within-unit distributions and complete-vector duplication instead, with the
+untrained network on identical inputs as the baseline.
+
 ## Reasons this result might be wrong
 
 - Pre-activation scale may depend more strongly on weight initialization than on

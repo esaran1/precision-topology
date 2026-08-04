@@ -42,3 +42,13 @@ final training accuracy is exactly 100% and evaluation accuracy is at least
 Checkpoints are captured before training at step 0 and after 10%, 25%, 50%, and
 100% of updates. Each checkpoint stores evaluation-set hidden pre-activations,
 not post-activation values.
+
+## Collision metrics
+
+Scalar output values are never pooled across units. For each real quantizer,
+the census reports the distribution of within-unit collision rates and, as the
+headline injectivity measure, the fraction of duplicate complete activation
+vectors across evaluation inputs. The identical inputs passed through the
+untrained step-0 network provide the pigeonhole baseline. Reported excess is
+`trained collision rate - initialization collision rate`. The paper's `2^-9`
+half row has no real quantizer, so all collision fields are null.
