@@ -11,7 +11,38 @@ python3 -m venv census/.venv
 census/.venv/bin/python -m pip install -r census/requirements.txt
 ```
 
-Run instructions and measured findings will be completed after the experiment runs.
+Run tests from this directory with:
+
+```bash
+.venv/bin/python -m pytest -q
+```
+
+Reproduce the full 480-run sweep and reports with:
+
+```bash
+.venv/bin/python -m src.census
+MPLCONFIGDIR=.matplotlib .venv/bin/python -m src.report
+```
+
+Both commands overwrite generated result artifacts. The sweep runs tanh first,
+then ReLU and leaky-ReLU controls, and persists results after every configuration.
+On the recorded Apple M5 CPU environment it took under 30 minutes.
+
+## Result artifacts
+
+- `results/saturation.parquet` and `.csv`: accepted final-checkpoint census rows
+- `results/training_status.parquet` and `.csv`: pass/fail records for all 480 runs
+- `results/training_dynamics.parquet` and `.csv`: five checkpoints for the
+  depth-6/width-30 representative subset
+- `results/summary_table.md`: absolute layer × precision tanh summary
+- `results/figures/`: saturation, vector-collision, and dynamics profiles
+- `FINDINGS.md`: interpretation, limitations, and specification corrections
+
+The sweep accepted 447 runs and excluded 33 strict-criterion failures, all at
+width 5. The primary linked-tori result is nonzero trained bfloat16 vector
+collision concentrated near the classifier, but the stronger blob control
+shows that the effect is not specific to linked geometry. See `FINDINGS.md` for
+seed-level means and standard deviations.
 
 ## Dataset geometry
 
@@ -52,3 +83,8 @@ vectors across evaluation inputs. The identical inputs passed through the
 untrained step-0 network provide the pigeonhole baseline. Reported excess is
 `trained collision rate - initialization collision rate`. The paper's `2^-9`
 half row has no real quantizer, so all collision fields are null.
+
+IEEE collision metrics apply the network's actual activation. Simulated
+fixed-point collision metrics are emitted only for bounded tanh outputs; they
+are omitted for ReLU and leaky-ReLU because an unbounded fixed-point format
+would require an arbitrary scale.
