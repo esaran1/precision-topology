@@ -24,3 +24,11 @@ tubes around the cores. The core curves have Gauss linking number of magnitude
 one. The configurable tube-radius guard keeps the two solid tori disjoint.
 
 The control is two isotropic Gaussian blobs in R3, centered on the x-axis.
+
+## Model initialization
+
+Main-run MLPs retain PyTorch's unmodified `nn.Linear.reset_parameters` behavior:
+Kaiming-uniform weights with `a=sqrt(5)` (gain `1/sqrt(3)`, equivalent bound
+`1/sqrt(fan_in)`) and uniform biases with the same bound. Inputs are not
+standardized. Initialization metadata is recorded with census results because
+it directly controls initial pre-activation scale.

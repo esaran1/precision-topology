@@ -9,3 +9,11 @@ Thresholds use the exact identity
 asymptotic form `0.5 * ln(2 / delta)` was rejected as the primary calculation.
 Its largest deviation in the configured table is 0.0159 at fixed-4. Direct
 `atanh` and the asymptotic form are retained only as documented cross-checks.
+
+## Reasons this result might be wrong
+
+- Pre-activation scale may depend more strongly on weight initialization than on
+  training or precision. Main runs retain PyTorch's default `nn.Linear`
+  initialization (Kaiming uniform with `a=sqrt(5)`, gain `1/sqrt(3)`, and default
+  uniform bias). This is a first-order confound, not a neutral implementation
+  detail; the present experiment does not compare initialization schemes.
