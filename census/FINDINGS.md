@@ -1,6 +1,22 @@
 # Findings
 
-In trained tanh networks on linked-tori data, reducing activation precision to bfloat16 was associated with 56.8787% ± 4.9153% final-layer vector non-injectivity; width-matched excess over initialization was 25.1729% ± 11.1080% at width 5, 47.9625% ± 11.9408% at width 15, 50.5925% ± 3.2979% at width 30, and 43.4175% ± 2.8248% at width 50, with the pooled 43.0156% ± 3.0951% retained only as a secondary summary, versus 0.3455% ± 0.3488% at float32. The effect is activation-specific: ReLU and leaky-ReLU showed negative bfloat16 excess of −15.7512% ± 4.2949% and −25.7277% ± 3.6525%. The tanh–ReLU sign reversal is consistent with a mechanism that supplies non-injectivity to an activation that is injective in exact arithmetic but is unnecessary for one already non-injective; leaky-ReLU is itself injective in exact arithmetic, so injectivity alone is not a sufficient explanation. The conjecture's operational precondition is present at practical precision, but control blobs collapsed more strongly than linked tori, so the effect tracks class separability more than topological complexity.
+In trained tanh networks on linked-tori data, reducing activation precision to
+bfloat16 was associated with 56.8787% ± 4.9153% final-layer vector
+non-injectivity, versus 0.3455% ± 0.3488% at float32.
+
+The effect was specific to the only bounded activation tested: pooled bfloat16
+excess over initialization was +43.0156% ± 3.0951% for tanh, versus −25.7277%
+± 3.6525% for leaky-ReLU and −15.7512% ± 4.2949% for ReLU. The pooled tanh
+figure is secondary to the width-resolved estimates below.
+
+The conjecture's operational precondition is therefore present at practical
+precision in these trained networks: reducing activation-output precision can
+make the observed layer map genuinely non-injective. Width-matched
+initialization baselines indicate that much of the effect develops during
+training rather than being fixed entirely by initialization.
+
+Control blobs nevertheless collapsed more strongly than linked tori, so the
+effect tracks class separability more than topological complexity.
 
 Unless stated otherwise, each mean and sample standard deviation is computed
 across five seed-level averages. Within a seed, accepted architecture-layer
@@ -8,15 +24,26 @@ rows are averaged with equal weight. Failed runs never enter these summaries.
 
 ## Activation specificity
 
-The mechanism predicts that precision loss should confer non-injectivity on an
-activation that is injective in exact arithmetic, such as tanh, while it should
-not be needed by ReLU, which is already non-injective. On linked-tori final
-layers at bfloat16, tanh had +43.0156% ± 3.0951% excess vector collision, while
-ReLU and leaky-ReLU had −15.7512% ± 4.2949% and −25.7277% ± 3.6525%. A paired,
-matched-architecture tanh-minus-ReLU comparison was +63.3474% ± 1.9422%. The
-sign reversal is consistent with the prediction; it does not establish the
-causal story, and leaky-ReLU's negative result shows that exact-arithmetic
-injectivity is not by itself enough.
+The JMLR construction is specifically a clipping mechanism: outputs accumulate
+against the finite asymptotes of tanh and round to the same endpoint. It
+therefore appears to require boundedness as well as exact-arithmetic
+injectivity. The three tested activations form a partial factorial comparison:
+
+| Activation | Injective in exact arithmetic | Bounded | Observed bfloat16 excess |
+|---|:---:|:---:|---:|
+| tanh | yes | yes | +43.0156% ± 3.0951% |
+| leaky-ReLU | yes | no | −25.7277% ± 3.6525% |
+| ReLU | no | no | −15.7512% ± 4.2949% |
+
+Only the bounded, injective activation had positive excess. Leaky-ReLU is the
+control that separates boundedness from injectivity: it is injective but has no
+asymptote or representational ceiling against which outputs can accumulate.
+Boundedness, not injectivity alone, is therefore the property this mechanism
+appears to require, as the JMLR clipping construction predicts.
+This role was not part of a preregistered factorial design; it emerged from the
+results. A paired, matched-architecture tanh-minus-ReLU comparison was
++63.3474% ± 1.9422%. The pattern is consistent with the clipping construction's
+boundedness account, but it does not establish that account causally.
 
 ReLU also behaves differently at float32. Its linked-tori final-layer vector
 collision was 2.3640% ± 3.4649%, compared with 0.2385% ± 0.3273% at
@@ -29,6 +56,17 @@ Simulated fixed-point collision metrics are reported only for tanh. ReLU and
 leaky-ReLU outputs are unbounded, so fixed-point quantization would require a
 free per-tensor scale; those rows are omitted rather than made incomparable by
 an improvised scale.
+
+### Untested prediction
+
+The boundedness account generates a specific falsifiable prediction: other
+bounded, injective activations should show positive precision-induced excess
+like tanh. Sigmoid and softsign are direct tests because both are bounded and
+strictly monotonic. A bounded, injective activation with null or negative excess
+would count against this account. Hard-tanh would be a useful bounded control,
+but not a direct test of this prediction: its flat tails make it non-injective
+in exact arithmetic. This prediction is post hoc and untested here; testing it
+would require one additional activation sweep but no new methodology.
 
 ## Width-resolved initialization baseline
 
@@ -50,6 +88,17 @@ depth; no value is imputed. The previously reported pooled initialization
 baseline of 13.8630% ± 5.9025% mixes width regimes and is secondary rather than
 the primary comparator.
 
+Excess is non-monotonic in width and peaks at width 30. Width 5 is the least
+reliable point: it has only four seed-level excess estimates, and its 55.5854% ±
+9.6393% matched initialization baseline leaves limited headroom for measurable
+excess, so its lower value may be a ceiling artifact rather than a genuine
+architectural effect. Widths 30 and 50 have near-zero matched baselines of
+0.0700% ± 0.0727% and 0.0050% ± 0.0112%, respectively, and therefore give the
+cleanest excess estimates. Four widths with these error bars do not support a
+trend claim.
+
+## Vector-collision structure
+
 Every bfloat16 collision group in the full accepted sweep was class-pure:
 100.0000% ± 0.0000% for each activation and each dataset. For linked-tori tanh
 final layers, 63.7010% ± 4.5352% of inputs belonged to a collision group. Across
@@ -58,12 +107,6 @@ architecture rows, group-size mean, median, and maximum were respectively
 consistent with reduced precision collapsing within-class representations while
 preserving class separation. It does not by itself support a claim about a
 topological change.
-
-The operational precondition therefore occurs in these trained networks:
-reducing activation-output precision can make a layer map genuinely
-non-injective on the observed evaluation set. The width-matched initialization
-baselines show that much of the linked-tori tanh effect develops during training
-rather than being fixed entirely by initialization.
 
 ## Saturation census
 
@@ -217,6 +260,11 @@ width-resolved values are the primary summaries.
 
 ## Reasons this result might be wrong
 
+- The boundedness interpretation is post hoc. Only one bounded activation was
+  tested, and the activation set was not designed as a factorial test of
+  boundedness and exact-arithmetic injectivity. The sigmoid/softsign prediction
+  needs a new sweep before this interpretation can be distinguished from a
+  tanh-specific effect.
 - Initialization is a first-order confound. Main runs retain PyTorch's default
   `nn.Linear` Kaiming-uniform initialization with `a=sqrt(5)`, gain `1/sqrt(3)`,
   and default uniform bias. No alternative initialization scale was tested.
