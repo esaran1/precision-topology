@@ -60,6 +60,36 @@ The final-layer minimum never falls below **4.9174 steps** in any run at any
 precision, including fixed-4. At bfloat16 the smallest final-layer margin over
 all 75 runs is 157.3581 steps.
 
+## Width-invariance of final-layer margin
+
+Final-layer margin in quantization steps is nearly constant in width. At
+fixed-4 the means are 12.2968, 12.5523, 12.6345, and 13.5179 at widths 5, 15,
+30, and 50. Width varies by a factor of ten while the margin changes by a factor
+of 1.0993.
+
+This is not an artifact of the step convention. Fixed-point quantizers have a
+constant step, so the fixed-4, fixed-6, and fixed-8 ratios are the same number
+rescaled. The underlying quantity is the raw post-activation Chebyshev distance,
+which is measured before any quantizer is applied:
+
+| Width | Final-layer raw Chebyshev distance |
+|---:|---:|
+| 5 | 1.5371 ± 0.2848 |
+| 15 | 1.5690 ± 0.2379 |
+| 30 | 1.5793 ± 0.3139 |
+| 50 | 1.6897 ± 0.3735 |
+
+bfloat16, whose step is data-dependent rather than constant, gives an
+independent ratio of 1.097 across the same widths.
+
+This is an open observation, not an explained effect. It suggests that training
+targets a characteristic separation relative to representation scale rather than
+exploiting the additional width available to it, but this analysis does not
+establish that, and no mechanism is offered here. Four widths, all at or above
+the width at which the classification obstruction is theoretically resolved, are
+too few and too narrowly placed to support a claim. It should be rechecked at
+widths 3 to 8, where the relevant transition is expected to sit.
+
 ## Where the ratio falls below one
 
 55 of 3,682 rows have Chebyshev margin below one step. All 55 are **fixed-4**;
@@ -80,10 +110,14 @@ Among the 1,705 rows that contain at least one collision group:
 | margin >= 1 | 1,650 | 0 |
 | margin < 1 | 40 | 15 |
 
-Margin below one is a **necessary** condition with no exceptions: every one of
-the 15 impure rows has margin < 1, and no row with margin >= 1 is impure. It is
-not sufficient — 40 rows have margin < 1 yet remain fully pure, because a
-sub-step separation still usually places the two points in different cells.
+Margin below one step is a **necessary** condition for impurity with zero
+exceptions: all 15 impure rows have margin below one, and none of the 1,650 rows
+at or above one step is impure. It is **not sufficient**: 40 rows fall below one
+step yet remain fully pure. Two points separated by less than one step usually
+still land in different cells, because sharing a cell requires the pair to fall
+within the same cell boundaries, not merely to be closer together than the cell
+is wide. The margin criterion therefore over-predicts impurity, flagging 55 rows
+as at risk where 15 actually contain a between-class collision.
 
 The sufficient condition is actual cell coincidence. Counting between-class
 pairs that quantize to identical vectors predicts impurity **exactly**:

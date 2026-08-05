@@ -123,12 +123,47 @@ precise across all 75 accepted linked-tori tanh runs and 3,682 layer-quantizer
 rows. Expressing the minimum between-class Chebyshev separation in units of the
 local quantization step, 3,627 of 3,682 rows have margin of at least one step.
 All 55 rows below one step are fixed-4, the coarsest tested quantizer, at widths
-5 and 15. Margin below one is a necessary condition for impurity with no
-exceptions: all 15 impure rows have margin below one, and no row at or above one
-step is impure. It is not sufficient -- 40 rows fall below one step yet stay
-fully pure, since a sub-step separation still usually places the two points in
-different cells. The exceptions therefore locate exactly where margin fails to
-exceed resolution, rather than showing that purity was vacuous.
+5 and 15. Margin below one is a necessary condition for impurity with zero
+exceptions: all 15 impure rows have margin below one, and none of the 1,650 rows
+at or above one step is impure. It is not sufficient: 40 rows fall below one step
+yet stay fully pure, because sharing a cell requires the pair to fall within the
+same cell boundaries rather than merely to be closer together than the cell is
+wide. The margin criterion consequently over-predicts impurity, flagging 55 rows
+at risk where 15 contain an actual between-class collision. Counting
+between-class pairs that quantize to identical vectors separates the two groups
+exactly, at 1,690 pure versus 15 impure with no errors in either direction. The
+exceptions therefore locate exactly where margin fails to exceed resolution,
+rather than showing that purity was vacuous.
+
+Final-layer margin is close to invariant in width. At fixed-4 the final-layer
+margin is 12.2968, 12.5523, 12.6345, and 13.5179 steps at widths 5, 15, 30, and
+50: width varies by a factor of ten while the margin changes by a factor of
+1.0993. The invariance is in the raw post-activation Chebyshev distance
+(1.5371 ± 0.2848, 1.5690 ± 0.2379, 1.5793 ± 0.3139, and 1.6897 ± 0.3735 at those
+widths), measured before any quantizer, so it is not an artifact of the constant
+fixed-point step; bfloat16, whose step is data-dependent, gives an independent
+ratio of 1.097. This is an open observation with no mechanism offered here. It
+suggests training targets a characteristic separation relative to representation
+scale rather than exploiting the additional width available, but this analysis
+does not establish that, and four widths all at or above the theoretically
+sufficient width cannot support the claim. It should be rechecked at widths 3
+to 8.
+
+This sits alongside a width-dependence that runs the other way. Between-class
+margin is close to width-invariant, while within-class vector-collision excess
+is not: it is non-monotonic in width and peaks at width 30 (50.5925% ± 3.2979%).
+These are different quantities -- margin is a between-class minimum over pairs,
+collision excess is a within-class count -- so there is no contradiction between
+them. The implication is nonetheless worth stating: if the minimum between-class
+separation barely moves across a tenfold change in width, the width-dependence
+of collision excess does not originate in between-class geometry. Within-class
+collision is additionally subject to pigeonhole pressure that varies strongly
+with output dimension, which the matched initialization baselines show directly
+at 55.5854% ± 9.6393% for width 5 against 0.0050% ± 0.0112% for width 50. That
+pressure is a property of how many distinct representable vectors the layer
+affords, not of how the two classes sit relative to one another. Reconciling the
+two measurements is owed to the redesign and is not resolved here; no collision
+value in this document is changed by the margin analysis.
 
 Layer position governs how far the gate's entailment reaches. Post-hoc
 quantization at a hidden layer is counterfactual: the trained classifier
