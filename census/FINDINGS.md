@@ -103,10 +103,50 @@ Every bfloat16 collision group in the full accepted sweep was class-pure:
 100.0000% ± 0.0000% for each activation and each dataset. For linked-tori tanh
 final layers, 63.7010% ± 4.5352% of inputs belonged to a collision group. Across
 architecture rows, group-size mean, median, and maximum were respectively
-12.5303 ± 2.5980, 3.7704 ± 0.1795, and 225.2821 ± 82.7277. This pattern is
-consistent with reduced precision collapsing within-class representations while
-preserving class separation. It does not by itself support a claim about a
-topological change.
+12.5303 ± 2.5980, 3.7704 ± 0.1795, and 225.2821 ± 82.7277.
+
+The purity value is not an independent finding. It is near-forced by margin, and
+the earlier reading of this section -- that reduced precision collapses
+within-class representations while preserving class separation -- is withdrawn.
+The acceptance gate required exactly 100% training accuracy and at least 99%
+evaluation accuracy. A between-class collision means two inputs of different
+classes map to identical representations, which makes them indistinguishable to
+any deterministic downstream classifier and forces at least one of them to be
+misclassified. The gate therefore entails a strictly positive between-class
+separation in float32 at every layer. Class purity under quantization follows
+wherever that separation exceeds the local quantization step, so observing it
+mostly restates the selection rule together with a resolution comparison. It is
+not evidence about a mechanism.
+
+The margin analysis in `results/between_class_margin.md` makes the "wherever"
+precise across all 75 accepted linked-tori tanh runs and 3,682 layer-quantizer
+rows. Expressing the minimum between-class Chebyshev separation in units of the
+local quantization step, 3,627 of 3,682 rows have margin of at least one step.
+All 55 rows below one step are fixed-4, the coarsest tested quantizer, at widths
+5 and 15. Margin below one is a necessary condition for impurity with no
+exceptions: all 15 impure rows have margin below one, and no row at or above one
+step is impure. It is not sufficient -- 40 rows fall below one step yet stay
+fully pure, since a sub-step separation still usually places the two points in
+different cells. The exceptions therefore locate exactly where margin fails to
+exceed resolution, rather than showing that purity was vacuous.
+
+Layer position governs how far the gate's entailment reaches. Post-hoc
+quantization at a hidden layer is counterfactual: the trained classifier
+consumed the unquantized float32 activation, so no hidden-layer quantized
+representation was ever required by the gate to be class-separable. Hidden-layer
+purity was never constrained by the acceptance criterion, which is why all 15
+impure rows occur there (layers 1-3, width 5, depths 6, 8, and 10, seeds 0, 1,
+and 3; lowest observed purity 97.1631%). The final hidden layer is different: it
+is what the linear readout consumes, and its minimum margin never falls below
+4.9174 steps at any tested precision, with the smallest bfloat16 final-layer
+margin at 157.3581 steps. Final-layer purity reflects margin exceeding
+resolution. The bfloat16 figure quoted above is accurate as a measurement, and
+no bfloat16 row anywhere falls below one step.
+
+The within-class collision measurements elsewhere in this document are
+unaffected. Collision rates, group counts, group sizes, and excess over
+initialization remain valid measurements; only the standalone purity claim is
+withdrawn.
 
 ## Saturation census
 
@@ -232,6 +272,18 @@ measured format cardinality. The replacement reports within-unit distributions,
 complete-vector collisions, collision-group purity and size, and excess relative
 to the untrained network on identical evaluation inputs.
 
+Known mismatch between the metric and the framing. The collision metric counts
+inputs whose representations coincide, which is a *within-class* quantity in
+practice: it is closest in spirit to the per-class Betti numbers tracked by the
+JMLR line of work, which are intrinsic descriptors of one class at a time.
+Linking number, which this project's framing invokes, is a *relational,
+between-class* invariant describing how two class manifolds are embedded
+relative to one another. These are different quantities, and a change in the
+former does not imply a change in the latter. The collision measurements
+reported here should not be read as measurements of linking or unlinking. This
+mismatch is recorded here as known and is to be corrected in the redesign, which
+will add primary between-class metrics and a separate linking-number estimator.
+
 Pre-activations remain genuine float32 training outputs, but saturation
 comparisons promote them to float64 before applying the float64 threshold. A
 regression test pins the boundary where PyTorch would otherwise round the scalar
@@ -287,8 +339,24 @@ width-resolved values are the primary summaries.
   dimensions intrinsically identical experiments. The A1 breakdown shows that
   this dependence is large, and the width-5 trained excess has only four
   seed-level estimates.
-- All collision groups were class-pure, but labels provide only a coarse
-  two-class partition. Purity does not identify what within-class geometry was
+- The collision-group purity result is withdrawn as a standalone finding
+  because it is near-forced by margin. Every accepted run was gated on 100%
+  training and at least 99% evaluation accuracy. Between-class collision implies
+  indistinguishability to any deterministic downstream classifier and therefore
+  misclassification, so the gate entails strictly positive float32 between-class
+  separation at every layer; purity under quantization then follows wherever
+  that separation exceeds the local quantization step. Reporting purity alone
+  restates the selection rule plus a resolution comparison and carries no
+  information about the mechanism. Two qualifications bound the entailment:
+  hidden-layer quantization is counterfactual, since the classifier consumed
+  float32 activations, so hidden-layer purity was never gate-constrained; and
+  the gate required >=99% rather than exactly 100% evaluation accuracy, with 442
+  of 447 accepted runs at exactly 100% and five at 99.90% or 99.95%. The
+  associated within-class collision numbers remain valid as measurements. See
+  `results/between_class_margin.md` for the margin table and the 15 fixed-4 rows
+  that are not fully pure.
+- Labels provide only a coarse two-class partition. Purity does not identify
+  what within-class geometry was
   discarded.
 - Dynamics are too sparse before step 200 to identify onset or its relation to
   the moment accuracy first reaches its plateau.
