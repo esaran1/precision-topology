@@ -111,6 +111,16 @@ For the record, the theoretical facts that *are* in the paper remain: at `d = 3`
 width 3 is the obstructed regime under Theorem 3.7, and width 4 is already
 sufficient in principle under Theorem D.1.
 
+**Framing: a width sweep at `d = 3` is not a replication.** The paper's `R^3`
+evidence varies *depth* at fixed width 3 (Tables 2, 3, 8). A sweep of ours
+varies *width* at `d = 3`. These are complementary axes, and the paper's own
+`R^3` experiments hold constant exactly the variable we would be moving.
+Consequently a width sweep at `d = 3` would be the first width evidence at
+`d = 3` in either project, not a reproduction of a published result. It should
+be described that way in the design, in the code, and in whatever it produces.
+Nothing in the paper predicts its outcome at widths 4 through 8, because the
+paper never ran it.
+
 ## Verified specifics
 
 Theorem numbering in the prior notes matches the paper exactly: 3.2 (linking
