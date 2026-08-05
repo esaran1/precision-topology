@@ -35,7 +35,7 @@ evaluation accuracy, so accepted runs cannot contain between-class F-collisions
 at the output in any quantity the gate would have caught.
 
 The real sweep therefore differs from the control **structurally, not
-incidentally**. The control demonstrates that the detector fires when a
+incidentally**. The control establishes that the detector fires when a
 qualifying pair exists; the gate largely removes the between-class version of
 that pair from the population being measured. A zero between-class count should
 be read as the expected consequence of the acceptance criterion, not as evidence

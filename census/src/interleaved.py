@@ -160,6 +160,89 @@ class RegimeComparison:
     divergence_layers: tuple[int, ...]
 
 
+@torch.no_grad()
+def final_hidden_full_precision(model: MLP, inputs: torch.Tensor) -> torch.Tensor:
+    """Full-precision activation of the final hidden layer.
+
+    This is the representation the census collision metric is computed on, and
+    unlike the two output logits it is where quantized collisions are dense.
+    """
+
+    hidden = torch.as_tensor(inputs, dtype=torch.float64, device="cpu")
+    for layer in model.hidden_layers:
+        preactivation = torch.nn.functional.linear(
+            hidden,
+            layer.weight.to(torch.float64),
+            layer.bias.to(torch.float64),
+        )
+        hidden = _activate(preactivation, model.activation_name)
+    return hidden
+
+
+@dataclass(frozen=True)
+class LayerRegimeComparison:
+    """QF versus G collision structure at the final hidden layer.
+
+    ``collisions(F)`` is empty at this observation point in trained networks --
+    exact float64 equality of a real-valued activation vector essentially never
+    occurs -- so the containment question is only non-trivial when the
+    comparison is made at a fixed quantization level.  ``QF`` quantizes the
+    full-precision activation once; ``G`` reaches the same layer through a
+    network that quantized every preceding activation.
+    """
+
+    quantizer: str
+    post_hoc_pairs: int
+    interleaved_pairs: int
+    post_hoc_not_interleaved: int
+    interleaved_not_post_hoc: int
+    post_hoc_not_interleaved_within: int
+    post_hoc_not_interleaved_between: int
+    interleaved_not_post_hoc_within: int
+    interleaved_not_post_hoc_between: int
+    containment_holds: bool
+
+
+def compare_final_layer(
+    model: MLP,
+    inputs: torch.Tensor,
+    labels: torch.Tensor,
+    quantizer: str,
+) -> LayerRegimeComparison:
+    """Compare QF and G collision partitions at the final hidden layer."""
+
+    full = final_hidden_full_precision(model, inputs)
+    post_hoc = partition_of(quantize_values(full, quantizer)).colliding_pairs()
+    _, trace = forward_interleaved(model, inputs, quantizer)
+    interleaved = partition_of(trace[-1]).colliding_pairs()
+
+    label_values = torch.as_tensor(labels, dtype=torch.int64, device="cpu").reshape(-1)
+
+    def split(pairs: set[tuple[int, int]]) -> tuple[int, int]:
+        within = sum(
+            1 for left, right in pairs if label_values[left] == label_values[right]
+        )
+        return within, len(pairs) - within
+
+    post_hoc_only = post_hoc - interleaved
+    interleaved_only = interleaved - post_hoc
+    post_within, post_between = split(post_hoc_only)
+    inter_within, inter_between = split(interleaved_only)
+
+    return LayerRegimeComparison(
+        quantizer=quantizer,
+        post_hoc_pairs=len(post_hoc),
+        interleaved_pairs=len(interleaved),
+        post_hoc_not_interleaved=len(post_hoc_only),
+        interleaved_not_post_hoc=len(interleaved_only),
+        post_hoc_not_interleaved_within=post_within,
+        post_hoc_not_interleaved_between=post_between,
+        interleaved_not_post_hoc_within=inter_within,
+        interleaved_not_post_hoc_between=inter_between,
+        containment_holds=not post_hoc_only,
+    )
+
+
 def compare_regimes(
     model: MLP,
     inputs: torch.Tensor,
