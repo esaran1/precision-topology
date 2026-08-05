@@ -307,6 +307,24 @@ measured format cardinality. The replacement reports within-unit distributions,
 complete-vector collisions, collision-group purity and size, and excess relative
 to the untrained network on identical evaluation inputs.
 
+What exact-collision counting can and cannot measure. In the accepted runs,
+`collisions(F)` is empty: all 2,000 evaluation inputs produce 2,000 distinct
+full-precision outputs, at the output layer, at the final hidden layer, and at
+the float32 training precision. This is a finite-sample property and is not
+evidence of injectivity. Exact coincidence of real-valued outputs is a
+measure-zero event, so any smooth map is injective on a finite sample almost
+surely, whatever it does to the underlying continuous supports. The consequence
+is structural: exact-collision counting cannot detect a topology change in full
+precision **by construction**, because the quantity it counts is almost surely
+zero regardless of the topology. Every collision reported in this document is
+therefore quantization-induced -- it exists because a quantizer merged points
+that the full-precision map had kept distinct, not because the network merged
+them. These results characterize quantization behavior, not topology. The only
+measure in the planned redesign that can address the topological question is
+linking-number estimation, which is a property of the continuous class supports
+rather than a count of coincidences on a finite sample. No collision value in
+this document is changed by this scope statement.
+
 Known mismatch between the metric and the framing. The collision metric counts
 inputs whose representations coincide, which is a *within-class* quantity in
 practice: it is closest in spirit to the per-class Betti numbers tracked by the
