@@ -45,6 +45,25 @@ results. A paired, matched-architecture tanh-minus-ReLU comparison was
 +63.3474% ± 1.9422%. The pattern is consistent with the clipping construction's
 boundedness account, but it does not establish that account causally.
 
+The activation comparison never varied the property the ICML ordering depends
+on. Ren and Lim's architecture ordering turns on monotonic versus non-monotonic
+activations. Tanh, ReLU, and leaky-ReLU are all continuous and coordinate-wise
+monotonic, so all three satisfy the same hypothesis of Theorem 4.7 and occupy a
+single expressivity class in that framework; sigmoid and tanh are named there
+alongside ReLU and leaky-ReLU as monotonic. Whatever separates tanh from the
+other two in the measurements above, it is therefore not a distinction that
+ordering predicts, since the ordering assigns all three activations to the same
+class. The boundedness observation is **orthogonal to the ICML ordering rather
+than a refinement of it**. It may still be a real property of quantized bounded
+activations, whose finite range interacts with fixed-point grids in ways
+unbounded activations do not, but that is a statement about quantization
+behavior and not about topological expressivity. Testing the ordering would
+require a genuinely non-monotonic activation such as GELU, Swish/SiLU, or Mish,
+or a folding mechanism such as a residual block; a census varying only among
+monotonic activations cannot bear on it in either direction. See
+`notes/icml_paper_reconciliation.md`. No measured value above is changed by this
+scope statement.
+
 ReLU also behaves differently at float32. Its linked-tori final-layer vector
 collision was 2.3640% ± 3.4649%, compared with 0.2385% ± 0.3273% at
 initialization and 2.1256% ± 3.3701% excess. Tanh's float32 excess was 0.3455%

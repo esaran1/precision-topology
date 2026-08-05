@@ -13,11 +13,26 @@ below are from the extracted text.
 
 The prior notes are **retained unchanged**. This file records the diff.
 
-## Headline: the two readings agree
+## Headline: the two readings agree; three corrections are to this file
 
 I found no substantive disagreement with `icml_paper_notes.md`. Every claim in
 it that I could check against the text is corroborated, including several
 specific numbers. The items below are verifications, then refinements.
+
+Three corrections were subsequently made to **this** file, not to the prior
+notes, and are marked inline below:
+
+1. An earlier draft extrapolated Table 7's multiplicative width curve from
+   `R^7`/`S^3 ⊔ S^3` to our `R^3` Hopf link. That is an invalid comparison
+   across link type and ambient dimension, and the paper contains no `R^3` width
+   sweep at all.
+2. An earlier draft cited "the crucial property is monotonicity, not
+   differentiability" as the paper contrasting monotonicity with *boundedness*.
+   It contrasts monotonicity with differentiability; the paper never discusses
+   boundedness.
+3. The consequence that our three activations are all monotonic, and therefore
+   that the census never varied the property the ordering depends on, was
+   missing and is now stated as its own section.
 
 ## Priority item: `d + c`
 
@@ -57,15 +72,44 @@ these "small finite-seed nonmonotonicities". Accuracy saturates near 99–100%
 around width `≈5d`, not at `d + small constant`. The related `R^5` experiment
 reaches 98.5% mean at width 20, which is `4d`.
 
-**Consequence for the width sweep.** If an additive `d+c` regime with `c < 5`
-were the design premise, this paper does not supply it. Its own empirical curve
-is multiplicative — the obstruction is relieved gradually over `1×` to `5×d`,
-not at `d+1` to `d+5`. For our Hopf link `d = 3`, the theoretically obstructed
-width is 3 and width 4 is already sufficient in principle; the paper's empirical
-analogue would suggest looking out to roughly `5d = 15`, not 8. A sweep of
-widths 3–8 is defensible as an empirical transition study but should be labeled
-as externally motivated, and its upper end is not where this paper's own data
-puts saturation.
+**Correction: Table 7 must not be extrapolated to `d = 3`.** An earlier draft of
+this file reasoned from Table 7's multiplicative curve to a suggested upper
+width for our Hopf-link sweep. That comparison is invalid. Table 7 is `R^7` with
+`S^3 ⊔ S^3` at `k = 10` copies — a different link type, a different ambient
+dimension, and a different number of copies from our two linked circles in
+`R^3`. Nothing in the paper licenses transporting its `5d` saturation point to
+`d = 3`.
+
+**There is no `R^3` width sweep in this paper.** I searched for one directly.
+Every `R^3` Hopf-link experiment fixes width at 3 and varies depth:
+
+- Table 2 (ReLU vs GELU): depths 3, 5, 8, 12, 16, 20; 30 seeds per cell.
+- Table 3 (plain ReLU vs ResNet): depths 3, 4, 5, 6, 7, 8; 30 seeds per cell.
+- Table 8 (layerwise link tracking): width 3, depth 5, best seed.
+
+Appendix G.2 states it outright: **"All architectures use width 3."** The only
+width sweeps in the paper are Table 7 (`R^7`) and the related `R^5` remark. The
+paper therefore contains no empirical evidence about how `R^3` Hopf-link
+accuracy behaves as width increases from 3.
+
+**Consequence for the width sweep.** Junyu's stated "~<3+5" figure for 3D links
+is **author knowledge beyond the published paper**. It cannot be derived from
+arXiv:2606.31856v1, and it cannot be checked against it, because the relevant
+experiment does not appear there. It should be treated as authoritative for
+choosing our sweep — it comes from the author, and it is specifically about the
+`d = 3` case we are studying, whereas Table 7 is not.
+
+The tension with Table 7's multiplicative scaling is recorded here as an **open
+question, not resolved**: Table 7 saturates near `5d` in `R^7` for `S^3 ⊔ S^3`
+at `k = 10`, while the "~<3+5" figure is additive and specific to 3D links.
+Both can hold simultaneously — link type, ambient dimension, and copy count all
+differ, and the paper gives no reason to expect one scaling law to cover both.
+Resolving it is not required to run the sweep, and the sweep should not be
+designed as though it were resolved.
+
+For the record, the theoretical facts that *are* in the paper remain: at `d = 3`
+width 3 is the obstructed regime under Theorem 3.7, and width 4 is already
+sufficient in principle under Theorem D.1.
 
 ## Verified specifics
 
@@ -85,24 +129,60 @@ linearly separable and perfect classification is impossible. The paper adds:
 > piecewise-linear activations (ReLU): the crucial property is monotonicity, not
 > differentiability."
 
-This confirms the prior notes' point 3 — monotonicity, not boundedness, is the
-operative property — in the paper's own words.
+**Correction to the attribution of this quote.** An earlier draft of this file
+cited this sentence as the paper stating that monotonicity rather than
+*boundedness* is the operative property. It does not say that. The sentence
+contrasts monotonicity with **differentiability**, and its purpose is to note
+that smooth activations (sigmoid, tanh) and piecewise-linear ones (ReLU) are
+alike obstructed. The word "boundedness" does not appear in the paper at all,
+and the four occurrences of "bounded" are all "width-bounded", referring to the
+CIFAR-10 CNN architecture. The paper is silent on boundedness as an activation
+property. The substantive point that monotonicity is the operative hypothesis
+stands — it is the stated hypothesis of Theorem 4.7 — but it must be sourced to
+the theorem statement, not to this sentence.
 
-**Corollary A.5** confirms the bottleneck reading: "The bottleneck dimension `d`
+## The activation comparison never varied the property the theory depends on
+
+This is the most consequential item in the reconciliation.
+
+The paper's ordering turns on **monotonic versus non-monotonic**. Our census
+tested tanh, ReLU, and leaky-ReLU. All three are continuous and coordinate-wise
+monotonic, so all three fall under the *same* hypothesis of Theorem 4.7 and
+occupy the *same* expressivity class in Table 1. Sigmoid and tanh are named in
+Theorem E.1's list of monotonic activations alongside ReLU and leaky-ReLU.
+
+It follows that the census's activation comparison never varied the property the
+theory depends on. Whatever separates tanh from ReLU and leaky-ReLU in our
+measurements, it is not a difference the paper's ordering predicts or explains,
+because the ordering assigns all three to one class. The boundedness observation
+in FINDINGS.md is therefore **orthogonal to the paper's ordering, not a
+refinement of it**. It may still be a real property of quantized tanh — bounded
+range interacts with fixed-point grids in ways unbounded activations do not —
+but it is a fact about quantization behavior, not about topological
+expressivity.
+
+Testing the paper's ordering would require a genuinely **non-monotonic**
+activation. The paper names GELU, Swish/SiLU, and Mish as the escape mechanisms
+(GELU appears 30 times, Swish 13, Mish 10), alongside residual folding and
+attention folds, and its own contrast experiments are ReLU versus GELU (Table 2)
+and plain versus ResNet (Table 3). A census that varies only among monotonic
+activations cannot speak to that contrast in either direction.
+
+**Corollary A.5** matches the bottleneck reading: "The bottleneck dimension `d`
 alone determines the topological constraint; the input dimension `n` is
 irrelevant."
 
-**Theorem 5.2** confirms the ResNet identity `|x| = x + 2 ReLU(-x)` and that the
+**Theorem 5.2** states the ResNet identity `|x| = x + 2 ReLU(-x)` and that the
 escape "relies crucially on discrete, non-infinitesimal residuals", so Neural
 ODE flows do not escape.
 
-**Table 8** (Appendix G.8) confirms the prior notes: width-3 depth-5, **best
+**Table 8** (Appendix G.8) agrees with the prior notes: width-3 depth-5, **best
 seed, 200 points per class**, no seed-level uncertainty. ReLU `d_min` collapses
 to 0.00 by L1 and the fractional link values 0.50 and 0.18 are starred as
 artifacts, with the paper stating "linking number is only defined for disjoint
 curves". GELU and ReLU+skip reach link 0 with `d_min` growing to 1.41 and 3.73.
 
-**Appendix H** confirms the point-cloud pipeline: PCA to `R^3`, ε-filtered k-NN
+**Appendix H** gives the point-cloud pipeline: PCA to `R^3`, ε-filtered k-NN
 graphs per class, fundamental cycle basis, Gauss integral over `O(β_X · β_Y)`
 basis pairs, ε "typically a percentile of nearest-neighbor distances".
 
