@@ -63,16 +63,25 @@ to separation anywhere in the completed grid:
 | Median fraction in outer decile | 1.000 | 0.300 |
 | Runs with **all** errors in outer decile | **4 of 7** | **0 of 10** |
 
-Both fail near the surface — this is a link, so the two tubes are closest there
-and errors concentrate accordingly. But the monotonic errors **reach deeper into
-the tube interior**: no monotonic run has all its errors in the outer decile,
-while four of seven GELU runs do, and the typical monotonic run has only about
-30% of its errors there against GELU's 100%.
+Both fail near the surface, and that shared concentration is **geometry rather
+than a shared failure mode**. These are linked tubes: the two components pass
+closest to each other near their surfaces, so any decision boundary threading
+between them runs nearest the data there, and errors from any cause will
+cluster toward the skin. The shared boundary concentration is therefore what the
+configuration forces and carries no information about mechanism. Reading it as
+"both activations fail the same way" would be the obvious objection and would
+be mistaken.
 
-This is evidence of a different failure mode rather than a worse version of the
-same one, but it is a difference of degree and is reported as such. The
+What distinguishes them is how far the errors **reach inward from** that forced
+concentration. No monotonic run has all its errors in the outer decile, while
+four of seven GELU runs do, and the typical monotonic run has about 30% of its
+errors there against GELU's 100%.
+
+This is a difference of degree, not of kind, and is reported as such. The
 monotonic failures are not confined to the boundary; neither are they uniformly
-distributed through the interior.
+distributed through the interior. The honest statement is that monotonic errors
+penetrate the tube interior in a way GELU's near-miss errors do not, against a
+shared baseline concentration that the link geometry imposes on both.
 
 ## The accuracy criterion and the median disagree everywhere
 
@@ -172,6 +181,58 @@ validated Gauss estimator, tubes embedded, tubes disjoint. The check rejected
 two draft configurations whose tubes overlapped once the second major radius was
 raised, with gaps −0.0000 and −0.0500; both were corrected by increasing the
 offset. All 12 configurations in the final grid are valid links.
+
+## Minimum errors per configuration
+
+The pooled headline could hide a configuration where the gap closes, so it is
+also reported per configuration. Minimum misclassified points out of 2,000, at
+width 3, n = 40 per activation:
+
+| Parametrization | GELU | tanh | ReLU | leaky-ReLU | Best monotonic | **Gap** |
+|---|---:|---:|---:|---:|---:|---:|
+| baseline | **0** | 54 | 53 | 52 | 52 | **52** |
+| thick_tube | **0** | 68 | 104 | 14 | 14 | **14** |
+| unequal_major | **0** | 34 | 35 | 36 | 34 | **34** |
+| asymmetric_tube | **0** | 32 | 28 | 18 | 18 | **18** |
+| asymmetric_both | **0** | 15 | 14 | 14 | 14 | **14** |
+| thin_tube | 1 | 10 | 11 | 12 | 10 | **9** |
+
+**The gap holds in every completed configuration.** GELU reaches exact
+separation in five of six; the smallest gap anywhere is 9 points, under
+`thin_tube`, which is also where GELU itself misses by 1. No configuration
+closes it.
+
+The gap varies widely in size — from 9 to 52 points — so its magnitude is
+parametrization-dependent even though its sign is not. `baseline` gives the
+largest gap of any configuration tested, which is worth noting: the original
+parametrization flatters the effect relative to the alternatives, and a reader
+should not take 52 as typical.
+
+## Fold layer: a prediction stated before the test
+
+The author's account is that an untweaked Hopf parametrization exposes the fold
+direction immediately after one affine map, which would make our layer-1 folding
+a property of the problem rather than of the network. The non-axis-aligned
+configurations — `rotated_30`, `rotated_generic`, and `generic` — are the
+tweaked case: their second core is rotated out of the coordinate planes, so no
+single input coordinate distinguishes the components.
+
+**Prediction under that account: fold layer should move later in the
+non-axis-aligned configurations.** If it stays at layer 1 across all three, the
+account does not explain the observation and something else is producing the
+immediacy.
+
+This is recorded before those configurations have finished training, so the
+result below is a test rather than a reading.
+
+**Measurability caveat.** Fold layer is only defined for runs that separate,
+which so far means GELU only — no monotonic run has separated at width 3 in any
+configuration. If a non-axis-aligned configuration produces no GELU
+separations, its fold layer is **unmeasurable**, which is not the same as absent
+and will be reported as such.
+
+Results are reported as a distribution across runs per configuration, not a
+single value.
 
 ## Still outstanding
 
