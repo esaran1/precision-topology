@@ -23,6 +23,11 @@ threshold is placed, and it survives the disagreement between accuracy criteria
 documented below, which would otherwise undercut any statement built on
 "fraction perfect".
 
+The gap holds in every configuration but varies in size from 9 to 52 points.
+**The representative figure is 14; `baseline`, the original parametrization, is
+the most favorable configuration tested at 52 and should not be quoted as
+typical.** See the per-configuration table below.
+
 **All 16 runs that come within 5 errors of separation are GELU.** Not one
 monotonic run appears in that set, across five completed parametrizations, four
 depths, and ten seeds each.
@@ -203,10 +208,56 @@ separation in five of six; the smallest gap anywhere is 9 points, under
 closes it.
 
 The gap varies widely in size — from 9 to 52 points — so its magnitude is
-parametrization-dependent even though its sign is not. `baseline` gives the
-largest gap of any configuration tested, which is worth noting: the original
-parametrization flatters the effect relative to the alternatives, and a reader
-should not take 52 as typical.
+parametrization-dependent even though its sign is not. **`baseline` gives the
+largest gap of any configuration tested**, so the original parametrization is
+the most favorable one in the grid and 52 should not be quoted as typical.
+
+**The representative figure is 14 points, with a range of 9 to 52.** Two of the
+six configurations sit at exactly 14 and it is close to the median of 16; the
+honest summary is that the best monotonic run misses separation by of order ten
+points where GELU reaches zero.
+
+### The gap and monotonic difficulty move together
+
+Sorted by how close the monotonic activations get to separation:
+
+| Parametrization | GELU min | Monotonic min | Gap |
+|---|---:|---:|---:|
+| thin_tube | 1 | 10 | 9 |
+| asymmetric_both | 0 | 14 | 14 |
+| thick_tube | 0 | 14 | 14 |
+| asymmetric_tube | 0 | 18 | 18 |
+| unequal_major | 0 | 34 | 34 |
+| baseline | 0 | 52 | 52 |
+
+The gap and the monotonic minimum rise together in perfect rank order. **Most of
+that agreement is definitional rather than empirical**: the gap is
+`monotonic_min − GELU_min`, and GELU's minimum is 0 in five of six
+configurations, so the gap simply *is* the monotonic minimum wherever GELU
+separates exactly. The Pearson correlation of 0.9997 mostly restates that
+identity and should not be reported as a finding.
+
+The substantive question is whether the monotonic minimum tracks instance
+difficulty measured some other way. Against two proxies that do not enter the
+gap's definition, the relationship is real but much weaker: the correlation with
+the width-4 monotonic perfect rate is +0.45, and with GELU's median error count
+at width 3 it is +0.21, both on six points.
+
+So the observation is: **configurations where monotonic activations come closer
+to separation are the same configurations where the gap narrows, and both appear
+to move with how hard the particular instance is, though the evidence that they
+track a single difficulty parameter is suggestive rather than settled.** No
+mechanism is offered here, and six configurations cannot support one.
+
+### Consequence for how the number should be quoted
+
+If this pattern holds through the remaining configurations, it follows that
+**the gap is not a fixed property of the activation class but a function of how
+hard the specific instance is.** Any single number quoted for it — 14, 52, or
+otherwise — is then a statement about our parametrization choices as much as
+about monotonic versus non-monotonic activations. The sign of the gap has been
+stable across everything tested; its magnitude has not, and should always be
+reported with the configuration that produced it.
 
 ## Fold layer: a prediction stated before the test
 
