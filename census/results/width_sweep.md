@@ -18,6 +18,31 @@ continuous and coordinate-wise monotonic and are a **robustness check within one
 expressivity class**, not a comparison. **GELU is non-monotonic** and is the
 only activation here that can bear on the paper's ordering.
 
+## Which accuracy is reported
+
+**Every accuracy in this document is held-out evaluation accuracy, never
+training accuracy.** "Perfect" means `final_eval_accuracy >= 1.0`.
+
+The evaluation split is generated from a different data seed than the training
+split (`20000 + seed` against `10000 + seed`), giving 2,000 evaluation points
+and 2,000 training points, balanced 1,000 per class in each. The two share no
+points: zero exact duplicates, and the nearest training point to any evaluation
+point is 5.78e−03 away (mean 0.0538). The training loss is computed only on the
+training split; the evaluation split is never used for the gradient, for early
+stopping, or for any model selection — the reported checkpoint is
+unconditionally the final step.
+
+The acceptance gate required **both**: exactly 100% training accuracy *and* at
+least 99% evaluation accuracy. The gate is separate from the "perfect" column,
+which is evaluation-only.
+
+The two quantities do differ in this sweep — 2,125 runs reach 1.0 on training
+against 1,958 on evaluation, with 167 runs perfect on training but not on
+evaluation — so the distinction is not academic. At width 3 the headline result
+is unchanged either way: on evaluation accuracy GELU has 6 perfect runs of 80
+and the monotonic activations 0 of 240; on training accuracy GELU has 7 and the
+monotonic activations still 0. The result rests on held-out accuracy.
+
 ## Accuracy distributions, n = 80 per width
 
 Counts, not means. Bands separate the two exact endpoints from the interior.
