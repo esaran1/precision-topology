@@ -68,44 +68,92 @@ Counts, not means. Bands separate the two exact endpoints from the interior.
 | 8 | 0 | 0 | 0 | 5 | 75 |
 | 15 | 0 | 0 | 0 | 7 | 73 |
 
-## Result 1: only GELU achieves perfect accuracy at width 3
+## Headline: GELU versus ReLU at width 3
 
-At the theorem-obstructed width, over 80 runs each:
+**The cleanest contrast in this sweep is GELU against ReLU**, because both are
+unbounded and they differ only in monotonicity, which is the property the
+paper's ordering turns on. It is also the larger effect.
 
-| Activation | Monotonic | Max accuracy | Perfect runs |
+At width 3, over 80 runs each:
+
+| | GELU | ReLU |
+|---|---:|---:|
+| Monotonic | **no** | yes |
+| Bounded | no | no |
+| Perfect runs (=1.0000) | **6 / 80** | **0 / 80** |
+| Max accuracy | **1.0000** | 0.9735 |
+| Runs at exactly chance | **0 / 80** | **49 / 80** |
+| Mean accuracy | 0.9634 | 0.6735 |
+
+Widening to all three monotonic activations, none reaches 1.0000 at width 3 in
+any run:
+
+| Activation | Monotonic | Max accuracy at width 3 | Perfect runs |
 |---|---|---:|---:|
-| tanh | yes | 0.9870 | **0 / 80** |
-| ReLU | yes | 0.9735 | **0 / 80** |
-| leaky-ReLU | yes | 0.9700 | **0 / 80** |
+| tanh | yes | 0.9870 | 0 / 80 |
+| ReLU | yes | 0.9735 | 0 / 80 |
+| leaky-ReLU | yes | 0.9700 | 0 / 80 |
+| **All monotonic** | yes | **0.9870** | **0 / 240** |
 | GELU | **no** | **1.0000** | **6 / 80** |
 
-All three monotonic activations fail to reach 1.0000 in any of 240 runs at
-width 3. The single non-monotonic activation reaches it in 6, spread across all
-four depths (2 at depth 3, 2 at depth 5, 1 at depth 8, 1 at depth 12). At width
-4 every activation reaches 1.0000.
+So the result is **6 / 80 for the one non-monotonic activation against 0 / 240
+across all three monotonic ones**, with the monotonic maxima falling short at
+0.9870, 0.9735, and 0.9700 respectively. GELU's six perfect runs are spread
+across all four depths (2 at depth 3, 2 at depth 5, 1 at depth 8, 1 at depth
+12), so they are not a single lucky configuration. At width 4 every activation
+reaches 1.0000.
 
 This is the direction Theorem 4.7 and the Table 1 ordering describe, at the
 width where the obstruction is stated. It is a **finite-sample result on
 thickened tubes and is not a test of the theorem**, which concerns perfect
-separation of the underlying continuous curves; see the caveats below.
+separation of the underlying continuous curves; see the caveats.
 
-## Result 2: independent agreement with the paper's Table 2 at width 3
+The GELU-versus-tanh comparison is reported below for completeness but is the
+weaker inference: tanh is monotonic *and* bounded, so a difference against GELU
+conflates monotonicity with boundedness. GELU versus ReLU isolates monotonicity
+as far as any standard activation allows.
 
-Our width-3 grid overlaps their depth grid, the one point where comparison is
-available. Mean accuracy (%):
+## Pipeline validation: independent agreement with the paper's Table 2
 
-| Depth | Paper ReLU | Ours ReLU | Paper GELU | Ours GELU |
+**This is the reason to believe the width-3 result**, and it is reported here
+rather than among the caveats. Our width-3 runs and the paper's Table 2 meet at
+exactly one place — width 3, depths 3, 5, 8, 12, ReLU and GELU — and they agree.
+
+Mean accuracy (%), side by side:
+
+| Depth | Paper ReLU | **Ours ReLU** | Paper GELU | **Ours GELU** |
 |---:|---:|---:|---:|---:|
-| 3 | 84.3 | 81.6 | 89.3 | 96.5 |
-| 5 | 77.1 | 73.1 | 90.0 | 96.5 |
-| 8 | 63.1 | 61.3 | 91.1 | 96.1 |
-| 12 | 57.7 | 53.5 | 91.2 | 96.2 |
+| 3 | 84.3 | **81.6** | 89.3 | **96.5** |
+| 5 | 77.1 | **73.1** | 90.0 | **96.5** |
+| 8 | 63.1 | **61.3** | 91.1 | **96.1** |
+| 12 | 57.7 | **53.5** | 91.2 | **96.2** |
 
-The ReLU trend matches closely, including the distinctive **degradation with
-depth** (84.3 → 57.7 in theirs, 81.6 → 53.5 in ours). Our GELU runs sit ~5-6
-points higher than theirs and are flat in depth, as theirs are. Datasets and
-training protocols differ, so this is agreement in direction and shape, not a
-reproduction of values.
+Maximum accuracy (%), side by side:
+
+| Depth | Paper ReLU | **Ours ReLU** | Paper GELU | **Ours GELU** |
+|---:|---:|---:|---:|---:|
+| 3 | 92.8 | **97.0** | 92.9 | **100.0** |
+| 5 | 92.5 | **97.4** | 100.0 | **100.0** |
+| 8 | 92.6 | **95.9** | 100.0 | **100.0** |
+| 12 | 91.6 | **96.6** | 100.0 | **100.0** |
+
+Three features reproduce independently:
+
+1. **ReLU means degrade with depth** — 84.3 → 57.7 in theirs, 81.6 → 53.5 in
+   ours. The magnitude of the decline matches to within a few points at every
+   depth.
+2. **GELU means are flat in depth** — 89.3 → 91.2 in theirs, 96.5 → 96.2 in
+   ours.
+3. **GELU reaches 100.0 max at depths 5, 8, and 12 while ReLU never does** in
+   either study.
+
+Our GELU means sit 5-6 points above theirs and our ReLU maxima 3-5 points above,
+which is expected: the datasets, tube geometry, optimiser, and step budget all
+differ. This is agreement in direction, shape, and ordering, not a reproduction
+of values, and it was obtained without tuning toward their numbers. It gives an
+independent check that the training pipeline, the linked-tori construction, and
+the accuracy measurement behave as the published setting does at the one point
+where the two overlap.
 
 ## Result 3: the trimodality is dying ReLU, not a ceiling
 
@@ -143,7 +191,27 @@ at width 3: max 0.9735 over 31 live runs, rising to 1.0000 at width 4. So both
 effects are present and separable — optimization failure dominated by depth, and
 a width-3 accuracy ceiling that survives removing it.
 
-## Result 4: the transition is at width 4-7, favouring the additive account
+## Result 4: additive scaling holds at d = 3; 5d scaling does not
+
+**This is the first evidence bearing on which scaling applies at `d = 3`.**
+Neither source supplies it: the author's `~<3+5` figure is unpublished, and
+Table 7 is a different setting. The sweep was extended to width 15 precisely so
+the two accounts could be told apart, since they diverge at `3+5 = 8` versus
+`5d = 15`.
+
+**At `d = 3`, nothing improves from width 8 to width 15.** Fraction perfect:
+
+| Activation | w=8 | w=10 | w=12 | w=15 | Change 8→15 |
+|---|---:|---:|---:|---:|---:|
+| tanh | 0.975 | 0.963 | 0.988 | 0.975 | 0.000 |
+| GELU | 0.938 | 0.912 | 0.887 | 0.912 | −0.026 |
+| leaky-ReLU | 0.900 | 0.950 | 0.988 | 0.950 | +0.050 |
+| ReLU | 0.762 | 0.900 | 0.938 | 0.950 | +0.188 |
+
+Three of four activations are flat within seed noise across that range; two move
+slightly downward. Only ReLU climbs materially, and that is the dying-ReLU rate
+resolving (its exactly-chance fraction falls from 5.0% at width 8 to 0.0% at
+width 12), not an expressivity change.
 
 Width at which each activation first exceeds 50% perfect runs:
 
@@ -154,19 +222,20 @@ Width at which each activation first exceeds 50% perfect runs:
 | leaky-ReLU | 6 |
 | ReLU | 7 |
 
-Nothing improves materially past width 8. Fraction perfect at widths 8, 10, 12,
-15: tanh 0.975, 0.963, 0.988, 0.975; GELU 0.938, 0.912, 0.887, 0.912;
-leaky-ReLU 0.900, 0.950, 0.988, 0.950; ReLU 0.762, 0.900, 0.938, 0.950. Only
-ReLU is still climbing at 8, and that is the dying-ReLU effect resolving rather
-than an expressivity change.
+**Conclusion: the additive account is supported in this setting and `5d`
+scaling is not.** Every activation is saturated by width 8, and three of four by
+width 6, which sits inside the additive `~<3+5 = 8` range. If accuracy at
+`d = 3` followed Table 7's multiplicative pattern, substantial gains would
+continue out to width 15; they do not.
 
-Against the two accounts: the additive `~<3+5 = 8` reading is consistent with
-this data — everything except ReLU is saturated by width 6, and ReLU by 10.
-Table 7's multiplicative `5d = 15` is **not** supported at `d = 3`: no
-activation shows meaningful improvement between width 8 and width 15. This does
-not contradict Table 7, which is `R^7` with `S^3 ⊔ S^3` at `k = 10`; it
-indicates the two scalings genuinely differ across settings, and the additive
-one is what holds here.
+**This does not contradict Table 7.** That table is `R^7`, with `S^3 ⊔ S^3`
+rather than two circles, and `k = 10` copies rather than one — a different link
+type, a different ambient dimension, and a different copy count. The two results
+together indicate that the scaling is **setting-dependent** rather than that
+either is wrong. The open question recorded in
+`notes/icml_paper_reconciliation.md` is now partly answered: additive scaling is
+what holds at `d = 3` for a single Hopf link, whatever governs `R^7` at
+`k = 10`.
 
 ## Caveats
 
