@@ -15,6 +15,55 @@ refused unless train and evaluation accuracy reproduce exactly.
 At the input the estimator returns −1.000025, rounding to **−1**, with minimum
 inter-curve distance 1.000000.
 
+## The central result: disjointness is what makes these six runs mean something
+
+Linking number reaching 0 is not by itself evidence of anything. There are two
+ways to get there, and they mean opposite things.
+
+**Destroy the geometry.** Drive the two curves into each other. Once they
+intersect, the linking number is undefined, and any value the Gauss integral
+returns is a numerical artifact. Nothing has been unlinked; the configuration
+has simply been ruined, and no downstream layer can recover a separation from
+it because an intersection propagates.
+
+**Perform a fold.** Move the curves past each other while they remain disjoint.
+Linking changes from −1 to 0 and stays defined throughout. This is the operation
+that permits linear separation, and it is what a non-monotonic activation makes
+available.
+
+The two are distinguished by exactly one quantity: **minimum inter-curve
+distance, which must stay strictly positive**. In all six GELU runs it does, at
+every layer, dipping to 0.098-0.157 where the fold occurs at layer 1 and then
+**growing to 2.28, 2.40, 3.48, 4.28, 4.74, and 5.53** at the output, against an
+input value of 1.000. The curves separate further and further after the fold.
+That trajectory — dip, then sustained growth — is the fold signature, and it is
+the reason these six runs are informative rather than merely lucky.
+
+The monotonic activations do not produce it. The contrast is direct:
+
+| | GELU (non-monotonic) | ReLU (monotonic) |
+|---|---|---|
+| Runs where curves intersect outright | **0 / 20 (0%)** | **15 / 20 (75%)** |
+| Hidden layers with a reportable value | **25.0%** | **0.0%** |
+| Hidden layers where curves have met | **0.0%** | **61.4%** |
+| Minimum distance at layer 1 (mean) | 0.03202 | 0.00207 |
+| Minimum distance at layer 1 (min) | 0.00073 | **0.00000** |
+
+The important reading is not that the monotonic activations fail to unlink. It
+is stronger than that: **they fail to maintain disjointness while attempting
+it.** ReLU never yields a reportable linking value at any layer of any run,
+because by the time its linking number would have changed, the two curves are
+already touching. Three quarters of its runs end with an outright intersection.
+tanh and leaky-ReLU sit between the two extremes, intersecting in 15% and 10%
+of runs and reportable at 3.6% and 2.1% of layers, but they are far closer to
+ReLU than to GELU.
+
+This is the distinction Ren and Lim draw in their Table 8 interpretation, where
+ReLU's fractional link values at layers 0 and 1 are starred as artifacts of the
+integral becoming ill-conditioned as minimum distance approaches zero, rather
+than treated as partial unlinking. Our measurement reproduces that behaviour
+across many runs.
+
 ## Reportability is a result, not missing data
 
 A linking value is quoted only when the curves are disjoint **and** the minimum
@@ -164,10 +213,45 @@ been driven into each other. Ren and Lim report the same qualitative shape for
 GELU and ReLU+skip in Table 8: link reaching 0 with minimum distance dipping and
 then rising steadily.
 
-The distinction matters because it separates two ways of reaching link 0. One
-destroys the geometry, so the invariant stops being defined; the other performs
-a fold, so the invariant changes while remaining defined. Only the latter is
-consistent with perfect classification, and only GELU produces it here.
+### The change happens at layer 1 regardless of available depth
+
+All six runs change linking at **layer 1**, whether the network has 3, 5, 8, or
+12 layers to work with. The topological work is done immediately rather than
+distributed across the available depth, and the remaining layers are spent
+increasing separation: minimum distance climbs from its smallest value to the
+output in every run, by factors of 15.6x, 16.3x, 27.3x, 36.6x, 40.4x, and
+93.8x.
+
+This is recorded as an observation, not an explanation. **No mechanism is
+offered**, and it rests on six runs, all from a single activation at a single
+width. Whether the immediacy is a property of the fold operation, of the
+optimiser, of this initialisation, or of the particular geometry here is not
+determined by this measurement. It would be worth checking against a larger
+sample and against non-monotonic activations other than GELU before any weight
+is put on it.
+
+### Relation to Table 8
+
+This measurement is stronger than Table 8 in one specific respect: **it reports
+20 runs per activation with a calibrated noise floor and an explicit
+undefined-rate, where Table 8 reports a single best seed.**
+
+That is a difference in purpose, not a deficiency in the original. Table 8 is
+presented as a mechanistic illustration — its role in the paper is to show what
+the impossibility theorem looks like layer by layer in a concrete network, and
+one clearly annotated trace does that job. It also does the most important
+thing correctly: it stars the fractional ReLU values as artifacts and states
+that linking number is only defined for disjoint curves, which is the exact
+point our artifact threshold operationalises.
+
+What the additional runs add is the ability to say how often each behaviour
+occurs rather than that it can occur. The 75% intersection rate for ReLU, the
+0% for GELU, the 0.0% versus 25.0% reportability, and the seed-level dispersion
+underlying them are quantities a single trace cannot supply. The calibrated
+noise floor (1.65e−04 at 200 points, with the estimator surviving jitter to 20%
+of curve radius) additionally lets a value be called converged rather than
+merely plausible, which matters when the claim is that a number equals an
+integer.
 
 ## Reportable linking values at width 3
 
