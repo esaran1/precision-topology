@@ -1,32 +1,47 @@
 # Parametrization sensitivity of the width-3 result
 
-Status: **partial — 6 of 12 configurations complete** (2,000 of 3,840 runs). The
-three non-axis-aligned configurations, which are the furthest from the
-handcrafted case the objection describes, are still running and are reported
-when they land. Everything below is held-out evaluation accuracy on 2,000
-points, seeds recorded per run in `parametrization_sweep.csv`.
+Status: **complete — 12 of 12 configurations, 3,840 runs.** Everything below is
+held-out evaluation accuracy on 2,000 points, seeds recorded per run in
+`parametrization_sweep.csv`.
+
+> **Final grid summary.** Across all 12 parametrizations at width 3: **33 GELU
+> separations, 0 monotonic separations out of 1,440 monotonic runs.** No
+> monotonic activation reached exact separation in any configuration. The three
+> non-axis-aligned configurations — the ones furthest from the handcrafted case
+> — separate *more* readily than the baseline, not less. Fold layer is at layer
+> 1 in 32 of 33 separating runs, including all 13 non-axis-aligned ones, which
+> does **not** match the prediction registered below.
 
 ## Headline: minimum errors, which needs no threshold
 
 **GELU reaches 0 misclassified points at width 3. No monotonic run gets within
 10 points of separation, on a 2,000-point evaluation set.**
 
-| Activation | Monotonic | Best run (min errors) | Median errors |
+Pooled over all 12 configurations, 480 runs per activation at width 3:
+
+| Activation | Monotonic | Best run (min errors) | Separations (0 errors) |
 |---|---|---:|---:|
-| **GELU** | **no** | **0** | 56.0 |
-| tanh | yes | 10 | 67.5 |
-| ReLU | yes | 11 | 1000.0 |
-| leaky-ReLU | yes | 12 | 68.5 |
+| **GELU** | **no** | **0** | **33 / 480** |
+| tanh | yes | 9 | **0 / 480** |
+| ReLU | yes | 11 | **0 / 480** |
+| leaky-ReLU | yes | 11 | **0 / 480** |
+
+**All 46 runs within 5 errors of separation are GELU.** The width 3→4 boundary
+also holds across the full grid: at width 4 every activation separates, with
+315, 209, 55, and 10 perfect runs of 480 for GELU, tanh, leaky-ReLU, and ReLU
+respectively.
 
 This is the criterion-free form of the claim. It does not depend on where a
 threshold is placed, and it survives the disagreement between accuracy criteria
 documented below, which would otherwise undercut any statement built on
 "fraction perfect".
 
-The gap holds in every configuration but varies in size from 9 to 52 points.
-**The representative figure is 14; `baseline`, the original parametrization, is
-the most favorable configuration tested at 52 and should not be quoted as
-typical.** See the per-configuration table below.
+Across the full grid the gap is positive in 11 of 12 configurations, ranging
+from 9 to 56 points with a median of 18 among the ten where any activation
+separates. **`baseline`, the original parametrization, sits near the top of that
+range at 52 and should not be quoted as typical.** The twelfth configuration,
+`far_offset`, defeats every activation at width 3 and is discussed below. See
+the per-configuration table.
 
 **All 16 runs that come within 5 errors of separation are GELU.** Not one
 monotonic run appears in that set, across five completed parametrizations, four
@@ -193,19 +208,48 @@ The pooled headline could hide a configuration where the gap closes, so it is
 also reported per configuration. Minimum misclassified points out of 2,000, at
 width 3, n = 40 per activation:
 
-| Parametrization | GELU | tanh | ReLU | leaky-ReLU | Best monotonic | **Gap** |
-|---|---:|---:|---:|---:|---:|---:|
-| baseline | **0** | 54 | 53 | 52 | 52 | **52** |
-| thick_tube | **0** | 68 | 104 | 14 | 14 | **14** |
-| unequal_major | **0** | 34 | 35 | 36 | 34 | **34** |
-| asymmetric_tube | **0** | 32 | 28 | 18 | 18 | **18** |
-| asymmetric_both | **0** | 15 | 14 | 14 | 14 | **14** |
-| thin_tube | 1 | 10 | 11 | 12 | 10 | **9** |
+**The gap and the monotonic minimum are reported as one column, not two.**
+Wherever GELU separates exactly its minimum is 0, so the gap
+(`monotonic_min − GELU_min`) and the monotonic minimum are *the same number*.
+Presenting them side by side would invite reading a correlation between them as
+a finding when it is an identity. The single column below is the monotonic
+minimum, which equals the gap in every row where GELU's minimum is 0; the one
+row where it does not is marked.
 
-**The gap holds in every completed configuration.** GELU reaches exact
-separation in five of six; the smallest gap anywhere is 9 points, under
-`thin_tube`, which is also where GELU itself misses by 1. No configuration
-closes it.
+| Parametrization | Aligned | GELU min | tanh | ReLU | leaky-ReLU | **Monotonic min (= gap)** |
+|---|---|---:|---:|---:|---:|---:|
+| baseline | yes | **0** | 54 | 53 | 52 | **52** |
+| oblique_offset | yes | **0** | 35 | 55 | 63 | **35** |
+| unequal_major | yes | **0** | 34 | 35 | 36 | **34** |
+| asymmetric_tube | yes | **0** | 32 | 28 | 18 | **18** |
+| thick_tube | yes | **0** | 68 | 104 | 14 | **14** |
+| asymmetric_both | yes | **0** | 15 | 14 | 14 | **14** |
+| near_offset | yes | **0** | 47 | 56 | 11 | **11** |
+| **rotated_30** | **no** | **0** | 60 | 56 | 59 | **56** |
+| **rotated_generic** | **no** | **0** | 15 | 58 | 54 | **15** |
+| **generic** | **no** | **0** | 9 | 41 | 40 | **9** |
+| thin_tube | yes | 1 | 10 | 11 | 12 | 10 → gap 9 |
+| far_offset | yes | 33 | 56 | 25 | 47 | 25 → **gap −8** |
+
+**GELU reaches exact separation in 10 of 12 configurations. No monotonic
+activation reaches it in any configuration**, across 1,440 monotonic runs at
+width 3.
+
+The gap is positive in 11 of 12. The exception is `far_offset`, and it is not a
+case where monotonic activations separate: **no activation separates there**.
+GELU's best run misses by 33 points and ReLU's by 25, so the −8 is a comparison
+between two failures. It should not be read as a configuration where the
+monotonic activations succeed and GELU does not — neither does. `far_offset` and
+`thin_tube` are the two configurations where width 3 defeats every activation
+tested.
+
+Restricting to the 10 configurations where separation occurs at all, the gap
+ranges from **9 to 56** with a median of 18.
+
+The three non-axis-aligned configurations behave like the rest: GELU separates
+in all three, with gaps of 9, 15, and 56. `generic`, the configuration furthest
+from the baseline in every parameter simultaneously, produced **7 GELU
+separations — more than any other configuration in the grid**.
 
 The gap varies widely in size — from 9 to 52 points — so its magnitude is
 parametrization-dependent even though its sign is not. **`baseline` gives the
@@ -217,31 +261,32 @@ six configurations sit at exactly 14 and it is close to the median of 16; the
 honest summary is that the best monotonic run misses separation by of order ten
 points where GELU reaches zero.
 
-### The gap and monotonic difficulty move together
+### How the single quantity varies across configurations
 
-Sorted by how close the monotonic activations get to separation:
+Because the gap and the monotonic minimum are one quantity here, the question is
+not whether they correlate — they are identical wherever GELU separates — but
+whether that **one** quantity tracks how hard the instance is, measured
+independently.
 
-| Parametrization | GELU min | Monotonic min | Gap |
+Sorted by that quantity:
+
+| Parametrization | Monotonic min (= gap) | Width-4 monotonic perfect rate | GELU median errors |
 |---|---:|---:|---:|
-| thin_tube | 1 | 10 | 9 |
-| asymmetric_both | 0 | 14 | 14 |
-| thick_tube | 0 | 14 | 14 |
-| asymmetric_tube | 0 | 18 | 18 |
-| unequal_major | 0 | 34 | 34 |
-| baseline | 0 | 52 | 52 |
+| thin_tube | 10 | 0.083 | 24.0 |
+| asymmetric_both | 14 | 0.150 | 27.5 |
+| thick_tube | 14 | 0.217 | 113.5 |
+| asymmetric_tube | 18 | 0.175 | 57.5 |
+| unequal_major | 34 | 0.233 | 48.0 |
+| baseline | 52 | 0.183 | 73.5 |
 
-The gap and the monotonic minimum rise together in perfect rank order. **Most of
-that agreement is definitional rather than empirical**: the gap is
-`monotonic_min − GELU_min`, and GELU's minimum is 0 in five of six
-configurations, so the gap simply *is* the monotonic minimum wherever GELU
-separates exactly. The Pearson correlation of 0.9997 mostly restates that
-identity and should not be reported as a finding.
+Neither proxy enters the gap's definition. Against them the relationship is real
+but weak: **+0.45** with the width-4 monotonic perfect rate and **+0.21** with
+GELU's median error count at width 3, both on six points.
 
-The substantive question is whether the monotonic minimum tracks instance
-difficulty measured some other way. Against two proxies that do not enter the
-gap's definition, the relationship is real but much weaker: the correlation with
-the width-4 monotonic perfect rate is +0.45, and with GELU's median error count
-at width 3 it is +0.21, both on six points.
+For the record of what was *not* found: correlating the gap against the
+monotonic minimum directly gives 0.9997, and that number is an artifact of the
+two being the same quantity. It is recorded here only so that a reader who
+computes it is not misled into treating it as evidence.
 
 So the observation is: **configurations where monotonic activations come closer
 to separation are the same configurations where the gap narrows, and both appear
@@ -285,9 +330,53 @@ and will be reported as such.
 Results are reported as a distribution across runs per configuration, not a
 single value.
 
-## Still outstanding
+### Fold-layer result
 
-`near_offset`, `far_offset`, `oblique_offset`, `rotated_30`, `rotated_generic`,
-and `generic`. The last three break the coordinate-plane alignment and are the
-configurations furthest from the handcrafted case. Fold-layer results for
-successful width-3 runs are also pending.
+The prediction above is unchanged from when it was written, before these
+configurations finished training.
+
+| Parametrization | Axis-aligned | Separating runs | Fold layers |
+|---|---|---:|---|
+| baseline | yes | 2 | L1 ×2 |
+| thick_tube | yes | 2 | L1 ×2 |
+| thin_tube | yes | 0 | **unmeasurable** |
+| unequal_major | yes | 3 | L1 ×3 |
+| asymmetric_tube | yes | 2 | L1 ×2 |
+| asymmetric_both | yes | 3 | L1 ×3 |
+| near_offset | yes | 5 | L1 ×5 |
+| far_offset | yes | 0 | **unmeasurable** |
+| oblique_offset | yes | 3 | L1 ×3 |
+| **rotated_30** | **no** | 4 | **L1 ×4** |
+| **rotated_generic** | **no** | 2 | **L1 ×2** |
+| **generic** | **no** | 7 | **L1 ×6, L2 ×1** |
+
+**Fold occurs at layer 1 in 32 of 33 separating runs (97%).** Splitting by
+alignment: all 20 axis-aligned separations fold at layer 1, and 12 of 13
+non-axis-aligned separations do, the exception being one `generic` run at depth
+12 that folds at layer 2.
+
+**The prediction is not borne out.** Under the author's account, rotating the
+second core out of the coordinate planes should push the fold later, because no
+single input coordinate then exposes the direction. It does not: the
+non-axis-aligned configurations fold at layer 1 essentially as often as the
+axis-aligned ones (mean fold layer 1.077 against 1.000).
+
+So the account does not explain the layer-1 immediacy we observe. Removing the
+coordinate-plane alignment — the specific property that makes the baseline
+"handcrafted and simple" — leaves the immediacy intact. Something other than the
+fold direction being exposed by the input parametrization is producing it, and
+this measurement does not identify what. Two possibilities it cannot separate:
+the fold may be cheap for a width-3 affine map to find under any parametrization
+of this link, or the immediacy may be a property of the optimiser rather than of
+the geometry.
+
+The single exception is instructive rather than noise. In `generic` at depth 12,
+seed 7, linking is still −1 at layer 1 (minimum distance 0.300) and reaches 0 at
+layer 2 (minimum distance 0.151), with the curves disjoint throughout and
+minimum distance rising to 2.248 by the output. That is a genuine two-layer
+fold, so later folding is possible; it is simply rare.
+
+**Two configurations have unmeasurable fold layers**, not absent ones:
+`thin_tube` and `far_offset` produced no width-3 separations by any activation,
+so there is no separating run to trace. This is reported as unmeasurable
+because the quantity is undefined there, not because folding failed to occur.
