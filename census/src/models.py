@@ -10,7 +10,13 @@ from torch import nn
 from torch.nn import functional as F
 
 
-ActivationName = Literal["tanh", "relu", "leaky_relu"]
+ActivationName = Literal["tanh", "relu", "leaky_relu", "gelu"]
+
+# tanh, ReLU, and leaky-ReLU are all continuous and coordinate-wise monotonic,
+# so under Ren and Lim they occupy a single expressivity class; GELU is
+# non-monotonic and is the only activation here that can bear on that ordering.
+MONOTONIC_ACTIVATIONS = ("tanh", "relu", "leaky_relu")
+NONMONOTONIC_ACTIVATIONS = ("gelu",)
 
 # nn.Linear.reset_parameters calls kaiming_uniform_(a=sqrt(5)) for weights and
 # uniform_(-1/sqrt(fan_in), 1/sqrt(fan_in)) for biases. No reset or rescaling is
@@ -38,7 +44,7 @@ class MLP(nn.Module):
             raise ValueError("input_dim and output_dim must be positive")
         if hidden_depth <= 0 or hidden_width <= 0:
             raise ValueError("hidden_depth and hidden_width must be positive")
-        if activation not in ("tanh", "relu", "leaky_relu"):
+        if activation not in MONOTONIC_ACTIVATIONS + NONMONOTONIC_ACTIVATIONS:
             raise ValueError(f"unsupported activation: {activation}")
 
         dimensions = [input_dim] + [hidden_width] * hidden_depth
@@ -58,6 +64,8 @@ class MLP(nn.Module):
             return torch.tanh(values)
         if self.activation_name == "relu":
             return F.relu(values)
+        if self.activation_name == "gelu":
+            return F.gelu(values)
         return F.leaky_relu(values, negative_slope=0.01)
 
     @overload
