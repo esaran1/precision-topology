@@ -31,9 +31,12 @@ parametrizations, four depths, ten seeds, and three monotonic activations —
 misses separation by 9 points out of 2,000. **All 46 runs that come within 5
 errors of separation are GELU.**
 
-The width 3→4 boundary also holds throughout. At width 4 every activation
-separates: 315, 209, 55, and 10 perfect runs of 480 for GELU, tanh, leaky-ReLU,
-and ReLU.
+The width 3→4 boundary also holds throughout, in the sense that every
+activation reaches separation *in at least one run* at width 4 where none of the
+monotonic ones ever does at width 3. That is not the same as every activation
+succeeding at width 4: of 480 runs each, GELU separates 315 times, tanh 209,
+leaky-ReLU 55, and **ReLU only 10 (2.08%)**. ReLU is not reliably trainable to
+perfect accuracy at width 4 here.
 
 ## 2. GELU separates in ten of twelve, including all three non-axis-aligned
 
@@ -244,9 +247,11 @@ Pooled over all 12 configurations, 480 runs per activation at width 3:
 | leaky-ReLU | yes | 11 | **0 / 480** |
 
 **All 46 runs within 5 errors of separation are GELU.** The width 3→4 boundary
-also holds across the full grid: at width 4 every activation separates, with
-315, 209, 55, and 10 perfect runs of 480 for GELU, tanh, leaky-ReLU, and ReLU
-respectively.
+also holds across the full grid, in the sense that each activation separates in
+at least one width-4 run where no monotonic activation ever separates at width
+3. Success rates at width 4 differ sharply and should not be read as uniform:
+of 480 runs each, GELU separates 315 times, tanh 209, leaky-ReLU 55, and **ReLU
+only 10 (2.08%)**.
 
 This is the criterion-free form of the claim. It does not depend on where a
 threshold is placed, and it survives the disagreement between accuracy criteria

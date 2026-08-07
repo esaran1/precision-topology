@@ -125,8 +125,16 @@ So the result is **6 / 80 for the one non-monotonic activation against 0 / 240
 across all three monotonic ones**, with the monotonic maxima falling short at
 0.9870, 0.9735, and 0.9700 respectively. GELU's six perfect runs are spread
 across all four depths (2 at depth 3, 2 at depth 5, 1 at depth 8, 1 at depth
-12), so they are not a single lucky configuration. At width 4 every activation
-reaches 1.0000.
+12), so they are not a single lucky configuration.
+
+At width 4 every activation reaches 1.0000 **in at least one run**, which is not
+the same as every activation succeeding at width 4 — and the distinction
+matters. The per-activation rates at width 4 are GELU 67.50%, tanh 51.25%,
+leaky-ReLU 6.25%, and **ReLU 2.50% (2 runs of 80)**, with ReLU additionally at
+exactly chance in 45.00% of runs. ReLU cannot be reliably trained to perfect
+accuracy at width 4 in this setup; it merely does so occasionally. Earlier
+wording here said "at width 4 every activation reaches 1.0000" without that
+qualification and overstated the result.
 
 This is the direction Theorem 4.7 and the Table 1 ordering describe, at the
 width where the obstruction is stated. It is a **finite-sample result on
