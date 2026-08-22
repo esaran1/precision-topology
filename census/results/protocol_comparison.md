@@ -155,6 +155,42 @@ Per activation, minimum errors at width 3:
 **GELU stayed floored while the monotonic activations got further from
 separation.** The best monotonic run went from 26 misclassified points to 42.
 
+#### That 26 is one lucky run, and the caveat matters
+
+The minimum over `n` runs is an extreme-value statistic: it moves with `n` and
+with luck, and `n` differs between the protocols (80 against 120). tanh is the
+only activation whose minimum got *worse* under their protocol, and it is also
+the activation setting the best-monotonic figure under ours, so it was checked
+directly.
+
+tanh at width 3, full distribution rather than the minimum:
+
+| Protocol | n | min | p10 | p25 | median | p75 | max |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ours | 80 | **26** | 65 | 71 | 78 | 92 | 561 |
+| Theirs | 120 | **44** | 57 | 62 | 73 | 85 | 539 |
+
+**The distribution moved the other way.** Their protocol is slightly *better* for
+tanh at every percentile — median 73 against 78, p10 57 against 65 — while its
+minimum is worse. Only the extreme moved in the direction the minimum suggests.
+
+The 26 is a single outlier. Ours: 26, then 49, 56, 57, … — a **23-point gap**
+between best and second-best. Theirs: 44, then 46, 48, 48, … — a **2-point
+gap**. Drawing 80 runs from their 120 at random, 2,000 times, the median
+resampled minimum is 44 and the probability of seeing a minimum at or below 26
+is **0.0000**. Excluding that one run, our tanh minimum is 49, which is *worse*
+than their 44.
+
+So the best-monotonic comparison of 26 against 42 is driven by one lucky run
+under our protocol and should not be read as a protocol effect. **The honest
+statement is that monotonic performance is essentially unchanged between the
+protocols — slightly better under theirs by distribution — and that no monotonic
+run separates under either.** The zero is the robust part; the minimum is not.
+
+This does not affect the interpretation above. GELU is floored at 0 under both
+protocols while no monotonic run reaches separation under either, and that
+comparison does not depend on where the monotonic minimum happens to fall.
+
 This is a stronger statement than the gap framing allowed. Under a protocol that
 **measurably makes GELU separate less often** (see below), the monotonic
 activations still never separate, and their closest approach gets worse. Pure

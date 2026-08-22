@@ -4,6 +4,27 @@
 > Theorem 4.7 invariant.** These results must never be placed in a table with
 > the width-3 results in `linking_width3.md`, which are exact.
 
+> ### Start here: `figures/projections/self_inconsistent_cell.png`
+>
+> One figure carries the main lesson of this document. It shows a **single
+> representation** — `leaky_relu`, width 15, depth 3, seed 0, final layer —
+> under six projections, and the same configuration returns **link 0, −1, and
+> +1** depending on which three components are chosen.
+>
+> The picture makes the mechanism legible without reference to any number: the
+> panels returning ±1 are visibly tangled with the two curves nearly touching
+> (projected distance 0.14–0.16), while every panel returning 0 shows two
+> cleanly separated components (2.7–6.5). The nonzero values come from
+> projections that crush the configuration, not from projections that reveal
+> hidden structure.
+>
+> Other figures in `figures/projections/`: `width8_{tanh,relu,leaky_relu,gelu}.png`
+> for a representative set across activations, and `input_reference.png` for the
+> unprojected Hopf link as a reference of what a clean link looks like.
+>
+> A conclusion withdrawn on the strength of this and the measurements in
+> `cancellation_control.md` is marked inline below.
+
 ## Why this document is separate
 
 For two one-dimensional curves, `m = n = 1`, and the complementary-dimension
