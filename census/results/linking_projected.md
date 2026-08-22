@@ -174,8 +174,13 @@ a regime where most projections cancel, every observation in that cell returns 0
 **uniformly**. Perfect uniformity is therefore consistent with systematic
 cancellation, not only with absence, and cannot distinguish them.
 
-**3. Two circles in `R^4` and above are always unlinked.** This argument
-stands, and is now the only support remaining. This is the standard
+**3. Two circles in `R^4` and above are always unlinked.** This argument is
+**theoretical, not empirical**, and is not support for the null. It is a
+statement about the ambient dimension that would hold whatever our estimator
+returned, so treating it as corroboration would be circular. The accurate
+position is that **the projected analysis cannot currently distinguish absence
+from cancellation**, and the theoretical expectation happens to point the same
+way. This is the standard
 fact the paper's introduction invokes — "any knot is equivalent to an unknot in
 `R^4`" — and it applies to links of circles equally: the extra dimension permits
 any crossing to be undone by an ambient isotopy. At hidden width 4 or more, the
@@ -200,10 +205,12 @@ What survives is the accuracy boundary and the minimum-distance measurements,
 the latter taken in each layer's **native** space before any projection and so
 untouched by the cancellation problem. The projected linking row is withdrawn.
 
-The remaining support for treating the obstruction as a width-3 phenomenon is
-therefore the accuracy boundary together with the topological fact that two
-circles in `R^4` and above are always unlinked — not a linking measurement in
-the wider layers, which this study cannot make reliably.
+The only **empirical** support for treating the obstruction as a width-3
+phenomenon is therefore the accuracy boundary. The topological fact that two
+circles in `R^4` and above are always unlinked points the same way, but it is a
+prior expectation about the ambient dimension rather than a measurement, and
+should not be counted as evidence. No reliable linking measurement in the wider
+layers is available from this study.
 
 ## Layer of change
 

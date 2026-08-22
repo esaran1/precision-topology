@@ -3,6 +3,14 @@
 **Outcome: cancellation is real, reproducible, and frequent. The uniform-zero
 conclusion in `linking_projected.md` does not hold and is withdrawn.**
 
+> **The single most important number here: the Hopf link with `|lk| = 1` — the
+> exact configuration our original fidelity control used — returns a clean
+> integer 0 in 17–23% of random projections once the embedding is distorted.**
+> That control reported 150 of 150 recoveries because it embedded by *rigid
+> rotation*, and rigid maps preserve precisely the structure that cancellation
+> destroys. The control was not merely weak; it was constitutionally unable to
+> detect the failure mode it was meant to rule out.
+
 ## What was tested
 
 The author's concern is that projecting to `R^3` creates self-intersections, so
@@ -99,24 +107,62 @@ resting on three arguments. Two of them no longer hold:
    0 uniformly. Uniformity is consistent with systematic cancellation, not only
    with absence.
 
-The third argument stands unchanged and is now the only support remaining:
+The third argument is **theoretical, not empirical**, and must not be presented
+as remaining support for the null:
 
-3. **Two circles in `R^4` and above are always unlinked.** This is a topological
-   fact independent of any measurement, and it still implies that nothing is
-   linked in the wider layers.
+3. **Two circles in `R^4` and above are always unlinked.** This is a statement
+   about the ambient dimension. It is not evidence about our measurement, and it
+   would be true whatever our estimator returned. Treating it as support for the
+   null would be circular: it is a prior expectation, not a result.
 
-**The projected zeros therefore cannot be used as evidence.** The conclusion
-that the obstruction is a width-3 phenomenon now rests on the accuracy boundary
-and on the `R^4` unknotting fact alone, not on the projected linking
-measurement. The width-3 results in `linking_width3.md` are unaffected: they are
-exact, unprojected, and in the dimension where the invariant is defined.
+**The accurate position is that the projected analysis cannot currently
+distinguish absence from cancellation.** The theoretical expectation happens to
+point the same way, which is reassuring but is not corroboration — a measurement
+that cannot discriminate between two hypotheses provides no evidence for either,
+regardless of which one theory favours.
+
+The projected zeros therefore cannot be used as evidence in either direction.
+The width-3 results in `linking_width3.md` are unaffected: they are exact,
+unprojected, and in the dimension where the invariant is defined.
+
+## A general methodological point
+
+This is not specific to our setup. **Any study that projects high-dimensional
+representations to `R^3` to compute a linking number is exposed to the same
+failure**, and the natural control does not catch it.
+
+The pattern is:
+
+1. The invariant is only defined in `R^3` for two curves, so a projection is
+   needed to measure anything at all.
+2. Projection creates self-intersections; the image can be several joined rings
+   whose signed crossings cancel.
+3. The obvious control — embed a known link, project it back, check the value is
+   recovered — passes cleanly if the embedding is a **rotation**, because rigid
+   maps preserve exactly the structure that cancellation destroys.
+4. The control therefore certifies an estimator that will return 0 on linked
+   configurations once the representation is genuinely deformed, which is the
+   only case that arises in practice.
+
+A control built on rigid rotations tests whether a link can be *recovered*. It
+never tests whether a link can be *hidden*, and those are different questions.
+The minimal fix is to sample the **distribution** over many random projections
+rather than checking one, and to include a distorted embedding rather than an
+isometric one. Reporting the fraction of projections returning 0, alongside the
+distribution of values, makes the failure visible where a single number hides
+it.
+
+Ren and Lim already label their own PCA-3D CIFAR-10 analysis as projection- and
+sampling-dependent and treat it as correlational. The measurements here give a
+quantitative sense of how large that dependence can be: up to 28% of random
+projections returning 0 on a configuration with `|lk| = 4`.
 
 ## What this does not show
 
-- It does not show that our width>3 representations *are* linked. Two circles in
-  `R^4` and above cannot be non-trivially linked, so the topological fact still
-  points to absence. What is withdrawn is the claim that the *measurement*
-  supports that conclusion.
+- It does not show that our width>3 representations *are* linked. The
+  theoretical expectation points to absence, and nothing here contradicts it.
+  What is withdrawn is the claim that the *measurement* supports that
+  conclusion.
 - The cancelling projections are not estimator failures in the numerical sense.
   Each returns a clean integer with a small residual; the integer is simply the
   linking number of the projected image, which differs from that of the
