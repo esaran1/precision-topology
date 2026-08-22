@@ -668,12 +668,19 @@ so runs are arriving close to separation in quantity. They simply stop. The
 smallest monotonic errors anywhere are 9, 10, 11, 11, 12, 12, 13, 13, 13, 14,
 14, …: a populated band with a hard edge below it.
 
-For scale: GELU has 51 runs at ≤8 errors against 4 at 9–15, a ratio of about
-12.75 to 1. If the monotonic distributions continued below 9 with the same
-shape, their 22 runs at 9–15 would imply roughly **280** monotonic runs at ≤8
-errors. **Observed: 0.**
+**The observed facts carry this on their own: 22 monotonic runs in the 9–15
+band, zero below 9, across 1,440 runs.** That is a floor regardless of what
+shape either distribution has.
 
-This is the stronger version of the argument. A tail that thins gradually and
-happens to terminate at 9 would be weak evidence, consistent with monotonic
-activations simply being somewhat worse. A tail that is well populated at 9–15
-and then stops completely is the shape of a floor.
+> *Illustration of scale only, not evidence.* GELU has 51 runs at ≤8 errors
+> against 4 at 9–15, roughly 12.75 to 1. Applying that ratio to the monotonic
+> 9–15 count would suggest about 280 monotonic runs at ≤8. This is **not** an
+> argument: it assumes the two distributions have the same shape near the
+> boundary, which is close to assuming what the section is arguing for. It is
+> offered only to give a sense of how large the absence is, and should not be
+> quoted as a result.
+
+A tail that thins gradually and happens to terminate at 9 would be weak
+evidence, consistent with monotonic activations simply being somewhat worse. A
+tail that is well populated at 9–15 and then stops completely is the shape of a
+floor.
