@@ -258,6 +258,15 @@ threshold is placed, and it survives the disagreement between accuracy criteria
 documented below, which would otherwise undercut any statement built on
 "fraction perfect".
 
+> **The load-bearing claim is the zero, not the minimum.** Per
+> `notes/reporting_rules.md`, a count of exactly zero over a whole population is
+> not an extreme-value statistic: it does not move with `n` the way a minimum
+> does, and the only way more runs can overturn it is by producing a separation.
+> **0 monotonic separations in 1,440 runs** under our protocol, and 0 in 360
+> under the author's, is the claim to lean on. The monotonic *minimum* — 9, or
+> 26, or 42 depending on cell and protocol — is a fragile summary and is
+> reported below only alongside its distribution.
+
 Across the full grid the gap is positive in 11 of 12 configurations, ranging
 from 9 to 56 points with a median of 18 among the ten where any activation
 separates. **`baseline`, the original parametrization, sits near the top of that
@@ -525,3 +534,80 @@ otherwise — is then a statement about our parametrization choices as much as
 about monotonic versus non-monotonic activations. The sign of the gap has been
 stable across everything tested; its magnitude has not, and should always be
 reported with the configuration that produced it.
+
+## Audit against the reporting rules
+
+`notes/reporting_rules.md` requires that any minimum or gap appear with its
+distribution, and that any comparison of minima across conditions be
+resampling-checked. Both quantitative claims in this document were re-examined.
+One survives unchanged, one needs qualifying.
+
+### The 9–56 range survives
+
+The per-configuration gap is a minimum over a 40-run cell, so it is exposed to
+the extreme-value problem that invalidated the tanh protocol comparison. It is
+not affected here.
+
+Monotonic error distributions at width 3, n = 120 per configuration:
+
+| Configuration | min | p10 | p25 | median | p75 |
+|---|---:|---:|---:|---:|---:|
+| generic | 9 | 43 | 52 | 76 | 667 |
+| thin_tube | 10 | 14 | 17 | **24** | 683 |
+| near_offset | 11 | 61 | 72 | 94 | 1000 |
+| asymmetric_both | 14 | 19 | 25 | 44 | 578 |
+| thick_tube | 14 | 109 | 116 | **144** | 586 |
+| rotated_generic | 15 | 63 | 70 | 86 | 684 |
+| asymmetric_tube | 18 | 34 | 56 | 82 | 685 |
+| far_offset | 25 | 61 | 69 | 78 | 578 |
+| unequal_major | 34 | 38 | 46 | 60 | 590 |
+| oblique_offset | 35 | 64 | 70 | 82 | 504 |
+| baseline | 52 | 61 | 68 | 80 | 657 |
+| rotated_30 | 56 | 67 | 80 | 94 | 413 |
+
+**The minima are not outliers within their cells.** The gap between best and
+second-best, normalised by the interquartile range, is at most 0.064 and is
+below 0.01 for five configurations — nothing like the tanh case, where the best
+run stood 23 points clear.
+
+The medians span 24 to 144, a **6.1× ratio**, against 6.2× for the minima. The
+two summaries agree on the spread. A permutation test on the extremes of the
+range, `thin_tube` against `rotated_30`, gives **p = 0.0000 on medians and
+p = 0.0000 on minima** over 5,000 permutations.
+
+The range is a real parametrization effect. The caveat already recorded — that
+its magnitude depends on parametrization and no single number should be quoted
+without its configuration — stands, and is now supported by distributions rather
+than by minima alone.
+
+### The "46 runs within 5 errors" claim survives, but the bulk difference is modest
+
+This is an extreme-tail statement and was checked directly. Full error
+distributions at width 3, n = 480 per activation:
+
+| Activation | min | p5 | p25 | median | p75 | max | runs ≤5 errors |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **GELU** | **0** | 0 | 34 | **61** | 80 | 208 | **46** |
+| tanh | 9 | 21 | 54 | **73** | 94 | 667 | **0** |
+| leaky-ReLU | 11 | 19 | 56 | 73 | 103 | 1000 | **0** |
+| ReLU | 11 | 35 | 94 | 1000 | 1000 | 1000 | **0** |
+
+**The tail claim holds and is not a lucky draw.** Resampling 480 runs from
+tanh's own distribution 5,000 times produces a maximum count of **0** runs at or
+below 5 errors, against GELU's observed 46. The separation in the tail is
+categorical rather than marginal.
+
+**But the bulk difference is much smaller than the tail suggests, and this
+qualifies how the result should be described.** GELU's median is 61 against
+tanh's 73 — a 12-point difference on 2,000 evaluation points, real
+(permutation p = 0.0000) but modest. GELU is not broadly better at this task;
+it is comparable in the bulk and categorically different only at the extreme
+where separation actually happens.
+
+That distinction matters for interpretation. The claim this project supports is
+**not** "GELU classifies linked tori better than monotonic activations at width
+3" — the medians barely differ. It is the narrower and stranger claim that
+**GELU reaches exact separation while monotonic activations never do**, despite
+performing similarly on average. A difference confined to the tail is what an
+expressivity barrier would look like; a broad shift would look more like an
+optimisation advantage.
