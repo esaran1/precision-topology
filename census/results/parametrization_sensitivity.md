@@ -237,14 +237,26 @@ one point of evidence rather than many.
 **GELU reaches 0 misclassified points at width 3. No monotonic run gets within
 10 points of separation, on a 2,000-point evaluation set.**
 
-Pooled over all 12 configurations, 480 runs per activation at width 3:
+Pooled over all 12 configurations, 480 runs per activation at width 3. The
+median is given first, deliberately, because it is unimpressive and a reader
+should see it before the tail statistic:
 
-| Activation | Monotonic | Best run (min errors) | Separations (0 errors) |
-|---|---|---:|---:|
-| **GELU** | **no** | **0** | **33 / 480** |
-| tanh | yes | 9 | **0 / 480** |
-| ReLU | yes | 11 | **0 / 480** |
-| leaky-ReLU | yes | 11 | **0 / 480** |
+| Activation | Monotonic | **Median errors** | Best run | **Separations (0 errors)** |
+|---|---|---:|---:|---:|
+| **GELU** | **no** | **61** | 0 | **33 / 480** |
+| tanh | yes | 73 | 9 | **0 / 480** |
+| leaky-ReLU | yes | 73 | 11 | **0 / 480** |
+| ReLU | yes | 1000 | 11 | **0 / 480** |
+
+**On typical performance the activations are close.** GELU's median of 61
+misclassified points against tanh's 73, on a 2,000-point evaluation set, is a
+real difference (permutation p = 0.0000) but a small one. ReLU's median of 1000
+is dead-ReLU collapse rather than a fitting difference, and is discussed
+separately.
+
+The categorical difference is confined to the extreme: **GELU reaches exact
+separation 33 times and no monotonic activation reaches it once.** Why that
+shape is the informative one, rather than a broad advantage, is argued below.
 
 **All 46 runs within 5 errors of separation are GELU.** The width 3→4 boundary
 also holds across the full grid, in the sense that each activation separates in
@@ -606,8 +618,62 @@ where separation actually happens.
 
 That distinction matters for interpretation. The claim this project supports is
 **not** "GELU classifies linked tori better than monotonic activations at width
-3" — the medians barely differ. It is the narrower and stranger claim that
-**GELU reaches exact separation while monotonic activations never do**, despite
-performing similarly on average. A difference confined to the tail is what an
-expressivity barrier would look like; a broad shift would look more like an
-optimisation advantage.
+3" — the medians barely differ, 61 against 73. It is the narrower and stranger
+claim that **GELU reaches exact separation while monotonic activations never
+do**, despite performing similarly on average.
+
+### Why a tail-confined difference is the interesting shape
+
+This is the argument connecting the measurement to the theory, so it is stated
+explicitly rather than left implicit.
+
+An **optimisation advantage** — one activation being easier to train, better
+conditioned, less prone to bad minima — should shift the whole distribution. If
+GELU were simply easier to optimise here, its runs would be broadly better:
+lower median, lower quartiles, a distribution translated toward zero. Some of
+that is present, but only slightly, at 12 points of median on a 2,000-point
+evaluation set.
+
+An **expressivity barrier** predicts something different and more specific. If a
+width-3 monotonic network *cannot represent* a separating map, then no amount of
+optimisation reaches zero, however well the run goes otherwise. The bulk of the
+distribution is governed by how well each run fits the data, which the barrier
+does not constrain — a monotonic network can fit almost all of it. Only the
+extreme is constrained, because only the extreme requires the map that does not
+exist. **The signature is a distribution that looks ordinary in the bulk and
+terminates before zero.**
+
+That is what is observed. The measurement matches the shape a representational
+limit predicts and does not match the shape an optimisation advantage predicts.
+
+### The approach to zero: a sharp floor, not a thinning tail
+
+The argument above is stronger if the monotonic distributions stop abruptly
+rather than petering out. Run counts by error band at width 3, n = 480 per
+activation and n = 1,440 monotonic in total:
+
+| Activation | 0 | 1–5 | 6–8 | 9–15 | 16–25 | 26–50 |
+|---|---:|---:|---:|---:|---:|---:|
+| **GELU** | **33** | **13** | **5** | 4 | 34 | 95 |
+| tanh | 0 | 0 | 0 | 7 | 35 | 61 |
+| leaky-ReLU | 0 | 0 | 0 | 9 | 39 | 55 |
+| ReLU | 0 | 0 | 0 | 6 | 12 | 22 |
+| **All monotonic** | **0** | **0** | **0** | **22** | **86** | **138** |
+
+**GELU populates every band down to zero: 33 runs at 0, 13 at 1–5, 5 at 6–8. No
+monotonic run lands anywhere below 9, in 1,440 runs.**
+
+The monotonic tail is not thin near the boundary — 22 runs sit at 9–15 errors,
+so runs are arriving close to separation in quantity. They simply stop. The
+smallest monotonic errors anywhere are 9, 10, 11, 11, 12, 12, 13, 13, 13, 14,
+14, …: a populated band with a hard edge below it.
+
+For scale: GELU has 51 runs at ≤8 errors against 4 at 9–15, a ratio of about
+12.75 to 1. If the monotonic distributions continued below 9 with the same
+shape, their 22 runs at 9–15 would imply roughly **280** monotonic runs at ≤8
+errors. **Observed: 0.**
+
+This is the stronger version of the argument. A tail that thins gradually and
+happens to terminate at 9 would be weak evidence, consistent with monotonic
+activations simply being somewhat worse. A tail that is well populated at 9–15
+and then stops completely is the shape of a floor.
