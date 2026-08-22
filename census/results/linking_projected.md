@@ -36,7 +36,16 @@ Scope: 640 runs (widths 4, 5, 6, 7, 8, 10, 12, 15; depths 3, 5, 8, 12; four
 activations; seeds 0-4), 5,120 layer observations. Networks reconstructed from
 recorded width-sweep seeds and refused unless accuracy reproduced exactly.
 
-## Control: the projection is not blind
+## Control: the projection is not blind — SUPERSEDED
+
+> **This control is insufficient and its conclusion is superseded.** It tests
+> only whether a link can be *recovered*, never whether a link can be *hidden*.
+> A stronger control in `cancellation_control.md` shows the estimator returns a
+> clean integer 0 on genuinely linked configurations in 7–28% of random
+> projections once the embedding is distorted, and in 17–23% even for a Hopf
+> link. The "distorted case" below used a *single fixed* projection per
+> dimension rather than sampling many, which is why it did not surface this.
+> The section is retained for auditability; its final claim does not hold.
 
 Before any result below can be read, the convention has to be shown capable of
 seeing a link when one is present. Otherwise a uniform zero would be
@@ -73,9 +82,15 @@ one, at every width the sweep uses.
 **Specificity.** An unlinked configuration put through the same pipeline
 returns 0, so the estimator is not reporting ±1 indiscriminately.
 
-**Total: 150 of 150 recoveries.** The convention can see linking at every
+~~**Total: 150 of 150 recoveries.** The convention can see linking at every
 dimension in this study, through both rigid and realistic distortion. A zero it
-returns is therefore a measurement of absence, not a failure to measure.
+returns is therefore a measurement of absence, not a failure to measure.~~
+
+**Superseded.** 150 of 150 is accurate as a count but tests the wrong thing:
+each trial used one projection of a configuration the estimator was likely to
+recover, rather than sampling the distribution over projections. Sampling that
+distribution shows cancellation is common. A zero returned here is **not**
+established as a measurement of absence.
 
 ## Reportability rises sharply with width
 
@@ -135,25 +150,32 @@ intersecting, against ReLU reportable at 0% and intersecting in 75% of runs.
 Above width 3, **that discrimination disappears**: every activation reaches
 projected link 0 whenever a value can be reported at all.
 
-**This is a real null, not a blind measure.** Three independent arguments
-establish it.
+> **WITHDRAWN.** This section previously argued that the uniform zero was a
+> real null rather than a blind measure. Two of its three arguments no longer
+> hold, and the conclusion is withdrawn. See `cancellation_control.md` for the
+> measurements that overturned it. The text below is retained with the failed
+> arguments marked, rather than deleted, so the correction is auditable.
 
-**1. The control recovers linking whenever it is present.** 150 of 150
-recoveries, across rigid rotations into `R^4` through `R^15` and across
-non-orthogonal maps followed by tanh, with an unlinked configuration correctly
-returning 0. The convention detects a link at every dimension in this study.
-When it returns zero here, nothing is there to find.
+~~**This is a real null, not a blind measure.** Three independent arguments
+establish it.~~
 
-**2. The null is uniform, and a destructive projection would not be.** Across
-four activations, six widths with reportable data, and 535 reportable
-final-layer observations, there are **zero exceptions**. A projection that
-destroyed structure would be expected to fail *inconsistently* — succeeding
-where the residual structure happened to align with the leading components and
-failing elsewhere, varying with activation, width, depth, and seed. Perfect
-uniformity across every cell is the signature of an absent quantity, not of a
-lossy measurement.
+**1. ~~The control recovers linking whenever it is present.~~ FAILS.** The
+original control used 150 recoveries across **rigid** rotations into `R^4`
+through `R^15`. Rigid embeddings preserve the geometry exactly, so nothing
+cancels. Under the non-orthogonal-map-plus-tanh distortion a trained layer
+actually applies, the same estimator returns a clean integer **0 on genuinely
+linked configurations in 7–28% of random projections**, and in 17–23% even on a
+Hopf link with `|lk| = 1`. The control never exercised the regime that matters.
 
-**3. Two circles in `R^4` and above are always unlinked.** This is the standard
+**2. ~~The null is uniform, and a destructive projection would not be.~~
+FAILS.** This was the strongest argument and is now the weakest. Cancellation
+does not require inconsistency across cells: if a layer's representation sits in
+a regime where most projections cancel, every observation in that cell returns 0
+**uniformly**. Perfect uniformity is therefore consistent with systematic
+cancellation, not only with absence, and cannot distinguish them.
+
+**3. Two circles in `R^4` and above are always unlinked.** This argument
+stands, and is now the only support remaining. This is the standard
 fact the paper's introduction invokes — "any knot is equivalent to an unknot in
 `R^4`" — and it applies to links of circles equally: the extra dimension permits
 any crossing to be undone by an ambient isotopy. At hidden width 4 or more, the
@@ -164,22 +186,24 @@ width-`d+1` classifier.
 
 ### Accuracy and linking place the boundary in the same place
 
-The substance of the claim is that **two unrelated measurements independently
-locate the transition between width 3 and width 4**.
+> **Weakened.** This section argued that two independent measurements agree on
+> the boundary. One of the two, the projected linking value, is no longer usable
+> as evidence, so the agreement is no longer mutual corroboration.
 
 | | Width 3 | Width 4 |
 |---|---|---|
-| Accuracy: activations reaching 1.0000 | GELU only (6 / 80) | all four |
-| Linking: reportable values | GELU 25%, ReLU 0% | link 0 for every activation |
-| Curves ever intersecting | ReLU 75% of runs | ReLU 60%, then falling to 0 by width 10 |
+| Accuracy: activations reaching 1.0000 | GELU only (6 / 80) | GELU 67.5%, tanh 51.3%, leaky-ReLU 6.3%, **ReLU 2.5%** |
+| ~~Linking: reportable values~~ | ~~GELU 25%, ReLU 0%~~ | ~~link 0 for every activation~~ — **withdrawn** |
+| Curves ever intersecting (native space, unprojected) | ReLU 75% of runs | ReLU 60%, then falling to 0 by width 10 |
 
-Accuracy is a property of the classifier on sampled points. Linking is a
-property of the propagated core curves and never touches the labels or the
-evaluation set. They share no measurement machinery. That they agree on where
-the boundary sits is stronger evidence than either would be alone, and it is
-consistent with Theorem D.1's statement that width `d + 1 = 4` suffices.
+What survives is the accuracy boundary and the minimum-distance measurements,
+the latter taken in each layer's **native** space before any projection and so
+untouched by the cancellation problem. The projected linking row is withdrawn.
 
-The obstruction, as this study can observe it, is a width-3 phenomenon.
+The remaining support for treating the obstruction as a width-3 phenomenon is
+therefore the accuracy boundary together with the topological fact that two
+circles in `R^4` and above are always unlinked — not a linking measurement in
+the wider layers, which this study cannot make reliably.
 
 ## Layer of change
 
