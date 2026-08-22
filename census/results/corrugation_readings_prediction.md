@@ -36,6 +36,61 @@ embedded at the published values.
 Both are implemented and reported separately. Neither is presented as the
 author's intent; the ambiguity is in the source text and is recorded as such.
 
+### Reading A has no sensible operating point
+
+This is the more useful observation than any ratio, so it is stated directly.
+
+**Under Reading A there is no amplitude that is simultaneously embedded and
+meaningfully corrugating.** At `r = 0.15` and frequency 100 the largest
+amplitude keeping the swept solid embedded is **0.01657** — about 11% of the
+tube radius, a perturbation small enough that the tube is barely deformed. Any
+amplitude large enough to corrugate the tube, so that no single planar fold
+separates the components, exceeds that limit. The two requirements do not
+overlap usefully on the axis.
+
+The same holds on the frequency axis: at the published amplitude of 0.3 the
+largest embedded frequency is **5.18**, about five oscillations around the whole
+curve, which is not a high-frequency oscillation in the sense the phrase
+implies.
+
+The ratios against published values are 18× in amplitude and 19× in frequency,
+but the ratios are the less informative way to put it. The point is not that the
+published numbers are past a threshold; it is that **the embedded side of the
+boundary does not contain values that do the job the oscillation is described as
+doing.**
+
+> *Correction.* An earlier version of this file reported these boundaries as
+> 0.00108 and 0.5, giving ratios of 277× and 200×. Those figures came from a
+> self-intersection test that compared arc-length exclusion against chord
+> distance; since a chord is always shorter than its arc, the test flagged every
+> smooth closed curve, including an uncorrugated circle. The corrected test uses
+> a 1.5-diameter arc margin. The qualitative conclusion is unchanged but the
+> magnitudes are roughly fifteen times smaller, and the corrected numbers are
+> the ones to use.
+
+### The counter-position, stated fairly
+
+It is entirely coherent that Reading A is what was intended and that the swept
+solid was simply never required to be embedded.
+
+Under Reading A the **core remains a valid knot with linking number −1**, which
+we verify: residual 3.92e−07, core separation 0.6955. If the analysis in the
+paper operates only on the core — and the linking number is defined on the core,
+not on the solid — then whether the thickened region self-overlaps has no
+bearing on any quantity they compute. The thickening would then be a sampling
+device for producing training points near the curve, not an object whose
+topology matters.
+
+On that reading the geometry is not an error. It is a choice about what the
+thickened region is for, and the answer may simply be "somewhere to draw points
+from". **This is a question about what the thickened region is meant to be, not
+a defect in the paper**, and it is recorded here in those terms.
+
+What the sweep decides, and the argument does not, is whether the two readings
+produce different results. If they agree, the ambiguity is immaterial to our
+conclusions and can be reported as resolved-by-irrelevance. If they disagree,
+the question of intent becomes load-bearing and should go to the author.
+
 ## Gating
 
 - **Reading A**: embeddedness is relaxed to a **reported diagnostic**. Minimum
