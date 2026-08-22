@@ -53,20 +53,42 @@ largest embedded frequency is **5.18**, about five oscillations around the whole
 curve, which is not a high-frequency oscillation in the sense the phrase
 implies.
 
-The ratios against published values are 18× in amplitude and 19× in frequency,
-but the ratios are the less informative way to put it. The point is not that the
-published numbers are past a threshold; it is that **the embedded side of the
-boundary does not contain values that do the job the oscillation is described as
-doing.**
+The two statements worth putting to the author are the absolute ones, since they
+hold regardless of what the published values happen to be:
+
+- **The embedded amplitude limit is 11% of the tube radius.** Any oscillation
+  large enough to corrugate the tube in the sense the account requires exceeds
+  it.
+- **The embedded frequency limit is 5.18**, which is roughly five oscillations
+  around the entire curve. That is not a high-frequency oscillation in the sense
+  the description implies.
+
+The ratios against published values are 18× and 19×, but they are the weaker way
+to put it and are given only for completeness.
 
 > *Correction.* An earlier version of this file reported these boundaries as
-> 0.00108 and 0.5, giving ratios of 277× and 200×. Those figures came from a
-> self-intersection test that compared arc-length exclusion against chord
-> distance; since a chord is always shorter than its arc, the test flagged every
-> smooth closed curve, including an uncorrugated circle. The corrected test uses
-> a 1.5-diameter arc margin. The qualitative conclusion is unchanged but the
-> magnitudes are roughly fifteen times smaller, and the corrected numbers are
-> the ones to use.
+> 0.00108 and 0.5, giving ratios of 277× and 200×.
+>
+> **How the bug surfaced: the validation test rejected a plain circle.** The
+> zero-amplitude configuration — an uncorrugated unit circle, which cannot
+> self-intersect at any tube radius below its own — was flagged as
+> self-intersecting. A test that rejects a plain circle is wrong about
+> something, and that is the clearest signal available that the fault was in the
+> test rather than in the geometry being tested.
+>
+> The cause was a chord-versus-arc mismatch. The exclusion window was computed
+> in arc length while the test measured chord distance, and a chord is always
+> shorter than its arc, so points separated by exactly one tube diameter of arc
+> sit slightly closer than one diameter in space: 0.3992 against a 0.40
+> threshold. Every smooth closed curve failed by that margin. The corrected test
+> uses a 1.5-diameter arc margin.
+>
+> The qualitative conclusion is unchanged, but the magnitudes are roughly
+> fifteen times smaller. **The corrected figures are the ones to use, and the
+> 277× and 200× figures should not be quoted.** The smaller numbers are also the
+> more credible ones: 18× is a plausible magnitude for a specification-versus-
+> geometry mismatch, whereas 277× would reasonably lead a reader to suspect our
+> measurement before suspecting the specification.
 
 ### The counter-position, stated fairly
 
