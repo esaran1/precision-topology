@@ -104,9 +104,18 @@ the artifact threshold, so these are the cleanest projections available:
 
 | Triple | Projected linking | Projected min distance |
 |---|---:|---:|
-| one triple | **−1** | 0.160515 |
-| another triple | **+1** | 0.138214 |
-| the top-3 triple (the reported convention) | **0** | — |
+| PCA (0, 1, 2) — the reported convention | **0** | 6.465 |
+| PCA (1, 2, 3) | **−1** | 0.161 |
+| PCA (1, 3, 4) | **+1** | 0.138 |
+| three random 3-frames | **0** | 2.720, 2.933, 3.383 |
+
+Rendered in `figures/projections/self_inconsistent_cell.png`. The picture makes
+the mechanism visible without reference to the numbers: the two panels returning
+±1 are the ones where the projected curves are visibly tangled and nearly
+touching, at distances of 0.14–0.16, while every projection that returns 0 shows
+two cleanly separated components at distances of 2.7–6.5. The nonzero values
+come from the projections that crush the configuration, not from projections
+that reveal hidden structure.
 
 **The same representation yields −1, +1, and 0 depending on which three
 components are chosen.** A configuration cannot have three linking numbers. At
