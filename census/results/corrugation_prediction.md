@@ -1,8 +1,10 @@
 # Registered predictions: corrugated parametrization and author protocol
 
 Written **before** the corrugation generator was implemented and before any run
-executed, so the results are a test rather than a reading. Nothing in this file
-is revised after the fact.
+executed, so the results are a test rather than a reading. **The predictions
+themselves are never revised.** Outcomes are appended in clearly marked sections
+below each prediction, leaving the original wording intact so the comparison is
+auditable.
 
 ## Why this supersedes the earlier fold-layer test
 
@@ -73,6 +75,38 @@ The consequential question is what happens to the monotonic-versus-GELU gap:
 
 Both outcomes are reportable. The gap will be reported under both protocols
 regardless of which way it falls.
+
+## Outcome of prediction 2: not borne out
+
+Recorded after the fact, without altering the prediction above.
+
+**The predicted substantial drop in dead-ReLU did not occur.** The at-chance
+fraction fell by roughly five percentage points, not the large drop the
+reasoning implied:
+
+| Width | Ours: at chance | Theirs: at chance | Change |
+|---:|---:|---:|---:|
+| 3 | 61.3% | 55.8% | −5.5 pts |
+| 4 | 45.0% | 40.8% | −4.2 pts |
+| 5 | 27.5% | 20.0% | −7.5 pts |
+| 6 | 20.0% | 12.5% | −7.5 pts |
+
+Minibatch noise, a learning rate 10× smaller, and early stopping with
+best-checkpoint restoration together move the collapse rate only slightly.
+
+**This makes the dead-ReLU numbers more robust than if the prediction had
+held.** Had the rate collapsed under their settings, our reported figures would
+have been an artifact of our optimiser and would have needed correcting
+wherever quoted. Instead the collapse survives three simultaneous changes, each
+of which independently works against it, which points to it being closer to a
+property of narrow ReLU networks on this problem than to our training choices.
+The existing figures stand as measured; what changes is that we can now say they
+are not protocol-specific.
+
+The reasoning behind the prediction was not unsound — minibatch noise *is* a
+documented escape from the dead-ReLU basin — it simply does not dominate at
+these widths. That is worth knowing and could not have been established without
+running it.
 
 ## What will be measured
 

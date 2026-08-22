@@ -125,6 +125,69 @@ The projected zeros therefore cannot be used as evidence in either direction.
 The width-3 results in `linking_width3.md` are unaffected: they are exact,
 unprojected, and in the dimension where the invariant is defined.
 
+## The residual nonzeros are boundary leakage, not signal
+
+After filtering on projected distance at the 0.02 threshold used at width 3, a
+residual of small nonzero values (±1, ±2, one 5) survived. Two checks were run
+to decide whether that residual is real.
+
+### Threshold sensitivity: the count collapses
+
+Genuine linking should be insensitive to where the artifact cutoff sits, since a
+cleanly separated configuration is comfortably clear of it. Recounting across
+3,740 individual projections drawn from the 55 cells that showed any surviving
+nonzero:
+
+| Family | Threshold | Projections surviving | Nonzero | Fraction nonzero |
+|---|---:|---:|---:|---:|
+| PCA triples | 0.02 | 786 | 105 | 0.1336 |
+| PCA triples | 0.05 | 633 | 25 | 0.0395 |
+| PCA triples | 0.10 | 579 | **8** | **0.0138** |
+| Random | 0.02 | 2,600 | 12 | 0.0046 |
+| Random | 0.05 | 2,586 | 1 | 0.0004 |
+| Random | 0.10 | 2,579 | **0** | **0.0000** |
+
+**Tightening the cutoff from 0.02 to 0.10 eliminates 92% of PCA nonzeros and
+100% of random ones.** A genuine value would not behave this way.
+
+The distance distribution makes the mechanism plain: PCA triples returning a
+nonzero have a **median projected distance of 0.0167**, while those returning
+zero sit at **4.7671** — a factor of 285. The nonzeros live almost entirely at
+the artifact boundary, where the Gauss integrand is ill conditioned.
+
+### Spatial structure: none
+
+If the survivors were real they should cluster by width, activation, or depth.
+The 8 PCA values surviving at 0.10 are scattered singletons:
+
+| Axis | Distribution |
+|---|---|
+| Activation | GELU 4, leaky-ReLU 3, ReLU 1 |
+| Width | 15 → 5, 12 → 2, 8 → 1 |
+| Depth | 3 → 6, 5 → 1, 8 → 1 |
+| Seed | 0 → 3, 1 → 3, 2 → 2 |
+
+Eight rows spread across **seven distinct cells**. They span three activations
+including one monotonic and one non-monotonic, three widths, and three depths,
+with no concentration anywhere.
+
+One cell is decisive on its own: `leaky_relu`, width 15, depth 3, seed 0 returns
+**both −1 and +1** from different triples of the **same** representation. A
+single configuration cannot have two linking numbers, so at least one of those
+values is an artifact, and there is no principled reason to trust the other.
+
+### Conclusion
+
+The residual is boundary leakage. **No reportable nonzero linking survives in
+any width>3 representation**, and the apparent PCA nonzeros reported earlier
+were an artifact of measuring reportability in the native space rather than in
+the projected image.
+
+This does not restore the uniform-zero conclusion. The measurement still cannot
+distinguish absence from cancellation — that limitation is unaffected by whether
+the residual is real. What it removes is the possibility that the projections
+were detecting genuine residual linking.
+
 ## A general methodological point
 
 This is not specific to our setup. **Any study that projects high-dimensional
