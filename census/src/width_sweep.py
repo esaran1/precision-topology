@@ -20,6 +20,7 @@ from typing import Sequence
 import pandas as pd
 
 from .census import _make_data, SweepConfig
+from .artifact_lock import artifact_lock
 from .models import DEFAULT_INITIALIZATION_GAIN, DEFAULT_INITIALIZATION_SCHEME
 from .train import TrainingConfig, train_mlp
 
@@ -152,12 +153,13 @@ def run_width_sweep(
 def _write(frame: pd.DataFrame, output_directory: Path) -> None:
     output_directory.mkdir(parents=True, exist_ok=True)
     stem = output_directory / "width_sweep"
-    csv_temp = stem.with_suffix(".csv.tmp")
-    parquet_temp = stem.with_suffix(".parquet.tmp")
-    frame.to_csv(csv_temp, index=False)
-    frame.to_parquet(parquet_temp, index=False)
-    csv_temp.replace(stem.with_suffix(".csv"))
-    parquet_temp.replace(stem.with_suffix(".parquet"))
+    with artifact_lock(stem, "width sweep"):
+        csv_temp = stem.with_suffix(".csv.tmp")
+        parquet_temp = stem.with_suffix(".parquet.tmp")
+        frame.to_csv(csv_temp, index=False)
+        frame.to_parquet(parquet_temp, index=False)
+        csv_temp.replace(stem.with_suffix(".csv"))
+        parquet_temp.replace(stem.with_suffix(".parquet"))
 
 
 def main() -> None:

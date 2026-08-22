@@ -17,6 +17,7 @@ from typing import Sequence
 
 import pandas as pd
 
+from .artifact_lock import artifact_lock
 from .models import DEFAULT_INITIALIZATION_GAIN, DEFAULT_INITIALIZATION_SCHEME
 from .parametrization import GRID, TorusLink, axis_alignment, sample_link, validate
 from .train import TrainingConfig, train_mlp
@@ -170,8 +171,9 @@ def run(
 def _write(frame: pd.DataFrame, output_directory: Path) -> None:
     output_directory.mkdir(parents=True, exist_ok=True)
     stem = output_directory / "parametrization_sweep"
-    frame.to_csv(stem.with_suffix(".csv"), index=False)
-    frame.to_parquet(stem.with_suffix(".parquet"), index=False)
+    with artifact_lock(stem, "parametrization sweep"):
+        frame.to_csv(stem.with_suffix(".csv"), index=False)
+        frame.to_parquet(stem.with_suffix(".parquet"), index=False)
 
 
 def main() -> None:

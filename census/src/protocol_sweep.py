@@ -15,6 +15,7 @@ import pandas as pd
 
 from .author_protocol import UNSPECIFIED, AuthorTrainingConfig, train_mlp_author
 from .census import _make_data
+from .artifact_lock import artifact_lock
 from .models import DEFAULT_INITIALIZATION_GAIN, DEFAULT_INITIALIZATION_SCHEME
 from .width_sweep import CHANCE_ACCURACY, WidthSweepConfig
 
@@ -103,8 +104,9 @@ def run(
 def _write(frame: pd.DataFrame, output_directory: Path) -> None:
     output_directory.mkdir(parents=True, exist_ok=True)
     stem = output_directory / "protocol_sweep"
-    frame.to_csv(stem.with_suffix(".csv"), index=False)
-    frame.to_parquet(stem.with_suffix(".parquet"), index=False)
+    with artifact_lock(stem, "author-protocol sweep"):
+        frame.to_csv(stem.with_suffix(".csv"), index=False)
+        frame.to_parquet(stem.with_suffix(".parquet"), index=False)
 
 
 def main() -> None:
