@@ -114,3 +114,104 @@ swept in Task 2.
   is the authoritative published source. Where the repository README lists
   differing values (for example batch size 32 for a smoke test), those are
   noted as smoke-test settings rather than the reported protocol.
+
+## Result: the width-3 monotonic zero survives their protocol
+
+1,920 runs at 30 seeds per cell under Appendix G.2 settings, parametrization
+held fixed so protocol is the only variable.
+
+**Zero monotonic separations in 360 width-3 runs under their protocol**, joining
+0 of 240 under ours. Best monotonic evaluation accuracy anywhere is 0.9790.
+
+| Activation | Ours (n=80) | Theirs (n=120) |
+|---|---|---|
+| tanh | 0 perfect, max 0.9870 | **0 perfect**, max 0.9780 |
+| ReLU | 0 perfect, max 0.9735 | **0 perfect**, max 0.9790 |
+| leaky-ReLU | 0 perfect, max 0.9700 | **0 perfect**, max 0.9775 |
+| GELU | 6 perfect | 2 perfect |
+
+### The gap did not respond to protocol; the monotonic minimum did
+
+Stating this carefully, because the two are the same quantity here. GELU's
+minimum error count is **0 under both protocols**, so the "gap"
+(`monotonic_min − GELU_min`) simply *is* the monotonic minimum. Reporting that
+the gap widened from 26 to 42 would present an identity as a response.
+
+What actually happened:
+
+| Protocol | GELU min errors | Monotonic min errors |
+|---|---:|---:|
+| Ours | **0** (floored) | 26 |
+| Theirs | **0** (floored) | 42 |
+
+Per activation, minimum errors at width 3:
+
+| Activation | Ours | Theirs |
+|---|---:|---:|
+| tanh | 26 | 44 |
+| ReLU | 53 | 42 |
+| leaky-ReLU | 60 | 45 |
+
+**GELU stayed floored while the monotonic activations got further from
+separation.** The best monotonic run went from 26 misclassified points to 42.
+
+This is a stronger statement than the gap framing allowed. Under a protocol that
+**measurably makes GELU separate less often** (see below), the monotonic
+activations still never separate, and their closest approach gets worse. Pure
+reachability struggles to account for that: if the difference were only about
+how easily each activation reaches a solution that exists for all of them, a
+protocol that hinders GELU should help or at least not hurt the others relative
+to it. Instead GELU remains at the floor and monotonic degrades.
+
+### GELU separates less often under their protocol, and the comparison is limited
+
+| Width | Ours % perfect | Theirs % perfect |
+|---:|---:|---:|
+| 3 | 7.5% | **1.7%** |
+| 4 | 67.5% | **40.0%** |
+| 5 | 76.2% | **60.0%** |
+| 6 | 96.2% | **76.7%** |
+
+The mechanism is early stopping. At width 3, **75% of GELU runs stopped early,
+at a median epoch of 488 with the best checkpoint at median epoch 338**, against
+a budget of 800. Those runs were **cut off, not converged**.
+
+This is a limitation of the comparison, not merely an explanation of it. **Under
+their protocol we do not know what GELU's separation rate would be with the full
+budget**, because patience terminated most runs before it was spent. Two
+framings are both defensible and neither is privileged:
+
+- **Ours is the fairer test of what GELU can do.** Fixed 2,000 steps with no
+  stopping criterion lets every run use its whole budget, so the separation rate
+  reflects what the architecture achieves when optimisation is allowed to run.
+- **Theirs is the fairer test of what GELU does under their stated conditions.**
+  It is the published protocol, and their reported numbers were produced under
+  it, so it is the right basis for comparing against their tables.
+
+The monotonic zero is unaffected by this ambiguity: it holds under both, and
+early stopping cannot explain a rate of exactly zero across 600 runs in total.
+
+### The dead-ReLU prediction failed, which strengthens the numbers
+
+Predicted: a substantial drop in the at-chance fraction under their protocol.
+Observed: roughly five points.
+
+| Width | Ours at chance | Theirs at chance | Change |
+|---:|---:|---:|---:|
+| 3 | 61.3% | 55.8% | −5.5 pts |
+| 4 | 45.0% | 40.8% | −4.2 pts |
+| 5 | 27.5% | 20.0% | −7.5 pts |
+| 6 | 20.0% | 12.5% | −7.5 pts |
+
+Minibatch noise, a learning rate ten times smaller, and early stopping with
+best-checkpoint restoration together barely move it. Had the rate collapsed, our
+reported dead-ReLU figures would have been an optimiser artifact needing
+correction wherever quoted. Instead they survive three simultaneous changes,
+each independently working against the collapse, so they are closer to a
+property of narrow ReLU networks on this problem than to our training choices.
+The figures stand as measured; what is new is that they are not
+protocol-specific.
+
+Width-4 ReLU reaches 1.0000 in 1.7% of runs under their protocol against 2.5%
+under ours, so the author's observation that ReLU is not reliably trainable to
+perfect accuracy at width 4 holds under both.

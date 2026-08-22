@@ -92,6 +92,33 @@ recover, rather than sampling the distribution over projections. Sampling that
 distribution shows cancellation is common. A zero returned here is **not**
 established as a measurement of absence.
 
+## The top-3 convention was arbitrary: a worked example
+
+One cell settles whether the choice of three PCA components was principled or
+incidental.
+
+**`leaky_relu`, width 15, depth 3, seed 0, final layer.** Evaluating every
+triple drawn from the top six PCA components of that single representation, and
+keeping only those whose *projected* minimum distance clears 0.10 — five times
+the artifact threshold, so these are the cleanest projections available:
+
+| Triple | Projected linking | Projected min distance |
+|---|---:|---:|
+| one triple | **−1** | 0.160515 |
+| another triple | **+1** | 0.138214 |
+| the top-3 triple (the reported convention) | **0** | — |
+
+**The same representation yields −1, +1, and 0 depending on which three
+components are chosen.** A configuration cannot have three linking numbers. At
+least two of these are artifacts, and nothing in the convention identifies
+which — the top-3 choice is a variance ordering, not a topological criterion,
+and variance says nothing about which projection preserves crossings.
+
+This is the sharpest available statement that the reported number was one draw
+from a distribution rather than a measurement of the representation. It is why
+this document now reports distributions over projections rather than a single
+value per layer.
+
 ## Reportability rises sharply with width
 
 Hidden-layer observations, n = 1,120 per activation:
