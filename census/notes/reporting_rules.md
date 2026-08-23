@@ -51,3 +51,7 @@ cell.
 It is a count, not an extreme. Increasing `n` can only overturn it by producing
 a separation, which is the honest way for it to fail. Every other quantitative
 claim in this project is subordinate to it and should be reported as such.
+
+> **Pointer (2026-08-22).** The counts in "Applying rule 4" were current
+> when written. `CLAIMS.md` (T1) now carries the authoritative,
+> artifact-verified total: 0 separations in 5,570 monotonic width-3 runs.

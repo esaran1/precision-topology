@@ -113,3 +113,6 @@ Not established:
   was chosen using knowledge of the geometry. Corrugated or rotated links
   would need their own fold plane, and nothing here shows one always
   exists.
+
+> **Count pointer (2026-08-22).** "4,970 SGD runs" reflects the total at
+> the time of writing; the audited total is 5,570 (`CLAIMS.md`, T1).

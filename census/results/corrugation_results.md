@@ -88,7 +88,9 @@ later, is outside what this measurement can reach.
 | **Total** | **1,890** | **0** | **23** |
 
 This extends the count to 3,330 monotonic width-3 runs with zero separations
-across 33 configurations, two protocols, and both G.1 readings. Per
+across 33 configurations, two protocols, and both G.1 readings. *(Ledger
+audit 2026-08-22: this total covers the corrugation and parametrization
+sweeps only; the audited all-strata total is 5,570 — `CLAIMS.md`, T1.)* Per
 `notes/reporting_rules.md` this is a count rather than an extreme-value
 statistic, and it is the claim this project leans on.
 
