@@ -1,0 +1,15 @@
+{'input': 'raw_pixels', 'subsample': 'sub1', 'two_nn': 18.074065552498702, 'mle_k10': 10.796468084479336, 'mle_k20': 11.11271311189807, 'pca_95_linear_reference': 150}
+{'input': 'raw_pixels', 'subsample': 'sub2', 'two_nn': 18.58008539554651, 'mle_k10': 10.883376520305882, 'mle_k20': 11.13485152599816, 'pca_95_linear_reference': 149}
+{'input': 'hidden_tanh_seed0', 'subsample': 'sub1', 'two_nn': 12.2372083129014, 'mle_k10': 7.315621360390758, 'mle_k20': 7.282197722390069, 'pca_95_linear_reference': 33}
+{'input': 'hidden_tanh_seed0', 'subsample': 'sub2', 'two_nn': 12.468958985876906, 'mle_k10': 7.246741811126146, 'mle_k20': 7.264017179820681, 'pca_95_linear_reference': 34}
+{'input': 'hidden_tanh_seed1', 'subsample': 'sub1', 'two_nn': 12.68892735705501, 'mle_k10': 7.3835166118717, 'mle_k20': 7.334145834396346, 'pca_95_linear_reference': 35}
+{'input': 'hidden_tanh_seed1', 'subsample': 'sub2', 'two_nn': 12.720244992204808, 'mle_k10': 7.354195299850922, 'mle_k20': 7.321731814772779, 'pca_95_linear_reference': 35}
+{'input': 'hidden_tanh_seed2', 'subsample': 'sub1', 'two_nn': 12.5457079917882, 'mle_k10': 7.302631622295402, 'mle_k20': 7.3298272516332155, 'pca_95_linear_reference': 35}
+{'input': 'hidden_tanh_seed2', 'subsample': 'sub2', 'two_nn': 12.615431085646078, 'mle_k10': 7.335290215228429, 'mle_k20': 7.362960059759591, 'pca_95_linear_reference': 35}
+{'input': 'hidden_gelu_seed0', 'subsample': 'sub1', 'two_nn': 12.215725976229043, 'mle_k10': 7.14024357560546, 'mle_k20': 7.1734153415461135, 'pca_95_linear_reference': 24}
+{'input': 'hidden_gelu_seed0', 'subsample': 'sub2', 'two_nn': 12.438327777608528, 'mle_k10': 7.039361728578859, 'mle_k20': 7.106590035310992, 'pca_95_linear_reference': 25}
+{'input': 'hidden_gelu_seed1', 'subsample': 'sub1', 'two_nn': 12.032824571243395, 'mle_k10': 7.130825433216912, 'mle_k20': 7.1500258777995045, 'pca_95_linear_reference': 23}
+{'input': 'hidden_gelu_seed1', 'subsample': 'sub2', 'two_nn': 11.853136933437721, 'mle_k10': 7.0901575981294975, 'mle_k20': 7.09118754665556, 'pca_95_linear_reference': 23}
+{'input': 'hidden_gelu_seed2', 'subsample': 'sub1', 'two_nn': 12.106977190678924, 'mle_k10': 7.157697423346448, 'mle_k20': 7.194948217642497, 'pca_95_linear_reference': 24}
+{'input': 'hidden_gelu_seed2', 'subsample': 'sub2', 'two_nn': 12.165272543893016, 'mle_k10': 7.155366100297081, 'mle_k20': 7.161430292004273, 'pca_95_linear_reference': 23}
+done
