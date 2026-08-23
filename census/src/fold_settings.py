@@ -47,22 +47,26 @@ def sample_radial(dimension: int, bands_zero: list[tuple[float, float]],
     return torch.tensor(x), torch.tensor(y)
 
 
+# Margins widened and depth/steps raised after a first attempt at depth 2 /
+# 2,000 steps produced zero solves for every activation including GELU and
+# sin(3.0) (best 19/600) — a design too hard to resolve threshold structure;
+# the piloted design below solves for GELU and clearly separates tanh.
 SETTINGS = {
     "annulus2d": dict(dimension=2, width=2,
-                      bands_zero=[(0.0, 0.8), (2.4, 3.0)], band_one=(1.2, 2.0)),
+                      bands_zero=[(0.0, 0.7), (2.6, 3.2)], band_one=(1.3, 2.0)),
     "shells3d": dict(dimension=3, width=3,
-                     bands_zero=[(0.0, 0.6), (1.8, 2.2)], band_one=(1.0, 1.4)),
+                     bands_zero=[(0.0, 0.55), (1.9, 2.4)], band_one=(0.95, 1.5)),
 }
 
 GRID = (
-    [("sin_family", a) for a in (1.0, 1.05, 1.1, 1.15, 1.25, 1.35, 1.5, 2.0, 3.0)]
+    [("sin_family", a) for a in (1.0, 1.1, 1.25, 1.5, 2.0, 3.0)]
     + [("pwl_family", -0.05), ("pwl_family", -0.25)]
-    + [("tanh", None), ("relu", None), ("leaky_relu", None), ("gelu", None)]
+    + [("tanh", None), ("relu", None), ("gelu", None)]
 )
 
 
 def run_one(setting: str, name: str, parameter: float | None, seed: int,
-            depth: int = 2, steps: int = 2_000) -> dict:
+            depth: int = 4, steps: int = 4_000) -> dict:
     spec = SETTINGS[setting]
     x, y = sample_radial(spec["dimension"], spec["bands_zero"], spec["band_one"], 300, seed)
     xe, ye = sample_radial(spec["dimension"], spec["bands_zero"], spec["band_one"], 300, 700_000 + seed)
