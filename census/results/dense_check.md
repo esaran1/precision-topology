@@ -96,13 +96,19 @@ sample-level criterion. Restricting to dense-verified separations:
 | Trace source | traced | dense-verified | fold layer among survivors |
 |---|---:|---:|---|
 | corrugation sweep | 34 | **5** | 1 in all 5 |
-| parametrization sweep | 33 | **18** | 1 in 17, **2 in 1** (`generic` d12 s7 — the already-reported exception, which survives densely) |
+| parametrization sweep | 33 | **18** | 1 in 17, **2 in 1** (`generic` d12 s7) |
 | baseline (`linking_width3`) | 3 | 2 (+1 marginal: 1 error primary sample, 0/0 on two extras) | 1 in all |
 | witness | 1 | 1 (2,000,000 points) | 1 by construction |
 
-**Layer-1 folding holds across every dense-verified trace** (with the one
-known layer-2 exception). What changes is the *strength of the corrugation
-negative*: "fold layer stays at 1 at amplitudes 18× past the embeddedness
+**Layer-1 folding holds across every dense-verified trace except one — and
+the exception is itself dense-verified.** The `generic` d12 s7 run folds at
+layer 2 and passes 100,000-point verification, which upgrades it from a
+possible artifact to a **confirmed existence proof of later folding**:
+layer-1 immediacy is the overwhelming regularity, and it is *rare rather
+than forced* — a genuinely regional separating network can fold after
+layer 1. This is the strongest available form of that statement.
+
+What changes on the corrugation side is the *strength of the negative*: "fold layer stays at 1 at amplitudes 18× past the embeddedness
 limit and frequencies to 200" was supported by 34 traces spanning all 21
 configurations; the dense-verified support is **5 traces spanning 4
 corrugated configurations plus flat** (A_a0.05, A_f50, A_embedded_f0.5 ×2,

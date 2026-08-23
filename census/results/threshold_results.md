@@ -67,12 +67,19 @@ modulates how often SGD exploits it, not just whether.
 > artifact is that the two families — which share nothing except the
 > property under test — agree on it in matched units to within one grid
 > step, and the annealing traces (`search_results.md`) land their failure
-> points in the same band from the other direction. The dense-verified
-> re-derivation leaves both intervals unchanged: every separation at the
-> transition-defining values (`a = 1.10`: 3/3, `α = −0.25`: 3/3) survives
-> 100,000-point verification. The "BORNE OUT" heading above should be read
-> as: borne out on the zero side, **not borne out on the location** — the
-> transition is past the threshold, not at it.
+> points in the same band from the other direction. The "BORNE OUT" heading
+> above should be read as: borne out on the zero side, **not borne out on
+> the location** — the transition is past the threshold, not at it.
+>
+> **The dense re-derivation is a robustness result, not a null check.**
+> Every separation at the interval-defining values passes 100,000-point
+> verification (`a = 1.10`: 3/3, `a = 1.25`: 5/5, `α = −0.25`: 3/3, all
+> pwl values 13/13), while the sweep's dense failures cluster exclusively
+> at `a ≥ 1.5`, far from the boundary. **The transition is located by
+> genuinely regional separations**: the runs that define where separation
+> first becomes reachable are exactly the runs that survive the strictest
+> verification this project has, and the sample-level artifacts sit away
+> from the boundary, where they cannot move it.
 
 ## Prediction 2: asymmetric sharpness — BORNE OUT
 
