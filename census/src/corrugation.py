@@ -103,6 +103,15 @@ def sample(link: CorrugatedLink, n_per_class: int, seed: int) -> Dataset:
             # point is drawn, leaving the centreline and the tube intact.  The
             # modulation scales the sampled radius, so points stay inside the
             # tube and the solid torus remains embedded.
+            #
+            # KNOWN FLAW (documented, deliberately not fixed): the modulation
+            # depth is hardcoded at 0.5 and ``link.amplitude`` never enters,
+            # so all Reading-B configurations at one frequency are the same
+            # condition regardless of their amplitude label, and the clip
+            # below concentrates ~20% of points exactly on the tube surface.
+            # See results/reading_b_anomaly.md.  Changing this would orphan
+            # the recorded artifacts; a future Reading-B sweep should thread
+            # amplitude through the depth and regenerate from scratch.
             radius = radius * (1.0 + 0.5 * np.sin(link.frequency * theta))
             radius = np.clip(radius, 0.0, tube)
         offsets = radius[:, None] * (

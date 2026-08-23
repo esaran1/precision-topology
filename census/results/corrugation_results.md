@@ -244,3 +244,17 @@ The width 3→4 boundary holds on corrugated links, with the same caveat recorde
 elsewhere: every activation separates in at least one width-4 run, which is not
 the same as every activation succeeding at width 4. ReLU and leaky-ReLU remain
 below 6%.
+
+---
+
+> **Duplicate-condition correction (2026-08-23).** Reading B's sampler
+> ignores the amplitude parameter (modulation depth hardcoded at 0.5), so
+> `B_a0.05`, `B_a0.15`, `B_a0.5`, and `B_paper` are **one condition run
+> four times** — their per-run accuracies are bit-identical. Corrected
+> distinct counts: 21 configurations → **18**; 5,040 runs → **4,320**
+> distinct; corrugated monotonic width-3 1,890 → **1,620** (still 0
+> separations); GELU width-3 separations 34 → **28**; runs ≤5 errors 60 →
+> **48**; configurations with GELU separations 18 → **15**. Medians and
+> permutation results are essentially unchanged (duplicates were unbiased
+> copies). Full analysis and mechanism: `reading_b_anomaly.md`;
+> authoritative counts: `CLAIMS.md`.

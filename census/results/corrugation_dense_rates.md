@@ -77,3 +77,16 @@ should be uniformly harder regionally is not explained by anything above.
 One Reading-B failure (B_f10 d12 s4, 1 error) is a flip case that passes
 0/0 on two extra samples; counts here follow the primary protocol, and the
 Reading-B zero would become 1/11 under a best-of-three convention.
+
+---
+
+> **Reading-B correction (2026-08-23).** The Reading-B anomaly flagged
+> above is resolved — and removed from the corrugation-strength story —
+> in `reading_b_anomaly.md`: Reading B's amplitude parameter is ignored
+> (its four zero-noise f=100 labels are one condition, so B has no mild
+> arm), and its sampler concentrates ~20% of points exactly on the tube
+> surface, making dense verification a surface probe (83% of one failed
+> run's dense errors lie exactly on the surface, vs 20% base rate).
+> Deduplicated, Reading B has 5 distinct separations, 0 dense survivors.
+> The strength analysis above should be read on Reading A + flat, where
+> the amplitude axis is real.
