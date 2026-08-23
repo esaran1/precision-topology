@@ -174,3 +174,13 @@ monotonic side, which is where all the data is. Distinguishing them needs
 evidence that separation is *representable* arbitrarily close above the
 threshold even where SGD fails — which is the Part 2 (constructed witness /
 harder search) question, not a sweep question.
+
+---
+
+> **Status note (2026-08-22, dense verification).** `dense_check.md` checked
+> every width-3 separation in this sweep on 100,000 fresh points. All
+> separations at the transition-defining values survive — `a = 1.10`: 3/3,
+> `a = 1.25`: 5/5, all 13 pwl-family separations, all 6 GELU — so **the
+> transition intervals reported above are unchanged under the dense
+> criterion.** Ten sin-family separations at `a ≥ 1.5` (of 61) fail densely;
+> per-value separation counts at those large parameters are sample-level.

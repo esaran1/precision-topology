@@ -163,6 +163,17 @@ same time the floor holds.
 > three activations it was measured on; the categorical barrier is at exactly
 > zero errors, not near it. Nothing above is revised; the scope is narrowed.
 
+> **Status note (2026-08-22, dense verification).** `dense_check.md`: of the
+> 34 width-3 GELU separations in this sweep, only **5 survive 100,000 fresh
+> points** from their own configuration, and 16 of the 21 configurations are
+> left with zero dense-verified separations. Every separation count in this
+> document is sample-level (0 errors on 2,000 eval points). The monotonic
+> zero is unaffected — a sample-level zero already implies a regional zero —
+> and the tail-versus-bulk contrast survives in direction, but the corrugated
+> GELU separation counts should not be quoted as regional separations. The
+> fold-layer-1 observation keeps its full support on the baseline link, where
+> the dense survivors concentrate.
+
 ---
 
 ## Do the two readings differ?
