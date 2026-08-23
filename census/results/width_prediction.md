@@ -107,3 +107,26 @@ gelu, sin_family(1.5)} × seeds 100–199, depth 3, lr 1e-2, 2,000 steps,
 linked tori tube radius 0.2, 1,000/class train and eval. Budget note:
 4,500 runs, CPU; the width-32 cells are the cost driver and the reason
 depth is fixed at 3.
+
+## Amendment (2026-08-23, pre-run, per user direction — original text above preserved)
+
+1. **Depth-6 slice added.** Widths 3, 6, 16, 32 × all five activations ×
+   seeds 100–139 (40/cell, 800 runs), depth 6, everything else
+   identical. Purpose: test whether the width-dependence interacts with
+   depth — Task D's premise is that depth substitutes for scale, so an
+   interaction is plausible. Registered expectation: the *shape* of
+   P-W2 is unchanged at depth 6 (categorical at 3, zero at large
+   width); we register no prediction about whether the remnant region
+   is wider or narrower at depth 6 — that is what the slice measures.
+   Depth 3 remains the primary grid; all P-W1/P-W3 significance claims
+   refer to depth 3.
+2. **P-W2's "width ≥ 8 (~2.5d)" is withdrawn as written.** The account
+   does not derive that constant; its likely source is the prior width
+   sweep, which would smuggle postdiction into the registration. The
+   registered shape claim is now exactly: **categorical at width d,
+   findability remnant beginning at width d + 1, advantage gone above —
+   with the transition location unspecified and measured, not
+   predicted.** P-W1's "every width ≥ 8" significance criterion stays
+   as the *test* threshold (a test must name a width), with the note
+   that ≥ 8 is informed by prior data and the out-of-sample content is
+   at 16, 24, 32.
