@@ -289,3 +289,16 @@ re-linked a still-disjoint pair.
 
 Width 3 complete. Widths above 3 pending and will be reported separately, under
 the projection convention, never in the same table as these numbers.
+
+---
+
+> **Status note (2026-08-22).** Two later findings bear on traces reported
+> here. (1) Dense verification (`dense_check.md`): separation labels are
+> sample-level; on the baseline link nearly all width-3 GELU separations
+> survive dense checking, so the traces in this file are essentially
+> unaffected. (2) Trace methodology (`localization_results.md`): the sign of
+> the linking number legitimately flips under orientation-reversing affine
+> layers (negative determinant), so |lk| is the layer-invariant quantity;
+> and 512-point traces can under-resolve deep, strongly distorting networks
+> — high-resolution retracing confirmed the GELU baseline traces used here
+> are stable under resolution doubling.

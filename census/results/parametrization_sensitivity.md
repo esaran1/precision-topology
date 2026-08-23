@@ -684,3 +684,16 @@ A tail that thins gradually and happens to terminate at 9 would be weak
 evidence, consistent with monotonic activations simply being somewhat worse. A
 tail that is well populated at 9–15 and then stops completely is the shape of a
 floor.
+
+---
+
+> **Status note (2026-08-22).** Dense verification (`dense_check.md`) found
+> that 15 of the 33 width-3 GELU separations reported here fail on 100,000
+> fresh points from their own configuration (worst 97 errors, margins to
+> −25). Dense-verified survivors by configuration: thick_tube 2/2,
+> unequal_major 3/3, rotated_30 3/4, generic 3/7, oblique_offset 2/2,
+> asymmetric_both 2/3, near_offset 2/5, rotated_generic 1/2, baseline 0/2,
+> asymmetric_tube 0/2. Separation counts in this document are sample-level
+> (0 errors on 2,000 eval points); no number above is revised, and the
+> monotonic zero is unaffected (a sample-level zero already implies a
+> regional zero).

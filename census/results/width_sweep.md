@@ -293,3 +293,13 @@ what holds at `d = 3` for a single Hopf link, whatever governs `R^7` at
 
 Half A complete. Half B (linking-number estimation) not started and blocked on
 the validation gate in `notes/width_sweep_design.md`.
+
+---
+
+> **Status note (2026-08-22).** Dense verification (`dense_check.md`): 5 of
+> the 6 width-3 GELU separations recorded here survive 100,000 fresh points;
+> the sixth (depth 5, seed 1) shows 1 error on the primary dense sample and
+> 0 on two further samples — marginal, not decisively failed. Width-4 dense
+> sampling found ReLU-family separations the least robust (ReLU 1/5,
+> leaky-ReLU 3/10 in the sampled subset). Counts in this document are
+> sample-level.

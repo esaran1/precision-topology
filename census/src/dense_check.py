@@ -68,7 +68,8 @@ def _reconstruct(row: pd.Series, sweep: str):
 
     depth, width, seed = int(row.depth), int(row.width), int(row.seed)
     # zlib.crc32 is deterministic across processes; hash() is not.
-    key = f"{sweep}|{getattr(row, 'configuration', '')}|{row.activation}|{depth}|{width}|{seed}"
+    configuration = getattr(row, "configuration", getattr(row, "parametrization", ""))
+    key = f"{sweep}|{configuration}|{row.activation}|{depth}|{width}|{seed}"
     dense_seed = DENSE_SEED_BASE + zlib.crc32(key.encode()) % 50_000
 
     if sweep in ("width_sweep", "threshold_sweep"):
@@ -98,7 +99,7 @@ def _reconstruct(row: pd.Series, sweep: str):
         )
         dense = linked_tori(DENSE_PER_CLASS, tube_radius=0.2, seed=dense_seed)
     elif sweep == "parametrization_sweep":
-        link = _PARAM_BY_NAME[row.configuration]
+        link = _PARAM_BY_NAME[row.parametrization]
         train_data = sample_link(link, 1_000, 30_000 + seed)
         eval_data = sample_link(link, 1_000, 40_000 + seed)
         result = train_mlp(
@@ -188,7 +189,9 @@ def run(output_directory: Path, verbose: bool = True) -> pd.DataFrame:
             {
                 "group": group,
                 "sweep": sweep,
-                "configuration": getattr(row, "configuration", "baseline"),
+                "configuration": getattr(
+                    row, "configuration", getattr(row, "parametrization", "baseline")
+                ),
                 "activation": row.activation,
                 "parameter": getattr(row, "parameter", None),
                 "depth": int(row.depth),
