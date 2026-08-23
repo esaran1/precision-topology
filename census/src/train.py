@@ -142,12 +142,19 @@ def train_mlp(
     hidden_width: int,
     activation: ActivationName,
     config: TrainingConfig,
+    activation_parameter: float | None = None,
 ) -> TrainingResult:
     """Train one MLP in float32 on CPU and capture all mandated checkpoints."""
 
     config.validate()
     seed_everything(config.seed, config.cpu_threads)
-    model = MLP(3, hidden_depth, hidden_width, activation).to(device="cpu", dtype=torch.float32)
+    model = MLP(
+        3,
+        hidden_depth,
+        hidden_width,
+        activation,
+        activation_parameter=activation_parameter,
+    ).to(device="cpu", dtype=torch.float32)
     train_features, train_labels = _tensor_dataset(train_data)
     eval_features, eval_labels = _tensor_dataset(eval_data)
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
