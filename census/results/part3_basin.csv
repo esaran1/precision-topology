@@ -1,0 +1,13 @@
+activation,parameter,depth,epsilon,recovered,n
+gelu,,5,0.003,20,20
+gelu,,5,0.01,20,20
+gelu,,5,0.03,20,20
+gelu,,5,0.1,19,20
+gelu,,5,0.3,13,20
+gelu,,5,1.0,0,20
+pwl_family,-0.25,8,0.003,20,20
+pwl_family,-0.25,8,0.01,20,20
+pwl_family,-0.25,8,0.03,19,20
+pwl_family,-0.25,8,0.1,10,20
+pwl_family,-0.25,8,0.3,2,20
+pwl_family,-0.25,8,1.0,0,20
