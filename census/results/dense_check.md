@@ -85,3 +85,30 @@ across samples.
    now describes 5 corrugated runs, not 34. The layer-1 immediacy statement
    retains its full support on the baseline link (all dense survivors) and
    its corrugated support shrinks — noted in `corrugation_results.md`.
+
+---
+
+## Addendum (2026-08-22): fold layer recomputed on dense-verified separations only
+
+The fold-layer claims were made over traced runs selected by the
+sample-level criterion. Restricting to dense-verified separations:
+
+| Trace source | traced | dense-verified | fold layer among survivors |
+|---|---:|---:|---|
+| corrugation sweep | 34 | **5** | 1 in all 5 |
+| parametrization sweep | 33 | **18** | 1 in 17, **2 in 1** (`generic` d12 s7 — the already-reported exception, which survives densely) |
+| baseline (`linking_width3`) | 3 | 2 (+1 marginal: 1 error primary sample, 0/0 on two extras) | 1 in all |
+| witness | 1 | 1 (2,000,000 points) | 1 by construction |
+
+**Layer-1 folding holds across every dense-verified trace** (with the one
+known layer-2 exception). What changes is the *strength of the corrugation
+negative*: "fold layer stays at 1 at amplitudes 18× past the embeddedness
+limit and frequencies to 200" was supported by 34 traces spanning all 21
+configurations; the dense-verified support is **5 traces spanning 4
+corrugated configurations plus flat** (A_a0.05, A_f50, A_embedded_f0.5 ×2,
+flat — none at the published amplitude 0.3 or frequencies above 50). The
+sample-level-only traces also all fold at layer 1, so no evidence points
+the other way; but the strong version of the corrugation fold-layer
+negative now rests on runs that were not regional separations, and the
+dense-verified version covers a much smaller slice of the corrugation
+grid. Restated in `corrugation_results.md`.

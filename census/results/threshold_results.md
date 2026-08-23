@@ -54,6 +54,26 @@ The rate keeps rising with distance from the threshold, to 29% at `a = 3`
 against GELU's 7.5% (6/80) in the same sweep — the depth of non-monotonicity
 modulates how often SGD exploits it, not just whether.
 
+> **Correction of the verdict (2026-08-22).** The registered prediction said
+> the transition would sit "at or very near" the analytic thresholds.
+> `(1.05, 1.10]` and `[−0.25, −0.10)` are **neither** — both transitions
+> land strictly *past* the thresholds, by one to four grid steps. The honest
+> reading: **monotonicity is necessary but not sufficient** — crossing the
+> analytic threshold does not make separation reachable; a finite margin of
+> non-monotonicity (roughly 0.1–0.25 in most-negative-derivative units) is
+> needed first. **That offset is not what the theory predicts**: Theorem 4.7
+> forbids the monotonic side and says nothing that would place the onset
+> away from the boundary. What makes the offset a finding rather than a grid
+> artifact is that the two families — which share nothing except the
+> property under test — agree on it in matched units to within one grid
+> step, and the annealing traces (`search_results.md`) land their failure
+> points in the same band from the other direction. The dense-verified
+> re-derivation leaves both intervals unchanged: every separation at the
+> transition-defining values (`a = 1.10`: 3/3, `α = −0.25`: 3/3) survives
+> 100,000-point verification. The "BORNE OUT" heading above should be read
+> as: borne out on the zero side, **not borne out on the location** — the
+> transition is past the threshold, not at it.
+
 ## Prediction 2: asymmetric sharpness — BORNE OUT
 
 The sharp edge is on the monotonic side, exactly as registered: the zero is
@@ -63,7 +83,17 @@ non-monotonic side rises gradually — zeros persist at `a = 1.05` and at
 small-parameter zeros do not count against the barrier reading; a positive
 on the monotonic side would have, and none occurred.
 
-## Prediction 3: floor structure — PARTIALLY NOT BORNE OUT, and this matters
+## Prediction 3: floor structure — NOT BORNE OUT; the floor argument is retracted
+
+**Monotonic networks can shatter the sample and cannot separate the
+region.** That is the replacement for the floor argument, and the CMA-ES
+result (`search_results.md`: monotonic networks at exactly 0 *train*
+errors, eval errors 16–19) is its sharp form. The registered prediction —
+a populated band above ~9–16 errors with a hard edge — was an SGD-search
+artifact of the three fixed activations, and it is **retracted rather than
+adjusted**: the barrier is at exactly zero eval errors, monotonic networks
+approach it arbitrarily closely without reaching it, and no populated-band
+structure above zero carries evidential weight.
 
 The registered prediction was that monotonic-side values show a hard floor
 ("no runs below ~9–16 errors on this link"). **That is not what happened.**

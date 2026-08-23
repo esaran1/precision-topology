@@ -75,6 +75,21 @@ fold layer to measure — the quantity is undefined for it, not large. Any claim
 about where monotonic activations would fold, if corrugation forced them to fold
 later, is outside what this measurement can reach.
 
+> **Restatement (2026-08-22, dense verification).** Of the 34 traced runs,
+> **only 5 are dense-verified separations** (`dense_check.md`, addendum),
+> spanning four corrugated configurations plus `flat` — none at the
+> published amplitude 0.3, none at frequencies above 50. Fold layer is 1 in
+> all 5 (and in all 29 sample-level-only traces, so no evidence points the
+> other way). But the claim this section makes — corrugation up to 18× the
+> embeddedness limit and frequency 200 does not move the fold — was
+> supported at that strength by runs that were not regional separations.
+> **The dense-verified version of the negative covers only mild
+> corrugation.** At the published corrugation values and beyond, no
+> dense-verified separating run exists to measure a fold layer on, so
+> whether strong corrugation moves the fold is now an open question rather
+> than a settled negative. The n=34 statements above stand as written about
+> sample-level separations.
+
 ---
 
 ## Prediction 2: the monotonic zero should survive — BORNE OUT
@@ -156,14 +171,22 @@ when the task gets harder; the distributions retreat from it. An optimisation
 advantage would erode, and the bulk shows exactly that erosion happening at the
 same time the floor holds.
 
-> **Status note (2026-08-22).** The floor figures above (9 uncorrugated, 16
-> corrugated) are properties of tanh/ReLU/leaky-ReLU specifically, not of the
-> monotonic category. The threshold sweep (`threshold_results.md`, Prediction
-> 3) found monotonic members of the `x + a·sin x` family reaching **2 errors**
-> at width 3 on the uncorrugated link while still never reaching 0 in 1,280
-> monotonic-side runs. The band-edge argument in this section stands for the
-> three activations it was measured on; the categorical barrier is at exactly
-> zero errors, not near it. Nothing above is revised; the scope is narrowed.
+> **Retraction (2026-08-22), superseding the scope-narrowing note that
+> previously stood here.** The floor argument in this section — a populated
+> band above 9–16 errors with a hard edge, read as the shape of a barrier —
+> **is retracted, not narrowed**. A monotonic network reached 2 errors
+> (threshold sweep), and derivative-free search produced monotonic networks
+> at 0 *train* errors: the 9–15 band with its apparent hard edge was an
+> artifact of which activations SGD was searching with, not a property of
+> the monotonic category. The replacement claim: **monotonic networks can
+> shatter the sample and cannot separate the region.** The barrier is at
+> exactly zero eval errors; monotonic networks approach it arbitrarily
+> closely without reaching it, and no populated-band structure above zero
+> carries evidential weight. The numbers in this section remain correct as
+> measurements of tanh/ReLU/leaky-ReLU under SGD; the argument built on
+> them does not survive. See `threshold_results.md` (Prediction 3) and
+> `search_results.md` (the train-zero finding); `CLAIMS.md` T6 is
+> authoritative.
 
 > **Status note (2026-08-22, dense verification).** `dense_check.md`: of the
 > 34 width-3 GELU separations in this sweep, only **5 survive 100,000 fresh

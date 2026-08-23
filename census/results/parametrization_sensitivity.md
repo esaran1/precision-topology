@@ -672,6 +672,20 @@ smallest monotonic errors anywhere are 9, 10, 11, 11, 12, 12, 13, 13, 13, 14,
 band, zero below 9, across 1,440 runs.** That is a floor regardless of what
 shape either distribution has.
 
+> **Retraction (2026-08-22).** The floor argument in this section is
+> **retracted, not adjusted**. The threshold sweep found a monotonic
+> network at **2 errors** and five more below 9; derivative-free search
+> found monotonic networks at **0 train errors**. The populated 9–15 band
+> with a hard edge below it was an artifact of which activations SGD was
+> searching with — tanh, ReLU and leaky-ReLU — not a property of the
+> monotonic category. The replacement claim: **monotonic networks can
+> shatter the sample and cannot separate the region**; the barrier is at
+> exactly zero eval errors, and monotonic networks approach it arbitrarily
+> closely without reaching it. The band counts above remain correct as
+> measurements of these three activations under SGD; the floor reading
+> built on them does not survive. `CLAIMS.md` T6; `threshold_results.md`
+> Prediction 3; `search_results.md` train-zero finding.
+
 > *Illustration of scale only, not evidence.* GELU has 51 runs at ≤8 errors
 > against 4 at 9–15, roughly 12.75 to 1. Applying that ratio to the monotonic
 > 9–15 count would suggest about 280 monotonic runs at ≤8. This is **not** an
