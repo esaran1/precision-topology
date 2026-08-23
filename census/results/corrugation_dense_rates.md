@@ -90,3 +90,13 @@ Reading-B zero would become 1/11 under a best-of-three convention.
 > Deduplicated, Reading B has 5 distinct separations, 0 dense survivors.
 > The strength analysis above should be read on Reading A + flat, where
 > the amplitude axis is real.
+
+---
+
+> **Superseded (2026-08-23).** The threshold reading of this analysis —
+> regional separation collapsing above mild corrugation — did not survive
+> adequate power: the corrugation_width sweep (30 seeds, depth 5) found
+> dense-verified width-3 separations at the published amplitude and at
+> every strong configuration tested (~3% rates), inside this analysis's
+> own stated power gap. The gradient survives as a gradient; the
+> threshold does not. See `corrugation_closure.md`; ledger T21/T26.
