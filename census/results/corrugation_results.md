@@ -154,6 +154,15 @@ when the task gets harder; the distributions retreat from it. An optimisation
 advantage would erode, and the bulk shows exactly that erosion happening at the
 same time the floor holds.
 
+> **Status note (2026-08-22).** The floor figures above (9 uncorrugated, 16
+> corrugated) are properties of tanh/ReLU/leaky-ReLU specifically, not of the
+> monotonic category. The threshold sweep (`threshold_results.md`, Prediction
+> 3) found monotonic members of the `x + a·sin x` family reaching **2 errors**
+> at width 3 on the uncorrugated link while still never reaching 0 in 1,280
+> monotonic-side runs. The band-edge argument in this section stands for the
+> three activations it was measured on; the categorical barrier is at exactly
+> zero errors, not near it. Nothing above is revised; the scope is narrowed.
+
 ---
 
 ## Do the two readings differ?
