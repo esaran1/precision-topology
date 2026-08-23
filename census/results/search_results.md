@@ -123,3 +123,7 @@ not pooled. The monotonic zero survives its own strongest attack so far,
 and the attack surfaced the sharpest characterization yet of what the zero
 means: monotonic networks can reach 2 errors by SGD and 0 *train* errors by
 direct search, and the eval zero remains empty.
+
+> **Count correction (2026-08-22, ledger audit).** "4,970 runs" above has the
+> same omission as earlier totals (width-sweep and protocol-sweep monotonic
+> strata excluded). Authoritative total: **5,570**, `CLAIMS.md` (T1).

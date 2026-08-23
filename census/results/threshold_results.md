@@ -184,3 +184,9 @@ harder search) question, not a sweep question.
 > transition intervals reported above are unchanged under the dense
 > criterion.** Ten sin-family separations at `a ≥ 1.5` (of 61) fail densely;
 > per-value separation counts at those large parameters are sample-level.
+
+> **Count correction (2026-08-22, ledger audit).** The "4,610 runs" total
+> above pooled corrugation + parametrization + this sweep but silently
+> excluded the width-sweep (240) and protocol-sweep (360) monotonic strata.
+> The artifact-derived total at the time of the audit is **5,570** monotonic
+> width-3 SGD runs with 0 separations; `CLAIMS.md` (T1) is authoritative.

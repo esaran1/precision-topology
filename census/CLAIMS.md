@@ -1,0 +1,57 @@
+# Claims ledger
+
+One row per claim. **Status**: current / qualified / withdrawn / superseded.
+This file is the authority on counts; where a results document disagrees, a
+correction block there points here. Withdrawn claims stay listed — the
+correction history is part of the record.
+
+Statistic kinds: *count* (exact-zero counts, the strongest kind here),
+*extreme* (minima/maxima, quoted only with distributions), *mean±SD* (seed
+level), *measurement* (direct computation on a specific object).
+
+## Topology / monotonicity strand
+
+| # | Claim | Status | Evidence (n) | Kind | Known threats | Where |
+|---|---|---|---|---|---|---|
+| T1 | **Monotonic width-3 zero**: no monotonic-activation width-3 network has reached 0 eval errors under SGD | **current** | 0 separations in **5,570** runs (width 240, threshold 1,280, parametrization 1,440, corrugation 1,890, protocol 360, new restarts 360); verified programmatically from artifacts 2026-08-22 | count | eval is 2,000 points (but regional ⇒ sample-level, so the zero is conservative); all runs share Adam/Kaiming ancestry except protocol stratum | `threshold_results.md`, `search_results.md`, ledger |
+| T2 | **Power bound on T1**: the monotonic width-3 separation rate is below **0.054%** (one-sided exact 95%), below 3.7% for any single 80-run cell | current | (1−p)^5570 = 0.05 | count-derived | the 5,570 pool is a heterogeneous mixture of links/depths/protocols; the bound applies to that mixture, not to each condition | ledger (authoritative), `threshold_results.md` |
+| T3 | **Non-SGD searches also find no monotonic separation**: swap-descent (24×2), annealing (12 traces, all fail at a\* ∈ [1.1, 1.8]), CMA-ES (0/120 restarts, positive control 12/20 at d3) | current | as listed, each family separate — never pooled with T1 | count | CMA objective changed after positive-control failure (documented); annealing path-dependence | `search_results.md` |
+| T4 | **Monotonic networks can shatter the sample**: 0 *train* errors on 2,000 points (3 CMA restarts), 2 *eval* errors by SGD — while T1 stands | current | 3 train-0 CMA candidates; 8 SGD runs < 9 errors | measurement | — | `search_results.md`, `threshold_results.md` |
+| T5 | **Threshold transition location**: width-3 separations appear only past the analytic monotonicity threshold in both parametric families — intervals (1.05, 1.10] and [−0.25, −0.10) | current | 4,480-run sweep; transition values dense-verified 3/3 and 5/5 | count | grid resolution; Family B threshold point is a dying-ReLU singularity (evidence rests on flanks); cannot distinguish monotonicity-binary from dip-depth-critical readings | `threshold_results.md` |
+| T6 | **The barrier sits at exactly 0 errors, not near it** (monotonic floor ~9–16 was activation-specific, not categorical) | current; supersedes the floor-as-band-edge generalization | sin-family monotonic runs at 2/6/8 errors; 0 at exactly zero (T1) | count + extreme (with distributions) | — | `threshold_results.md`, status note in `corrugation_results.md` |
+| T7 | **GELU/non-monotonic width-3 separations exist and are regional**: witness at 0 errors on 2,000,000 points (margin 0.28); 35 GELU dense survivors | current | dense checks at 100k/run; witness 2M | measurement | dense sampling is still sampling; margins down to 0.017 in survivors | `witness.md`, `dense_check.md` |
+| T8 | **Sample-level separation overstates regional separation**: 56 of 163 width-3 separations (46/81 GELU) fail at 100k points | current | 163 reconstructed runs, 163/163 recovery checks passed | count | flip-prone band near 1-in-100k margins (documented) | `dense_check.md` |
+| T9 | Corrugated-link GELU separation counts (34 at width 3; "18 of 21 configurations") | **qualified**: sample-level only; **5 of 34 survive densely; 16 of 21 configurations have zero dense-verified separations** | dense check | count | see T8 | `corrugation_results.md` + status note, `dense_check.md` |
+| T10 | **Fold layer 1**: separating runs change linking at layer 1 | qualified: full support on baseline link (all dense survivors + witness by construction); corrugated support reduced to 5 dense-verified runs | 34 traces + witness trace (lk −1→0 at fold, residual 2e−15) | measurement | 512-point traces under-resolve deep distorted nets (fixed: 8,192 + convergence gate); corrugated trace resolution not re-audited | `witness.md`, `localization_results.md`, `linking_width3.md` |
+| T11 | **Monotonic layers never change \|lk\|**; sign flips exactly track negative-determinant layers; near-miss runs crush inter-component distance to 10⁻³–10⁻⁴ instead | current | 8 monotonic traces, every converged measurement; det-sign match 100% | measurement | unreportable gaps where curves crush below artifact threshold | `localization_results.md` |
+| T12 | **Layer-1 fold is irreplaceable**: monotonic student for layer 1 → chance (1023) despite best MSE; full-depth student → 88 errors | current | 3 seeds × 3 prefixes | measurement | single teacher network | `localization_results.md` |
+| T13 | Error geography: near-miss errors sit toward the other component (8/8 runs); strong angular clustering only in some | current, partial | 8 runs | measurement | small error counts per run | `localization_results.md` |
+| T14 | Width-4 practical sufficiency for all activations | qualified: every activation separates *sometimes* at width 4, but ReLU-family rates ≤6% and densely weaker still (ReLU 1/5, leaky 3/10 sampled) | sweeps + 200-run dense sample | count | dense sample is a sample | `width_sweep.md`, `dense_check.md` |
+| T15 | Tail-vs-bulk: GELU advantage confined to the tail; corrugation narrowed bulk gap 12→4 while monotonic floor rose 9→16 | qualified: direction intact; corrugated tail counts are sample-level (T9); floor figures are activation-specific (T6) | 5,040-run corrugation sweep | count + medians | see T6, T9 | `corrugation_results.md` + status notes |
+| T16 | **Projected linking uniform-zero on width >3 traces** | **withdrawn** | — | — | overturned by the cancellation control: distorted Hopf embeddings project to a clean integer 0 in 17–23% of random projections; original fidelity control used rigid rotations only | `linking_projected.md`, `cancellation_control.md` |
+| T17 | Corrugation embeddedness boundaries 277× / 200× past published values | **withdrawn**, superseded by **18× / 19×** (amplitude limit 0.01657, frequency limit 5.18) | chord-vs-arc bug; found because the test rejected a plain circle | measurement | — | correction block in `corrugation_readings_prediction.md` |
+| T18 | G.1 reading ambiguity is immaterial to every result | current | both readings: 0 monotonic separations, fold layer 1, minima 23/24 | count | — | `corrugation_results.md` |
+| T19 | Annealing localization: every trace loses separation at a\* ∈ [1.1, 1.8] (median 1.275), never below the threshold | current | 12 traces | measurement | path/schedule dependence | `search_results.md` |
+| T20 | Estimator validity: Gauss estimator exact on unlink/Hopf/(2,4)-torus/chain; winding links verified lk = −q | current | validation suite + `winding_validation.csv` | measurement | — | `linking_validation.md`, `test_winding.py` |
+
+## Precision / quantization strand
+
+| # | Claim | Status | Evidence (n) | Kind | Known threats | Where |
+|---|---|---|---|---|---|---|
+| P1 | bfloat16 tanh final-layer vector non-injectivity 56.88% ± 4.92% vs 0.35% ± 0.35% at float32 | current | 5 seed-level averages | mean±SD | acceptance gate excludes failed runs | `FINDINGS.md` |
+| P2 | Boundedness (not injectivity alone) is the operative property; positive excess only for tanh | qualified: post-hoc factorial, n=1 bounded activation; orthogonal to the ICML monotonicity ordering | 3 activations | mean±SD | untested prediction registered (sigmoid/softsign) | `FINDINGS.md` |
+| P3 | Blobs collapse more than linked tori → effect tracks separability, not topology | current | control dataset | mean±SD | — | `FINDINGS.md` |
+| P4 | Class-purity reading of collision structure | **withdrawn** (circular: purity was computed on a quantity that presupposed it); replaced by the per-class/linking distinction note | — | — | — | `FINDINGS.md` correction, `notes/icml_paper_reconciliation.md` |
+| P5 | `collisions(F)` is empty in float32 (measure-zero); exact-collision counting cannot detect topology change at full precision | current | direct check | measurement | — | `interleaved_quantization.md` |
+| P6 | Interleaved vs post-hoc quantization: `collisions(QF) ⊇ collisions(F)` verified; `collisions(G) ⊇ collisions(F)` fails (positive control established after 3 attempts) | current | per-layer comparisons | measurement | — | `interleaved_quantization.md` |
+| P7 | Between-class margin < 1 ULP does not predict the 15 impure rows | current | margin analysis, Chebyshev/local-ULP | measurement | — | `between_class_margin.md` |
+
+## Count-language corrections (audit of 2026-08-22)
+
+Earlier documents pooled the monotonic-zero count inconsistently: "3,330"
+(corrugation + parametrization only), "4,610" (+ threshold), "4,970"
+(+ new restarts) — all silently excluding the width-sweep (240) and
+protocol-sweep (360) monotonic strata. The artifact-derived total is
+**5,570**, verified by recomputation from the recorded frames. Correction
+notes have been added where the older totals appear; the older totals were
+each true of their stated subsets, mislabeled as totals.
