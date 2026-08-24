@@ -129,3 +129,46 @@ def export(model: OffsetWitness, path: Path) -> None:
         },
     }
     path.write_text(json.dumps(payload, indent=2))
+
+
+# Reconstructed generator (audit 2026-08-24).  The original 1.4M-point
+# evaluation ran from uncommitted session code with unrecorded sample seeds
+# (AUDIT.md finding 8).  This main() is the committed replacement: four
+# fresh 175,000-per-class samples (1,400,000 points total) at the fixed
+# seeds below, disjoint from the training data seed (10_016 lineage) and
+# from every crc32 dense band in use (900k-970k bases are avoided by
+# offsetting into 931k).  Results are printed and persisted to
+# results/offset_witness_dense.csv.  The headline claim (T25) rests on
+# this committed run, not on the original prose figure.
+DENSE_SAMPLE_SEEDS = (931_001, 931_002, 931_003, 931_004)
+DENSE_SAMPLE_PER_CLASS = 175_000
+
+
+def main() -> None:
+    import pandas as pd
+
+    from .artifact_lock import artifact_lock
+
+    model = train_offset_witness()
+    rows = []
+    total_points = 0
+    total_errors = 0
+    for sample_seed in DENSE_SAMPLE_SEEDS:
+        errors, margin = dense_errors(model, DENSE_SAMPLE_PER_CLASS, sample_seed)
+        rows.append({"sample_seed": sample_seed,
+                     "n_points": 2 * DENSE_SAMPLE_PER_CLASS,
+                     "errors": errors, "min_margin": margin})
+        total_points += 2 * DENSE_SAMPLE_PER_CLASS
+        total_errors += errors
+        print(rows[-1], flush=True)
+    print(f"total: {total_errors} errors on {total_points} points", flush=True)
+    directory = Path(__file__).resolve().parents[1] / "results"
+    stem = directory / "offset_witness_dense"
+    with artifact_lock(stem, "offset witness dense evaluation"):
+        temp = stem.with_suffix(".csv.tmp")
+        pd.DataFrame(rows).to_csv(temp, index=False)
+        temp.replace(stem.with_suffix(".csv"))
+
+
+if __name__ == "__main__":
+    main()

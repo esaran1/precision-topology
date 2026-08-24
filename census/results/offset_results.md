@@ -112,3 +112,13 @@ family-specific, tracks no activation scalar we tested, and sits at
 smooth training health. The interval (1, 1.08] is the measured
 possible-but-unreached zone — with the exhibit standing at 1.02 as
 proof that the zone is genuinely possible, not merely asserted.
+
+---
+
+> **Status note (2026-08-24, audit follow-up).** The 1,400,000-point
+> evaluation above originally ran from uncommitted session code
+> (`AUDIT.md` finding 8). A committed generator now exists
+> (`src/offset_witness.py::main`, sample seeds 931001–931004) and
+> reproduces the result: **0 errors on 1,400,000 fresh points, minimum
+> margins 0.54–0.85** (`offset_witness_dense.csv`). The claim rests on
+> the committed run.
