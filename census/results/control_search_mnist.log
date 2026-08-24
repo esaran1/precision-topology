@@ -1,0 +1,10 @@
+mnist_mlp depth=4 gelu: mean test errors 223
+mnist_mlp depth=4 relu: mean test errors 198
+mnist_mlp depth=4 tanh: mean test errors 225
+mnist_mlp depth=8 gelu: mean test errors 205
+mnist_mlp depth=8 relu: mean test errors 229
+mnist_mlp depth=8 tanh: mean test errors 274
+mnist_mlp depth=12 gelu: mean test errors 227
+mnist_mlp depth=12 relu: mean test errors 249
+mnist_mlp depth=12 tanh: mean test errors 379
+mnist arm done

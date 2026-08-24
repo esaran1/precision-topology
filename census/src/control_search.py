@@ -114,7 +114,7 @@ def train_and_eval(model, x, y, xt, yt, epochs: int, batch: int, lr: float,
         epoch_losses[-2] - epoch_losses[-1]) < 0.01 * abs(epoch_losses[-2])
     return {"test_errors": test_errors, "train_errors_10k": train_errors,
             "final_train_loss": epoch_losses[-1],
-            "penultimate_train_loss": epoch_losses[-2],
+            "penultimate_train_loss": epoch_losses[-2] if len(epoch_losses) >= 2 else float("nan"),
             "loss_plateaued": plateaued}
 
 

@@ -1,0 +1,7 @@
+depth=8 gelu: mean 197 plateau False
+depth=8 relu: mean 210 plateau False
+depth=8 tanh: mean 255 plateau False
+depth=12 gelu: mean 240 plateau False
+depth=12 relu: mean 243 plateau False
+depth=12 tanh: mean 304 plateau False
+replication done
