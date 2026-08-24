@@ -1,0 +1,11 @@
+object,epsilon,n,recovered
+found,0.003,300,300
+found,0.01,300,300
+found,0.03,300,300
+found,0.1,300,300
+found,0.3,300,267
+constructed,0.003,300,300
+constructed,0.01,300,300
+constructed,0.03,300,300
+constructed,0.1,300,279
+constructed,0.3,300,206

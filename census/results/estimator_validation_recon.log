@@ -1,0 +1,45 @@
+found theta: [0.9759, -2.3653, 4.394, 13.081]
+constructed theta: [0.1, 2.3005, -23.0, 78.4984]
+{'object': 'found', 'epsilon': 0.003, 'n': 300, 'recovered': 300}
+{'object': 'found', 'epsilon': 0.01, 'n': 300, 'recovered': 300}
+{'object': 'found', 'epsilon': 0.03, 'n': 300, 'recovered': 300}
+{'object': 'found', 'epsilon': 0.1, 'n': 300, 'recovered': 300}
+{'object': 'found', 'epsilon': 0.3, 'n': 300, 'recovered': 267}
+{'object': 'constructed', 'epsilon': 0.003, 'n': 300, 'recovered': 300}
+{'object': 'constructed', 'epsilon': 0.01, 'n': 300, 'recovered': 300}
+{'object': 'constructed', 'epsilon': 0.03, 'n': 300, 'recovered': 300}
+{'object': 'constructed', 'epsilon': 0.1, 'n': 300, 'recovered': 279}
+{'object': 'constructed', 'epsilon': 0.3, 'n': 300, 'recovered': 206}
+{'object': 'found', 'coord': 0, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 0, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 0, 'epsilon': 0.3, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 0, 'epsilon': 1.0, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 1, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 1, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 1, 'epsilon': 0.3, 'recovered': 37, 'n': 40}
+{'object': 'found', 'coord': 1, 'epsilon': 1.0, 'recovered': 16, 'n': 40}
+{'object': 'found', 'coord': 2, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 2, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 2, 'epsilon': 0.3, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 2, 'epsilon': 1.0, 'recovered': 33, 'n': 40}
+{'object': 'found', 'coord': 3, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 3, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'found', 'coord': 3, 'epsilon': 0.3, 'recovered': 38, 'n': 40}
+{'object': 'found', 'coord': 3, 'epsilon': 1.0, 'recovered': 29, 'n': 40}
+{'object': 'constructed', 'coord': 0, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 0, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 0, 'epsilon': 0.3, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 0, 'epsilon': 1.0, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 1, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 1, 'epsilon': 0.1, 'recovered': 39, 'n': 40}
+{'object': 'constructed', 'coord': 1, 'epsilon': 0.3, 'recovered': 29, 'n': 40}
+{'object': 'constructed', 'coord': 1, 'epsilon': 1.0, 'recovered': 6, 'n': 40}
+{'object': 'constructed', 'coord': 2, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 2, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 2, 'epsilon': 0.3, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 2, 'epsilon': 1.0, 'recovered': 32, 'n': 40}
+{'object': 'constructed', 'coord': 3, 'epsilon': 0.01, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 3, 'epsilon': 0.1, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 3, 'epsilon': 0.3, 'recovered': 40, 'n': 40}
+{'object': 'constructed', 'coord': 3, 'epsilon': 1.0, 'recovered': 29, 'n': 40}
+done

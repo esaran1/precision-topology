@@ -290,3 +290,29 @@ The fix list is short, mechanical, and almost entirely in documents
 rather than code — the two real code findings (layer-1 distill seed,
 winding validate bypass) affect stated n and future safety, not present
 conclusions.
+
+---
+
+## Resolutions (2026-08-24, post-audit, user-directed)
+
+- **Finding 4/5 (counts):** fixed in `CLAIMS.md` (ea61c45) — T1 restarts
+  400, total 5,580, T2 bound restated, corrections block reconciled.
+- **Finding 8 (T25 generator):** reconstructed as
+  `src/offset_witness.py::main` (4ef6309), seeds 931001–931004:
+  **0 errors on 1,400,000 points re-verified**, margins 0.54–0.85
+  (`offset_witness_dense.csv`).
+- **Finding 7 (T31 harness):** reconstructed as
+  `src/estimator_validation.py`. The noise convention had to be
+  recovered by reconciliation: whole-vector RMS-relative noise gives
+  systematically lower recovery (found ε=0.3: 56% vs 87%); **per-
+  coordinate |θi|-relative noise reproduces the committed table** —
+  found object exact to within 1.7% (its θ is bit-reproduced, so this
+  is a true validation of harness + convention), constructed object
+  within 6–10 points at ε ≥ 0.1 (its θ is re-derived from design
+  constants; the original tensor was never persisted). All 2c
+  conclusions reproduce. The RMS-convention run is kept as
+  `estimator_*_rms_sensitivity.csv`: a ~30-point convention spread at
+  ε=0.3, which is a standing caveat on radius-style numbers and further
+  support for 2b's volume-over-radius conclusion.
+- Documentary fixes (findings 1–3, 6, 9–11 wording) remain **deferred**
+  per user direction. CIFAR conclusions held pending replication.
