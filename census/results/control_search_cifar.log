@@ -1,0 +1,10 @@
+cifar_cnn depth=4 warmup=0 gelu: mean test errors 2446
+cifar_cnn depth=4 warmup=0 relu: mean test errors 2568
+cifar_cnn depth=4 warmup=0 tanh: mean test errors 2896
+cifar_cnn depth=8 warmup=0 gelu: mean test errors 2047
+cifar_cnn depth=8 warmup=0 relu: mean test errors 2193
+cifar_cnn depth=8 warmup=0 tanh: mean test errors 2520
+cifar_cnn depth=8 warmup=500 gelu: mean test errors 2103
+cifar_cnn depth=8 warmup=500 relu: mean test errors 2113
+cifar_cnn depth=8 warmup=500 tanh: mean test errors 2537
+cifar arm done
