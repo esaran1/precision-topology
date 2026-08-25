@@ -1,0 +1,8 @@
+stratum,runs,separations,note
+width_sweep,240,0,fixed monotonic activations
+threshold_sweep,1280,0,"family A a<=1, family B alpha>=0, fixed monotonic"
+parametrization_sweep,1440,0,monotonic column
+corrugation_sweep (distinct),1620,0,1890 rows minus 270 bit-identical Reading-B amplitude duplicates (T23)
+protocol_sweep,360,0,author-protocol stratum
+search_restarts,400,0,"200 tanh + 200 sin_family a=0.95, all monotonic by construction"
+winding_sweep,240,0,"monotonic column, q=1..4 links"
