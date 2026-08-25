@@ -316,3 +316,34 @@ conclusions.
   support for 2b's volume-over-radius conclusion.
 - Documentary fixes (findings 1–3, 6, 9–11 wording) remain **deferred**
   per user direction. CIFAR conclusions held pending replication.
+
+---
+
+## Hardening pass (2026-08-25): execution record
+
+All 11 qualifying + 5 cosmetic findings executed, plus one new
+claim-invalidating finding discovered during the theorem work.
+
+| finding | resolution | commit |
+|---|---|---|
+| 4/5 bound + stale totals | `monotonic_zero.md` + `src/zero_decomposition.py`: full stratum decomposition regenerable from artifacts; **0 in 5,580**, one-sided exact bound **0.0537%** | a895cb8 |
+| 1 P7 inversion | ledger restated (necessary-not-sufficient, 15/15 vs base 40/3,667); repo-wide grep found no other instance | d8960cf |
+| 2 T19 interval | restated with explicit definition; **2 re-entrant traces** found and reported (depth-5 seeds 10, 16) | d8960cf |
+| 3 T24 mismatches | pooled-vs-per-activation scope fixed; attrition sequence given in full; knife-edge cell flagged | d8960cf |
+| 9 T29 sidedness | one-sided labelled; **Bonferroni ×3 stated: down-arm fails (0.138)**, headline rests on the up arm | d8960cf |
+| 6 T12 n | investigated as a code defect and **is not one** — seeds propagate (init max|Δ| 0.90), the three runs converge to a common optimum (finals agree 1.5e−8); extended to 5 seeds: **{88, 89, 1000, 1000, 1000}**, chance is the majority outcome | d8960cf |
+| live bypass | artifact gate applied at **every** linking emitter; `tests/test_artifact_gate.py` adds behavioural + static-scan protection (`cancellation.py` exempt by design, documented) | 09ac6f0 |
+| 10 sampler | density derived exactly (R/(R+ρcosφ); ±25%, ratio 1.5, floor 0.833); **84 survivors, the 4 interval-defining runs, and both witnesses at 1M points re-verified volume-uniform — no claim moves** | 956701c |
+| 11 ε₅₀ | withdrawn as an undefined statistic; "flat in a" retained | d8960cf |
+| 7/8 generators | both reconstructed, calling production code by import path (`from .fold1d import …`, `train_offset_witness`); **1.4M re-verified at full size, 0 errors**; estimator table reproduced after recovering the per-coordinate noise convention (RMS run kept as a labelled sensitivity annex) | eb8fe53, 4ef6309 |
+| cosmetics | T30 rate, ratio range, seed-overlap note, registration one-word edit — all recorded | d8960cf, 05123d6 |
+| **NEW: claim-invalidating** | **T30 box-emptiness withdrawn** — in-box solutions exist at a = 1.02 with \|w₂\| = 1; "required \|w₂\| ≈ 58" was the 41⁴ grid's own resolution requirement | 4eacf25 |
+| follow-on | grid-derived measures audited and replaced with an analytic instrument; 2a's smooth-growth claim **survives on better evidence** (true measure positive and strictly monotone at every a > 1); component counts and basin/solution ratios withdrawn | 846280a |
+
+Coverage additions: overclaim sweep (12 edits, 05123d6), reverse
+coverage T32–T36 (879eb42), theorem T37 (8a1a7e7),
+`notes/instrument_artifacts.md` on the two instrument-limitation errors.
+
+231 tests pass. Deferred by scope: per-family volume-uniform samplers
+for deformed links; `reproduce.py --verify` (competing with the live
+CIFAR convergence run).
