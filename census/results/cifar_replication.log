@@ -1,0 +1,6 @@
+depth=8 gelu: mean 2050 n=10
+depth=8 relu: mean 2182 n=10
+depth=8 tanh: mean 2514 n=5
+depth=4 gelu: mean 2498 n=10
+depth=4 relu: mean 2614 n=10
+replication done
