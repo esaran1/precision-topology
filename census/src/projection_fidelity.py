@@ -95,13 +95,16 @@ def fidelity_trial(
 
     left, right = _project_to_r3(embedded_first, embedded_second)
     estimate = linking_number(left, right)
+    from .linking_trace import ARTIFACT_DISTANCE
+
+    usable = estimate.defined and native_distance > ARTIFACT_DISTANCE
     return FidelityResult(
         dimension=dimension,
         seed=seed,
         expected=expected,
-        recovered=estimate.rounded if estimate.defined else None,
-        raw=estimate.raw if estimate.defined else None,
-        residual=estimate.residual if estimate.defined else None,
+        recovered=estimate.rounded if usable else None,
+        raw=estimate.raw if usable else None,
+        residual=estimate.residual if usable else None,
         min_distance=native_distance,
         defined=estimate.defined,
     )

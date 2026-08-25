@@ -237,10 +237,13 @@ def validate(
         minimum = float(pairwise.min().item())
         collisions = int((pairwise == 0.0).sum().item())
 
+    from .linking_trace import ARTIFACT_DISTANCE
+
+    usable = estimate.defined and estimate.min_distance > ARTIFACT_DISTANCE
     return CorrugationValidation(
         name=link.name,
-        linking_number=estimate.rounded if estimate.defined else None,
-        linking_residual=estimate.residual if estimate.defined else None,
+        linking_number=estimate.rounded if usable else None,
+        linking_residual=estimate.residual if usable else None,
         core_separation=estimate.min_distance,
         tube_gap=gap,
         self_intersects=self_hit,

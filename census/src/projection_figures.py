@@ -39,9 +39,9 @@ def _panel(axis, left: torch.Tensor, right: torch.Tensor, title: str) -> None:
 def _describe(left: torch.Tensor, right: torch.Tensor) -> str:
     estimate = linking_number(left, right)
     distance = float(torch.cdist(left, right).min().item())
-    flag = "" if distance > ARTIFACT_DISTANCE else "  ARTIFACT"
-    value = estimate.rounded if estimate.defined else "undef"
-    return f"link {value}   d={distance:.3f}{flag}"
+    usable = estimate.defined and distance > ARTIFACT_DISTANCE
+    value = estimate.rounded if usable else ("artifact" if estimate.defined else "undef")
+    return f"link {value}   d={distance:.3f}"
 
 
 def figure_for_projections(

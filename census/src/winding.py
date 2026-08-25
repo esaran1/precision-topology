@@ -160,11 +160,17 @@ def validate(link: WindingLink, n_points: int = 4096, sample_seed: int = 0) -> W
     points = torch.tensor(data.features, dtype=torch.float64)
     labels = torch.tensor(data.labels)
     pairwise = torch.cdist(points[labels == 0], points[labels == 1])
+    # Same artifact gate as linking_trace: no linking value is emitted when
+    # the curves sit inside the artifact regime (audit 2026-08-25 closed the
+    # bypass here; previously only exact coincidence was rejected).
+    from .linking_trace import ARTIFACT_DISTANCE
+
+    usable = estimate.defined and core_gap > ARTIFACT_DISTANCE
     return WindingValidation(
         name=link.name,
         q=link.q,
-        linking_number=estimate.rounded if estimate.defined else None,
-        linking_residual=estimate.residual if estimate.defined else None,
+        linking_number=estimate.rounded if usable else None,
+        linking_residual=estimate.residual if usable else None,
         core_gap=core_gap,
         b_self_gap=b_gap,
         tube_clearance=core_gap - (link.tube_radius_a + link.tube_radius_b),

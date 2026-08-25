@@ -176,10 +176,13 @@ def validate(link: TorusLink, n_points: int = 512) -> LinkValidation:
     self_a = link.tube_radius_a >= link.major_radius_a
     self_b = link.tube_radius_b >= link.major_radius_b
     gap = separation - (link.tube_radius_a + link.tube_radius_b)
+    from .linking_trace import ARTIFACT_DISTANCE
+
+    usable = estimate.defined and separation > ARTIFACT_DISTANCE
     return LinkValidation(
         name=link.name,
-        linking_number=estimate.rounded if estimate.defined else None,
-        linking_residual=estimate.residual if estimate.defined else None,
+        linking_number=estimate.rounded if usable else None,
+        linking_residual=estimate.residual if usable else None,
         core_separation=separation,
         tube_gap=gap,
         self_intersects_a=self_a,
