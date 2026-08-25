@@ -127,3 +127,16 @@ direct search, and the eval zero remains empty.
 > **Count correction (2026-08-22, ledger audit).** "4,970 runs" above has the
 > same omission as earlier totals (width-sweep and protocol-sweep monotonic
 > strata excluded). Authoritative total: **5,570**, `CLAIMS.md` (T1).
+
+---
+
+> **Audit correction (2026-08-25).** The annealing localization above
+> quoted "every trace loses separation at a\* ∈ [1.1, 1.8] (median
+> 1.275)". Recomputation (`AUDIT.md` finding 2) shows the median 1.275
+> corresponds to the midpoint-of-first-loss definition, whose values
+> span **[1.075, 2.275]**; the quoted interval matches no definition of
+> the statistic. Two of the 12 traces (depth 5, seeds 10 and 16) are
+> **re-entrant** — they fail, regain separation at lower `a`, and fail
+> again (final losses at 1.375 and 1.125); the remaining ten are
+> single-transition. No trace fails below the analytic threshold
+> (min 1.075). Ledger row T19 carries the corrected statement.

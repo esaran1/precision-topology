@@ -1,0 +1,3 @@
+layer,student_activation,eval_mse,worst_point_distance,errors_with_teacher_suffix,teacher_errors,student_seed
+3,tanh,21.158788681030273,22.148529052734375,1000,0,3
+3,tanh,21.15859603881836,22.148530960083008,1000,0,4

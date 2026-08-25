@@ -82,3 +82,18 @@ The registered against-reading condition — all rates collapsing at every
 width including 6, leaving topology and optimization indistinguishable —
 did not occur: width 6 holds 75–100% dense-verified rates for sin(2.0) at
 every q.
+
+---
+
+> **Audit correction (2026-08-25).** Three statements above are
+> restated at the scope the data supports (`AUDIT.md` finding 3):
+> monotone decay of dense-verified rates with `q` holds for the
+> **pooled** non-monotonic rates at every width, not per-activation
+> (gelu w4 rises 0% → 15% at q3→q4; sin w5 rises 95% → 100% at q1→q2);
+> dense attrition by q is 22%, 28%, 46%, **42%** — higher at q ≥ 3 than
+> q ≤ 2 but not monotone, and the earlier "22% → 46%" selected the q=3
+> endpoint; tanh needs one extra width at q=1, two at q=2, and reaches
+> no dense-verified majority at any width ≤ 6 for q ≥ 3 ("one width
+> behind" held only at q=1). The q=4 majority-width value (6) rests on
+> a knife-edge cell (sin w5 exactly 10/20). Ledger row T24 carries the
+> corrected statement.

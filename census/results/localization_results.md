@@ -106,3 +106,20 @@ change |lk|; their best runs instead compress the components toward
 contact, spending near-singular layers to fake separation at sample level.
 Both point at the same object — the fold — as the entirety of what
 non-monotonicity buys at width 3.
+
+---
+
+> **Audit correction and extension (2026-08-25).** (1) The three
+> layer-1 distillation "seeds" recorded bit-identical rows. This was
+> investigated as a possible seeding defect and is **not one**: initial
+> student parameters differ across seeds (max |Δ| 0.90) and the three
+> runs converge to a common optimum (final MSE agreeing to 1.5e−8).
+> The layer-1 result is a replicated optimum at chance, not three
+> independent draws. (2) The full-depth student's "88 errors" was the
+> best of three, with the chance-level seed (student_seed 2, 1000
+> errors) unmentioned. Extension seeds 3–4
+> (`localization_distill_extension.csv`) both land at 1000: the 5-seed
+> distribution is **{88, 89, 1000, 1000, 1000}** — chance is the
+> majority outcome, and the full-depth contrast is an existence
+> statement (2/5), not a typical outcome. Ledger row T12 carries the
+> corrected statement.
