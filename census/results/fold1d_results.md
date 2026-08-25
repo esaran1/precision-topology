@@ -93,3 +93,25 @@ total cannot locate an onset or test the calibration across dimensions.
 design that would decide it stated: order-of-magnitude larger seed
 counts or longer training at these exact tasks, beyond this project's
 budget envelope.
+
+---
+
+> **Claim-invalidating correction (2026-08-25).** The Part 2a–2b bullet
+> "At a = 1.05/1.10 the solution set is **empty within both boxes** —
+> because required |w₂| ≈ 58 exceeds the box … the box-dependence *is
+> the mechanism made visible*" is **false and withdrawn**. Solutions
+> exist inside [−5, 5]⁴ at every value tested, including **a = 1.02
+> with |w₂| = 1** (`src/box_counterexample.py`, verified float64 on
+> 500k+ points with strict two-sided margins). The emptiness was a
+> **grid-resolution artifact**: the admissible b₂ interval has width
+> |w₂|·gap(a), and a 41-point grid (step 0.25) needs |w₂| ≳ 40–456
+> depending on a for any node to land inside it — which is where the
+> "≈ 58" came from. Consequently every `solution_fraction` in
+> `fold1d_geometry.csv` is a **lower bound at grid resolution**, not a
+> measure, and the small-a entries mean "unresolvable at 41⁴", not
+> "zero". The findability results (0/200 at a ≤ 1.30), the basin-volume
+> jump, the solutions-with-zero-basins finding, and the provable
+> monotonic zero are all unaffected — basins were measured by SGD from
+> 6,561 initializations, not from this grid — and the thin-sheet
+> finding is strengthened: the sheets are thinner than the grid that
+> was measuring them. Full analysis: `box_emptiness_correction.md`.
