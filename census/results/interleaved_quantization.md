@@ -150,7 +150,7 @@ Supporting the argument: at every precision the network actually tolerates —
 float32, float16, bfloat16, fixed-8, fixed-6 — interleaved quantization produces
 **zero** between-class collisions that post-hoc quantization does not also
 produce. Interleaving does not supply separation between classes that
-full-precision weights had not already established.
+full-precision weights had not already recorded.
 
 Refining the argument: the superset relation `collisions(G) ⊇ collisions(F)`
 does not hold, and neither does its converse, once both sides are evaluated at a

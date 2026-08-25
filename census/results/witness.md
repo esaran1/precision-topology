@@ -34,7 +34,7 @@ The fold layer is exactly expressible in the project's activation zoo as a
   independent 200,000-point samples and one 1,000,000-point sample, six
   data seeds, worst logit margin over all samples **0.284** (per-sample
   minima 0.28–0.56). This is regional separation as far as sampling can
-  establish it, not sample shattering.
+  support it, not sample shattering.
 - **Linking trace** (all stages are width 3; no projection anywhere):
 
   | stage | lk | residual | min distance |
@@ -67,7 +67,7 @@ endpoints on A's plane — one inside the hole, one outside, a staple
 through the ring — while the `x = 1` fold leaves the arc's crease
 endpoints off A's plane on opposite sides, crossing A's disk once. The
 geometric account of *why* one staple resolves and the other does not is
-an observation, not a theorem; what the controls establish is only that
+an observation, not a theorem; what the controls support is only that
 placement matters.
 
 In the final witness parametrization (no +4 offsets) the selection sweep
@@ -95,7 +95,7 @@ naive simplification.
 
 ## What the witness establishes, and what it does not
 
-Established:
+Measured and held:
 
 - Separating width-3 networks exist whose non-monotonicity budget is
   exactly **one non-injective fold at one plane** — the existence claim no

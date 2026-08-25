@@ -9,7 +9,7 @@ Data: `basin_recovery.csv`, `basin_distances.csv`, `basin_profiles.csv`,
 
 ## The one-paragraph answer
 
-The gap is a **weight-scale barrier, demonstrated by manipulation**: the
+The gap is a **weight-scale barrier, shown by two-sided manipulation**: the
 solutions at `a = 1.02` require ~1,000× fold amplification; standard
 training reaches spectral-norm products of ~50 (median) to ~150 (max)
 there and never travels to the required scale; and the required scale
@@ -84,7 +84,7 @@ real, monotone quantity within Family A and is not the cross-family
 matched unit. The cross-family onset difference remains unexplained at
 the level of a single scalar.
 
-## 2b: the amplification account — confirmed by intervention
+## 2b: the amplification account — borne out by intervention
 
 **2b-tail, borne out with the crossing at the onset.** Spectral-norm
 products of standard trained depth-5 networks versus `A_req`:

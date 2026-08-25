@@ -300,5 +300,5 @@ the projection convention, never in the same table as these numbers.
 > the linking number legitimately flips under orientation-reversing affine
 > layers (negative determinant), so |lk| is the layer-invariant quantity;
 > and 512-point traces can under-resolve deep, strongly distorting networks
-> — high-resolution retracing confirmed the GELU baseline traces used here
+> — high-resolution retracing agreed with the GELU baseline traces used here
 > are stable under resolution doubling.

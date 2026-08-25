@@ -71,7 +71,7 @@ outcome "exhibit separates + searches fail" obtained.
   interval statements are count-based at grid resolution.
 - Which stopping condition occurred: **the rate fell below resolution**,
   not the interval becoming tight — below `a = 1.08` all cells are 0/40
-  (ceiling 8.8%), while the exhibit proves representability down to at
+  (ceiling 8.8%), while the exhibit realizes representability down to at
   least 1.02. Min errors at the near-threshold probes are 3–8: SGD gets
   within a handful of errors even at `a = 1.001` and never to zero.
 - The sample-level-only events (A at 1.08, B at −0.11) both failed dense
@@ -89,7 +89,7 @@ touched at |min f′| = 0.10 on the original grid; the bisection breaks it:
 **A transitions at |min f′| ∈ (0.08, 0.09], B at (0.20, 0.25]** —
 disjoint. **No candidate unit makes the two families coincide.** Per the
 registered reading, a universal negative here argues for reachability —
-which A4 established independently. The two families simply have
+which A4 found independently. The two families simply have
 different SGD-reachability onsets, and there is no single activation
 scalar that predicts where separation becomes findable.
 

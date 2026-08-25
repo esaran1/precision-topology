@@ -52,7 +52,7 @@ measurement that matters.
   (51 eval-0, 34 dense-verified: 33% dense attrition, against 11% in the
   standard arm) — larger scale finds more true solutions *and* more
   sample-level artifacts; dense verification remains mandatory.
-- The scaled-down arm's rate (3.0%) confirms the low side is not
+- The scaled-down arm's rate (3.0%) bears out the low side: it is not
   saturated: standard initialization is not at the floor of the scale
   response.
 - Substantive difference from the sin intervention, as required: the sin

@@ -142,7 +142,7 @@ first affine map — does not survive removing the alignment that would expose i
 
 #### The existence proof that later folding is possible
 
-One run folds at layer 2. It is reported in full because it establishes that
+One run folds at layer 2. It is reported in full because it is an existence case:
 layer-1 folding is *rare rather than forced* — a two-layer fold is available and
 simply seldom taken.
 
