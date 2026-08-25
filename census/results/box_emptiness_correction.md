@@ -3,6 +3,23 @@
 Found 2026-08-25 during the Part 5 theorem work (hardening brief).
 Reported before continuing the audit, per the standing rule.
 
+## How it was found (the methodological point)
+
+**Deriving theory exposed an empirical error.** The Part 5 lower bound
+says a solving network needs |w₂| ≥ c/D(a) with c set by task geometry
+(c ≈ 1.2 as measured). At a = 1.02 that permits |w₂| ≈ 1 — flatly
+contradicting the committed claim that solutions there require |w₂| ≈ 58
+and therefore cannot fit in the box. One of the two had to be wrong. The
+theorem was right: an explicit |w₂| = 1 solution exists, verified below.
+
+Independently and a few hours earlier, the Part 3 overclaim sweep had
+flagged this same sentence — "empty within both boxes **because**
+required |w₂| ≈ 58 exceeds the box" — purely on the causal connective,
+with no knowledge of the mathematics, and deferred it to the theorem
+work rather than rewording it. Two unrelated detectors, a derivation and
+a language audit, converged on the same false sentence. The general
+lesson is recorded in `notes/instrument_artifacts.md`.
+
 ## The claim, as committed
 
 `fold1d_results.md` (Part 2a–2b table) and ledger row T30 stated:

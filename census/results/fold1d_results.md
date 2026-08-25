@@ -115,3 +115,17 @@ budget envelope.
 > 6,561 initializations, not from this grid — and the thin-sheet
 > finding is strengthened: the sheets are thinner than the grid that
 > was measuring them. Full analysis: `box_emptiness_correction.md`.
+
+> **Restatement at greater strength (2026-08-25).** With the box-emptiness
+> artifact removed, the possible-versus-findable result is sharper than
+> first reported. Previously the reading was that near-threshold
+> solutions migrate to large ‖θ‖ — somewhere training cannot reach in
+> norm. That is false. Solutions sit **inside the ordinary parameter
+> region** (a = 1.02 solves with |w₂| = 1, every coordinate within
+> [−5, 5], a scale training passes through constantly) and have **no
+> basin whatsoever**: 0/200 SGD runs solve at a ≤ 1.30, and the exact
+> basin fraction is 0 through a = 1.25. The obstruction is not distance
+> or norm. It is that the solution set is a sheet of measure ~1e−6 with
+> zero attracting volume, sitting in a region training visits and
+> passes through without being drawn in. Analytic solution measures:
+> `grid_measure_audit.md`, `solution_measure.csv`.
