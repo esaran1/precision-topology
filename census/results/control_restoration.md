@@ -76,3 +76,70 @@ confirmed at convergence") is the user's.
 
 No conclusions beyond this table are drawn; Part 2 (the width
 prediction in this setting) is gated on that decision.
+
+---
+
+## Convergence verdict (2026-08-26): all four criteria met — the control is restored
+
+The plateau criterion, the only one the mid-descent replication failed,
+was tested by rerunning the depth-8 cells to convergence (up to 40
+epochs, explicit stop at < 1% relative training-loss improvement on two
+consecutive epochs; same architecture, data, optimizer, and seeds).
+Data: `cifar_convergence.csv`; module `src/cifar_convergence.py`.
+
+| arm | n | mean test errors | SD | median epochs | plateaued |
+|---|---:|---:|---:|---:|---:|
+| GELU | 10 | **2,047.0** | 47 | 22 | 9/10 |
+| ReLU | 10 | **2,179.7** | 45 | 31.5 | 9/10 |
+| tanh | 5 | **2,591.8** | 36 | 21 | 5/5 |
+
+### The four criteria
+
+1. **Effect** — pass. GELU below ReLU by 133 errors.
+2. **Statistics at n ≥ 10** — pass. Two-sided permutation
+   p = **3e−5** (100,000 resamples, seed 0).
+3. **Replication in ≥ 2 nearby configurations** — pass, and now across
+   *budgets* as well: depth 8 and depth 4 at 12 epochs
+   (p = 1.2e−4, 6e−3) and depth 8 at convergence (p = 3e−5).
+4. **Training-loss plateau** — **pass**: 24 of 25 runs plateaued
+   (9/10, 9/10, 5/5). The two censored runs (GELU seed 10, ReLU seed 4)
+   hit the 40-epoch cap and are reported as censored, not counted as
+   converged. Dropping them entirely does not move the result:
+   plateaued-only means 2,049 vs 2,183, p = 6e−5.
+
+**Verdict: the positive control is restored.** The pre-registered
+criterion is met in full, on fresh seeds, at convergence.
+
+### The mid-descent snapshot was not misleading
+
+Same seeds, 12 epochs → convergence: GELU 2,049.7 → 2,047.0; ReLU
+2,182.0 → 2,179.7; tanh 2,514.0 → 2,591.8. The GELU–ReLU gap is 132 at
+12 epochs and 133 at convergence — the caution that motivated criterion
+4 was warranted but, here, the ranking was stable. (Contrast the MNIST
+bottleneck reversal, T34, where the short-budget ranking *was* an
+artifact — which is why the criterion stays in force rather than being
+weakened retrospectively.)
+
+### 1c kill switch: not fired, at convergence
+
+tanh — smooth, monotonic — is **worst of the three**: 545 errors behind
+GELU (p = 4e−4) and 412 behind ReLU (p = 4e−4), and its training error
+is 4× the others' (744 vs ~180 per 10,000), so it is underfitting the
+task rather than generalizing differently. The advantage therefore
+tracks **non-monotonicity, not smoothness**, in the setting where the
+folk phenomenon reproduces. The standard smoothness explanation is
+contradicted here: a smooth monotonic activation is not merely no
+better than ReLU, it is substantially worse.
+
+### What this unlocks, and what it does not
+
+- **Unlocks Task F Part 2**: the width prediction can now be registered
+  against a setting whose positive control holds — the thing the MNIST
+  bottleneck experiment lacked (T34).
+- **Does not establish** that the fold mechanism *causes* the CIFAR
+  advantage. What is established: the advantage reproduces at
+  convergence, and it does not track smoothness. Whether it tracks
+  bottleneck width relative to intrinsic dimension is exactly what
+  Part 2 would test, and is untested.
+- Scope limits unchanged: one architecture family, no augmentation,
+  single learning rate, depth 8 (depth 4 tested only at 12 epochs).

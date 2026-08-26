@@ -4,3 +4,23 @@ gelu seed=5: 24 epochs plateaued=True test=1990
 gelu seed=6: 17 epochs plateaued=True test=2039
 gelu seed=7: 22 epochs plateaued=True test=2099
 gelu seed=8: 22 epochs plateaued=True test=2015
+gelu seed=9: 22 epochs plateaued=True test=1997
+gelu seed=10: 40 epochs plateaued=False test=2031
+gelu seed=11: 33 epochs plateaued=True test=2005
+gelu seed=12: 18 epochs plateaued=True test=2091
+relu seed=3: 38 epochs plateaued=True test=2142
+relu seed=4: 40 epochs plateaued=False test=2152
+relu seed=5: 32 epochs plateaued=True test=2219
+relu seed=6: 31 epochs plateaued=True test=2269
+relu seed=7: 30 epochs plateaued=True test=2132
+relu seed=8: 29 epochs plateaued=True test=2175
+relu seed=9: 36 epochs plateaued=True test=2230
+relu seed=10: 23 epochs plateaued=True test=2147
+relu seed=11: 32 epochs plateaued=True test=2156
+relu seed=12: 26 epochs plateaued=True test=2175
+tanh seed=3: 21 epochs plateaued=True test=2568
+tanh seed=4: 20 epochs plateaued=True test=2540
+tanh seed=5: 22 epochs plateaued=True test=2621
+tanh seed=6: 27 epochs plateaued=True test=2613
+tanh seed=7: 19 epochs plateaued=True test=2617
+done
