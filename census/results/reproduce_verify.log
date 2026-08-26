@@ -1,0 +1,10 @@
+determinism: same config trained twice in-process
+  ok  state dicts bit-identical
+recovery: one recorded run per sweep family, exact accuracy match
+  ok  width_sweep {'activation': 'gelu', 'depth': 3, 'width': 3, 'seed': 10}: stored=1.0 reproduced exactly
+  ok  threshold_sweep {'activation': 'sin_family', 'parameter': 0.95, 'depth': 8, 'width': 3, 'seed': 2}: stored=0.999 reproduced exactly
+  ok  parametrization_sweep {'parametrization': 'baseline', 'activation': 'tanh', 'depth': 3, 'width': 3, 'seed': 0}: stored=0.956 reproduced exactly
+  ok  corrugation_sweep {'configuration': 'flat', 'activation': 'tanh', 'depth': 3, 'width': 3, 'seed': 0}: stored=0.967 reproduced exactly
+  ok  protocol_sweep {'activation': 'tanh', 'depth': 3, 'width': 3, 'seed': 0}: stored=0.9635 reproduced exactly
+  ok  winding_sweep {'configuration': 'winding_q1', 'activation': 'tanh', 'depth': 5, 'width': 3, 'seed': 0}: stored=0.9315 reproduced exactly
+exit:0

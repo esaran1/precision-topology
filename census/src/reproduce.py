@@ -100,34 +100,46 @@ def verify() -> bool:
     passed &= identical
 
     print("recovery: one recorded run per sweep family, exact accuracy match")
+    # Every family is exercised through dense_check._reconstruct, which owns the
+    # per-family data/training paths (corrugated and winding links and the
+    # author protocol each differ).  Extended 2026-08-25: previously only
+    # width_sweep and threshold_sweep were checked while the docstring claimed
+    # per-family coverage.
+    from .dense_check import _reconstruct
+
     checks = [
-        ("width_sweep.parquet", dict(activation="gelu", depth=3, width=3, seed=10), None),
-        (
-            "threshold_sweep.parquet",
-            dict(activation="sin_family", parameter=0.95, depth=8, width=3, seed=2),
-            0.95,
-        ),
+        ("width_sweep", dict(activation="gelu", depth=3, width=3, seed=10)),
+        ("threshold_sweep",
+         dict(activation="sin_family", parameter=0.95, depth=8, width=3, seed=2)),
+        ("parametrization_sweep",
+         dict(parametrization="baseline", activation="tanh", depth=3, width=3, seed=0)),
+        ("corrugation_sweep",
+         dict(configuration="flat", activation="tanh", depth=3, width=3, seed=0)),
+        ("protocol_sweep", dict(activation="tanh", depth=3, width=3, seed=0)),
+        ("winding_sweep",
+         dict(configuration="winding_q1", activation="tanh", depth=5, width=3, seed=0)),
     ]
-    for artifact, selector, parameter in checks:
-        frame = pd.read_parquet(RESULTS / artifact)
+    for sweep, selector in checks:
+        stem = RESULTS / sweep
+        frame = (pd.read_parquet(stem.with_suffix(".parquet"))
+                 if stem.with_suffix(".parquet").exists()
+                 else pd.read_csv(stem.with_suffix(".csv")))
         for key, value in selector.items():
             frame = frame[frame[key] == value]
+        if frame.empty:
+            print(f"  FAIL {sweep} {selector}: no such recorded run")
+            passed = False
+            continue
         row = frame.iloc[0]
-        train_data, eval_data, *_ = _make_data("linked_tori", int(row.seed), config)
-        result = train_mlp(
-            train_data,
-            eval_data,
-            hidden_depth=int(row.depth),
-            hidden_width=int(row.width),
-            activation=row.activation,
-            config=TrainingConfig(seed=int(row.seed), max_steps=2_000, learning_rate=1e-2),
-            activation_parameter=parameter,
-        )
-        passed &= _verify_one(
-            f"{artifact} {selector}",
-            float(row.final_eval_accuracy),
-            result.final_eval_accuracy,
-        )
+        try:
+            # _reconstruct raises RecoveryDivergence unless the retrained run
+            # matches the stored accuracy exactly.
+            _reconstruct(row, sweep)
+        except Exception as error:  # noqa: BLE001 - reported, not swallowed
+            print(f"  FAIL {sweep} {selector}: {type(error).__name__}: {error}")
+            passed = False
+            continue
+        print(f"  ok  {sweep} {selector}: stored={float(row.final_eval_accuracy)} reproduced exactly")
     return passed
 
 

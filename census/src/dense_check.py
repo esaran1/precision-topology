@@ -28,6 +28,8 @@ from .corrugation import sample as corrugation_sample
 from .data import linked_tori
 from .parametrization import GRID as PARAM_GRID
 from .parametrization import sample_link
+from .winding import GRID as WINDING_GRID
+from .winding import sample as winding_sample
 from .train import TrainingConfig, train_mlp
 
 
@@ -38,6 +40,10 @@ WIDTH4_SAMPLE_SEED = 424_242
 
 _PARAM_BY_NAME = {link.name: link for link in PARAM_GRID}
 _CORR_BY_NAME = {link.name: link for link in CORRUGATION_GRID}
+_WINDING_BY_NAME = {link.name: link for link in WINDING_GRID}
+# winding_sweep's own data seed bases (src/winding_sweep.py)
+_WINDING_TRAIN_SEED_BASE = 70_000
+_WINDING_EVAL_SEED_BASE = 80_000
 
 
 class RecoveryDivergence(RuntimeError):
@@ -124,6 +130,23 @@ def _reconstruct(row: pd.Series, sweep: str):
             config=TrainingConfig(seed=seed, max_steps=2_000, learning_rate=1e-2),
         )
         dense = corrugation_sample(link, DENSE_PER_CLASS, dense_seed)
+    elif sweep == "winding_sweep":
+        link = _WINDING_BY_NAME[row.configuration]
+        train_data = winding_sample(link, 1_000, _WINDING_TRAIN_SEED_BASE + seed)
+        eval_data = winding_sample(link, 1_000, _WINDING_EVAL_SEED_BASE + seed)
+        parameter = None
+        if "parameter" in row and not pd.isna(row.parameter):
+            parameter = float(row.parameter)
+        result = train_mlp(
+            train_data,
+            eval_data,
+            hidden_depth=depth,
+            hidden_width=width,
+            activation=row.activation,
+            config=TrainingConfig(seed=seed, max_steps=2_000, learning_rate=1e-2),
+            activation_parameter=parameter,
+        )
+        dense = winding_sample(link, DENSE_PER_CLASS, dense_seed)
     else:
         raise ValueError(f"unknown sweep: {sweep}")
 
