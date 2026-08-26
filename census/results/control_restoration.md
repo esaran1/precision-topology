@@ -1,4 +1,11 @@
-# Task F 1b verdict: three of four restoration criteria pass; the plateau criterion fails
+# Task F 1b verdict: the positive control is restored (all four criteria)
+
+> **Reading order.** The first two sections record the verdict as it
+> stood on 2026-08-25, when the plateau criterion had failed and the
+> control was **not** restored. The convergence run commissioned in
+> response is scored at the end (2026-08-26) and **passes all four
+> criteria**. Both are kept: the earlier verdict is not wrong, it is
+> superseded, and the sequence is part of the record.
 
 Criterion fixed in advance in `control_criterion.md`. Data:
 `control_search_mnist.csv` (map), `control_replication.csv` (MNIST
@@ -38,7 +45,8 @@ recorded as a lead, not a claim).
    those has *rising* loss (improvement −23%), i.e. instability, not
    convergence. Every cell is still mid-descent at 12 epochs.
 
-**Verdict under the registered criterion: the control is NOT formally
+**Verdict under the registered criterion (as of 2026-08-25; superseded
+by the convergence section below): the control is NOT formally
 restored.** Three of four conditions pass, strongly; the fourth was
 written precisely to prevent declaring an activation ranking from
 mid-descent snapshots — the MNIST bottleneck reversal (tanh ahead at 3
