@@ -1,0 +1,6 @@
+gelu seed=3: 23 epochs plateaued=True test=2087
+gelu seed=4: 21 epochs plateaued=True test=2116
+gelu seed=5: 24 epochs plateaued=True test=1990
+gelu seed=6: 17 epochs plateaued=True test=2039
+gelu seed=7: 22 epochs plateaued=True test=2099
+gelu seed=8: 22 epochs plateaued=True test=2015
