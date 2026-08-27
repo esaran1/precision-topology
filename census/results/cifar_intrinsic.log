@@ -1,0 +1,9 @@
+{'representation': 'flatten512_gelu_seed0', 'subsample': 'sub1', 'two_nn': 45.25152327273944, 'mle_k10': 26.04864864590685, 'mle_k20': 26.324281326583762, 'pca_95_linear_reference': 364}
+{'representation': 'flatten512_gelu_seed0', 'subsample': 'sub2', 'two_nn': 45.29545232955138, 'mle_k10': 25.607757656297135, 'mle_k20': 25.811516727307296, 'pca_95_linear_reference': 364}
+{'representation': 'flatten512_gelu_seed1', 'subsample': 'sub1', 'two_nn': 45.16938602694094, 'mle_k10': 26.28277795497665, 'mle_k20': 26.554905167666277, 'pca_95_linear_reference': 368}
+{'representation': 'flatten512_gelu_seed1', 'subsample': 'sub2', 'two_nn': 47.45751303084209, 'mle_k10': 26.898894934771683, 'mle_k20': 26.94352178646397, 'pca_95_linear_reference': 370}
+{'representation': 'flatten512_tanh_seed0', 'subsample': 'sub1', 'two_nn': 48.555935757632106, 'mle_k10': 28.68514678357594, 'mle_k20': 29.29283021380047, 'pca_95_linear_reference': 398}
+{'representation': 'flatten512_tanh_seed0', 'subsample': 'sub2', 'two_nn': 48.02544290362943, 'mle_k10': 28.61119051947042, 'mle_k20': 28.981166031865005, 'pca_95_linear_reference': 397}
+{'representation': 'flatten512_tanh_seed1', 'subsample': 'sub1', 'two_nn': 49.886127224190346, 'mle_k10': 28.92853521130005, 'mle_k20': 29.452083389140952, 'pca_95_linear_reference': 398}
+{'representation': 'flatten512_tanh_seed1', 'subsample': 'sub2', 'two_nn': 51.004971789091734, 'mle_k10': 29.851830188899584, 'mle_k20': 30.322479726915606, 'pca_95_linear_reference': 398}
+done
