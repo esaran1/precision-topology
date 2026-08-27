@@ -1,0 +1,8 @@
+# Downloaded dataset caches: regenerable from src/mnist_data.py and
+# src/cifar_data.py, which verify against recorded sha256 checksums
+# (census/data/*/SHA256SUMS, which ARE tracked).  Not versioned: the
+# CIFAR-10 array exceeds GitHub's 100 MB per-file limit.
+census/data/mnist/*.npy
+census/data/cifar10/*.npy
+
+.DS_Store
