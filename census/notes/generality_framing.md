@@ -70,3 +70,36 @@ scale, in a four-parameter one-dimensional fold task where impossibility
 is provable in one line — and its exact solution-set and basin geometry
 there show thin-sheet solutions whose basin volume, not radius, turns on
 at the findability onset."
+
+---
+
+## Task F outcome (2026-08-26): the bridge, and where it stops
+
+The attempt to connect the fold account to the widely reported
+GELU-over-ReLU advantage produced one standalone result and one
+specified-but-untested prediction. Full record: `task_f_conclusion.md`.
+
+**Established.** In the setting where the folk advantage reproduces
+(CIFAR-10, depth-8 CNN, at convergence, 24/25 runs plateaued), the
+advantage **does not track smoothness**: tanh — smooth and monotonic —
+is worst of the three, 545 errors behind GELU and 412 behind ReLU with
+4× the training error. The standard smoothness explanation is
+contradicted there. This is a constraint on explanations, not a
+demonstration that the fold mechanism is at work.
+
+**Untested, not refuted.** Whether the advantage tracks bottleneck
+width relative to intrinsic dimension — the account's distinguishing
+prediction — could not be tested, because no setting we could construct
+supplied both a reproducible advantage and an unambiguous width axis
+(T39). The requirements a qualifying setting must meet are specified in
+`task_f_conclusion.md` §3.
+
+**Recommended scope sentence** (supersedes nothing above; it covers the
+real-data claim only):
+
+"The mechanism is established in the toy setting. It predicts that
+activation choice matters near width ≈ intrinsic dimension and not
+above it; on real data we confirmed the advantage exists and is not a
+smoothness effect, but could not test the width prediction, because no
+setting we could construct supplied both a reproducible advantage and
+an unambiguous width axis."
