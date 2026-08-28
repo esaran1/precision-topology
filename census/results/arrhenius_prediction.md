@@ -22,3 +22,31 @@ where SGD lands.
 
 **5.** Arrhenius with the 1D-fitted temperature constant reproduces GELU's
 3%/8%/17% dose-response within a factor ~2.
+
+---
+
+# Successor hypothesis: capture is cross-section limited (registered 2026-08-27)
+
+Context: the Arrhenius premise is falsified (`barrier_results.md`) — MEP
+barriers are exactly 0 and the linear proxy anti-correlates with the rate.
+So findability is dynamical, not energetic.
+
+**P-step (the discriminator).** If capture is limited by the solution
+sheet's cross-section rather than by an energy barrier, then **reducing
+the optimizer step size raises findability near the onset**, monotonically,
+because a large step overshoots a thin sheet. The energetic account
+predicts the opposite sign (smaller steps = lower effective temperature =
+less escape), and we have shown there is nothing to escape. Falsified if
+findability falls as step size falls, or is flat.
+
+**P-ratio (the quantitative version).** The sheet's thickness in each
+parameter direction, divided by Adam's typical step in that direction,
+predicts which a values are findable: findability should rise where
+thickness/step exceeds order 1. Falsified if the ratio is uncorrelated
+with the observed rates, or ordered wrongly across a.
+
+**P-4a.** Basin volume along the solution manifold peaks near |w2| ~ 5,
+matching where SGD lands. **P-4b.** The peak sits where two effects cross:
+below it, b1-perturbations destroy the solution; above it, large weights
+are reached from a shrinking set of initializations. **P-4c.** The peak
+moves outward with initialization scale.
