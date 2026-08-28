@@ -1,16 +1,17 @@
 # Instrument limitations read as properties of the object
 
 A short methodological note, written because this project has now made
-this class of error **three times** — twice in unrelated strands, and a
+this class of error **four times** — twice in unrelated strands, and a
 third time in a distinct form within the same instrument — and caught
 each only through an independent route. It is transferable to anyone
 measuring a solution set by scanning, or a topological invariant by
 projection.
 
-The three instances: a projection that returns the right answer for the
+The four instances: a projection that returns the right answer for the
 wrong reason (1), a scan whose resolution floor was read as a property
-of the object (2a), and the same scan's *parameter-dependent* bias
-contaminating a comparison across that parameter (2b).
+of the object (2a), the same scan's *parameter-dependent* bias
+contaminating a comparison across that parameter (2b), and a probe
+whose own construction dominated the quantity it was measuring (3).
 
 ## The pattern
 
@@ -85,6 +86,47 @@ apparent growth, because the instrument was getting better at seeing
 exactly as the quantity grew. The claim survived re-derivation, but on
 different numbers than the ones originally offered for it.
 
+## Instance 3: the barrier collapse — the probe dominated the measurement (2026-08-27)
+
+The most expensive of the four: it sent a full brief down a wrong path.
+
+`gap_results.md` reported linear-interpolation barrier heights of
+**1,065 → 125 → 10 → 1** as `a` crossed the findability onset. Three
+orders of magnitude, tracking findability. That motivated an Arrhenius
+account of findability — P(find) ~ exp(−ΔE/T) — with a full
+experimental program built on it.
+
+Measured properly in the 1D task, the effect does not exist:
+
+- Every **minimum-energy-path** barrier is exactly **0.000**, at every
+  `a`, for both endpoint types. Solutions are downhill-connected to
+  typical initializations even where the solve rate is 0/200.
+- The **linear** proxy *anti*-correlates with findability once the
+  endpoint is held fixed: ΔE rises 0.020 → 0.103 as `a` goes 1.02 → 3.0
+  while the rate rises 0% → 70%.
+
+What the original 1,065 measured: those barriers ran to *constructed*
+endpoints at **amplification 600**. A path from a unit-scale
+initialization to a weight vector of norm ~600 passes through
+intermediate weights at half that scale, and the loss there is enormous.
+**The barrier height was mostly the endpoint's own weight scale** — a
+property of the probe we built, not of the landscape we were probing.
+`gap_results.md` had even flagged this in passing ("for constructed
+endpoints the barrier height partly *is* the amplification"), and the
+caveat was not carried forward into the claim that used it.
+
+The distinguishing feature of this instance: unlike 2a/2b, the
+instrument had no resolution limit and no bias in the usual sense. It
+measured a real quantity correctly. The error was that the quantity was
+dominated by a property of the object we inserted into the measurement,
+so it varied with `a` for a reason unrelated to the hypothesis. **A
+correct measurement of the wrong quantity.**
+
+The control that would have caught it immediately, and now does: hold
+the endpoint fixed while sweeping the parameter. Constructed
+|w₂| = 1 endpoints at every `a` show the barrier is flat-to-rising,
+killing the account in one table.
+
 ## Why all of these were caught only from outside the measurement
 
 None of these errors was found by examining the measurement more
@@ -110,9 +152,17 @@ carefully.
   control nor the theorem would have caught it, since the biased
   numbers were finite, plausible, and in the right direction.
 
-Four independent detectors, none of them "look at the scan again":
-a known-answer control, a theoretical prediction, a language audit, and
-an independent re-derivation.
+- Instance 3 was caught by **re-measuring the same quantity with the
+  confound removed** — the same endpoint at every parameter value, plus
+  a second estimator (MEP) that does not share the linear path's
+  sensitivity to endpoint norm. Both said the same thing. Note the
+  cost: it was *not* caught by the passing caveat in the document that
+  first reported it, which shows a flagged-but-uncarried caveat is
+  worth about as much as no caveat at all.
+
+Five independent detectors, none of them "look at the scan again":
+a known-answer control, a theoretical prediction, a language audit, an
+independent re-derivation, and a confound-removing re-measurement.
 
 ## Checklist this yields
 
@@ -141,6 +191,16 @@ an independent re-derivation.
    style issue. "Empty *because* required |w₂| exceeds the box" asserted
    a mechanism where only a correlation between two grid-derived
    quantities existed.
-6. **Derive theory even in an empirical project.** The single highest-
+6. **Ask what fraction of your measurement is the probe.** When a
+   quantity is measured between a fixed reference and an object you
+   constructed, vary the construction while holding the parameter
+   fixed, and vary the parameter while holding the construction fixed.
+   If the first sweep moves the number as much as the second, you are
+   measuring your probe. This is cheap and would have saved a brief.
+7. **A caveat recorded in passing is not a caveat.** The endpoint-scale
+   confound was noted in `gap_results.md` when the barriers were first
+   reported, then not carried into the claim built on them. Either a
+   caveat gates the claim or it does not exist.
+8. **Derive theory even in an empirical project.** The single highest-
    value output of the theorem work so far was not the theorem; it was
    the empirical error the theorem exposed.
