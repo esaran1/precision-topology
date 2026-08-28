@@ -129,3 +129,10 @@ budget envelope.
 > zero attracting volume, sitting in a region training visits and
 > passes through without being drawn in. Analytic solution measures:
 > `grid_measure_audit.md`, `solution_measure.csv`.
+
+> **Qualification (2026-08-28).** The onset (1.30, 1.35] is specific to
+> the standard configuration (Adam, lr 1e-2, 2,000 steps). A step-size
+> sweep (`step_size_results.md`) finds 83/200 solves at a = 1.25 with
+> Adam lr 3e-2, against 0/200 at baseline — the onset moves below 1.25.
+> The monotonic zero and the existence of the gap are unaffected; the
+> onset's *location* must be quoted with its optimizer configuration.
