@@ -1,0 +1,12 @@
+{'a': 1.5, 'w2': 1.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.0388, 'basin_eps03': 0.7667, 'basin_eps10': 0.1833, 'reach_standard': 0.7, 'reach_scaled3x': 0.89}
+{'a': 1.5, 'w2': 1.5, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.0582, 'basin_eps03': 0.6667, 'basin_eps10': 0.15, 'reach_standard': 0.68, 'reach_scaled3x': 0.78}
+{'a': 1.5, 'w2': 2.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.0776, 'basin_eps03': 0.65, 'basin_eps10': 0.15, 'reach_standard': 0.66, 'reach_scaled3x': 0.58}
+{'a': 1.5, 'w2': 3.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.1164, 'basin_eps03': 0.6, 'basin_eps10': 0.2167, 'reach_standard': 0.65, 'reach_scaled3x': 0.21}
+{'a': 1.5, 'w2': 4.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.1552, 'basin_eps03': 0.7167, 'basin_eps10': 0.2333, 'reach_standard': 0.47, 'reach_scaled3x': 0.06}
+{'a': 1.5, 'w2': 5.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.194, 'basin_eps03': 0.7, 'basin_eps10': 0.2833, 'reach_standard': 0.21, 'reach_scaled3x': 0.02}
+{'a': 1.5, 'w2': 6.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.2328, 'basin_eps03': 0.6833, 'basin_eps10': 0.3333, 'reach_standard': 0.01, 'reach_scaled3x': 0.0}
+{'a': 1.5, 'w2': 8.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.3104, 'basin_eps03': 0.7167, 'basin_eps10': 0.4167, 'reach_standard': 0.0, 'reach_scaled3x': 0.0}
+{'a': 1.5, 'w2': 10.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.388, 'basin_eps03': 0.7333, 'basin_eps10': 0.4, 'reach_standard': 0.0, 'reach_scaled3x': 0.0}
+{'a': 1.5, 'w2': 14.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.5432, 'basin_eps03': 0.7333, 'basin_eps10': 0.4333, 'reach_standard': 0.0, 'reach_scaled3x': 0.0}
+{'a': 1.5, 'w2': 20.0, 'halfwidth_b1': 0.0498, 'halfwidth_w1': 0.0612, 'halfwidth_b2': 0.776, 'basin_eps03': 0.7333, 'basin_eps10': 0.35, 'reach_standard': 0.0, 'reach_scaled3x': 0.0}
+done
