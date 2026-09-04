@@ -99,3 +99,30 @@ reached-|w2| saturates and findability is budget-independent.
 **P-3b.** Findability = overlap between the correctly-classifying |w2| region
 and the terminal-|w2| distribution. Falsified if the overlap fraction does not
 track measured rates across a, lr, and init scale.
+
+---
+
+# Budget power-law predictions (registered 2026-08-28, BEFORE measuring onsets)
+
+Provisional alpha from the four committed budgets (2k/4k/8k/20k, medians
+3.15/7.75/17.90/48.48 at a=1.25): terminal |w2| ~ B^alpha with alpha ~ 1.19.
+
+**P-alpha.** Terminal |w2| follows a power law in budget B with exponent
+alpha, measured over a wider range (1k..160k) before any onset is measured.
+
+**P-onset-law.** Equating reachable |w2| ~ B^alpha to required
+|w2| ~ c/D(a) ~ (a-1)^{-3/2} gives (a_onset - 1) ~ B^{-2*alpha/3}.
+At alpha = 1.19 this is **B^{-0.79}**. Registered prediction: the measured
+onset exponent lies within +-0.15 of -2*alpha/3 using the alpha measured in
+P-alpha. Falsified if outside that band, if the onset does not follow a power
+law, or if alpha itself is not constant across the budget range.
+
+**P-joint.** The one-dimensional |w2| criterion over-predicts because it
+ignores (w1,b1). The joint criterion -- terminal (w1,b1,w2,b2) lands in the
+correctly-classifying set -- should predict rates with substantially lower
+error than 0.283 mean absolute.
+
+**P-stall.** Stalling at loss = log 2 is a distinct mechanism from
+budget-limited travel: registered as budget-INDEPENDENT (stall fraction
+roughly constant in B while travel is not). Falsified if the stall fraction
+falls with budget like the solve rate does.
