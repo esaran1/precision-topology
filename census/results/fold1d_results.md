@@ -136,3 +136,13 @@ budget envelope.
 > Adam lr 3e-2, against 0/200 at baseline — the onset moves below 1.25.
 > The monotonic zero and the existence of the gap are unaffected; the
 > onset's *location* must be quoted with its optimizer configuration.
+
+> **Terminology correction (2026-08-28).** The objects called "zero-basin
+> solutions" here are **not critical points of the loss** (gradient norm
+> 0.02–0.27 versus training's terminal 0.0006–0.021; loss 0.22–0.69;
+> λ_min < 0 at six of eight values). Read "solution" throughout as
+> "correctly-classifying parameter vector", never as "minimum of the loss".
+> The measurements are unaffected; what changes is what they are about. See
+> `criticality_results.md` and `terminology_correction.md`. In particular the
+> statement that Ahn–Zhang–Sra does not apply was tested on one of its two
+> conditions only, and is corrected there.

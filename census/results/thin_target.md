@@ -99,3 +99,13 @@ stable by the standard criterion, separated from initialization by no barrier
 and by less distance than the minima it does reach; we show by measurement
 that the usual explanations do not apply, and we do not yet have a
 quantitative law that replaces them.
+
+> **Terminology correction (2026-08-28).** The objects called "zero-basin
+> solutions" here are **not critical points of the loss** (gradient norm
+> 0.02–0.27 versus training's terminal 0.0006–0.021; loss 0.22–0.69;
+> λ_min < 0 at six of eight values). Read "solution" throughout as
+> "correctly-classifying parameter vector", never as "minimum of the loss".
+> The measurements are unaffected; what changes is what they are about. See
+> `criticality_results.md` and `terminology_correction.md`. In particular the
+> statement that Ahn–Zhang–Sra does not apply was tested on one of its two
+> conditions only, and is corrected there.
