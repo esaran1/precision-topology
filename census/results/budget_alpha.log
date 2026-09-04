@@ -1,0 +1,12 @@
+alpha a=1.25 B=1000: w2_med=0.87 stall=0.267 rate=0.000
+alpha a=1.25 B=2000: w2_med=2.95 stall=0.200 rate=0.000
+alpha a=1.25 B=4000: w2_med=7.08 stall=0.100 rate=0.067
+alpha a=1.25 B=8000: w2_med=17.45 stall=0.100 rate=0.833
+alpha a=1.25 B=16000: w2_med=37.92 stall=0.100 rate=0.900
+alpha a=1.25 B=40000: w2_med=97.48 stall=0.033 rate=0.933
+alpha a=1.25 B=80000: w2_med=170.70 stall=0.000 rate=1.000
+alpha a=1.25 B=160000: w2_med=264.24 stall=0.000 rate=1.000
+
+ALPHA = 1.1172  (R^2 = 0.98272)
+predicted onset exponent -2*alpha/3 = -0.7448
+done

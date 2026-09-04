@@ -126,3 +126,8 @@ error than 0.283 mean absolute.
 budget-limited travel: registered as budget-INDEPENDENT (stall fraction
 roughly constant in B while travel is not). Falsified if the stall fraction
 falls with budget like the solve rate does.
+
+**P-onset-law, instantiated (2026-08-28, before any onset was measured):**
+alpha measured = **1.1172** (R^2 = 0.983, budgets 1k-160k, a = 1.25).
+Predicted onset exponent = -2*alpha/3 = **-0.745**.
+Registered acceptance band: measured onset exponent in **[-0.895, -0.595]**.
