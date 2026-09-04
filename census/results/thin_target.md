@@ -1,3 +1,8 @@
+> **Superseded (2026-08-28) by `thin_target_v2.md`.** The criticality
+> measurements showed the objects discussed here are not critical points;
+> this document is kept for the record. See `criticality_results.md`.
+
+
 # A thin-target failure mode: what is ours, and what is measured versus inferred
 
 Positioning for the paper. Written to be honest to the point of understatement.
