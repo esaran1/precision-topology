@@ -80,3 +80,22 @@ solution is partly an artifact of the optimizer that found it, so the
 found-vs-constructed comparison is partly circular. The manifold sweep (1c),
 where |w2| is set by construction rather than by training, is the
 non-circular test.
+
+---
+
+# Criticality predictions (registered 2026-08-28, before measurement)
+
+**P-crit-1a.** The zero-basin points have large ||grad L|| and are NOT critical
+points; found solutions sit at/near critical points with small gradient norm.
+Falsified if zero-basin gradient norms are small (comparable to found ones).
+
+**P-crit-1b.** If lambda_min < 0 anywhere, Ahn-Zhang-Sra applies via its FIRST
+condition and our earlier dismissal was incomplete; to be reported as our error.
+
+**P-2c.** If termination is a step-budget cutoff, reached-|w2| keeps growing
+with budget (2x/4x/10x) and findability improves. If a genuine attractor,
+reached-|w2| saturates and findability is budget-independent.
+
+**P-3b.** Findability = overlap between the correctly-classifying |w2| region
+and the terminal-|w2| distribution. Falsified if the overlap fraction does not
+track measured rates across a, lr, and init scale.
