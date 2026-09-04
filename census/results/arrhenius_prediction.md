@@ -50,3 +50,33 @@ matching where SGD lands. **P-4b.** The peak sits where two effects cross:
 below it, b1-perturbations destroy the solution; above it, large weights
 are reached from a shrinking set of initializations. **P-4c.** The peak
 moves outward with initialization scale.
+
+---
+
+# Edge-of-stability predictions (registered 2026-08-28, before measurement)
+
+Literature read first: Ahn-Zhang-Sra Thm 1 (GD does not converge to stationary
+points with lambda_max > 2/eta, except from a measure-zero initialization set;
+deterministic GD; the paper's thesis is that unstable convergence nonetheless
+happens via forward-invariant sets). Cohen et al.: lambda_max *rises to* 2/eta
+and hovers there (progressive sharpening).
+
+**P-EoS-1b.** Found solutions satisfy lambda_max * eta_eff < 2; zero-basin
+constructed solutions violate it. Falsified if the two populations do not
+separate at 2, or overlap substantially.
+
+**P-EoS-1c.** lambda_max falls with |w2| along the solution manifold, crossing
+2/eta_eff near |w2| ~ 5. Falsified if flat, rising, or crossing elsewhere.
+
+**P-EoS-1d.** lambda_max of reachable solutions diverges as a -> 1+, and the a
+at which it crosses 2/eta predicts the measured onset (1.30, 1.35].
+
+**P-EoS-2b (SGD, the clean test).** For plain SGD, eta_eff = eta, so
+findability should FALL monotonically as eta rises. Falsified by a rise or
+non-monotonicity.
+
+Caveat registered in advance: Cohen et al. imply lambda_max at an SGD-found
+solution is partly an artifact of the optimizer that found it, so the
+found-vs-constructed comparison is partly circular. The manifold sweep (1c),
+where |w2| is set by construction rather than by training, is the
+non-circular test.
