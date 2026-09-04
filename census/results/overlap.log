@@ -1,0 +1,19 @@
+a_sweep a=1.02 lr=0.01 scale=1.0: rate=0.000 w2_med=1.81
+a_sweep a=1.1 lr=0.01 scale=1.0: rate=0.000 w2_med=2.37
+a_sweep a=1.25 lr=0.01 scale=1.0: rate=0.000 w2_med=3.15
+a_sweep a=1.35 lr=0.01 scale=1.0: rate=0.000 w2_med=3.51
+a_sweep a=1.45 lr=0.01 scale=1.0: rate=0.175 w2_med=3.66
+a_sweep a=1.5 lr=0.01 scale=1.0: rate=0.375 w2_med=3.70
+a_sweep a=2.0 lr=0.01 scale=1.0: rate=0.700 w2_med=3.84
+a_sweep a=3.0 lr=0.01 scale=1.0: rate=0.650 w2_med=3.22
+lr_sweep a=1.25 lr=0.03 scale=1.0: rate=0.500 w2_med=10.25
+lr_sweep a=1.25 lr=0.003 scale=1.0: rate=0.000 w2_med=0.95
+lr_sweep a=1.25 lr=0.001 scale=1.0: rate=0.000 w2_med=0.56
+lr_sweep a=1.45 lr=0.03 scale=1.0: rate=0.875 w2_med=10.43
+lr_sweep a=1.45 lr=0.003 scale=1.0: rate=0.000 w2_med=0.97
+lr_sweep a=1.45 lr=0.001 scale=1.0: rate=0.000 w2_med=0.58
+init_scale a=1.25 lr=0.01 scale=0.3: rate=0.000 w2_med=5.26
+init_scale a=1.25 lr=0.01 scale=3.0: rate=0.000 w2_med=1.69
+init_scale a=1.5 lr=0.01 scale=0.3: rate=0.925 w2_med=5.43
+init_scale a=1.5 lr=0.01 scale=3.0: rate=0.000 w2_med=2.22
+done

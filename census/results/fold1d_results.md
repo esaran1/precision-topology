@@ -146,3 +146,9 @@ budget envelope.
 > `criticality_results.md` and `terminology_correction.md`. In particular the
 > statement that Ahn–Zhang–Sra does not apply was tested on one of its two
 > conditions only, and is corrected there.
+
+> **Budget qualification (2026-08-28).** The onset is also **budget-dependent**:
+> at 20,000 Adam steps (vs the standard 2,000) a = 1.25 solves at 92.5%, and
+> median terminal |w₂| grows 3.15 → 48.48 without saturating. The onset
+> (1.30, 1.35] is specific to the 2,000-step budget as well as to the
+> optimizer and step size. See `termination_results.md` (T42).
