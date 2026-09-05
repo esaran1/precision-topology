@@ -302,3 +302,10 @@ B's flat onset) by making the dissociation quantitative.
 Same bracketing criteria as all prior onset work: located only if some
 parameter value gives >=50% and a strictly smaller one gives <50%;
 unbracketed cells reported as bounds and excluded from fits.
+
+**Note for the writeup (flagged 2026-09-05, before results):** q4's predicted
+onset exponent -0.8938 sits essentially at the upper edge of the band
+registered for family A ([-0.895, -0.595]). This is **coincidence**: -0.8938
+is an independent prediction for a different family with beta = 1.25, not a
+restatement of family A's band. A reader skimming could conflate them; the
+writeup must separate them explicitly.
