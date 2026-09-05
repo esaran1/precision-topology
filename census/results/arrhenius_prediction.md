@@ -131,3 +131,30 @@ falls with budget like the solve rate does.
 alpha measured = **1.1172** (R^2 = 0.983, budgets 1k-160k, a = 1.25).
 Predicted onset exponent = -2*alpha/3 = **-0.745**.
 Registered acceptance band: measured onset exponent in **[-0.895, -0.595]**.
+
+---
+
+# Floor-vs-failure disambiguation (registered 2026-08-28, BEFORE the 128k cell resolved)
+
+At large budget the onset may fall below the smallest `a` the grid tests
+(1.02 at B=128k). In the data that is **indistinguishable** from the power law
+breaking down at large budget. Evidence that separates them, fixed now:
+
+1. **Bracketing.** An onset is *located* only if some grid value gives rate
+   >= 50% and a strictly smaller one gives < 50%. A cell where every tested
+   `a` is >= 50% is **bounded above only** and must be reported as a bound
+   (onset <= a_min_tested), never as a point. Such a cell is EXCLUDED from the
+   exponent fit and the fit is reported on the bracketed cells alone, with n
+   stated.
+2. **Smaller-budget agreement.** If the bracketed (smaller-budget) onsets
+   still lie on a power law whose exponent is inside [-0.895, -0.595], the
+   law is supported and the large-budget cell is the family running out of
+   room. If the bracketed cells themselves depart from the band, the law
+   fails and the floor is irrelevant.
+3. **Consistency check.** The unbracketed cell must still be CONSISTENT with
+   the extrapolated law: predicted onset at that budget must be <= the
+   smallest tested `a`. If the extrapolation predicts an onset well above the
+   grid while the cell reads 100%, that is a genuine contradiction, not a
+   floor.
+
+Reported either way, with the number of bracketed cells stated explicitly.
