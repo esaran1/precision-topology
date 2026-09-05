@@ -1,0 +1,3 @@
+alpha_eff=1.063880181434144
+alpha_measured=1.1172
+n_points=2
