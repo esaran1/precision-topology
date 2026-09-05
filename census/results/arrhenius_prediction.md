@@ -210,3 +210,16 @@ low enough that the comparison would plausibly appear in a paper, i.e. the
 
 **Reporting rule.** If the crossing is confined to the very-early regime, the
 headline is the narrower claim and the flip is a supporting detail.
+
+---
+
+# Alpha-derivation predictions (registered 2026-09-05, before measurement)
+
+**P-1a.** If d|w2|/dt ~ |w2|^{-p} then |w2| ~ t^{1/(p+1)} and alpha = 1/(p+1).
+Measured alpha = 1.1172 implies **p = -0.105** (gradient growing slightly with
+|w2|). Registered: the measured power of |dL/dw2| vs |w2| along Adam
+trajectories matches p = -0.105 +- 0.05. Falsified otherwise.
+
+**P-1b.** Pure sign-descent gives alpha = 1 exactly. Registered: Adam's
+derivation gives alpha ~ 1, and if the measured 1.1172 exceeds it the gap is
+diagnosed, not declared agreement.
