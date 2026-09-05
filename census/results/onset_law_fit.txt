@@ -1,0 +1,6 @@
+measured_exponent=-0.727537339269162
+r2=0.9864740152330491
+n_bracketed=4
+registered=-0.7448
+band=[-0.895,-0.595]
+within=True

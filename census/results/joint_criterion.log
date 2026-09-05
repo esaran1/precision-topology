@@ -1,0 +1,25 @@
+a_sweep a=1.02 lr=0.01 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.000
+a_sweep a=1.1 lr=0.01 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.000
+a_sweep a=1.25 lr=0.01 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.550
+a_sweep a=1.35 lr=0.01 sc=1.0 B=2000: obs=0.000 joint=0.250 onedim=0.650
+a_sweep a=1.45 lr=0.01 sc=1.0 B=2000: obs=0.175 joint=0.600 onedim=0.675
+a_sweep a=1.5 lr=0.01 sc=1.0 B=2000: obs=0.375 joint=0.650 onedim=0.675
+a_sweep a=2.0 lr=0.01 sc=1.0 B=2000: obs=0.700 joint=0.725 onedim=0.875
+a_sweep a=3.0 lr=0.01 sc=1.0 B=2000: obs=0.650 joint=0.675 onedim=0.975
+lr_sweep a=1.25 lr=0.03 sc=1.0 B=2000: obs=0.500 joint=0.825 onedim=0.875
+lr_sweep a=1.25 lr=0.003 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.000
+lr_sweep a=1.25 lr=0.001 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.000
+lr_sweep a=1.45 lr=0.03 sc=1.0 B=2000: obs=0.875 joint=0.875 onedim=0.875
+lr_sweep a=1.45 lr=0.003 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.400
+lr_sweep a=1.45 lr=0.001 sc=1.0 B=2000: obs=0.000 joint=0.000 onedim=0.025
+init_scale a=1.25 lr=0.01 sc=0.3 B=2000: obs=0.000 joint=0.000 onedim=0.925
+init_scale a=1.25 lr=0.01 sc=3.0 B=2000: obs=0.000 joint=0.000 onedim=0.000
+init_scale a=1.5 lr=0.01 sc=0.3 B=2000: obs=0.925 joint=0.925 onedim=0.925
+init_scale a=1.5 lr=0.01 sc=3.0 B=2000: obs=0.000 joint=0.250 onedim=0.875
+budget a=1.25 lr=0.01 sc=1.0 B=4000: obs=0.050 joint=0.550 onedim=0.850
+budget a=1.25 lr=0.01 sc=1.0 B=8000: obs=0.875 joint=0.900 onedim=0.925
+budget a=1.25 lr=0.01 sc=1.0 B=16000: obs=0.925 joint=0.925 onedim=0.925
+
+joint  : mean|err| 0.1000 max 0.5000
+onedim : mean|err| 0.2833 max 0.9250
+done

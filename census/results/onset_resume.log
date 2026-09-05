@@ -1,0 +1,16 @@
+B=128000 a=1.04: rate=1.000
+B=128000 a=1.035: rate=1.000
+B=128000 a=1.03: rate=0.700
+B=128000 a=1.025: rate=0.000
+
+ budget  onset  bracketed
+   2000   1.60       True
+   8000   1.18       True
+  32000   1.06       True
+ 128000   1.03       True
+
+BRACKETED CELLS: 4 of 4
+MEASURED ONSET EXPONENT = -0.7275  (R^2 = 0.9865, n = 4)
+REGISTERED = -0.7448, band [-0.895, -0.595]
+VERDICT: WITHIN BAND
+done
