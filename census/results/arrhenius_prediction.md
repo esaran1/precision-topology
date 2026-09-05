@@ -262,3 +262,43 @@ two different purposes:
   - alpha_population = 1.1172 -> onset exponent -0.745 (registered, measured -0.734)
   - alpha_escaper ~ 1.0 describes the individual growth trajectory
 This is stated now rather than discovered at review.
+
+---
+
+# Part 2 registration (2026-09-05, AFTER beta verification, BEFORE any training)
+
+Construction: f'(x) = (1-a) + a*|x|^q near 0, integrated in closed form, so
+**beta = 1 + 1/q** analytically. Verified numerically (`depth_families.py`,
+`depth_families_verification.csv`): measured beta matches 1+1/q to <=0.7% for
+every family. Positive control: q = 2 reproduces family A's beta (1.4959 vs
+1.4963 for sin) with a constant prefactor ratio of sqrt(2) across three
+decades -- same exponent, different scale.
+
+**P-beta-law.** With required scale ~ eps^{-beta} and terminal scale ~ B^alpha,
+the onset satisfies eps_onset ~ B^{-alpha/beta}. Using the committed
+**alpha = 1.1172** (measured, not derived; range 1k-160k):
+
+| family | q | beta | **predicted onset exponent** |
+|---|---|---|---|
+| q4_beta1.25 | 4 | 1.25 | **-0.8938** |
+| q2_beta1.5 | 2 | 1.50 | **-0.7448** |
+| q1_beta2 | 1 | 2.00 | **-0.5586** |
+| q0.667_beta2.5 | 2/3 | 2.50 | **-0.4469** |
+
+Registered acceptance: each measured exponent within **+-0.15** of its
+prediction, and -- the stronger test -- the exponents **ordered** by beta,
+with the ratio between the extreme families (beta 1.25 vs 2.5) within +-25%
+of the predicted factor of 2.
+
+Falsified if the exponents do not order with beta, or if the measured values
+scatter without tracking 1/beta. A single family landing is not the test;
+the test is that the exponent tracks beta ACROSS families at fixed alpha.
+
+Note on what this can and cannot show: alpha is measured, not derived
+(P-1a/P-1c falsified), so this is a law with one empirical input rather than
+an end-to-end derivation. It answers the open prediction left by 2b (family
+B's flat onset) by making the dissociation quantitative.
+
+Same bracketing criteria as all prior onset work: located only if some
+parameter value gives >=50% and a strictly smaller one gives <50%;
+unbracketed cells reported as bounds and excluded from fits.
