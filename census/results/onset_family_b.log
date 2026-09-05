@@ -1,0 +1,25 @@
+B=2000 alpha=-0.2: rate=0.550
+B=2000 alpha=-0.1: rate=0.550
+B=2000 alpha=-0.05: rate=0.575
+B=2000 alpha=-0.03: rate=0.475
+B=2000: onset_alpha=-0.05 bracketed=True
+B=16000 alpha=-0.05: rate=0.500
+B=16000 alpha=-0.02: rate=0.250
+B=16000: onset_alpha=-0.05 bracketed=True
+B=64000 alpha=-0.02: rate=0.200
+B=64000 alpha=-0.01: rate=0.150
+B=64000 alpha=-0.005: rate=0.150
+B=64000 alpha=-0.002: rate=0.025
+B=64000 alpha=-0.001: rate=0.000
+B=64000 alpha=-0.0005: rate=0.000
+B=64000 alpha=-0.0002: rate=0.000
+B=64000 alpha=-0.0001: rate=0.000
+B=64000: onset_alpha=None bracketed=False
+
+ budget  onset_alpha  bracketed
+   2000        -0.05       True
+  16000        -0.05       True
+  64000          NaN      False
+family B onset exponent (|alpha| ~ B^s) = 0.0000, n = 2
+family A exponent for comparison = -0.7340
+done

@@ -1,0 +1,4 @@
+budget,onset_alpha,bracketed
+2000,-0.05,True
+16000,-0.05,True
+64000,,False

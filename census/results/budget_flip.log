@@ -1,1 +1,2 @@
 epochs=2 gelu: mean test errors 3173.1 (n=8)
+epochs=2 relu: mean test errors 3923.5 (n=8)
