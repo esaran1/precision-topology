@@ -7,3 +7,6 @@ epochs=5 relu: mean test errors 2585.4 (n=8)
 epochs=5 tanh: mean test errors 2653.9 (n=8)
 --- budget 5 complete ---
 epochs=12 gelu: mean test errors 2070.9 (n=8)
+epochs=12 relu: mean test errors 2221.5 (n=8)
+epochs=12 tanh: mean test errors 2549.2 (n=8)
+--- budget 12 complete ---

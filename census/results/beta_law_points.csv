@@ -1,3 +1,4 @@
 family,beta,inv_beta,measured,predicted,n_cells,r2,source
+q0.667_beta2.5,2.5,0.4,-0.4999999999999996,-0.44688,3,0.966607668692994,constructed
 familyA_sin,1.5,0.6666666666666666,-0.734,-0.7448,6,0.99,independent (pre-existing)
 q4_beta1.25,1.25,0.8,-0.8304820237218402,-0.89376,3,0.9812267169771597,constructed
