@@ -1,0 +1,21 @@
+/Users/Evan/precision-topology/census/src/alpha_derivation.py:46: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:823.)
+  "loss": float(loss)})
+trace seed 0 done
+trace seed 1 done
+trace seed 2 done
+trace seed 3 done
+trace seed 4 done
+trace seed 5 done
+trace seed 6 done
+trace seed 7 done
+trace seed 8 done
+trace seed 9 done
+trace seed 10 done
+trace seed 11 done
+
+gradient exponent  p (|dL/dw2| ~ |w2|^-p) = 1.0853  -> alpha = 1/(p+1) = 0.4796
+realized-step exponent p_step               = 0.0050  -> alpha = 0.9951
+registered implication of measured alpha 1.1172: p = -0.105
+direct |w2| ~ t^alpha within traces: median 1.0812 (n=11 traces, IQR 1.016-1.246)
+done

@@ -1,0 +1,24 @@
+adam B=1000: all_med=0.871 escaper_med=1.561 stall=8/30
+adam B=2000: all_med=2.947 escaper_med=3.150 stall=6/30
+adam B=4000: all_med=7.078 escaper_med=7.520 stall=3/30
+adam B=8000: all_med=17.448 escaper_med=17.628 stall=3/30
+adam B=16000: all_med=37.921 escaper_med=38.107 stall=3/30
+adam B=40000: all_med=97.483 escaper_med=97.586 stall=1/30
+
+--- Adam ---
+  adam alpha (all) = 1.2627
+  adam alpha (escapers) = 1.1416
+  P-composition: escaper alpha LOWER than population alpha (predicted: lower)
+sgd B=1000: all_med=1.362 escaper_med=1.685 stall=9/30
+sgd B=2000: all_med=2.485 escaper_med=2.723 stall=9/30
+sgd B=4000: all_med=4.241 escaper_med=4.363 stall=8/30
+sgd B=8000: all_med=6.976 escaper_med=7.102 stall=8/30
+sgd B=16000: all_med=11.208 escaper_med=11.270 stall=7/30
+sgd B=40000: all_med=19.377 escaper_med=19.421 stall=5/30
+
+--- SGD ---
+  sgd alpha (all) = 0.7188
+  sgd alpha (escapers) = 0.6678
+  P-1c registered alpha_SGD = 0.479, band [0.38, 0.58]
+  VERDICT: OUTSIDE BAND
+done

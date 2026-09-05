@@ -1,0 +1,6 @@
+adam_all=1.2626824615044292
+adam_escapers=1.1415695643714916
+sgd_all=0.718803268229008
+sgd_escapers=0.6678101230334336
+registered_sgd=0.479 band=[0.38,0.58]
+within=False
