@@ -188,3 +188,25 @@ stays within the registered band [-0.895, -0.595].
 
 **P-2b.** The pwl family's onset also moves with budget, in the same
 direction (lower onset at larger budget). Falsified if flat or reversed.
+
+---
+
+# Flip-reporting criteria (registered 2026-08-29, before the tanh cells landed)
+
+Fixed in advance so the interpretation is not chosen after seeing which
+answer it favours.
+
+**Any flip must be reported with:** the budget at which the crossing occurs,
+the ABSOLUTE test error of both activations at that budget, and whether it
+survives into the 5- and 12-epoch cells.
+
+**Regime criterion.** At 2 epochs these models sit at ~68% test error. A flip
+whose crossing exists ONLY in that regime supports the narrow claim that
+early-training rankings are unstable -- closer to known than to new -- and
+must be reported as such, NOT led with. A flip carries the paper only if the
+crossing sits in a regime people publish from (as a working line: test error
+low enough that the comparison would plausibly appear in a paper, i.e. the
+5-epoch cell or later, roughly <50% error).
+
+**Reporting rule.** If the crossing is confined to the very-early regime, the
+headline is the narrower claim and the flip is a supporting detail.
