@@ -158,3 +158,33 @@ breaking down at large budget. Evidence that separates them, fixed now:
    floor.
 
 Reported either way, with the number of bracketed cells stated explicitly.
+
+---
+
+# Budget-flip predictions (registered 2026-08-29, before any CIFAR budget run)
+
+Setting: CIFAR-10, depth-8 SmallCNN, GELU/ReLU/tanh, fresh seeds (100+),
+budgets 2/5/12/30/60 epochs.
+
+**P-flip.** At least one activation pair reverses order with budget,
+significant at both ends. **Most likely pair: tanh vs ReLU.** Reason: tanh
+led at short budget on MNIST bottlenecks (T34) and underfits at convergence
+on CIFAR (train error 744 vs ~180 per 10k, T38), so its relative position
+should degrade with budget. Predicted direction: tanh ahead of ReLU at 2
+epochs, behind by 30-60 epochs.
+
+**P-no-flip-GELU.** GELU vs ReLU does NOT flip: GELU led at both 12 epochs
+(mid-descent) and at convergence (T35/T38), so the pair is expected stable.
+Registered so a GELU/ReLU flip would count against my reasoning, not for it.
+
+**P-margin.** Even absent a flip, the GELU-over-ReLU gap magnitude changes
+substantially (>1.5x) across the budget range.
+
+Falsification: flat ranking AND gap stable within ~1.5x => the methodological
+claim narrows to the controlled setting, and the abstract is rewritten.
+
+**P-2a.** Onsets at B = 4,000 and 64,000 bracket, and the six-point exponent
+stays within the registered band [-0.895, -0.595].
+
+**P-2b.** The pwl family's onset also moves with budget, in the same
+direction (lower onset at larger budget). Falsified if flat or reversed.
