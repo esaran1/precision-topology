@@ -50,8 +50,23 @@ that rate. Stated as an open prediction rather than a finding.
 
 ## Why the negative strengthens rather than weakens the account
 
-A budget law that applied to every activation family would be a statement
-about optimizers. One that applies exactly where the theorem says required
-scale diverges, and not where it says the requirement is undefined, is a
-statement about the **interaction** between an expressivity boundary and a
-finite optimization budget -- which is the paper's actual claim.
+This is a **double dissociation**, not a mere absence:
+
+| | family A (sin) | family B (pwl) |
+|---|---|---|
+| required scale as threshold approached | **diverges** (\|w2\| >= 2m/(kappa*D(a)), D ~ (a-1)^{3/2}) | **undefined** -- degenerates in shear, not depth (T28) |
+| onset exponent in budget | **-0.7340** (R^2 = 0.990, n = 6) | **0.0000** (n = 2 bracketed) |
+| rates as budget rises | rise to 1.000 | **fall** (0.575 -> 0.500 -> unlocatable) |
+
+Both directions are measured. The law appears exactly where the theorem says
+required scale diverges and is absent -- indeed reversed in rate -- where the
+theorem says the requirement is undefined.
+
+The distinction matters for what the paper is claiming. **A budget law
+holding for every activation family would be a statement about optimizers,
+and a reviewer would rightly note that it is implicit in any convergence
+analysis: run longer, get closer.** A law that holds where an expressivity
+boundary makes the required scale diverge, and fails where it does not, is a
+statement about the **interaction** between the boundary and a finite budget.
+That interaction is the paper's thesis, and this falsification is what
+separates it from the trivial version.
