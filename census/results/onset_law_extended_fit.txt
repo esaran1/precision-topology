@@ -1,0 +1,4 @@
+exponent=-0.7339552423351158
+r2=0.9899511325890163
+n_bracketed=6
+within_band=True
