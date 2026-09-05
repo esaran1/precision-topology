@@ -1,2 +1,5 @@
 epochs=2 gelu: mean test errors 3173.1 (n=8)
 epochs=2 relu: mean test errors 3923.5 (n=8)
+epochs=2 tanh: mean test errors 3424.5 (n=8)
+--- budget 2 complete ---
+epochs=5 gelu: mean test errors 2167.0 (n=8)
