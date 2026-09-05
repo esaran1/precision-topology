@@ -223,3 +223,42 @@ trajectories matches p = -0.105 +- 0.05. Falsified otherwise.
 **P-1b.** Pure sign-descent gives alpha = 1 exactly. Registered: Adam's
 derivation gives alpha ~ 1, and if the measured 1.1172 exceeds it the gap is
 diagnosed, not declared agreement.
+
+**P-1a VERDICT (measured before the registrations below): FALSIFIED.**
+Gradient exponent p = 1.085, not the -0.105 implied by alpha = 1.1172; the
+gradient-flow route gives alpha = 0.48 for Adam. Mechanism identified
+instead: Adam's REALIZED step is scale-free (p_step = 0.005), so |w2| grows
+linearly, alpha ~ 1.
+
+**P-1c (registered 2026-09-05, before any SGD terminal-scale run).**
+Plain SGD does NOT normalize by gradient magnitude, so it inherits the
+measured gradient exponent directly: d|w2|/dt ~ |w2|^{-1.085} gives
+**alpha_SGD = 1/(1+1.085) = 0.479**. Registered band: **[0.38, 0.58]**.
+
+This is deliberately risky. It is a factor-of-two departure from Adam's
+alpha ~ 1, derived from an independently measured gradient exponent, and it
+applies **the same gradient-flow route that was just falsified for Adam** --
+to the optimizer where it should hold, because SGD's step is proportional to
+the gradient. A hit is meaningful precisely because the route already failed
+once where normalization breaks it; a miss falsifies the mechanism rather
+than the optimizer choice.
+
+Second, dependent prediction: the SGD onset exponent should be
+**-2*alpha_SGD/3 = -0.319** (band [-0.42, -0.22]), by the same argument that
+gave -0.745 for Adam.
+
+**P-composition (registered before refitting).** Stallers at short budgets
+drag median terminal |w2| DOWN, steepening the cross-budget slope UPWARD.
+Predicted sign: refitting alpha on escapers only should LOWER it toward 1.0.
+Falsified if the escaper-only alpha is unchanged or higher.
+
+**Consistency resolution, decided before writing section 6.** The onset
+measurement (`onset_more.rate_at` -> `run_full`) runs all 40 seeds and counts
+stallers as failures, so the onset rate is a POPULATION quantity. The
+internally consistent alpha for the onset law is therefore the
+population/cross-budget alpha (1.1172, stallers included), NOT the
+escaper-trajectory alpha (~1.0). They are two different quantities serving
+two different purposes:
+  - alpha_population = 1.1172 -> onset exponent -0.745 (registered, measured -0.734)
+  - alpha_escaper ~ 1.0 describes the individual growth trajectory
+This is stated now rather than discovered at review.
