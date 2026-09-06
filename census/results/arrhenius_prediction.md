@@ -368,3 +368,25 @@ that supports using the theorem **descriptively** -- the criterion is still
 m -> 0, the theorem still degenerates there, and we would be relying on an
 observed regularity rather than a proved one. That is honest and usable; it is
 NOT a connection between the theorem and the criterion.
+
+**P-2a-onset MIXED-CASE SCORING, registered 2026-09-06 before the numbers landed.**
+The margin distribution is strongly a-dependent (min margin 0.0038 at a = 1.5
+against >0.167 at a >= 2.0), so a partial outcome is likely. Scored as
+follows, fixed in advance:
+
+- **Clean survival**: BOTH m = 0.01 and m = 0.05 exponents inside
+  [-0.8690, -0.5989]. The empirical criterion can be restated at fixed
+  margin and section 6's use of the theorem is repaired.
+- **Clean failure**: both outside. The theorem does not apply as run; stop
+  and report; the remedy is a scope decision.
+- **MIXED** (m = 0.01 survives, m = 0.05 shifts; or fixed-margin criteria
+  move onsets at large a while leaving near-threshold cells alone): this is
+  **NOT scored as survival**. The honest reading is that **the theorem
+  connects to the experiments only where margins sit comfortably above
+  threshold -- which is not the regime section 6 needs**, since section 6
+  invokes the theorem precisely at the onset, where the margin tail reaches
+  0.004. A mixed outcome is reported as a limitation of the theorem's
+  applicability, not as a qualified success.
+
+Also fixed: the **a = 1.35 margin row is n = 1** and is not a distribution.
+Only a >= 1.5 rows are informative, and a = 1.5 is the straddling case.
