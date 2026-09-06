@@ -87,12 +87,22 @@ def main() -> None:
                          "onset_eps": o, "bracketed": br})
             curves.extend(curve)
             print(f"q={q:.3f} B={B}: onset_eps={o} bracketed={br}", flush=True)
+            # APPEND to any existing artifact rather than overwriting: a second
+            # invocation for different families previously clobbered the first
+            # run's rows and silently dropped two families from the figure.
             for nm, fr in (("family_onsets", pd.DataFrame(rows)),
                            ("family_onset_curves", pd.DataFrame(curves))):
                 stem = RESULTS / nm
                 with artifact_lock(stem, nm):
+                    path = stem.with_suffix(".csv")
+                    if path.exists():
+                        prior = pd.read_csv(path)
+                        key = (["family", "budget"] if nm == "family_onsets"
+                               else ["q", "budget", "eps"])
+                        fr = (pd.concat([prior, fr])
+                                .drop_duplicates(subset=key, keep="last"))
                     tmp = stem.with_suffix(".csv.tmp"); fr.to_csv(tmp, index=False)
-                    tmp.replace(stem.with_suffix(".csv"))
+                    tmp.replace(path)
         sub = pd.DataFrame(rows)
         sub = sub[(sub.family == name) & sub.bracketed & sub.onset_eps.notna()]
         if len(sub) >= 2:

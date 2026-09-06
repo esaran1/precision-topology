@@ -1,0 +1,59 @@
+  q=2.000 B=2000 eps=0.60000: rate=0.825
+  q=2.000 B=2000 eps=0.40000: rate=0.825
+  q=2.000 B=2000 eps=0.25000: rate=0.600
+  q=2.000 B=2000 eps=0.15000: rate=0.000
+q=2.000 B=2000: onset_eps=0.25 bracketed=True
+  q=2.000 B=8000 eps=0.60000: rate=0.875
+  q=2.000 B=8000 eps=0.40000: rate=0.825
+  q=2.000 B=8000 eps=0.25000: rate=0.825
+  q=2.000 B=8000 eps=0.15000: rate=0.800
+  q=2.000 B=8000 eps=0.10000: rate=0.775
+  q=2.000 B=8000 eps=0.06000: rate=0.000
+q=2.000 B=8000: onset_eps=0.1 bracketed=True
+  q=2.000 B=32000 eps=0.60000: rate=0.925
+  q=2.000 B=32000 eps=0.40000: rate=0.875
+  q=2.000 B=32000 eps=0.25000: rate=0.850
+  q=2.000 B=32000 eps=0.15000: rate=0.825
+  q=2.000 B=32000 eps=0.10000: rate=0.900
+  q=2.000 B=32000 eps=0.06000: rate=0.850
+  q=2.000 B=32000 eps=0.04000: rate=0.825
+  q=2.000 B=32000 eps=0.02500: rate=0.000
+q=2.000 B=32000: onset_eps=0.04 bracketed=True
+  q=2.000 B=128000 eps=0.60000: rate=0.925
+  q=2.000 B=128000 eps=0.40000: rate=0.875
+  q=2.000 B=128000 eps=0.25000: rate=0.850
+  q=2.000 B=128000 eps=0.15000: rate=0.825
+  q=2.000 B=128000 eps=0.10000: rate=0.900
+  q=2.000 B=128000 eps=0.06000: rate=0.850
+  q=2.000 B=128000 eps=0.04000: rate=0.825
+  q=2.000 B=128000 eps=0.02500: rate=0.800
+  q=2.000 B=128000 eps=0.01500: rate=0.775
+  q=2.000 B=128000 eps=0.01000: rate=0.000
+q=2.000 B=128000: onset_eps=0.015 bracketed=True
+*** q2_beta1.5: beta=1.500 measured exponent=-0.6749 predicted=-0.7448 n=4
+  q=1.000 B=2000 eps=0.60000: rate=0.750
+  q=1.000 B=2000 eps=0.40000: rate=0.475
+q=1.000 B=2000: onset_eps=0.6 bracketed=True
+  q=1.000 B=8000 eps=0.60000: rate=0.775
+  q=1.000 B=8000 eps=0.40000: rate=0.800
+  q=1.000 B=8000 eps=0.25000: rate=0.775
+  q=1.000 B=8000 eps=0.15000: rate=0.000
+q=1.000 B=8000: onset_eps=0.25 bracketed=True
+  q=1.000 B=32000 eps=0.60000: rate=0.775
+  q=1.000 B=32000 eps=0.40000: rate=0.825
+  q=1.000 B=32000 eps=0.25000: rate=0.800
+  q=1.000 B=32000 eps=0.15000: rate=0.750
+  q=1.000 B=32000 eps=0.10000: rate=0.775
+  q=1.000 B=32000 eps=0.06000: rate=0.000
+q=1.000 B=32000: onset_eps=0.1 bracketed=True
+  q=1.000 B=128000 eps=0.60000: rate=0.775
+  q=1.000 B=128000 eps=0.40000: rate=0.825
+  q=1.000 B=128000 eps=0.25000: rate=0.800
+  q=1.000 B=128000 eps=0.15000: rate=0.750
+  q=1.000 B=128000 eps=0.10000: rate=0.775
+  q=1.000 B=128000 eps=0.06000: rate=0.775
+  q=1.000 B=128000 eps=0.04000: rate=0.675
+  q=1.000 B=128000 eps=0.02500: rate=0.000
+q=1.000 B=128000: onset_eps=0.04 bracketed=True
+*** q1_beta2: beta=2.000 measured exponent=-0.6521 predicted=-0.5586 n=4
+done

@@ -74,3 +74,57 @@ not a restatement of family A's band.
 Remaining: q2 (beta 1.5) and q1 (beta 2.0). q2 is the construction's own
 re-test of family A -- it predicts -0.7448, the value family A measured at
 -0.7340 through an entirely separate activation.
+
+---
+
+# Diagnosis of the R^2 drop (2026-09-05): resolution, not a systematic departure
+
+The four-family fit gave R^2 = 0.684 about the predicted line, against 0.898
+for the extreme pair alone, with deviations of opposite sign at the two ends.
+That signature was checked before anything went in the ledger, per this
+project's record with instrument artifacts.
+
+**Hypothesis tested: the epsilon grid is fixed across families while onset
+locations differ, so bracketing resolution differs systematically by family.**
+
+**Result: rejected as stated.** All four families sit on the same geometric
+grid with near-identical local spacing (mean ln-step 0.474-0.497), so
+resolution per *step* does not differ by family.
+
+**But the resolution per family does differ, for a different reason: budget
+span.** Two families lost an extreme budget cell to non-bracketing (q4's
+128k, q0.667's 2k), halving their lever arm from ln-span 4.16 to 2.77:
+
+| family | beta | cells | budget span (ln) | deviation | grid resolution | inside? |
+|---|---|---|---|---|---|---|
+| q0.667 | 2.50 | 3 | 2.77 | -0.053 | +-0.171 | **yes** |
+| q1 | 2.00 | 4 | 4.16 | -0.094 | +-0.114 | **yes** |
+| q2 | 1.50 | 4 | 4.16 | +0.070 | +-0.114 | **yes** |
+| q4 | 1.25 | 3 | 2.77 | +0.063 | +-0.171 | **yes** |
+
+**Every deviation lies inside that family's own grid resolution.** The mean
+signed deviation is **-0.0033** -- essentially zero, so there is no
+compression toward the origin and no systematic departure from the law.
+
+**Conclusion: the R^2 drop is an instrument effect, not a real deviation.**
+R^2 about a fixed predicted line is a harsh statistic when the points span a
+narrow range in 1/beta (0.40-0.80) and each carries +-0.11 to +-0.17 of
+resolution noise; it is not evidence of a departure. The appropriate summary
+is the through-origin slope, **1.0969 against the independently measured
+alpha = 1.1172 (1.8% apart)**, together with the deviation table above.
+
+Reported this way rather than as "a small systematic departure", which the
+data do not support.
+
+# Construction validation: q2 versus family A
+
+q2 (beta = 1.5, constructed) and family A (beta = 1.5, `x + a*sin(x)`) are
+**different activation functions with the same fold-depth exponent**. Measured
+independently: **-0.6749** and **-0.7340**, agreeing to 0.059 -- inside the
+grid resolution of both. Family A's value was measured before the constructed
+families existed.
+
+Together with the earlier prefactor check (q = 2 reproduces family A's
+beta to four digits with a constant sqrt(2) ratio across three decades), this
+is the construction validating itself: same geometry, different function,
+same exponent.
