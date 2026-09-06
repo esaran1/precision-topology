@@ -345,3 +345,26 @@ bound follows from the sample geometry.
 **P-2a-onset.** Redefining separation at fixed m > 0 leaves the budget law and
 the four-family relationship intact (exponents within +-0.15 of the m -> 0
 values). Falsified if onsets shift materially with m.
+
+**P-2a-onset threshold, registered 2026-09-06 BEFORE the margin onsets landed.**
+Fixed in exponent terms (what section 6 claims), not onset location, and
+derived from the data rather than chosen:
+
+  m = 0 family-A exponent = -0.7340, n = 6 bracketed cells
+  statistical 95% CI on the slope = +-0.0725 (SE 0.0370, dof 4)
+  grid-resolution component        = +-0.1140 (mean ln-step 0.474 / span 4.16)
+  combined in quadrature           = **+-0.1351**
+
+**Survival band: [-0.8690, -0.5989].** If the fixed-margin exponents (m = 0.01,
+0.05) fall inside it, the budget law survives redefinition and the theorem can
+be connected by restating the empirical criterion at fixed m. If they fall
+outside, **the theorem does not apply to the experiments as run** -- stop and
+report before touching anything, since the remedy (restating every result at
+fixed margin) is a scope decision, not an incremental edit.
+
+Note on what the margin-distribution measurement can and cannot buy, fixed in
+advance: if found solutions cluster at margins where the bound is non-vacuous,
+that supports using the theorem **descriptively** -- the criterion is still
+m -> 0, the theorem still degenerates there, and we would be relying on an
+observed regularity rather than a proved one. That is honest and usable; it is
+NOT a connection between the theorem and the criterion.
