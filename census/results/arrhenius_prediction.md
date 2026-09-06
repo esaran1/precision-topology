@@ -309,3 +309,22 @@ registered for family A ([-0.895, -0.595]). This is **coincidence**: -0.8938
 is an independent prediction for a different family with beta = 1.25, not a
 restatement of family A's band. A reader skimming could conflate them; the
 writeup must separate them explicitly.
+
+---
+
+# Part 1 registration (2026-09-06, before measurement)
+
+Objection: bounded |w2| does not bound amplification; required scale may
+diverge through w1. Our family B conclusion was argued from |w2| alone.
+
+**P-obj1.** Adopting the reviewer's posture (the objection is right until the
+data says otherwise): for family B some amplification measure -- |w1*w2|,
+|w1|, or the composed Lipschitz constant -- DOES diverge as alpha -> 0-.
+Falsified only if every measure stays bounded.
+
+Outcome classes fixed in advance:
+ (i)   nothing diverges -> dissociation stands, restated in the right measure
+ (ii)  diverges but training reaches it -> "diverges but within reach", a
+       weaker and DIFFERENT claim than "does not diverge"; restate
+ (iii) diverges and training does not reach it -> dissociation FAILS, T28 is
+       wrong, family B is not the beta-undefined endpoint. Stop and report.
