@@ -89,3 +89,44 @@ medians, and the median of a product is not the product of medians. The
 identity holds per-run. alpha_product = 1.049 excludes the B=1000 cell, where
 8/30 runs stalled and the product median was a 40x outlier; including it
 inflates the estimate to 1.467.)
+
+---
+
+## Family B over a 64x budget range: not flat, and not slow -- REVERSED
+
+Prompted by review: family B's original "flat" result spanned only 8x
+(2k-16k) against family A's 64x, so the comparison was not like-for-like.
+Re-measured over 2k-128k with the same bracketing criteria (40 seeds/cell):
+
+| budget | family B onset (alpha) | bracketed |
+|---|---|---|
+| 2,000 | -0.05 | yes (-0.05: 0.575 -> -0.03: 0.475) |
+| 8,000 | -0.05 | yes |
+| 32,000 | **-0.20** | yes (-0.2: 0.575 -> -0.1: 0.475) |
+| 128,000 | **-0.10** | yes (-0.1: 0.525 -> -0.05: 0.475) |
+
+**Measured exponent: +0.2500** -- *positive*. Family B's onset moves **away**
+from the threshold as budget grows: it needs a **larger** |alpha| to solve at
+128k steps than at 2k. Family A over the identical range moves 1.60 -> 1.03
+(exponent -0.734).
+
+So the earlier "exponent 0.0000, flat" reading was an artifact of the 8x
+range. **`family_b_budget.md`'s value is superseded by this measurement**
+(the second correction to that document, after the homogeneity error).
+
+This is the third possible outcome and it was not among the two anticipated:
+
+- not **flat** (which would have made B a null case),
+- not **slow** (which would have weakened the anomaly to a range artifact),
+- but **reversed** -- the opposite sign from the law's prediction of -1.117.
+
+**Family B is a strong counterexample, not a weak one.** More budget makes it
+worse, consistent with the earlier reach measurement (solve rates falling
+0.567 -> 0.433 and 0.300 -> 0.133 as budget rose 16x while amplification grew
+50-1000x). Whatever governs family B's findability is not amplification and
+is not budget in the direction the law describes.
+
+Restated for the record: **family B lies outside the law's class by
+homogeneity, and its onset exponent -- now measured at +0.25 over 64x, not
+0.00 -- is not accounted for by any amplification measure we tested.** Open
+question.

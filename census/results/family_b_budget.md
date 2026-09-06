@@ -70,3 +70,12 @@ boundary makes the required scale diverge, and fails where it does not, is a
 statement about the **interaction** between the boundary and a finite budget.
 That interaction is the paper's thesis, and this falsification is what
 separates it from the trivial version.
+
+> **SUPERSEDED (2026-09-06), twice.** (1) The premise that family B has no
+> diverging requirement is **false**: its f is positively homogeneous, the
+> amplification measure is |w₁·w₂|, and the requirement diverges as 1/|α|
+> (β_B = 1). (2) The "exponent 0.0000" here spans only 8× (2k–16k). Over a
+> matched 64× range (2k–128k) the measured exponent is **+0.25** — family B's
+> onset moves *away* from the threshold as budget grows. See
+> `review_objection1.md`. Both errors were found through external expert
+> review.
