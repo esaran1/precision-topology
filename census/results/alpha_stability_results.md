@@ -62,8 +62,24 @@ similarly. With the window-matched alpha:
   **both** windows.
 
 **So the four-family relationship does not depend on which alpha is used.**
-That is a strong statement and it is worth making explicitly: the result is
-robust to the window choice, even though alpha itself is window-dependent.
+
+**Why it works, since a reviewer will ask.** Alpha's drift is monotone in both
+window width and window position. The two windows compared here (1k-160k and
+2k-128k) are both **wide and heavily overlapping**, so they average over the
+same drift and land within 0.009 of each other. A **narrow** window at either
+end would not: 1k-4k gives 1.5123 and 40k-160k gives 0.7193, a spread of 0.79.
+
+Both facts hold simultaneously and the writeup carries both:
+
+1. **The four-family relationship is robust to this window choice** -- it does
+   not depend on which of the two wide fits is used.
+2. **Alpha is not a range-independent constant** -- it drifts by 0.79 across
+   sub-ranges, and 1.1172 is meaningful only with its range attached.
+
+The robustness result does **not** soften (1)'s companion finding. It shows
+the four-family comparison is insensitive to a choice between two similar wide
+windows; it says nothing about alpha being well-defined asymptotically, and it
+would not survive a comparison between narrow windows at opposite ends.
 
 ## 3b: propagated uncertainty. All four families still agree.
 
