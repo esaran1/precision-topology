@@ -27,12 +27,43 @@ Every sub-range fits with R^2 >= 0.983, so the *local* behaviour is
 power-law-like at every scale -- but the exponent itself keeps falling. That
 is the signature of a curve that is not a single power law over this range.
 
+**This is not a range caveat on a constant -- it is evidence that growth is
+not a power law over this range.** Local power-law behaviour at every scale
+(R^2 >= 0.983 in every window) combined with an exponent that drifts
+monotonically with the window is what a **logarithmic or saturating process
+looks like when fitted piecewise**. A true power law has a window-independent
+exponent; this does not.
+
 **The honest statement, which replaces "alpha = 1.1172":** terminal weight
-scale grows approximately as a power law over any restricted budget window,
-with an exponent that **decreases monotonically from ~1.5 at short budgets to
-~0.72 at long ones**. The value 1.1172 is the full-range (1k-160k) fit and
-must be quoted with that range attached. It is not an asymptotic constant, and
-extrapolating beyond 160k is unsupported.
+scale grows **sub-power-law**, well approximated by B^alpha over any
+restricted window with alpha decreasing from ~1.5 (short budgets) to ~0.72
+(long budgets). The value 1.1172 is the full-range (1k-160k) fit and is
+meaningful only with that range attached. It is not an asymptotic constant,
+and extrapolation beyond 160k is unsupported.
+
+## Window-matching check: the four-family result is ROBUST
+
+Alpha was fitted over 1k-160k, but the onsets were measured over 2k-128k.
+Given that alpha varies by 0.79 across windows, the predictions were refit
+using alpha over the window the onsets actually span:
+
+| alpha source | value | 95% CI | n |
+|---|---|---|---|
+| 1k-160k (committed) | 1.1173 | +-0.1187 | 8 |
+| **2k-128k (onset window)** | **1.1084** | +-0.0842 | 6 |
+
+**The two differ by 0.0089** -- two orders of magnitude smaller than the 0.79
+spread across all sub-ranges, because both windows are wide and centred
+similarly. With the window-matched alpha:
+
+- **all four families still overlap their predicted intervals (4/4)**;
+- mean |error| is marginally *better*: 0.0539 vs 0.0552;
+- the through-origin slope 1.1240 [1.008, 1.240] overlaps alpha under
+  **both** windows.
+
+**So the four-family relationship does not depend on which alpha is used.**
+That is a strong statement and it is worth making explicitly: the result is
+robust to the window choice, even though alpha itself is window-dependent.
 
 ## 3b: propagated uncertainty. All four families still agree.
 
