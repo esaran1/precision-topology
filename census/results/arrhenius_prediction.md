@@ -328,3 +328,20 @@ Outcome classes fixed in advance:
        weaker and DIFFERENT claim than "does not diverge"; restate
  (iii) diverges and training does not reach it -> dissociation FAILS, T28 is
        wrong, family B is not the beta-undefined endpoint. Stop and report.
+
+---
+
+# Part 2a registration (2026-09-06, before measurement)
+
+Objection: the theorem is stated at fixed margin m; experiments count sign
+correctness (m -> 0), where |w2| >= 2m/(kappa*D) degenerates to |w2| >= 0.
+
+**P-2a-geom.** The finite evaluation sample does NOT force a useful minimum
+margin: the exact-region check `solves()` tests a dense grid over CONTINUOUS
+intervals, not a finite point set, so no positive margin is implied by
+correctness. Registered as the expected answer; falsified if a positive lower
+bound follows from the sample geometry.
+
+**P-2a-onset.** Redefining separation at fixed m > 0 leaves the budget law and
+the four-family relationship intact (exponents within +-0.15 of the m -> 0
+values). Falsified if onsets shift materially with m.
