@@ -13,3 +13,9 @@ SGD B=2000: onset=1.6 bracketed=True
   SGD B=8000 a=1.32: rate=0.450
 SGD B=8000: onset=1.38 bracketed=True
   SGD B=32000 a=1.6: rate=0.750
+  SGD B=32000 a=1.45: rate=0.750
+  SGD B=32000 a=1.35: rate=0.750
+  SGD B=32000 a=1.28: rate=0.750
+  SGD B=32000 a=1.22: rate=0.725
+  SGD B=32000 a=1.18: rate=0.150
+SGD B=32000: onset=1.22 bracketed=True

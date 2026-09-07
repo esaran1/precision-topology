@@ -472,3 +472,14 @@ is **more likely to reflect our onset grid than a wrong alpha**. If the result
 lands just outside, the decomposition is reported, because "the prediction is
 wrong" and "our instrument cannot resolve the prediction" are different
 findings and the band's composition distinguishes them.
+
+**Cost-law resolution, registered 2026-09-07 before the verification ran.**
+The budget ladder is geometric with 2x steps, so its resolution is ln(2) =
+0.6931 per cell against the onset grid's mean ln-step of 0.474. Over the eps
+span used (a = 1.50 down to 1.10, ln(0.50/0.10) = 1.6094):
+
+    cost-exponent resolution = 0.6931 / 1.6094 = **+-0.4307**
+
+against the onset exponent's **+-0.1140**. **The cost exponent is ~3.8x
+coarser**, and the two must not be presented as if they had equal precision.
+Each is reported with its own resolution term.
