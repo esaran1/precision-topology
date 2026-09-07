@@ -1,0 +1,2 @@
+optimizer,budget,onset,bracketed
+sgd,2000,1.6,True

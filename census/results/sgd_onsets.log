@@ -1,0 +1,10 @@
+  SGD B=2000 a=2.2: rate=0.625
+  SGD B=2000 a=2.0: rate=0.625
+  SGD B=2000 a=1.8: rate=0.600
+  SGD B=2000 a=1.7: rate=0.600
+  SGD B=2000 a=1.6: rate=0.525
+  SGD B=2000 a=1.5: rate=0.125
+SGD B=2000: onset=1.6 bracketed=True
+  SGD B=8000 a=1.9: rate=0.700
+  SGD B=8000 a=1.7: rate=0.700
+  SGD B=8000 a=1.55: rate=0.700

@@ -425,3 +425,25 @@ Bracketing criteria unchanged: an onset is located only if some a gives >=50%
 and a strictly smaller a gives <50%; unbracketed cells are reported as bounds
 and excluded from the fit; the count of bracketed cells is reported before the
 exponent.
+
+---
+
+# Part 1a registration (2026-09-07, BEFORE the budget-bisection verification)
+
+Inverting eps_onset ~ B^{-0.734}: the compute needed to realize a capability
+within eps of the analytic threshold is
+
+    B(eps) ~ eps^{-1/0.734} = eps^{-1.3624}
+
+Uncertainty propagated from the onset exponent's interval [-0.8691, -0.5989]
+(stat 95% CI +-0.0725 combined in quadrature with grid resolution +-0.1140):
+**cost exponent 1.3624, interval [1.1506, 1.6698]**. Halving eps costs
+**2.57x** compute (interval 2.22x-3.18x).
+
+**P-cost.** Measured along the OTHER axis -- fixing a and bisecting on BUDGET
+to find the B at which the solve rate reaches 50% -- the fit of log B against
+log(a-1) should have slope **-1.3624**, band **[-1.6698, -1.1506]**.
+
+This is a consistency check rather than a restatement only because it is a
+different measurement: bisection on budget at fixed a, not on a at fixed
+budget. Falsified if the slope falls outside the band.
