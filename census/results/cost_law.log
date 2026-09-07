@@ -1,0 +1,31 @@
+  a=1.5 B=1000: rate=0.000
+  a=1.5 B=2000: rate=0.267
+  a=1.5 B=4000: rate=0.767
+a=1.5: B_50% = 4000 bracketed=True
+  a=1.35 B=1000: rate=0.000
+  a=1.35 B=2000: rate=0.000
+  a=1.35 B=4000: rate=0.567
+a=1.35: B_50% = 4000 bracketed=True
+  a=1.25 B=1000: rate=0.000
+  a=1.25 B=2000: rate=0.000
+  a=1.25 B=4000: rate=0.067
+  a=1.25 B=8000: rate=0.833
+a=1.25: B_50% = 8000 bracketed=True
+  a=1.15 B=1000: rate=0.000
+  a=1.15 B=2000: rate=0.000
+  a=1.15 B=4000: rate=0.000
+  a=1.15 B=8000: rate=0.100
+  a=1.15 B=16000: rate=0.900
+a=1.15: B_50% = 16000 bracketed=True
+  a=1.1 B=1000: rate=0.000
+  a=1.1 B=2000: rate=0.000
+  a=1.1 B=4000: rate=0.000
+  a=1.1 B=8000: rate=0.000
+  a=1.1 B=16000: rate=0.533
+a=1.1: B_50% = 16000 bracketed=True
+
+BRACKETED CELLS: 5
+COST EXPONENT (log B vs log eps) = -1.0242
+REGISTERED: -1.3624, band [-1.6698, -1.1506]
+VERDICT: OUTSIDE BAND
+done
