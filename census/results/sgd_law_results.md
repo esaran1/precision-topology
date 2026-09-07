@@ -74,6 +74,17 @@ about SGD's trajectory also slows the onset. This is stated as a limitation of
 the law, not smoothed over: the ratio test is a cleaner comparison than either
 exponent alone, because grid resolution partially cancels, and it fails.
 
+## Consequence for the rest of the paper
+
+With the strong form unsupported here, **the four-family relationship (T44) is
+now the only relationship in this project that holds quantitatively rather
+than directionally** -- through-origin slope 1.1240 [1.008, 1.240] against an
+independently measured alpha of 1.1173 [0.999, 1.236], with all four families
+overlapping their propagated intervals. It is correspondingly more
+load-bearing, and its own limitations (n = 4 families, per-family grid
+resolution +-0.114 to +-0.171, alpha not range-stable) matter more than they
+did when the SGD result was expected to corroborate it.
+
 ## Status of the claim
 
 - **Not an Adam artifact.** The law's qualitative content -- onsets move with
