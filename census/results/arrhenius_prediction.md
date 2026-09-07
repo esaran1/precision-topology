@@ -447,3 +447,28 @@ log(a-1) should have slope **-1.3624**, band **[-1.6698, -1.1506]**.
 This is a consistency check rather than a restatement only because it is a
 different measurement: bisection on budget at fixed a, not on a at fixed
 budget. Falsified if the slope falls outside the band.
+
+**P-SGD PARTIAL-OUTCOME SCORING, registered 2026-09-07 before the fit landed.**
+
+A plausible result is an exponent slightly outside [-0.5973, -0.3611] while
+still clearly separated from Adam's -0.7340. Scored in advance:
+
+- **Hit**: inside the band. The law holds across two optimizers and the
+  optimizer enters only through alpha.
+- **Directional-only** (outside the band, but clearly nearer -0.4792 than
+  -0.7340, i.e. separated from Adam): **the alpha-dependence holds
+  directionally while the quantitative prediction misses.** Weaker than a hit,
+  considerably stronger than a null. Reported in exactly those terms -- NOT as
+  a qualified success.
+- **Null**: indistinguishable from Adam's -0.7340. The law's alpha-dependence
+  is wrong.
+- **Neither**: matching no prediction. The law is optimizer-specific.
+
+**Band composition, recorded before the result so the diagnosis is not chosen
+afterwards.** The +-0.1181 band is dominated by the **grid-resolution term
+(+-0.1140)**, not by alpha's uncertainty (+-0.0311 after propagation through
+/beta): resolution contributes 93% of the variance. Consequently a near-miss
+is **more likely to reflect our onset grid than a wrong alpha**. If the result
+lands just outside, the decomposition is reported, because "the prediction is
+wrong" and "our instrument cannot resolve the prediction" are different
+findings and the band's composition distinguishes them.
