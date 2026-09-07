@@ -543,3 +543,29 @@ band.
   **Adam-specific**, the four-family result does not generalize, and the
   paper's scope narrows to one optimizer. **Most consequential negative in
   the project** -- report immediately, before anything else.
+
+**P-null, registered 2026-09-07 before running.** The propagated band
+[1.114, 2.886] is **too wide to constitute a test**: a ratio of 1.2 would
+"pass" it, and 1.2 is much closer to **no beta-dependence at all (ratio 1.0)**
+than to the prediction of 2.0. A hit against that band would be nearly
+uninformative and is not reported as one.
+
+**The null this test must exclude is ratio ~ 1.0** -- the exponent does not
+depend on beta at all. Scored explicitly:
+
+- **ratio >= 1.5**: the null is excluded. Geometry governs the ordering even
+  if the point prediction is missed -- a real result, reported as such.
+- **ratio near 1.0** (below ~1.25): the geometric claim **fails under SGD**,
+  regardless of what the wide propagated band permits.
+- The **informative comparison** is whether SGD's ratio lands near Adam's
+  measured **1.661** and near the prediction **2.0** -- not whether it falls
+  inside an interval that also admits 1.2.
+
+**Grid refinement, decided before running.** q0.667's resolution dominates the
+ratio's uncertainty (its predicted exponent -0.2875 is small, so a fixed
++-0.114 is a large relative error). Refining **q0.667's eps grid to 1.25x
+steps** (from ~1.6x) halves its resolution to +-0.0537 and tightens the
+propagated band from **+-44.3% to +-27.2%** ([1.456, 2.544]) -- comparable to
+Adam's +-25% standard -- at the cost of ~12 grid points per budget instead of
+~6, for that family only. **Adopted.** q4 keeps the standard grid, since its
+larger exponent makes its relative resolution unimportant.
