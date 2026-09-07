@@ -19,3 +19,16 @@ SGD B=8000: onset=1.38 bracketed=True
   SGD B=32000 a=1.22: rate=0.725
   SGD B=32000 a=1.18: rate=0.150
 SGD B=32000: onset=1.22 bracketed=True
+  SGD B=128000 a=1.4: rate=0.900
+  SGD B=128000 a=1.3: rate=0.900
+  SGD B=128000 a=1.22: rate=0.900
+  SGD B=128000 a=1.16: rate=0.725
+  SGD B=128000 a=1.12: rate=0.025
+SGD B=128000: onset=1.16 bracketed=True
+
+BRACKETED CELLS: 4 of 4
+SGD ONSET EXPONENT = -0.3255
+REGISTERED: -0.4792, band [-0.5973, -0.3611]
+VERDICT: OUTSIDE BAND
+Adam's value -0.7340: excluded by the band
+done

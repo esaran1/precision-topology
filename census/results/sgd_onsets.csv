@@ -2,3 +2,4 @@ optimizer,budget,onset,bracketed
 sgd,2000,1.6,True
 sgd,8000,1.38,True
 sgd,32000,1.22,True
+sgd,128000,1.16,True
