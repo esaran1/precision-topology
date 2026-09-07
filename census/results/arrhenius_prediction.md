@@ -390,3 +390,38 @@ follows, fixed in advance:
 
 Also fixed: the **a = 1.35 margin row is n = 1** and is not a distribution.
 Only a >= 1.5 rows are informative, and a = 1.5 is the straddling case.
+
+---
+
+# Part 2a registration (2026-09-07, BEFORE any SGD onset run)
+
+**P-SGD.** The law eps_onset ~ B^{-alpha/beta} predicts that swapping the
+optimizer changes the onset exponent only through alpha.
+
+  alpha_SGD (population, 6 budgets, committed `alpha_composition.csv`)
+      = **0.7188**, SE 0.0238, 95% CI [0.6722, 0.7654]
+  family A beta = 1.5
+  predicted SGD onset exponent = -alpha_SGD/beta = **-0.4792**
+
+Band, derived not chosen: alpha CI propagated through /beta gives +-0.0311;
+grid resolution (mean ln-step 0.474 over the 64x span, ln 4.16) gives
++-0.1140; combined in quadrature **+-0.1181**.
+
+**REGISTERED BAND: [-0.5973, -0.3611].**
+
+**The test discriminates**: Adam's measured -0.7340 lies OUTSIDE this band, so
+"SGD looks like Adam" and "SGD follows its own alpha" give different verdicts.
+
+Failure meanings, fixed in advance:
+- measured exponent ~ -0.734 (Adam's value, outside the band): **the law's
+  dependence on alpha is wrong** -- the exponent is not set by the optimizer's
+  growth rate.
+- measured exponent matching neither -0.479 nor -0.734: **the law is
+  optimizer-specific** and must be reported as an Adam result.
+- measured inside the band: the law holds across two optimizers with different
+  growth exponents, and the optimizer enters only through alpha.
+
+Bracketing criteria unchanged: an onset is located only if some a gives >=50%
+and a strictly smaller a gives <50%; unbracketed cells are reported as bounds
+and excluded from the fit; the count of bracketed cells is reported before the
+exponent.
