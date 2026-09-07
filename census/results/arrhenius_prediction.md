@@ -483,3 +483,13 @@ span used (a = 1.50 down to 1.10, ln(0.50/0.10) = 1.6094):
 against the onset exponent's **+-0.1140**. **The cost exponent is ~3.8x
 coarser**, and the two must not be presented as if they had equal precision.
 Each is reported with its own resolution term.
+
+**Cost verification DEMOTED, decided 2026-09-07 before it ran.** Its
+resolution (+-0.4307) exceeds the half-width of the band it tests (0.26), so
+**it cannot falsify the prediction**. It can confirm sign and order of
+magnitude and catch a gross disagreement between the two measurement axes or
+an arithmetic error in the inversion -- and nothing more. It is therefore
+reported as an **appendix consistency check with its resolution limitation
+stated**, not as a headline result and not as a figure. A finer ladder (1.5x
+steps, resolution 0.405, plus a wider eps span) was considered and rejected:
+compute spent on a check that is not load-bearing, with the deadline close.
