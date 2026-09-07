@@ -95,3 +95,36 @@ did when the SGD result was expected to corroborate it.
   ratio is 0.447 against the predicted 0.643.
 - 2c (a second family under SGD) is **not run**: its premise was that 2b
   landed, and it did not.
+
+## Where the missing dependence may live: one look at distribution SHAPE
+
+The discrepancy has a sign -- SGD moves **slower** than its alpha predicts,
+not faster -- which prompted a single check: do the two optimizers differ in
+the *shape* of their terminal weight distribution, or only in its scale?
+Scale-free metrics, matched a = 1.25 and budget, n = 60:
+
+| budget | optimizer | median \|w2\| | IQR/median | log-sd | p10 / p90 |
+|---|---|---|---|---|---|
+| 8,000 | Adam | 17.45 | **0.22** | 0.737 | 9.86 / 20.34 |
+| 8,000 | SGD | 7.02 | **0.90** | 1.153 | **0.57** / 7.38 |
+| 32,000 | Adam | 78.38 | **0.05** | 0.817 | 71.14 / 81.20 |
+| 32,000 | SGD | 17.07 | **0.70** | 1.373 | **0.73** / 17.69 |
+
+**The distributions differ in shape, not merely in scale.** Adam's terminal
+weights concentrate tightly and tighten further with budget (IQR/median
+0.22 -> 0.05); SGD's stay broadly dispersed (0.90 -> 0.70), with a p10 that
+barely moves (0.57 -> 0.73) while its median grows 2.4x.
+
+So under SGD a substantial minority of runs are **left behind** near |w2| ~ 1
+regardless of budget, while the median advances. Since the onset is a **50%
+solve-rate threshold**, it is set by the *lower* part of the distribution, not
+the median -- and SGD's lower tail is nearly budget-independent. That would
+depress the onset exponent below what the median-based alpha predicts, which
+is the observed direction.
+
+**Stated as a hypothesis consistent with one observation, not a result.** It
+was not registered, it rests on two budgets at one a, and it was not pursued
+further. What it establishes is only that **the missing dependence plausibly
+concerns the spread of where training lands rather than how far it travels on
+average** -- which is a different quantity from alpha, and would explain why
+alpha alone is insufficient.
