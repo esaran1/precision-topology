@@ -493,3 +493,53 @@ reported as an **appendix consistency check with its resolution limitation
 stated**, not as a headline result and not as a figure. A finer ladder (1.5x
 steps, resolution 0.405, plus a wider eps span) was considered and rejected:
 compute spent on a check that is not load-bearing, with the deadline close.
+
+---
+
+# Part 1b registration (2026-09-07, BEFORE any SGD family-onset run)
+
+Separating the law's two parts. **Geometric**: the onset exponent scales as
+1/beta, beta derived analytically from fold depth with no training.
+**Dynamical**: the constant of proportionality is alpha, measured per
+optimizer. 2b tested the dynamical part and it FAILED (exponent ratio 0.447 vs
+alpha ratio 0.643). The geometric part has never been tested across
+optimizers.
+
+**P-abs (weak, expected to miss).** Each family's SGD exponent equals
+-alpha_SGD/beta with alpha_SGD = 0.7188:
+    q4     (beta 1.25): **-0.5750**
+    q0.667 (beta 2.50): **-0.2875**
+Expected to miss: the same prediction missed for family A by 0.0356, and the
+ratio diagnostic showed alpha under-predicts SGD's onset movement.
+
+**P-ratio (strong -- this is the actual test).** The ratio of the two
+families' exponents equals the inverse ratio of their betas:
+    e(q4) / e(q0.667) = beta(q0.667) / beta(q4) = 2.5 / 1.25 = **2.0000**
+**alpha cancels exactly in this ratio.** The dynamical constant that failed
+the cross-optimizer test drops out, leaving only the geometric claim.
+
+**Bands, derived not chosen.** Planned 4 cells per family spanning 64x gives
+per-family resolution 0.474/ln(64) = +-0.1140. Propagated through the ratio
+(dR/R = sqrt((dE4/E4)^2 + (dE067/E067)^2)) with predicted exponents -0.5750
+and -0.2875:
+    relative uncertainty = **44.3%**  =>  **propagated band [1.114, 2.886]**
+
+**Both standards reported.** The propagated band is much wider than the
++-25% standard Adam's ratio was judged against ([1.50, 2.50]), because
+q0.667's small predicted exponent inflates its relative resolution. **The
+primary comparison is against Adam's +-25% standard**, per the brief; the
+propagated band is reported alongside so the difference in stringency is
+visible. Adam's measured 1.661 deviates 16.9%, i.e. 0.38 of the propagated
+band.
+
+**Outcomes, fixed in advance:**
+- **Ratio holds within Adam's +-25% standard [1.50, 2.50]:** geometry
+  transfers; the optimizer enters only through scale. Becomes the central
+  claim.
+- **Ratio holds within the propagated band but outside +-25%:** partial --
+  ordering is geometric but the relationship is not purely 1/beta. Reported
+  as such, NOT as a hit.
+- **Ratio outside the propagated band:** the geometric relationship is
+  **Adam-specific**, the four-family result does not generalize, and the
+  paper's scope narrows to one optimizer. **Most consequential negative in
+  the project** -- report immediately, before anything else.
