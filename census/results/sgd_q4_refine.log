@@ -1,0 +1,35 @@
+  q4 SGD B=2000 eps=0.25: rate=0.700
+  q4 SGD B=2000 eps=0.23148: rate=0.700
+  q4 SGD B=2000 eps=0.21433: rate=0.700
+  q4 SGD B=2000 eps=0.19846: rate=0.700
+  q4 SGD B=2000 eps=0.18376: rate=0.625
+  q4 SGD B=2000 eps=0.17015: rate=0.325
+q4 SGD B=2000: onset=0.18376 bracketed=True
+  q4 SGD B=8000 eps=0.25: rate=0.825
+  q4 SGD B=8000 eps=0.23148: rate=0.775
+  q4 SGD B=8000 eps=0.21433: rate=0.750
+  q4 SGD B=8000 eps=0.19846: rate=0.750
+  q4 SGD B=8000 eps=0.18376: rate=0.725
+  q4 SGD B=8000 eps=0.17015: rate=0.575
+  q4 SGD B=8000 eps=0.15754: rate=0.400
+q4 SGD B=8000: onset=0.17015 bracketed=True
+  q4 SGD B=32000 eps=0.25: rate=0.875
+  q4 SGD B=32000 eps=0.23148: rate=0.850
+  q4 SGD B=32000 eps=0.21433: rate=0.825
+  q4 SGD B=32000 eps=0.19846: rate=0.800
+  q4 SGD B=32000 eps=0.18376: rate=0.550
+  q4 SGD B=32000 eps=0.17015: rate=0.350
+q4 SGD B=32000: onset=0.18376 bracketed=True
+  q4 SGD B=128000 eps=0.25: rate=0.900
+  q4 SGD B=128000 eps=0.23148: rate=0.900
+  q4 SGD B=128000 eps=0.21433: rate=0.850
+  q4 SGD B=128000 eps=0.19846: rate=0.850
+  q4 SGD B=128000 eps=0.18376: rate=0.575
+  q4 SGD B=128000 eps=0.17015: rate=0.350
+q4 SGD B=128000: onset=0.18376 bracketed=True
+
+BRACKETED CELLS: 4 of 4
+q4 SGD exponent = 0.0056   (q4 Adam = -0.8305)
+predicted -alpha_SGD/beta = -0.5750
+ratio SGD/Adam = -0.0067  (alpha ratio = 0.6434)
+done

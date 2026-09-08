@@ -1,0 +1,67 @@
+  SGD q4_beta1.25 B=2000 eps=0.6: rate=0.700
+  SGD q4_beta1.25 B=2000 eps=0.4: rate=0.700
+  SGD q4_beta1.25 B=2000 eps=0.25: rate=0.700
+  SGD q4_beta1.25 B=2000 eps=0.15: rate=0.025
+SGD q4_beta1.25 B=2000: onset=0.25 bracketed=True
+  SGD q0.667_beta2.5 B=2000 eps=0.6: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.48: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.384: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.3072: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.24576: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.19661: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.15729: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.12583: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.10066: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.08053: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.06442: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.05154: rate=0.000
+  SGD q0.667_beta2.5 B=2000 eps=0.04123: rate=0.000
+SGD q0.667_beta2.5 B=2000: onset=None bracketed=False
+  SGD q4_beta1.25 B=8000 eps=0.6: rate=0.850
+  SGD q4_beta1.25 B=8000 eps=0.4: rate=0.850
+  SGD q4_beta1.25 B=8000 eps=0.25: rate=0.825
+  SGD q4_beta1.25 B=8000 eps=0.15: rate=0.375
+SGD q4_beta1.25 B=8000: onset=0.25 bracketed=True
+  SGD q0.667_beta2.5 B=8000 eps=0.6: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.48: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.384: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.3072: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.24576: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.19661: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.15729: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.12583: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.10066: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.08053: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.06442: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.05154: rate=0.000
+  SGD q0.667_beta2.5 B=8000 eps=0.04123: rate=0.000
+SGD q0.667_beta2.5 B=8000: onset=None bracketed=False
+  SGD q4_beta1.25 B=32000 eps=0.6: rate=0.900
+  SGD q4_beta1.25 B=32000 eps=0.4: rate=0.900
+  SGD q4_beta1.25 B=32000 eps=0.25: rate=0.875
+  SGD q4_beta1.25 B=32000 eps=0.15: rate=0.150
+SGD q4_beta1.25 B=32000: onset=0.25 bracketed=True
+  SGD q0.667_beta2.5 B=32000 eps=0.6: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.48: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.384: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.3072: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.24576: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.19661: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.15729: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.12583: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.10066: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.08053: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.06442: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.05154: rate=0.000
+  SGD q0.667_beta2.5 B=32000 eps=0.04123: rate=0.000
+SGD q0.667_beta2.5 B=32000: onset=None bracketed=False
+  SGD q4_beta1.25 B=128000 eps=0.6: rate=0.925
+  SGD q4_beta1.25 B=128000 eps=0.4: rate=0.925
+  SGD q4_beta1.25 B=128000 eps=0.25: rate=0.900
+  SGD q4_beta1.25 B=128000 eps=0.15: rate=0.175
+SGD q4_beta1.25 B=128000: onset=0.25 bracketed=True
+  SGD q0.667_beta2.5 B=128000 eps=0.6: rate=0.000
+  SGD q0.667_beta2.5 B=128000 eps=0.48: rate=0.000
+  SGD q0.667_beta2.5 B=128000 eps=0.384: rate=0.000
+  SGD q0.667_beta2.5 B=128000 eps=0.3072: rate=0.000
+  SGD q0.667_beta2.5 B=128000 eps=0.24576: rate=0.000

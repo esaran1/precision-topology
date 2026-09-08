@@ -59,3 +59,78 @@ cross-optimizer comparison at fixed beta = 1.25** against Adam's measured
 cannot reach the families the test requires at feasible budgets. The
 four-family result remains a single-optimizer result and the paper should say
 so.
+
+---
+
+# q4 under SGD, refined: the onset is FLAT, and the bound is tight
+
+Refined 1.08x grid across (0.15, 0.25], **4 of 4 cells bracketed**:
+
+| budget | q4 onset (eps) |
+|---|---|
+| 2,000 | 0.18376 |
+| 8,000 | 0.17015 |
+| 32,000 | 0.18376 |
+| 128,000 | 0.18376 |
+
+Three of four budgets give the **identical** grid value; the fourth differs by
+one 1.08x step (non-monotonically -- it is *lower* at 8k than at 32k and 128k,
+so the variation is grid noise, not a trend).
+
+**Fitted exponent: +0.0056.** Total variation 1.08x across a **64x** budget
+range.
+
+## Stated as a bound, not a null
+
+Flat at 1.08x resolution over 64x bounds the exponent:
+
+    |exponent| < ln(1.08) / ln(64) = **0.0185**
+
+and the fitted value (0.0056) is well inside that. So:
+
+| family beta = 1.25 | exponent |
+|---|---|
+| **Adam** | **-0.8305** |
+| **SGD** | **+0.0056**, \|value\| < **0.0185** |
+
+**SGD's onset exponent for q4 is at least 45x smaller in magnitude than
+Adam's, at fixed beta.** The coarse grid's apparent flatness was an artifact
+(it reported 0.25 everywhere; the refined onset is 0.184), but the refined
+measurement finds the onset genuinely does not move.
+
+**The registered absolute prediction is missed badly**: -alpha_SGD/beta =
+-0.5750 against a measured +0.0056, a miss of 0.58 -- far outside any
+resolution argument.
+
+## Reading, with both possibilities stated
+
+Family A **does** move under SGD (1.60 -> 1.16 over 64x, exponent -0.3255), so
+SGD onsets are not generally static. Two readings of q4's flatness:
+
+1. **A beta-dependent difference between optimizers**: SGD's onset moves for
+   beta = 1.5 (family A) but not for beta = 1.25 (q4). If real, this is
+   interesting in its own right and is **not** what the law predicts -- the
+   law says smaller beta gives a *steeper* exponent, and q4 has the smallest
+   beta of any family tested.
+2. **Movement below resolution**: q4's onset moves by under 8% across 64x.
+   Even so, that is bounded at |exponent| < 0.0185 against Adam's 0.8305.
+
+Both readings agree on the quantitative content: **at fixed beta = 1.25, the
+two optimizers differ by at least a factor of 45 in onset exponent.** That is
+a same-family cross-optimizer result and it does not depend on the ratio test
+that could not run.
+
+## Consequence for the law
+
+The law predicts the exponent should scale as -alpha/beta, so q4 (the smallest
+beta) should have the **steepest** exponent under either optimizer. Under Adam
+it does (-0.8305, steepest of four families). **Under SGD it is flat.** So the
+1/beta scaling, which holds across four families under Adam, **does not
+reproduce under SGD for the one family that could be measured.**
+
+Combined with T45 (the alpha-dependence holds directionally but the exponent
+ratio 0.447 misses the alpha ratio 0.643), the honest position is:
+
+> **The four-family geometric relationship is an Adam result.** Its transfer
+> to other optimizers is untested for three of four families (unreachable at
+> feasible budgets) and **fails for the one family that could be measured**.

@@ -1,0 +1,5 @@
+budget,onset_eps,bracketed
+2000,0.18376,True
+8000,0.17015,True
+32000,0.18376,True
+128000,0.18376,True
