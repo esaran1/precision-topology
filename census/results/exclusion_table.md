@@ -22,10 +22,15 @@ reached (0/200 SGD runs at a <= 1.30; exact basin fraction 0 through a = 1.25).
 
 ## What each column excludes, and how
 
-**Energy barrier — excluded by measurement.** Minimum-energy-path barrier is
-**exactly 0.000** for every zero-basin solution at every a, from 5
-initializations each (string method, `barrier.csv`). The solutions are
-downhill-connected to typical initializations. Nothing is being escaped.
+**Energy barrier — excluded by measurement, with the exclusion NARROWED
+(2026-09-08).** Minimum-energy-path barrier is **exactly 0.000** for every
+zero-basin solution at every a, from 5 initializations each (string method,
+`barrier.csv`). **What this establishes: the landscape admits a barrier-free
+path from typical initializations to these solutions**, which excludes an
+*energetic* explanation. **What it does not establish: that SGD's own
+trajectory is barrier-free.** The string method finds *a* low-barrier path,
+not *the* path training follows; those are different claims and the second
+does not follow. The exclusion is of the landscape explanation only.
 *This is a measurement.* It could have come out positive; the linear-path
 proxy, which was the original evidence, does show positive values, and the
 first version of this project believed them (`instrument_artifacts.md`
@@ -40,12 +45,19 @@ and is not violated. *This is a measurement* (exact 4x4 Hessians), and the
 registered prediction was that it would separate the populations at 2. It
 did not.
 
-**Distance — excluded by measurement, with the sign reversed.** Zero-basin
-solutions sit **4.7-5.5** from typical initialization; found solutions sit
-**10.2-17.7** away, 2-3x further. Training routinely travels past the
-unreachable solutions to reach the reachable ones. *This is a measurement*,
-and it is the cleanest reversal in the table: the never-found solutions are
-the nearer ones.
+**Distance — excluded by measurement, with the sign reversed, and the metric
+objection answered (2026-09-08).** Zero-basin solutions sit **4.7-5.5** from
+typical initialization; found solutions sit **10.2-17.7** away, 2-3x further.
+Training routinely travels past the unreachable solutions to reach the
+reachable ones.
+
+*Adversarial check*: Euclidean norm in raw parameter coordinates is not the
+metric Adam moves in, so the reversal could be a coordinate artifact.
+Recomputed under Adam's own preconditioner (bias-corrected sqrt of the
+accumulated second moment, measured from real trajectories), found/constructed
+distance ratios are **3.79, 3.04, 2.30, 1.72** at a = 1.45, 1.50, 2.00, 3.00
+against Euclidean **3.50, 2.80, 2.56, 1.85**. **The reversal survives in the
+optimizer's own metric at every value.**
 
 **Margin — excluded by measurement, with population overlap.** At a = 1.5 the
 zero-basin solution's margin is 0.0384, and **5 of 20 found solutions have a

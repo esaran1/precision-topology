@@ -147,8 +147,12 @@ initializations. *Adversarial failure:* Euclidean distance in unnormalized
 parameter coordinates is not the metric SGD moves in -- Adam's per-coordinate
 normalization means the effective metric is closer to L-infinity in
 gradient-scaled units. Under a different metric the ordering could reverse.
-*Status:* **not excluded.** The claim survives only as "nearer in parameter
-norm", and the reversal it reports is metric-dependent. This needs saying.
+*Status:* **RESOLVED 2026-09-08 -- attack answered.** Recomputed under Adam's
+own preconditioner (bias-corrected sqrt of accumulated second moment, measured
+from trajectories): found/constructed ratios **3.79 / 3.04 / 2.30 / 1.72** at
+a = 1.45 / 1.50 / 2.00 / 3.00, against Euclidean 3.50 / 2.80 / 2.56 / 1.85.
+**The reversal survives in the metric the optimizer actually uses**, so it is
+not a coordinate artifact. The claim strengthens.
 
 **(d) Margin (5/20 found solutions have smaller margin).** *Measures:* minimum
 logit margin over dense sweeps of both class regions. *Adversarial failure:*
@@ -274,8 +278,8 @@ Theorem verification re-checked: n = 66, 0 violations, **minimum slack
 2. **The budget law's staller/escaper entanglement** over 1k-16k, where the
    exponent has most leverage.
 3. **The string method finds a path, not the path** -- the barrier exclusion
-   is about the landscape, not the trajectory.
-4. **Distance is measured in a metric the optimizer does not use.**
+   is about the landscape, not the trajectory. **The exclusion table now says
+   this explicitly** rather than only the audit.
 5. **The theorem's verification cannot separate "tight bound" from "SGD finds
    near-optimal fold placements"** (0 violations, min slack 1.04x).
 6. **B(eps) is a median**; the distribution's other quantiles are unmeasured.
