@@ -92,28 +92,54 @@ one is stated as analogy.
 
 # THE ANSWERS
 
-## To R1 -- the strongest criticism, and it is partly right
+## To R1 -- the objection makes a false prediction
 
-**Conceded**: the algebra is one line, and the paper must say so. What is not
-conceded is that this makes it contentless. The substitution requires **both
-inputs to be independently measurable and to actually take the values the
-substitution needs** -- and neither was guaranteed:
+R1 says the law is one line of algebra: set B^alpha = eps^{-beta}, get
+eps ~ B^{-alpha/beta}. The algebra is indeed trivial. **The objection
+nonetheless fails, because it treats a measured dynamical fact as an a priori
+one.**
 
-- alpha is measured on a **different experiment** (terminal weight growth) and
-  never fitted to the families. It could have taken any value; the predicted
-  line's slope came out at 1.1240 [1.008, 1.240] against alpha's 1.1173
-  [0.999, 1.236].
-- The chain assumes training reaches the required scale by *growing* |w2|
-  along a fold-amplifying direction. **That assumption is falsifiable and we
-  falsified two versions of it**: family B has a diverging requirement, meets
-  it by 900-1200x, and still fails; and the alpha-dependence fails
-  quantitatively under SGD.
+The substitution requires that terminal weight scale follow a power law in
+budget. **That is not given; it is measured, and it is not universal:**
 
-So the substitution is not automatic: it holds where the mechanism holds and
-demonstrably fails where it does not. **But R1's core point stands and the
-framing must change** -- from "we derived a law" to "we verified that a
-two-step chain closes quantitatively, under one optimizer, and identified two
-regimes where it does not."
+- **alpha is not range-stable.** Fitted over every contiguous sub-range it
+  falls monotonically from **1.5123** (1k-4k) to **0.7193** (40k-160k), with
+  R^2 >= 0.983 in every window. Growth is sub-power-law -- locally
+  power-law-like at every scale with a drifting exponent, the signature of a
+  logarithmic or saturating process. A "trivial substitution" presumes a
+  quantity that does not exist as a range-independent constant.
+- **The chain does not close under SGD.** If the relationship were mere
+  algebra, it would close for *any* optimizer with any alpha: measure alpha,
+  divide by beta, done. It does not. The exponent ratio is **0.447** against
+  the alpha ratio **0.643** (30% gap, on the quantity where grid resolution
+  partially cancels), and for q4 the exponent is **-0.8305** under Adam and
+  **+0.0056** (bounded |exp| < 0.0185) under SGD -- a factor of at least 45 at
+  fixed beta.
+
+**So the objection makes a prediction, and the prediction is false.** If the
+law were a definitional consequence, it could not fail under an optimizer
+change; it would follow from the definitions regardless of dynamics. Two of
+the two optimizers tested were required to satisfy it, and one does not.
+
+The same point holds for family B, which has a **diverging** requirement
+(beta = 1, derived analytically after external review corrected our error),
+**exceeds** it by 900-1200x in training, and **still fails** -- its onset
+exponent is **+0.25** over a matched 64x range, the wrong sign entirely.
+Algebra cannot produce a counterexample to itself.
+
+**What the algebra buys, precisely**: given that (i) terminal scale grows as a
+power law over a stated range, (ii) required scale diverges with a derivable
+exponent, and (iii) training reaches solutions by growing |w2| along a
+fold-amplifying direction, the onset exponent follows. **Each of (i)-(iii) is
+an empirical claim that can fail. (i) holds only over restricted windows,
+(iii) fails for family B, and the conjunction fails under SGD.** The
+contribution is establishing where the conjunction holds and exhibiting two
+regimes where it does not -- not the division.
+
+**Conceded on wording only**: the paper should not say "we derived the power
+law and it holds", which oversells. It should say the chain closes
+quantitatively under one optimizer for families where the mechanism applies,
+and identify the two regimes where it demonstrably does not.
 
 ## To R2 -- conceded, and it is already in the abstract
 
@@ -157,6 +183,15 @@ is the strongest available check we did not run.
 
 **Cannot answer.** This is listed as an open exposure in the interpretive
 audit and should appear in the paper's limitations in the same words.
+
+*Attempted 2026-09-08*: a second construction route was derived and verified
+-- fixing the activation and varying the **traversal scale** rather than the
+functional form. It gives **beta = 2 exactly** (verified 1.9945 over three
+decades; the derivation beta = order of the fold minimum's vanishing is exact
+across five test folds). But **beta = 2 collides with q1**, and obtaining a
+different beta from that route requires varying the fold's vanishing order --
+**the same knob the q-families turn**. It is a reparametrization, not an
+independent mechanism, and was **not run** (`traversal_route.md`). R4 stands.
 
 ## To R5 -- disputed, with a concession
 
