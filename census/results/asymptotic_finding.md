@@ -71,3 +71,60 @@ the measured range (within 4.2%), not merely of the limit. But the paper
 should quote beta = 3/2 as the analytic limit **and** note that the effective
 local exponent over the measured range is ~1.44, so the derivation is not
 being applied outside where it holds.
+
+---
+
+# Effective beta across all five families: the substitution is not neutral
+
+Prompted by review: each family's beta is an **asymptotic** (1 + 1/q as
+eps -> 0), and each has an **effective local value** over the eps range its own
+onsets actually span. If the through-origin slope shifts materially when
+effective beta replaces asymptotic beta, that must be stated.
+
+| family | onset eps range | beta_asym | beta_eff | pred(asym) | pred(eff) | measured |
+|---|---|---|---|---|---|---|
+| q4 | 0.025-0.250 | 1.2500 | **1.2285** | -0.8938 | -0.9095 | -0.8305 |
+| q2 | 0.015-0.250 | 1.5000 | **1.4630** | -0.7449 | -0.7637 | -0.6749 |
+| q1 | 0.040-0.600 | 2.0000 | **1.8409** | -0.5586 | -0.6069 | -0.6521 |
+| q0.667 | 0.100-0.400 | 2.4993 | **2.2391** | -0.4470 | -0.4990 | -0.5000 |
+| family A | 0.030-0.600 | 1.5000 | **1.4326** | -0.7449 | -0.7799 | -0.7340 |
+
+Effective beta is **below** asymptotic beta in every family (D's local slope
+falls as eps grows), by 1.7% (q4) to 10.4% (q0.667).
+
+## The two diagnostics disagree about which beta is right
+
+| | asymptotic beta | effective beta |
+|---|---|---|
+| mean per-family \|error\| | 0.0581 | **0.0520** (better) |
+| through-origin slope | **1.0984** | 1.0547 |
+| slope vs measured alpha = 1.1173 | **1.7% apart** (better) | 5.6% apart |
+
+Per family: effective beta **improves** q1 (0.094 -> 0.045) and q0.667
+(0.053 -> 0.001) but **worsens** q4, q2 and family A -- including family A,
+whose agreement degrades from 0.011 to 0.046.
+
+**So using effective beta improves the average per-family fit while worsening
+the slope's agreement with the independently measured alpha.** The two
+diagnostics point opposite ways, and that disagreement is itself the finding:
+the relationship is not resolved finely enough to distinguish a 3-10% change
+in beta.
+
+## What the paper must do
+
+**Report both, and say which is used.** The headline figure and the through-
+origin slope use **asymptotic beta**, because beta is defined analytically
+there and the x-axis (1/beta) is then a derived quantity with no measurement
+error. Using effective beta would put a measured quantity on both axes and
+make the slope a regression of two noisy variables.
+
+**State the sensitivity**: the through-origin slope is 1.0984 (asymptotic) or
+1.0547 (effective) against alpha = 1.1173 [0.999, 1.236]; **both lie inside
+alpha's confidence interval**, so the conclusion -- slope consistent with
+independently measured alpha -- is unchanged. The choice affects the headline
+number by 4%, well inside the interval, and it must not be presented as a
+1.7% agreement without noting that the alternative gives 5.6%.
+
+This is the same class as the alpha window question (1.1172 vs 1.1084): a
+quantity with two defensible values where the paper states which it uses and
+why, rather than quoting the more favourable one.
