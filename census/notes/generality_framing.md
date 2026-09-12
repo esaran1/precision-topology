@@ -103,3 +103,6 @@ above it; on real data we confirmed the advantage exists and is not a
 smoothness effect, but could not test the width prediction, because no
 setting we could construct supplied both a reproducible advantage and
 an unambiguous width axis."
+
+
+> **Correction (2026-09-11).** This document states "24 of 25 runs plateaued" while also reporting the per-arm breakdown 9/10, 9/10, 5/5 and **two** censored runs. 9 + 9 + 5 = **23**. `cifar_convergence.csv` has exactly two non-plateaued runs (GELU seed 10, ReLU seed 4, both at the 40-epoch cap), so the correct total is **23 of 25**. The plateau criterion passes either way and no downstream number moves; the total was simply miscounted. Found by recomputation from the artifact during §7 verification (`paper/link_cifar_verification.md`, M2).
