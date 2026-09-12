@@ -1,0 +1,1846 @@
+Failures of Gradient-Based Deep Learning
+Shai Shalev-Shwartz1, Ohad Shamir2, and Shaked Shammah1
+1School of Computer Science and Engineering, The Hebrew University
+2Weizmann Institute of Science
+Abstract
+In recent years, Deep Learning has become the go-to solution for a broad range of applications,
+often outperforming state-of-the-art. However, it is important, for both theoreticians and practitioners,
+to gain a deeper understanding of the difﬁculties and limitations associated with common approaches
+and algorithms. We describe four types of simple problems, for which the gradient-based algorithms
+commonly used in deep learning either fail or suffer from signiﬁcant difﬁculties. We illustrate the failures
+through practical experiments, and provide theoretical insights explaining their source, and how they
+might be remedied1.
+1 Introduction
+The success stories of deep learning form an ever lengthening list of practical breakthroughs and state-of-
+the-art performances, ranging the ﬁelds of computer vision [23, 14, 25, 33], audio and natural language
+processing and generation [5, 15, 11, 34], as well as robotics [24, 26], to name just a few. The list of success
+stories can be matched and surpassed by a list of practical “tips and tricks”, from different optimization
+algorithms, parameter tuning methods [30, 22], initialization schemes [10], architecture designs [31], loss
+functions, data augmentation [23] and so on.
+The current theoretical understanding of deep learning is far from being sufﬁcient for a rigorous analysis
+of the difﬁculties faced by practitioners. Progress must be made from both parties: from a practitioner’s per-
+spective, emphasizing the difﬁculties provides practical insights to the theoretician, which in turn, supplies
+theoretical insights and guarantees, further strengthening and sharpening practical intuitions and wisdom.
+In particular, understanding failures of existing algorithms is as important as understanding where they
+succeed.
+Our goal in this paper is to present and discuss families of simple problems for which commonly used
+methods do not show as exceptional a performance as one might expect. We use empirical results and
+insights as a ground on which to build a theoretical analysis, characterising the sources of failure. Those
+understandings are aligned, and sometimes lead to, different approaches, either for an architecture, loss
+function, or an optimization scheme, and explain their superiority when applied to members of those fami-
+lies. Interestingly, the sources for failure in our experiment do not seem to relate to stationary point issues
+such as spurious local minima or a plethora of saddle points, a topic of much recent interest (e.g. [6, 3]),
+1This paper was done with the support of the Intel Collaborative Research institute for Computational Intelligence (ICRI-CI)
+and is part of the “Why & When Deep Learning works – looking inside Deep Learning” ICRI-CI paper bundle
+1
+arXiv:1703.07950v2  [cs.LG]  26 Apr 2017
+but rather to more subtle issues, having to do with informativeness of the gradients, signal-to-noise ratios,
+conditioning etc. The code for running all our experiments is available online2.
+We start off in Section 2 by discussing a class of simple learning problems for which the gradient infor-
+mation, central to deep learning algorithms, provably carries negligible information on the target function
+which we attempt to learn. This result is a property of the learning problems themselves, and holds for any
+speciﬁc network architecture one may choose for tackling the learning problem, implying that no gradient-
+based method is likely to succeed. Our analysis relies on tools and insights from the Statistical Queries
+literature, and underscores one of the main deﬁciencies of Deep Learning: its reliance on local properties of
+the loss function, with the objective being of a global nature.
+Next, in Section 3, we tackle the ongoing dispute between two common approaches to learning. Most,
+if not all, learning and optimization problems can be viewed as some structured set of sub-problems. The
+ﬁrst approach, which we refer to as the “end-to-end” approach, will tend to solve all of the sub-problems
+together in one shot, by optimizing a single primary objective. The second approach, which we refer to as the
+“decomposition” one, will tend to handle these sub-problems separately, solving each one by deﬁning and
+optimizing additional objectives, and not rely solely on the primary objective. The beneﬁts of the end-to-end
+approach, both in terms of requiring a smaller amount of labeling and prior knowledge, and perhaps enabling
+more expressive architectures, cannot be ignored. On the other hand, intuitively and empirically, the extra
+supervision injected through decomposition is helpful in the optimization process. We experiment with a
+simple problem in which application of the two approaches is possible, and the distinction between them
+is clear and intuitive. We observe that an end-to-end approach can be much slower than a decomposition
+method, to the extent that, as the scale of the problem grows, no progress is observed. We analyze this gap
+by showing, theoretically and empirically, that the gradients are much more noisy and less informative with
+the end-to-end approach, as opposed to the decomposition approach, explaining the disparity in practical
+performance.
+In Section 4, we demonstrate the importance of both the network’s architecture and the optimization
+algorithm on the training time. While the choice of architecture is usually studied in the context of its
+expressive power, we show that even when two architectures have the same expressive power for a given
+task, there may be a tremendous difference in the ability to optimize them. We analyze the required runtime
+of gradient descent for the two architectures through the lens of the condition number of the problem.
+We further show that conditioning techniques can yield additional orders of magnitude speedups. The
+experimental setup in this section is around a seemingly simple problem — encoding a piece-wise linear
+one-dimensional curve. Despite the simplicity of this problem, we show that following the common rule of
+“perhaps I should use a deeper/wider network”3 does not signiﬁcantly help here.
+Finally, in Section 5, we consider deep learning’s reliance on “vanilla” gradient information for the
+optimization process. We previously discussed the deﬁciency of using a local property of the objective
+in directing global optimization. Here, we focus on a simple case in which it is possible to solve the
+optimization problem based on local information, but not in the form of a gradient. We experiment with
+architectures that contain activation functions with ﬂat regions, which leads to the well known vanishing
+gradient problem. Practitioners take great care when working with such activation functions, and many
+heuristic tricks are applied in order to initialize the network’s weights in non-ﬂat areas of its activations.
+Here, we show that by using a different update rule, we manage to solve the learning problem efﬁciently.
+Moreover, one can show convergence guarantees for a family of such functions. This provides a clean
+example where non-gradient-based optimization schemes can overcome the limitations of gradient-based
+2 https://github.com/shakedshammah/failures_of_DL. See command lines in Appendix D.
+3See http://joelgrus.com/2016/05/23/fizz-buzz-in-tensorflow/ for the inspiration behind this quote.
+2
+learning.
+2 Parities and Linear-Periodic Functions
+Most existing deep learning algorithms are gradient-based methods; namely, algorithms which optimize
+an objective through access to its gradient w.r.t. some weight vector w, or estimates of the gradient. We
+consider a setting where the goal of this optimization process is to learn some underlying hypothesis class
+H, of which one member,h∈H , is responsible for labelling the data. This yields an optimization problem
+of the form
+min
+w
+Fh(w).
+The underlying assumption is that the gradient of the objective w.r.t. w,∇Fh(w), contains useful informa-
+tion regarding the target functionh, and will help us make progress.
+Below, we discuss a family of problems for which with high probability, at any ﬁxed point, the gradient,
+∇Fh(w), will be essentially the same regardless of the underlying target functionh. Furthermore, we prove
+that this holds independently of the choice of architecture or parametrization, and using a deeper/wider
+network will not help. The family we study is that of compositions of linear and periodic functions, and we
+experiment with the classical problem of learning parities. Our empirical and theoretical study shows that
+indeed, if there’s little information in the gradient, using it for learning cannot succeed.
+2.1 Experiment
+We begin with the simple problem of learning random parities: After choosing somev∗∈{ 0, 1}d uniformly
+at random, our goal is to train a predictor mapping x∈{ 0, 1}d toy = (−1)⟨x,v∗⟩, where x is uniformly
+distributed. In words,y indicates whether the number of1’s in a certain subset of coordinates ofx (indicated
+by v∗) is odd or even.
+For our experiments, we use the hinge loss, and a simple network architecture of one fully connected
+layer of width 10d > 3d
+2 with ReLU activations, and a fully connected output layer with linear activation
+and a single unit. Note that this class realizes the parity function corresponding to any v∗ (see Lemma 5 in
+the appendix).
+Empirically, as the dimensiond increases, so does the difﬁculty of learning, which can be measured in
+the accuracy we arrive at after a ﬁxed number of training iterations, to the point where around d = 30, no
+advance beyond random performance is observed after reasonable time. Figure 1 illustrates the results.
+2.2 Analysis
+To formally explain the failure from a geometric perspective, consider the stochastic optimization problem
+associated with learning a target functionh,
+min
+w
+Fh(w) := E
+x
+[ℓ(pw(x),h (x))], (1)
+whereℓ is a loss function, x are the stochastic inputs (assumed to be vectors in Euclidean space), andpw is
+some predictor parametrized by a parameter vector w (e.g. a neural network of a certain architecture). We
+will assume thatF is differentiable. A key quantity we will be interested in studying is the variance of the
+3
+0 1 2 3 4 5
+·104
+0.5
+1
+Training Iterations
+Accuracy
+d=5
+d=10
+d=30
+Figure 1: Parity Experiment: Accuracy as a function of the number of training iterations, for various input
+dimensions.
+gradient ofF with respect toh, whenh is drawn uniformly at random from a collection of candidate target
+functionsH:
+Var(H,F, w) = E
+h
+∇Fh(w)− E
+h′
+∇Fh′(w)
+
+2
+(2)
+Intuitively, this measures the expected amount of “signal” about the underlying target function contained in
+the gradient. As we will see later, this variance correlates with the difﬁculty of solving (1) using gradient-
+based methods4.
+The following theorem bounds this variance term.
+Theorem 1 Suppose that
+• Hconsists of real-valued functionsh satisfying Ex[h2(x)]≤ 1, such that for any two distincth,h′∈
+H, Ex[h(x)h′(x)] = 0.
+• pw(x) is differentiable w.r.t.w, and satisﬁes Ex
+[
+∥ ∂
+∂wpw(x)∥2]
+≤G(w)2 for some scalarG(w).
+• The loss function ℓ in (1) is either the square loss ℓ(ˆy,y ) = 1
+2(ˆy−y)2 or a classiﬁcation loss of the
+formℓ(ˆy,y ) =r(ˆy·y) for some 1-Lipschitz functionr, and the target functionh takes values in{±1}.
+Then
+Var(H,F, w) ≤ G(w)2
+|H| .
+The proof is given in Appendix B.1. The theorem implies that if we try to learn an unknown target function,
+possibly coming from a large collection of uncorrelated functions, then the sensitivity of the gradient to the
+target function at any point decreases linearly with|H|.
+Before we make a more general statement, let us return to the case of parities, and study it through
+the lens of this framework. Suppose that our target function is some parity function chosen uniformly at
+random, i.e. a random element from the set of 2d functionsH ={x↦→ (−1)⟨x,v∗⟩ : v∗∈{ 0, 1}d}. These
+4This should not be confused with the variance of gradient estimates used by SGD, which we discuss in Section 3.
+4
+are binary functions, which are easily seen to be mutually orthogonal: Indeed, for any v, v′,
+E
+x
+[
+(−1)⟨x,v⟩(−1)⟨x,v′⟩
+]
+= E
+x
+[
+(−1)⟨x,v+v′⟩
+]
+=
+d∏
+i=1
+E
+[
+(−1)xi(vi+v′
+i)
+]
+=
+d∏
+i=1
+(−1)vi+v′
+i + (−1)−(vi+v′
+i)
+2
+which is non-zero if and only if v = v′. Therefore, by Theorem 1, we get that Var(H,F, w)≤G(w)2/2d
+– that is, exponentially small in the dimension d. By Chebyshev’s inequality, this implies that the gradient
+at any point w will be extremely concentrated around a ﬁxed point independent ofh.
+This phenomenon of exponentially-small variance can also be observed for other distributions, and learn-
+ing problems other than parities. Indeed, in [29], it was shown that this also holds in a more general setup,
+when the outputy corresponds to a linear function composed with a periodic one, and the inputx is sampled
+from a smooth distribution:
+Theorem 2 (Shamir 2016) Letψ be a ﬁxed periodic function, and letH ={x↦→ ψ(v∗⊤x) :∥v∗∥ = r}
+for some r >0. Suppose x∈ Rd is sampled from an arbitrary mixture of distributions with the following
+property: The square root of the density functionϕ has a Fourier transform ˆϕ satisfying
+∫
+x:∥x∥>r ˆϕ2(x)dx∫
+x ˆϕ2(x)dx ≤
+exp(−Ω(r)). Then ifF denotes the objective function with respect to the squared loss,
+Var(H,F, w)≤O (exp(−Ω(d)) + exp(−Ω(r))).
+The condition on the Fourier transform of the density is generally satisﬁed for smooth distributions (e.g.
+arbitrary Gaussians whose covariance matrices are positive deﬁnite, with all eigenvalues at least Ω(1/r)).
+Thus, the bound is extremely small as long as the norm r and the dimension d are moderately large, and
+indicates that the gradients contains little signal on the underlying target function.
+Based on these bounds, one can also formally prove that a gradient-based method, under a reasonable
+model, will fail in returning a reasonable predictor, unless the number of iterations is exponentially large in
+r andd 5 . This provides strong evidence that gradient-based methods indeed cannot learn random parities
+and linear-periodic functions. We emphasize that these results hold regardless of which class of predictors
+we use (e.g. they can be arbitrarily complex neural networks) – the problem lies in using a gradient-based
+method to train them. Also, we note that the difﬁculty lies in the random choice of v∗, and the problem is
+not difﬁcult if v∗ is known and ﬁxed in advance (for example, for a full parityv∗ = (1,..., 1), this problem
+is known to be solvable with an appropriate LSTM network [17]).
+Finally, we remark that the connection between parities, difﬁculty of learning and orthogonal functions
+is not new, and has already been made in the context of statistical query learning [21, 1]. This refers to
+algorithms which are constrained to interact with data by receiving estimates of the expected value of some
+query over the underlying distribution (e.g. the expected value of the ﬁrst coordinate), and it is well-known
+that parities cannot be learned with such algorithms. Recently, [8] have formally shown that gradient-based
+methods with an approximate gradient oracle can be implemented as a statistical query algorithm, which
+implies that gradient-based methods are indeed unlikely to solve learning problems which are known to be
+hard in the statistical queries framework, in particular parities. In the discussion on random parities above,
+we have simply made the connection between gradient-based methods and parities more explicit, by direct
+examination of gradients’ variance w.r.t. the target function.
+5Formally, this requires an oracle-based model, where given a point w, the algorithm receives the gradient at w up to some
+arbitrary error much smaller than machine precision. See [29, Theorem 4] for details.
+5
+3 Decomposition vs. End-to-end
+Many practical learning problems, and more generally, algorithmic problems, can be viewed as a structured
+composition of sub-problems. Applicable approaches for a solution can either be tackling the problem in
+an end-to-end manner, or by decomposition. Whereas for a traditional algorithmic solution, the “divide-
+and-conquer” strategy is an obvious choice, the ability of deep learning to utilize big data and expressive
+architectures has made “end-to-end training” an attractive alternative. Prior results of end-to-end [24, 11]
+and decomposition and added feedback [13, 16, 32, 2] approaches show success in both directions. Here,
+we try to address the following questions: What is the price of the rather appealing end-to-end approach? Is
+letting a network “learn by itself” such a bad idea? When is it necessary, or worth the effort, to “help” it?
+There are various aspects which can be considered in this context. For example, [28] analyzed the differ-
+ence between the approaches from the sample complexity point of view. Here, we focus on the optimization
+aspect, showing that an end-to-end approach might suffer from non-informative or noisy gradients, which
+may signiﬁcantly affect the training time. Helping the SGD process by decomposing the problem leads
+to much faster training. We present a simple experiment, motivated by questions every practitioner must
+answer when facing a new, non trivial problem: What exactly is the required training data, what network ar-
+chitecture should be used, and what is the right distribution of development efforts. These are all correlated
+questions with no clear answer. Our experiments and analysis show that making the wrong choice can be
+expensive.
+3.1 Experiment
+Our experiment compares the two approaches in a computer vision setting, where convolutional neural
+networks (CNN) have become the most widely used and successful algorithmic architectures. We deﬁne
+a family of problems, parameterized by k ∈ N, and show a gap (rapidly growing with k) between the
+performances of the end-to-end and decomposition approaches.
+LetX denote the space of28×28 binary images, with a distributionD deﬁned by the following sampling
+procedure:
+• Sampleθ∼U([0,π ]),l∼U([5, 28− 5]), (x,y )∼U([0, 27])2.
+• The image xθ,l,(x,y) associated with the above sample is set to 0 everywhere, except for a straight line
+of lengthl, centered at (x,y ), and rotated at an angleθ. Note that as the images space is discrete, we
+round the values corresponding to the points on the lines to the closest integer coordinate.
+Let us deﬁne an “intermediate” labeling function y : X→{± 1}, denoting whether the line in a given
+image slopes upwards or downwards, formally:
+y(xθ,l,(x,y)) =
+{
+1 ifθ<π/ 2
+−1 otherwise .
+Figure 2 shows a few examples. We can now deﬁne the problem for each k. Each input instance is a
+tuple xk
+1 := (x1,..., xk) ofk images sampled i.i.d. as above. The target output is the parity over the image
+labelsy(x1),...,y (xk), namely ˜y(xk
+1) =∏
+j=1...ky(xj).
+Many architectures of DNN can be used for predicting ˜y(xk
+1) given xk
+1. A natural “high-level” choice
+can be:
+6
+Figure 2: Section 3.1’s experiment - examples of samples fromX. They values of the top and bottom rows
+are 1 and−1, respectively.
+• Feed each of the images, separately, to a single CNN (of some standard speciﬁc architecture, for
+example, LeNet-like), denoted N (1)
+w1 and parameterized by its weights vector w1, outputting a single
+scalar, which can be regarded as a “score”.
+• Concatenate the “scores” of a tuple’s entries, transform them to the range[0, 1] using a sigmoid func-
+tion, and feed the resulting vector into another network, N (2)
+w2 , of a similar architecture to the one
+deﬁned in Section 2, outputting a single “tuple-score”, which can then be thresholded for obtaining
+the binary prediction.
+Let the whole architecture be denoted Nw. Assuming that N (1) is expressive enough to provide, at least,
+a weak learner for y (a reasonable assumption), and that N (2) can express the relevant parity function (see
+Lemma 5 in the appendix), we obtain that this architecture has the potential for good performance.
+The ﬁnal piece of the experimental setting is the choice of a loss function. Clearly, the primary loss
+which we’d like to minimize is the expected zero-one loss over the prediction, Nw(xk
+1), and the label,
+˜y(xk
+1), namely:
+˜L0−1(w) := E
+xk
+1
+[
+Nw(xk
+1)̸= ˜y(xk
+1)
+]
+A “secondary” loss which can be used in the decomposition approach is the zero-one loss over the
+prediction ofN (1)
+w1 (xk
+1) and the respectivey(xk
+1) value:
+L0−1(w1) := E
+xk
+1
+[
+N (1)
+w1 (xk
+1)̸=y(xk
+1)
+]
+Let ˜L,L be some differentiable surrogates for ˜L0−1,L 0−1. A classical end-to-end approach will be to
+minimize ˜L, and only it; this is our “primary” objective. We have no explicit desire for N (1) to output any
+7
+0.3
+1
+k = 1
+0.3
+1
+k = 2
+0.3
+1
+k = 3
+0.3
+1
+k = 4
+Figure 3: Performance comparison, Section 3.1’s experiment. The red and blue curves correspond to the
+end-to-end and decomposition approaches, respectively. The plots show the zero-one accuracy with respect
+to the primary objective, over a held out test set, as a function of training iterations. We have trained the
+end-to-end network for 20000 SGD iterations, and the decomposition networks for only 2500 iterations.
+speciﬁc value, and hence L is, a priori, irrelevant. A decomposition approach would be to minimize both
+losses, under the assumption that L can “direct” w1 towards an “area” in which we know that the resulting
+outputs ofN (1) can be separated by N (2). Note that using L is only possible when the y values are known
+to us.
+Empirically, when comparing performances based on the “primary” objective, we see that the end-to-end
+approach is signiﬁcantly inferior to the decomposition approach (see Figure 3). Using decomposition, we
+quickly arrive at a good solution, regardless of the tuple’s length,k (as long ask is in the range where perfect
+input toN (2) is solvable by SGD, as described in Section 2). However, using the end-to-end approach works
+only fork = 1, 2, and completely fails already when k = 3 (or larger). This may be somewhat surprising,
+as the end-to-end approach optimizes exactly the primary objective, composed of two sub-problems each of
+which is easily solved on its own, and with no additional irrelevant objectives.
+3.2 Analysis
+We study the experiment from two directions: Theoretically, by analyzing the gradient variance (as in
+Section 2), for a somewhat idealized version of the experiment, and empirically, by estimating a signal-
+to-noise ratio (SNR) measure of the stochastic gradients used by the algorithm. Both approaches point to a
+similar issue: With the end-to-end approach, the gradients do not seem to be sufﬁciently informative for the
+optimization process to succeed.
+Before continuing, we note that a conceptually similar experiment to ours has been reported in [13] (also
+involving a composition of an image recognition task and a simple Boolean formula, and with qualitatively
+similar results). However, that experiment came without a formal analysis, and the failure was attributed
+to local minima. In contrast, our analysis indicates that the problem is not due to local-minima (or saddle
+points), but from the gradients being non-informative and noisy.
+We begin with a theoretical result, which considers our experimental setup under two simplifying as-
+sumptions: First, the input is assumed to be standard Gaussian, and second, we assume the labels are gener-
+ated by a target function of the formhu(xk
+1) =∏k
+l=1 sign(u⊤xl). The ﬁrst assumption is merely to simplify
+the analysis (similar results can be shown more generally, but the argument becomes more involved). The
+second assumption is equivalent to assuming that the labels y(x) of individual images can be realized by a
+linear predictor, which is roughly the case for simple image labelling task such as ours.
+Theorem 3 Let xk
+1 denote a k-tuple (x1,..., xk) of input instances, and assume that each xl is i.i.d. stan-
+8
+dard Gaussian in Rd. Deﬁne
+hu(xk
+1) =
+k∏
+l=1
+sign(u⊤xl),
+and the objective (w.r.t. some predictorpw parameterized by w)
+F (w) = E
+xk
+1
+[
+ℓ(pw(xk
+1),h u(xk
+1)
+]
+.
+Where the loss function ℓ is either the square loss ℓ(ˆy,y ) = 1
+2(ˆy−y)2 or a classiﬁcation loss of the form
+ℓ(ˆy,y ) =r(ˆy·y) for some 1-Lipschitz functionr.
+Fix some w, and suppose that pw(x) is differentiable w.r.t. w and satisﬁes Exk
+1
+[
+∥ ∂
+∂wpw(xk
+1∥2]
+≤
+G(w)2. Then ifH ={hu : u∈ Rd,∥u∥ = 1}, then
+Var(H,F, w) ≤ G(w)2·O
+(√
+k log(d)
+d
+)k
+.
+The proof is given in Section B.2. The theorem shows that the “signal” regarding hu (or, if applying
+to our experiment, the signal for learning N (1), had y been drawn uniformly at random from some set of
+functions overX) decreases exponentially withk. This is similar to the parity result in Section 2, but with an
+important difference: Whereas the base of the exponent there was 1/2, here it is the much smaller quantity
+k log(d)/
+√
+d (e.g. in our experiment, we havek≤ 4 andd = 282). This indicates that already for very small
+values of k, the information contained in the gradients about u can become extremely small, and prevent
+gradient-based methods from succeeding, fully according with our experiment.
+To complement this analysis (which applies to an idealized version of our experiment), we consider a
+related “signal-to-noise” (SNR) quantity, which can be empirically estimated in our actual experiment. To
+motivate it, note that a key quantity used in the proof of Theorem 3, for estimating the amount of signal
+carried by the gradient, is the squared norm of the correlation between the gradient of the predictor pw,
+g(xk
+1) := ∂
+∂wpw(xk
+1) and the target functionhu, which we denote by Sigu:
+Sigu :=
+ E
+xk
+1
+[
+hu(xk
+1)g(xk
+1)
+]
+2
+.
+We will consider the ratio between this quantity and a “noise” term Noiu, i.e. the variance of this correlation
+over the samples:
+Noiu := E
+xk
+1
+hu(xk
+1)g(xk
+1)− E
+xk
+1
+[
+hu(xk
+1)g(xk
+1)
+]
+2
+.
+Since here the randomness is with respect to the data rather than the target function (as in Theorem 3),
+we can estimate this SNR ratio in our experiment. It is well-known (e.g. [9]) that the amount of noise in
+the stochastic gradient estimates used by stochastic gradient descent crucially affects its convergence rate.
+Hence, smaller SNR should be correlated with worse performance.
+We empirically estimated this SNR measure, Sigy/Noiy, for the gradients w.r.t. the weights of the last
+layer of N (1) (which potentially learns our intermediate labeling function y) at the initialization point in
+parameter space. The SNR estimate for various values ofk are plotted in Figure 4. We indeed see that when
+k≥ 3, the SNR appears to approach extremely small values, where the estimator’s noise, and the additional
+9
+1 2 3 4
+−7
+−15
+Figure 4: Section 3.1’s experiment: comparing the SNR for the end-to-end approach (red) and the decom-
+position approach (blue), as a function ofk, in loge scale.
+noise introduced by a ﬁnite ﬂoating point representation, can completely mask the signal, which can explain
+the failure in this case.
+In Section A in the Appendix, we also present a second, more synthetic, experiment, which demonstrates
+a case where the decomposition approach directly decreases the stochastic noise in the SGD optimization
+process, hence beneﬁting the convergence rate.
+4 Architecture and Conditioning
+Network architecture choice is a crucial element in the success of deep learning. New variants and develop-
+ment of novel architectures are one of the main tools for achieving practical breakthroughs [14, 32]. When
+choosing an architecture, one consideration is how to inject prior knowledge on the problem at hand, im-
+proving the network’s expressiveness for that problem, while not dramatically increasing sample complexity.
+Another aspect involves improving the computational complexity of training. In this section we formally
+show how the choice of architecture affects the training time through the lens of the condition number of the
+problem.
+The study and practice of conditioning techniques, for convex and non-convex problems, gained much
+attention recently (e.g., [18, 22, 7, 27]). Here we show how architectural choice may have a dramatic effect
+on the applicability of better conditioning techniques.
+The learning problem we consider in this section is that of encoding one-dimensional, piecewise lin-
+ear curves. We show how different architectures, all of them of sufﬁcient expressive power for solving the
+problem, have orders-of-magnitude difference in their condition numbers. In particular, this becomes appar-
+ent when considering convolutional vs. fully connected layers. This sheds a new light over the success of
+convolutional neural networks, which is generally attributed to their sample complexity beneﬁts. Moreover,
+we show how conditioning, applied in conjunction with a better architecture choice, can further decrease
+the condition number by orders of magnitude. The direct effect on the convergence rate is analyzed, and is
+aligned with the signiﬁcant performance gaps observed empirically. We also demonstrate how performance
+may not signiﬁcantly improve by employing deeper and more powerful architectures, as well as the price
+that comes with choosing a sub-optimal architecture.
+10
+4.1 Experiments and Analysis
+We experiment with various deep learning solutions for encoding the structure of one-dimensional, con-
+tinuous, piecewise linear (PWL) curves. Any PWL curve with k pieces can be written as: f(x) = b +∑k
+i=1ai[x−θi]+, where ai is the difference between the slope at the i’th segment and the (i− 1)’th seg-
+ment. For example, the curve below can be parametrized byb = 1,a = (1,−2, 3),θ = (0, 2, 6).
+The problem we consider is that of receiving a vector of the values off atx∈{ 0, 1,...,n −1}, namely
+f := (f(0),f (1),...,f (n−1)), and outputting the values ofb,{ai,θi}k
+i=1. We can think of this problem as
+an encoding problem, since we would like to be able to rebuildf from the values ofb,{ai,θi}k
+i=1. Observe
+thatb =f(0), so from now on, let us assume without loss of generality thatb = 0.
+Throughout our experiments, we use n = 100,k = 3. We sample{θi}i∈[k] uniformly without replace-
+ment from{0, 1,...,n − 1}, and sample eachai i.i.d. uniformly from [−1, 1].
+4.1.1 Convex Problem, Large Condition Number
+As we assume that each θi is an integer in {0, 1,...,n − 1}, we can represent {ai,θi}k
+i=1 as a vector
+p∈ Rn such thatpj = 0 unless there is some i such thatθi = j, and in this case we set pj = ai. That is,
+pj =∑k
+i=1ai 1[θi=j−1].
+This allows us to formalize the problem as a convex optimization problem. Deﬁne a matrix W∈ Rn,n
+such thatWi,j = [i−j + 1]+. It is not difﬁcult to show that f = Wp. Moreover, W can be shown to be
+invertible, so we can extract p from f by p =W−1f.
+We hence start by attempting to learn this linear transformation directly, using a connected architecture
+of one layer, withn output channels. Let the weights of this layer be denoted ˆU. We therefore minimize the
+objective:
+min
+ˆU
+E
+f
+[1
+2(W−1f− ˆUf)2
+]
+(3)
+where f is sampled according to some distribution. As a convex, realizable (by ˆU = W−1) problem,
+convergence is guaranteed, and we can explicitly analyze its rate. However, perhaps unexpectedly, we
+observe a very slow rate of convergence to a satisfactory solution, where signiﬁcant inaccuracies are present
+at the non-smoothness points. Figure 5a illustrates the results.
+To analyze the convergence rate of this approach, and to benchmark the performance of the next set of
+experiments, we start off by giving an explicit expression forW−1:
+Lemma 1 The inverse of W is the matrix U s.t. Ui,i = Ui+2,i = 1,Ui+1,i =−2, and the rest of the
+coordinates ofU are zero.
+The proof is given in Appendix B.3. Next, we analyze the iteration complexity of SGD for learning the
+matrixU. To that end, we give an explicit expression for the expected value of the learned weight matrix at
+each iterationt, denoted as ˆUt:
+11
+Lemma 2 Assume ˆU 0 = 0, and that Ef[Uﬀ⊤U⊤] =λI for someλ. Then, running SGD with learning rate
+η over objective 3 fort iterations yields:
+E ˆUt =ηλW⊤
+t−1∑
+i=0
+(I−ηλWW⊤)i
+The proof is given in Appendix B.4. Note that the assumption that Ef[Uﬀ⊤U⊤] = λI holds under the dis-
+tributional assumption over the curves, as changes of direction in the curve are independent, and are sampled
+each time from the same distribution. The following theorem establishes a lower bound on∥ E ˆUt+1−U∥,
+which by Jensen’s inequality, implies a lower bound onE∥ ˆUt+1−U∥, the expected distance of ˆUt+1 from
+U. Note that the lower bound holds even if we use all the data for updating (that is, gradient descent and not
+stochastic gradient descent).
+Theorem 4 Let W = QSV⊤ be the singular value decomposition of W . If ηλS 2
+1,1 ≥ 1 then E ˆUt+1
+diverges. Otherwise, we have
+t + 1≤ S2
+1,1
+2S2n,n
+⇒ ∥ E ˆUt+1−U∥≥ 0.5,
+where the norm is the spectral norm. Furthermore, the condition number
+S2
+1,1
+S2n,n
+(whereS1,1,Sn,n are the top
+and bottom singular values ofW ) is Ω(n3.5).
+The proof is given in Appendix B.5. The theorem implies that the condition number of W, and hence, the
+number of GD iterations required for convergence, scales quite poorly with n. In the next subsection, we
+will try to decrease the condition number of the problem.
+4.1.2 Improved Condition Number through Convolutional Architecture
+Examining the explicit expression for U given in Lemma 1, we see that Uf can be written as a one-
+dimensional convolution of f with the kernel [1,−2, 1]. Therefore, the mapping from f to p is realizable
+using a convolutional layer.
+Empirically, convergence to an accurate solution is faster using this architecture. Figure 5b illustrates
+a few examples. To theoretically understand the beneﬁt of using a convolution, from the perspective of the
+required number of iterations for training, we will consider the new problem’s condition number, providing
+understanding of the gap in training time. In the previous section we saw that GD requiresΩ(n3.5) iterations
+to learn the full matrixU. In the appendix (sections B.6 and B.7) we show that under some mild assumptions,
+the condition number is only Θ(n3), and GD requires only that order of iterations to learn the optimal ﬁlter
+[1,−2, 1].
+4.1.3 Additional Improvement through Explicit Conditioning
+In Section 4.1.2, despite observing an improvement from the fully connected architecture, we saw that GD
+still requires Ω(n3) iterations even for the simple problem of learning the ﬁlter [1,−2, 1]. This motivates an
+application of additional conditioning techniques, in the hope for extra performance gains.
+First, let us explicitly represent the convolutional architecture as a linear regression problem. We perform
+Vec2Row operation onf as follows: given a sample f, construct a matrix,F , of sizen× 3, such that thet’th
+row ofF is [ft−1, ft, ft+1]. Then, we obtain a vanilla linear regression problem inR3, with the ﬁlter[1,−2, 1]
+12
+as its solution. Given a samplef, we can now approximate the correlation matrix ofF , denotedC∈ R3,3, by
+settingCi,j = Ef,t[ft−2+ift−2+j]. We then calculate the matrixC−1/2 and replace every instance (namely, a
+row ofF ) [ft−1, ft, ft+1] by the instance [ft−1, ft, ft+1]C−1/2. By construction, the correlation matrix of the
+resulting instances is approximately the identity matrix, hence the condition number is approximately 1. It
+follows (see again Appendix B.6) that SGD converges using order of log(1/ϵ) iterations, independently of
+n. Empirically, we quickly converge to extremely accurate results, illustrated in Figure 5c.
+We note that the use of a convolution architecture is crucial for the efﬁciency of the conditioning; had the
+dimension of the problem not been reduced so dramatically, the difﬁculty of estimating a largen×n correla-
+tion matrix scales strongly withn, and furthermore, its inversion becomes a costly operation. The combined
+use of a better architecture and of conditioning is what allows us to gain this dramatic improvement.
+4.1.4 Perhaps I should use a deeper network?
+The solution arrived at in Section 4.1.3 indicates that a suitable architecture choice and conditioning scheme
+can provide training time speedups of multiple orders of magnitude. Moreover, the beneﬁt of reducing the
+number of parameters, in the transition from a fully connected architecture to a convolutional one, is shown
+to be helpful in terms of convergence time. However, we should not rule out the possibility that a deeper,
+wider network will not suffer from the deﬁciencies analyzed above for the convex case.
+Motivated by the success of deep auto-encoders, we experiment with a deeper architecture for en-
+coding f. Namely, we minimize minv1,v2 Ef[(f−Mv2(Nv1(f)))2], Where Nv1,M v2 are deep networks
+parametrized by their weight vectors v1, v2, with the output of N being of dimension 2k, enough for real-
+ization of the encoding problem. Each of the two networks has three layers with ReLU activations, except
+for the output layer of M having a linear activation. The dimensions of the layers are, 500, 100, 2k forN,
+and 100, 100,n forM.
+Aligned with the intuition gained through the previous experiments, we observe that additional expres-
+sive power, when unnecessary, does not solve inherent optimization problems, as this stronger Auto-Encoder
+fails to capture the ﬁne details of f at its non-smooth points. See Figure 5d for examples.
+5 Flat Activations
+We now examine a different aspect of gradient-based learning which poses difﬁculties for optimization:
+namely, ﬂatness of the loss surface due to saturation of the activation functions, leading to vanishing gradi-
+ents and a slow-down of the training process. This problem is ampliﬁed in deeper architectures, since it is
+likely that the backpropagated message to lower layers in the architecture would vanish due to a saturated
+activation somewhere along the way. This is a major problem when using sigmoids as a gating mechanisms
+in Recurrent Neural Networks such as LSTMS and GRUs [12, 4].
+While non-local search-based optimization for large scale problems seems to be beyond reach, variants
+on the gradient update, whether by adding momentum, higher order methods, or normalized gradients, are
+quite successful, leading to consideration of update schemes deviating from “vanilla” gradient updates.
+In this section, we consider a family of activation functions which amplify the “vanishing gradient
+due to saturated activation” problem; they are piecewise ﬂat. Using such activations in a neural network
+architecture will result in a gradient equal to 0, which will be completely useless. We consider different
+ways to implement, approximate or learn such activations, such that the error will effectively propagate
+through them. Using a different variant of a local search-based update, based on [20, 19] , we arrive at
+13
+(a) Section 4.1.1’s experiment - linear architecture.
+(b) Section 4.1.2’s experiment - convolutional architecture.
+(c) Section 4.1.3’s experiment - convolutional architecture with conditioning.
+(d) 4.1.4’s experiment - vanilla auto encoder.
+Figure 5: Examples for decoded outputs of Section 4’s experiments, learning to encode PWL curves. In
+blue are the original curves. In red are the decoded curves. The plot shows the outputs for two curves, after
+500, 10000, and 50000 iterations, from left to right.
+14
+an efﬁcient solution. Convergence guarantees exist for a one-layer architecture. We leave further study of
+deeper networks to future work.
+5.1 Experimental Setup
+Consider the following optimization setup. The sample space X⊂ Rd is symmetrically distributed. The
+target functiony : Rd→ R is of the formy(x) = u(v∗⊤x +b∗), where v∗∈ Rd,b∗∈ R, andu : R→ R
+is a monotonically non-decreasing function. The objective of the optimization problem is given by:
+min
+w
+E
+x
+[ℓ (u(Nw(x)),y (x))]
+whereNw is some neural network parametrized byw, andℓ is some loss function (for example, the squared
+or absolute difference).
+For the experiments, we useu of the form:
+u(r) =z0 +
+∑
+i∈[55]
+1[r>zi]· (zi−zi−1),
+wherez0 < z1 < ... < z55 are known. In words, given r, the function rounds down to the nearest zi. We
+also experiment with normally distributed X. Our theoretical analysis is not restricted to u of this speciﬁc
+form, nor to normalX. All ﬁgures are found in Figure 6.
+Of course, applying gradient-based methods to solve this problem directly, is doomed to fail as the
+derivative ofu is identically 0. Is there anything which can be done instead?
+5.2 Non-Flat Approximation Experiment
+We start off by trying to approximateu using a non ﬂat function ˜u deﬁned by
+˜u(r) =z0 +
+∑
+i∈[55]
+(zi−zi−1)·σ(c· (r−zi)),
+wherec is some constant, and σ is the sigmoid function σ(z) = (1 + exp(−z))−1. Intuitively, we approx-
+imate the “steps” in u using a sum of sigmoids, each of amplitude corresponding to the step’s height, and
+centered at the step’s position. This is similar to the motivation for using sigmoids as activation functions
+and as gates in LSTM cells — a non-ﬂat approximation of the step function. Below is an example for u, and
+its approximation ˜u.
+u
+˜u
+The objective is the expected squared loss, propagated through ˜u, namely
+min
+v,b
+E
+x
+[(
+˜u(v⊤x +b)−y(x)
+)2]
+.
+Although the objective is not completely ﬂat, and is continuous, it suffers from the ﬂatness and non continu-
+ity deﬁciencies of the originalu, and training using this objective is much slower, and sometimes completely
+failing. In particular, sensitivity to the initialization of bias term is observed, where the wrong initialization
+can cause the starting point to be in a very wide ﬂat region ofu, and hence a very ﬂat region of ˜u.
+15
+5.3 End-to-End Experiment
+Next, we attempt to solve the problem using improper learning, with the objective now being:
+min
+w
+E
+x
+[
+(Nw(x)−y(x))2
+]
+where Nw is a network parametrized by its weight vector w. We use a simple architecture of four fully
+connected layers, the ﬁrst three with ReLU activations and 100 output channels, and the last, with only one
+output channel and no activation function.
+As covered in Section 4, difﬁculty arises when regressing to non smooth functions. In this case, with
+u not even being continuous, the inaccuracies in capturing the non continuity points are brought to the
+forefront. Moreover, this solution has its extra price in terms of sample complexity, training time, and test
+time, due to the use of a much larger than necessary network. An advantage is of course the minimal prior
+knowledge aboutu which is required. While this approach manages to ﬁnd a reasonable solution, it is far
+from being perfect.
+5.4 Multi-Class Experiment
+In this experiment, we approach the problem as a general multi-class classiﬁcation problem, with each value
+of the image of u is treated as a separate class. We use a similar architecture to that of the end-to-end
+experiment, with one less hidden layer, and with the ﬁnal layer outputting 55 outputs, each corresponding
+to one of the steps deﬁned by thezis. A problem here is the inaccuracies at the boundaries between classes,
+due to the lack of structure imposed over the predictor. The fact that the linear connection between x and
+the input to u is not imposed through the architecture results in “blurry” boundaries. In addition, the fact
+that we rely on an “improper” approach, in the sense that we ignore the ordering imposed by u, results in
+higher sample complexity.
+5.5 The “Forward-Only” Update Rule
+Let us go back to a direct formulation of the problem, in the form of the objective function
+min
+w
+F (w) = E
+x
+[
+(u(w⊤x)−y(x))2
+]
+wherey(x) = u(v∗⊤x). The gradient update rule in this case is w(t+1) = w(t)−η∇F (w(t)), where for
+our objective we have
+∇F (w) = E
+x
+[
+(u(w⊤x)−y(x))·u′(w⊤x)· x
+]
+Sinceu′ is zero a.e., the gradient update is meaningless. [20, 19] proposed to replace the gradient with the
+following:
+˜∇F (w) = E
+x
+[
+(u(w⊤x)−y(x))· x
+]
+(4)
+In terms of the backpropagation algorithm, this kind of update can be interpreted as replacing the backprop-
+agation message for the activation functionu with an identity message. For notation simplicity, we omitted
+the bias termsb,b∗, but the same Forward-only concept is applied to them too.
+This method empirically achieves the best results, both in terms of ﬁnal accuracy, training time, and test
+time cost. As mentioned before, the method is due to [20, 19], where it is proven to converge to anϵ-optimal
+solution in O(L2/ϵ2), under the additional assumptions that the function u is L-Lipschitz, and that w is
+constrained to have bounded norm. For completeness, we provide a short proof in Appendix B.8.
+16
+(a) Experiment 5.2, Non-ﬂat approximation (b) Experiment 5.3, end-to-end
+(c) Experiment 5.4, Multi Class (d) Experiment 5.4, Multi Class. Zoomed-in
+boundary between classes.
+(e) Experiment 5.5, Forward only
+Figure 6: Section 5’s Experiment: backpropagating through the steps function. The horizontal axis is the
+value ofr = v∗⊤x +b∗. The dashed green curves show the label, u(r). The red curves show the outputs
+of the learnt hypothesis. The plots are zoomed around the mean of r. In the non-ﬂat approximation plot,
+the dashed magenta curve shows the non-ﬂat approximation, namely ˜u(r). Note the inaccuracies around the
+boundaries between classes in the Multi Class experiment. All plots show the results after 10000 training
+iterations, except for the forward only plot, showing results after 5000 iterations.
+17
+−1 −0.5 0 0.5 1
+−1
+0
+1
+(a) Extremely small variance in the loss sur-
+face’s gradient, w.r.t. different target functions,
+each with a very different optimum.
+−1 −0.5 0 0.5 1
+−1
+0
+1
+(b) Low SNR of gradient estimates. The dashed
+lines represent losses w.r.t. different samples,
+each implying a very different estimate than the
+average gradient.
+−2 0 2
+−2
+0
+2
+(c) Bad conditioning - 2 dimensional example
+of a loss function’s quiver. Following the gra-
+dient is far from being the best direction to go.
+−1 −0.5 0 0.5 1
+−1
+0
+1
+(d) Completely ﬂat activation - no information
+in the gradient.
+Figure 7: A graphical summary of limitations of gradient-based learning.
+6 Summary
+In this paper, we considered different families of problems, where standard gradient-based deep learning
+approaches appear to suffer from signiﬁcant difﬁculties. Our analysis indicates that these difﬁculties are not
+necessarily related to stationary point issues such as spurious local minima or a plethora of saddle points, but
+rather more subtle issues: Insufﬁcient information in the gradients about the underlying target function; low
+SNR; bad conditioning; or ﬂatness in the activations (see Figure 7 for a graphical illustration). We consider
+it as a ﬁrst step towards a better understanding of where standard deep learning methods might fail, as well
+as what approaches might overcome these failures.
+Acknowledgements: This research is supported in part by the Intel Collaborative Research Institute for
+Computational Intelligence (ICRI-CI), and by the European Research Council (TheoryDL project). OS was
+also supported in part by an FP7 Marie Curie CIG grant and an Israel Science Foundation grant 425/13.
+18
+References
+[1] Avrim Blum, Merrick Furst, Jeffrey Jackson, Michael Kearns, Yishay Mansour, and Steven Rudich.
+Weakly learning dnf and characterizing statistical query learning using fourier analysis. InProceedings
+of the twenty-sixth annual ACM symposium on Theory of computing, pages 253–262. ACM, 1994.
+[2] Rich Caruana. Multitask learning. In Learning to learn, pages 95–133. Springer, 1998.
+[3] Anna Choromanska, Mikael Henaff, Michael Mathieu, G ´erard Ben Arous, and Yann LeCun. The loss
+surfaces of multilayer networks. In AISTATS, 2015.
+[4] Junyoung Chung, Caglar Gulcehre, KyungHyun Cho, and Yoshua Bengio. Empirical evaluation of
+gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555, 2014.
+[5] Ronan Collobert and Jason Weston. A uniﬁed architecture for natural language processing: Deep neu-
+ral networks with multitask learning. In Proceedings of the 25th international conference on Machine
+learning, pages 160–167. ACM, 2008.
+[6] Yann N Dauphin, Razvan Pascanu, Caglar Gulcehre, Kyunghyun Cho, Surya Ganguli, and Yoshua
+Bengio. Identifying and attacking the saddle point problem in high-dimensional non-convex optimiza-
+tion. In Advances in neural information processing systems, pages 2933–2941, 2014.
+[7] John Duchi, Elad Hazan, and Yoram Singer. Adaptive subgradient methods for online learning and
+stochastic optimization. Journal of Machine Learning Research, 12(Jul):2121–2159, 2011.
+[8] Vitaly Feldman, Cristobal Guzman, and Santosh Vempala. Statistical query algorithms for stochastic
+convex optimization. arXiv preprint arXiv:1512.09170, 2015.
+[9] Saeed Ghadimi and Guanghui Lan. Stochastic ﬁrst-and zeroth-order methods for nonconvex stochastic
+programming. SIAM Journal on Optimization, 23(4):2341–2368, 2013.
+[10] Xavier Glorot and Yoshua Bengio. Understanding the difﬁculty of training deep feedforward neural
+networks. In Aistats, volume 9, pages 249–256, 2010.
+[11] Alex Graves, Abdel-rahman Mohamed, and Geoffrey Hinton. Speech recognition with deep recur-
+rent neural networks. In Acoustics, speech and signal processing (icassp), 2013 ieee international
+conference on, pages 6645–6649. IEEE, 2013.
+[12] Alex Graves and J ¨urgen Schmidhuber. Framewise phoneme classiﬁcation with bidirectional lstm and
+other neural network architectures. Neural Networks, 18(5):602–610, 2005.
+[13] C ¸ alar G¨ulc ¸ehre and Yoshua Bengio. Knowledge matters: Importance of prior information for opti-
+mization. Journal of Machine Learning Research, 17(8):1–32, 2016.
+[14] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recogni-
+tion. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2016.
+[15] Geoffrey Hinton, Li Deng, Dong Yu, George E Dahl, Abdel-rahman Mohamed, Navdeep Jaitly, An-
+drew Senior, Vincent Vanhoucke, Patrick Nguyen, Tara N Sainath, et al. Deep neural networks for
+acoustic modeling in speech recognition: The shared views of four research groups. IEEE Signal
+Processing Magazine, 29(6):82–97, 2012.
+19
+[16] Geoffrey E Hinton and Ruslan R Salakhutdinov. Reducing the dimensionality of data with neural
+networks. science, 313(5786):504–507, 2006.
+[17] Sepp Hochreiter and J ¨urgen Schmidhuber. Long short-term memory. Neural computation, 9(8):1735–
+1780, 1997.
+[18] Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by
+reducing internal covariate shift. arXiv preprint arXiv:1502.03167, 2015.
+[19] Sham M Kakade, Varun Kanade, Ohad Shamir, and Adam Kalai. Efﬁcient learning of generalized
+linear and single index models with isotonic regression. InAdvances in Neural Information Processing
+Systems, pages 927–935, 2011.
+[20] Adam Tauman Kalai and Ravi Sastry. The isotron algorithm: High-dimensional isotonic regression.
+In COLT, 2009.
+[21] Michael Kearns. Efﬁcient noise-tolerant learning from statistical queries. Journal of the ACM (JACM),
+45(6):983–1006, 1998.
+[22] Diederik Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint
+arXiv:1412.6980, 2014.
+[23] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classiﬁcation with deep convo-
+lutional neural networks. In Advances in neural information processing systems , pages 1097–1105,
+2012.
+[24] V olodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Bellemare,
+Alex Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al. Human-level control
+through deep reinforcement learning. Nature, 518(7540):529–533, 2015.
+[25] Florian Schroff, Dmitry Kalenichenko, and James Philbin. Facenet: A uniﬁed embedding for face
+recognition and clustering. In The IEEE Conference on Computer Vision and Pattern Recognition
+(CVPR), June 2015.
+[26] John Schulman, Sergey Levine, Pieter Abbeel, Michael I Jordan, and Philipp Moritz. Trust region
+policy optimization. In ICML, pages 1889–1897, 2015.
+[27] Shai Shalev-Shwartz, Alon Gonen, and Ohad Shamir. Large-scale convex minimization with a low-
+rank constraint. arXiv preprint arXiv:1106.1622, 2011.
+[28] Shai Shalev-Shwartz and Amnon Shashua. On the sample complexity of end-to-end training vs. se-
+mantic abstraction training. arXiv preprint arXiv:1604.06915, 2016.
+[29] Ohad Shamir. Distribution-speciﬁc hardness of learning neural networks. arXiv preprint
+arXiv:1609.01037, 2016.
+[30] Ilya Sutskever, James Martens, George E Dahl, and Geoffrey E Hinton. On the importance of initial-
+ization and momentum in deep learning. ICML (3), 28:1139–1147, 2013.
+[31] Christian Szegedy, Sergey Ioffe, Vincent Vanhoucke, and Alex Alemi. Inception-v4, inception-resnet
+and the impact of residual connections on learning. arXiv preprint arXiv:1602.07261, 2016.
+20
+[32] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru
+Erhan, Vincent Vanhoucke, and Andrew Rabinovich. Going deeper with convolutions. InProceedings
+of the IEEE Conference on Computer Vision and Pattern Recognition, pages 1–9, 2015.
+[33] Yaniv Taigman, Ming Yang, Marc’Aurelio Ranzato, and Lior Wolf. Deepface: Closing the gap to
+human-level performance in face veriﬁcation. In Proceedings of the IEEE Conference on Computer
+Vision and Pattern Recognition, pages 1701–1708, 2014.
+[34] A ¨aron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, Alex Graves, Nal
+Kalchbrenner, Andrew Senior, and Koray Kavukcuoglu. Wavenet: A generative model for raw audio.
+CoRR abs/1609.03499, 2016.
+A Reduced Noise through Decomposition - Experiment
+A.1 Experiment
+For this experiment, consider the problem of training a predictor, which given a “positive media reference”
+x to a certain stock option, will distribute our assets between the k = 500 stocks in the S&P500 index in
+some manner. One can, again, come up with two rather different strategies for solving the problem.
+• An end-to-end approach: train a deep network Nw that given x outputs a distribution over the k
+stocks. The objective for training is maximizing the gain obtained by allocating our money according
+to this distribution.
+• A decomposition approach: train a deep network Nw that given x outputs a single stock, y∈ [k],
+whose future gains are the most positively correlated to x. Of course, we may need to gather extra
+labeling for trainingNw based on this criterion.
+We make the (non-realistic) assumption that every instance of media reference is strongly and positively
+correlated to a single stock y∈ [k], and it has no correlation with future performance of other stocks. This
+obviously makes our problem rather toyish; the stock exchange and media worlds have highly complicated
+correlations. However, it indeed arises from, and is motivated by, practical problems.
+To examine the problem in a simple and theoretically clean manner, we design a synthetic experiment
+deﬁned by the following optimization problem: Let X×Z⊂ Rd×{± 1}k be the sample space, and let
+y : X→ [k] be some labelling function. We would like to learn a mapping Nw : X→ Sk−1, with the
+objective being:
+min
+w
+L(w) := E
+x,z∼X×Z
+[
+−z⊤Nw(x)
+]
+.
+To connect this to our story, Nw(x) is our asset distribution, z indicates the future performance of the
+stocks, and thus, we are seeking minimization of our expected future negative gains, or in other words,
+maximization of expected proﬁt. We further assume that given x, the coordinate zy(x) equals 1, and the rest
+of the coordinates are sampled i.i.d from the uniform distribution over{±1}.
+Whereas in Section 3.1’s experiment, the difference between the end-to-end and decomposition ap-
+proaches could be summarized by a different loss function choice, in this experiment, the difference boils
+down to the different gradient estimators we would use, where we are again taking as a given fact that exact
+gradient computations are expensive for large-scale problems, implying the method of choice to be SGD.
+For the purpose of the experimental discussion, let us write the two estimators explicitly as two unconnected
+update rules. We will later analyze their (equal) expectation.
+21
+0 2,500−1
+0
+k = 10
+0 2,500−1
+0
+k = 1000
+0 2,500−1
+0
+k = 2000
+Figure 8: Decomposition vs. end-to-end Experiment: Loss as a function of the number of training iterations,
+for input dimensiond = 1000 and for variousk values. The red and blue curves correspond to the losses of
+the end-to-end and decomposition estimators, respectively.
+For an end-to-end approach, we sample a pair (x, z), and use∇w(−z⊤Nw(x)) as a gradient estimate.
+It is clear that this is an unbiased estimator of the gradient.
+For a decomposition approach, we sample a pair (x, z), completely ignore z, and instead, pay the extra
+costs and gather the required labelling to get y(x). We will then use ∇w(−e⊤
+y(x)Nw(x)) as a gradient
+estimate. It will be shown later that this too is an unbiased estimator of the gradient.
+Figure 8 clearly shows that optimizing using the end-to-end estimator is inferior to working with the
+decomposition one, in terms of training time and ﬁnal accuracy, to the extent that for largek, the end-to-end
+estimator cannot close the gap in performance in reasonable time.
+A.2 Analysis
+We examine the experiment from a SNR perspective. First, let us show that indeed, both estimators are
+unbiased estimators of the true gradient. As stated above, it is clear, by deﬁnition of L, that the end-to-
+end estimator is an unbiased estimator of∇wL(w). To observe this is also the case for the decomposition
+estimator, we write:
+∇wL(w) =∇w E
+x,z
+[−z⊤Nw(x)]
+= E
+x
+[ E
+z|x
+[∇w(−z⊤Nw(x))]]
+(1)
+= E
+x
+[ E
+z|x
+[−z⊤∇w(Nw(x))]]
+(2)
+= E
+x
+[−e⊤
+y(x)∇w(Nw(x))]
+where (1) follows from the chain rule, and (2) from the assumption on the distribution of z given x. It is
+now easy to see that the decomposition estimator is indeed a (different) unbiased estimator of the gradient,
+hence the “signal” is the same.
+Intuition says that when a choice between two unbiased estimators is presented, we should choose the
+one with the lower variance. In our context, [9] showed that when running SGD (even on non-convex
+objectives), arriving at a point where∥∇wL(w)∥2≤ϵ requires order of ¯ν2/ϵ2 iterations, where
+¯ν2 = max
+t
+E
+x,q
+∥∇t
+w(x,q )∥2−∥∇ wL(w(t))∥2,
+wt is the weight vector at time t,q is sampled along with x (where it can be replaced by z ory(x), in our
+22
+experiment), and∇t
+w is the unbiased estimator for the gradient. This serves as a motivation for analyzing
+the problem through this lens.
+Motivated by [9]’s result, and by our results regarding Section 3.1, we examine the quantityEx,q∥∇t
+w(x,q )∥2,
+or “noise”, explicitly. For the end-to-end estimator, this quantity equals
+E
+x,z
+∥− z⊤∇wNw(x)∥2 = E
+x,z
+∥−
+k∑
+i=1
+zi∇wNw(x)i∥2
+Denoting byGi :=∇wNw(x)i, we get:
+= E
+x
+E
+z|x
+∥−
+k∑
+i=1
+ziGi∥2 = E
+x
+k∑
+i=1
+∥Gi∥2 (5)
+where the last equality follows from expanding the squared sum, and taking expectation overz, while noting
+that mixed terms cancel out (from independence of z’s coordinates), and thatz2
+i = 1 for alli.
+As for the decomposition estimator, it is easy to see that
+E
+x
+∥− e⊤
+y(x)∇wNw(x)∥2 = E
+x
+∥Gy(x)∥2. (6)
+Observe that in 5 we are summing up, per x,k summands, compared to the single element in 6. When
+randomly initializing a network it is likely that the values of∥Gi∥2 are similar, hence we obtain that at the
+beginning of training, the variance of the end-to-end estimator is roughly k times larger than that of the
+decomposition estimator.
+B Proofs
+B.1 Proof of Theorem 1
+Proof Given two square-integrable functionsf,g on an Euclidean space Rn, let⟨f,g⟩L2 = Ex[f(x)g(x)]
+and∥f∥L2 =
+√
+Ex[f 2(x)] denote inner product and norm in the L2 space of square-integrable functions
+(with respect to the relevant distribution). Also, deﬁne the vector-valued function
+g(x) = ∂
+∂wpw(x),
+and let g(x) = (g1(x),g 2(x),...,g n(x)) for real-valued functions g1,...,g n. Finally, let Eh denote an
+expectation with respect toh chosen uniformly at random fromH. Let|H| =d.
+We begin by proving the result for the squared loss. To prove the bound, it is enough to show that
+Eh∥∇Fh(w)−a∥2≤ G2
+|H| for any vectora independent ofh. In particular, let us choosea = Ex [pw(x)g(x)].
+23
+We thus bound the following:
+E
+h
+∥∇Fh(w)− E
+x
+[pw(x)g(x)]∥2 = E
+h
+∥ E
+x
+[(pw(x)−h(x)) g(x)]− E
+x
+[pw(x)g(x)]∥2
+= E
+h
+∥ E
+x
+[h(x)g(x)]∥2 = E
+h
+n∑
+j=1
+(
+E
+x
+[h(x)gj(x)]
+)2
+= E
+h
+n∑
+j=1
+⟨h,gj⟩2
+L2 =
+n∑
+j=1
+(
+1
+|H|
+d∑
+i=1
+⟨hi,gj⟩2
+L2
+)
+(∗)
+≤
+n∑
+j=1
+( 1
+|H|∥gj∥2
+L2
+)
+= 1
+|H|
+n∑
+j=1
+E
+x
+[g2
+j (x)]
+= 1
+|H| E
+x
+[
+∥g(x)∥2]
+≤ G(w)2
+|H| ,
+where (∗) follows from the functions in H being mutually orthogonal, and satisfying ∥h∥L2 ≤ 1 for all
+h∈H .
+To handle a classiﬁcation loss, note that by its deﬁnition and the fact thath(x)∈{− 1, +1},
+∇Fh(w) = E
+x
+[
+r′(h(x)pw(x))· ∂
+∂wpw(x)
+]
+= E
+x
+[(r′(pw(x)) +r′(−pw(x))
+2 +h(x)· r′(pw(x))−r′(−pw(x))
+2
+)
+· ∂
+∂wpw(x)
+]
+= E
+x
+[r′(pw(x)) +r′(−pw(x))
+2 · ∂
+∂wpw(x)
+]
++ E
+x
+[
+h(x)·
+(r′(pw(x))−r′(−pw(x))
+2
+)
+· ∂
+∂wpw(x)
+]
+.
+Letting g(x) =
+(
+r′(pw(x))−r′(−pw(x))
+2
+)
+· ∂
+∂wpw(x) (which satisﬁes Ex[∥g(x)∥2]≤G2 sincer is 1-Lipschitz)
+and a = Ex
+[
+r′(pw(x))+r′(−pw(x))
+2 · ∂
+∂wpw(x)
+]
+(which does not depend onh), we get that
+E
+h
+∥∇Fh(w)− a∥2 = E
+h
+∥ E
+x
+[h(x)g(x)]∥2.
+Proceeding now exactly in the same manner as the squared loss case, the result follows.
+B.2 Proof of Theorem 3
+Proof We ﬁrst state and prove two auxiliary lemmas.
+Lemma 3 Leth1,...,h n be real-valued functions on some Euclidean space, which belong to some weighted
+L2 space. Suppose that∥hi∥L2 = 1 and maxi̸=j|⟨hi,hj⟩L2|≤ c. Then for any function g on the same do-
+main,
+1
+n
+n∑
+i=1
+⟨hi,g⟩2
+L2 ≤ ∥g∥2
+L2
+( 1
+n +c
+)
+.
+24
+Proof For simplicity, suppose ﬁrst that the functions are deﬁned over some ﬁnite domain equipped with
+a uniform distribution, so that h1,...,h n and g can be thought of as ﬁnite-dimensional vectors, and the
+L2 inner product and norm reduce to the standard inner product and norm in Euclidean space. Let H =
+(h1,...,h n) denote the matrix whosei-th column ishi. Then
+n∑
+i=1
+⟨hi,g⟩2 =g⊤
+( n∑
+i=1
+hih⊤
+i
+)
+g = g⊤HH⊤g≤∥g∥2∥HH⊤∥ = ∥g∥2∥H⊤H∥,
+where∥·∥ for a matrix denotes the spectral norm. SinceH⊤H is simply then×n matrix with entry⟨hi,hj⟩
+in location i,j , we can write it as I +M, where I is the n×n identity matrix, and M is a matrix with 0
+along the main diagonal, and entries of absolute value at most c otherwise. Therefore, letting∥·∥ F denote
+the Frobenius norm, we have that the above is at most
+∥g∥2 (∥I∥ +∥M∥) ≤ ∥g∥2 (1 +∥M∥F ) = ∥g∥2 (1 +cn),
+from which the result follows.
+Finally, it is easily veriﬁed that the same proof holds even when h1,...,h n,g are functions over some
+Euclidean space, belonging to some weightedL2 space. In that case, H is a bounded linear operator, and it
+holds that∥H∗H∥ =∥H∥2 =∥H∗∥2 =∥HH∗∥ whereH∗ is the Hermitian adjoint of H and the norm is
+the operator norm. The rest of the proof is essentially identical.
+Lemma 4 If w, v are two unit vectors in Rd, and x is a standard Gaussian random vector, then
+⏐⏐⏐E
+x
+[
+sign(w⊤x)sign(v⊤x)
+]⏐⏐⏐≤|⟨ w, v⟩|
+Proof Note that w⊤x, v⊤x are jointly zero-mean Gaussian, each with variance 1 and with covariance
+E[w⊤xx⊤v] = w⊤v. Therefore,
+E
+x
+[
+sign(w⊤x)sign(v⊤x)
+]
+= Pr(w⊤x≥ 0, v⊤x≥ 0) + Pr(w⊤x≤ 0, v⊤x≤ 0)
+− Pr(w⊤x≥ 0, v⊤x≤ 0)− Pr(w⊤x≤ 0, v⊤x≥ 0)
+= 2 Pr(w⊤x≥ 0, v⊤x≥ 0)− 2 Pr(w⊤x≥ 0, v⊤x≤ 0),
+which by a standard fact on the quadrant probability of bivariate normal distributions, equals
+2
+(1
+4 + sin−1(w⊤v)
+2π
+)
+− 2
+(cos−1(w⊤v)
+2π
+)
+= 1
+2 + 1
+π
+(
+sin−1(w⊤v)− cos−1(w⊤v)
+)
+= 1
+2 + 1
+π
+(
+2 sin−1(w⊤v)− π
+2
+)
+= 2 sin−1(w⊤v)
+π .
+The absolute value of the above can be easily veriﬁed to be upper bounded by|w⊤v|, from which the result
+follows.
+With these lemmas at hand, we turn to prove our theorem. By a standard measure concentration
+argument, we can ﬁnd dk unit vectors u1, u2,..., udk in Rd such that their inner product is at most
+25
+O(
+√
+k log(d)/d) (where theO(·) notation is w.r.t.d). This induces dk functionshu1,h u2,...,h udk where
+hu(x1,..., xk) = ∏k
+l=1 sign(u⊤xl). Their L2 norm (w.r.t. the distribution over xk
+1 = ( x1,..., xk)) is
+1, as they take values in {−1, +1}. Moreover, since x1,..., xk are i.i.d. standard Gaussian, we have by
+Lemma 4 that for anyi̸=j,
+⟨hui,h uj⟩L2 =
+⏐⏐⏐⏐⏐E
+[ k∏
+l=1
+sign(u⊤
+i xl)
+k∏
+l=1
+sign(u⊤
+j xl)
+]⏐⏐⏐⏐⏐
+=
+⏐⏐⏐⏐⏐
+k∏
+l=1
+E
+[
+sign(u⊤
+i xl)sign(u⊤
+j xl)
+]⏐⏐⏐⏐⏐
+=
+⏐⏐⏐E
+[
+sign(u⊤
+i xl)sign(u⊤
+j xl)
+]⏐⏐⏐
+k
+≤| u⊤
+i uj|k ≤ O
+(√
+k log(d)
+d
+)k
+.
+Using this and Lemma 3, we have that for any functiong,
+1
+dk
+dk
+∑
+i=1
+⟨hui,g⟩2
+L2 ≤ ∥g∥2
+L2·
+
+ 1
+dk +O
+(√
+k log(d)
+d
+)k
+ ≤ ∥g∥2
+L2·O
+(√
+k log(d)
+d
+)k
+.
+Moreover, since this bound is derived based only on an inner product condition between u1,..., udk, the
+same result would hold for Uu1,...,U udk whereU is an arbitrary orthogonal matrix, and in particular if
+we pick it uniformly at random:
+E
+U
+
+ 1
+dk
+dk
+∑
+i=1
+⟨hU ui,g⟩2
+L2
+
+ ≤ ∥g∥2
+L2·
+(
+1
+dk +O
+(√
+k log(d)
+d
+))
+.
+Now, note that for any ﬁxedi,Uui is uniformly distributed on the unit sphere, so the left hand side simply
+equals Eu
+[
+⟨hu,g⟩2
+L2
+]
+, and we get
+E
+u
+[
+⟨hu,g⟩2
+L2
+]
+≤ ∥g∥2·O
+(√
+k log(d)
+d
+)k
+. (7)
+With this key inequality at hand, the proof is now very similar to the one of Theorem 1. Given the
+predictorpw(xk
+1), where w∈ Rn, deﬁne the vector-valued function g(xk
+1) = ∂
+∂wpw(xk
+1), and let g(xk
+1) =
+(g1(xk
+1),g 2(xk
+1),...,g n(xk
+1)) for real-valued functions g1,...,g n. To prove the bound, it is enough to
+upper bound Eu∥∇Fu(w)− a∥2 for any vector a independent of u. In particular, let us choose a =
+26
+Exk
+1
+[
+pw(xk
+1)g(xk
+1)
+]
+. We thus bound the following:
+E
+u
+∥∇Fu(w)− E
+xk
+1
+[
+pw(xk
+1)g(xk
+1)
+]
+∥2 = E
+u
+∥ E
+xk
+1
+[(
+pw(xk
+1)−hu(xk
+1)
+)
+g(xk
+1)
+]
+− E
+xk
+1
+[
+pw(xk
+1)g(xk
+1)
+]
+∥2
+= E
+u
+∥ E
+xk
+1
+[
+hu(xk
+1)g(xk
+1)
+]
+∥2 = E
+u
+n∑
+j=1
+(
+E
+xk
+1
+[
+hu(xk
+1)gj(xk
+1)
+])2
+= E
+u
+n∑
+j=1
+⟨hu,gj⟩2
+L2 =
+n∑
+j=1
+E
+u
+⟨hu,gj⟩2
+L2
+(∗)
+≤
+n∑
+j=1
+∥gj∥2·O
+(√
+k log(d)
+d
+)k
+=
+n∑
+j=1
+E
+xk
+1
+[g2
+j (xk
+1)]·O
+(√
+k log(d)
+d
+)k
+= E
+xk
+1
+∥g(xk
+1)∥2·O
+(√
+k log(d)
+d
+)k
+≤ G(w)2·O
+(√
+k log(d)
+d
+)k
+,
+where (∗) follows from (7). By deﬁnition of Var(H,F, w), the result follows. Generalization for the classi-
+ﬁcation loss is obtained in the exact same way to the one used in the proof of Theorem 1.
+B.3 Proof of lemma 1
+Proof
+(UW )i,j =
+∑
+t
+Ui,tWt,j =Wi,j− 2Wi−1,j +Wi−2,j
+Ifi≥j + 1 then Wi,j +Wi−2,j
+2 =Wi−1,j and therefore the above is clearly zero. If i<j then all the values
+ofW are zeros. Finally, ifi =j we obtain 1. This concludes our proof.
+B.4 Proof of lemma 2
+Proof Given a sample f, and that our current weight matrix is ˆU, let p =W−1f. The loss function on f is
+given by
+1
+2∥ ˆUf− p∥2
+The gradient w.r.t. ˆU is
+∇ = ( ˆUf− p)f⊤ = ˆUﬀ⊤− pf⊤
+We obtain that the update rule is
+ˆUt+1 = ˆUt−η
+(
+ˆUtﬀ⊤− pf⊤
+)
+= ˆUt(I−ηﬀ⊤) +ηpf⊤
+Taking expectation with respect to the random choice of the pair, using again f = Wp, and assuming
+E pp⊤ =λI, we obtain that the stochastic gradient update rule satisﬁes
+E ˆUt+1 = ˆUt(I−ηλWW⊤) +ηλW⊤
+27
+Continuing recursively, we obtain
+E ˆUt+1 = E ˆUt(I−ηλWW⊤) +ηλW⊤
+=
+[
+E ˆUt−1(I−ηλWW⊤) +ηλW⊤
+]
+(I−ηλWW⊤) +ηλW⊤
+= E ˆUt−1(I−ηλWW⊤)2 +ηλW⊤(I−ηλWW⊤) +ηλW⊤
+= ˆU0(I−ηλWW⊤)t +ηλW⊤
+t∑
+i=0
+(I−ηλWW⊤)i
+We assume that ˆU0 = 0, and thus
+E ˆUt+1 =ηλW⊤
+t∑
+i=0
+(I−ηλWW⊤)i
+B.5 Proof of Theorem 4
+Proof Fix somei, we have that
+(I−ηλWW ⊤)i = (QIQ⊤−ηλQSV ⊤VSQ⊤)i =Q(I−ηλSS )iQ⊤ =QΛiQ⊤
+where Λi is diagonal with Λi
+j,j = (1−ηλS 2
+j )i. Therefore, by the properties of geometric series, E ˆUt+1
+converges if and only ifηλS 2
+1,1< 1. When this condition holds we have that
+ˆU∞ =ηλW ⊤
+∞∑
+i=0
+(I−ηλWW ⊤)i
+=ηλW ⊤(ηλWW ⊤)−1 =W⊤(WW⊤)−1
+=VSQ⊤(QSV⊤VSQ⊤)−1 =VSQ⊤QS−2Q⊤ =VS−1Q⊤ =U .
+Therefore,
+E ˆUt+1−U =ηλW⊤
+∞∑
+i=t+1
+(I−ηλWW ⊤)i
+=ηλVSQ ⊤
+∞∑
+i=t+1
+QΛiQ⊤
+=V
+[ ∞∑
+i=t+1
+(ηλS )Λi
+]
+Q⊤.
+The matrix in the parentheses is diagonal, where thej’th diagonal element is
+ηλSj,j·
+(1−ηλS 2
+j,j)t+1
+ηλS 2
+j,j
+=S−1
+j,j (1−ηλS 2
+j,j)t+1
+28
+It follows that
+∥ E ˆUt+1−U∥ = max
+j
+S−1
+j,j (1−ηλS 2
+j,j)t+1
+Using the inequality (1−a)t+1≥ 1− (t + 1)a, that holds for everya∈ (−1, 1), we obtain that
+∥ E ˆUt+1−U∥≥ S−1
+n,n(1− (t + 1)ηλS 2
+n,n)≥S−1
+n,n(1− (t + 1)S2
+n,n
+S2
+1,1
+).
+It follows that whenever,
+t + 1≤ S2
+1,1
+2S2n,n
+,
+we have that∥ E ˆUt+1−U∥≥ 0.5S−1
+n,n. Finally, observe that
+S2
+n,n = min
+x:∥x∥=1
+x⊤WW⊤x≤e⊤
+1WW⊤e1 = 1,
+henceS−1
+n,n≥ 1.
+We now prove the second part of the theorem, regarding the condition number of W⊤W , namely,
+S2
+1,1
+2S2n,n
+≥ Ω(n3.5). We note that the condition number of W⊤W can be calculated through its inverse
+matrix’s, namely,U⊤U’s condition number, as those are equal.
+It is easy to verify that Uen = en. Therefore, the maximal eigenvalue of U⊤U is at least 1. To
+construct an upper bound on the minimal eigenvalue of U⊤U, consider v∈ Rn s.t. for i≤√n we have
+vi =− 1
+2(i/n)2 and fori> √n we havevi = 1
+2n− i/n√n. We have that|vi| =O(1/n) fori< √n + 2 andv
+is linear fori≥√n. This implies that (Uv )i = 0 fori≥√n + 2. We also have (Uv )1 =v1 =−0.5/n2,
+(Uv )2 =−2v1 +v2≈− 1/n2, and fori∈{ 3,..., √n} we have
+(Uv )i =vi−2− 2vi−1 +vi =−3/n2
+Finally, fori =√n + 1 we have
+(Uv )i =vi−2− 2vi−1 +vi =vi−vi−1− (vi−1−vi−2)
+= 1
+n√n− 1
+2n2
+(
+(i− 1)2− (i− 2)2)
+= 1
+n√n− 1
+2n2 (2i− 3) = 1
+2n2 .
+This yields
+∥Uv∥2≈ Θ(√n/n4) = Θ(n−3.5)
+In addition,
+∥v∥2≥
+n∑
+i=n/2
+v2
+i≥ n
+2 v2
+n/2 = n
+2
+( 1
+2n− 1
+2√n
+)2
+= Ω(1).
+Therefore,
+∥Uv∥2
+∥v∥2 =O(n−3.5),
+which implies that the minimal eigenvalue ofU⊤U is at mostO(n−3.5). All in all, we have shown that the
+condition number ofU⊤U is Ω(n−3.5), implying the same overW⊤W .
+29
+B.6 Gradient Descent for Linear Regression
+The loss function is
+E
+x,y
+1
+2(x⊤w−y)2
+The gradient atw is
+∇ = E
+x,y
+x(x⊤w−y) =
+(
+E
+x
+xx⊤
+)
+w− E
+x,y
+xy :=Cw−z
+For the optimal solution we haveCw∗−z = 0, hencez =Cw∗. The update is therefore
+wt+1 =wt−η(Cwt−z) = (I−ηC)wt +ηz =... =
+t∑
+i=0
+(I−ηC)iηz =
+t∑
+i=0
+(I−ηC)iηCw∗
+LetC =VDV ⊤ be the eigenvalue decomposition ofC. Observe that
+wt+1 =V
+t∑
+i=0
+η(I−ηD)iDV⊤w∗
+Hence
+∥w∗−wt+1∥ =∥(VV ⊤−V
+t∑
+i=0
+η(I−ηD)iDV⊤)w∗∥
+=∥(I−
+t∑
+i=0
+η(I−ηD)iD)V⊤w∗∥
+=∥(I−ηD)t+1V⊤w∗∥,
+where the last equality is because for everyj we have
+(I−
+t∑
+i=0
+η(I−ηD)iD)j,j = 1−
+t∑
+i=0
+η(1−ηDj,j)iDj,j = (1−ηDj,j)t+1.
+Denotev∗ =V⊤w∗. We therefore obtain that
+∥w∗−wt+1∥2 =
+n∑
+j=1
+(
+(1−ηDj,j)t+1v∗
+j
+)2
+To obtain an upper bound, chooseη = 1/D1,1 andt + 1≥ D1,1
+Dn,n log(∥w∗∥/ϵ), and then, using 1−a≤e−a,
+we get that
+∥w∗−wt+1∥2≤
+n∑
+j=1
+(
+exp(−ηDj,j(t + 1))v∗
+j
+)2≤ ϵ2
+∥w∗∥2
+n∑
+j=1
+(
+v∗
+j
+)2 =ϵ2.
+To obtain a lower bound, observe that ifv∗
+1 is non-negligible thenη must be at most 1/D1,1 (otherwise
+the process will diverge). If in additionv∗
+n is a constant (for simplicity, sayv∗
+n = 1), then
+∥w∗−wt+1∥≥ (1−ηDn,n)t+1≥ (1−Dn,n/D1,1)t+1≥ 1− (t + 1)Dn,n/D1,1,
+where we used (1−a)t+1≥ 1− (t + 1)a fora∈ [−1, 1]. It follows that ift + 1< 0.5Dn,n/D1,1 then we
+have that∥w∗−wt+1∥≥ 0.5.
+30
+B.7 The Covariance Matrix of Section 4.1.2
+Denote byC∈ R3,3 the covariance matrix, and let λi(C) denote thei’th eigenvalue ofC (in a decreasing
+order). The condition number of C is λ1(C)/λ3(C). Below we derive lower and upper bounds on the
+condition number under some assumptions.
+Lower bound We assume thatEf,tf 2
+t = Ω(n2) (this would be the case in many typical cases, for example
+when the allowed slopes are in {±1}), that k (the number of pieces of the curve) is constant, and that the
+changes of slope are in [−1, 1].
+Now, takev = [1, 1, 1]⊤, then
+v⊤Cv = E
+f,t
+(ft−1 +ft +ft+1)2 = Ω(n2)
+This yieldsλ1(C)≥ Ω(n2). Next, takev = [1,−2, 1]⊤ we obtain
+v⊤Cv = E
+f,t
+(ft−1−ft +ft+1)2 =O(k/n)
+This yieldsλ3(C)≤O(k/n). All in all, we obtain that the condition number ofC is Ω(n3).
+Upper bound We consider distribution over f s.t. for every f, at exactlyk indices f changes slope from
+1 to−1 or from−1 to 1 (with equal probability over the indices), and at the rest of the indices we have that
+f is linear with a slope of 1 or−1. Denote p =k/n. Take any unit vectorv, and denote ¯v =v1 +v2 +v3.
+Then
+v⊤Cv = E
+f,t
+(v1ft−1 +v2ft +v3ft+1)2
+= E
+f
+[
+0.5(1−p)
+(
+(¯vft +v3−v1)2 + (¯vft +v1−v3)2)
++ 0.5p
+(
+(¯vft +v3 +v1)2 + (¯vft−v3−v1)2)]
+= ¯v2 E
+f
+f 2
+t + (1−p)(v1−v3)2 +p(v1 +v3)2.
+Since Ef,tf 2
+t = Θ(n2), it is clear that v⊤Cv = O(n2). We next establish a lower bound of Ω(1/n).
+Observe that if ¯v2≥ Ω(1/n3), we are done. If this is not the case, then−v2≈v1 +v3. If|v1 +v3|> 0.1,
+we are done. Otherwise, 0.9≤ 1−v2
+2 = v2
+1 +v2
+3, so we must have that v1 andv3 has opposite signs, and
+one of them is large, hence (v1−v3)2 is larger than a constant. This concludes our proof.
+B.8 Proof of Update Rule 4 Convergence in the Lipschitz Case
+Proof LetB be an upper bound over∥w(t)∥ for all time step t, and over∥v∗∥. Moreover, assume|u|≤ c
+for some constantc. We denote the update rule by w(t) = w(t−1) +η ˜∇, and bound from below:
+∥w(t)− v∗∥2−∥ w(t+1)− v∗∥2 = 2⟨w(t)− v∗,η ˜∇⟩− η2∥ ˜∇∥2
+= 2η E
+[
+(u((w(t))⊤x)−u((v∗)⊤x))(w(t)− v∗)x
+]
+−η2∥ ˜∇∥2
+(1)
+≥ 2η
+L E
+[
+(u((w(t))⊤x)−u((v∗)⊤x))2
+]
+−η2∥ ˜∇∥2
+(2)
+≥ 2η
+L E
+[
+(u((w(t))⊤x)−u((v∗)⊤x))2
+]
+−η2B2c2
+31
+where (1) follows fromL-Lipschitzness and monotonicity of u, (2) follows from bounding∥w∥,∥x∥ and
+u. Let the expected error of the regressor parametrized by wt be denotedet. We separate into cases:
+• If∥wt− v∗∥2−∥ wt+1− v∗∥2≥η2B2c2, we can rewrite∥wt− v∗∥2−η2B2c2≥∥ wt+1− v∗∥2,
+and note that since∥wt+1− v∗∥2≥ 0, and∥w0− v∗∥2≤B2, there can be at most B2
+η2B2c2 = 1
+η2c2
+iterations where this condition will hold.
+• Otherwise, we get thatet≤ηB 2c2L.
+Therefore, for a givenϵ, by takingT = c4B4L2
+ϵ2 , and settingη =
+√
+1
+Tc 2 , we obtain that afterT iterations, the
+ﬁrst case is not holding anymore, and the second case implieseT≤ϵ.
+C Technical Lemmas
+Lemma 5 Any parity function overd variables is realizable by a network with one fully connected layer of
+width ˜d> 3d
+2 with ReLU activations, and a fully connected output layer with linear activation and a single
+unit.
+Proof Let the weights entering each of the ﬁrst 3d
+2 hidden units be set to v∗, and the rest to 0. Further
+assume that for i∈ [d/2], the biases of the ﬁrst 3i +{1, 2, 3} units are set to−(2i− 1
+2),−2i,−(2i + 1
+2)
+respectively, and that their weights in the output layer are1,−2, and 1. It is not hard to see that the weighted
+sum of those triads of neurons is 1
+2 if⟨x, v∗⟩ = 2i, and 0 otherwise. Observe that there’s such a triad deﬁned
+for each even number in the range[d]. Therefore, the output of this net is 0 ify =−1, and 1
+2 otherwise. It is
+easy to see that scaling of the output layer’s weights by 4, and introduction of a−1 bias value to it, results
+in a perfect predictor.
+D Command Lines for Experiments
+Our experiments are implemented in a simple manner in python. We use the tensorﬂow package for opti-
+mization. The following command lines can be used for viewing all optional arguments:
+To run experiment 2.1, use:
+python ./parity.py --help
+To run experiment 3.1, use:
+python ./tuple_rect.py --help
+For SNR estimations, use:
+python ./tuple_rect_SNR.py --help
+To run experiment A, use:
+python ./dec_vs_e2e_stocks.py --help
+32
+For Section 4’s experiments, given below are the command lines used to generate the plots. Additional
+arguments can be viewed by running:
+python PWL_fail1.py --help
+To run experiment 4.1.1, use:
+python PWL_fail1.py --FtoK
+To run experiment 4.1.2, use:
+python PWL_fail1.py --FtoKConv
+To run experiment 4.1.3, use:
+python PWL_fail1.py --FtoKConvCond --batch_size 10
+--number_of_iterations 500 --learning_rate 0.99
+To run experiment 4.1.4, use:
+python PWL_fail1.py --FAutoEncoder
+To run Section 5’s experiments, run:
+python step_learn.py --help
+33

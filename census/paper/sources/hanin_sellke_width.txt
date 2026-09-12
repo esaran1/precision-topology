@@ -1,0 +1,608 @@
+APPROXIMATING CONTINUOUS FUNCTIONS BY RELU NETS
+OF MINIMAL WIDTH
+BORIS HANIN AND MARK SELLKE
+Abstract. This article concerns the expressive power of depth in deep feed-forward
+neural nets with ReLU activations. Speciﬁcally, we answer the following question:
+for a ﬁxed din≥ 1, what is the minimal width w so that neural nets with ReLU
+activations, input dimension din, hidden layer widths at most w, and arbitrary depth
+can approximate any continuous, real-valued function of din variables arbitrarily
+well? It turns out that this minimal width is exactly equal to din + 1. That is, if all
+the hidden layer widths are bounded by din, then even in the inﬁnite depth limit,
+ReLU nets can only express a very limited class of functions, and, on the other hand,
+any continuous function on the din-dimensional unit cube can be approximated to
+arbitrary precision by ReLU nets in which all hidden layers have width exactlydin+1.
+Our construction in fact shows that any continuous function f : [0 , 1]din → Rdout
+can be approximated by a net of width din + dout. We obtain quantitative depth
+estimates for such an approximation in terms of the modulus of continuity of f.
+1. Introduction
+Over the past several years, artiﬁcial neural networks, especially deep networks,
+have become the state of the art in a wide variety of machine learning tasks. These
+tasks include important benchmark problems in machine vision ([KSH12]) and machine
+translation ([SVL14, WSC +16]) as well as superhuman performance at games such as
+Go [SHM +16]. Despite these varied and striking successes, a theory of why neural
+nets provide such good approximations to interesting functions and can be eﬀectively
+trained is only beginning to take shape.
+While non-linear activations help neural nets express a wide variety of functions, re-
+peated non-linearities can also “garble” the signal, leading to a loss of mutual informa-
+tion between the input and the activations at various hidden layers. Such an informa-
+tion theoretic point of view on neural nets has recently been systematically taken up in
+the work of Tishby with Shwartz-Ziv, Moshkovitz, and Zaslavsky [ST17, MT17, TZ15].
+In the present article, we answer a basic information theoretic question about neural
+nets. Namely, for each d≥ 1, what is the minimal width wmin(d) so that neural nets
+whose hidden layers have width at least wmin(d) and arbitrary depth can approximate
+arbitrarily well any scalar continuous function of d variables? We treat only neural
+nets with a popular and particularly simple activation function called rectiﬁed linear
+units, deﬁned
+ReLU(t) := max (0,t ).
+It have been known since the 1980’s (e.g. the work of Cybenko [Cyb89] and Hornik-
+Stinchcombe-White [HSW89]) that feed-forward neural nets with a single hidden layer
+1
+arXiv:1710.11278v2  [stat.ML]  10 Mar 2018
+2 BORIS HANIN AND MARK SELLKE
+can approximate essentially any function if the hidden layer is allowed to be arbi-
+trarily wide. Such results hold for a wide variety of activations, including ReLU .
+However, part of the recent renaissance in neural nets, is the empirical observation
+that deep neural nets tend to achieve greater expressivity per parameter than their
+shallow cousins. There are now a number of rigorous results about this so-called ex-
+pressive power of depth [ABMM16, MLP16, LTR17, MP16, PLR+16, RPK+17, RT17,
+Tel15, Tel16, Tel17, Yar16]. We refer the reader to §3 in [Han17] for a discussion of
+the relationships between some of these articles.
+The main result of this article shows a sharp transition in the representational power
+of deep feed-forward neural nets with ReLU activations as a function of the widths
+of their hidden layers. To state it, we need some notation. We say that N is a feed-
+forward neural net with ReLU activations, input dimensiondin, output dimensiondout,
+and widths din = d1,d 2,...,d k,d k+1 = dout (a ReLU net for short) if it computes a
+function fN of the form
+Ak◦ ReLU◦Ak−1◦···◦ ReLU◦A1, (1)
+where Ai : Rdi→ Rdi+1 are aﬃne transformations and for any m≥ 1
+ReLU (x1,...,x m) = (max (0,x 1),..., max (0,x m)).
+The integers d2,...,d k are said to be the widths of the hidden layers of N, and the
+integerk is the depth ofN. Notice that for ﬁxed d1,...d k+1, the family of neural nets
+(1) is a ﬁnite dimensional family of non-linear functions parameterized by the aﬃne
+transformations Ai. Our main result concerns the numbers wmin(din,d out), deﬁned to
+be the minimal value of w such that for every continuous function f : [0, 1]din→ Rdout
+and everyε> 0 there is a ReLU netN with input dimension din, hidden layer widths
+at most w, and output dimension dout that ε−approximatesf :
+sup
+x∈[0,1]din
+∥f(x)−fN (x)∥≤ ε.
+The main result of this article is the following estimate for wmin(din,d out).
+Theorem 1. For every din,d out≥ 1,
+din + 1≤wmin(din,d out)≤din +dout.
+Proving the upper bound wmin(din,d out)≤ din +dout in Theorem 1 requires a novel
+construction by which any continuous function withdin input variables anddout output
+variables can be approximated to arbitrary precision by a ReLU net with width din +
+dout and depth depending on its modulus of continuityωf. Recall that ωf(δ)≤ε when
+|x−y|≤ δ implies that|f(x)−f(y)|≤ ε uniformly over all inputs x,y. Sinceωf need
+not be continuous or bijective, deﬁne
+ω−1
+f (ε) = sup{δ :ωf(δ)≤ε}.
+We will show that ifK⊆ Rdin is any compact set andf :K→ Rdout is continuous, then
+there exists a ReLU net N with input dimension din, all hidden layers of width din +
+dout, output dimenion dout, and depth O(diam(K)/ω−1
+f (ε))din+1 that ε-approximates
+f on K :
+sup
+x∈K
+∥f(x)−fN (x)∥≤ ε.
+RELU NETS OF MINIMAL WIDTH 3
+We refer the reader to Proposition 3 for the precise statement. The construction is
+carried out in§2. In contrast, obtaining the lower bound
+wmin(din,d out)≥wmin(din, 1)≥din + 1,
+requires constructing, for every din≥ 1, a continuous function f : [0, 1]din→ R and a
+constantη >0 so that any width d ReLU netN must satisfy
+sup
+x∈[0,1]din
+|f(x)−fN (x)|>η. (2)
+Our construction in §3 only requires that the function have some compact level set
+(connected component of a ﬁber f−1(a)) and be non-constant inside that level set.
+Before proceeding to the proof of Theorem 1, we make two remarks. First, the
+neural nets we consider here are not allowed to have skip (e.g. residual) connections,
+popularized in the ResNets introduced by He-Zhang-Ren-Sun in [HZRS16] and in the
+Highway Nets introduced by Srivastava-Greﬀ-Schidhuber in [SGS15]. A skip connec-
+tion allows the input to a given hidden layer to be an aﬃne function of the all the
+outputs of all the previous hidden layers, instead of just the one preceeding it. If one
+allows skip connections, then a ReLU net whose hidden layers have width 1 can already
+approximate any continuous function if the net is allowed to be arbitrarily deep. The
+reason is that any feed-forward neural net with one hidden layer of width k can be
+converted into a neural net with k hidden layers, each of width 1 , that computes the
+same function. The construction is simply to “turn the hidden layer on its’ side.” That
+is, each neuron in the single hidden layer in the original shallow net becomes its own
+hidden layer. The input to the net is connected to the single neural in every new hidden
+layer, which is in turn connected to the output. In this construction, each hidden layer
+is connected only to the input and output. In the language of Veit-Wilber-Belongie
+[VWB16], the resulting ResNet implements an ensemble of paths of length 1. Second,
+it is tempting to generalize Theorem 1 to arbitrary piecewise linear activations. How-
+ever, it seems that such a generalization is not straightforward, even for activations of
+the form σ(t) = max (ℓ1(t),ℓ 2(t)), where ℓ1,ℓ 2 are two aﬃne functions with diﬀerent
+slopes.
+Acknowledgements. The ﬁrst author would like to thank Zhangyang Wang for sev-
+eral stimulating discussions about extending the results in this article to allowing
+residual connections and to more general activations. We are also grateful to Dmitry
+Yarotsky for pointing out several inaccuracies and a mistake (now corrected) in the
+proof of Lemma 6 in a previous version.
+2. Proof of the Upper Bound in Theorem 1
+Fix ε > 0, din,d out ≥ 1, a compact set K ⊆ Rdin, and a continuous function
+f : K→ Rdout. In this section, we prove that there exists a ReLU net N with input
+dimension din, hidden layer widths din +dout, and output dimension dout such that
+∥f−fN∥C0(K) = sup
+x∈K
+∥f(x)−fN (x)∥≤ ε. (3)
+We will use the following deﬁnition.
+4 BORIS HANIN AND MARK SELLKE
+Deﬁnition 1. A function g : Rdin→ Rdout is a max-min string of length L≥ 1 on
+din input variables and dout output variables if there exist aﬃne functions ℓ1,...,ℓ L :
+Rdin→ Rdout such that
+g =σL−1(ℓL,σ L−2(ℓL−1,...,σ 2(ℓ3,σ 1(ℓ1,ℓ 2))··· ),
+where each σi is either a coordinate-wise max or a min.
+The statement (3) follows immediately from the following two propositions.
+Proposition 2. For every max-min string g on din input variables and dout ouput
+variables with length L and every compact K⊆ Rdin, there exists a ReLU net with
+input dimension d, hidden layer width din +dout, output dimension ddout, and depth L
+that computes x↦→g(x) for every x∈K.
+Proposition 3. For every compactK⊆ Rdin, any continuousf :K→ Rdout and each
+ε> 0 there exists a max-min string g on din input variables and dout output variables
+with length (
+O(diam(K))
+ω−1
+f (ε)
+)din+1
+for which
+∥f−g∥C0(K)≤ε.
+Proposition 2 is essentially Lemma 4 in [Han17]. We include a short proof for the
+reader’s convenience in §2.1. Proposition 3 appears to be new, however, and is the
+main technical result in the present article. It is proved in§2.2. It is related in spirit to
+results in the literature (e.g. [Sch12, Prop. 2.2.2.]) that express a continuous piecewise
+aﬃne h :K→ R on a convex domain as
+max
+1≤i≤N
+min
+1≤j≤M (i)
+{ℓ1,i,...,ℓ M (i),i}, ℓ j,i :K→ R aﬃne.
+Nonetheless, Proposition 3 is of a rather diﬀerent nature since we are allowed to take
+only max and min of two aﬃne functions at a time.
+2.1. Proof of Proposition 2. We may assume without loss of generality that K is
+contained in the positive orthant:
+K⊆ Rdin
++ =
+{
+(x1,...,x din)∈ Rdin
+⏐⏐⏐ xi≥ 0, 1≤i≤din}
+since we can always shift the input to a neural net by a ﬁxed vector. Let us ﬁx a
+max-min string
+g =σL−1(ℓL,σ L−2(ℓL−1,...,σ 2(ℓ3,σ 1(ℓ1,ℓ 2))··· ).
+We can assume g is non-negative since we can subtract a constant in the ﬁnal linear
+transformation. Note that for any constant C, the function g +C is also a max-min
+string whose aﬃne tranformations are ℓi +C. Since we may subtract an arbitrary
+constant in the output of the last layer in a ReLU net, we may additionally assume
+that each ℓi is non-negative on K. With these reductions, we construct the neural
+RELU NETS OF MINIMAL WIDTH 5
+net that computes g(x) for every x∈ K. For all j = 2,...,L deﬁne invertible aﬃne
+tranformations Aj : Rdin+dout→ Rdin+dout
+Aj(x,y ) =
+{
+(x,y−ℓj(x)), if σj−1 = max
+(x,−y +ℓj(x)), if σj−1 = min.,
+where x∈ Rdin and y∈ Rdout. Their inverses are given by
+A−1
+j (x,y ) =
+{
+(x,y +ℓj(x)), if σj−1 = max
+(x,−y +ℓj(x)), if σj−1 = min..
+Further, set
+A1(x) = (x,ℓ 1(x)), x ∈ Rdin.
+WriteH1 :=A1 and
+Hj :=Aj◦ ReLU◦A−1
+j , j = 2,...,L.
+The image ofK underH0 is the graph ofℓ1, and the image of the graph of any function
+g :K→ Rdout under Hj is the graph of σj−1 (ℓj,g ). Hence, the image of K under the
+ReLU net
+ReLU◦HL◦···◦ H1
+is the graph ofg. Note that the ﬁnal ReLU is trivial sinceg is non-negative. Appending
+a ﬁnal layer (x1,...,x din,y 1,...,y dout)↦→ (y1,...,y dout) yields the desired net. □
+2.2. Proof of Proposition 3. Note that ifg is a max-min string ondin input variables
+anddout output variables, then so is g(x−x0) for anyx0∈ Rdin. Using also that every
+compact set is contained in a ball shows that we may assume without loss of generality
+that K is a ball Br of radius r centered at the origin.
+Fix a continuous function f : Br→ Rdout. We ﬁrst explain how to uniformly ap-
+proximatef by max-min strings in the model case when we seek to approximate f on
+an arbitrary ﬁnite subset of Rdin.
+Proposition 4. LetS⊆ Rdin be a ﬁnite set. Then any function f :S→ Rdout can be
+computed exactly by a max-min string.
+Proof. We prove the proposition by induction on |S|. If S ={s}, then the constant
+max-min string f(s) suﬃces. Suppose now that |S|≥ 2. The idea is to consider the
+convex hull ˆS of the points in S and “repeatedly cut oﬀ a corner.” Let s0∈ S be
+an extreme point of ˆS, a vertex of ˆS that is not contained in any proper face. By
+the inductive hypothesis, there is a max-min string g on din input variables and dout
+output variables that agrees with f onS\{s0}. Moreover, for every t> 0, we can ﬁnd
+an aﬃne function ℓ : Rdin→ Rdout with ℓ(s0) = 0 and ℓ(s)≥ t for s∈ S\{s0} (the
+inequality holds for each of thek components ofℓ). Taking t large, deﬁne the max-min
+string
+ˆg = max(min(g,f (s0) +ℓ),f (s0)−ℓ),
+where the max and min are componentwise. By construction, ˆg(s0) =f(s0). Further,
+because t is large, ˆg(s) =f(s) for s∈S\{s0}. Hence ˆg and f agree on S, completing
+the proof. □
+6 BORIS HANIN AND MARK SELLKE
+We carry out the same proof idea for continuous functions on Rdin. We focus for
+simplicity on the construction fordin = 2 anddout = 1. The extension to general dout is
+immediate and requires only that various inequalities below hold for every component
+of vectors in Rdout. The extension to din≥ 3 requires a minor modiﬁcation, which we
+present after thedin = 2 proof. Before getting into the details, we emphasize the main
+diﬀerence between the discrete case treated in Proposition 4 above and the continuous
+case below. The issue is that now when we cut oﬀ a corner from the convex hull of the
+set where we haveε-approximated the function f, we have to approximate f correctly
+on the entire piece we cut oﬀ, not just at a single vertex. To get an ε-approximation,
+we need our corner piece to have diameter O
+(
+ω−1
+f (ε)
+)
+so that the variation of f on
+the piece is O(ε) (recall that ω−1
+f (ε) is the inverse modulus of continuity). That is, we
+can only cut oﬀ small-diameter pieces at a time. Thus, to build an approximation to f
+on ball of radius R from an approximation to f on a ball of radius r <R, we have to
+slowly add small pieces to Br in all directions until the resulting set grows to contain
+BR. Our precise construction repeatedly uses the following observation. We state the
+observation for din = 2 and explain below its extension to din≥ 3.
+Lemma 5. Fix ε >0 and a continuous function f : R2→ R. Suppose K⊆ R2 and
+△ABC is an triangle with
+diam(△ABC)≤ω−1
+f (ε)
+such that K is contained in the inﬁnite planar sector ∠BAC. Then if there exists a
+max-min string g with
+sup
+x∈K
+|f(x)−g(x)|≤ ε,
+then there also exists a max-min string ˆg with
+sup
+x∈K∪ABC
+|f(x)−ˆg(x)|≤ ε.
+Proof. Let g be a max-min string that ε-approximates f on K. Let ℓ be the aﬃne
+function with ℓ(A) = 0, ℓ(B) =ℓ(C) =ε. As in Proposition 4, deﬁne
+ℓ−(x) :=f(A)−ℓ(x), ℓ +(x) :=f(A) +ℓ(x)
+and consider the max-min string
+ˆg = max(ℓ−, min(ℓ+,g )).
+Next, by the deﬁnition of ω−1
+f , we have
+|f(x)−ˆg(x)−f(x)|≤ ε, x ∈ABC.
+We now show that this estimate continues to hold for x∈ K as well. We claim that
+on K∪△ABC we have
+ℓ−−ε≤f≤ℓ+ +ε (4)
+These inequalities follow essentially from the fact that the absolute values of the slopes
+of ℓ± on the rays Ap for any point p on segment BC are bounded below by
+ω−1
+f (ε)
+ε .
+RELU NETS OF MINIMAL WIDTH 7
+This is true since for any such p we haveℓ(p) =ε and|A−p|≤ ω−1
+f (ε). Now to prove
+Inequality 4 we note that for any x∈K we have
+|f(x)−f(A)|≤ ε + ε
+ω−1
+f (ε)|x−A|.
+Indeed, suppose that ray Ax has length nω−1
+f (ε) +r for integer n and real remainder
+r<ω −1
+f (ε). Then by the triangle inequality we have
+|f(x)−f(A)|≤ nε +ε≤ε + ε
+ω−1
+f (ε)|x−A|
+as desired.
+These estimates imply that on K
+f−ε = min(f,f −ε)≤ min(ℓ+,g )≤ max (ℓ−, min(ℓ+,g )) =ˆg
+and
+ˆg = max (ℓ−, min(ℓ+,g ))≤ max(ℓ−,g )≤ max(f,f +ε) =f +ε.
+Therefore,ˆg−ε≤f≤ˆg +ε, as desired. □
+We now turn to the details of the proof of Proposition 3. We will explain how to
+approximate our ﬁxed continuous function f by a max-min string on a ball of radius
+R> 0 centered at the origin. We will use Lemma 5 to show that we can approximate
+f on successively larger and larger balls. Observe that if r≤ω−1
+f (ε) then
+∥f−f(0)∥C0(Br)≤ε,
+so that the constant max-min string f(0) is an ε-approximation to f on the small
+ball Bω−1
+f (ε)(0). To prove that we can approximate f on larger balls, suppose g is a
+max-min string ondin variables that approximatesf to withinε on the ballBr(0) with
+r≥ w−1
+f (ε). We use Lemma 5 to construct a new max-min string ˆg which uniformly
+ε-approximatesf on a ball of slightly larger radius
+Rr,ε :=r +
+ω−1
+f (ε)2
+10r .
+Since for everyε> 0, the functionRr,ε is strictly increasing in r it cannot have a ﬁxed
+point and the k−fold composition R(k)
+r,ε sends any r >0 to inﬁnity with k. Using this
+procedure repeatedly therefore allows us to increaser without bound and will complete
+the proof. Our approach is illustrated in Figures 1 and 2.
+We begin with the construction when din = 2 and will explain the simple modiﬁca-
+tion for din≥ 3 below. For each r′ > rand any two suﬃciently close points X,Y on
+the boundary ofBr, letX′,Y ′ be the intersections of lineXY with the boundary circle
+ofBr′(P ). Also, denote by Z be the intersection of the tangents to Br′ throughX′,Y ′
+(see Figure 1). Then Br is contained in the planar sector ∠X′ZY′, and the diameter
+of△X′ZY′ can be made arbitrarily small by taking r′ close to r andX close to Y. In
+particular, for every r≥ω−1
+f (ε), we take
+r′ =Rr,ε =r +
+ω−1
+f (ε)2
+10r , |XY| =ω−1
+f (ε)
+(
+1−
+ω−1
+f (ε)2
+100r2
+)1/2
+.
+8 BORIS HANIN AND MARK SELLKE
+Figure 1. To extend an ε-approximation of f on the inner disk of
+radiusr to the outer disk of radiusr′ =r+
+ω−1
+f (ε)2
+r , we proceed in steps.
+Each step, we draw triangle X′ZY′ as shown and apply Lemma 5 to
+extend our approximation to a larger region. Because the outer circle
+Br′(P ) is contained in sectorX′ZY′, we do not lose any area contained
+in Br′(P ) when applying Lemma 5.
+This choice for|XY| is valid because|XY|≤ ω−1
+f (ε)≤r, so we can indeed ﬁnd points
+X,Y at this distance with no problem. Then
+|X′Y′| =
+√
+|XY|2 + 4(r′−r)2 =ω−1
+f (ε).
+We also know that|X′Z| =|Y′Z|≤| X′Y′| =ω−1
+f (ε) because|X′Y′| =ω−1
+f (ε)≤r≤
+r′, implying obtuseness of △X′ZY′ at Z. Thus,
+diam(△X′ZY′) =|X′Y′| =ω−1
+f (ε).
+Lemma 5 therefore shows that there exists a max-min stringg′ that uniformlyε approx-
+imates f on K′ =△X′Y′Z∪Br. Notice that K′ contains the circular sector of BRr,ε
+cut out by the rays OX and OY. Finally, consider a δ−net{pi} on the circumference
+of Br with
+δ =
+ω−1
+f (ε)
+2
+(
+1−
+ω−1
+f (ε)2
+100r2
+)1/2.
+RELU NETS OF MINIMAL WIDTH 9
+Figure 2. In Figure 1, after applying Lemma 5, the region on which we
+approximatedf has grown to include the shaded circular sectorX0PY 0.
+(This is just because it is contained in the union of the two shaded
+regions in Figure 1.) Since d(X,Y ) ≍ ε, this means that applying
+Lemma 5 toO
+( r
+ε
+)
+rotated conﬁgurations of this form extends the region
+of ε-approximation from Br(P ) to Br′(P ).
+The size of this net is O(r/ω−1
+f (ε)). Applying Lemma 5 O(r/ω−1
+f (ε)) times and re-
+peating the above argument with (X,Y ) = (pi,p i+1) completes the proof of the upper
+bound in Theorem 1 when din = 2.
+The argument whendin≥ 3 is essentially the same. The idea is to take the diagrams
+depicted and rotate them around the axis PZ. Lemma 5 extends to higher dimensions
+with the triangle△ABC replaced by the tip of a cone with the same diameter require-
+ment. Such a cone is obtained by rotating X′ZY′ in Figures 1 and 2. The rest of the
+argument then carries over verbatim.
+Now we analyze the eﬃciency of this procedure. First, to complete a single radius
+increment requires covering the boundary of Br with balls of radius O
+(
+ω−1
+f (ε)
+)
+. It is
+standard that in Rdin, this requires
+(
+O(r)
+ω−1
+f (ε)
+)din−1
+10 BORIS HANIN AND MARK SELLKE
+balls. We get one extra max and min in the max-min string we build to approximate f
+for each such ball. Thus, at a cost of
+(
+O(r)
+ω−1
+f (ε)
+)din−1
+many maxes and mins, the radius
+on which we approximate f increases
+r↦→Rr,ε =r +
+ω−1
+f (ε)2
+10r .
+Hence, if we ﬁx R>ω −1
+f (ε), then for every ω−1
+f (ε)≤r≤R, we have
+Rr,ε−r≥
+ω−1
+f (ε)2
+10R
+and to obtain an approximation of f on BR, by a max-min we need to extend the
+approximation of f from a small ball to a larger ball at most 10 R2/ω−1
+f (ε)2 times.
+The number of maxes and mins required for each extension is ( O(R)/ω−1
+f (ε))din−1.
+Hence, the length of the max-min string we construct to approximate f on BR is
+(
+O(R)
+ω−1
+f (ε)
+)din+1
+,
+as claimed.
+□
+Remark 1. We have tacitly neglected the case din = 1. This case is the same as
+din = 2 but easier. In fact here we require only(
+O(R)
+ω−1
+f (ε)
+)
+layers, which would naively correspond to din = 0. The reason is that a 1-dimensional
+ball can be increased in radius by ω−1
+f (ε) by adding only a single external line segment
+of length ω−1
+f (ε). In the higher dimensional cases, we need to add the external pieces
+mostly tangentially which requires more layers.
+3. Proof of the Lower Bound in Theorem 1
+The purpose of this section is to prove that for every din ≥ 1, there exists f ∈
+C([0, 1]din, R) and η = η(din,f ) > 0 so f satisﬁes the following property. For any
+ReLU netN with input dimension din, hidden layer width din, and output dimension
+1, we have
+∥f−fN∥C0≥η.
+In fact, we will show that if there is a such that a compact connected component
+of the pre-image f−1(a) disconnects a bounded region from the inﬁnite component of
+Rdin, then f is not approximable by depth-din ReLU nets.
+Fix din≥ 1, and consider a width din ReLU net
+fN :=An◦ ReLU◦An−1···◦ ReLU◦A1,
+where the Ai’s are aﬃne and An maps Rdin to R, while for 1 ≤ i ≤ n− 1, the
+transformations Ai map Rdin to Rdin. We may assume without loss of generality that
+RELU NETS OF MINIMAL WIDTH 11
+Ai have full rank for all i since fN is continuous with respect to the Ai’s and aﬃne
+maps with full rank are dense among all aﬃne maps. Deﬁne a level set of a function f
+to be a connected component of a pre-image f−1(a) for some a. The following Lemma
+shows the level sets of any function
+fj(x) = ReLU◦Aj◦··· ReLU◦A1(x)
+computed by the ﬁrst j hidden layers ofN are of a rather special form.
+Lemma 6. For eachj≥ 1, set Sj to be the set of points on which all ReLU evaluations
+throughout the evaluation of fj are (strictly) positive. Then Sj is open and convex, fj
+is aﬃne on Sj, and every level set of fj that is bounded is contained in Sj.
+Proof. For everyj,S j is open and convex since it is cut out by a collection of inequalities
+of the form {ℓk(x) > 0}, where ℓk : Rdin→ R are aﬃne. Note that the level sets of
+fn : Rdin→ R are the union of level sets of fn−1 : Rdin→ Rdin. Hence, it is enough to
+show that for everyj≤n−1 if a level set offj intersects the complement ofSj, then it
+is unbounded. We prove this by induction on j≥ 1. The base case j = 1 is immediate
+if S1 = Rdin. Otherwise, consider y̸∈ S1. Then, at least one, say the kth, component
+of f1(y) is zero. The inverse image under ReLU of the point f1(y) therefore contains
+a ray (e.g. the ray r starting at f1(y) and going to −∞ parallel to the kth coordinate
+axis). The inverse image of r under the aﬃne map A1 also contains a ray and hence
+is unbounded, proving the base case.
+For the inductive step, ﬁx somej≥ 2. There is nothing to prove ifSj = Rdin. Other-
+wise, considery̸∈Sj. Ify̸∈Sj−1, then we are done by induction sincef−1
+j−1(fj−1(y))⊆
+f−1
+j (fj(y)). If y∈Sj−1, then we argue as before. Namely, the kth component of fj(y)
+vanishes for somek and the inverse image under ReLU◦Aj of the pointfj(y) therefore
+contains a ray. If this ray is contained infj−1(Sj−1), then its pre-image underfj−1 also
+contains a ray since fj−1 is aﬃne when restricted to Sn−1. Otherwise, this ray inter-
+sects the boundary of fj−1(Sj−1) at some pointp. By induction, the pre-image f−1
+j−1(p)
+is unbounded and hence so is f−1
+j (fj(y)) since it contains f−1
+j−1(p). This completes the
+proof.
+□
+We now complete the proof of the lower bound in Theorem 1. Suppose that f :
+Rdin→ R is a continuous function such that for somea, the pre-imagef−1(a) contains
+a compact connected component A and that Rdin\A contains a bounded connected
+component B. For example, we could take
+f(x1,...,x din) :=
+din∑
+j=1
+(
+xj− 1
+2
+)2
+, a = 1
+4.
+In this case A is a sphere and B is a ball. Suppose y∈B and f(y) =b̸=a. Then for
+η <|a−b|
+4 , we show that f is not η-approximable on A∪B.
+Set c = a+b
+2 , and let C be the intersection of f−1(c) with B. Since f is continuous,
+the intermediate value theorem implies that C separates y and A. Let C′⊆C be the
+boundary of any connected component of C that contains y. Informally, A surrounds
+12 BORIS HANIN AND MARK SELLKE
+C′ which surrounds y. Now, suppose some fN computed by a neural net satisﬁes
+∥f−fN∥C0(A∪B)≤η.
+Denote bySN the set of points in Rdin where all the ReLUs inN are positive. Suppose
+ﬁrst that SN contains C′. By Lemma 6, SN is convex. Since the intermediate value
+theorem implies any path from y to∞ intersectsC′, we know that y is in the convex
+hull of C′. Hence we have y∈SN as well. Since fN is aﬃne on SN, this means that
+fN (y) is between the minimum and maximum values of fN on C′. As f(y) = b and
+f(C′) =c we get a contradiction since η <|b−c|
+2 = |a−b|
+4 .
+Suppose in the second case that SN does not contain C′, so there is x∈ C′\SN .
+Then, by Lemma 6, the level set of fN containing x must be unbounded, and hence
+must intersect A (as A separates y from∞ and x∈ C′ is reachable from y without
+intersecting A). This is again a contradiction for η <|a−c|
+2 = |a−b|
+4 .
+In both cases, we showed thatf andfN diﬀered signiﬁcantly; the ﬁrst case used the
+aﬃneness of fN on SN while the second used the unboundedness of level sets away
+from SN . We conclude that a width-d net cannot uniformly approximate f.□
+References
+[ABMM16] Raman Arora, Amitabh Basu, Poorya Mianjy, and Anirbit Mukherjee. Understanding
+deep neural networks with rectiﬁed linear units. arXiv preprint arXiv:1611.01491 , 2016.
+[Cyb89] George Cybenko. Approximation by superpositions of a sigmoidal function. Mathematics
+of Control, Signals, and Systems (MCSS) , 2(4):303–314, 1989.
+[Han17] Boris Hanin. Universal function approximation by deep neural nets with bounded width
+and relu activations. arXiv preprint arXiv:1708.02691 , 2017.
+[HSW89] Kurt Hornik, Maxwell Stinchcombe, and Halbert White. Multilayer feedforward networks
+are universal approximators. Neural networks, 2(5):359–366, 1989.
+[HZRS16] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for im-
+age recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern
+Recognition, pages 770–778, 2016.
+[KSH12] Alex Krizhevsky, Ilya Sutskever, and Geoﬀrey E Hinton. Imagenet classiﬁcation with
+deep convolutional neural networks. InAdvances in neural information processing systems,
+pages 1097–1105, 2012.
+[LTR17] Henry W Lin, Max Tegmark, and David Rolnick. Why does deep and cheap learning work
+so well? Journal of Statistical Physics , 168(6):1223–1247, 2017.
+[MLP16] Hrushikesh Mhaskar, Qianli Liao, and Tomaso A. Poggio. Learning real and boolean
+functions: When is deep better than shallow. CoRR, abs/1603.00988, 2016.
+[MP16] Hrushikesh N Mhaskar and Tomaso Poggio. Deep vs. shallow networks: An approximation
+theory perspective. Analysis and Applications , 14(06):829–848, 2016.
+[MT17] Michal Moshkovitz and Naftali Tishby. Mixing complexity and its applications to neural
+networks. CoRR, 2017.
+[PLR+16] Ben Poole, Subhaneil Lahiri, Maithreyi Raghu, Jascha Sohl-Dickstein, and Surya Ganguli.
+Exponential expressivity in deep neural networks through transient chaos. In Advances In
+Neural Information Processing Systems, pages 3360–3368, 2016.
+[RPK+17] Maithra Raghu, Ben Poole, Jon Kleinberg, Surya Ganguli, and Jascha Sohl-Dickstein. On
+the expressive power of deep neural networks. In Proceedings of the 34th International
+Conference on Machine Learning, pages 2847–2854, 2017.
+[RT17] David Rolnick and Max Tegmark. The power of deeper networks for expressing natural
+functions. arXiv preprint arXiv:1705.05502 , 2017.
+[Sch12] Stefan Scholtes. Introduction to piecewise diﬀerentiable equations. Springer Science, 2012.
+RELU NETS OF MINIMAL WIDTH 13
+[SGS15] Rupesh Kumar Srivastava, Klaus Greﬀ, and J¨ urgen Schmidhuber. Highway networks.
+arXiv preprint arXiv:1505.00387 , 2015.
+[SHM+16] David Silver, Aja Huang, Chris J Maddison, Arthur Guez, Laurent Sifre, George Van
+Den Driessche, Julian Schrittwieser, Ioannis Antonoglou, Veda Panneershelvam, Marc
+Lanctot, et al. Mastering the game of go with deep neural networks and tree search.
+Nature, 529(7587):484–489, 2016.
+[ST17] Ravid Shwartz-Ziv and Naftali Tishby. Opening the black box of deep neural networks via
+information. CoRR, 2017.
+[SVL14] Ilya Sutskever, Oriol Vinyals, and Quoc V Le. Sequence to sequence learning with neural
+networks. In Advances in neural information processing systems , pages 3104–3112, 2014.
+[Tel15] Matus Telgarsky. Representation beneﬁts of deep feedforward networks. arXiv preprint
+arXiv:1509.08101, 2015.
+[Tel16] Matus Telgarsky. beneﬁts of depth in neural networks. In 29th Annual Conference on
+Learning Theory, pages 1517–1539, 2016.
+[Tel17] Matus Telgarsky. Neural networks and rational functions. arXiv preprint
+arXiv:1706.03301, 2017.
+[TZ15] Naftali Tishby and Noga Zaslavsky. Deep learning and the information bottleneck princi-
+ple. In Information Theory Workshop (ITW), 2015 IEEE , pages 1–5. IEEE, 2015.
+[VWB16] Andreas Veit, Michael J Wilber, and Serge Belongie. Residual networks behave like ensem-
+bles of relatively shallow networks. InAdvances in Neural Information Processing Systems,
+pages 550–558, 2016.
+[WSC+16] Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V Le, Mohammad Norouzi, Wolfgang
+Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, et al. Google’s neural
+machine translation system: Bridging the gap between human and machine translation.
+arXiv preprint arXiv:1609.08144 , 2016.
+[Yar16] Dmitry Yarotsky. Error bounds for approximations with deep relu networks. arXiv preprint
+arXiv:1610.01145, 2016.
+(B. Hanin) Department of Mathematics, Texas A&M, College Station, United States
+E-mail address: bhanin@math.tamu.edu
+(M. Sellke) Trinity College, Cambridge, CB2 1TQ, UK
+E-mail address: mas279@cam.ac.uk

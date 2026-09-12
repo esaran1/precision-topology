@@ -1,0 +1,876 @@
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+William H. Guss 1 Ruslan Salakhutdinov 1
+{wguss, rsalakhu}@cs.cmu.edu
+Abstract
+The learnability of different neural architectures
+can be characterized directly by computable mea-
+sures of data complexity. In this paper, we re-
+frame the problem of architecture selection as
+understanding how data determines the most ex-
+pressive and generalizable architectures suited to
+that data, beyond inductive bias. After suggesting
+algebraic topology as a measure for data com-
+plexity, we show that the power of a network to
+express the topological complexity of a dataset in
+its decision region is a strictly limiting factor in
+its ability to generalize. We then provide the ﬁrst
+empirical characterization of the topological ca-
+pacity of neural networks. Our empirical analysis
+shows that at every level of dataset complexity,
+neural networks exhibit topological phase tran-
+sitions. This observation allowed us to connect
+existing theory to empirically driven conjectures
+on the choice of architectures for fully-connected
+neural networks.
+1. Introduction
+Deep learning has rapidly become one of the most perva-
+sively applied techniques in machine learning. From com-
+puter vision (Krizhevsky et al., 2012) and reinforcement
+learning (Mnih et al., 2013) to natural language process-
+ing (Wu et al., 2016) and speech recognition (Hinton et al.,
+2012), the core principles of hierarchical representation and
+optimization central to deep learning have revolutionized
+the state of the art; see Goodfellow et al. (2016). In each do-
+main, a major difﬁculty lies in selecting the architectures of
+models that most optimally take advantage of structure in the
+data. In computer vision, for example, a large body of work
+((Simonyan & Zisserman, 2014), (Szegedy et al., 2014), (He
+et al., 2015), etc.) focuses on improving the initial archi-
+tectural choices of Krizhevsky et al. (2012) by developing
+novel network topologies and optimization schemes speciﬁc
+1Machine Learning Department, Carnegie Mellon University,
+Pittsburgh, Pennsylvania.
+to vision tasks. Despite the success of this approach, there
+are still not general principles for choosing architectures in
+arbitrary settings, and in order for deep learning to scale
+efﬁciently to new problems and domains without expert ar-
+chitecture designers, the problem of architecture selection
+must be better understood.
+Theoretically, substantial analysis has explored how vari-
+ous properties of neural networks, (eg. the depth, width,
+and connectivity) relate to their expressivity and generaliza-
+tion capability ((Raghu et al., 2016), (Daniely et al., 2016),
+(Guss, 2016)). However, the foregoing theory can only be
+used to determine an architecture in practice if it is under-
+stood how expressive a model need be in order to solve
+a problem. On the other hand, neural architecture search
+(NAS) views architecture selection as a compositional hy-
+perparameter search ((Saxena & Verbeek, 2016), (Fernando
+et al., 2017), (Zoph & Le, 2017)). As a result NAS ideally
+yields expressive and powerful architectures, but it is of-
+ten difﬁcult to interpret the resulting architectures beyond
+justifying their use from their empirical optimality.
+We propose a third alternative to the foregoing: data-ﬁrst
+architecture selection. In practice, experts design architec-
+tures with some inductive bias about the data, and more
+generally, like any hyperparameter selection problem, the
+most expressive neural architectures for learning on a par-
+ticular dataset are solely determined by the nature of the
+true data distribution. Therefore, architecture selection can
+be rephrased as follows: given a learning problem (some
+dataset), which architectures are suitably regularized and
+expressive enough to learn and generalize on that problem?
+A natural approach to this question is to develop some ob-
+jective measure of data complexity, and then characterize
+neural architectures by their ability to learn subject to that
+complexity. Then given some new dataset, the problem
+of architecture selection is distilled to computing the data
+complexity and choosing the appropriate architecture.
+For example, take the two datasetsD1 andD2 given in Fig-
+ure 1(a,b) and Figure 1(c,d) respectively. The ﬁrst dataset,
+D1, consists of positive examples sampled from two disks
+and negative examples from their compliment. On the right,
+datasetD2 consists of positive points sampled from two
+disks and two rings with hollow centers. Under some ge-
+arXiv:1802.04443v1  [cs.LG]  13 Feb 2018
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+ometric measure of complexityD2 appears more ’compli-
+cated’ thanD1 because it contains more holes and clusters.
+As one trains single layer neural networks of increasing
+hidden dimension on both datasets, the minimum number of
+hidden units required to achieve zero testing error is ordered
+according to this geometric complexity. Visually in Figure
+1, regardless of initialization no single hidden layer neural
+network with≤ 12 units, denotedh≤12, can express the two
+holes and clusters inD2. Whereas on the simplerD1, both
+h12 andh26 can express the decision boundary perfectly.
+Returning to architecture selection, one wonders if this char-
+acterization can be extrapolated; that is, is it true that for
+datasets with ’similar’ geometric complexity toD1, any ar-
+chitecture with≥ 12 hidden learns perfectly, and likewise
+for those datasets similar in complexity toD2, architectures
+with≤ 12 hidden units can never learn to completion?
+1.1. Our Contribution
+In this paper, we formalize the above notion of geometric
+complexity in the language of algebraic topology. We show
+that questions of architecture selection can be answered by
+understanding the ’topological capacity’ of different neural
+networks. In particular, a geometric complexity measure,
+called persistent homology, characterizes the capacity of
+neural architectures in direct relation to their ability to gen-
+eralize on data. Using persistent homology, we develop
+a method which gives the ﬁrst empirical insight into the
+learnability of different architectures as data complexity
+increases. In addition, our method allows us to generate
+conjectures which tighten known theoretical bounds on the
+expressivity of neural networks. Finally, we show that topo-
+logical characterizations of architectures areuseful in prac-
+tice by presenting a new method, topological architecture
+selection, and applying it to several OpenML datasets.
+2. Background
+2.1. General Topology
+In order to more formally describe notions of geometric
+complexity in datasets, we will turn to the language of topol-
+ogy. Broadly speaking, topology is a branch of mathematics
+that deals with characterizing shapes, spaces, and sets by
+their connectivity. In the context of characterizing neural
+networks, we will work towards deﬁning the topological
+complexity of a dataset in terms of how that dataset is ’con-
+nected’, and then group neural networks by their capacity
+to produce decision regions of the same connectivity.
+In topology, one understands the relationships between two
+different spaces of points by the continuous maps between
+them. Informally, we say that two topological spacesA and
+B are equivalent (A∼=B) if there is a continuous function
+f :A→B that has an inversef−1 that is also continuous.
+Figure 1. The positive label outptus of single hidden layer neural
+networks,h12 andh26, of 2 inputs with 12 and 26 hidden units
+respectively after training on datasets D1 and D2 with positive
+examples in red. Highlighted regions of the output constitute the
+positive decision region.
+Whenf exists, we say thatA andB are homeomorphic and
+f is their homeomorphism; for a more detailed treatment of
+general topology see Bredon (2013). In an informal way,
+D1̸∼=D2 in Figure 1 since if there were a homeomorphism
+f : D1 → D2 at least one of the clusters in D1 would
+need to be split discontinuously in order to produce the four
+different regions inD2.
+The power of topology lies in its capacity to differentiate
+sets (topological spaces) in a meaningful geometric way that
+discards certain irrelevant properties such as rotation, trans-
+lation, curvature, etc. For the purposes of deﬁning geomet-
+ric complexity, non-topological properties1 like curvature
+would further ﬁne-tune architecture selection–say ifD2 had
+the same regions but with squigly (differentially complex)
+boundaries, certain architectures might not converge–but
+as we will show, grouping neural networks by ’topological
+capacity’ provides a powerful minimality condition. That
+is, we will show that if a certain architecture is incapable of
+expressing a decision region that is equivalent in topology
+to training data, then there is no hope of it ever generalizing
+to the true data.
+2.2. Algebraic Topology
+Algebraic topology provides the tools necessary to not only
+build the foregoing notion of topological equivalence into
+a measure of geometric complexity, but also to compute
+that measure on real data ((Betti, 1872), (Dey et al., 1998),
+(Bredon, 2013)). At its core, algebraic topology takes topo-
+logical spaces (shapes and sets with certain properties) and
+assigns them algebraic objects such as groups, chains, and
+other more exotic constructs. In doing so, two spaces can
+be shown to be topologically equivalent (or distinct) if the
+algebraic objects to which they are assigned are isomorphic
+(or not). Thus algebraic topology will allow us to compare
+the complexity of decision boundaries and datasets by the
+objects to which they are assigned.
+1A topological property or invariant is one that is preserved by
+a homeomorphism. For example, the number of holes and regions
+which are disjoint from one another are topological properties,
+whereas curvature is not.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Although there are many ﬂavors of algebraic topology, a
+powerful and computationally realizable tool is homology.
+Deﬁnition 2.1 (Informal, (Bredon, 2013)). IfX is a topo-
+logical space, thenHn(X) = Zβn is called thenth homol-
+ogy group ofX if the power βn is the number of ’holes’
+of dimensionn inX. Note that β0 is the number of sepa-
+rate connected components. We call βn(X) thenth Betti
+number of X. Finally, the homology 2 ofX is deﬁned as
+H(X) ={Hn(X)}∞
+n=0.
+Immediately homology brings us closer to deﬁning the com-
+plexity ofD1 andD2. If we assume thatD1 is not actually
+a collection ofN datapoints, but really the union of 2 solid
+balls, and likewise that D2 is the union of 2 solid balls
+and 2 rings, then we can compute the homology directly.
+In this case H0(D1) = Z2 since there are two connected
+components3; H1(D1) = {0} since there are no circles
+(one-dimensional holes); and clearly, Hn(D1) ={0} for
+n≥ 2. Performing the same computation in the second
+case, we get H0(D2) = Z4 and H1(D2) = Z2 as there
+are 4 seperate clusters and 2 rings/holes. With respect to
+any reasonable ordering on homology,D2 is more complex
+thanD1. The measure yields non-trivial differentiation of
+spaces in higher dimension. For example, the homology of
+a hollow donut is{Z1, Z2, Z1, 0,... }.
+Surprisingly, the homology of a space contains a great deal
+of information about its topological complexity1. The fol-
+lowing theorem suggests the absolute power of homology
+to group topologically similar spaces, and therefore neural
+networks with topologically similar decision regions.
+Theorem 2.2 (Informal). Let X and Y be topological
+spaces. IfX∼=Y thenH(X) =H(Y ).4
+Intuitively, Theorem 2.2 states that number of ’holes’ (and
+in the case ofH0(X), connected components) are topologi-
+cally invariant, and can be used to show that two shapes (or
+decision regions) are different.
+2.3. Computational Methods for Homological
+Complexity
+In order to compute the homology of bothD1 andD2 we
+needed to assume that they were actually the geometric
+shapes from which they were sampled. Without such as-
+sumptions, for any dataset D a H(D) = {ZN, 0,... }
+where N is the number of data points. This is because,
+at small enough scales each data point can be isolated as
+2This deﬁnition of homology makes many assumptions onX
+and the base ﬁeld of computation, but for introductory purposes,
+this informality is edifying.
+3Informally, a connected component is a set which is not con-
+tained in another connected set except for itself.
+4Equality ofH(X) andH(Y ) should be interpreted as isomor-
+phism between each individualHi(X) andHi(Y ).
+Figure 2. An illustration of computing persistent homology on a
+collection of points ((Topaz et al., 2015))
+its own connected component; that is, as sets each pair of
+different positive pointsd1,d 2∈D are disjoint. To prop-
+erly utilize homological complexity in better understanding
+architecture selection, we need to be able to compute the
+homology of the data directly and still capture meaningful
+topological information.
+Persistent homology, introduced in Zomorodian & Carlsson
+(2005), avoids the trivialization of computation of dataset
+homology by providing an algorithm to calculate the homol-
+ogy of a ﬁltration of a space. Speciﬁcally, a ﬁltration is a
+topological spaceX equipped with a sequence of subspaces
+X0 ⊂ X1 ⊂···⊂ X. In Figure 2 one such particular
+ﬁltration is given by growing balls of size ϵ centered at
+each point, and then letting Xϵ be the resulting subspace
+in the ﬁltration. Deﬁne βn(X) to be the nth Betti num-
+ber of the homology H(Xϵ) ofXϵ. Then for example at
+ϵ = 1.5, β0(Xϵ) = 19 and β1(Xϵ) = 0 as every ball is
+disjoint. Atϵ = 5.0 some connected components merge and
+β0(Xϵ) = 12 andβ1(Xϵ) = 0. Finally atϵ = 7, the union
+of the balls forms a hole towards the center of the dataset
+andβ1(Xϵ)> 0 withβ0(Xϵ) = 4.
+All together the change in homology and therefore Betti
+numbers forXϵ asϵ changes can be summarized succinctly
+in the persistence barcode diagram given in Figure 2. Each
+bar in the sectionβn(X) denotes a ’hole’ of dimensionn.
+The left endpoint of the bar is the point at which homology
+detects that particular component, and the right endpoint
+is when that component becomes indistinguishable in the
+ﬁltration. When calculating the persistent homology of
+datasets we will frequently use these diagrams.
+With the foregoing algorithms established, we are now
+equipped with the tools to study the capacity of neural net-
+works in the language of algebraic topology.
+3. Homological Characterization of Neural
+Architectures
+In the forthcoming section, we will apply persistent homol-
+ogy to empirically characterize the power of certain neural
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+architectures. To understand why homological complexity
+is a powerful measure for differentiating architectures, we
+present the following principle.
+Suppose thatD is some dataset drawn from a joint distri-
+butionF with continuous CDF on some topological space
+X×{0, 1}. LetX + denote the support of the distribution of
+points with positive labels, andX− denote that of the points
+with negative labels. Then let HS(f) := H[f−1((0,∞))]
+denote the support homology of some function f : X→
+{0, 1}. EssentiallyHS(f) is homology of the set ofx such
+thatf(x)> 0. For a binary classiﬁer,f,HS(f) is roughly a
+characterization of how many ’holes’ are in the positive de-
+cision region off. We will sometimes useβn(f) to denote
+thenth Betti number of this support homology. Finally let
+F ={f :X→{ 0, 1}} be some family of binary classiﬁers
+onX.
+Theorem 3.1 (Homological Generalization). IfX =X−⊔
+X + and for allf∈F withHS(f)̸=H(X +), then for all
+f∈F there existsA⊂X + sof misclassiﬁes everyx∈A.
+Essentially, Theorem 3.1 says that if an architecture (a fam-
+ily of models F) is incapable of producing a certain ho-
+mological complexity, then for any model using that archi-
+tecture there will always be a set A of true datapoints on
+which the model will fail. Note that the above principle
+holds regardless of howf∈F is attained, learned or other-
+wise. The principle implies that no matter how well somef
+learns to correctly classifyD there will always be counter
+examples in the true data.
+In the context of architecture selection, the foregoing mini-
+mality condition signiﬁcantly reduces the size of the search
+space by eliminating smaller architectures which cannot
+even express the ’holes’ (persistent homology) of the data
+H(D). This allows us to return to our original question
+of ﬁnding suitably expressive and generalizable architec-
+tures but in the very computable language of homological
+complexity: Let FA the set of all neural networks with
+’architecture’A, then
+Given a datasetD, for which architecturesA does there
+exist a neural networkf∈F A such thatHS(f) =H(D)?
+We will resurface a contemporary theoretical view on this
+question, and thereafter make the ﬁrst steps towards an
+empirical characterization of the capacity of neural architec-
+tures in the view of topology.
+3.1. Theoretical Basis for Neural Homology
+Theoretically, the homological complexity of neural network
+can be framed in terms of the sum of the number of holes
+expressible by certain architectures. In particular, Bianchini
+et al. (2014) gives an analysis of how the maximum sum of
+Figure 3. Scatter plots of 6 different synthetic datasets of varying
+homological complexity.
+Betti numbers grows asFA changes. The results show that
+the width and activation of a fully connected architecture
+effect its topological expressivity to varying polynomial and
+exponential degrees.
+What is unclear from this analysis is how these bounds
+describe expressivity or learnability in terms of individual
+Betti numbers. From a theoretical perspective Bianchini
+et al. (2014) stipulated that a characterization of individual
+homology groups require the solution of deeper unsolved
+problems in algebraic topology. However, for topological
+complexity to be effective in architecture selection, under-
+standing each Betti number is essential in that it grants
+direct inference of architectural properties from the persis-
+tent homology of the data. Therefore we turn to an empirical
+characterization.
+3.2. Empirical Characterization
+To understand how the homology of data determines ex-
+pressive architectures we characterize the capacities of ar-
+chitectures with an increasing number of layers and hidden
+units to learn and express homology on datasets of varying
+homological complexity.
+Restricting5 our analysis to the case ofn = 2 inputs, we gen-
+erate binary datasets of increasing homological complexity
+by samplingN = 5000 points from mixtures of Unif(S1)
+and Unif(B2), uniform random distributions on solid and
+empty circles with known support homologies. The homolo-
+gies chosen range contiguously from H(D) ={Z1, 0} to
+H(D) ={Z30, Z30} and each sampled distribution is geo-
+metrically balanced i.e. each topological feature occupies
+the same order of magnitude. Additionally, margins were
+induced between the classes to aid learning. Examples are
+shown in Figure 3.
+5Although we chose to study the low dimensional setting be-
+cause it allows us to compute the persistent homology of the de-
+cision region directly, the convergence analysis extends to any
+number of dimensions.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 4. Topological phase transitions in low dimensional neural networks as the homological complexity of the data increases. The
+upper right corner of each plot is a dataset on which the neural networks of increasing ﬁrst layer hidden dimension are trained. Each plot
+gives the minimum error for each architecture versus the number of minibatches seen.
+To characterize the difﬁculty of learning homologically com-
+plex data in terms of both depth and width, we consider
+fully connected architectures with ReLu activation func-
+tions (Nair & Hinton, 2010) of depth ℓ ={1,..., 6} and
+widthhl =β0(D) when 1≤l≤ℓ andhl∈{ 1,..., 500}
+whenl = 0. We will denote individual architectures by the
+pair (ℓ,h 0). We vary the number of hidden units in the ﬁrst
+layer, as they form a half-space basis for the decision region.
+The weights of each architecture are initialized to samples
+from a normal distributionN (0, 1
+β0
+) with variance respect-
+ing the scale of each synthetic dataset. For each homology
+we take several datasets sampled from the foregoing proce-
+dure and optimize 100 initializations of each architecture
+against the standard cross-entropy loss. To minimize the
+objective we use the Adam optimizer (Kingma & Ba, 2014)
+with a ﬁxed learning rate of 0.01 and an increasing batch
+size schedule (Smith et al., 2017).
+We compare each architectures average and best perfor-
+mance by measuring misclassiﬁcation error over the course
+of training and homological expressivity at the end of train-
+ing. The latter quantity, given by
+Ep
+H(f,D) = min
+{βp(f)
+βp(D), 1
+}
+,
+measures the capacity of a model to exhibit the true homol-
+ogy of the data. We compute the homology of individual
+decision regions by constructing a ﬁltration on Heaviside
+step function of the difference of the outputs, yielding a per-
+sistence diagram with the exact homological components of
+the decision regions. The results are summarized in Figures
+4-6
+The resulting convergence analysis indicates that neural
+networks exhibit a statistically signiﬁcant topological phase
+transition during learning which depends directly on the
+homological complexity of the data. For any dataset and
+any random homeomorphism applied thereto, the best error
+of architectures with ℓ layers and h hidden units (on the
+ﬁrst layer) is strictly limited in magnitude and convergence
+time byhphase. For example in Figure 4,ℓ = 3 layer neural
+networks fail to converge forh < hphase = 4 on datasets
+with homologyH(D5) = (Z2, Z1,... ).
+More generally, homological complexity directly effects the
+efﬁcacy of optimization in neural networks. As shown in
+Figure 5, taking any increasing progression of homologies
+against the average convergence time of a class of architec-
+tures yields an approximately monotonic relationship; in
+this case, convergence time athphase increases with increas-
+ingβp(D), and convergence time ath>h phase decreases
+with ﬁxedβp(D). A broader analysis for a varying number
+of layers is given in the appendix.
+Returning to the initial question of architecture selection,
+the analysis of empirical estimation ofEp
+H(f,D) provides
+the ﬁrst complete probabilistic picture of the homological
+expressivity of neural architectures. For architectures with
+ℓ∈{ 1, 2, 3, 4} andh0∈{ 0,..., 30} Figure 6 displays the
+estimated probability that (ℓ,h 0) expresses the homology
+of the decision region after training. Speciﬁcally, Figure
+6(top) indicates that, forℓ = 1 hidden layer neural networks,
+maxβ0(f)) is clearly Ω(h0). Examining ℓ = 2, 3, 4 in
+Figure 6(top), we conjecture6 that asℓ increases
+max
+f∈FA
+β0(f)∈ Ω(hℓ
+0)),
+6We note thatβ0(f ) does not depend onβ1(D) in the experi-
+ment for datasets withβ1(D)>β 0(D) were not generated.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 5. A scatter plot of the number of iterations required for
+single-layer architectures of varying hidden dimension to converge
+to 5% misclassiﬁcation error. The colors of each point denote the
+topological complexity of the data on which the networks were
+trained. Note the emergence of monotonic bands. Multilayer plots
+given in the appendix look similar.
+by application of Theorem 3.1 to the expressivity estimates.
+Therefore
+hphase≥C
+ℓ
+√
+β0(D). (3.1)
+Likewise, in Figure 6(bottom), each horizontal matrix gives
+the probability of expressingβ1(D)∈{ 1, 2} for each layer.
+This result indicates that higher order homology is extremely
+difﬁcult to learn in the single-layer case, and as ℓ→∞ ,
+maxf∈fAβ1(f)→n = 2, the input dimension.
+The importance of the foregoing empirical characterization
+for architecture selection is two-fold. First, by analyzing the
+effects of homological complexity on the optimization of dif-
+ferent architectures, we were able to conjecture probabilistic
+bounds on the learnable homological capacity of neural net-
+works. Thus, predictions of minimal architectures using
+those bounds are sufﬁcient enough to learn data homology
+up to homeomorphism. Second, the analysis of individual
+Betti numbers enables data-ﬁrst architecture selection using
+persistent homology.
+4. Topological Architecture Selection
+We have thus far demonstrated the discriminatory power
+of homological complexity in determining the expressivity
+of architectures. However, for homological complexity to
+have any practical use in architecture selection, it must
+be computable on real data, and more generally real data
+must have non-trivial homology. In the following section
+we present a method for relating persistent homology of
+any dataset to a minimally expressive architecture predicted
+by the foregoing empirical characterization, and then we
+experimentally validate our method on several datasets.
+Topological architecture selection is comprised of three
+steps: given a dataset, compute its persistent homology;
+Figure 6. A table of estimated probabilities of different neural ar-
+chitectures to express certain homological features of the data
+after training. Top: the probabilities of express homologies with
+increasingβ0 as a function of layers and neurons. Bottom: The
+probabilities of expressingβ1 ∈ {1, 2} as a function of layers and
+neurons.
+determine an appropriate scale at which to accept topologi-
+cal features as pertinent to the learning problem; and infer a
+lower-bound onhphase from the topological features at or
+above the decided scale.
+The extraction of static homology from persistence homol-
+ogy, while aesthetically valid (Carlsson et al., 2008), is
+ill-posed in many cases. For the purposes of architecture
+selection, however, exact reconstruction of the original ho-
+mology is not necessary. Given a persistence diagram,Dp
+containing the birthsbi and deathsdi of features inHp(D),
+letϵ be given and consider allαi = (bi,di) such that when
+|di−bi|>ϵ we assumeα to be a topological component
+of the real space. Then the resulting homologies form a
+ﬁltration Hϵ1
+p (D)⊂ Hϵ2
+p forϵ1,ϵ 2∈ R+. If ϵ is chosen
+such that certain topologically noisy features (Fasy et al.,
+2014) are included in the estimate ofhphase, then at worst
+the architecture is overparameterized, but still learns. Ifϵ is
+such that the estimatedhphase is underrepresentitive of the
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 7. Topological architecture selection applied to four different datasets. The persistent homology, the histogram of topological
+lifespans, and the predicted ˆhphase are indicated. For each test error plot, the best performance of one (blue), two (green), three (red), and
+four (light blue) layer neural networks are given in terms of the number of hidden units on the ﬁrst layer.
+topological features of a space, then at worst, the architec-
+ture is underparameterized but potentially close tohphase.
+As either case yields the solution or a plausibly useful seed
+for other algorithm selection algorithms (Zoph & Le, 2017;
+Feurer et al., 2015), we adopt the this static instantiation of
+persistence homology.
+In order to select an architecture (ℓ,h 0) lower-bounding
+hphase, we restrict the analysis to the case of ℓ = 1 and
+regress a multilinear model training on pairs
+(b0,b 1)↦→ arg min
+m
+Ep
+H(fm,D)≥ 1,β∗(D) = (b0,b 1)
+over allm hidden unit single layer neural networksfm and
+synthetic datasets of known homologyD from our previous
+experiments. The resultant discretization of the model gives
+a lower-bound estimate after applying the bound from (3.1):
+ˆhphase(β0,β 1)≥β1C
+ℓ
+√
+(β0) + 2 (4.1)
+Estimating this lower-bound is at the core of neural homol-
+ogy theory and is the subject of substantial future theoretical
+and empirical work.
+4.1. Results
+In order to validate the approach, we applied topologi-
+cal architecture selection to several binary datasets from
+the OpenML dataset repository (Vanschoren et al., 2013):
+fri_c, balance-scale, banana, phoneme, and
+delta_ailerons. We compute persistent homology of
+each of the two labeled classes therein and accept topo-
+logical features with lifespans greater than two standard
+deviations from the mean for each homological dimension.
+We then estimated a lowerbound onhphase for single hid-
+den layer neural networks using 4.1. Finally we trained
+100 neural networks for each architecture (ℓ,h 0) where
+h0∈{ 1, 3,..., 99} andℓ∈{ 1,..., 4}. During training we
+record the minimum average error for eachh0 and compare
+this with the estimate ˆhphase. The results are summarized
+in 4.
+These preliminary ﬁndings indicate that the empirically de-
+rived estimate ofhphase provides a strong starting point for
+architecture selection, as the minimum error at ˆhphase is
+near zero in every training instance. Although the estimate
+is given only in terms of 0 and 1 dimensional homology
+of the data, it still performed well for higher dimensional
+datasets such as phoneme and fri_c*. In failure cases,
+choice ofϵ greatly affected the predictedhphase, and thus
+it is imperative that more adaptive topological selection
+schemes be investigated.
+While our analysis and characterization is given for the the
+decision regions of individual classes in a dataset, it is plau-
+sible that the true decision boundary is topologically simple
+despite the complexity of the classes. Although we did
+not directly characterize neural network by the topology of
+their decision boundaries, recent work by Varshney & Ra-
+mamurthy (2015) provides an exact method for computing
+the persistent homology of a decision boundary between
+any number of classes in a dataset. It is the subject of future
+work to provide a statistical foundation for (Varshney &
+Ramamurthy, 2015) and then reanalyze the homological
+capacity of neural networks in this context.
+4.2. Homological Complexity of Real Data
+In addition to testing topological measures of complexity
+in the setting of architecture selection, we verify that com-
+mon machine learning benchmark datasets have non-trivial
+homology and the computation thereof is tractable.
+CIFAR-10. We compute the persistent homology of several
+classes of CIFAR-10 using the Python library Dionysus.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 8. The persistent homology barcodes of classes in the
+CIFAR-10 Datasets; The barcode for the dimensions 0 and 1 for
+the ’cars’ class along side different samples. Note how different
+orientations are shown.
+Current algorithms for persistent homology do not deal well
+with high dimensional data, so we embed the entire dataset
+in R3 using local linear embedding (LLE; (Saul & Roweis,
+2000)) withK = 120 neighbors. We note that an embed-
+ding of any dataset to a lower dimensional subspace with
+small enough error roughly preserves the static homology of
+the support of the data distribution distribution by Theorem
+2.2. After embedding the dataset, we take a sample of 1000
+points from example class ’car’ and build a persistent ﬁltra-
+tion by constructing a Vietoris-Rips complex on the data.
+The resulting complex has 20833750 simplices and took 4.3
+min. to generate. Finally, computation of the persistence
+diagram shown in Figure 8 took 8.4 min. locked to a single
+thread on a Intel Core i7 processor. The one-time cost of
+computing persistent homology could easily augment any
+neural architecture search.
+Although we only give an analysis of dimension 2 topo-
+logical features–and there is certainly higher dimensional
+homological information in CIFAR-10–the persistence bar-
+code diagram is rich with different components in both
+H0(D) andH1(D). Intuitively, CIFAR contains pictures of
+cars rotated across a range of different orientations and this
+is exhibited in the homology. In particular, several holes are
+born and die in the range ϵ∈ [0.15, 0.375] and one large
+loop fromϵ∈ [0.625, 0.82].
+UCI Datasets. We further compute the homology of three
+low dimensional UCI datasets and attempt to assert the of
+non-trivial , hphase. Speciﬁcally, we compute the persis-
+tent homology of the majority classes in the Yeast Protein
+Localization Sites, UCI Ecoli Protein Localization Sites,
+and HTRU2 datasets. For these datasets no dimensional-
+ity reduction was used. In Figure 8(left), the persistence
+barcode exhibits two separate signiﬁcant loops (holes) at
+ϵ∈ [0.19, 0.31] and ϵ∈ [0.76, 0.85], as well as two ma-
+jor connected components inβ0(D). The Other persistence
+diagrams are relegated to the appendix.
+5. Related Work
+We will place this work in the context of deep learning the-
+ory as it relates to expressivity. Since the seminal work of
+Cybenko (1989) which established standard universal ap-
+proximation results for neural networks, many researchers
+have attempted to understand the expressivity of certain neu-
+ral architectures. Pascanu et al. (2013) and MacKay (2003)
+provided the ﬁrst analysis relating the depth and width of
+architectures to the complexity of the sublevel sets they can
+express. Motivated therefrom, Bianchini et al. (2014) ex-
+pressed this theme in the language of Pfefferian functions,
+thereby bounding the sum of Betti numbers expressed by
+sublevel sets. Finally Guss (2016) gave an account of how
+topological assumptions on the input data lead to optimally
+expressive architectures. In parallel, Eldan & Shamir (2016)
+presented the ﬁrst analytical minimality result in expressiv-
+ity theory; that is, the authors show that there are simple
+functions that cannot be expressed by two layer neural net-
+works without exponential dependence on input dimension.
+This work spurred the work of Poole et al. (2016), Raghu
+et al. (2016) which reframed expressivity in a differential
+geometric lens.
+Our work presents the ﬁrst method to derive expressivity
+results empirically. Our topological viewpoint sits dually
+with its differential geometric counterpart, and in conjunc-
+tion with the work of (Poole et al., 2016) and (Bianchini
+et al., 2014). This duality implies that when topological
+expression is not possible, exponential differential expres-
+sivity allows networks to bypass homological constraints at
+the cost of adversarial sets. Furthermore, our work opens a
+practical connection between the foregoing theory on neural
+expressivity and architecture selection, with the potential to
+substantially improve neural architecture search (Zoph &
+Le, 2017) by directly computing the capacities of different
+architectures.
+6. Conclusion
+Architectural power is closely related to the algebraic topol-
+ogy of decision regions. In this work we distilled neural
+network expressivity into an empirical question of the gen-
+eralization capabilities of architectures with respect to the
+homological complexity of learning problems. This view
+allowed us to provide an empirical method for developing
+tighter characterizations on the the capacity of different ar-
+chitectures in addition to a principled approach to guiding
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+architecture selection by computation of persistent homol-
+ogy on real data.
+There are several potential avenues of future research in us-
+ing homological complexity to better understand neural ar-
+chitectures. First, a full characterization of neural networks
+with convolutional linearities and state-of-the-art topologies
+is a crucial next step. Our empirical results suggest that
+there are exact formulas describing the of power of neural
+networks to express decision boundaries with certain prop-
+erties. Future theoretical work in determining these forms
+would signiﬁcantly increase the efﬁciency and power of
+neural architecture search, constraining the search space by
+the persistent homology of the data. Additionally, we intend
+on studying how the topological complexity of data changes
+as it is propagated through deeper architectures.
+7. Acknowledgements
+We thank Greg Yang, Larry Wasserman, Guy Wilson, Dawn
+Song and Peter Bartlett for useful discussions and insights.
+References
+Betti, E. Il nuovo cimento. Series, 2:7, 1872.
+Bianchini, Monica et al. On the complexity of shallow and
+deep neural network classiﬁers. In ESANN, 2014.
+Bredon, Glen E. Topology and geometry , volume 139.
+Springer Science & Business Media, 2013.
+Carlsson, Gunnar, Ishkhanov, Tigran, De Silva, Vin, and
+Zomorodian, Afra. On the local behavior of spaces of
+natural images. International journal of computer vision,
+76(1):1–12, 2008.
+Cybenko, George. Approximation by superpositions of a
+sigmoidal function. Mathematics of Control, Signals, and
+Systems (MCSS), 2(4):303–314, 1989.
+Daniely, Amit, Frostig, Roy, and Singer, Yoram. Toward
+deeper understanding of neural networks: The power of
+initialization and a dual view on expressivity. In Ad-
+vances In Neural Information Processing Systems , pp.
+2253–2261, 2016.
+Dey, TK, Edelsbrunner, H, and Guha, S. Computational
+topology, invited paper in advances in discrete and com-
+putational geometry, eds. b. chazelle, je goodmann and r.
+pollack. Contemporary Mathematics, AMS, 1998.
+Eldan, Ronen and Shamir, Ohad. The power of depth for
+feedforward neural networks. In Conference on Learning
+Theory, pp. 907–940, 2016.
+Fasy, Brittany Terese, Lecci, Fabrizio, Rinaldo, Alessan-
+dro, Wasserman, Larry, Balakrishnan, Sivaraman, Singh,
+Aarti, et al. Conﬁdence sets for persistence diagrams. The
+Annals of Statistics, 42(6):2301–2339, 2014.
+Fernando, Chrisantha, Banarse, Dylan, Blundell, Charles,
+Zwols, Yori, Ha, David, Rusu, Andrei A., Pritzel, Alexan-
+der, and Wierstra, Daan. Pathnet: Evolution chan-
+nels gradient descent in super neural networks. CoRR,
+abs/1701.08734, 2017. URL http://arxiv.org/
+abs/1701.08734.
+Feurer, Matthias, Springenberg, Jost Tobias, and Hutter,
+Frank. Initializing bayesian hyperparameter optimization
+via meta-learning. In AAAI, pp. 1128–1135, 2015.
+Goodfellow, Ian, Bengio, Yoshua, and Courville, Aaron.
+Deep Learning . MIT Press, 2016. http://www.
+deeplearningbook.org.
+Guss, William H. Deep function machines: Generalized
+neural networks for topological layer expression. arXiv
+preprint arXiv:1612.04799, 2016.
+He, Kaiming, Zhang, Xiangyu, Ren, Shaoqing, and Sun,
+Jian. Deep residual learning for image recognition. CoRR,
+abs/1512.03385, 2015. URL http://arxiv.org/
+abs/1512.03385.
+Hinton, Geoffrey, Deng, Li, Yu, Dong, Dahl, George E, Mo-
+hamed, Abdel-rahman, Jaitly, Navdeep, Senior, Andrew,
+Vanhoucke, Vincent, Nguyen, Patrick, Sainath, Tara N,
+et al. Deep neural networks for acoustic modeling in
+speech recognition: The shared views of four research
+groups. IEEE Signal Processing Magazine, 29(6):82–97,
+2012.
+Kingma, Diederik P and Ba, Jimmy. Adam: A method for
+stochastic optimization. arXiv preprint arXiv:1412.6980,
+2014.
+Krizhevsky, Alex, Sutskever, Ilya, and Hinton, Geoffrey E.
+Imagenet classiﬁcation with deep convolutional neural
+networks. In Advances in neural information processing
+systems, pp. 1097–1105, 2012.
+MacKay, David JC. Information theory, inference and learn-
+ing algorithms. Cambridge university press, 2003.
+Mnih, V olodymyr, Kavukcuoglu, Koray, Silver, David,
+Graves, Alex, Antonoglou, Ioannis, Wierstra, Daan, and
+Riedmiller, Martin. Playing atari with deep reinforcement
+learning. arXiv preprint arXiv:1312.5602, 2013.
+Nair, Vinod and Hinton, Geoffrey E. Rectiﬁed linear units
+improve restricted boltzmann machines. In Proceedings
+of the 27th international conference on machine learning
+(ICML-10), pp. 807–814, 2010.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Pascanu, Razvan, Montufar, Guido, and Bengio, Yoshua. On
+the number of response regions of deep feed forward net-
+works with piece-wise linear activations. arXiv preprint
+arXiv:1312.6098, 2013.
+Poole, Ben, Lahiri, Subhaneil, Raghu, Maithreyi, Sohl-
+Dickstein, Jascha, and Ganguli, Surya. Exponential ex-
+pressivity in deep neural networks through transient chaos.
+In Advances In Neural Information Processing Systems,
+pp. 3360–3368, 2016.
+Raghu, Maithra, Poole, Ben, Kleinberg, Jon, Ganguli, Surya,
+and Sohl-Dickstein, Jascha. On the expressive power of
+deep neural networks. arXiv preprint arXiv:1606.05336,
+2016.
+Saul, Lawrence K and Roweis, Sam T. An introduction
+to locally linear embedding. unpublished. Available
+at: http://www. cs. toronto. edu/˜ roweis/lle/publications.
+html, 2000.
+Saxena, Shreyas and Verbeek, Jakob. Convolutional neural
+fabrics. CoRR, abs/1606.02492, 2016. URL http://
+arxiv.org/abs/1606.02492.
+Simonyan, Karen and Zisserman, Andrew. Very deep con-
+volutional networks for large-scale image recognition.
+CoRR, abs/1409.1556, 2014. URL http://arxiv.
+org/abs/1409.1556.
+Smith, Samuel L, Kindermans, Pieter-Jan, and Le, Quoc V .
+Don’t decay the learning rate, increase the batch size.
+arXiv preprint arXiv:1711.00489, 2017.
+Szegedy, Christian, Liu, Wei, Jia, Yangqing, Sermanet,
+Pierre, Reed, Scott E., Anguelov, Dragomir, Erhan,
+Dumitru, Vanhoucke, Vincent, and Rabinovich, An-
+drew. Going deeper with convolutions. CoRR,
+abs/1409.4842, 2014. URL http://arxiv.org/
+abs/1409.4842.
+Topaz, Chad M, Ziegelmeier, Lori, and Halverson, Tom.
+Topological data analysis of biological aggregation mod-
+els. PloS one, 10(5):e0126383, 2015.
+Vanschoren, Joaquin, van Rijn, Jan N., Bischl, Bernd, and
+Torgo, Luis. Openml: Networked science in machine
+learning. SIGKDD Explorations, 15(2):49–60, 2013. doi:
+10.1145/2641190.2641198. URL http://doi.acm.
+org/10.1145/2641190.2641198.
+Varshney, Kush R and Ramamurthy, Karthikeyan Natesan.
+Persistent topology of decision boundaries. In Acoustics,
+Speech and Signal Processing (ICASSP), 2015 IEEE In-
+ternational Conference on, pp. 3931–3935. IEEE, 2015.
+Wu, Yonghui, Schuster, Mike, Chen, Zhifeng, Le, Quoc V ,
+Norouzi, Mohammad, Macherey, Wolfgang, Krikun,
+Maxim, Cao, Yuan, Gao, Qin, Macherey, Klaus, et al.
+Google’s neural machine translation system: Bridging
+the gap between human and machine translation. arXiv
+preprint arXiv:1609.08144, 2016.
+Zomorodian, Afra and Carlsson, Gunnar. Computing per-
+sistent homology. Discrete & Computational Geometry,
+33(2):249–274, 2005.
+Zoph, Barret and Le, Quoc V . Neural architecture search
+with reinforcement learning. 2017. URL https://
+arxiv.org/abs/1611.01578.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+A. Proofs, Conjectures, and Formal
+Deﬁnitions
+A.1. Homology
+Homology is naturally described using the language of cat-
+egory theory. LetTop 2 denote the category of topological
+spaces andAb the category of abelian groups.
+Deﬁnition A.1 (Homology Theory, (Bredon, 2013)). A ho-
+mology theory on the onTop 2 is a functionH :Top 2→Ab
+assigning to each pair (X,A ) of spaces a graded (abelian)
+group{Hp(X,A )}, and to each mapf : (X,A )→ (Y,B ),
+homomorphisms f∗ : Hp(X,A ) → Hp(Y,B ), together
+with a natural transformation of functors∂∗ :Hp(X,A )→
+Hp−1(X,A ), called the connecting homomorphism (where
+we useH∗(A) to denoteH∗(A,∅)) such that the following
+ﬁve axioms are satisﬁed.
+1. If f ≃ g : ( X,A ) → (Y,B ) then f∗ = g∗ :
+H∗(X,A )→H∗(Y,B ).
+2. For the inclusionsi : A→ X andj : X→ (X,A )
+the sequence sequence of inclusions and connecting
+homomorphisms are exact.
+3. Given the pair (X,A ) and an open set U⊂ X such
+that cl(U) ⊂ int(A) then the inclusion k : (X−
+U,A−U)→ (X,A ) induces an isomorphism k∗ :
+H∗(X−U,A−U)→H∗(X,A )
+4. For a one point space P,Hi(P ) = 0 for alli̸= 0.
+5. For a topological sumX = +αXα the homomorphism
+⨁
+(iα)∗ :
+⨁
+Hn(Xα)→Hn(X)
+is an isomorphism, whereiα :Xα→X is the inclu-
+sion.
+For related deﬁnitions and requisite notions we refer the
+reader to (Bredon, 2013).
+A.2. Proof of Theorem 3.1
+Theorem A.2. LetX be a topological space and X + be
+some open subspace. IfF⊂ 2X such thatf∈F implies
+HS(f)̸=H(X +), then for allf∈F there existsA⊂X
+so thatf(A∩X +) ={0} andf(A∩ (X\X +)) ={1}.
+Proof. Suppose the for the sake of contraiction that for
+all f ∈F , HS(f)̸= H(X +) and yet there exists an f
+such that for all A⊂ X, there exists an x∈ A such that
+f(x) = 1. Then takeA ={x}x∈X, and note thatf maps
+each singleton into its proper partition onX. We have that
+for any open subset of V ⊂ X +, f(V ) = {1}, and for
+any closed subsetW⊂X\X +,f(W ) ={0}. Therefore
+X + =⋃
+A∈τX+ ∩X
+A⊂supp(f) as the subspace topology
+τX +∩X =τX +∩τX whereτX + ={A∈τX|A⊂X +}
+andτX denotes the topology ofX. Likewise,int(X−)⊂
+X\supp(F ) under the same logic. Therefore supp(f) has
+the exact same topology as X + and so by Theorem 2.2
+H(X +) = H(supp(f)) but this is a contradiction. This
+completes the proof.
+B. Additional Figures
+See next page.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 9. A scatter plot of the number of iterations required for architectures of varying hidden dimension and number of layers to
+converge to 5% misclassiﬁcation error. The colors of each point denote the topological complexity of the data on which the networks were
+trained. Note the emergence of convergence bands.
+Figure 10. The topological persistence diagrams of several datasets. In each plot, the barcode diagram is given for 0 and 1 dimensional
+features along with a 2-dimensional embedding of each dataset. Note that we do not compute the homologies of the datasets in the
+embeeding with the exception of CIFAR.
+On Characterizing the Capacity of Neural Networks using Algebraic Topology
+Figure 11. Additional topological phase transitions in low dimensional neural networks as the homological complexity of the data
+increases. The upper right corner of each plot is a dataset on which the neural networks of increasing ﬁrst layer hidden dimension are
+trained.

@@ -1,0 +1,1604 @@
+Low-dimensional topology of deep neural networks
+Junyu Ren 1 Lek-Heng Lim 1
+Abstract
+We study layered models, including feedforward
+networks, ResNets, and transformers, by limiting
+each layer to a width ofd= 3 , i.e., R3 as represen-
+tation space. This allows us to track how a neural
+network changes low-dimensional topological in-
+variants through its layers. Just about any topolog-
+ical structure may be simplified or even trivialized
+by simply increasing dimension; e.g., any knot is
+equivalent to an unknot in R4. By restricting to
+R3, we not only isolate the effects of activation
+and depth from that of width, we work in a space
+that lends itself to easy visualization. We focus
+onlinking numberhere, deferring other invariants
+like link groups, Milnor’s ¯µ-invariants, knot types,
+ambient cobordisms, to a sequel. We provide
+full proofs and empirical experiments to justify
+the following insights: When measured by their
+power to effect changes in linking numbers, the
+layer-skipping feature in ResNets is as powerful
+as the attention mechanism in transformers; both
+ResNets and transformers are strictly more power-
+ful than feedforward neural networks with mono-
+tonic activations, which are in turn more powerful
+than invertible and flow-based models; but replac-
+ing monotonic activation with a nonmonotonic
+one elevates a feedforward network into the same
+expressivity class as ResNets and transformers.
+These results suggest that low-dimensional topol-
+ogy can be a useful tool to guide designs of AI
+architectures. We also generalize our results from
+d= 3to arbitraryd >3.
+1. Introduction
+The last 50 years in topology has arguably been the half-
+century oflow-dimensional topology, with many astounding
+groundbreaking advances in the topology of 3-manifolds
+1University of Chicago, Chicago, IL, USA. Correspondence to:
+Junyu Ren<junyuren@uchicago.edu>.
+Proceedings of the 43 rd International Conference on Machine
+Learning, Seoul, South Korea. PMLR 306, 2026. Copyright 2026
+by the author(s).
+(Wall, 1984; Birman, 1991; Lott, 2007) and 4-manifolds
+(Atiyah, 1987; Milnor, 1987). We will show how innovative
+topological invariants developed to study low-dimensional
+(i.e., 3- or 4-dimensional) manifolds may be put to good use
+in the analysis and design of modern AI models.
+We begin with a simple example. Consider two interlocking
+rings in R3, the Hopf link. Can a neural network learn to
+classify points on these rings into their respective connected
+components? This deceptively simple question reveals deep
+connections between topology and machine learning. Under
+the manifold hypothesis (Bengio et al., 2013), real-world
+data concentrates near low-dimensional manifolds embed-
+ded in high-dimensional space. When class manifolds are
+topologically entangled, like in a Hopf link, classification
+requiresone to geometrically “untangle” them. We will
+see how such topological obstructions impose fundamental
+constraints on neural network architectures. Due to space
+constraints, we limit ourselves to one specific invariant, the
+linking number, to illustrate our general framework of us-
+ing low-dimensional topological invariants to study neural
+network architectures. A companion paper treats more so-
+phisticated invariants in detail (Ren & Lim, 2026).
+We emphasize that dimension itself is a powerful, if not all-
+powerful, attribute in machine learning (Cover, 1965; Cortes
+& Vapnik, 1995) — there is almost nothing that one cannot
+do through simply increasing dimension, including effecting
+topological changes; although curse-of-dimensionality often
+also accompanies a dimension increase. The flip side of this
+coin is that dimension is a factor that masks the effects of all
+other aspects of a neural network architecture. Our approach
+removes this confounding factor by fixing width throughout,
+first atd= 3, and later increasing it to higherd.
+Existing neural network theory largely ignores topologi-
+cal structure other than dimension (a topological invariant).
+Universal approximation theorems (Cybenko, 1989; Hornik
+et al., 1989) show that sufficiently wide networks approxi-
+mate any function, but say nothing about which architectures
+succeed on which data. Depth–width tradeoffs (Telgarsky,
+2016; Eldan & Shamir, 2016) and approximation rates (Bar-
+ron, 1993; Yarotsky, 2017) characterize function complexity,
+not data complexity. Topological data analysis (Carlsson,
+2009) studies intrinsic data shape but not how embeddings
+in ambient space constrain learning. Meanwhile, practi-
+1
+arXiv:2606.31856v1  [cs.LG]  30 Jun 2026
+Low-dimensional topology of deep neural networks
+(a)point cloud data with linked supports
+ (b)convex decision regions containing linked
+classes must intersect
+(c)classes separated by a hyperplane cannot
+be linked
+Figure 1.Linked supports create a topological obstruction to classification: linked class manifolds cannot be contained in disjoint convex
+decision regions, while hyperplane-separated classes are necessarily unlinked.
+tioners have observed that certain architectural features like
+skip connections, nonmonotonic activations, attention, etc,
+consistently outperform alternatives. Engineering reasons
+have been proffered for some of these: training stability,
+information flow, incremental layer-wise transformations,
+etc. We will provide a topological perspective.
+When does topological structure create fundamental barri-
+ers for neural networks, and which mechanisms overcome
+them? The Hopf link (Figure 1) provides a canonical exam-
+ple: two interlocking circles with linking number link = 1,
+measuring how many times one curve winds through the
+other. Linear separability requires link = 0 . Indeed, if a
+hyperplane separates two curves, each curve can be con-
+tinuously contracted to a point inside its own half-space
+without ever leaving it, yielding a link homotopy to a dis-
+joint pair of points whose linking number is zero. We prove
+that width-3 feedforward networks with ReLU activations
+preservelinking numbers: invertible affine layers preserve
+link as homeomorphisms, and monotonic activations pre-
+serve link via straight-line homotopies. Since the Hopf
+link has link = 1̸= 0 , no such network can achieve lin-
+ear separability, regardless of depth. Similarly, decision
+regions cannot be made disjoint and convex, so logit-based
+classifiers cannot achieve perfect accuracy.
+How do modern architectures escape from such topological
+traps? The key isfolding: coordinate-wise nonmonotonic
+transformations like the absolute value |x|. A ResNet block
+can synthesize |x|=x+ 2·ReLU(−x) using only ReLU
+and skip connections. Nonmonotonic activations (GELU,
+Swish) fold directly. Attention mechanisms create input-
+dependent convex combinations that locally approximate
+folding. These mechanisms break the homotopy argument
+underlying our impossibility theorems, enabling topological
+transformations that monotonic networks cannot perform.
+Our contributions.We study the expressivity and learn-
+ability of neural network with low-dimensional topology:
+1. Topology–ML connection.We prove that classification
+of linked datarequiresunlinking before a linear readout
+(Proposition 3.6).
+2. Topological expressivity.We prove that width-d feedfor-
+ward networks with continuous coordinate-wise mono-
+tonic activations cannot separate linked manifolds in Rd
+(Sections 3–4). As a corollary, universal approximation
+with such activations requires width at least d+ 1 . We
+then show that skip connections, attention, nonmono-
+tonic activations, and width expansion all provide ways
+to fold the data representation and thereby unlink linked
+manifolds (Section 5).
+3. Learnability beyond expressivity.Experiments on
+Hopf links and higher-dimensional linked spheres show
+that limited topological expressivity imposes an accuracy
+ceiling under our training protocol. Further experiments
+on synthetic data and CIFAR-10 show that architectures
+with folding mechanisms gain a classification advantage,
+and this advantage is more pronounced at data points
+near the links (Section 6).
+4. Extrinsic TDA.We present an algorithm for estimat-
+ing linking between class manifolds from point-cloud
+samples, using spatial graphs, cycle bases, and Gauss
+integrals. Applied to CIFAR-10, the algorithm shows
+that class pairs with stronger linking tend to be harder
+for topologically less expressive architectures to classify
+(Section 6.6).
+Table 1 offers a preview of our main expressivity results:
+which architectures can perform which topological transfor-
+mations under width constraints. We will develop the theory
+in Sections 3–5, validate predictions experimentally in Sec-
+tion 6, and demonstrate real-world relevance via CIFAR-10
+linking detection in Section 6.6.
+2
+Low-dimensional topology of deep neural networks
+Table 1.Topological expressivity of width- d architectures, scored
+on the linking/folding transformations studied here. ✗ = cannot
+perform under our hypotheses; ✓= can perform via the construc-
+tion we give.AH: Ambient homeomorphism (flow-based models,
+Neural ODEs).FM: Feedforward monotonic (ReLU, sigmoid,
+tanh).AE: Autoencoder with width- d bottleneck.FN: Feedfor-
+ward nonmonotonic (GELU, Swish).R: ResNet.T: Pure trans-
+former (two-token attention construction of Theorem 5.3).
+Topological Transformation AH FM AE FN R T
+Deform shapes (no topological change) ✓ ✓ ✓ ✓ ✓ ✓
+Merge connected components ✗✓ ✓ ✓ ✓ ✓
+Fill up holes ✗✓ ✓ ✓ ✓ ✓
+Unlink 2-component link ✗ ✗ ✗✓ ✓ ✓
+2. Related Work
+Topological data analysis extracts intrinsic shape features
+(holes, connected components) via persistent homology
+(Carlsson, 2009; Edelsbrunner & Harer, 2010; Cang & Wei,
+2017). Naitzat et al. (2020) study how deep networks change
+Betti numbers of data manifolds; we study how narrow
+networkspreservelinking numbers, an extrinsic invariant
+depending on how manifolds are embedded in an ambient
+space, not an intrinsic invariant of a manifold itself like the
+Betti numbers. This extrinsic perspective connects to early
+intuitions about neural networks “untangling” data (Olah,
+2014). Recent works have identified other topological limi-
+tations: higher-order message-passing cannot compute ho-
+mology (Eitan et al., 2025), E(3)-invariant GNNs cannot
+distinguish enantiomers (Dumitrescu et al., 2025), and topo-
+logical obstructions constrain generative models (Esmaeili
+et al., 2023). These concern what networks candetect; we
+study what they cantransform, a question also relevant
+to world models that must represent geometric structure
+(LeCun, 2022). Width bounds for universal approximation
+(Hanin & Sellke, 2017; Johnson, 2019; Rochau et al., 2024)
+show that width-d networks cannot approximate all func-
+tions on Rd; we on the other hand show that arbitrarily deep
+width-d networks cannot separate linked data in Rd. Neu-
+ral networks for molecular dynamics lift R3 coordinates to
+64- to 384-dimensional features (Sch¨utt et al., 2017; Sator-
+ras et al., 2021; Jumper et al., 2021); our theory offers a
+topological rationale for this practice.
+3. The Hopf Link: An Intuitive Example
+Consider two interlinked circles in 3D space forming the
+Hopf link (for topological background, see Rolfsen, 1976;
+Hatcher, 2002).
+Question:Can a width-3 ReLU network classify
+points on these circles into separate classes?
+Here a width-d feedforward network is F=A L ◦σ ◦· · ·◦σ ◦
+A1 with affine Ai(x) =W ix+b i, Wi ∈R d×d, and coordi-
+natewise activation σ, e.g., ReLU. Our results apply to any
+architecture whose intermediate representations have dimen-
+sions ≤d after flattening any spatial axes and whose non-
+linearities are coordinatewise. This includes CNNs, since
+convolutional layers are affine maps and the flattened repre-
+sentation size C·H·W is the operative width, as well as
+bottleneck autoencoders with width-dbottlenecks.
+Example 3.1(The Hopf link).TheHopf linkconsists of
+two interlinked circles inR 3 given parametrically by
+X(t) = (cos(t),sin(t),0),
+Y(s) = (1 + cos(s),0,sin(s)),
+for t, s∈[0,2π] . These two circles are topologically linked
+with link(X, Y) = 1, meaning they cannot be separated
+without cutting one of the curves.
+Classifying samples from the two Hopf link circles exposes
+a topological constraint on narrow neural networks; we
+develop the argument step by step, leaving technical details
+to Appendix C.
+3.1. Linking Numbers
+The core of our argument is a topological invariant that
+quantifies how two closed curves are intertwined in 3D
+space.
+Definition 3.2(Linking number).Let X, Y⊂R 3 be two
+disjoint, oriented, simple closed curves. Thelinking number
+link(X, Y)is defined by the Gauss integral:
+link(X, Y) = 1
+4π
+I
+X
+I
+Y
+(x−y)·(dx×dy)
+|x−y| 3 .
+This measures the degree of the Gauss mapG:X×Y→S 2
+given by G(x, y) = (x−y)/∥x−y∥ . The linking number
+is always an integer. For the Hopf link,link(X, Y) =±1.
+There is an equivalent combinatorial formula: For any regu-
+lar projectionπ:R 3 →R 2,
+link(X, Y) = 1
+2
+X
+p∈π(X)∩π(Y)
+ϵp
+whereϵ p =±1is the sign of each crossing.
+3.2. Network Operations and Linking Number
+Preservation
+We analyze each layer type in a width-3 ReLU network
+through the following key lemmas.
+Definition 3.3(Homotopy).Ahomotopybetween two
+continuous maps f, g:X→Z is a continuous func-
+tion H:X×[0,1]→Z such that H(x,0) =f(x)
+and H(x,1) =g(x) for all x∈X . Intuitively, H pro-
+vides a continuous “interpolation” from f to g, deform-
+ing f(X) to g(X) within Z. Thestraight-line homotopy
+3
+Low-dimensional topology of deep neural networks
+Figure 2.Rank-deficient transformations force intersection.
+R3:link̸= 0
+f
+R2: intersection
+Ht(x) = (1−t)f(x) +tg(x) is the simplest example when
+Z=R n.
+Lemma 3.4(Homotopy invariance).If X ′ is homotopic to
+Xvia a homotopy avoidingY, then
+link(X ′, Y) = link(X, Y).
+Proof sketch. The function t7→link(X t, Y)is continuous
+and integer-valued on[0,1], hence constant.
+Lemma 3.5(Rank-deficient intersection).Let X, Y⊂R 3
+be disjoint curves with link(X, Y)̸= 0 . For any rank-
+deficient affinef:R 3 →R 3, we havef(X)∩f(Y)̸=∅.
+Proof sketch. Reduce via SVD to projection. If projected
+curves were disjoint, the combinatorial formula giveslink =
+0, contradiction.
+3.3. Classification Requires Unlinking
+Linear separability is the goal of representation learning for
+classification: the final layer (classifier head) applies a linear
+transformation to features, so perfect classification requires
+that class representations become linearly separable. The
+task imposes a strict topological constraint:
+Proposition 3.6(Linear readouts require unlinking).Let
+X, Y⊂R 3 be disjoint oriented closed curves with
+link(X, Y)̸= 0 . If a continuous feature map F:
+R3 →R 3 makes F(X) and F(Y) linearly separable, then
+link(F(X), F(Y)) = 0 ; the feature map must unlink the
+classes.
+Proof. A separating hyperplane H puts F(X) in one open
+half-space and F(Y) in the other. Each half-space is convex,
+so straight-line contractions of F(X) and F(Y) to points p
+and q inside their respective half-spaces stay disjoint. This
+gives a link homotopy to two point components. At the
+endpoint, the Gauss map is constant, hence has degree zero;
+by link-homotopy invariance, link(F(X), F(Y)) = 0.
+This exposes the conflict: to classify the Hopf link perfectly,
+a network must change the linking number from±1to0.
+3.4. Separation Impossibility for the Hopf Link
+Theorem 3.7(Link separation impossibility).Let X, Y⊂
+R3 be disjoint simple closed curves with link(X, Y)̸= 0 .
+Let F:R 3 →R 3 be any width-3 feedforward network
+with affine transformations and ReLU activations. Then
+F(X) and F(Y) are not linearly separable, and perfect
+classification is impossible.
+Proof sketch. Assume for contradiction that linear
+separability is achieved. Proposition 3.6 gives
+link(F(X), F(Y)) = 0 ; moreover, any intermediate
+collision between the two class images would propagate
+through later layers and prevent final linear separation, so
+the class images stay disjoint throughout the network. We
+analyze each layer:
+Invertible affine layers:Homeomorphisms of R3 preserve
+linking numbers (up to sign).
+ReLU activations:We apply homotopiesone coordinate
+at a time. For coordinate i, define H (i)
+t that interpolates
+xi →ReLU(x i) while other coordinates stay fixed. Sup-
+pose paths collide: H (i)
+t (x)i =H (i)
+t (y)i for some t. If
+xi ≥0 , the path is constant at xi; if xi <0 , it tra-
+verses [xi,0] . In all cases, collision implies ReLU(xi) =
+ReLU(yi). Since σ(X)∩σ(Y) =∅ by assumption, no
+collision occurs. Concatenating H (1), H(2), H(3) gives
+link(σ(X), σ(Y)) = link(X, Y).
+Rank-deficient layers:By Lemma 3.5, these create inter-
+sections whenlink̸= 0.
+Since ReLU preserves link and invertible affines preserve
+it up to sign, changing it from non-zero to zero requires
+rank-deficient layers. But these force intersections.
+This example demonstrates the core mechanism: linking
+numbers create barriers that narrow monotonic networks
+cannot overcome, regardless of depth. The next section
+generalizes to higher-dimensional linked manifolds and ar-
+bitrary coordinate-wise monotonic activations.
+4. Higher Dimension, More Activations
+The Hopf link example gives the core mechanism in a visual
+setting. In this section we switch notation from the curves
+X, Y⊂R 3 of Section 3 to manifolds M m, Nn ⊂R d, and
+generalize from ReLU to arbitrary coordinate-wise mono-
+tonic activations.
+4.1. Higher-Dimensional Linking Numbers
+The concept of linking generalizes from curves to higher-
+dimensional manifolds. For two closed, oriented, disjoint
+manifolds M m and N n in ambient space Rd where d=
+4
+Low-dimensional topology of deep neural networks
+m+n+ 1, the linking number is well-defined via degree.
+In the layerwise arguments below, F denotes the compo-
+sition of the first j network layers, for some j, applied
+to both manifolds. The images F(M) and F(N) may
+no longer be manifolds; whenever they remain disjoint,
+link(F(M), F(N)) means the linking number of the maps
+F ◦ ιM and F ◦ ιN parametrizing the images F(M) and
+F(N).
+Definition 4.1(Higher-dimensional linking number).For
+two disjoint, closed, oriented manifolds M m and N n in Rd
+where d=m+n+ 1 , the linking number link(M, N)is
+defined via the Gauss map G:M×N→S d−1 given by
+G(x, y) = (x−y)/|x−y|:
+link(M, N) = deg(G)
+wheredeg(G)is the topological degree.
+Example 4.2(Higher Hopf links: Sn ⊔S n in R2n+1).Two
+n-spheres can be linked in R2n+1 with link =±1 . For n=
+1, this recovers the classical Hopf link (S1 ⊔S 1 ⊂R 3). For
+n= 2 , we obtain linked 2-spheres S2 ⊔S 2 ⊂R 5, which we
+use in experiments (Section 6.5). The construction embeds
+each sphere into complementary coordinate subspaces via
+stereographic projection.
+The key lemmas from Section 3 generalize:
+Lemma 4.3(Higher-dimensional homotopy invariance).
+Let M m, Nn ⊂R d (with d=m+n+ 1 ) be disjoint
+manifolds. If M ′ is homotopic to M via a homotopy avoid-
+ingN, thenlink(M ′, N) = link(M, N).
+Lemma 4.4(Higher-dimensional linear separability).If
+M m and N n in Rd (with d=m+n+ 1 ) are linearly
+separable, thenlink(M, N) = 0.
+Theorem 4.5(Higher-dimensional separation impossibility).
+Let M m and N n be disjoint, closed, oriented manifolds in
+Rd (with d=m+n+ 1 ) such that link(M, N)̸= 0. Then
+no width-d feedforward network with affine transformations
+and coordinate-wise monotonic activations can linearly
+separate M and N, and perfect classification is impossible.
+Proof sketch. The argument follows Theorem 3.7: invert-
+ible affines preserve link up to sign as homeomorphisms;
+monotonic activations preserve link via the same straight-
+line homotopy argument (which works in any dimension);
+rank-deficient transformations force intersections when
+link̸= 0.
+4.2. General Monotonic Activations
+The Hopf link analysis used ReLU, but the impossibil-
+ity extends to anycoordinate-wise monotonicactivation
+σ(x) = (σ1(x1), . . . , σn(xn)) where each σi is continuous
+and monotonic, e.g., sigmoid, tanh, Leaky ReLU, ELU. This
+ReLU Sigmoid
+Tanh
+Leaky
+Abs GELU Swish Mish
+Figure 3.Monotonic (top) vs nonmonotonic (bottom) activations.
+shows the obstruction is fundamental to monotonicity, not
+an artifact of ReLU’s piecewise-linear form.
+The key to generalizing beyond ReLU is the concept oflink
+homotopy: a simultaneous continuous deformation of multi-
+ple components that keeps them disjoint throughout. Unlike
+single-component homotopy, where one set moves while
+others stay fixed, link homotopy moves all components to-
+gether via the same formula Ht(x) = (1−t)x+tσ(x) .
+This simultaneity is essential: if only one component moves,
+it can collide with stationary components even for nonde-
+creasing activations.
+Lemma 4.6(Monotonic activation preservation).Let σ:
+Rd →R d be coordinate-wise monotonic with r nonincreas-
+ing coordinates. If M, N⊂R d are disjoint compact mani-
+folds such thatσ(M)andσ(N)remain disjoint, then:
+link(σ(M), σ(N)) = (−1)r link(M, N)
+Proof sketch. The straight-line homotopy Ht(x) = (1−
+t)x+tσ(x) applied simultaneously to bothM and N defines
+a link homotopy when σ is nondecreasing: if xi < yi,
+then monotonicity gives σi(xi)≤σ i(yi), so Ht(x)i <
+Ht(y)i for t∈[0,1) , and the assumed disjointness σ(M)∩
+σ(N) =∅ at t= 1 rules out a collision at the endpoint.
+For nonincreasing coordinates, we decompose σ=R ◦ σ′
+where σ′ is nondecreasing and R is the output reflection
+negating those coordinates; reflections contribute the sign
+factor(−1) r.
+Theorem 4.7(General impossibility theorem).Let
+M m, Nn ⊂R d be disjoint closed oriented submanifolds
+with complementary dimension m+n+ 1 =d and
+link(M, N)̸= 0. Let F:R d →R d be any width-d feedfor-
+ward network with affine transformations and coordinate-
+wise monotonic activations. Then F(M) and F(N) are not
+linearly separable, and perfect classification is impossible.
+Proof sketch. By Lemma 4.6, monotonic activations pre-
+serve link up to sign via link homotopy. The proof structure
+of Theorem 3.7 carries through: invertible affines preserve
+link up to sign, monotonic activations preserve link up to
+sign, and since link̸= 0 implies ±link̸= 0 , rank-deficient
+5
+Low-dimensional topology of deep neural networks
+Step 1 Step 2 Step 3 Step 4 Step 5
+Figure 4.Hopf link unlinking via |x| activations (full resolution:
+Figure 9).
+layers are required to achieve link = 0. But rank-deficient
+layers force intersections.
+The result applies equally to smooth activations (sigmoid,
+tanh) and piecewise-linear activations (ReLU): the crucial
+property is monotonicity, not differentiability. Thus the topo-
+logical barrier is intrinsic to the coordinate-wise monotonic
+structure.
+5. Breaking Topological Constraints:
+Architectural Mechanisms
+The impossibility results in Sections 3–4 demonstrate funda-
+mental limitations of narrow networks with coordinate-wise
+monotonic activations. These constraints can be overcome
+through architectural approaches while preserving narrow
+width. We explore four complementary mechanisms, with
+supporting constructions in Appendices D and F.
+5.1. Non-Monotonic Activation Functions
+The first approach breaks the monotonicity constraint un-
+derlying our impossibility theorems. While ReLU and other
+monotonic activations preserve topological rigidity, non-
+monotonic functions create geometric flexibility needed to
+overcome linking obstructions.
+Important nonmonotonic activations (Figure 3, bottom) in-
+clude GELU (Hendrycks & Gimpel, 2016) (x·Φ(x) , stan-
+dard in Transformers), Swish/SiLU (Ramachandran et al.,
+2017; Elfwing et al., 2018) ( x·σ(x) ), and Mish (Misra,
+2020) ( x·tanh(softplus(x)) ). The impossibility results
+critically depend on Lemma 3.4: monotonic activations
+preserve linking numbers via straight-line homotopies that
+avoid intersections. This fails for nonmonotonic functions.
+Example 5.1(Nonmonotonic unlinking).Coordinate-wise
+|x| can unlink the Hopf link through “folding” operations
+that collapse signed coordinates into the positive octant. By
+translating data appropriately, each folding layer affects only
+one coordinate at a time: (x1, x2, x3)7→(|x 1|, x2, x3)7→
+(|x1|,|x 2|, x3)7→ · · ·Figure 4 illustrates.
+The same recipe extends to any activation σ that has a strict
+local extremum on an open interval I⊂R , e.g., GELU
+near −0.5, Swish near −1.3, Mish near a similar point: for
+compact data, affine layers rescale the relevant coordinate
+into I, and the nonmonotonicity of σ|I breaks the same
+x
++
+2 ReLU(−x)
+=
+|x|
+(a)ResNet identity
+x
+g(x)
+(b)attention V-shape
+Figure 5.Mechanisms for expressing non-monotonicity in coordi-
+nates with monotonic activation functions.
+homotopy-disjointness argument that fails for| · |.
+5.2. Skip Connections and Residual Networks
+Residual networks (He et al., 2016) maintain monotonic acti-
+vations but break the purely feedforward constraint through
+skip connections. The key insight is that ResNet can express
+nonmonotonic functions:
+Theorem 5.2(ResNet topological expressivity).Width- n
+ResNet architectures using only ReLU activations can per-
+form the same topological transformations as networks with
+nonmonotonic activations, including unlinking.
+Proof sketch. ResNet blocks F(x) =x+G(x) can express
+absolute value via the identity:
+|x|=x+ 2 ReLU(−x)(1)
+Setting G(x) = 2 ReLU(−x) yields F(x) =|x| . This
+enables the same coordinate-wise folding operations as non-
+monotonic activations.
+While ResNets can be viewed as discretizations of Neu-
+ral ODEs (Chen et al., 2018), the discrete formulation is
+strictly more expressive for topological transformations.
+Neural ODEs generate continuous flows (diffeomorphisms)
+that must preserve topological invariants. Discrete ResNet
+blocks can implement folding maps that change these invari-
+ants; the |x|=x+ 2 ReLU(−x) identity relies crucially on
+discrete, non-infinitesimal residuals.
+5.3. Attention Mechanisms
+The Transformer architecture (Vaswani et al., 2017) intro-
+duces self-attention mechanisms enabling global informa-
+tion routing. We study the topological expressivity of atten-
+tion by consideringpure transformers.
+Theorem 5.3(Two-token attention as a coordinate fold).
+For each input coordinate xi there is a single-head two-
+token attention layer (with distinct positional encodings
+(p1, p2) and scalar query/key/value/output weights) whose
+output g(xi) has a strict local minimum at xi = 0 and
+is monotonically decreasing on a left interval and mono-
+tonically increasing on a right interval, giving a smoothed
+V-shape that approximates |xi| near the origin. Applying
+6
+Low-dimensional topology of deep neural networks
+this construction coordinate-wise yields a pure-transformer
+realization of the coordinate-wise fold used in our unlinking
+construction, after an affine pre-shift that rescales the data
+into the V-shape’s effective region.
+Proof sketch. Use a two-token input (xi, xi) (or a copy-
+token preamble): with distinct positional encodings the
+second-position attention weight reduces to a sigmoid in
+q2(k1 −k 2), and an explicit choice of scalar weights pro-
+duces the V-shape (Figure 5b). The construction is a per-
+coordinatelocalsurrogate for | · |, not a global approxima-
+tion; it suffices for the topological transformation because
+the unlinking construction depends only on the existence of
+a coordinate-wise nonmonotonic fold on the data domain,
+not on exact equality with| · |.
+5.4. Width Threshold and Design Implications
+Width ≥d+ 1 eliminates the classification obstruction.
+Our impossibility results are tight: width-(d+ 1) ReLU net-
+works achieve universal approximation on compact subsets
+of Rd (Hanin & Sellke, 2017), and subsequent work sharp-
+ens minimum-width thresholds for ReLU, leaky-ReLU, and
+compact-domain settings (Park et al., 2021; Cai, 2023; Li
+et al., 2023; Kim et al., 2024). This suffices to map any
+disjoint configuration of class manifolds into disjoint scalar
+class labels, i.e., to achieve linear separability; it does not
+require “unlinking” as an ambient-topology operation, only
+producing the right value of a continuous label function.
+Design guidance.For topologically complex data, width
+should be read locally as well as globally: a wide model may
+contain concrete narrow maps, such as the dmodel →d k, dv
+projections in a single attention head, a latent bottleneck,
+or the reduced channel inside a bottleneck residual block.
+In such settings: (1) expand MLP width slightly beyond
+input dimension before narrowing; (2) prefer nonmonotonic
+activations (GELU, SiLU, Mish) in bottleneck layers; (3)
+use skip connections; or (4) leverage attention. These mech-
+anisms change topology directly rather than relying solely
+on dimension expansion.
+6. Experiments
+We validate our theoretical results with experiments on the
+Hopf link classification task. These experiments verify both
+the impossibility results for monotonic activations and the
+escape mechanisms described in the previous section, with
+experimental and detection details in Appendices G–I.
+6.1. Experimental Setup
+Thickened Hopf link.We construct volumetric data by
+sampling points from two thickened interlinked tori. Each
+curve is thickened by adding small perturbations normal to
+Table 2.Held-out accuracy (%) on Hopf link classification across
+depths, ReLU vs GELU (30 seeds per cell). Rows report mean,
+std, and maximum over seeds.
+Model Stat 3 5 8 12 16 20
+mean 84.3 77.1 63.1 57.7 53.5 50.3
+ReLU std 9.1 18.7 18.1 15.1 9.9 1.8
+max 92.8 92.5 92.6 91.6 91.4 54.4
+mean 89.3 90.0 91.1 91.2 72.8 52.8
+GELU std 2.6 2.8 3.1 2.0 19.7 9.8
+max 92.9 100.0 100.0 100.0 92.6 90.1
+Table 3.Held-out accuracy (%) on Hopf link classification across
+depths, plain ReLU vs ResNet (30 seeds per cell). Rows report
+mean, std, and maximum over seeds.
+Model Stat 3 4 5 6 7 8
+mean 83.9 76.5 74.3 69.9 64.8 66.2
+Plain std 10.1 15.2 18.1 19.9 18.7 19.0
+max 92.0 92.3 91.2 91.9 91.5 91.5
+mean 97.5 97.3 98.5 96.6 97.5 97.5
+ResNet std 4.4 3.6 2.4 3.8 3.1 3.0
+max 100.0 100.0 100.0 100.0 100.0 100.0
+the curve surface. Dataset: 6000 points (3000 per class),
+split 80/20 train/validation.
+Training protocol.Adam/AdamW with learning rate 10−3,
+up to 800 epochs with early stopping (patience 100–200).
+Cross-entropy loss.
+6.2. ReLU vs GELU on Hopf Link
+We compare monotonic (ReLU) versus nonmonotonic
+(GELU) activations across 12 depths (3–20 layers) with
+30 random seeds each (720 total experiments).
+Table 2 confirms the theory: ReLU stays at or below the
+topological ceiling and degrades with depth as optimiza-
+tion difficulty compounds the expressivity barrier (Theo-
+rem 3.7); GELU consistently achieves ∼90% at moderate
+depths, breaking the barrier. At extreme depths ( ≥16 )
+both activations suffer optimization instability (large stds).
+Across 30 seeds, GELU’s best run reaches100.0% at depths
+5–12 while ReLU never exceeds 92.8%, matching the pre-
+diction.
+6.3. ResNet vs Plain ReLU
+We compare plain ReLU feedforward networks against
+ReLU ResNets, both at width 3.
+Across 30 seeds, ResNet reaches a100% best run at every
+depth from 3 to 8, and mean accuracy stays at 96.6–98.5%
+across all depths. Plain ReLU never exceeds 92.3% and has
+much lower means with high seed variance, confirming both
+7
+Low-dimensional topology of deep neural networks
+Figure 6.ResNet skip connection implementing |x|=x+
+2 ReLU(−x)on linked disk-annulus (pt- S1 link). (a) Input x.
+(b) Residual branch f(x)≈2 ReLU(−x) . (c) Output x+f(x) :
+folding separates components.
+Table 4.Best test accuracy (%) across 100 seeds for total linking
+number k, i.e., k disjoint copies of linked S2 ⊔S 2, in R5. Width-5,
+depth-5 networks; “best” reports the expressivity ceiling per cell.
+Modelk=1k=2k=5k=10k=20k=50
+ReLU 98.6 98.0 93.5 87.9 84.5 80.2
+ReLU+Skip100.0 98.7 94.185.4 83.6 80.9
+GELU 98.8 98.4 92.5 91.1 88.684.8
+Swish 97.0 98.2 92.091.6 88.984.3
+an expressivity barrier and depth-dependent optimization
+difficulty. Skip connections provide a mechanism to over-
+come topological barriers even with monotonic activations,
+as predicted by Theorem 5.2.
+6.4. Mechanistic Interpretability: How ResNet Unlinks
+a Point/Circle Pair inR 2
+The disk-annulus separation task is the ambient-dimension
+d= 2 instance of our linking framework, given by Theo-
+rem 4.7 with m= 0 , n= 1 , and d= 2 : a point inside
+the annulus and the annulus’ inner boundary circle form a
+0-manifold/1-manifold link with |link|= 1 , equivalently
+winding number ±1. By our theory, width- 2 monotonic
+feedforward networks cannot linearly separate them, but a
+width-2ResNet can.
+Figure 6 shows the layer-by-layer transformation. ResNet
+implements “folding” operations via|x|=x+2 ReLU(−x)
+(Equation 1), enabling nonmonotonic transformations that
+separate the topologically linked components.
+6.5. Higher-Dimensional Linking:S n ⊔S n inR 2n+1
+We extend experiments to higher dimensions using linked
+hyperspheres: two n-spheres embedded in R2n+1 with link-
+ing number ±1. For n= 2 , this gives S2 ⊔S 2 ⊂R 5
+classified by width-5 networks. We quantify topological dif-
+ficulty via linking number: a single link has only one local
+entanglement region, so networks can achieve high accuracy
+by being wrong only in that small patch; placing k disjoint
+copies forces the network to handle larger entanglement
+regions (Table 4).
+At small k, monotonic architectures with skip connections
+Figure 7.Linked cycles in CIFAR-10: bird (blue) and deer (red)
+withlink =−1atε= 0.034.
+reach the expressivity ceiling (ReLU+Skip attains 100% at
+k= 1 , 98.7% at k= 2 ). As k increases, the best nonmono-
+tonic architectures (GELU/Swish) hold a 3–4pp accuracy
+advantage over the best monotonic architecture at k≥10 ,
+consistent with nonmonotonic activations being able to re-
+solve each local entanglement separately. The effect at
+k= 1 is weaker than for n= 1 (Table 2) due to the linking
+region’s smaller volume fraction in higher dimensions.
+6.6. Linking in Real Data: CIFAR-10
+As a suggestive proof-of-concept, we investigate whether
+topological linking detectable by our algorithm corresponds
+to classification difficulty in real image data. We emphasize
+that the evidence below is correlational rather than causal:
+classification on real images involves many confounding
+factors beyond ambient topology, and the construction relies
+on 3D PCA projection rather than the native data manifold.
+Using the linking detection algorithm, we analyze CIFAR-
+10 class manifolds projected to 3D via PCA.
+Link detection.With 20 × data augmentation (1.05M sam-
+ples) and k-NN graph construction (k= 15 , mutual edges),
+we detect linked cycles between bird and deer classes at
+ε= 0.034 (0.22% of the 3D bounding box diagonal). The
+witness cycles have linking number link =−1 with Gauss
+integral −1.004 (Figure 7). This binary search only locates
+the onset scale; the all-pair consistency study uses fixed
+thresholds, and detected graph-cycle witnesses persist as
+ε increases because the filtered k-NN edge set only grows.
+This is a reproducible linking signal in PCA-3D, not a claim
+about linking of the full3072D pixel manifold.
+10-class linking consistency.Running detection 11 times
+8
+Low-dimensional topology of deep neural networks
+Table 5.Binary classification accuracy at L8 no-skip: linked pair
+(deer-dog) vs unlinked control (frog-ship). All 3 nonmonotonic
+activations outperform all 4 monotonic activations on the linked
+pair; no such pattern on the unlinked pair.
+Linked (deer-dog) Unlinked (frog-ship)
+Activation Type Acc (%) Type Acc (%)
+GELU NONM90.8NONM 97.9
+Mish NONM90.8NONM 97.7
+Swish NONM 90.1 NONM 97.8
+ReLU MONO 89.6 MONO 97.8
+LeakyReLU MONO 89.6 MONO 97.7
+ELU MONO 89.1 MONO 97.2
+SELU MONO 87.4 MONO 97.6
+Gap+1.2% +0.1%
+across all 45 class pairs yields a linking-consistency sum-
+mary. Of 45 pairs, 27 are strongly linked ( >70% consis-
+tency), 8 are weak or unlinked ( <30%), and 10 are am-
+biguous. High examples include deer–dog (91%), bird–cat
+(91%), cat–dog (82%), and automobile–truck (91%); low
+controls include frog–ship (18%), airplane–horse (18%),
+and cat–ship (27%).
+Classification experiments.We train width-bounded CNNs
+(all intermediate layers ≤3072 D) on both binary and 10-
+class classification tasks, comparing monotonic (ReLU,
+ELU, SELU, LeakyReLU) versus nonmonotonic (GELU,
+Swish, Mish) activations.
+At L8 no-skip (Table 5), all nonmonotonic activations out-
+perform all monotonic activations on the linked deer-dog
+pair (+1.2% gap), while no such pattern exists on the un-
+linked frog-ship pair (control). With skip connections, the
+effect disappears: monotonic networks match nonmono-
+tonic performance, as predicted by Theorem 5.2. As a
+localization diagnostic, we retrained bird–deer L8 no-skip
+ReLU/GELU classifiers, detected one PCA-3D link wit-
+ness, and stratified the unaugmented test set by distance
+to that witness. The activation gap is largest near the wit-
+ness and decays with distance (Table 6); this is diagnostic
+rather than causal evidence, since distance is measured in
+PCA-3D and can mix topology with local geometry. PCA-
+3D linking consistency also correlates with within-CIFAR
+class-pair confusion (r≈0.48 , p <0.001), outperforming
+pixel-space distance metrics.
+Table 6.Bird–deer test accuracy by distance to a detected PCA-3D
+link witness.
+SubsetnReLU (%) GELU (%) Gap (pp)
+<10ε31 90.6 97.1 +6.5
+<20ε243 89.4 92.3 +2.9
+<50ε1191 89.3 91.4 +2.1
+All 2000 89.9 91.6 +1.6
+>50ε809 90.6 91.4 +0.8
+Expressivity vs. optimization.Our theoretical results con-
+cernexpressivity, meaning what functions network architec-
+tures can represent, notoptimization, meaning what func-
+tions gradient descent actually finds. Even when two ar-
+chitectures have identical expressivity ceilings, they may
+exhibit different training dynamics: convergence speed, sen-
+sitivity to learning rate, propensity to find particular local
+minima, etc. The observed CIFAR-10 gaps thus reflect a
+combination of (i) the topological expressivity barrier pre-
+dicted by our theory, and (ii) optimization dynamics that our
+theory does not address.
+7. Conclusion
+This work develops a new lens for neural network expressiv-
+ity analysis: from approximation rates to geometric transfor-
+mation requirements. Rather than asking whether a network
+can approximate a target function, we ask what geomet-
+ric operations on embedded data it can perform. For the
+pairwise linking and folding phenomena studied here, this
+perspective extends to mechanistic understanding: ResNet
+skip connections, attention mechanisms, and nonmonotonic
+activations all break the monotonicity required by our im-
+possibility argument via a “folding” construction.
+Our framework focuses onambient-sensitive(extrinsic)
+topological invariants, fundamentally distinguishing it from
+traditional topological data analysis which studies intrinsic
+properties. The linking number of two manifolds depends
+onhowthey are embedded in Rn, not merely on the man-
+ifolds themselves. This extrinsic perspective captures the
+algorithmic reality: neural networks must transform data
+within the ambient space, making embedding geometry as
+important as intrinsic data structure.
+We expect this work to open broader applications of low-
+dimensional topology and geometric topology to machine
+learning. The invariant we study, the pairwise linking num-
+ber, is an initial example. A companion paper treats richer
+invariants from link theory and knot theory, such as Milnor’s
+¯µ-invariants and knot types, in detail (Ren & Lim, 2026).
+Similarly, the task correspondence we establish between un-
+linking and classification likely represents an initial example
+of a broader pattern yet to be fully explored. Understanding
+this interplay between data geometry and algorithmic capa-
+bility offers new directions for both theoretical foundations
+and principled architecture design.
+Impact Statement
+This paper presents theoretical and empirical work on neural
+network expressivity. We identify fundamental limitations
+of certain architectures, which may inform more principled
+architecture design. We also propose a link detection algo-
+rithm that characterizes topological complexity in datasets,
+9
+Low-dimensional topology of deep neural networks
+which may inform dataset difficulty analysis.
+Acknowledgments
+JR and LH are partially supported by a Vannevar Bush
+Faculty Fellowship ONR N000142312863.
+References
+Atiyah, M. On the work of Simon Donaldson. In Gleason,
+A. M. (ed.),Proceedings of the International Congress
+of Mathematicians (Berkeley, Calif., 1986), volume 1,
+pp. 3–6. Amer. Math. Soc., Providence, RI, 1987. ISBN
+0-8218-0110-4.
+Barron, A. R. Universal approximation bounds for super-
+positions of a sigmoidal function.IEEE Trans. Inform.
+Theory, 39(3):930–945, 1993. doi: 10.1109/18.256500.
+Bengio, Y ., Courville, A., and Vincent, P. Representation
+learning: A review and new perspectives.IEEE Trans.
+Pattern Anal. Mach. Intell., 35(8):1798–1828, 2013. doi:
+10.1109/TPAMI.2013.50.
+Birman, J. S. The work of Vaughan F. R. Jones. In Satake,
+I. (ed.),Proceedings of the International Congress of
+Mathematicians (Kyoto, 1990), volume 1, pp. 9–18. Math.
+Soc. Japan, Tokyo, 1991. ISBN 4-431-70047-1.
+Cai, Y . Achieve the minimum width of neural networks for
+universal approximation. InInternational Conference on
+Learning Representations (ICLR), 2023. URL https:
+//openreview.net/forum?id=hgSOMSDnXKM.
+Cang, Z. and Wei, G.-W. TopologyNet: Topology based
+deep convolutional and multi-task neural networks for
+biomolecular property predictions.PLOS Computational
+Biology, 13(7):e1005690, 2017. doi: 10.1371/journal.
+pcbi.1005690.
+Carlsson, G. Topology and data.Bull. Amer. Math.
+Soc. (N.S.), 46(2):255–308, 2009. doi: 10.1090/
+S0273-0979-09-01249-X.
+Chen, R. T. Q., Rubanova, Y ., Bettencourt, J., and Duvenaud,
+D. Neural ordinary differential equations. InAdvances in
+Neural Information Processing Systems, volume 31, pp.
+6571–6583, 2018. Best Paper Award.
+Cortes, C. and Vapnik, V . Support-vector networks.Ma-
+chine Learning, 20(3):273–297, 1995. doi: 10.1007/
+BF00994018.
+Cover, T. M. Geometrical and statistical properties of sys-
+tems of linear inequalities with applications in pattern
+recognition.IEEE Transactions on Electronic Comput-
+ers, EC-14(3):326–334, 1965. doi: 10.1109/PGEC.1965.
+264137.
+Cybenko, G. Approximation by superpositions of a sig-
+moidal function.Math. Control Signals Systems, 2(4):
+303–314, 1989. doi: 10.1007/BF02551274.
+Dinh, L., Sohl-Dickstein, J., and Bengio, S. Density
+estimation using Real NVP. InInternational Con-
+ference on Learning Representations (ICLR), 2017.
+arXiv:1605.08803.
+Dumitrescu, A., Korpela, D., Heinonen, M., Verma,
+Y ., Iakovlev, V ., Garg, V ., and L ¨ahdesm¨aki, H.
+E(3)-equivariant models cannot learn chirality: Field-
+based molecular generation. InInternational Con-
+ference on Learning Representations (ICLR), 2025.
+arXiv:2402.15864.
+Dupont, E., Doucet, A., and Teh, Y . W. Augmented neural
+ODEs. InAdvances in Neural Information Processing
+Systems, volume 32, 2019. arXiv:1904.01681.
+Edelsbrunner, H. and Harer, J. L.Computational Topol-
+ogy: An Introduction. American Mathematical Society,
+Providence, RI, 2010. ISBN 978-0-8218-4925-5.
+Eitan, Y ., Gelberg, Y ., Bar-Shalom, G., Frasca, F., Bron-
+stein, M. M., and Maron, H. Topological blindspots:
+Understanding and extending topological deep learn-
+ing through the lens of expressivity. InInternational
+Conference on Learning Representations (ICLR), 2025.
+arXiv:2408.05486.
+Eldan, R. and Shamir, O. The power of depth for feedfor-
+ward neural networks. InConference on Learning Theory
+(COLT), volume 49 ofPMLR, pp. 907–940, 2016.
+Elfwing, S., Uchibe, E., and Doya, K. Sigmoid-weighted
+linear units for neural network function approximation
+in reinforcement learning.Neural Networks, 107:3–11,
+2018. doi: 10.1016/j.neunet.2017.12.012. Introduces
+SiLU activationx·σ(x), equivalent to Swish.
+Esmaeili, B., Walters, R., Zimmermann, H., and van de
+Meent, J.-W. Topological obstructions and how to avoid
+them. InAdvances in Neural Information Processing
+Systems (NeurIPS), volume 36, 2023. arXiv:2312.07529.
+Geng, Z., Deng, M., Bai, X., Kolter, J. Z., and He, K.
+Mean flows for one-step generative modeling, 2025.
+arXiv:2505.13447.
+Gomez, A. N., Ren, M., Urtasun, R., and Grosse, R. B. The
+reversible residual network: Backpropagation without
+storing activations. InAdvances in Neural Information
+Processing Systems, volume 30, pp. 2214–2224, 2017.
+Grathwohl, W., Chen, R. T. Q., Bettencourt, J., Sutskever,
+I., and Duvenaud, D. FFJORD: Free-form continuous
+dynamics for scalable reversible generative models. In
+10
+Low-dimensional topology of deep neural networks
+International Conference on Learning Representations
+(ICLR), 2019. arXiv:1810.01367.
+Hanin, B. and Sellke, M. Approximating continu-
+ous functions by ReLU nets of minimal width, 2017.
+arXiv:1710.11278.
+Hatcher, A.Algebraic Topology. Cambridge University
+Press, Cambridge, 2002. ISBN 0-521-79540-0. Available
+online at the author’s website.
+He, K., Zhang, X., Ren, S., and Sun, J. Deep resid-
+ual learning for image recognition. InProceedings
+of the IEEE Conference on Computer Vision and Pat-
+tern Recognition (CVPR), pp. 770–778, 2016. doi:
+10.1109/CVPR.2016.90.
+Hendrycks, D. and Gimpel, K. Gaussian error linear units
+(GELUs).arXiv:1606.08415, 2016. Standard activation
+in BERT and GPT models.
+Hornik, K., Stinchcombe, M., and White, H. Multi-
+layer feedforward networks are universal approximators.
+Neural Networks, 2(5):359–366, 1989. doi: 10.1016/
+0893-6080(89)90020-8.
+Jacobsen, J.-H., Smeulders, A., and Oyallon, E. i-
+RevNet: Deep invertible networks. InInternational
+Conference on Learning Representations (ICLR), 2018.
+arXiv:1802.07088.
+Johnson, J. Deep, skinny neural networks are not uni-
+versal approximators. InInternational Conference on
+Learning Representations (ICLR), 2019. URL https:
+//openreview.net/forum?id=ryGgSsAcFQ.
+Jumper, J., Evans, R., Pritzel, A., Green, T., Figurnov, M.,
+Ronneberger, O., Tunyasuvunakool, K., Bates, R., ˇZ´ıdek,
+A., Potapenko, A., et al. Highly accurate protein structure
+prediction with AlphaFold.Nature, 596(7873):583–589,
+2021. doi: 10.1038/s41586-021-03819-2.
+Kim, N., Min, C., and Park, S. Minimum width for universal
+approximation using ReLU networks on compact domain.
+InInternational Conference on Learning Representations
+(ICLR), 2024. URL https://openreview.net/
+forum?id=dpDw5U04SU.
+Kingma, D. P. and Dhariwal, P. Glow: Generative flow
+with invertible 1x1 convolutions. InAdvances in Neural
+Information Processing Systems, volume 31, pp. 10215–
+10224, 2018.
+LeCun, Y . A path towards autonomous machine intelligence.
+OpenReview, 2022. URL https://openreview.
+net/pdf?id=BZ5a1r-kVsf. Version 0.9.2, 2022-
+06-27.
+Li, L., Duan, Y ., Ji, G., and Cai, Y . Minimum width of
+Leaky-ReLU neural networks for uniform universal ap-
+proximation. InProceedings of the 40th International
+Conference on Machine Learning, volume 202 ofPro-
+ceedings of Machine Learning Research, pp. 19460–
+19470. PMLR, 2023. URL https://proceedings.
+mlr.press/v202/li23g.html.
+Lipman, Y ., Chen, R. T. Q., Ben-Hamu, H., Nickel, M., and
+Le, M. Flow matching for generative modeling. InInter-
+national Conference on Learning Representations (ICLR),
+2023. Notable paper (top 25%), arXiv:2210.02747.
+Lott, J. The work of Grigory Perelman. InInternational
+Congress of Mathematicians. Vol. I, pp. 65–76. Eur. Math.
+Soc., Z¨urich, 2007. ISBN 978-3-03719-022-7. doi: 10.
+4171/022-1/2. URL https://doi.org/10.4171/
+022-1/2.
+Milnor, J. The work of M. H. Freedman. In Gleason,
+A. M. (ed.),Proceedings of the International Congress
+of Mathematicians (Berkeley, Calif., 1986), volume 1, pp.
+13–15. Amer. Math. Soc., Providence, RI, 1987. ISBN
+0-8218-0110-4.
+Misra, D. Mish: A self regularized non-monotonic acti-
+vation function. InBritish Machine Vision Conference
+(BMVC), 2020. arXiv:1908.08681.
+Munkres, J. R.Topology. Prentice Hall, Upper Saddle River,
+NJ, second edition, 2000. ISBN 0-13-181629-2.
+Naitzat, G., Zhitnikov, A., and Lim, L.-H. Topology of deep
+neural networks.J. Mach. Learn. Res., 21(184):1–40,
+2020.
+Olah, C. Neural networks, manifolds, and topol-
+ogy. https://colah.github.io/posts/
+2014-03-NN-Manifolds-Topology/, 2014.
+Park, S., Yun, C., Lee, J., and Shin, J. Mini-
+mum width for universal approximation. InInterna-
+tional Conference on Learning Representations (ICLR),
+2021. URL https://openreview.net/forum?
+id=O-XJwyoIF-k.
+Ramachandran, P., Zoph, B., and Le, Q. V . Searching for
+activation functions.arXiv:1710.05941, 2017. Introduces
+Swish activation.
+Ren, J. and Lim, L.-H. Topology of deep neural networks
+II, 2026. Preprint.
+Rochau, D., Chan, R., and Gottschalk, H. New advances in
+universal approximation with neural networks of minimal
+width, 2024. arXiv:2411.08735.
+11
+Low-dimensional topology of deep neural networks
+Rolfsen, D.Knots and Links, volume 7 ofMathematics
+Lecture Series. Publish or Perish, Inc., Berkeley, CA,
+1976. ISBN 0-914098-16-0.
+Satorras, V . G., Hoogeboom, E., and Welling, M. E(n)
+equivariant graph neural networks. InInternational Con-
+ference on Machine Learning (ICML), volume 139 of
+PMLR, pp. 9323–9332, 2021.
+Sch¨utt, K. T., Kindermans, P.-J., Sauceda, H. E., Chmiela, S.,
+Tkatchenko, A., and M¨uller, K.-R. SchNet: A continuous-
+filter convolutional neural network for modeling quantum
+interactions. InAdvances in Neural Information Process-
+ing Systems, volume 30, pp. 991–1001, 2017.
+Telgarsky, M. Benefits of depth in neural networks. In
+Conference on Learning Theory (COLT), volume 49 of
+PMLR, pp. 1517–1539, 2016.
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones,
+L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I. Atten-
+tion is all you need. InAdvances in Neural Information
+Processing Systems, volume 30, pp. 5998–6008, 2017.
+Wall, C. T. C. On the work of W. Thurston. In Ciesielski,
+Z. and Olech, C. (eds.),Proceedings of the International
+Congress of Mathematicians (Warsaw, 1983), volume 1,
+pp. 11–14. PWN, Warsaw and North-Holland, Amster-
+dam, 1984. ISBN 0-444-86659-0.
+Yarotsky, D. Error bounds for approximations with deep
+ReLU networks.Neural Networks, 94:103–114, 2017.
+doi: 10.1016/j.neunet.2017.07.002.
+12
+Low-dimensional topology of deep neural networks
+A. Network Architecture
+This appendix collects the network-architecture definitions used in the main text (§A.1) and the classifier-head/linear-
+separability equivalence (§A.2).
+A.1. Network Architectures
+Definition A.1(Width- d feedforward network).Awidth- d feedforward networkwith activation σ is F=A L ◦ σ ◦ AL−1 ◦
+σ ◦ · · ·◦ σ ◦ A1, where each Ai(x) =W ix+b i is affine with Wi ∈R d×d, bi ∈R d, and σ is applied coordinate-wise. All
+intermediate representations lie inR d.
+Definition A.2(Width- d ResNet).Awidth- d ResNetis F=B L ◦ · · ·◦ B1 where each block Bi(x) =x+R i(x) and
+Ri =A i,2 ◦ σ ◦ Ai,1 is a width-dfeedforward sublayer with monotonicσ(typically ReLU).
+Definition A.3(Pure transformer).Apure transformeris a transformer with residual connections and layer normalization
+removed: each block applies self-attention Attention(X) = softmax
+  XW Q(XW K )T
+√dk
+
+XW V , then an affine layer, then a
+coordinate-wise activation. The width constraint requires all intermediate dimensions≤n.
+Definition A.4(Autoencoder with bottleneck d).Anautoencoder with bottleneck d is F=D ◦ E where the encoder
+E:R n →R d projects via an initial affine A1 :R n →R d followed by width-d monotonic-feedforward layers, and the
+decoderD:R d →R n symmetrically expands via width-dlayers and a finalA L :R d →R n.
+Corollary A.5(Autoencoder topological impossibility).Let X, Y⊂R n be disjoint compact manifolds contained in a
+d-dimensional affine subspace H⊂R n with link(X, Y)̸= 0 . No autoencoder with bottleneck d and coordinate-wise
+monotonic activations can transform(X, Y)into linearly separable images while preserving disjointness.
+Proof. After an appropriate rotation, assume H=R d × {0}n−d. Let G:H ∼= Rd →R d denote the pre-final-decoder
+feature map, i.e., the composition of the encoder restricted to H with all width-d decoder layersexceptthe final affine
+AL :R d →R n. ThenGis a width-dfeedforward network inR d with monotonic activations, andF| H =A L ◦ G.
+Suppose for contradiction that F(X), F(Y)⊂R n are linearly separable by a hyperplane π⊤z=α . Pulling back through
+AL, the linear functional (A⊤
+L π) on Rd satisfies (A⊤
+L π)⊤G(x) + (π⊤AL(0)−α) =π ⊤F(x)−α , which is positive on
+G(X) and negative on G(Y) . Hence G(X) and G(Y) are linearly separable in Rd. But link(X, Y)̸= 0, so by Theorem 4.7
+no width-d feedforward network with monotonic activations can render X, Y⊂R d linearly separable, a contradiction.
+The bottleneck dimension d alone determines the topological constraint; the input dimension n is irrelevant. To break the
+obstruction one must widen the bottleneck or place full-width nonmonotonic/skip-augmented layers before compression.
+A.2. Classifier Heads and Linear Separability
+A standard classifier head maps features z∈R d to logits ℓ=W z+b∈R c, predicting ˆy= arg maxi ℓi. The class- i
+decision region Di ={z∈R c :z i > zj for allj̸=i} is the intersection of c−1 open half-spaces, hence convex, and the
+{Di}are pairwise disjoint.
+Proposition A.6(Binary classification equivalence).For c= 2 , ˆy= arg max{ℓ0, ℓ1}=1
+
+(w0 −w 1)⊤z+ (b 0 −b 1)>0
+
+.
+Two classes are perfectly classified by such a head iff their feature representations are linearly separable.
+Hence proving that a width-d network cannot separate linked components is equivalent to proving that no classifier head
+achieves perfect accuracy on them.
+B. Invertible Architectures and Ambient Homeomorphisms
+Anambient homeomorphismof Rd is a continuous bijection h:R d →R d with continuous inverse. By the invariance of
+domain (Brouwer 1912; (Munkres, 2000, Thm. 36.5)), any continuous injective map f:U→R d on an open U⊆R d is an
+open map onto its image, hence a homeomorphism onto f(U) , though not in general anambienthomeomorphism of Rd.
+The architectures we analyze in this appendix (flow-based models, Neural ODEs, normalizing flows) are constructed to
+be ambient homeomorphisms by design: their forward maps are explicit continuous bijections Rd →R d with continuous
+inverses. For such architectures, the lemmas below apply globally; for a continuous injective width-d feedforward network,
+they apply on the image of the data manifold under that network, which suffices for the linking-preservation conclusion.
+13
+Low-dimensional topology of deep neural networks
+Lemma B.1(Ambient homeomorphisms preserve component count and intrinsic invariants).For disjoint compact connected
+sets X1, . . . , Xk ⊂R n and any ambient homeomorphism h:R n →R n, the images h(X1), . . . , h(Xk) are k pairwise
+disjoint compact connected sets, and every intrinsic topological invariant of each Xi (homotopy type, homology, knot
+complement type, etc.) is preserved.
+Proof. Continuity preserves connectedness, bijectivity preserves disjointness, and h restricted to each Xi is a homeomor-
+phism onto h(Xi), so every homotopy- or homeomorphism-invariant of Xi transfers. This justifies the “cannot merge
+connected components” and “cannot fill holes” rows of the AH (ambient homeomorphism) column in Table 1; the “cannot
+unlink” row uses the companion linking-preservation result (Lemma B.2).
+Lemma B.2(Ambient homeomorphisms preserve linking numbers).For disjoint simple closed curves X, Y⊂R 3 and any
+ambient homeomorphism h:R 3 →R 3, link(h(X), h(Y)) =±link(X, Y) (+ if h is orientation-preserving, − otherwise).
+Proof. The linking number is the degree of the Gauss map Γ :X×Y→S 2 (Definition C.1); h induces a self-map of
+X×Ypreserving degree up to the orientation sign.
+B.1. Invertible Architectures in Machine Learning
+Invertible architectures whose forward map is an ambient homeomorphism therefore cannot change linking number at any
+depth. This includes reversible residual networks (RevNet (Gomez et al., 2017), i-RevNet (Jacobsen et al., 2018)) and
+normalizing flows (Dinh et al., 2017; Kingma & Dhariwal, 2018), which are invertible by construction; and ODE-based flows
+(Neural ODEs (Chen et al., 2018), FFJORD (Grathwohl et al., 2019), Flow Matching (Lipman et al., 2023)), whose ODE
+integration of a Lipschitz vector field produces a diffeomorphism. Dupont et al. (2019) verify this constraint empirically on
+concentric-ring classification with Neural ODEs; their augmented variant works precisely by lifting to higher dimension
+(width expansion). Discrete-time ResNets arenotsubject to this constraint: their layer-by-layer composition need not be
+a homeomorphism, and a discrete block can implement |x|=x+ 2 ReLU(−x) (Theorem 5.2), which is not invertible.
+One-step direct evaluators, e.g., MeanFlow (Geng et al., 2025), similarly escape the homeomorphism constraint by avoiding
+ODE integration entirely.
+C. Proofs for Sections 3 and 4: Linking-Number Preservation
+This appendix proves the main linking-preservation and impossibility theorems for both the R3/ReLU setting of Section 3
+and the general width-d/coordinate-wise-monotonic setting of Section 4. The general results subsume the R3/ReLU special
+case; we present the general proofs and indicate where the elementaryR 3 argument specializes.
+C.1. Linking number and link homotopy
+Definition C.1(Link and linking number in R3).Alinkis a finite collection of disjoint simple closed curves in R3. For
+disjoint oriented simple closed curvesX, Y⊂R 3 thelinking numberlink(X, Y)∈Zis the Gauss integral
+link(X, Y) = 1
+4π
+I
+X
+I
+Y
+(x−y)·(dx×dy)
+|x−y| 3 ,
+equivalently the signed crossing-count 1
+2
+P
+p∈π(X)∩π(Y) ϵp for any regular projectionπ:R 3 →R 2.
+Definition C.2(Degree and higher-dimensional linking number).Thedegreeof a continuous map G:X→S k from a
+closed oriented k-manifold X is deg(G) = P
+x∈G−1(y) sign(detDG x) at any regular value y∈S k. For disjoint closed
+oriented manifolds M m, Nn ⊂R d with d=m+n+ 1 , thelinking number link(M, N)is the degree of the Gauss map
+G(x, y) = (x−y)/|x−y|:M×N→S d−1; form=n= 1,d= 3this recovers Definition C.1.
+Definition C.3(Link homotopy).Alink homotopyof disjoint compact subsets X1, . . . , Xk ⊂R n is a continuous map
+H: F
+i Xi ×[0,1]→R n with H(·,0) the inclusion and H(X i, t)∩H(X j, t) =∅ for all t∈[0,1] and i̸=j . Two
+configurations arelink homotopicif connected by such a homotopy.
+RemarkC.4 (Parametrized-image convention).In the layerwise arguments below, notation such as X (j) and Y (j) denotes
+the images of the composed maps
+fj =F j ◦ · · ·◦ F1 ◦ ιX :M→R d, g j =F j ◦ · · ·◦ F1 ◦ ιY :N→R d,
+14
+Low-dimensional topology of deep neural networks
+with the parametrizing maps left implicit. Thuslink(X (j), Y(j))means the Gauss map degree of
+(u, v)7→ fj(u)−g j(v)
+∥fj(u)−g j(v)∥ ,
+which is well-defined whenever fj(M)∩g j(N) =∅ , even if one component has self-intersections or the composed maps
+are not embeddings (Rolfsen, 1976, Ch. 5); see also (Hatcher, 2002, Sec. 2.2). A link homotopy is likewise a homotopy
+of these maps, equivalently ht ◦ fj and ht ◦ gj when written using an ambient homotopy ht :R d →R d. We keep the set
+notation as a standard abuse of notation, with the underlying composed maps understood.
+Lemma C.5(Link homotopy invariance).If (M ′, N′) is link homotopic to (M, N)in Rd (d=m+n+ 1 ), then
+link(M ′, N′) = link(M, N).
+Proof. The Gauss map varies continuously with t along the link homotopy (disjointness keeps it well-defined), and degree
+is a homotopy invariant; equivalently,t7→link(H M (M, t), HN (N, t))is a continuous Z-valued function on [0,1] , hence
+constant.
+Lemma C.6(Linear separability implies link = 0).If two disjoint closed oriented manifolds M m, Nn ⊂R d (d=m+n+1 )
+are linearly separable, thenlink(M, N) = 0.
+Proof. A separating hyperplane partitions Rd into disjoint open half-spaces H + ∋M and H − ∋N . Straight-line
+contractions of M to a point p∈H + and N to a point q∈H − stay in their respective half-spaces and so remain disjoint,
+defining a link homotopy. At the endpoint of the homotopy, the Gauss map M×N→S d−1 is the constant map sending
+(x, y)to(p−q)/|p−q|, hence has degree zero; by Lemma C.5 this degree equalslink(M, N), solink(M, N) = 0.
+C.2. Preservation under monotonic activations
+Lemma C.7(Monotonic-activation linking preservation).Let σ:R d →R d be coordinate-wise monotonic, with r
+nonincreasing coordinates. If disjoint compact manifoldsM, N⊂R d satisfyσ(M)∩σ(N) =∅, then
+link(σ(M), σ(N)) = (−1)r link(M, N).
+Proof. Decompose σ=R ◦ σ′ coordinate-wise as follows. For each coordinate i, set σ′
+i =σ i if σi is nondecreasing and
+σ′
+i =−σ i if σi is nonincreasing; then every σ′
+i is nondecreasing. Let R:R d →R d be the diagonal reflection that negates
+each output coordinate i where σi was nonincreasing (R has ri =−1 for those r coordinates and ri = +1 for the rest).
+ThenR i(σ′
+i(t)) =σ i(t)for everyiand everyt, soσ=R ◦ σ′.
+Stage 1: link homotopy via σ′.The straight-line interpolation Ht(x) = (1−t)x+tσ ′(x), applied simultaneously to
+M and N, is a link homotopy. Suppose Ht(x) =H t(y) with x∈M , y∈N . Pick coordinate i with xi ̸=y i (exists
+since M∩N=∅ ); WLOG xi < yi. Since σ′
+i is nondecreasing, σ′
+i(xi)≤σ ′
+i(yi), so Ht(x)i = (1−t)x i +tσ ′
+i(xi)<
+(1−t)y i +tσ ′
+i(yi) =H t(y)i for t∈[0,1) . At t= 1 equality would require σ′(x) =σ ′(y); applying R gives σ(x) =σ(y) ,
+contradictingσ(M)∩σ(N) =∅. By Lemma C.5,link(σ ′(M), σ′(N)) = link(M, N).
+Stage 2: reflection. R is a homeomorphism of Rd with detR= (−1) r. Under R, the Gauss map G:M×N→S d−1
+(Definition C.2) for any disjoint M, N⊂R d becomes GR(x, y) =R(x−y)/|R(x−y)| ; since R is an isometry
+of Rd restricted to a degree- (−1)r self-map of Sd−1, the degree of the Gauss map is multiplied by (−1)r. Hence
+link(R(σ′(M)), R(σ′(N))) = (−1) r link(σ′(M), σ′(N)) = (−1) r link(M, N), as claimed.
+For the R3/ReLU special case with curves X, Y, the same conclusion admits an elementary one-coordinate-at-a-time
+argument: write σ=G 3 ◦ G2 ◦ G1 where Gj applies ReLU only to coordinate j, and homotope X then Y through each Gj
+in turn. A collision H X
+t (x) =y would force Gj(x) =G j(y) at the endpoint, contradicting σ(X)∩σ(Y) =∅ . We refer to
+this elementary form below as thesequential ReLU homotopy.
+C.3. Rank-deficient transformations force intersection
+Lemma C.8(Rank-deficient intersection, general Rd).Let M m, Nn ⊂R d be disjoint closed oriented submanifolds with
+m+n+ 1 =dandlink(M, N)̸= 0. For any rank-deficient affinef:R d →R d,f(M)∩f(N)̸=∅.
+15
+Low-dimensional topology of deep neural networks
+x
+y
+z
+v
+(a)Sliding alongv∈ker(A)
+x
+y
+z
+(b)Contract to points
+Figure 8.Kernel translation argument. If a rank-deficient affine map with v in its kernel does not create intersections, we can slide
+components alongv(unchanged byf) to achieve linear separation, then contract each to a point, forcinglink = 0.
+Proof. Suppose not. Write f(x) =Ax+b with rank(A)< d and pick a unit vector v∈ker(A) . Since M, Nare compact,
+chooseLlarge enough thatMandN+Lvlie in disjoint open half-spaces normal tov(hence are linearly separable).
+Translation along v commutes with f: f(N+tv) =AN+Atv+b=AN+b=f(N) for every t, so f(M)∩
+f(N+tv) =f(M)∩f(N) =∅ for all t∈[0, L] . Hence any putative collision x=y+tv during the translation
+would force f(x) =f(y) , contradicting f(M)∩f(N) =∅ . So t7→(M, N+tv) is a link homotopy. By Lemma C.5,
+link(M, N+Lv) = link(M, N)̸= 0. But (M, N+Lv) is linearly separable, so Lemma C.6 gives link(M, N+Lv) = 0,
+a contradiction.
+In R3, every rank-deficient affine map factors through a rank- 2 orthogonal projection P:R 3 →R 2; the combinatorial
+linking formula then equates link(X, Y)with a signed sum over P(X)∩P(Y) , so non-zero linking forces a non-empty
+projection intersection. This is the special case used to prove Theorem 3.7.
+C.4. Main impossibility theorems
+Proof of Theorem 4.7 (general impossibility). Suppose a width-d feedforward network F=A L ◦σL−1 ◦AL−1 ◦· · ·◦σ1 ◦A1
+with coordinate-wise monotonic σi achieves linear separability of M, N⊂R d with link(M, N)̸= 0. Here M (j), N(j) are
+understood in the parametrized-image sense of Remark C.4. Linear separability forces M (j) ∩N (j) =∅ at every layer
+(else collision propagates). We prove by induction on j that link(M (j), N(j)) =±link(M, N)̸= 0 : invertible affine layers
+preserve link up to sign (ambient homeomorphisms preserve degree); monotonic activations preserve link up to sign by
+Lemma C.7; rank-deficient affine layers would create an intersection by Lemma C.8, contradicting disjointness. Therefore
+link(F(M), F(N)) =±link(M, N)̸= 0. But linear separability requireslink = 0by Lemma C.6. Contradiction.
+Proof of Theorem 3.7 (R3/ReLU). The same argument with d= 3 and σi = ReLU ; the sequential ReLU homotopy
+substitutes for Lemma C.7.
+Proof of Theorem 4.5 (higher-dimensional). The same argument with general d=m+n+ 1 ; Lemma C.6 and Lemma C.7
+apply verbatim.
+D. Width Upper Bound for Topological Unlinking
+This section shows that width d+ 1 is sufficient to eliminate theclassificationobstruction: a width- (d+ 1) ReLU network
+can linearly separate any disjoint compact configuration in Rd regardless of linking. The construction does not unlink the
+classes as ambient subsets of Rd; it maps them into disjoint scalar intervals, which is the operation classification actually
+requires.
+16
+Low-dimensional topology of deep neural networks
+Theorem D.1(Unlinking via width- (d+ 1) networks).Let X1, . . . , Xk ⊂R d be disjoint compact subsets in any linking
+configuration. For any ε∈(0,1/2) , there exists a feedforward network F:R d →R with ReLU activations and width d+ 1
+such that|F(x)−i|< εfor everyx∈X i, so the imagesF(X i)⊂(i− 1
+2 , i+ 1
+2 )lie in disjoint convex intervals.
+Proof.Disjoint compact sets inR d admit disjoint open neighborhoodsU i ⊃X i together with Urysohn cutoffsψ i :R d →
+[0,1] with ψi ≡1 on Xi and ψi ≡0 outside Ui. The target ˜f(x) = Pk
+i=1 i·ψ i(x) is continuous and equals i on Xi. By the
+Hanin–Sellke width-(d+ 1) universal approximation theorem (Hanin & Sellke, 2017), ˜f can be uniformly ε-approximated
+on the compact set S
+i Ui by a width-(d+ 1) ReLU network F . Then |F(x)−i|< ε < 1
+2 on each Xi, separating the images
+into disjoint intervals. To keep input and output dimensions equal, extendFtoG(x) = (F(x),0, . . . ,0).
+Widthd+ 1is therefore tight: widthdis impossible by the lower bound below, while widthd+ 1suffices.
+E. Width Lower Bound for Universal Approximation
+Theorem E.1(Width lower bound for universal approximation).For any continuous coordinate-wise monotonic activation
+(ReLU, leaky-ReLU, sigmoid, tanh, etc.), the minimum width wmin for which width-wmin feedforward networks F:R d →R
+are uniform universal approximators on compact sets satisfiesw min ≥d+ 1.
+Proof. Suppose for contradiction that width- d networks with some monotonic σ are dense in C(K) for every compact
+K⊂R d. We treat the three casesd= 1,d= 2,d≥3in turn.
+d= 1 .A width- 1 feedforward network is a composition of monotonic scalar maps (affineR→R composed with monotonic
+σ:R→R ); such a composition is itself monotonic. Monotonic functions on R are not dense in C([0,1]) (they cannot
+approximate any nonmonotonic continuous function), contradicting universal approximation. Hencew min ≥2.
+d= 2 .Take M={p 0} a point and N a smooth simple closed curve in R2 encircling p0 once, so link(M, N) = 1(the
+winding number / degree of the Gauss map M×N→S 1). The function f| M = 0, f| N = 1 extends continuously to
+all of R2 by Tietze extension; a width- 2 uniform approximation on the compact M∪N would give a linear separator,
+contradicting Theorem 4.7 with(m, n, d) = (0,1,2).
+d≥3 .Write d=m+n+ 1 with m, n≥1 and take a non-trivially linked pair (M m, Nn)⊂R d with link(M, N) = 1:
+the Hopf link for d= 3 , the linked-spheres construction of Appendix G.4 for d >3. Same Tietze + Theorem 4.7 argument
+applies.
+In all three cases,w min ≥d+ 1.
+The contribution here is the proof technique, not the bound itself. Prior width- d insufficiency results constrain either
+the activation class or its regularity: Hanin & Sellke (2017) (ReLU, level-set components), Johnson (2019) (activations
+approximable by injections, level-set topology), Park et al. (2021); Cai (2023); Li et al. (2023); Kim et al. (2024) (ReLU,
+leaky-ReLU, and compact-domain minimum-width analyses), and Rochau et al. (2024) (monotoneLipschitzactivations,
+approximation-theoretic). Our argument requires onlycontinuous coordinate-wise monotonicactivations, with no Lipschitz
+regularity, smoothness, or approximation by injections, and obtains the bound as a direct corollary of ambient topological
+invariance, complementing the width-(d+ 1)upper bound of Appendix D.
+F. Detailed Constructions Breaking Topological Constraints
+F.1. Why nonmonotonic activations break homotopy preservation
+The monotonic-activation preservation lemma (Lemma C.7) used the straight-line homotopy Ht(x) = (1−t)x+tσ(x) ,
+which is a link homotopy precisely because monotonicity rules out coordinate-wise collisions during interpolation. For
+σ(x) =|x| , the same straight-line interpolation crosses the fold line xi = 0 from negative to positive sides: distinct points
+with mirror-image coordinates can collide on the fold. Thus link(σ(M), σ(N))need not equal link(M, N), and the rigidity
+that drives the impossibility theorems disappears.
+17
+Low-dimensional topology of deep neural networks
+F.2. Hopf link unlinking via absolute value activations
+We give an explicit five-step construction (Figure 9) that takes the Hopf link X(t) = (cost,sint,0) , Y(s) = (0,1 +
+coss,sins) (the same Hopf link as in Example 3.1, with the X-axis offset of the main text swapped to the Y -axis by
+a 90◦ rotation of coordinates, chosen so the first fold acts on y) to a linearly separable configuration in R3 using only
+coordinate-wise| · |and affine maps:
+1. Apply| · |to they-coordinate:X7→(cost,|sint|,0).
+2. Affine(x, y, z)7→(x,1−y, z): nowX= (cost,1− |sint|,0)andY= (0,−coss,sins).
+3. Apply| · |to thex- andy-coordinates.
+4. Apply| · |to thez-coordinate.
+After step 4, both curves lie in the positive octant; an explicit hyperplane (shaded in Figure 9) separates them.
+Extension to activations with a local extremum.The recipe generalizes to any activation σ:R→R with a strict local
+extremum on an open interval I⊂R , e.g., the local minimum of GELU near −0.5, of Swish/SiLU near −1.3, of Mish near
+a similar point: since the data is compact, an affine pre-shift x7→ax+b rescales the relevant data coordinate into I, on
+which σ|I is nonmonotonic. The straight-line homotopy t7→(1−t)x+tσ(x) on I admits a fold-line collision in exactly
+the same way as | · |does on R, so the same disjoint-tube argument fails and the same unlinking construction goes through
+with σ|I in place of | · |. We do not require σ|I to equal | · |, only to fold the rescaled data into a region with reduced crossing
+structure.
+x
+y
+z
+(a)Step 1
+x
+y
+z
+(b)Step 2
+x
+y
+z
+(c)Step 3
+x
+y
+z
+(d)Step 4
+x
+y
+z
+(e)Step 5 (separating hy-
+perplane shaded)
+Figure 9.Hopf link unlinking via absolute value activations.
+F.3. ResNet absolute-value synthesis
+Proof of Theorem 5.2 (ResNet topological expressivity).The single identity
+|x|=x+ 2 ReLU(−x)
+realizes coordinate-wise absolute value as one ResNet block: take residual branch G(x) = 2 ReLU(−x) (a width-d ReLU
+sublayer with input weight −Id and output weight 2Id), then F(x) =x+G(x) =|x| . Translated folds x7→c+|x−c|
+follow by composing affine shifts. Iterating coordinate-wise yields the unlinking construction of Figure 9, so a width- d
+ReLU ResNet inherits the topological expressivity of absolute-value activations.
+F.4. Transformer absolute-value synthesis
+Proof of Theorem 5.3 (transformer topological expressivity). Process each coordinate xi independently as a two-token
+sequence (xi, xi) with distinct positional encodings (p1, p2). With scalar query/key/value/output weights and biases
+(wq, wk, wv, wo, bq, bk, bv, bo), the second-position attention weight reduces to a sigmoid:
+α21 = softmax(q2k1, q2k2)1 = sigmoid
+ 
+q2(k1 −k 2)
+
+,
+giving output g(xi) =w o [α21v1 + (1−α 21)v2] +b o. Choosing for instance wq =−5 , wk = 5, wv =w o = 1, p1 = 0,
+p2 = 1, bq = 4.3, bk =b v =b o = 0 produces a function with a local minimum near x= 0 , decreasing for x <0 and
+increasing forx >0, a smoothed V-shape that locally resembles|x|near the origin.
+This construction is a per-coordinatelocalsurrogate for | · |, not a global approximation. For the unlinking sequence of
+Figure 9, an affine pre-shift first rescales the compact data into the V-shape’s effective neighborhood; the resulting attention
+18
+Low-dimensional topology of deep neural networks
+map then implements a nonmonotonic coordinate fold close enough to | · |for the topological transformation, since the
+construction depends only on the existence of a coordinate-wise fold (any nonmonotonic surrogate with the required folding
+behavior on the rescaled data domain suffices), not on exact equality with | · |. Composing this attention-fold step with the
+affine transformations from each step of the unlinking sequence gives a pure-attention realization of the same topological
+transformation, breaking the linking obstruction.
+G. Experimental Details
+G.1. Hopf Link Parametrization and Thickening
+Hopf link parametrization.X(t) = (cost,sint,0)andY(s) = (1 + coss,0,sins).
+Thickening procedure.Sample points as γ(t) +ε·n(t) where n(t) is a unit normal to the curve,ε∼ U(0, r)with r= 0.15 ,
+and high-frequency oscillations0.3 sin(100t)are added to preserve topology.
+G.2. Network Architectures and Training Protocol
+All architectures use width 3. FFNs are fully connected with depths 3–20; ReLU ResNets use residual blocks x7→x+g(x)
+with 2-layer width-3 subnetworks g. We train with Adam for FFNs and AdamW for ResNets at learning rate 10−3, batch
+size 128, up to 800 epochs, early stopping with patience 100–200, and cross-entropy loss on 6000 points (3000 per class)
+split80/20for train/validation. Code: github.com/7pocheR/low dimensional topology.
+G.3. ReLU vs GELU: Detailed Observations
+Table 2 reveals three patterns. (i) Across 30 seeds, ReLU’s best run never exceeds the ∼90% topological ceiling at any
+depth (max 92.8% at depth 3); mean accuracy is bounded above by the ceiling and additionally degrades with depth as
+optimization difficulty compounds the expressivity barrier, consistent with Theorem 3.7. (ii) GELU mean accuracy stays at
+89–91% for depths 3–12 and the best run achieves 100% at depths 5–12, confirming that nonmonotonic activations escape
+the constraint (§5.1). (iii) At extreme depths (≥16 ) both activations suffer optimization instability (large stds); depth alone
+cannot compensate. Unlike standard universal-approximation results where depth substitutes for width, here depth provides
+no escape from the topological barrier.
+G.4. Higher-Dimensional Linked Spheres Construction
+For the higher-dimensional experiments (Section 6.5), we construct two n-spheres linked in R2n+1 with linking number ±1.
+The construction uses explicit parametrizations ˜A, ˜B:S n →R 2n+1 derived from stereographic projection.
+Parametrization.For u= (u 0, u′)∈S n ⊂R n+1 with u′ = (u 1, . . . , un), set a= 1−u 0/
+√
+2 and define ˜A(u) =
+(u′/a,−u 0/(
+√
+2a),0 n)∈R n×R×R n =R 2n+1, where 0n is the zero vector inRn. Symmetrically, for v= (v 0, v′)∈S n
+set b= 1−v 0/
+√
+2 and define ˜B(v) = (0 n, v0/(
+√
+2b), v′/b). The images ˜A(Sn), ˜B(Sn) are disjoint n-spheres in R2n+1
+withlink( ˜A(Sn), ˜B(Sn)) = 1(verified numerically via the higher-dimensional Gauss linking integral).
+Geometric structure.The embedding places ˜A(Sn) in the X-Z subspace (first n coordinates plus middle coordinate,
+with Y=0 ) and ˜B(Sn) in the Z-Y subspace (middle coordinate plus last n coordinates, with X=0 ). These coordinate
+subspaces intersect only along the shared middle coordinate axis, and the linking arises from the spheres’ interlocking
+configuration around this axis.
+Minimum separation.The minimum distance between points on the two spheres is dmin = 2(
+√
+2−1)≈0.828 ,
+independent ofn. This ensures the spheres remain well-separated.
+Targeted thickening.To create training data with non-trivial volume, we usetargeted thickening: each sphere is thickened
+within its complementary (normal) subspace to preserve the linking structure. In the (X, Z, Y)split with X, Y∈R n,
+Z∈R : ˜A lies in the X-Z subspace (Y= 0 ) and is thickened in the Y -direction as ˜Aρ(u, η) =˜A(u) + (0,0, η); ˜B lies in
+the Z-Y subspace (X= 0 ) and is thickened in theX-direction as ˜Bρ(v, ζ) = ˜B(v) + (ζ,0,0) , with η, ζ∼Uniform(B n(ρ))
+on then-dimensional radius-ρball. Our experiments useρ= 0.5.
+Multi-copy placement.To amplify the topological barrier (Section 6.5), we place k disjoint copies of the linked pair using
+L1-ordered grid placement: copy centers are integer lattice points in Z2n+1 enumerated in nondecreasing L1 norm order,
+19
+Low-dimensional topology of deep neural networks
+scaled by spacing s= 10 . Specifically, we enumerate shells {v∈Z 2n+1 :∥v∥ 1 =m} for m= 0,1,2, . . .and take the first
+k vectors. This spreads copies isotropically rather than along a single axis, preventing networks from exploiting directional
+biases. Each copy contributes an independent entanglement region, so networks must overcome k local obstructions
+simultaneously.
+G.5. Linking Scaling Experiments: Variance and Dimensional Effect
+For the higher-dimensional linking experiments (Table 4,S2 ⊔S 2 in R5 with k disjoint copies), we tracked accuracy variance
+across 100 seeds in addition to best-case ceilings. At small k, ReLU+Skip is both the most reliable and reaches the best
+ceiling: at k= 1 it attains 100% best and a 97.0±3.5 mean test accuracy, whereas plain ReLU’s mean is 89.4±11.4 with
+seeds occasionally collapsing far below the topological ceiling. Ask grows, monotonic ceilings (ReLU, ReLU+Skip) decline
+faster than nonmonotonic ceilings (GELU, Swish): the nonmonotonic-minus-monotonic best-case gap is mildly negative
+for k≤5 , becoming +3.7,+4.4,+3.9 pp at k= 10,20,50 . The pattern is consistent with skip connections resolving the
+single entanglement at k= 1 , while nonmonotonic activations are required to resolve each of many local entanglements at
+larger k. Mean accuracies decline for all architectures as k grows, but nonmonotonic mean accuracies remain 4–6pp above
+monotonic atk≥10, e.g., GELU mean81.0±3.7vs. ReLU+Skip mean76.4±3.9atk= 10.
+Why higher dimensions need larger k.At n= 1 (S1 ⊔S 1 in R3) the topological advantage of skip/nonmonotonic
+architectures is visible at k= 1 (Table 2); at n= 2 (S2 ⊔S 2 in R5) one needs k >5 to see it. The reason is geometric:
+monotonic networks can achieve high accuracy by sacrificing accuracy on a small overlap region of characteristic sizeε near
+each linked location, whose volume fraction scales as Θ(ε2n+1) in ambient R2n+1. For n= 1 that fraction is ∼10% ; for
+n= 2 the same ε gives ∼ε 2 smaller (the ∼90%→∼99% drop at k= 1 implies ε≈0.3 ). Real high-dimensional datasets
+are expected to compensate by having more linking opportunities (volume growing as Θ(poly(n))); our multi-copy design
+synthetically restores the cumulative obstruction so the experiment remains controlled acrossn.
+G.6. ResNet Skip Connection Visualization
+Figure 10 shows the full resolution visualization of the ResNet skip connection mechanism on the disk-annulus ( S0-S1)
+separation task. This experiment demonstrates that a depth-3 width-2 ResNet with ReLU activations learns to implement the
+folding operation|x|=x+ 2 ReLU(−x)predicted by Theorem 5.2.
+Figure 10.Full resolution ResNet skip connection visualization.(a)Input x: The nested disk (inner) and annulus (outer) form an
+S0-S1 link with link =±1. Each point is assigned a color based on its angular position in the input space; this color is preserved across
+all three panels, allowing one to track where each input point is mapped by the network. Since colors vary continuously with position,
+a point’s trajectory can be identified by locating the dot (or small patch of similar color) in each panel. (b)Residual branch output
+f(x): The learned transformation approximates 2 ReLU(−x), “folding” negative coordinate values toward zero. Note the characteristic
+triangular shape created by the ReLU. (c)Skip connection output x+f(x) : Adding the residual to the input implements |x|, folding the
+configuration and separating the two components into vertically disjoint regions. The disk and annulus are now linearly separable. This
+experiment validates that ResNet can overcome topological barriers through the skip connection mechanism.
+Training details.The ResNet architecture uses 3 residual blocks with width-2 hidden layers. Training uses Adam optimizer
+with learning rate 0.001 for 5000 epochs on 50,000 points per class. The visualization shows the block 1 transformation
+(input → first residual block output). Multiple random seeds (including seed 103 shown) consistently learn similar folding
+transformations, demonstrating that the theoretical mechanism is reliably discovered by gradient descent.
+20
+Low-dimensional topology of deep neural networks
+G.7. Width Expansion Eliminates the Obstruction
+Theorem D.1 predicts that increasing width past the critical d+ 1 threshold removes the topological barrier. We verify this
+in R7 on S3 ⊔S 3 with k= 10 copies, depth 5, 15 seeds per width (Table 7). Critical width d= 7 caps at ≈88% (mean)
+/ 93% (max), and accuracy improves overall as width is expanded (with small finite-seed nonmonotonicities), saturating
+near 99−100% around width ≈5d . The same pattern holds in R5 (k= 10 , depth 5): plain ReLU at width 20 already
+reaches 98.5% mean, and adding nonmonotonic activations or skip connections only marginally changes this, confirming
+that the architectural mechanisms (folding, skip) are most valuable when width is constrained below the critical threshold
+and become substitutable with width when width is relaxed.
+Table 7.Width-expansion inR 7 (S3 ⊔S 3,k= 10, depth5,15ReLU seeds).
+Width 7 8 10 14 21 28 35 49
+Multiplier ofd1×1.1×1.4×2×3×4×5×7×
+Mean (%) 87.9 86.7 91.2 95.4 98.8 99.4 99.6 99.7
+Max (%) 93.1 93.9 94.8 98.0 99.2 99.7 100.0 99.9
+G.8. Layer-by-Layer Linking-Number and Min-Distance Tracking
+To verify mechanistically that the impossibility theorem reflects what the network actually does, we track both the Gauss
+linking integrallinkand the minimum inter-class distanced min layer-by-layer for a width-3, depth-5network on the Hopf
+link, comparing ReLU, GELU, and ReLU+skip (Table 8).
+Table 8.Layer-by-layer link and minimum inter-class distance dmin on the Hopf link (best seed, 200 points per class). Starred ReLU link
+values are artifacts (see Interpretation below).
+InputL 0 L1 L2 L3 L4 L5
+ReLUlink−1 0.50 ∗ 0.18∗ 0 0 0 0
+ReLUd min 0.83 0.06 0.00 0.00 0.00 0.00 0.00
+GELUlink−1 0 0 0 0 0 0
+GELUd min 0.83 0.11 0.17 0.63 1.01 1.32 1.41
+ReLU+skiplink−1 0 0 0 0 0 0
+ReLU+skipd min 0.83 0.38 0.46 1.05 2.21 3.04 3.73
+Interpretation.ReLU forces the two curves into intersection by L1 (minimum distance collapses to 0); the apparent
+fractional link values at L0, L1 are not meaningful linking numbers but artifacts of the Gauss integral becoming ill-
+conditioned as |x−y| →0 (linking number is only defined for disjoint curves). After L1, the network has destroyed the
+geometric structure rather than resolved the topology, consistent with Lemma 3.5 and the impossibility theorem. GELU
+and ReLU+skip, by contrast, achieve link = 0 while keeping the curves disjoint: after the first unlinking layer (dmin small
+but positive), subsequent layers increase dmin steadily, implementing the genuine unlinking that monotonic feedforward
+networks cannot.
+H. Linking Detection Algorithm for Point Cloud Data
+This section gives the algorithm used to detect topological linking between two finite point clouds X,Y ⊂Rd. The pipeline
+is: (i) project to R3 via PCA, (ii) build k-NN spatial graphs per class, (iii) extract a fundamental cycle basis per graph, (iv)
+compute Gauss linking numbers over pairs of basis cycles.
+H.1. Graph construction
+For each class X={x 1, . . . , xn} ⊂R3, the ε-filtered k-NN graph G has vertex set {1, . . . , n}and edge (i, j)whenever
+j is among the k nearest neighbors of xi and ∥xi −x j∥ ≤ε. The threshold ε (typically a percentile of nearest-neighbor
+distances) suppresses spurious long edges. For fixed point cloud and k-NN relation, the edge set is monotone in ε: increasing
+ε only adds eligible k-NN edges, so already detected witness cycles remain graph cycles at larger thresholds. Themutual
+variant additionally requiresi∈kNN(j), yielding sparser but more symmetric graphs robust to density variation.
+21
+Low-dimensional topology of deep neural networks
+H.2. Fundamental cycle basis via spanning forest
+Definition H.1(Fundamental cycle basis).For a graph G= (V, E) with |V|=n , |E|=m , and c connected components,
+fix a spanning forest T⊂E (n−c edges). Each of the m−n+c non-tree edges e= (u, v) adds a unique cycle Ce
+consisting ofeplus the uniqueT-path fromutov. The collection{C e}is thefundamental cycle basis.
+Proposition H.2(Cycle-basis sufficiency).The fundamental cycle basis generates H1(G;Z) , so every cycle is an integer
+linear combination of basis cycles. Linking number extends bilinearly to H1, so X,Y exhibit detectable linking iff some
+basis pair(C i, Dj)haslink(C i, Dj)̸= 0.
+This reduces detection from a search over infinitely many cycle pairs to a finite computation over O(βX ·β Y ) basis pairs,
+whereβ=m−n+cis the first Betti number.
+H.3. Gauss linking number
+For disjoint piecewise-linear cycles C1, C2 ⊂R 3, we evaluate the Gauss integral link(C1, C2) = 1
+4π
+H
+C1
+H
+C2
+(x−y)·(dx×dy)
+|x−y|3
+via midpoint quadrature on subdivided edges. Algorithm 1 packages the full detection pipeline.
+Algorithm 1Link Detection for Point Cloud Data
+Require:Point cloudsX,Y ⊂R d; parametersk,ε, subdivisionN sub
+Ensure:Linked decision + witness cycle pair if linked
+1:ProjectX ∪ YtoR3 via PCA
+2:Buildε-filteredk-NN graphsG X , GY
+3:Compute spanning forests via BFS; extract fundamental cycle basesC X ,C Y
+4:ifC X =∅orC Y =∅then
+5:return(Not linked: insufficient cycles)
+6:end if
+7:forC∈ C X ,D∈ CY do
+8:ℓ←midpoint-quadrature Gauss integral overC×DwithN sub subdivisions, rounded to nearest integer
+9:ifℓ̸= 0then
+10:return(Linked, witness(C, D, ℓ))
+11:end if
+12:end for
+13:return(Not linked, all|C X | · |CY |basis pairs checked)
+H.4. Parameters and complexity
+Typical choices: k∈[6,15] (denser k exposes more cycles at the cost of compute), ε at the 70th percentile of nearest-
+neighbor distances, Nsub ∈ {4,8}subdivisions per edge, and minimum cycle length ≥4 (smaller cycles are construction
+artifacts). Use mutualk-NN for heterogeneous density.
+Complexity: k-NN graph in O(nlogn) via k-d trees; spanning forest and cycle-basis extraction in O(n+m) =O(kn) ;
+Gauss integral per cycle pair in O(L1L2N 2
+sub) for cycle lengths L1, L2. Total: O(nlogn+β X βY L2N 2
+sub). For our
+CIFAR-10 setting (n∼10 4,β∼10 2,L∼20) the algorithm runs in tens of seconds per class pair.
+I. CIFAR-10 Linking Experiments: Details
+This appendix gives the data-preparation, detection-parameter, and architectural details for the suggestive CIFAR-10 linking
+analysis of Section 6.6. We emphasize throughout that the evidence here iscorrelational, not causal, and rests on a 3D PCA
+projection rather than the native data manifold; the synthetic experiments (Appendix G) are the primary validation of the
+theory.
+I.1. Data preparation and link detection
+Augmentation and projection.We apply 20× training-set augmentation (random horizontal flip, random crop with 4-pixel
+padding, color jitter ±0.2 for brightness/contrast/saturation) to CIFAR-10 (yielding 1,050,000 samples; 105,000 per class),
+22
+Low-dimensional topology of deep neural networks
+flatten + standardize, and project toR 3 via PCA on the combined augmented dataset.
+Detection parameters.We run Algorithm 1 with k= 15 mutual nearest neighbors and minimum cycle length 30. For
+the displayed bird–deer witness, we separately binary-search the threshold ε to locate the smallest scale at which any
+pair of class cycles links. At ε= 0.0338 (0.22% of the 3D bounding-box diagonal 15.555), the bird (58-vertex) and deer
+(40-vertex) classes form interlocked cycles withlink =−1(Gauss integral−1.0036); see Figure 11.
+Figure 11.Linked cycles detected in CIFAR-10 PCA-3D: bird (blue, 58 points) and deer (red, 40 points) interlock with link =−1 at
+ε= 0.034.
+Linking-consistency definition.For a class pair (Xi, Xj) and N independent runs (each regenerating the augmented
+dataset with a fresh random seed and recomputing graphs/cycles), thelinking consistencyis consistency(Xi, Xj) =
+1
+N
+P
+r 1[|link r(Xi, Xj)| ≥1]. Variation across runs stems from augmentation randomness, sampling-dependent k-NN
+structure, and cycle-vertex placement; consistency measures how robustly a pair’s linking survives sampling variability
+rather than being a property of the underlying manifold.
+The consistency runs donotbinary-search ε independently for each pair. They use the same pre-arranged threshold sequence
+for all 45 pairs, (0.11,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.3,1.0,30.0) . Because the ε-filtered graph is monotone in ε,
+23
+Low-dimensional topology of deep neural networks
+a detected witness remains available at larger thresholds; the sequence therefore measures how small a scale suffices for
+detection, rather than whether some tuned threshold exists.
+I.2. 10-class linking consistency
+Eleven runs across all 45 CIFAR-10 class pairs give a deliberately coarse robustness measure rather than a definitive
+topological classification. The distribution is still informative: 27/45 pairs are strongly linked (consistency ≥0.7 ), 8/45 are
+weak or unlinked (≤0.3 ), and the remaining 10/45 are ambiguous. Representative high-consistency pairs include deer–dog
+(91%), bird–cat (91%), cat–deer (91%), cat–dog (82%), and automobile–truck (91%). Representative low-consistency pairs
+include frog–ship (18%), airplane–horse (18%), airplane–automobile (27%), cat–ship (27%), and deer–truck (27%). We use
+this summary, rather than the full 45-entry matrix, because the point is robustness of the signal across augmentation seeds
+and not a claim that each CIFAR-10 pair has an intrinsic binary linked/unlinked label.
+I.3. CNN architecture
+To probe whether the bounded-width topological obstruction applies to CNNs on CIFAR-10, we use width-bounded
+CNNs whose every intermediate representation has flattened dimension ≤3072 (matching the input). Each spatial-
+resolution stage quadruples channels while halving each spatial dimension, preserving the C·H·W= 3072 budget:
+3×32 2 →12×16 2 →48×8 2 →192×4 2. Depth variants L5/L8/L11 use 1/2/3 ConvBlocks per stage; ConvBlocks
+are 3×3 convs followed by activation (no batch normalization). When enabled, skip connections span each conv block:
+x7→x+G(x) . Training: Adam at 10−3, batch size 128, up to 100 epochs with patience-15 early stopping on the standard
+CIFAR-10 train/test split.
+I.4. 10-class confusion vs. linking
+For each of 42 trained models (7 activations × 3 depths × 2 skip settings) we compute the Spearman rank correlation
+between the linking-consistency scores and the symmetric confusion rateconf(i, j) =P(ˆy=j|y=i) +P(ˆy=i|y=j)
+across all 45 class pairs. The pattern is stable across L5/L8/L11 and across activation choice: mean Spearman r≈0.47
+with p <0.003 throughout. Representative L11/no-skip values are ReLU r= 0.436 (p= 0.0028 ), GELU r= 0.501
+(p= 0.0005), and Mishr= 0.497(p= 0.0005).
+The same runs show a large separation in confusion rates. High-link pairs (consistency ≥0.7 ) have about 3× the confusion
+of low-link pairs (consistency ≤0.3 ): ReLU gives 6.4% vs. 2.1%, GELU gives 6.0% vs. 1.8%, and Mish gives 5.9% vs.
+2.1%. We report representative values rather than the full per-activation table because the rows are redundant; the relevant
+observation is that the correlation persists across architectures and activations.
+I.5. Distance-metric and projection controls
+A natural concern is whether linking consistency simply measures inter-class distance. We compared linking consistency
+against two pixel-space distance metrics (mean Spearman |r| across all 42 models): linking consistency reaches 0.479,
+average pairwise distance 0.412, minimum-distance 0.356. Linking is therefore not reducible to a simple distance proxy; it
+captures additional signal about how class manifolds are intertwined rather than merely how far apart they sit on average.
+We also repeated detection under 20 random 3D projections. In the same projection-control protocol, PCA detected links
+in 21/45 class pairs, while random projections detected 31–43/45 pairs depending on the projection. Per-pair random-
+projection frequency ranged from 11/20 (frog–ship) to 20/20 (deer–dog), preserving the same weak/strong ordering
+but with less discrimination than PCA consistency ( 55–100% vs. 18–91%). These random-projection frequencies vary
+projection subspaces, whereas the linking-consistency summary above varies augmentation seeds, so they should be read as
+complementary controls rather than the same estimator.
+Caveats.The evidence above is suggestive, not causal. (i) Linking is detected in 3D PCA space, not the native 3072D pixel
+space, so some detected linking may be projection artifacts and some genuine high-dimensional linking will be invisible after
+PCA. (ii) The linked-pair gap on the binary task is modest (1.2%) and concentrated on the few hundred points that participate
+in detected cycles (∼0.1% of each class). (iii) The 10-class confusion correlation is robust but partially confounded by
+semantic similarity; the within-dataset comparison controls factors like resolution and collection methodology but cannot
+disentangle topology from semantic similarity entirely. Multi-projection aggregation and higher-dimensional topological
+data analysis are natural next steps for stronger conclusions.
+24

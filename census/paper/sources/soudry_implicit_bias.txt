@@ -1,0 +1,5890 @@
+arXiv:1710.10345v7  [stat.ML]  26 Oct 2024
+Journal of Machine Learning Research 19 (2018) 1-57 Submitt ed 4/18; Published 11/18
+The Implicit Bias of Gradient Descent on Separable Data
+Daniel Soudry DANIEL .SOUDRY @GMAIL .COM
+Elad Hoffer ELAD .HOFFER @GMAIL .COM
+Mor Shpigel Nacson MOR .SHPIGEL @GMAIL .COM
+Department of Electrical Engineering,T echnion
+Haifa, 320003, Israel
+Suriya Gunasekar SURIYA @TTIC .EDU
+Nathan Srebro NATI@TTIC .EDU
+T oyota T echnological Institute at Chicago
+Chicago, Illinois 60637, USA
+Editor: Leon Bottou
+Abstract
+We examine gradient descent on unregularized logistic regr ession problems, with homogeneous
+linear predictors on linearly separable datasets. We show t he predictor converges to the direction
+of the max-margin (hard margin SVM) solution. The result als o generalizes to other monotone de-
+creasing loss functions with an inﬁmum at inﬁnity, to multi- class problems, and to training a weight
+layer in a deep network in a certain restricted setting. Furt hermore, we show this convergence is
+very slow, and only logarithmic in the convergence of the los s itself. This can help explain the
+beneﬁt of continuing to optimize the logistic or cross-entr opy loss even after the training error is
+zero and the training loss is extremely small, and, as we show , even if the validation loss increases.
+Our methodology can also aid in understanding implicit regu larization in more complex models
+and with other optimization methods.
+Keywords: gradient descent, implicit regularization, generalizati on, margin, logistic regression
+1. Introduction
+It is becoming increasingly clear that implicit biases introduced by the optimization algorithm play a
+crucial role in deep learning and in the generalization ability of the learned models (Neyshabur et al.,
+2014, 2015; Zhang et al., 2017; Keskar et al., 2017; Neyshabu r et al., 2017; Wilson et al., 2017). In
+particular, minimizing the training error, without explic it regularization, over models with more pa-
+rameters and capacity than the number of training examples, often yields good generalization. This
+is despite the fact that the empirical optimization problem being highly underdetermined. That is,
+there are many global minima of the training objective, most of which will not generalize well, but
+the optimization algorithm ( e.g. gradient descent) biases us toward a particular minimum tha t does
+generalize well. Unfortunately, we still do not have a good u nderstanding of the biases introduced
+by different optimization algorithms in different situati ons.
+We do have an understanding of the implicit regularization i ntroduced by early stopping of
+stochastic methods or, at an extreme, of one-pass (no repetition) stochastic gradient descent (Hardt et al.,
+2016). However, as discussed above, in deep learning we ofte n beneﬁt from implicit bias even when
+optimizing the training error to convergence (without early stopping) using stochastic or batch meth-
+ods. For loss functions with attainable, ﬁnite minimizers, such as the squared loss, we have some
+©2018 Daniel Soudry, Elad Hoffer, Mor Shpigel Nacson, Suriy a Gunasekar, and Nathan Srebro.
+License: CC-BY 4.0, see https://creativecommons.org/licenses/by/4.0/. Attribution requirements are provided at
+http://jmlr.org/papers/v19/18-188.html.
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+understanding of this: in particular, when minimizing an un derdetermined least squares problem us-
+ing gradient descent starting from the origin, it can be show n that we will converge to the minimum
+Euclidean norm solution. However, the logistic loss, and it s generalization the cross-entropy loss
+which is often used in deep learning, do not admit ﬁnite minim izers on separable problems. Instead,
+to drive the loss toward zero and thus minimize it, the norm of the predictor must diverge toward
+inﬁnity.
+Do we still beneﬁt from implicit regularization when minimi zing the logistic loss on separable
+data? Clearly the norm of the predictor itself is not minimiz ed, since it grows to inﬁnity. However,
+for prediction, only the direction of the predictor, i.e. the normalized w(t)/ ∥w(t)∥, is important.
+How does w(t)/ ∥w(t)∥ behave as t → ∞ when we minimize the logistic (or similar) loss using
+gradient descent on separable data, i.e., when it is possible to get zero misclassiﬁcation error and
+thus drive the loss to zero?
+In this paper, we show that even without any explicit regular ization, for all linearly separa-
+ble datasets, when minimizing logistic regression problem s using gradient descent, we have that
+w(t)/ ∥w(t)∥ converges to the L2 maximum margin separator, i.e. to the solution of the hard mar-
+gin SVM for homogeneous linear predictors. This happens eve n though neither the norm ∥w∥, nor
+the margin constraint, are part of the objective or explicit ly introduced into optimization. More
+generally, we show the same behavior for generalized linear problems with any smooth, monotone
+strictly decreasing, lower bounded loss with an exponentia l tail. Furthermore, we characterize the
+rate of this convergence, and show that it is rather slow, whe rein for almost all datasets, the distance
+to the max-margin predictor decreasing only as O(1/ log(t)), and in some degenerate datasets, the
+rate further slows down to O(log log(t)/ log(t)). This explains why the predictor continues to im-
+prove even when the training loss is already extremely small . We emphasize that this bias is speciﬁc
+to gradient descent, and changing the optimization algorit hm, e.g. using adaptive learning rate meth-
+ods such as ADAM (Kingma and Ba, 2015), changes this implicit bias.
+2. Main Results
+Consider a dataset {xn,yn}N
+n=1, with xn ∈ Rd and binary labelsyn ∈ {−1, 1}. We analyze learning
+by minimizing an empirical loss of the form
+L (w) =
+N∑
+n=1
+ℓ
+(
+ynw⊤xn
+)
+. (1)
+where w ∈ Rd is the weight vector. To simplify notation, we assume that al l the labels are positive:
+∀n : yn = 1 — this is true without loss of generality, since we can always re-deﬁne ynxn as xn.
+We are particularly interested in problems that are linearl y separable, and the loss is smooth
+strictly decreasing and non-negative:
+Assumption 1 The dataset is linearly separable: ∃w∗ such that ∀n : w⊤
+∗ xn> 0 .
+Assumption 2 ℓ (u) is a positive, differentiable, monotonically decreasing to zero1, (so ∀u : ℓ (u)>
+0,ℓ ′ (u) < 0, limu→∞ℓ (u) = lim u→∞ℓ′ (u) = 0 ), a β-smooth function, i.e. its derivative is β-
+Lipshitz, and lim supu→−∞ℓ′ (u)< 0.
+1. The requirement of non-negativity and that the loss asymp totes to zero is purely for convenience. It is enough to
+require the loss is monotone decreasing and bounded from bel ow. Any such loss asymptotes to some constant, and is
+thus equivalent to one that satisﬁes this assumption, up to a shift by that constant.
+2
+GRADIENT DESCENT ON SEPARABLE DATA
+Assumption 2 includes many common loss functions, including the logistic, exp-loss2 and probit
+losses. Assumption 2 implies that L (w) is a βσ 2
+max (X )-smooth function, where σmax (X ) is the
+maximal singular value of the data matrix X ∈ Rd×N .
+Under these conditions, the inﬁmum of the optimization prob lem is zero, but it is not attained
+at any ﬁnite w. Furthermore, no ﬁnite critical point w exists. We consider minimizing eq. 1 using
+Gradient Descent (GD) with a ﬁxed learning rate η, i.e., with steps of the form:
+w (t + 1) = w (t) −η∇L (w(t)) = w (t) −η
+N∑
+n=1
+ℓ′
+(
+w (t)⊤ xn
+)
+xn. (2)
+We do not require convexity. Under Assumptions 1 and 2, gradi ent descent converges to the global
+minimum (i.e. to zero loss) even without it:
+Lemma 1 Let w (t) be the iterates of gradient descent (eq. 2) with η < 2β−1σ−2
+max (X ) and
+any starting point w(0). Under Assumptions 1 and 2, we have: (1) limt→∞ L (w (t)) = 0 , (2)
+limt→∞ ∥w (t)∥ = ∞, and (3) ∀n : limt→∞ w (t)⊤ xn = ∞.
+Proof Since the data is linearly separable, ∃w∗ which linearly separates the data, and therefore
+w⊤
+∗ ∇L (w) =
+N∑
+n=1
+ℓ′
+(
+w⊤xn
+)
+w⊤
+∗ xn.
+For any ﬁnite w, this sum cannot be equal to zero, as a sum of negative terms, since ∀n : w⊤
+∗ xn > 0
+and ∀u : ℓ′ (u) < 0. Therefore, there are no ﬁnite critical points w, for which ∇L (w) = 0. But
+gradient descent on a smooth loss with an appropriate stepsi ze is always guaranteed to converge to a
+critical point: ∇L (w (t)) → 0 (see, e.g. Lemma 10 in Appendix A.4, slightly adapted from Ganti
+(2015), Theorem 2). This necessarily implies that ∥w (t)∥ → ∞ while ∀n : w (t)⊤ xn > 0 for
+large enought—since only then ℓ′
+(
+w (t)⊤ xn
+)
+→ 0. Therefore, L (w) → 0, so GD converges to
+the global minimum.
+The main question we ask is: can we characterize the directio n in which w(t) diverges? That is,
+does the limit limt→∞ w (t)/ ∥w (t)∥ always exist, and if so, what is it?
+In order to analyze this limit, we will need to make a further a ssumption on the tail of the loss
+function:
+Deﬁnition 2 A functionf (u) has a “tight exponential tail”, if there exist positive cons tantsc,a,µ +,µ −,u +
+andu− such that
+∀u>u + :f (u) ≤c (1 + exp (−µ+u))e−au
+∀u>u − :f (u) ≥c (1 − exp (−µ−u))e−au.
+Assumption 3 The negative loss derivative −ℓ′ (u) has a tight exponential tail (Deﬁnition 2).
+For example, the exponential loss ℓ (u) = e−u and the commonly used logistic loss ℓ (u) =
+log (1 +e−u) both follow this assumption with a =c = 1. We will assume a =c = 1 — without
+loss of generality, since these constants can be always abso rbed by re-scaling xn andη.
+We are now ready to state our main result:
+2. The exp-loss does not have a global β smoothness parameter. However, if we initialize with η < 1/ L(w(0)) then it
+is straightforward to show the gradient descent iterates ma intain bounded local smoothness.
+3
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Theorem 3 F or any dataset which is linearly separable (Assumption 1), anyβ-smooth decreasing
+loss function (Assumption 2) with an exponential tail (Assumption 3), any stepsizeη <2β−1σ−2
+max (X )
+and any starting point w(0), the gradient descent iterates (as in eq. 2) will behave as:
+w (t) = ˆw logt + ρ (t) , (3)
+where ˆw is theL2 max margin vector (the solution to the hard margin SVM):
+ˆw = argmin
+w∈Rd
+∥w∥2 s.t. w⊤xn ≥ 1, (4)
+and the residual grows at most as ∥ρ (t)∥ =O(log log(t)), and so
+lim
+t→∞
+w (t)
+∥w (t)∥ = ˆw
+∥ ˆw∥.
+Furthermore, for almost all data sets (all except measure ze ro), the residualρ(t) is bounded.
+Proof Sketch (complete proof in the appendix) We ﬁrst understand intuitively why an expo-
+nential tail of the loss entail asymptotic convergence to th e max margin vector: Assume for sim-
+plicity that ℓ (u) = e−u exactly, and examine the asymptotic regime of gradient desc ent in which
+∀n : w (t)⊤ xn → ∞ , as is guaranteed by Lemma 1. Suppose w (t)/ ∥w (t)∥ converges to some
+limit w∞ such so we can write w (t) = g (t) w∞ + ρ (t) such that g (t) → ∞ , ∀n :x⊤
+n w∞ > 0,
+and limt→∞ ρ (t)/g (t) = 0 . The gradient can then be written as:
+−∇L (w) =
+N∑
+n=1
+exp
+(
+−w (t)⊤ xn
+)
+xn =
+N∑
+n=1
+exp
+(
+−g (t) w⊤
+∞xn
+)
+exp
+(
+−ρ (t)⊤ xn
+)
+xn. (5)
+Asg(t) → ∞ and the exponents become more negative, only those samples w ith the largest ( i.e.,
+least negative) exponents will contribute to the gradient. These are precisely the samples with
+the smallest margin argminnw⊤
+∞xn, aka the “support vectors”. The negative gradient (eq. 5)
+would then asymptotically become a non-negative linear com bination of support vectors. The limit
+w∞ will then be dominated by these gradients, since any initial conditions become negligible as
+∥w (t)∥ → ∞ (from Lemma 1). Therefore, w∞ will also be a non-negative linear combination of
+support vectors, and so will its scaling ˆw = w∞/
+(
+minn w⊤
+∞xn
+)
+. We therefore have:
+ˆw =
+N∑
+n=1
+αnxn ∀n
+(
+αn ≥ 0 and ˆw⊤xn = 1
+)
+OR
+(
+αn = 0 and ˆw⊤xn> 1
+)
+(6)
+These are precisely the KKT conditions for the SVM problem (e q. 4) and we can conclude that ˆw
+is indeed its solution and w∞ is thus proportional to it.
+To prove Theorem 3 rigorously, we need to show that w (t)/ ∥w (t)∥ has a limit, that ∀n :
+w⊤
+∞xn > 0, thatg (t) = log (t) and to bound the effect of various residual errors, such as gr adients
+of non-support vectors and the fact that the loss is only appr oximately exponential. To do so, we
+substitute eq. 3 into the gradient descent dynamics (eq. 2), with w∞ = ˆw being the max margin
+vector andg(t) = log t. We then show that, except when certain degeneracies occur, the increment
+in the norm of ρ (t) is bounded by C1t−ν for someC1 > 0 andν >1, which is a converging series.
+This happens because the increment in the max margin term, ˆw [log (t + 1) − log (t)] ≈ ˆwt−1,
+cancels out the dominant t−1 term in the gradient −∇L (w (t)) (eq. 5 with g (t) = log ( t) and
+w⊤
+∞xn = 1).
+4
+GRADIENT DESCENT ON SEPARABLE DATA
+Degenerate and Non-Degenerate Data Sets An earlier conference version of this paper (Soudry et al.,
+2018) included a partial version of Theorem 3, which only app lies to almost all data sets, in which
+case we can ensure the residualρ(t) is bounded. This partial statement (for almost all data sets ) is re-
+stated and proved as Theorem 9 in Appendix A. It applies, e.g. with probability one for data sampled
+from any absolutely continuous distribution. It does not ap ply in “degenerate” cases where some
+of the support vectors xn (for which ˆw⊤xn = 1 ) are associated with dual variables that are zero
+(αn = 0) in the dual optimum of 4. As we show in Appendix B, this only ha ppens on measure zero
+data sets. Here, we prove the more general result which appli es for all data sets, including degener-
+ate data sets. To do so, in Theorem 13 in Appendix C we provide a more complete characterization
+of the iterates w(t) that explicitly speciﬁes all unbounded components even in t he degenerate case.
+We then prove the Theorem by plugging in this more complete ch aracterization and showing that
+the residual is bounded, thus also establishing Theorem 3.
+Parallel Work on the Degenerate Case Following the publication of our initial version, and
+while preparing this revised version for publication, we le arned of parallel work by Ziwei Ji and
+Matus Telgarsky that also closes this gap. Ji and Telgarsky ( 2018) provide an analysis of the degen-
+erate case, establishing converges to the max margin predic tor by showing that
+
+
+ w(t)
+∥w(t)∥ − ˆw
+∥ ˆw∥
+
+
+ =
+O
+(√
+log logt
+logt
+)
+. Our analysis provides a more precise characterization of t he iterates, and also shows
+the convergence is actually quadratically faster (see Sect ion 3). However, Ji and Telgarsky go even
+further and provide a characterization also when the data is non-separable but w(t) still goes to
+inﬁnity.
+More Reﬁned Analysis of the Residual In some non-degenerate cases, we can further character-
+ize the asymptotic behavior of ρ (t). To do so, we need to refer to the KKT conditions (eq. 6) of
+the SVM problem (eq. 4) and the associated support vectors S = argminn ˆw⊤xn. We then have the
+following Theorem, proved in Appendix A:
+Theorem 4 Under the conditions and notation of Theorem 3, for almost al l datasets, if in addition
+the support vectors span the data (i.e. rank (XS ) = rank ( X), where XS is a matrix whose columns
+are only those data points xn s.t. ˆw⊤xn = 1), then limt→∞ ρ (t) = ˜w, where ˜w is a solution to
+∀n ∈ S : η exp
+(
+−x⊤
+n ˜w
+)
+=αn (7)
+Analogies with Boosting Perhaps most similar to our study is the line of work on unders tanding
+AdaBoost in terms its implicit bias toward largeL1-margin solutions, starting with the seminal work
+of Schapire et al. (1998). Since AdaBoost can be viewed as coo rdinate descent on the exponential
+loss of a linear model, these results can be interpreted as an alyzing the bias of coordinate descent,
+rather then gradient descent, on a monotone decreasing loss with an exact exponential tail. Indeed,
+with small enough step sizes, such a coordinate descent proc edure does converge precisely to the
+maximumL1-margin solution (Zhang et al., 2005; Telgarsky, 2013). In f act, Telgarsky (2013) also
+generalizes these results to other losses with tight expone ntial tails, similar to the class of losses we
+consider here.
+Also related is the work of Rosset et al. (2004). They conside red the regularization path wλ =
+arg min L(w) +λ ∥w∥p
+p for similar loss functions as we do, and showed that limλ→0 wλ/ ∥wλ∥p is
+proportional to the maximumLp margin solution. That is, they showed how adding inﬁnitesim alLp
+5
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+(e.g.L1 andL2) regularization to logistic-type losses gives rise to the c orresponding max-margin
+predictor.3 However, Rosset et al. do not consider the effect of the optim ization algorithm, and
+instead add explicit regularization. Here we are speciﬁcal ly interested in the bias implied by the
+algorithm not by adding (even inﬁnitesimal) explicit regularization. We see that coordinate descent
+gives rise to the max L1 margin predictor, while gradient descent gives rise to the m ax L2 norm
+predictor. In Section 4.3 and in follow-up work (Gunasekar e t al., 2018) we discuss also other
+optimization algorithms, and their implied biases.
+Non-homogeneous linear predictors In this paper we focused on homogeneous linear predictors
+of the form w⊤x, similarly to previous works ( e.g., Rosset et al. (2004); Telgarsky (2013)). Specif-
+ically, we did not have the common intercept term: w⊤x +b. One may be tempted to introduce
+the intercept in the usual way, i.e., by extending all the input vectors xn with an additional ′1′ com-
+ponent. In this extended input space, naturally, all our res ults hold. Therefore, we converge in
+direction to the L2 max margin solution (eq. 4) in the extended space. However, i f we translate this
+solution to the original x space we obtain
+argmin
+w∈Rd,b∈R
+∥w∥2 +b2 s.t. w⊤xn +b ≥ 1,
+which is not the L2 max margin (SVM) solution
+argmin
+w∈Rd,b∈R
+∥w∥2 s.t. w⊤xn +b ≥ 1,
+where we do not have a b2 penalty in the objective.
+3. Implications: Rates of convergence
+The solution in eq. 3 implies that w (t)/ ∥w (t)∥ converges to the normalized max margin vec-
+tor ˆw/ ∥ ˆw∥. Moreover, this convergence is very slow— logarithmic in the number of iterations.
+Speciﬁcally, our results imply the following tight rates of convergence:
+Theorem 5 Under the conditions and notation of Theorem 3, for any linea rly separable data set,
+the normalized weight vector converges to the normalized ma x margin vector in L2 norm
+
+
+
+
+w (t)
+∥w (t)∥ − ˆw
+∥ ˆw∥
+
+
+
+ =O
+(log logt
+logt
+)
+, (8)
+with this rate improving to O(1/ log(t)) for almost every dataset; and in angle
+1 − w (t)⊤ ˆw
+∥w (t)∥ ∥ ˆw∥ =O
+((log logt
+logt
+)2)
+, (9)
+with this rate improving to O(1/ log2(t)) for almost every dataset; and the margin converges as
+1
+∥ ˆw∥ − minn x⊤
+n w (t)
+∥w (t)∥ =O
+( 1
+logt
+)
+. (10)
+3. In contrast, with non-vanishing regularization ( i.e., λ > 0), arg minw L(w) +λ ∥w∥p
+p is generally not a max margin
+solution.
+6
+GRADIENT DESCENT ON SEPARABLE DATA
+On the other hand, the loss itself decreases as
+L (w (t)) = O
+(1
+t
+)
+. (11)
+All the rates in the above Theorem are a direct consequence of Theorem 3, except for avoiding
+the log logt factor for the degenerate cases in eq. 10 and eq. 11 ( i.e., establishing that the rates
+1/ logt and 1/t always hold)—this additional improvement is a consequence of the more complete
+characterization of Theorem 13. Full details are provided i n Appendix D. In this appendix, we also
+provide a simple construction showing all the rates in Theor em 5 are tight (except possibly for the
+log logt factors).
+The sharp contrast between the tight logarithmic and 1/t rates in Theorem 5 implies that the
+convergence of w(t) to the max-margin ˆw can be logarithmic in the loss itself, and we might need
+to wait until the loss is exponentially small in order to be cl ose to the max-margin solution. This can
+help explain why continuing to optimize the training loss, e ven after the training error is zero and
+the training loss is extremely small, still improves generalization performance—our results suggests
+that the margin could still be improving signiﬁcantly in thi s regime.
+A numerical illustration of the convergence is depicted in F igure 1. As predicted by the theory,
+the norm ∥w(t)∥ grows logarithmically (note the semi-log scaling), and w(t) converges to the max-
+margin separator, but only logarithmically, while the loss itself decreases very rapidly (note the
+log-log scaling).
+An important practical consequence of our theory, is that al though the margin of w(t) keeps
+improving, and so we can expect the population (or test) misc lassiﬁcation error of w(t) to improve
+for many datasets, the same cannot be said about the expected population loss (or test loss)! At the
+limit, the direction of w(t) will converge toward the max margin predictor ˆw. Although ˆw has zero
+training error, it will not generally have zero misclassiﬁc ation error on the population, or on a test or
+a validation set. Since the norm of w(t) will increase, if we use the logistic loss or any other convex
+loss, the loss incurred on those misclassiﬁed points will al so increase. More formally, consider the
+logistic lossℓ(u) = log(1 + e−u) and deﬁne also the hinge-at-zero loss h(u) = max(0, −u). Since
+ˆw classiﬁes all training points correctly, we have that on the training set ∑ N
+n=1h( ˆw⊤xn) = 0 .
+However, on the population we would expect some errors and so E[h( ˆw⊤x)] > 0. Since w(t) ≈
+ˆw logt andℓ(αu) →αh(u) asα → ∞, we have:
+E[ℓ(w(t)⊤x)] ≈ E[ℓ((logt) ˆw⊤x)] ≈ (logt)E[h( ˆw⊤x)] = Ω(log t). (12)
+That is, the population loss increases logarithmically whi le the margin and the population misclassi-
+ﬁcation error improve. Roughly speaking, the improvement i n misclassiﬁcation does not out-weight
+the increase in the loss of those points still misclassiﬁed.
+The increase in the test loss is practically important becau se the loss on a validation set is
+frequently used to monitor progress and decide on stopping. Similar to the population loss, the
+validation loss will increase logarithmically witht, if there is at least one sample in the validation set
+which is classiﬁed incorrectly by the max margin vector (sin ce we would not expect zero validation
+error). More precisely, as a direct consequence of Theorem 3 (as shown on Appendix D):
+Corollary 6 Letℓ be the logistic loss, and V be an independent validation set, for which ∃x ∈ V
+such that x⊤ ˆw< 0. Then the validation loss increases as
+Lval (w (t)) =
+∑
+x∈V
+ℓ
+(
+w (t)⊤ x
+)
+= Ω(log(t)).
+7
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+0.5
+1
+Normalized ||w(t)||
+t
+(B)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+610
+−10
+10
+−5
+10
+0
+L(w(t))
+t
+(C)
+ 
+ 
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+2
+4
+6
+8
+x 10
+−3
+Angle gap
+t
+(D)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+0.05
+0.1
+Margin gap
+t
+(E)
+−3 −2 −1 0 1 2 3
+−3
+−2
+−1
+0
+1
+2
+3
+x1
+x2
+(A)
+GD
+GDMO
+Figure 1: Visualization of or main results on a synthetic dat aset in which the L2 max margin vec-
+tor ˆw is precisely known. (A) The dataset (positive and negatives samples ( y = ±1)
+are respectively denoted by ′+′ and ′◦′), max margin separating hyperplane (black line),
+and the asymptotic solution of GD (dashed blue). For both GD a nd GD with momentum
+(GDMO), we show: (B) The norm of w (t), normalized so it would equal to 1 at the last
+iteration, to facilitate comparison. As expected (eq. 3), t he norm increases logarithmi-
+cally; (C) the training loss. As expected, it decreases as t−1 (eq. 11); and (D&E) the
+angle and margin gap of w (t) from ˆw (eqs. 9 and 10). As expected, these are logarith-
+mically decreasing to zero. Implementation details: The dataset includes four support
+vectors: x1 = (0.5, 1.5), x2 = (1.5, 0.5) withy1 =y2 = 1 , and x3 = −x1, x4 = −x2
+withy3 =y4 = −1 (theL2 normalized max margin vector is then ˆw = (1, 1)/
+√
+2 with
+margin equal to
+√
+2 ), and 12 other random datapoints ( 6 from each class), that are not on
+the margin. We used a learning rate η = 1/σ2
+max (X), where σ2
+max (X) is the maximal
+singular value of X, momentumγ = 0.9 for GDMO, and initialized at the origin.
+This behavior might cause us to think we are over-ﬁtting or ot herwise encourage us to stop the
+optimization. However, this increase does not actually rep resent the model getting worse, merely
+∥w(t)∥ getting larger, and in fact the model might be getting better (increasing the margin and
+possibly decreasing the error rate).
+4. Extensions
+4.1 Multi-Class Classiﬁcation with Cross-Entropy Loss
+So far, we have discussed the problem of binary classiﬁcatio n, but in many practical situations,
+we have more than two classes. For multi-class problems, the labels are the class indices yn ∈
+[K] ≜ {1,...,K } and we learn a predictor wk for each class k ∈ [K]. A common loss function
+in multi-class classiﬁcation is the following cross-entro py loss with a softmax output, which is a
+generalization of the logistic loss:
+L
+(
+{wk}k∈[K]
+)
+= −
+N∑
+n=1
+log
+(
+exp
+(
+w⊤
+ynxn
+)
+∑ K
+k=1 exp
+(
+w⊤
+k xn
+)
+)
+(13)
+8
+GRADIENT DESCENT ON SEPARABLE DATA
+What do the linear predictors wk(t) converge to if we minimize the cross-entropy loss by gradien t
+descent on the predictors? In Appendix E we analyze this prob lem for separable data and show that
+again, the predictors diverge to inﬁnity and the loss conver ges to zero. Next, to answer to which
+direction do these predictors converge, we deﬁne ˆwk as the solution of the K-class SVM:
+argminw1,...,wK
+K∑
+k=1
+||wk||2 s.t. ∀n, ∀k ̸=yn : w⊤
+ynxn ≥ w⊤
+k xn + 1, (14)
+for each k ∈ [K], deﬁne Sk = arg minn( ˆwyn − ˆwk)⊤xn = {n : ( ˆwyn − ˆwk)⊤xn = 1 }, i.e., the
+kth class support vectors, and deﬁne αn,k as some positive dual variables for Sk that together satisfy
+theK-class SVM KKT conditions. Using these deﬁnitions, we prove the following Theorem:
+Theorem 7 F or all multiclass datasets which are linearly separable (i .e. the constraints in eq. 14
+below are feasible) and for which the equation
+∀k ∈ [K], ∀n ∈ Sk : η exp
+(
+−x⊤
+n ( ˜wyn − ˜wk)
+)
+=αn,k, (15)
+has a solution { ˜wk}K
+k=1, the following holds: for any starting point w(0) and any small enough
+stepsize, the iterates of gradient descent on eq. 13 will beh ave as:
+wk(t) = ˆwk log(t) + ρk(t), (16)
+where the residual ρk(t) is bounded.
+Note that here we had to assume eq. 15 has a solution. In the bin ary case, we could prove that
+this equation has a solution for almost every dataset. In the original version of this manuscript, we
+incorrectly assumed that this proof in the binary case carries to the multiclass case (as was pointed to
+us by Y utong Wang). We therefore added the assumption that eq . 15 has a solution. We conjecture
+this assumption should also be true for almost all datasets i n the multiclass case (see Appendix H in
+Ravi et al. (2024)), but we leave this proof for future work.
+4.2 Deep networks
+So far we have only considered linear prediction. Naturally , it is desirable to generalize our results
+also to non-linear models and especially multi-layer neura l networks.
+Even without a formal extension and description of the preci se bias, our results already shed
+light on how minimizing the cross-entropy loss with gradient descent can have a margin maximizing
+effect, how the margin might improve only logarithmically s low, and why it might continue to
+improve even as the validation loss increases. These effect s are demonstrated in Figure 2 and Table
+1 which portray typical training of a convolutional neural n etwork using unregularized gradient
+descent4. As can be seen, the norm of the weight increases, but the vali dation error continues
+decreasing, albeit very slowly (as predicted by the theory) , even after the training error is zero and
+the training loss is extremely small. We can now understand h ow even though the loss is already
+extremely small, some sort of margin might be gradually impr oving as we continue optimizing.
+We can also observe how the validation loss increases despit e the validation error decreasing, as
+discussed in Section 3.
+4. Code available here: https://github.com/paper-submissions/MaxMargin
+9
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Figure 2: Training of a convolutional neural network on CIFA R10 using stochastic gradient de-
+scent with constant learning rate and momentum, softmax out put and a cross entropy
+loss, where we achieve 8.3% ﬁnal validation error. We observe that, approximately: (1)
+The training loss decays as a t−1, (2) the L2 norm of last weight layer increases logarith-
+mically, (3) after a while, the validation loss starts to inc rease, and (4) in contrast, the
+validation (classiﬁcation) error slowly improves.
+Epoch 50 100 200 400 2000 4000
+L2 norm 13.6 16.5 19.6 20.3 25.9 27.54
+Train loss 0.1 0.03 0.02 0.002 10−4 3 · 10−5
+Train error 4% 1.2% 0.6% 0.07% 0% 0%
+V alidation loss 0.52 0.55 0.77 0.77 1.01 1.18
+V alidation error 12.4% 10.4% 11.1% 9.1% 8.92% 8.9%
+Table 1: Sample values from various epochs in the experiment depicted in Fig. 2.
+As an initial advance toward tackling deep network, we can po int out that for several special
+cases, our results may be directly applied to multi-layered networks. First, somewhat trivially, our
+results may be applied directly to the last weight layer of a n eural network if the last hidden layer
+becomes ﬁxed and linearly separable after a certain number o f iterations. This can become true,
+either approximately, if the input to the last hidden layer i s normalized ( e.g., using batch norm), or
+exactly, if the last hidden layer is quantized (Hubara et al. , 2018).
+Second, as we show next, our results may be applied exactly on deep networks if only a sin-
+gle weight layer is being optimized, and, furthermore, afte r a sufﬁcient number of iterations, the
+activation units stop switching and the training error goes to zero.
+Corollary 8 We examine a multilayer neural network with component-wiseReLU functionsf (z) =
+max [z, 0], and weights {Wl}L
+l=1. Given input xn and target yn ∈ {− 1, 1}, the DNN produces a
+scalar output
+un = WLf (WL−1f (· · ·W2f (W1xn)))
+and has loss ℓ (ynun), whereℓ obeys assumptions 2 and 3.
+If we optimize a single weight layer wl = vec
+(
+W⊤
+l
+)
+using gradient descent, so that L (wl) =∑ N
+n=1ℓ (ynun(wl)) converges to zero, and ∃t0 such that ∀t > t0 the ReLU inputs do not switch
+10
+GRADIENT DESCENT ON SEPARABLE DATA
+signs, then wl(t)/ ∥wl(t)∥ converges to
+ˆwl = argmin
+wl
+∥wl∥2 s.t. ynun(wl) ≥ 1.
+Proof We examine the output of the network given a single input xn, for t > t0. Since the ReLU
+inputs do not switch signs, we can write vl, the output of layer l, as
+vl,n =
+l∏
+m=1
+Am,nWmxn,
+where we deﬁned Al,n forl < Las a diagonal 0-1 matrix, which diagonal is the ReLU slopes at
+layerl, samplen, and AL,n = 1. Additionally, we deﬁne
+δl,n = Al,n
+l+1∏
+m=L
+W⊤
+mAm,n ; ˜xl,n = δl,n ⊗ ul−1,n.
+Using this notation we can write
+un(wl) = vL,n =
+L∏
+m=1
+Am,nWmxn = δ⊤
+l,nWlul−1,n = ˜x⊤
+l,nwl. (17)
+This implies that
+L(wl) =
+N∑
+n=1
+ℓ (ynun(wl)) =
+N∑
+n=1
+ℓ
+(
+yn˜x⊤
+l,nwl
+)
+,
+which is the same as the original linear problem. Since the lo ss converges to zero, the dataset
+{˜xl,n,yn}N
+n=1 must be linearly separable. Applying Theorem 3, and recalli ng that u(wl) = ˜x⊤
+l wl
+from eq. 17, we prove this corollary.
+Importantly, this case is non-convex, unless we are optimiz ing the last layer. Note we assumed
+ReLU functions for simplicity, but this proof can be easily generalized for any other piecewise linear
+constant activation functions ( e.g., leaky ReLU, max-pooling).
+Lastly, in a follow-up work (Gunasekar et al., 2018b), given a few additional assumptions, ex-
+tended our results to linear predictors which can be written as a homogeneous polynomial in the
+parameters. These results seem to indicate that, in many cas es, GD operating on exp-tailed loss
+with positively homogeneous predictors aims to a speciﬁc di rection. This is the direction of the max
+margin predictor minimizing theL2 norm in the parameter space. It is not yet clear how to general ly
+translate such an implicit bias in the parameter space to the implicit bias in the predictor space — ex-
+cept in special cases, such as deep linear neural nets, as we h ave shown in (Gunasekar et al., 2018b).
+Moreover, in non-linear neural nets, there are many equival ent max-margin solutions which mini-
+mize theL2 norm of the parameters. Therefore, it is natural to expect th at GD would have additional
+implicit biases, which select a speciﬁc subset of these solu tions.
+11
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+0.5
+1
+Normalized ||w(t)||
+t
+(B)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+610
+−20
+10
+−10
+10
+0
+L(w(t))
+t
+(C)
+ 
+ 
+GD
+GDMO
+ADAM
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+0.05
+0.1
+0.15Angle gap
+t
+(D)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+10
+60
+1
+2Margin gap
+t
+(E)
+−50 0 50
+−50
+0
+50
+x1
+x2
+(A)
+Figure 3: Same as Fig. 1, except we multiplied all x2 values in the dastaset by 20, and also train
+using ADAM. The ﬁnal weight vector produced after 2 · 106 epochs of optimization using
+ADAM (red dashed line) does not converge to L2 max margin solu tion (black line), in
+contrast to GD (blue dashed line), or GDMO.
+4.3 Other optimization methods
+In this paper we examined the implicit bias of gradient desce nt. Different optimization algorithms
+exhibit different biases, and understanding these biases a nd how they differ is crucial to under-
+standing and constructing learning methods attuned to the i nductive biases we expect. Can we
+characterize the implicit bias and convergence rate in othe r optimization methods?
+In Figure 1 we see that adding momentum does not qualitativel y affect the bias induced by
+gradient descent. In Figure 4 in Appendix F we also repeat the experiment using stochastic gradient
+descent, and observe a similar asymptotic bias (this was lat er proved in Nacson et al. (2018)). This
+is consistent with the fact that momentum, acceleration and stochasticity do not change the bias
+when using gradient descent to optimize an under determined least squares problem. It would be
+beneﬁcial, though, to rigorously understand how much we can generalize our result to gradient
+descent variants, and how the convergence rates might chang e in these cases.
+On the other hand, as an example of how changing the optimizat ion algorithm does change the
+bias, consider adaptive methods, such as AdaGrad (Duchi et a l., 2011) and ADAM (Kingma and Ba,
+2015). In Figure 3 we show the predictors obtained by ADAM and by gradient descent on a simple
+data set. Both methods converge to zero training error solut ions. But although gradient descent
+converges to theL2 max margin predictor, as predicted by our theory, ADAM does not. The implicit
+bias of adaptive methods has in fact been a recent topic of int erest, with Hoffer et al. (2017) and
+Wilson et al. (2017) suggesting they lead to worse generalization, and Wilson et al. (2017) providing
+examples of the differences in the bias for linear regressio n problems with the squared loss. Can
+we characterize the bias of adaptive methods for logistic re gression problems? Can we characterize
+the bias of other optimization methods, providing a general understanding linking optimization
+algorithms with their biases?
+In a follow-up paper (Gunasekar et al., 2018) provided initial answers to these questions. Gunasekar et al.
+(2018) derived a precise characterization of the limit dire ction of steepest descent for general norms
+when optimizing the exp-loss, and show that for adaptive met hods such as Adagrad the limit direc-
+12
+GRADIENT DESCENT ON SEPARABLE DATA
+tion can depend on the initial point and step size and is thus n ot as predictable and robust as with
+non-adaptive methods.
+4.4 Other loss functions
+In this work we focused on loss functions with exponential tail and observed a very slow, logarithmic
+convergence of the normalized weight vector to the L2 max margin direction. A natural question
+that follows is how does this behavior change with types of lo ss function tails. Speciﬁcally, does the
+normalized weight vector always converge to the L2 max margin solution? How is the convergence
+rate affected? Can we improve the convergence rate beyond th e logarithmic rate found in this work?
+In a follow-up work Nacson et al. (2018) provided partial ans wers to these questions. They
+proved that the exponential tail has the optimal convergenc e rate, for tails for which ℓ′(u) is of the
+form exp(−uν ) withν > 0.25. They then conjectured, based on heuristic analysis, that t he expo-
+nential tail is optimal among all possible tails. Furthermo re, they demonstrated that polynomial or
+heavier tails do not converge to the max margin solution. Las tly, for the exponential loss they pro-
+posed a normalized gradient scheme which can signiﬁcantly i mprove convergence rate, achieving
+O(log(t)/
+√
+t).
+4.5 Matrix Factorization
+With multi-layered neural networks in mind, Gunasekar et al . (2017) recently embarked on a study
+of the implicit bias of under-determined matrix factorization problems, where the squared loss of the
+linear observation of a matrix is minimized by gradient desc ent on its factorization. Since a matrix
+factorization can be viewed as a two-layer network with line ar activations, this is perhaps the sim-
+plest deep model one can study in full, and can thus provide in sight and direction to studying more
+complex neural networks. Gunasekar et al. conjectured, and provided theoretical and empirical evi-
+dence, that gradient descent on the factorization for an und er-determined problem converges to the
+minimum nuclear norm solution, but only if the initializati on is inﬁnitesimally close to zero and
+the step-sizes are inﬁnitesimally small. With ﬁnite step-s izes or ﬁnite initialization, Gunasekar et al.
+could not characterize the bias.
+The follow-up paper (Gunasekar et al., 2018) studied this sa me problem with exponential loss
+instead of squared loss. Under additional assumptions on th e asymptotic convergence of update di-
+rections and gradient directions, they were able to relate t he direction of gradient descent iterates on
+the factorized parameterization asymptotically to the max imum margin solution with unit nuclear
+norm. Unlike the case of squared loss, the result for exponen tial loss are independent of initializa-
+tion and with only mild conditions on the step size. Here agai n, we see the asymptotic nature of
+exponential loss on separable data nullifying the initiali zation effects thereby making the analysis
+simpler compared to squared loss.
+5. Summary
+We characterized the implicit bias induced by gradient desc ent on homogeneous linear predictors
+when minimizing smooth monotone loss functions with an expo nential tail. This is the type of loss
+commonly being minimized in deep learning. We can now rigoro usly understand:
+1. How gradient descent, without early stopping, induces im plicit L2 regularization and con-
+verges to the maximum L2 margin solution, when minimizing for binary classiﬁcation with
+13
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+logistic loss, exp-loss, or other exponential tailed monot one decreasing loss, as well as for
+multi-class classiﬁcation with cross-entropy loss. Notab ly, even though the logistic loss and
+the exp-loss behave very different on non-separable problems, they exhibit the same behaviour
+for separable problems. This implies that the non-tail part does not affect the bias. The bias
+is also independent of the step-size used (as long as it is sma ll enough to ensure convergence)
+and is also independent on the initialization (unlike for le ast square problems).
+2. The convergence of the direction of gradient descent upda tes to the maximum L2 margin
+solution, however is very slow compared to the convergence o f training loss, which explains
+why it is worthwhile continuing to optimize long after we hav e zero training error, and even
+when the loss itself is already extremely small.
+3. We should not rely on plateauing of the training loss or on t he loss (logistic or exp or cross-
+entropy) evaluated on a validation data, as measures to deci de when to stop. Instead, we
+should look at the 0– 1 error on the validation dataset. We might improve the valida tion
+and test errors even when when the decrease in the training lo ss is tiny and even when the
+validation loss itself increases.
+Perhaps that gradient descent leads to a max L2 margin solution is not a big surprise to those for
+whom the connection between L2 regularization and gradient descent is natural. Neverthel ess, we
+are not familiar with any prior study or mention of this fact, let alone a rigorous analysis and study
+of how this bias is exact and independent of the initial point and the step-size. Furthermore, we also
+analyze the rate at which this happens, leading to the novel observations discussed above. Even more
+importantly, we hope that our analysis can open the door to further analysis of different optimization
+methods or in different models, including deep networks, wh ere implicit regularization is not well
+understood even for least square problems, or where we do not have such a natural guess as for
+gradient descent on linear problems. Analyzing gradient de scent on logistic/cross-entropy loss is
+not only arguably more relevant than the least square loss, b ut might also be technically easier.
+Acknowledgments
+The authors are grateful to J. Lee, and C. Zeno for helpful com ments on the manuscript. The
+research of DS was supported by the Israel Science Foundatio n (grant No. 31/1031), by the Taub
+foundation and of NS by the National Science Foundation.
+14
+GRADIENT DESCENT ON SEPARABLE DATA
+Appendix
+Appendix A. Proof of Theorems 3 and 4 for almost every dataset
+In the following sub-sections we ﬁrst prove Theorem 9 below, which is a version of Theorem 3,
+specialized for almost every dataset. We then prove Theorem 4 (which is already stated for almost
+every dataset).
+Theorem 9 F or almost every dataset which is linearly separable (Assum ption 1), any β-smooth
+decreasing loss function (Assumption 2) with an exponentia l tail (Assumption 3), any stepsize η <
+2β−1σ−2
+max (X ) and any starting point w(0), the gradient descent iterates (as in eq. 2) will behave
+as:
+w (t) = ˆw logt + ρ (t) , (18)
+where ˆw is theL2 max margin vector
+ˆw = argmin
+w∈Rd
+∥w∥2 s.t. ∀n : w⊤xn ≥ 1,
+the residualρ(t) is bounded, and so
+lim
+t→∞
+w (t)
+∥w (t)∥ = ˆw
+∥ ˆw∥.
+In the following proofs, for any solution w (t), we deﬁne
+r (t) = w (t) − ˆw logt − ˜w,
+where ˆw and ˜w follow the conditions of Theorems 3 and 4, i.e. ˆw is theL2 is the max margin vector
+deﬁned above, and ˜w is a vector which satisﬁes eq. 7:
+∀n ∈ S : η exp
+(
+−x⊤
+n ˜w
+)
+=αn, (19)
+where we recall that we denoted XS ∈ Rd×|S| as the matrix whose columns are the support vectors,
+a subset S ⊂ { 1,...,N } of the columns of X = [x1,..., xN ] ∈ Rd×N .
+In Lemma 12 (Appendix B) we prove that for almost every datase t α is uniquely deﬁned, there
+are no more then d support vectors and αn ̸= 0, ∀n ∈ S . Therefore, eq. 19 is well-deﬁned in those
+cases. If the support vectors do not span the data, then the so lution ˜w to eq. 19 might not be unique.
+In this case, we can use any such solution in the proof.
+We furthermore denote the minimum margin to a non-support ve ctor as:
+θ = min
+n/∈S
+x⊤
+n ˆw> 1, (20)
+and by Ci,ǫi,ti (i ∈ N) various positive constants which are independent of t. Lastly, we deﬁne
+P1 ∈ Rd×d as the orthogonal projection matrix 5 to the subspace spanned by the support vectors
+(the columns of XS ), and ¯P1 = I − P1 as the complementary projection (to the left nullspace of
+XS ).
+5. This matrix can be written as P1 = XSX+
+S , where M† is the Moore-Penrose pseudoinverse of M.
+15
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+A.1 Simple proof of Theorem 9
+In this section we ﬁrst examine the special case that ℓ (u) = e−u and take the continuous time limit
+of gradient descent: η → 0 , so
+˙w (t) = −∇L (w (t)) .
+The proof in this case is rather short and self-contained ( i.e., does not rely on any previous results),
+and so it helps to clarify the main ideas of the general (more c omplicated) proof which we will give
+in the next sections.
+Recall we deﬁned
+r (t) = w (t) − log (t) ˆw − ˜w. (21)
+Our goal is to show that ∥r (t)∥ is bounded, and therefore ρ (t) = r (t) + ˜w is bounded. Eq. 21
+implies that
+˙r (t) = ˙w (t) − 1
+t ˆw = −∇L (w (t)) − 1
+t ˆw (22)
+and therefore
+1
+2
+d
+dt ∥r (t)∥2 = ˙r⊤ (t) r (t)
+=
+N∑
+n=1
+exp
+(
+−x⊤
+n w (t)
+)
+x⊤
+n r (t) − 1
+t ˆw⊤r (t)
+=
+[ ∑
+n∈S
+exp
+(
+− log (t) ˆw⊤xn − ˜w⊤xn − x⊤
+n r (t)
+)
+x⊤
+n r (t) − 1
+t ˆw⊤r (t)
+]
++
+
+∑
+n̸/∈S
+exp
+(
+− log (t) ˆw⊤xn − ˜w⊤xn − x⊤
+n r (t)
+)
+x⊤
+n r (t)
+
+ , (23)
+where in the last equality we used eq. 21 and decomposed the su m over support vectors S and
+non-support vectors. We examine both bracketed terms. Reca ll that ˆw⊤xn = 1 forn ∈ S , and that
+we deﬁned (in eq. 19) ˜w so that∑
+n∈S exp
+(
+− ˜w⊤xn
+)
+xn = ˆw. Thus, the ﬁrst bracketed term in eq.
+23 can be written as
+1
+t
+∑
+n∈S
+exp
+(
+− ˜w⊤xn − x⊤
+n r (t)
+)
+x⊤
+n r (t) − 1
+t
+∑
+n∈S
+exp
+(
+− ˜w⊤xn
+)
+x⊤
+n r (t)
+= 1
+t
+∑
+n∈S
+exp
+(
+− ˜w⊤xn
+)(
+exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t) ≤ 0, (24)
+since ∀z, z (e−z − 1) ≤ 0. Furthermore, since ∀z e−zz ≤ 1 andθ = argminn/∈Sx⊤
+n ˆw > 1 (eq.
+20), the second bracketed term in eq. 23 can be upper bounded b y
+∑
+n̸/∈S
+exp
+(
+− log (t) ˆw⊤xn − ˜w⊤xn
+)
+exp
+(
+−x⊤
+n r(t)
+)
+x⊤
+n r(t) ≤ 1
+tθ
+∑
+n̸/∈S
+exp
+(
+− ˜w⊤xn
+)
+. (25)
+Substituting eq. 24 and 25 into eq. 23 and integrating, we obt ain, that ∃C,C ′ such that
+∀t1, ∀t>t 1 : ∥r (t)∥2 − ||r(t1)||2 ≤C
+∫ t
+t1
+dt
+tθ ≤C ′< ∞,
+16
+GRADIENT DESCENT ON SEPARABLE DATA
+sinceθ >1 (eq. 20). Thus, we showed that r(t) is bounded, which completes the proof for the
+special case. ■
+A.2 Complete proof of Theorem 9
+Next, we give the proof for the general case (non-inﬁnitesim al step size, and exponentially-tailed
+functions). Though it is based on a similar analysis as in the special case we examined in the
+previous section, it is somewhat more involved since we have to bound additional terms.
+First, we state two auxiliary lemmata, that are proven below in appendix sections A.4 and A.5:
+Lemma 10 Let L (w) be aβ-smooth non-negative objective. Ifη <2β−1, then, for any w(0), with
+the GD sequence
+w (t + 1) = w (t) −η∇L (w(t)) (26)
+we have that∑ ∞
+u=0 ∥∇L (w (u))∥2< ∞ and therefore limt→∞ ∥∇L (w (t))∥2 = 0.
+Lemma 11 We have
+∃C1,t 1 : ∀t>t 1 : ( r (t + 1) − r (t))⊤ r (t) ≤C1t− min(θ,1+1.5µ+,1+0.5µ−). (27)
+Additionally, ∀ǫ1 > 0 , ∃C2,t 2, such that ∀t>t 2, if
+∥P1r (t)∥ ≥ ǫ1, (28)
+then the following improved bound holds
+(r (t + 1) − r (t))⊤ r (t) ≤ −C2t−1< 0. (29)
+Our goal is to show that ∥r (t)∥ is bounded, and therefore ρ (t) = r (t) + ˜w is bounded. To
+show this, we will upper bound the following equation
+∥r (t + 1)∥2 = ∥r (t + 1) − r (t)∥2 + 2 (r (t + 1) − r (t))⊤ r (t) + ∥r (t)∥2 (30)
+First, we note that ﬁrst term in this equation can be upper-bo unded by
+∥r (t + 1) − r (t)∥2
+(1)
+= ∥w (t + 1) − ˆw log (t + 1) − ˜w − w (t) + ˆw log (t) + ˜w∥2
+(2)
+= ∥−η∇L (w (t)) − ˆw [log (t + 1) − log (t)]∥2
+=η2 ∥∇L (w (t))∥2 + ∥ ˆw∥2 log2(
+1 +t−1)
++ 2η ˆw⊤∇L (w (t)) log
+(
+1 +t−1)
+(3)
+≤ η2 ∥∇L (w (t))∥2 + ∥ ˆw∥2t−2 (31)
+where in (1) we used eq. 21, in (2) we used eq. 2, and in (3) we used ∀x> 0 : x ≥ log (1 +x)> 0,
+and also that
+ˆw⊤∇L (w (t)) =
+N∑
+n=1
+ℓ′
+(
+w (t)⊤ xn
+)
+ˆw⊤xn ≤ 0, (32)
+17
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+since ˆw⊤xn ≥ 1 (from the deﬁnition of ˆw) andℓ′(u) ≤ 0.
+Also, from Lemma 10 we know that
+∥∇L (w (t))∥2 =o (1) and
+∞∑
+t=0
+∥∇L (w (t))∥2< ∞. (33)
+Substituting eq. 33 into eq. 31, and recalling that a t−ν power series converges for any ν >1, we
+can ﬁnd C0 such that
+∥r (t + 1) − r (t)∥2 =o (1) and
+∞∑
+t=0
+∥r (t + 1) − r (t)∥2 =C0< ∞. (34)
+Note that this equation also implies that ∀ǫ0
+∃t0 : ∀t>t 0 : |∥r (t + 1)∥ − ∥r (t)∥|<ǫ 0. (35)
+Next, we would like to bound the second term in eq. 30. From eq. 27 in Lemma 11, we can ﬁnd
+t1,C 1 such that ∀t>t 1:
+(r (t + 1) − r (t))⊤ r (t) ≤C1t− min(θ,1+1.5µ+,1+0.5µ−). (36)
+Thus, by combining eqs. 36 and 34 into eq. 30, we ﬁnd
+∥r (t)∥2 − ∥r (t1)∥2
+=
+t−1∑
+u=t1
+[
+∥r (u + 1)∥2 − ∥r (u)∥2
+]
+≤C0 + 2
+t−1∑
+u=t1
+C1u− min(θ,1+1.5µ+,1+0.5µ−)
+which is a bounded, since θ > 1 (eq. 20) and µ−,µ + > 0 (Deﬁnition 2). Therefore, ∥r (t)∥ is
+bounded. ■
+A.3 Proof of Theorem 4
+All that remains now is to show that ∥r (t)∥ → 0 if rank (XS ) = rank ( X), and that ˜w is unique
+given w (0). To do so, this proof will continue where the proof of Theorem 3 stopped, using
+notations and equations from that proof.
+Since r (t) has a bounded norm, its two orthogonal components r (t) = P1r (t) + ¯P1r (t) also
+have bounded norms (recall that P1, ¯P1 were deﬁned in the beginning of appendix section A). From
+eq. 2, ∇L (w) is spanned by the columns of X. If rank (XS ) = rank ( X), then it is also spanned
+by the columns of XS , and so ¯P1∇L (w) = 0 . Therefore, ¯P1r (t) is not updated during GD, and
+remains constant. Since ˜w in eq. 21 is also bounded, we can absorb this constant ¯P1r (t) into ˜w
+without affecting eq. 7 (since ∀n ∈ S : x⊤
+n ¯P1r (t) = 0 ). Thus, without loss of generality, we can
+assume that r (t) = P1r (t).
+We deﬁne the set
+T = {t> max [t2,t 0] : ∥r (t)∥<ǫ 1} .
+18
+GRADIENT DESCENT ON SEPARABLE DATA
+By contradiction, we assume that the complementary set is no t ﬁnite,
+¯T = {t> max [t2,t 0] : ∥r (t)∥ ≥ ǫ1} .
+Additionally, the set T is not ﬁnite: if it were ﬁnite, it would have had a ﬁnite maxima l point
+tmax ∈ T , and then, combining eqs. 29, 30, and 34, we would ﬁnd that ∀t>t max
+∥r (t)∥2 − ∥r (tmax)∥2 =
+t−1∑
+u=tmax
+[
+∥r (u + 1)∥2 − ∥r (u)∥2
+]
+≤C0 − 2C2
+t−1∑
+u=tmax
+u−1 → −∞,
+which is impossible since ∥r (t)∥2 ≥ 0. Furthermore, eq. 34 implies that
+t∑
+u=0
+∥r (u + 1) − r (t)∥2 =C0 −h (t)
+whereh (t) is a positive monotone function decreasing to zero. Let t3,t be any two points such that
+t3 <t , {t3,t 3 + 1,...t } ⊂ ¯T , and (t3 − 1) ∈ T . For all such t3 andt, we have
+∥r (t)∥2 ≤ ∥r (t3)∥2 +
+t−1∑
+u=t3
+[
+∥r (u + 1)∥2 − ∥r (u)∥2
+]
+= ∥r (t3)∥2 +
+t−1∑
+u=t3
+[
+∥r (u + 1) − r (u)∥2 + 2 (r (u + 1) − r (u))⊤ r (u)
+]
+≤ ∥r (t3)∥2 +h (t3) −h (t − 1) − 2C2
+t−1∑
+u=t3
+u−1
+≤ ∥r (t3)∥2 +h (t3) . (37)
+Also, recall that t3 > t0, so from eq. 35, we have that |∥r (t3)∥ − ∥r (t3 − 1)∥| < ǫ0. Since
+∥r (t3 − 1)∥ < ǫ1 (from T deﬁnition), we conclude that ∥r (t3)∥ ≤ ǫ1 +ǫ0. Moreover, since ¯T
+is an inﬁnite set, we can choose t3 as large as we want. This implies that ∀ǫ2 > 0 we can ﬁnd t3
+such that ǫ2 > h(t3), since h (t) is a monotonically decreasing function. Therefore, from eq . 37,
+∀ǫ1,ǫ 0,ǫ 2, ∃t3 ∈ ¯T such that
+∀t>t 3 : ∥r (t)∥2 ≤ǫ1 +ǫ0 +ǫ2.
+This implies that ∥r (t)∥ → 0.
+Lastly, we note that since ¯P1r (t) is not updated during GD, we have that ¯P1 ( ˜w − w (0)) = 0 .
+This sets ˜w uniquely, together with eq. 7. ■
+A.4 Proof of Lemma 10
+Lemma 10 Let L (w) be aβ-smooth non-negative objective. Ifη <2β−1, then, for any w(0), with
+the GD sequence
+w (t + 1) = w (t) −η∇L (w(t)) (26)
+we have that∑ ∞
+u=0 ∥∇L (w (u))∥2< ∞ and therefore limt→∞ ∥∇L (w (t))∥2 = 0.
+19
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+This proof is a slightly modiﬁed version of the proof of Theor em 2 in (Ganti, 2015). Recall a
+well-known property of β-smooth functions:
+⏐
+⏐
+⏐f (x) −f (y) − ∇f (y)⊤ (x − y)
+⏐
+⏐
+⏐ ≤ β
+2 ∥x − y∥2 . (38)
+From theβ-smoothness of L (w)
+L (w (t + 1)) ≤ L (w (t)) + ∇L (w (t))⊤ (w (t + 1) − w (t)) + β
+2 ∥w (t + 1) − w (t)∥2
+= L (w (t)) −η ∥∇L (w (t))∥2 + βη 2
+2 ∥∇L (w (t))∥2
+= L (w (t)) −η
+(
+1 − βη
+2
+)
+∥∇L (w (t))∥2
+Thus, we have
+L (w (t)) − L (w (t + 1))
+η
+(
+1 − βη
+2
+) ≥ ∥∇L (w (t))∥2
+which implies
+t∑
+u=0
+∥∇L (w (u))∥2 ≤
+t∑
+u=0
+L (w (u)) − L (w (u + 1))
+η
+(
+1 − βη
+2
+) = L (w (0)) − L (w (t + 1))
+η
+(
+1 − βη
+2
+) .
+The right hand side is upper bounded by a ﬁnite constant, sinc eL (w (0))< ∞ and 0 ≤ L (w (t + 1)).
+This implies
+∞∑
+u=0
+∥∇L (w (u))∥2 < ∞,
+and therefore ∥∇L (w (t))∥2 → 0. ■
+A.5 Proof of Lemma 11
+Recall that we deﬁned r (t) = w (t) − ˆw logt − ˜w, with ˆw and ˜w follow the conditions of the
+Theorems 3 and 4, i.e, ˆw is theL2 max margin vector and (eq. 4), and eq. 7 holds
+∀n ∈ S : η exp
+(
+−x⊤
+n ˜w
+)
+=αn.
+Lemma 11 We have
+∃C1,t 1 : ∀t>t 1 : ( r (t + 1) − r (t))⊤ r (t) ≤C1t− min(θ,1+1.5µ+,1+0.5µ−). (27)
+Additionally, ∀ǫ1 > 0 , ∃C2,t 2, such that ∀t>t 2, if
+∥P1r (t)∥ ≥ ǫ1, (28)
+then the following improved bound holds
+(r (t + 1) − r (t))⊤ r (t) ≤ −C2t−1< 0. (29)
+20
+GRADIENT DESCENT ON SEPARABLE DATA
+From Lemma 1, ∀n : lim t→∞ w (t)⊤ xn = ∞. In addition, from assumption 3 the negative
+loss derivative −ℓ′ (u) has an exponential tail e−u (recall we assume a = c = 1 without loss of
+generality). Combining both facts, we have positive consta ntsµ−,µ +,t− andt+ such that ∀n
+∀t>t + : −ℓ′
+(
+w (t)⊤ xn
+)
+≤
+(
+1 + exp
+(
+−µ+w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)
+(39)
+∀t>t − : −ℓ′
+(
+w (t)⊤ xn
+)
+≥
+(
+1 − exp
+(
+−µ−w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)
+(40)
+Next, we examine the expression we wish to bound, recalling t hat r (t) = w (t) − ˆw logt − ˜w:
+(r (t + 1) − r (t))⊤ r (t)
+= (−η∇L (w (t)) − ˆw [log (t + 1) − log (t)])⊤ r (t)
+= −η
+N∑
+n=1
+ℓ′
+(
+w (t)⊤ xn
+)
+x⊤
+n r (t) − ˆw⊤r (t) log
+(
+1 +t−1)
+= ˆw⊤r (t)
+[
+t−1 − log
+(
+1 +t−1)]
+−η
+∑
+n/∈S
+ℓ′
+(
+w (t)⊤ xn
+)
+x⊤
+n r (t) (41)
+−η
+∑
+n∈S
+[
+t−1 exp
+(
+− ˜w⊤xn
+)
++ℓ′
+(
+w (t)⊤ xn
+)]
+x⊤
+n r (t)
+where in last line we used eqs. 6 and 7 to obtain
+ˆw =
+∑
+n∈S
+αnxn =η
+∑
+n∈S
+exp
+(
+− ˜w⊤xn
+)
+xn.
+We examine the three terms in eq. 41. The ﬁrst term can be upper bounded by
+ˆw⊤r (t)
+[
+t−1 − log
+(
+1 +t−1)]
+≤ max
+[
+ˆw⊤r (t), 0
+] [
+t−1 − log
+(
+1 +t−1)]
+(1)
+≤ max
+[
+ˆw⊤P1r (t), 0
+]
+t−2
+(2)
+≤
+{
+∥ ˆ w∥ǫ1t−2 , if ∥P1r (t)∥ ≤ ǫ1
+o
+(
+t−1)
+, if ∥P1r (t)∥>ǫ 1
+(42)
+21
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+where in (1) we used that ¯P1 ˆw = ¯P1XSα = 0 from eq. 6, and in (2) we used that ˆw⊤r (t) = o (t),
+since
+ˆw⊤r (t) = ˆw⊤
+(
+w (0) −η
+t∑
+u=0
+∇L (w (u)) − ˆw log (t) − ˜w
+)
+≤ ˆw⊤ (w (0) − ˜w − ˆw log (t)) +η ∥ ˆw∥
+t∑
+u=0
+∥∇L (w (u))∥
+≤O (log (t)) +η ∥ ˆw∥
+⌈
+√
+t⌉∑
+u=0
+∥∇L (w (u))∥ +η ∥ ˆw∥
+t∑
+u=⌈
+√
+t⌉
+∥∇L (w (u))∥
+≤O (log (t)) +η
+⌈√
+t
+⌉
+∥ ˆw∥ max
+0≤u≤⌈
+√
+t⌉
+∥∇L (w (u))∥ +ηt ∥ ˆw∥ max
+⌈
+√
+t⌉≤u≤t
+∥∇L (w (u))∥
+=O (log (t)) +
+⌈√
+t
+⌉
+O (1) +o (1)t =o (t) ,
+where in the last line we used that ∇L (w (t)) = o (1), from Lemma 10.
+Next, we upper bound the second term in eq. 41. From eq. 39 ∃t′
++, such that ∀>t 0>t ′
++,
+ℓ′(w(t)⊤xn) ≤ 2 exp(−w(t)⊤xn). (43)
+Therefore, ∀t>t ′
++:
+−η
+∑
+n/∈S
+ℓ′
+(
+w (t)⊤ xn
+)
+x⊤
+n r (t)
+≤ −η
+∑
+n/∈S: x⊤
+n r(t)≥0
+ℓ′
+(
+w (t)⊤ xn
+)
+x⊤
+n r (t)
+(1)
+≤η
+∑
+n/∈S: x⊤
+n r(t)≥0
+2 exp
+(
+−w (t)⊤ xn
+)
+x⊤
+n r (t)
+(2)
+≤η
+∑
+n/∈S: x⊤
+n r(t)≥0
+2t−x⊤
+n ˆw exp
+(
+− ˜w⊤xn − x⊤
+n r (t)
+)
+x⊤
+n r (t)
+(3)
+≤η
+∑
+n/∈S: x⊤
+n r(t)≥0
+2t−x⊤
+n ˆw exp
+(
+− ˜w⊤xn
+)
+(4)
+≤ηN exp
+(
+− min
+n
+˜ w⊤xn
+)
+t−θ (44)
+where in (1) we used eq. 43, in (2) we used w (t) = ˆw logt + ˜w + r (t), in (3) we used
+xe−x ≤ 1 and x⊤
+n r (t) ≥ 0,and in (4) we usedθ >1, from eq. 20.
+Lastly, we will bound the sum in the third term in eq. 41
+−η
+∑
+n∈S
+[
+t−1 exp
+(
+− ˜w⊤xn
+)
++ℓ′
+(
+w (t)⊤ xn
+)]
+x⊤
+n r (t) . (45)
+We examine each termn in this sum, and divide into two cases, depending on the sign o f x⊤
+n r (t).
+22
+GRADIENT DESCENT ON SEPARABLE DATA
+First, if x⊤
+n r (t) ≥ 0, then term n in eq. 45 can be upper bounded ∀t>t +, using eq. 39, by
+ηt−1 exp
+(
+− ˜w⊤xn
+)[(
+1 +t−µ+ exp
+(
+−µ+ ˜w⊤xn
+))
+exp
+(
+−x⊤
+n r (t)
+)
+− 1
+]
+x⊤
+n r (t) (46)
+We further divide into cases:
+1. If
+⏐
+⏐x⊤
+n r(t)
+⏐
+⏐ ≤C0t−0.5µ+, then we can upper bound eq. 46 with
+η exp
+(
+− (1 +µ+) min
+n
+˜w⊤xn
+)
+C0t−1−1.5µ+. (47)
+2. If
+⏐
+⏐x⊤
+n r(t)
+⏐
+⏐>C 0t−0.5µ+, then we can ﬁnd t′′
++>t ′
++ to upper bound eq. 46 ∀t>t ′′
++:
+ηt−1e− ˜w⊤xn
+[(
+1 +t−µ+e−µ+ ˜w⊤xn
+)
+exp
+(
+−C0t−0.5µ+
+)
+− 1
+]
+x⊤
+n r (t)
+(1)
+≤ηt−1e− ˜w⊤xn
+[(
+1 +t−µ+e−µ+ ˜w⊤xn
+)(
+1 −C0t−0.5µ+ +C 2
+0t−µ+
+)
+− 1
+]
+x⊤
+n r (t)
+≤ηt−1e− ˜w⊤xn
+[ (
+1 −C0t−0.5µ+ +C 2
+0t−µ+
+)
+e
+−µ+ min
+n
+˜w⊤xn
+t−µ+ −C0t−0.5µ+ +C 2
+0t−µ+
+]
+x⊤
+n r (t)
+(2)
+≤ 0, ∀t>t ′′
++ (48)
+where in (1) we used the fact that e−x ≤ 1 −x +x2 forx ≥ 0 and in (2) we deﬁned t′′
++ so
+that the previous expression is negative — since t−0.5µ+ decreases slower thant−µ+.
+3. If
+⏐
+⏐x⊤
+n r(t)
+⏐
+⏐ ≥ǫ2, then we deﬁne t′′′
++ >t ′′
++ such thatt′′′
++ > exp
+(
+minn ˜w⊤xn
+)[
+e0.5ǫ2 − 1
+] −1/µ+
+,
+and therefore ∀t>t ′′′
++, we have
+(
+1 +t−µ+ exp
+(
+−µ+ ˜w⊤xn
+))
+e−ǫ2 <e −0.5ǫ2 .
+This implies that ∀t>t ′′′
++ we can upper bound eq. 46 by
+−η exp
+(
+− max
+n
+˜w⊤xn
+)(
+1 −e−0.5ǫ2
+)
+ǫ2t−1. (49)
+Second, if x⊤
+n r(t)< 0, we again further divide into cases:
+1. If
+⏐
+⏐x⊤
+n r(t)
+⏐
+⏐ ≤ C0t−0.5µ−, then, since −ℓ′
+(
+w (t)⊤ xn
+)
+> 0, we can upper bound term n in
+eq. 45 with
+ηt−1 exp
+(
+− ˜w⊤xn
+)⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐ ≤η exp
+(
+− min
+n
+˜ w⊤xn
+)
+C0t−1−0.5µ− (50)
+2. If
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐>C 0t−0.5µ− , then, using eq. 40 we upper bound term n in eq. 45 with
+η
+[
+−t−1e− ˜w⊤xn −ℓ′
+(
+w (t)⊤ xn
+)]
+x⊤
+n r (t)
+≤η
+[
+−t−1e− ˜w⊤xn +
+(
+1 − exp
+(
+−µ−w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)]
+x⊤
+n r (t)
+=ηt−1e− ˜w⊤xn
+[
+1 − exp
+(
+−r (t)⊤ xn
+)(
+1 −
+[
+t−1e− ˜w⊤xn exp
+(
+−r (t)⊤ xn
+)] µ−)] ⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐
+(51)
+23
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Next, we will show that ∃t′
+− > t− such that the last expression is strictly negative ∀t > t′
+−.
+LetM > 1 be some arbitrary constant. Then, since
+[
+t−1e− ˜w⊤xn exp
+(
+−r (t)⊤ xn
+)] µ−
+=
+exp
+(
+−µ−w (t)⊤ xn
+)
+→ 0 from Lemma 1, ∃tM > max(t−,Me − ˜w⊤xn) such that ∀t>t M ,
+if exp
+(
+−r (t)⊤ xn
+)
+≥M >1 then
+exp
+(
+−r (t)⊤ xn
+)(
+1 −
+[
+t−1e− ˜w⊤xn exp
+(
+−r (t)⊤ xn
+)] µ−)
+≥M ′ > 1. (52)
+Furthermore, if ∃t>t M such that exp
+(
+r (t)⊤ xn
+)
+<M , then
+exp
+(
+−r (t)⊤ xn
+)(
+1 −
+[
+t−1e− ˜w⊤xn exp
+(
+−r (t)⊤ xn
+)] µ−)
+> exp
+(
+−r (t)⊤ xn
+)(
+1 −
+[
+t−1e− ˜w⊤xnM
+] µ−)
+. (53)
+which is lower bounded by
+(
+1 +C0t−0.5µ−
+)(
+1 −t−µ−
+[
+e− ˜w⊤xnM
+] µ−)
+≥1 +C0t−0.5µ− −t−µ−
+[
+e− ˜w⊤xnM
+] µ−
+−t−1.5µ−
+[
+e− ˜w⊤xnM
+] µ−
+C0
+since
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐> C0t−0.5µ−, x⊤
+n r (t) < 0 andex ≥ 1 + x. In this case last line is strictly
+larger than 1 for sufﬁciently large t. Therefore, after we substitute eqs. 52 and 53 into 51, we
+ﬁnd that ∃t′
+−>t M >t − such that ∀t>t ′
+−, termk in eq. 45 is strictly negative
+η
+[
+−t−1e− ˜w⊤xk −ℓ′
+(
+w (t)⊤ xk
+)]
+x⊤
+k r (t)< 0 (54)
+3. If
+⏐
+⏐x⊤
+k r(t)
+⏐
+⏐ ≥ǫ2 , which is a special case of the previous case (
+⏐
+⏐x⊤
+k r (t)
+⏐
+⏐> C0t−0.5µ−) then
+∀t > t′
+−, either eq. 52 or 53 holds. Furthermore, in this case, ∃t′′
+− > t′
+− andM ′′ > 1 such
+that ∀t>t ′′
+− eq. 53 can be lower bounded by
+exp (ǫ2)
+(
+1 −
+[
+t−1e− ˜w⊤xkM
+] µ−)
+>M ′′ > 1.
+Substituting this, together with eq. 52, into eq. 51, we can ﬁ ndC ′
+0 > 0 such we can upper
+bound termk in eq. 45 with
+−C ′
+0t−1, ∀t>t ′′
+−. (55)
+To conclude, we chooset0 = max
+[
+t′′′
++,t ′′
+−
+]
+:
+1. If ∥P1r (t)∥ ≥ ǫ1 (as in Eq. 28), we have that
+max
+n∈S
+⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐
+2 (1)
+≥ 1
+|S|
+∑
+n∈S
+⏐
+⏐
+⏐x⊤
+n P1r (t)
+⏐
+⏐
+⏐
+2
+= 1
+|S|
+
+
+X⊤
+S P1r (t)
+
+
+
+2 (2)
+≥ 1
+|S|σ2
+min (XS )ǫ2
+1 (56)
+where in (1) we used P⊤
+1 xn = xn ∀n ∈ S , in (2) we denoted by σmin (XS ), the minimal
+non-zero singular value of XS and used eq. 28. Therefore, for some k,
+⏐
+⏐x⊤
+k r
+⏐
+⏐ ≥ ǫ2 ≜
+24
+GRADIENT DESCENT ON SEPARABLE DATA
+√
+|S| −1σ2
+min (XS )ǫ2
+1. In this case, we denote C ′′
+0 as the minimum between C ′
+0 (eq. 55) and
+η exp
+(
+− maxn ˜w⊤xn
+)(
+1 −e−0.5ǫ2
+)
+ǫ2 (eq. 49). Then we ﬁnd that eq. 45 can be upper
+bounded by −C ′′
+0t−1 +o
+(
+t−1)
+, ∀t>t 0, given eq. 28. Substituting this result, together with
+eqs. 42 and 44 into eq. 41, we obtain ∀t>t 0
+(r (t + 1) − r (t))⊤ r (t) ≤ −C ′′
+0t−1 +o
+(
+t−1)
+.
+This implies that ∃C2 < C′′
+0 and ∃t2 > t0 such that eq. 29 holds. This implies also that eq.
+27 holds for ∥P1r (t)∥ ≥ ǫ1.
+2. Otherwise, if ∥P1r (t)∥<ǫ 1, we ﬁnd that ∀t>t 0 , each term in eq. 45 can be upper bounded
+by either zero (eqs. 48 and 54), or terms proportional to t−1−1.5µ+ (eq. 47) or t−1−0.5µ−, (eq.
+50). Combining this together with eqs. 42, 44 into eq. 41 we ob tain (for some positive
+constantsC3,C4,C5, andC6)
+(r (t + 1) − r (t))⊤ r (t) ≤C3t−1−1.5µ+ +C4t−1−0.5µ− +C5t−2 +C6t−θ.
+Therefore, ∃t1>t 0 andC1 such that eq. 27 holds. ■
+Appendix B. Generic solutions of the KKT conditions in eq. 6
+Lemma 12 F or almost all datasets there is a unique α which satisﬁes the KKT conditions (eq. 6):
+ˆw =
+N∑
+n=1
+αnxn ∀n
+(
+αn ≥ 0 and ˆw⊤xn = 1
+)
+OR
+(
+αn = 0 and ˆw⊤xn> 1
+)
+Furthermore, in this solution αn ̸= 0 if ˆw⊤xn = 1 , i.e., xn is a support vector (n ∈ S ), and there
+are at mostd such support vectors.
+For almost every set X, no more than d points xn can be on the same hyperplane. Therefore,
+since all support vectors must lie on the same hyperplane, th ere can be at most d support vectors,
+for almost every X.
+Given the set of support vectors, S, the KKT conditions of eq. 6 entail that αn = 0 ifn /∈ S and
+1 = X⊤
+S ˆw = X⊤
+S XS α S, (57)
+where we denoted α S as α restricted to the support vector components. For almost eve ry set X,
+sinced ≥ |S| , X⊤
+S XS ∈ R|S|×|S| is invertible. Therefore, α S has the unique solution
+(
+X⊤
+S XS
+)−1
+1 = α S. (58)
+This implies that ∀n ∈ S ,αn is equal to a rational function in the components of XS, i.e.,αn =
+pn (XS )/qn (XS ), wherepn andqn are polynomials in the components of XS. Therefore, ifαn = 0,
+thenpn (XS ) = 0 , so the components of XS must be at a root of the polynomialpn. The roots of the
+polynomialpn have measure zero, unless ∀XS : pn (XS ) = 0 . However, pn cannot be identically
+equal to zero, since, for example, if X⊤
+S =
+[
+I|S|×|S|, 0|S|×(d−|S|)
+]
+, then X⊤
+S XS = I|S|×|S| , and so
+in this case ∀n ∈ S ,αn = 1 ̸= 0, from eq. 58.
+25
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Therefore, for a given S, the event that “eq. 57 has a solution with a zero component” h as a
+zero measure. Moreover, the union of these events, for all po ssible S, also has zero measure, as a
+ﬁnite union of zero measures sets (there are only ﬁnitely man y possible sets S ⊂ { 1,...,N } ). This
+implies that, for almost all datasets X,αn = 0 only if n /∈ S . Furthermore, for almost all datasets
+the solution α is unique: for each dataset, S is uniquely determined, and given S , the solution eq.
+57 is uniquely given by eq. 58. ■
+Appendix C. Completing the proof of Theorem 3 for zero measur e cases
+In the preceding Appendices, we established Theorem 4, whic h only applied when all support vec-
+tors are associated with non-zero coefﬁcients. This charac terizes almost all data sets, i.e. all except
+for measure zero. We now turn to presenting and proving a more complete characterization of the
+limit behaviour of gradient descent, which covers all data s ets, including those degenerate data sets
+not covered by Theorem 4, thus establishing Theorem 3.
+In order to do so, we ﬁrst have to introduce additional notati on and a recursive treatment of the
+data set. We will deﬁne a sequence of data sets ¯PmX ¯Sm obtained by considering only a subset ¯Sm
+of the points, and projecting them using the projection matr ix ¯Pm. We start, for m = 0 , with the
+full original data set, i.e. ¯S0 = {1,...,N } and ¯P0 = Id×d. We then deﬁne ˆwm as the max margin
+predictor for ¯Pm−1X ¯Sm−1, i.e.:
+ˆwm = argmin
+w∈Rd
+∥w∥2 s.t. w⊤ ¯Pm−1xn ≥ 1 ∀n ∈ ¯Sm−1. (59)
+In particular, ˆw1 is the max margin predictor for the original data set. We then denote S +
+m the indices
+of non-support vectors for 59, Sm the indices of support vector of 59 with non-zero coefﬁcient s for
+the dual variables corresponding to the margin constraints (for some dual solution), and ¯Sm the set
+of support vector with zero coefﬁcients. That is:
+S +
+m =
+{
+n ∈ ¯Sm−1| ˆw⊤
+m ¯Pm−1xn > 1
+}
+S =
+m =
+{
+n ∈ ¯Sm−1| ˆw⊤
+m ¯Pm−1xn = 1
+}
+= ¯Sm \ S +
+m
+Sm =
+{
+n ∈ S =
+m|∃α ∈ RN
+≥0 : ˆ wm =
+N∑
+k=1
+αk ¯Pm−1xk,αn> 0, ∀i /∈ S =
+m : αi = 0
+}
+¯Sm = S =
+m \ Sm. (60)
+The problematic degenerate case, not covered by the analysi s of Theorem 4, is when there are
+support vectors with zero coefﬁcients, i.e., when ¯Sm ̸= ∅. In this case we recurse on these zero-
+coefﬁcient support vectors ( i.e., on ¯Sm), but only consider their components orthogonal to the non-
+zero-coefﬁcient support vectors ( i.e., not spanned by points in Sm). That is, we project using:
+¯Pm = ¯Pm−1
+(
+Id − XSmX†
+Sm
+)
+(61)
+where we denoted A† as the Moore-Penrose pseudo-inverse of A. We also denote Pm = Id − ¯Pm.
+This recursive treatment continues as long as ¯Sm ̸= ∅, deﬁning a sequence ˆwm of max margin
+predictors, for smaller and lower dimensional data sets ¯Pm−1X ¯Sm−1. We stop when ¯Sm = ∅ and
+26
+GRADIENT DESCENT ON SEPARABLE DATA
+denote the stopping stage M —that is, M is the minimal m such that ¯Sm = ∅. Our characterization
+will be in terms of the sequence ˆw1,..., ˆwM . As established in Lemma 12 of Appendix B, for
+almost all data sets we will not have support vectors with non -zero coefﬁcients, and so we will have
+M = 1 , and so the characterization only depends on the max margin p redictor ˆw1 of the original
+data set. But, even for the measure zero of data sets in which M > 1, we provide the following
+more complete characterization:
+Theorem 13 F or all datasets which are linearly separable (Assumption 1 ) and given a β-smooth
+loss function (Assumption 2) with an exponential tail (Assu mption 3), gradient descent (as in eq. 2)
+with step sizeη <2β−1σ−2
+max (X ) and any starting point w(0), the iterates of gradient descent can
+be written as:
+w (t) =
+M∑
+m=1
+ˆwm log◦m (t) + ρ (t) , (62)
+where log◦m (t) =
+m times
+
+ 
+log log · · ·log (t), ˆwm is the L2 max margin vector deﬁned in eq. 59, and the
+residual ρ (t) is bounded.
+C.1 Auxiliary notation
+We say that a functionf : N → R is absolutely summable if∑ ∞
+t=1 |f (t)|< ∞, and then we denote
+f (t) ∈L1. Furthermore, we deﬁne
+r (t) = w (t) −
+M∑
+m=1
+[
+ˆwm log◦m (t) + ˜wm +
+m−1∑
+k=1
+ˇwk,m
+∏ m−1
+r=k log◦r (t)
+]
+where ˜wm and ˇwk,m are deﬁned next, and additionally, we denote
+˜w =
+M∑
+m=1
+˜wm.
+We deﬁne, ∀m ≥ 1, ˜wm as the solution of
+∀m ≥ 1 : ∀n ∈ Sm : η
+∑
+n∈Sm
+exp
+(
+−
+m∑
+k=1
+˜w⊤
+k xn
+)
+¯Pm−1xn = ˆwm, (63)
+such that
+Pm−1 ˜wm = 0 and ¯Pm ˜wm = 0. (64)
+The existence and uniqueness of the solution, ˜wm are proved in appendix section C.4.
+Lastly, we deﬁne, ∀m>k ≥ 1, ˇwk,m as the solution of
+∑
+n∈Sm
+exp
+(
+− ˜w⊤xn
+)
+Pm−1xn =
+m−1∑
+k=1
+
+∑
+n∈Sk
+exp
+(
+− ˜w⊤xn
+)
+xnx⊤
+n
+
+ ˇwk,m (65)
+such that
+Pk−1 ˇwk,m = 0 and ¯Pk ˇwk,m = 0. (66)
+27
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+The existence and uniqueness of the solution ˇwk,m are proved in appendix section C.5.
+Together, eqs. 63-66 entail the existence of a unique decomp osition, ∀m ≥ 1 :
+ˆwm =η
+∑
+n∈Sm
+exp
+(
+− ˜w⊤xn
+)
+xn −η
+m−1∑
+k=1
+
+∑
+n∈Sk
+exp
+(
+− ˜w⊤xn
+)
+xnx⊤
+n
+
+ ˇwk,m (67)
+given the constraints in eqs. 64 and 66 hold.
+C.2 Proof of Theorem 13
+In the following proofs, for any solution w(t), we deﬁne
+τ (t) =
+M∑
+m=2
+ˆwm log◦m (t) +
+M∑
+m=1
+m−1∑
+k=1
+ˇwk,m
+∏ m−1
+r=k log◦r (t)
+noting that
+∥τ (t + 1) − τ (t)∥ ≤ Cτ
+t log (t)
+and
+r(t) = w(t) − ˆw1 log (t) − ˜w − τ (t) (68)
+where ˜w follow the conditions of Theorem 13. Our goal is to show that ∥r(t)∥ is bounded. To show
+this, we will upper bound the following equation
+∥r(t + 1)∥2 = ∥r(t + 1) − r(t)∥2 + 2 (r(t + 1) − r(t))⊤ r(t) + ∥r(t)∥2 (69)
+First, we note that ∃t0 such that ∀t>t 0 the ﬁrst term in this equation can be upper bounded by
+||r(t + 1) − r(t)||2
+(1)
+= ||w(t + 1) − ˆw1 log (t + 1) − τ (t + 1) − w(t) + ˆw1 log (t) + τ (t) ||2
+(2)
+= || −η∇L(w(t)) − ˆw1(log (t + 1) − log (t)) − (τ (t + 1) − τ (t))||2
+=η2||∇L(w(t))||2 + ∥ ˆw1∥2 log2(
+1 +t−1)
++ ∥τ (t + 1) − τ (t)∥2
++ 2η∇L(w(t))⊤(ˆw1 log
+(
+1 +t−1)
++ τ (t + 1) − τ (t)
+)
++ 2 ˆw⊤
+1 (τ (t + 1) − τ (t)) log
+(
+1 +t−1)
+(3)
+≤ η2||∇L(w(t))||2 + ∥ ˆw1∥2t−2 +C 2
+τt−2 log−2 (t) + 2Cτ ∥ ˆw1∥t−2 log−1(t) , ∀t>t 0 (70)
+where in (1) we used eq. 68, in (2) we used eq. 2 and in (3) we used ∀x> 0 : x ≥ log (1 +x)> 0,
+and also using ℓ′(w(t)⊤xn)< 0 for large enough t, we have that
+(
+ˆw1 log
+(
+1 +t−1)
++ τ (t + 1) − τ (t)
+)⊤
+∇L (w (t)) ≤
+N∑
+n=1
+ℓ′(w(t)⊤xn)
+(
+ˆw⊤
+1 xn log
+(
+1 +t−1)
+− ∥xn∥C′
+τ
+t log (t)
+)
+(71)
+which is negative for sufﬁciently large t0 (since log
+(
+1 +t−1)
+decreases as t−1, which is slower
+then 1/ (t log (t))), ∀n : ˆw⊤
+1 xn ≥ 1 andℓ′(u) ≤ 0.
+28
+GRADIENT DESCENT ON SEPARABLE DATA
+Also, from Lemma 10 we know that:
+∥∇L (w (t)) ∥2 =o(1) and
+∞∑
+u=0
+∥∇L(w(u))∥2 < ∞ (72)
+Substituting eq. 72 into eq. 70, and recalling that t−ν1 log−ν2 (t) converges for anyν1 > 1 and any
+ν2, and so
+κ0 (t) ≜ ||r(t + 1) − r(t)||2 ∈L1. (73)
+Also, in the next subsection we will prove that
+Lemma 14 Letκ1 (t) andκ2 (t) be functions in L1, then
+(r (t + 1) − r (t))⊤ r (t) ≤κ1 (t) ∥r (t)∥ +κ2 (t) (74)
+Thus, by combining eqs. 74 and 73 into eq. 69, we ﬁnd
+∥r(t + 1)∥2 ≤κ0 (t) + 2κ1 (t) ∥r (t)∥ + 2κ2 (t) + ∥r(t)∥2
+On this result we apply the following lemma (with φ (t) = ∥r(t)∥, h (t) = 2 κ1 (t), and z (t) =
+κ0 (t) + 2κ2 (t)), which we prove in appendix C.6:
+Lemma 15 Letφ (t),h (t),z (t) be three functions from N to R≥0, andC1,C 2,C 3 be three positive
+constants. Then, if ∑ ∞
+t=1h (t) ≤C1 < ∞, and
+φ2 (t + 1) ≤z (t) +h (t)φ (t) +φ2 (t) (75)
+we have
+φ2 (t + 1) ≤C2 +C3
+t∑
+u=1
+z (u) (76)
+and obtain that
+∥r(t + 1)∥2 ≤C2 +C3
+t∑
+u=1
+(κ0 (u) + 2κ2 (u)) ≤C4< ∞,
+since we assumed that ∀i = 0, 1, 2 : κi (t) ∈L1. This completes our proof. ■
+C.3 Proof of Lemma 14
+Before we prove Lemma 14, we prove the following auxilary Lem ma:
+Lemma 16 Consider the function f (t) = t−ν1(log(t))−ν2(log log(t))−ν3... (log◦M (t))−νM +1. If
+∃m0 ≤M + 1 such thatνm0 > 1 and for all m′<m 0,νm′ = 1, thenf (t) ∈L1.
+Proof To prove Lemma 16, we will show that the improper integeral
+∫ ∞
+t1
+f (t)dt for any t1 > 0 is
+bounded, i.e., ∀t1 > 0,
+∫ ∞
+t1
+f (t)dt < C. Using the integeral test for convergence (or Maclaurin–
+Cauchy test) this in turn implies that ∀t1> 0,∑ ∞
+t1 f (t)<C , and thus f (t) ∈L1.
+29
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+First, ifm0 > 1, thenν1 =ν2... =νm0−1 = 1 andνm0 = 1 +ǫ for someǫ> 0. Using change
+of variablesy = log ◦(m0−1)(t), we have
+dy =
+(
+t
+m0−2∏
+r=1
+log◦r(t)
+)−1
+dt =t−ν1
+m0−2∏
+r=1
+(log◦r(t))−νr+1 dt
+and for all m>m 0,
+(
+log◦(m−1)(t)
+)−νm
+=
+(
+log◦(m−m0)(y)
+)−νm
+≤ (log(y))|νm|. Thus, denoting
+˜ν =∑ M +1
+m=m0+1 |νm| and log◦(m0−1)(t1) = y1, we have
+∫ ∞
+t1
+f (t)dt =
+∫ ∞
+y1
+y−νm0
+M +1∏
+m=m0+1
+(
+log◦m−m0 (y)
+)−νm
+d(y) ≤
+∫ ∞
+y1
+(log(y))˜ν
+y1+ǫ dy. (77)
+For m0 = 1 , we have ν1 = 1 + ǫ for some ǫ > 0, and for m > 1,
+(
+log◦(m−1)(t)
+)−νm
+≤
+(log(t))|νm|. Thus, denoting, ˜ν =∑ M +1
+m=2 |νm|, we have
+∫ ∞
+t1
+f (t)dt ≤
+∫ ∞
+t1
+(log(t))˜ν
+t1+ǫ dt.
+Thus, for any m0, we only need to show that for all t1 > 0,ǫ > 0 and ˜ν >0,
+∫ ∞
+t1
+(log(t)) ˜ν
+t1+ǫ dt<
+∞.
+Let us now look at
+∫ ∞
+t1
+(log(t)) ˜ν
+t1+ǫ dt. using u = (log( t))˜ν and dv = 1
+t1+ǫ , we have du =
+˜νt−1 (log(t))˜ν−1 andv = − 1
+ǫtǫ . Using integration by parts,
+∫
+udv =uv −
+∫
+vdu, we have
+∫ (log(t))˜ν
+t1+ǫ dt = − (log(t))˜ν
+ǫtǫ + ¯ν
+ǫ
+∫ (log(t))˜ν−1
+t1+ǫ dt
+Recursing the above equation K times such that ˜ν − K < 0, we have positive constants
+c0,c 1,...c K > 0 independent oft, such that
+∫ ∞
+t1
+(log(t))˜ν
+t1+ǫ dt =
+[
+−
+K−1∑
+k=0
+ck (log(t))˜ν−k
+ǫtǫ
+] ∞
+t=t1
++cK
+∫ ∞
+t=t1
+(log(t))˜ν−K
+t1+ǫ dt
+(1)
+=
+K−1∑
+k=0
+ck (log(t1))˜ν−k
+ǫtǫ
+1
++cK
+∫ ∞
+t=t1
+(log(t))˜ν−K
+t1+ǫ dt
+(2)
+≤
+K−1∑
+k=0
+ck (log(t1))˜ν−k
+ǫtǫ
+1
++cK
+∫ ∞
+t=t1
+1
+t1+ǫ
+(3)
+=
+K−1∑
+k=0
+ck (log(t1))˜ν−k
+ǫtǫ
+1
+y + cK
+ǫtǫ
+1
+< ∞ (78)
+where (1) follows as∑ K−1
+k=0
+ck(log(t))˜ν−k
+ǫtǫ
+t→∞→ 0, (2) follows as K is chosen such that ˜ν −K <0
+and hence for all t> 0, (log(t))˜ν−K < 1. This completes the proof of the lemma.
+Lemma 14 Letκ1 (t) andκ2 (t) be functions in L1, then
+(r (t + 1) − r (t))⊤ r (t) ≤κ1 (t) ∥r (t)∥ +κ2 (t) (74)
+30
+GRADIENT DESCENT ON SEPARABLE DATA
+Proof Recall that we deﬁned
+r(t) = w(t) − q (t) (79)
+where
+q (t) =
+M∑
+m=1
+[ ˆwm log◦m (t) + hm (t)] . (80)
+hm (t) = ˜wm +
+m−1∑
+k=1
+ˇwk,m
+∏ m−1
+r=k log◦r (t)
+(81)
+with ˆwm, ˜wm and ˇwk,m deﬁned in eqs. 59, 63 and 65, respectively. We note that
+∥q (t + 1) − q (t) − ˙q (t)∥ ≤ Cqt−2 ∈L1 (82)
+where
+˙q (t) =
+M∑
+m=1
+ˆwm
+1
+t∏ m−1
+r=1 log◦r (t)
++ ˙hm (t) . (83)
+Additionally, we deﬁne Ch,C ′
+h so that
+∥hm (t)∥ ≤ ∥ ˜wm∥ +
+m∑
+k=1
+∥ ˇwk,m∥ ≤ Ch (84)
+and 
+
+ ˙hm (t)
+
+
+ ≤ C ′
+h
+t
+(∏ m−2
+r=1 log◦r (t)
+)(
+log◦(m−1) (t)
+)2 ∈L1. (85)
+We wish to calculate
+(r(t + 1) − r(t))⊤ r(t)
+(1)
+= [w(t + 1) − w (t) − [q (t + 1) − q (t)]]⊤ r (t)
+(2)
+= [−η∇L (w (t)) − ˙q (t)]⊤ r (t) − [q (t + 1) − q (t) − ˙q (t)]⊤ r (t) (86)
+where in (1) we used eq. 79 and in (2) we used the deﬁnition of GD in eq. 2. We can bound the
+second term using Cauchy-Shwartz inequality and eq. 82:
+[q (t + 1) − q (t) − ˙q (t)]⊤ r (t) ≤ ∥q (t + 1) − q (t) − ˙q (t)∥ ∥r (t)∥ ≤ Cqt−2 ∥r (t)∥ .
+Next, we examine the second term in eq. 86
+[−η∇L (w (t)) − ˙q (t)]⊤ r (t)
+=
+[
+−η
+N∑
+n=1
+ℓ′(w(t)⊤xn) xn − ˙q (t)
+] ⊤
+r (t)
+(1)
+= −
+M∑
+m=1
+˙hm (t)⊤ r (t) −η
+M∑
+m=1
+∑
+n∈S +
+m
+ℓ′(w(t)⊤xn) x⊤
+n r (t)
++
+[
+η
+M∑
+m=1
+∑
+n∈Sm
+−ℓ′(w(t)⊤xn) xn −
+M∑
+m=1
+ˆwm
+1
+t∏ m−1
+r=1 log◦r (t)
+] ⊤
+r (t), (87)
+31
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+where in (1) recall from eq. 60 that Sm, S +
+m are mutually exclusive and ∪M
+m=1Sm ∪ S +
+m = [N ].
+Next we upper bound the three terms in eq. 87.
+To bound the ﬁrst term in eq. 87 we use Cauchy-Shartz, and eq. 85.
+M∑
+m=1
+˙hm (t)⊤ r (t) ≤
+M∑
+m=1
+
+
+ ˙hm (t)
+
+
+ ∥r (t)∥ ≤ MC ′
+h
+t
+(∏ m−2
+r=1 log◦r (t)
+)(
+log◦(m−1) (t)
+)2 ∥r (t)∥
+In bounding the second term in eq. 87, note that for tight exponential tail loss, since w (t)⊤ xn →
+∞, for large enought0, we have −ℓ′(w (t)⊤ xn) ≤ (1+exp( −µ+w (t)⊤ xn)) exp(−w (t)⊤ xn) ≤
+2 exp(−w (t)⊤ xn) for all t > t0. The ﬁrst term in eq. 87 can be bounded by the following set of
+inequalities, fort>t 0,
+η
+M∑
+m=1
+∑
+n∈S +
+m
+−ℓ′(w (t)⊤ xn) x⊤
+n r (t) ≤η
+M∑
+m=1
+∑
+n∈S +
+m: x⊤
+n r(t)≥0
+−ℓ′(w (t)⊤ xn) x⊤
+n r (t)
+(1)
+≤ 2η
+M∑
+m=1
+∑
+n∈S +
+m: x⊤
+n r(t)≥0
+exp
+(
+−
+M∑
+l=1
+[
+ˆw⊤
+l xn log◦l (t) + x⊤
+n hl(t)
+]
+− x⊤
+n r (t)
+)
+x⊤
+n r (t)
+(2)
+≤ 2η
+M∑
+m=1
+∑
+n∈S +
+m: x⊤
+n r(t)≥0
+exp
+(
+−
+M∑
+l=1
+[
+ˆw⊤
+l xn log◦l (t) + x⊤
+n hl (t)
+] )
+(3)
+≤ 2η
+M∑
+m=1
+⏐
+⏐
+⏐
+⏐S +
+m max
+n∈S +
+m
+⏐
+⏐
+⏐
+⏐exp (M ∥xn∥Ch) exp
+(
+−
+M∑
+l=1
+ˆw⊤
+l xn log◦l (t)
+)
+(4)
+≤
+
+
+
+
+
+
+
+∑ M
+m=1
+2η|S +
+m| exp
+(
+M maxn∈S+m
+∥xn∥Ch
+)
+t(
+∏ m−1
+k=1 log◦k(t))(log◦m−1(t))
+θm
+( ∏ M −1
+k=m (log◦m(t)) ˆ w⊤
+k xn
+) ifM >1
+2η|S +
+1 | exp(maxn∥xn∥Ch)
+tθ1 ifM = 1
+∈L1. (88)
+where in (1) we used eqs. 79 and 80, in (2) we used that ∀x : xe−x ≤ 1 and x⊤
+n r (t) ≥ 0, (3) we
+used eq. 84 and in (4) we denoted θm = minn∈S +
+m
+ˆw⊤
+mxn > 1 and the last line is integrable based
+on Lemma 16.
+Next, we bound the last term in eq. 87. For exponential tailed losses (Assumption 3), since
+w(t)⊤xn → ∞, we have positive constants µ−,µ + > 0,t− andt+ such that ∀n
+∀t>t + : −ℓ′
+(
+w (t)⊤ xn
+)
+≤
+(
+1 + exp
+(
+−µ+w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)
+∀t>t − : −ℓ′
+(
+w (t)⊤ xn
+)
+≥
+(
+1 − exp
+(
+−µ−w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)
+We deﬁne γn(t) as
+γn(t) =
+{
+(1 + exp(−µ+w(t)⊤xn) if r (t)⊤ xn ≥ 0
+(1 − exp(−µ−w(t)⊤xn) if r (t)⊤ xn< 0 . (89)
+This impliest> max (t+,t −), −ℓ′(w(t)⊤xn) x⊤
+n r (t) ≤γn(t) exp
+(
+−w⊤ (t) xn
+)
+xn.
+32
+GRADIENT DESCENT ON SEPARABLE DATA
+From this result, we have the following set of inequalities:
+η
+M∑
+m=1
+∑
+n∈Sm
+−ℓ′(w(t)⊤xn) x⊤
+n r (t) ≤η
+M∑
+m=1
+∑
+n∈Sm
+γn(t) exp
+(
+−w (t)⊤ xn
+)
+x⊤
+n r (t)
+(1)
+=η
+M∑
+m=1
+∑
+n∈Sm
+γn(t) exp
+(
+−
+M∑
+l=1
+[
+ˆw⊤
+l xn log◦l (t) + x⊤
+n ˜wl +
+l−1∑
+k=1
+x⊤
+n ˇwk,l
+∏ l−1
+r=k log◦r (t)
+]
+− x⊤
+n r (t)
+)
+x⊤
+n r (t)
+(2)
+=
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+exp
+(
+−
+m∑
+k=1
+M∑
+l=k+1
+x⊤
+n ˇwk,l
+∏ l−1
+r=k log◦r (t)
+)
+(3)
+=
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+exp
+(
+−
+M∑
+l=m+1
+x⊤
+n ˇwm,l
+∏ l−1
+r=m log◦r (t)
+)
+ψm (t)
+≤
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+[(
+1 −
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)
++ exp
+(
+−
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)
+−
+(
+1 −
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)]
+(90)
+where in (1) we used eqs. 79 and 80, and in (2) we used Pk−1 ˇwk,m = 0 from eq. 66 (so x⊤
+n ˇwk,l = 0
+ifm<k ) and in (3) deﬁned
+ψm (t) = exp
+(
+−
+m−1∑
+k=1
+M∑
+l=k+1
+x⊤
+n ˇwk,l
+∏ l−1
+r=k log◦r (t)
+)
+. (91)
+Note ∃tψ such that ∀t>t ψ, we can bound ψm (t) by
+exp
+(
+−M maxn ∥xn∥Ch
+log◦(m−1) (t)
+)
+≤ψm (t) ≤ 1. (92)
+Thus, the third term in 87 is given by
+η
+M∑
+m=1
+∑
+n∈Sm
+−ℓ′(w(t)⊤xn) x⊤
+n r (t) −
+M∑
+m=1
+ˆw⊤
+mr (t)
+t∏ m−1
+r=1 log◦r (t)
+(1)
+≤
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+[
+exp
+(
+−
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)
+−
+(
+1 −
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)]
++
+M∑
+m=1
+[ ∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+(
+1 −
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)
+− r(t)⊤ ˆwm
+t∏ m−1
+r=1 log◦r (t)
+]
+, (93)
+where (1) follows from the bound in eq. 90.
+33
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+We examine the ﬁrst term in eq. 93
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+·
+[
+exp
+(
+−
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)
+−
+(
+1 −
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)]
+∀t>t 1 >t ψ, where we will determine t1 later. We have the following for all m ∈ [M ]
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+·
+[
+exp
+(
+−
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)
+−
+(
+1 −
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)]
+(1)
+≤
+∑
+n∈Sm:
+x⊤
+n r(t)≥0
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+ψm (t)
+t∏ m−1
+r=1 log◦r (t)
+[
+exp
+(
+−
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)
+−
+(
+1 −
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)]
+(2)
+≤
+∑
+n∈Sm:
+x⊤
+n r(t)≥0
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+(t)
+t∏ m−1
+r=1 log◦rψm (t)
+(M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+)2
+∈L1, (94)
+where we set t1 > 0 such that ∀t>t 1 the term in the square bracket is positive and
+M −1∑
+l=m
+x⊤
+n ˇwm,l+1
+∏ l
+r=m log◦r (t)
+> −1,
+in (1) we used that since e−x ≥ 1 −x, and also from using e−xx ≤ 1 and in (2) we use that
+∀x ≥ −1 we have thate−x ≤ 1 −x +x2 andψm (t) ≤ 1 from eq. 92.
+34
+GRADIENT DESCENT ON SEPARABLE DATA
+We examine the second term in eq. 93 using the decomposition o f ˆwm from eq. 67
+M∑
+m=1
+[ ∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+ψm (t)
+(
+1 −
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
+)
+− x⊤
+n ˆwm
+t∏ m−1
+r=1 log◦r (t)
+]
+(1)
+=
+M∑
+m=1
+∑
+n∈Sm
+η exp
+(
+−x⊤
+n ˜w
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+(
+γn(t) exp
+(
+−x⊤
+n r (t)
+)
+ψm (t) − 1
+)
+−
+M∑
+m=1
+∑
+n∈Sm
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)ψm(t)
+t∏ m−1
+r=1 log◦r (t)
+M−1∑
+l=m
+x⊤
+n ˇwm,l +1
+∏ l
+r=m log◦r (t)
++
+M∑
+m=1
+m−1∑
+k=1
+∑
+n∈Sk
+η exp
+(
+−x⊤
+n ˜w
+)
+x⊤
+n r (t) x⊤
+n ˇwk,m
+∏ m−1
+r=1 t log◦r (t)
+(2)
+=
+M∑
+m=1
+∑
+n∈Sm
+η exp
+(
+−x⊤
+n ˜w
+)
+x⊤
+n r (t)
+t∏ m−1
+r=1 log◦r (t)
+(
+γn(t) exp
+(
+−x⊤
+n r (t)
+)
+ψm (t) − 1
+)
+−
+M∑
+m=1
+∑
+n∈Sm
+M−1∑
+l=m
+ηγn(t) exp
+(
+−x⊤
+n ˜w
+)
+exp
+(
+−x⊤
+n r (t)
+)
+x⊤
+n r (t)ψm(t)x⊤
+n ˇwm,l +1
+t∏ l
+r=1 log◦r (t)
++
+M∑
+k=1
+∑
+n∈Sk
+M−1∑
+m=k
+η exp
+(
+−x⊤
+n ˜w
+)
+x⊤
+n r (t) x⊤
+n ˇwk,m +1
+∏ m
+r=1t log◦r (t)
+(3)
+=
+M∑
+m=1
+∑
+n∈Sm
+[
+1
+t∏ m−1
+r=1 log◦r (t)
+−
+M−1∑
+k=m
+x⊤
+n ˇwm,k +1
+t∏ k
+r=1 log◦r (t)
+]
+η exp
+(
+−x⊤
+n ˜w
+)(
+γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t)
+:=
+M∑
+m=1
+∑
+n∈Sm
+Γ m,n (t), (95)
+where in (1) we used eq. 67, in (2) we re-arranged the order of summation in the last term, and in
+(3) we just use a change of variables.
+Next, we examine Γm,n(t) for each m andn ∈ Sm in eq. 95. Note that, ∃t2 > tψ such that
+∀t>t 2 we have ⏐
+⏐
+⏐
+⏐
+⏐
+M −1∑
+k=m
+x⊤
+n ˇwm,k+1
+t∏ k
+r=1 log◦r (t)
+⏐
+⏐
+⏐
+⏐
+⏐ ≤ 0.5
+t∏ m−1
+r=1 log◦r (t)
+.
+In this case, ∀t>t 2
+Γm,n(t)
+(1)
+≤ η
+[
+κ(n,t )
+t∏ m−1
+r=1 log◦r (t)
+]
+exp
+(
+−x⊤
+n ˜w
+)(
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t),
+(96)
+where in (1) follows from the deﬁnition of t2, wherein
+κn(t) =
+{ 1.5 if
+(
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t)> 0
+0.5 if
+(
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t)< 0 .
+1. First, if x⊤
+n r (t)> 0, thenγn(t) = (1 + exp( −µ+w(t)⊤xn))> 0.
+We further divide into two cases. In the following C0,C 1 are some constants independent of t.
+35
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+(a) If
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐>C 0t−0.5µ+ , then we have the following
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+(1)
+≤
+(
+1 + exp
+(
+−µ+
+M∑
+l=1
+[
+ˆw⊤
+l xn log◦l(t) + h⊤
+l xn
+] ))
+exp
+(
+−x⊤
+n r (t)
+)
+(2)
+≤
+
+1 + exp(µ+Ch ∥xn∥)
+(
+t∏ m−1
+r=1 log◦r (t)
+)µ+
+
+ exp(−C0t−0.5µ+)
+(3)
+≤
+(
+1 +C1t−µ+
+)(
+1 −C0t−0.5µ+ + 0.5C 2
+0t−µ+
+)
+, ∀t>t ′
++
+≤ 1 −C0t−0.5µ+
+(
+1 +C1t−µ+
+)
++ 0.5C 2
+0t−µ+
+(
+1 +C1t−µ+
+)(4)
+≤ 1, ∀t>t ′′
++, (97)
+where in (1), we use ψm(t) ≤ 1 from eq. 92 and using eq. 79, in (2) we used bound on hm
+from eq. 84, in (3) for some large enough t′
++ > t+, we have exp(µ+Ch∥xn∥)
+(
+∏ m−1
+r=1 log◦r(t))
+µ+ ≤ C1, and
+for the second term we used the inequality e−x ≤ 1 −x + 0.5x2 forx > 0, and (4) holds
+asymptotically for t > t′′
++ for large enough t′′
++ > t′
++ as C0t−0.5µ+ converges slower than
+0.5C 2
+0t−µ+ to 0.
+Thus, using eq. 97 in eq. 96, ∀t> max (t2,t ′′
++), we have
+Γm,n(t)≤
+[
+ηκ(n,t ) exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+] (
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t) ≤ 0
+(b) If 0< x⊤
+n r (t)<C 0t−0.5µ+, then we have the following:ψm(t) ≤ 1 from eq. 92, exp
+(
+−x⊤
+n r (t)
+)
+≤
+1 as x⊤
+n r (t)> 0, and since w(t)⊤xn → ∞, for large enought>t ′′′
++,γn(t) =
+(
+1 + exp
+(
+−µ+w(t)⊤xn
+))
+≤
+2
+This gives us,
+(
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r (t) ≤ x⊤
+n r (t) ≤C0t−0.5µ+, and using
+this in eq. 96, ∀t> max (t2,t ′
++)
+Γm,n(t)≤
+[
+ηκ(n,t ) exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+]
+C0t−0.5µ+ ∈L1.
+2. Second, if x⊤
+n r (t) ≤ 0, then γn(t) = (1 − exp(−µ−w(t)⊤xn)) ∈ (0, 1). We again divide
+into following special cases.
+(a) If
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐ ≤C0
+(
+log◦(m−1)(t)
+)−0.5˜µ−
+, where ˜µ− = min (µ−, 1), then we have
+Γm,n(t) ≤
+[
+1.5η exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+] (
+1 −γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+))⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐
+(1)
+≤
+[
+1.5η exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−2
+r=1 log◦r (t)
+]
+C0
+(
+log◦(m−1)(t)
+)−1−0.5˜µ−
+∈L1.
+where in (1) we used that
+(
+1 −γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+))
+< 1 and
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐ ≤C0
+(
+log◦(m−1)(t)
+)−0.5˜µ−
+.
+36
+GRADIENT DESCENT ON SEPARABLE DATA
+(b) If ψm (t) exp
+(
+−x⊤
+n r (t)
+)
+< 1, then, from eq. 92
+−M maxn ∥xn∥Ch
+log◦(m−1) (t)
+≤ logψm (t)< x⊤
+n r (t). (98)
+In this case, sinceγn(t) = 1 −exp(−w(t)⊤xn)< 1, we also haveγn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+)
+<
+1, and hence
+(
+γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+)
+− 1
+)
+x⊤
+n r(t) > 0. Thus, ∀t > t2, in 96, κn(t) =
+1.5, and we have
+Γm,n(t) ≤
+[
+1.5η exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+] (
+1 −γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+))⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐
+(1)
+≤
+[
+1.5η exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+]
+M maxn ∥xn∥Ch
+log◦(m−1) (t)
+≤ C2
+t∏ m−2
+r=1 log◦r (t)
+(
+log◦(m−1) (t)
+)2 ∈L1,
+where (1) follows from
+(
+1 −γn(t)ψm (t) exp
+(
+−x⊤
+n r (t)
+))
+< 1 and the bound on |x⊤
+n r(t)| =
+−x⊤
+n r(t) from eq. 98.
+(c) If ψm (t) exp
+(
+−x⊤
+n r (t)
+)
+> 1, and
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐>C 0
+(
+log◦(m−1)(t)
+)−0.5˜µ−
+, where ˜µ= min (1,µ −).
+Since, x⊤
+n w(t) → ∞ andψm(t) → 1 from eq. 91, for large enought′
+−>t −, we have ∀t>t ′
+−,
+ψm(t)> 0.5 andγn(t) = (1 − exp(−µ−x⊤
+n w(t)))> 0.5. Let τ >max (4,t ′
+−) be an arbitrar-
+ily large constant. For allt>τ , if exp
+(
+−x⊤
+n r (t)
+)
+>τ ≥ 4, thenγn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+>
+0.25τ ≥ 1.
+On the other hand, if there exists t > τ≥ 4, such that exp
+(
+−x⊤
+n r (t)
+)
+< τ, then for some
+constantsC1,C 2 we have the following
+(i) exp(−x⊤
+n r (t)) = exp( |x⊤
+n r (t) |) ≥
+(
+1 +C0
+(
+log◦(m−1)(t)
+)−0.5˜µ−
+)
+, since ex > 1 +
+x for allx,
+(ii) ψm(t) ≥ exp
+(
+−C1
+(
+log◦(m−1)(t)
+)−1)
+≥
+(
+1 −C1
+(
+log◦(m−1)(t)
+)−1)
+from eq. 92
+and again using ex> 1 +x for allx,
+(iii)
+γn(t) =
+(
+1 −
+[
+exp(−hl(t)⊤xn) exp
+(
+−x⊤
+n r (t)
+)
+t∏ m−1
+r=1 log◦r(t)
+] µ−)
+≥
+(
+1 −
+[
+exp(−Ch∥xn∥)τ
+t∏ m−1
+r=1 log◦r(t)
+] µ−)
+≥
+(
+1 −
+(
+C2 log◦(m−1)(t)
+)−µ−
+)
+, ∀t>t ′′
+−
+where the last inequality follows as for large enough t′′
+−>t ′
+−, we have exp(−Ch∥xn∥)τ
+t ∏ m−2
+r=1 log◦r(t) ≤
+C2.
+37
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Using the above inequalities, we have
+γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+)
+≥
+(
+1 +C0
+(
+log◦(m−1)(t)
+)−0. 5˜µ −
+)(
+1 −C1
+(
+log◦(m−1)(t)
+)−1)(
+1 −C2
+(
+log◦(m−1)(t)
+)−µ −
+)
+(1)
+≥ 1 +C0
+(
+log◦(m−1)(t)
+)−0. 5˜µ −
+−C1
+(
+log◦(m−1)(t)
+)−1
+−C2
+(
+log◦(m−1)(t)
+)−µ −
+−C0C2
+(
+log◦(m−1)(t)
+)−µ −0. 5˜µ −
+−C0C1
+(
+log◦(m−1)(t)
+)−1−0. 5˜µ − (2)
+≥ 1, ∀t>t ′′′
+−, (99)
+where in (1) we dropped the other positive terms, and (2) follows for large enough t′′′
+− > t′′
+−
+as theC0 log
+(
+log◦(m−1)(t)
+)−0.5˜µ−
+converges to 0 more slowly than the other negative terms.
+Finally, using eq. 99 in eq. 96, we have for all t> max (t2,τ,t ψ,t ′′′
+−)
+Γm,n(t) ≤
+[
+ηκ(n,t ) exp
+(
+−x⊤
+n ˜w
+)
+t∏ m−1
+r=1 log◦r (t)
+] (
+1 −γn(t)ψm(t) exp
+(
+−x⊤
+n r (t)
+))⏐
+⏐
+⏐x⊤
+n r (t)
+⏐
+⏐
+⏐ ≤ 0
+(100)
+Collecting all the terms from the above special cases, and su bstituting back into eq. 86, we note
+that all terms are either negative, in L1, or of the form f (t) ∥r (t)∥, wheref (t) ∈L1, thus proving
+the lemma.
+C.4 Proof of the existence and uniqueness of the solution to e qs. 63-64
+We wish to prove that ∀m ≥ 1 :
+∑
+n∈Sm
+exp
+(
+−
+m∑
+k=1
+˜w⊤
+k xn
+)
+¯Pm−1xn = ˆwm, (101)
+such that
+Pm−1 ˜wm = 0 and ¯Pm ˜wm = 0, (102)
+we have a unique solution. From eq. 102, we can modify eq. 101 t o
+∑
+n∈Sm
+exp
+(
+−
+m∑
+k=1
+˜w⊤
+k ¯Pk−1xn
+)
+¯Pm−1xn = ˆwm,.
+To prove this, without loss of generality, and with a slight a buse of notation, we will denote Sm as
+S1, ¯Pm−1xn as xn andβn = exp
+(
+−∑ m−1
+k=1 ˜w⊤
+k ¯Pk−1xn
+)
+, so we can write the above equation as
+∑
+n∈S1
+xnβn exp
+(
+−x⊤
+n ˜w1
+)
+= ˆw1
+In the following Lemma 17 we prove this equation ∀β ∈ R|S1|
+>0 .
+38
+GRADIENT DESCENT ON SEPARABLE DATA
+Lemma 17 ∀β ∈ R|S1|
+>0 we can ﬁnd a unique ˜w such that
+∑
+n∈S1
+xnβn exp
+(
+−x⊤
+n ˜w1
+)
+= ˆw1 (103)
+and for ∀z ∈ Rd such that z⊤XS1 = 0 we would have ˜w⊤
+1 z = 0.
+Proof LetK = rank ( XS1). Let and U = [ u1,..., ud] ∈ Rd×d be a set of orthonormal vectors
+(i.e., UU⊤ = U⊤U = I) such that u1 = ˆ w1/ ∥ ˆ w1∥, and
+∀z ̸= 0, ∀n ∈ S 1 : z⊤ [u1,..., uK]⊤ xn ̸= 0, (104)
+while
+∀i>K : ∀n ∈ S 1 : u⊤
+i xn = 0. (105)
+In other words, u1 is in the direction of ˆ w1, [u1,..., uK ] are in the space spanned by the columns
+of XS1, and [uK+1,..., ud] are orthogonal to the columns of XS1.
+We deﬁne vn = U⊤xn and s = U⊤ ˜w1. Note that ∀i > K: vi,n = 0 ∀n ∈ S 1 from eq. 105,
+and ∀i > K: si = 0 , since for ∀z ∈ Rd such that z⊤XS1 = 0 we would have ˜w⊤
+1 z = 0 . Lastly,
+equation 103 becomes
+∑
+n∈S1
+xnβn exp
+
+−
+K∑
+j=1
+sjvj,n
+
+ = ˆw1. (106)
+Multiplying by U⊤ from the left, we obtain
+∀i ≤K :
+∑
+n∈S1
+vi,nβn exp
+
+−
+K∑
+j=1
+sjvj,n
+
+ = u⊤
+i ˆw1.
+Since u1 = ˆ w1/ ∥ ˆ w1∥, we have that
+∀i ≤K :
+∑
+n∈S1
+vi,nβn exp
+
+−
+K∑
+j=1
+sjvj,n
+
+ = ∥ ˆ w1∥δi,1. (107)
+We recall thatv1,n = ˆw⊤
+1 xn/ ∥ ˆ w1∥ = 1/ ∥ ˆ w1∥, ∀n ∈ S 1. Given {sj}K
+j=2, we examine eq. 107 for
+i = 1,
+exp
+(
+− s1
+∥ ˆ w1∥
+)
+∑
+n∈S1
+βn exp
+
+−
+K∑
+j=2
+sjvj,n
+
+
+
+ = ∥ ˆ w1∥2 .
+This equation always has the unique solution
+s1 = ∥ ˆ w1∥ log
+
+∥ ˆ w1∥−2 ∑
+n∈S1
+βn exp
+
+−
+K∑
+j=2
+sjvj,n
+
+
+
+ , (108)
+given {sj}K
+j=2. Next, we similarly examine eq. 107 for 2 ≤i ≤K as a function of si
+∑
+n∈S1
+βnvi,n exp
+
+−s1/ ∥ ˆ w1∥ −
+K∑
+j=2
+sjvj,n
+
+ = 0. (109)
+39
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+multiplying by exp (s1/ ∥ ˆ w1∥) we obtain
+0 =
+∑
+n∈S1
+βnvi,n exp
+
+−
+K∑
+j=2
+sjvj,n
+
+ = − ∂
+∂si
+[E (s2,...,s K)] ,
+where we deﬁned
+E (s2,...,s K) =
+∑
+n∈S1
+βn exp
+
+−
+K∑
+j=2
+sjvj,n
+
+ .
+Therefore, any critical point of E (s2,...,s K) would be a solution of eq. 109 for 2 ≤ i ≤ K,
+and substituting this solution into eq. 108 we obtain s1. Since βn > 0,E (s2,...,s K ) is a convex
+function, as positive linear combination of convex functio n (exponential). Therefore, any ﬁnite
+critical point is a global minimum. All that remains is to sho w that a ﬁnite minimum exists and that
+it is unique.
+From the deﬁnition of S1, ∃α ∈ R|S1|
+>0 such that ˆw1 =∑
+n∈S1αnxn . Multiplying this equation
+by U⊤ we obtain that ∃α ∈ R|S1|
+>0 such that 2 ≤i ≤K
+∑
+n∈S1
+vi,nαn = 0. (110)
+Therefore, ∀ (s2,...,s K) ̸= 0 we have that
+∑
+n∈S1
+
+
+K∑
+j=2
+sjvj,n
+
+αn = 0. (111)
+Recall, from eq. 104 that ∀ (s2,...,s K) ̸= 0, ∃n ∈ S 1 : ∑ K
+j=2sjvj,n ̸= 0 , and that αn > 0.
+Therefore, eq. 111 implies that ∃n ∈ S 1 such that∑ K
+j=2sjvj,n > 0 and also ∃m ∈ S 1 such that∑ K
+j=2sjvj,m< 0.
+Thus, in any direction we take a limit in which |si| → ∞ ∀ 2 ≤ i ≤ K, we obtain that
+E (s2,...,s K) → ∞ , since at least one exponent in the sum diverge. Since E (s2,...,s K), is
+a continuous function, it implies it has a ﬁnite global minim um. This proves the existence of a ﬁnite
+solution. To prove uniqueness we will show the function is st rictly convex, since the hessian is
+(strictly) positive deﬁnite, i.e., that the following expression is strictly positive:
+K∑
+i=2
+K∑
+k=2
+qiqk
+∂
+∂si
+∂
+∂sk
+E (s2,...,s K).
+=
+∑
+n∈S1
+βn
+( K∑
+i=2
+qivi,n
+)( K∑
+k=2
+qkvk,n
+)
+exp
+
+−
+K∑
+j=2
+sjvj,n
+
+
+=
+∑
+n∈S1
+βn
+( K∑
+i=2
+qivi,n
+)2
+exp
+
+−
+K∑
+j=2
+sjvj,n
+
+ .
+the last expression is indeed strictly positive since ∀q ̸= 0, ∃n ∈ S 1 : ∑ K
+j=2qjvj,n ̸= 0 , from eq.
+104. Thus, there exists a unique solution ˜w1.
+40
+GRADIENT DESCENT ON SEPARABLE DATA
+C.5 Proof of the existence and uniqueness of the solution to e qs. 65-66
+Lemma 18 F or∀m>k ≥ 1, the equations
+∑
+n∈Sm
+exp
+(
+− ˜w⊤xn
+)
+Pm−1xn =
+m−1∑
+k=1
+
+∑
+n∈Sk
+exp
+(
+− ˜w⊤xn
+)
+xnx⊤
+n
+
+ ˇwk,m (112)
+under the constraints
+Pk−1 ˇwk,m = 0 and ¯Pk ˇwk,m = 0 (113)
+have a unique solution ˇwk,m.
+Proof For this proof we denote XSk as the matrix which columns are {xn|n ∈ Sk}, the orthogonal
+projection matrix Qk = Pk ¯Pk−1where QkQm = 0 ∀k ̸=m, Qk ¯Pm = 0 ∀k<m , and
+∀m : I = Pm + ¯Pm =
+m∑
+k=1
+Qk + ¯Pm (114)
+We will write ˇwk,m = Wk,muk,m , where uk,m ∈ Rdk and Wk,m ∈ Rd×dk is a full rank matrix
+such that QkWk,m = Wk,m, so
+ˇwk,m = Qk ˇwk,m = QkWk,muk,m. (115)
+and, furthermore,
+rank
+[
+X⊤
+Sk QkWk,m
+]
+= rank
+(
+X⊤
+Sk Qk
+)
+=dk. (116)
+Recall that ∀m : ¯PmPm = 0 and ∀k ≥ 1, ∀n ∈ S m ¯Pm+kxn = 0. Therefore, ∀v ∈ Rd ,
+Pk−1Qkv = 0, ¯PkQkv = 0. Thus, ˇwk,m eq. 115 implies the constraints in eq. 113 hold.
+Next, we prove the existence and uniqueness of the solution ˇwk,m for each k = 1 ,...,m
+separately. We multiply eq. 112 from the left by the identity matrix, decomposed to orthogonal
+projection matrices as in eq. 114. Since each matrix project s to an orthogonal subspace, we can
+solve each product separately.
+The product with ¯Pm is equal to zero for both sides of the equation. The product wi th Qk is
+equal to
+∑
+n∈Sm
+exp
+(
+− ˜w⊤xn
+)
+QkPm−1xn =
+
+∑
+n∈Sk
+exp
+(
+− ˜w⊤xn
+)
+Qkxnx⊤
+n
+
+ ˇwk,m.
+Substituting eq. 115, and multiplying by W⊤
+k,m from the right, we obtain
+∑
+n∈Sm
+exp
+(
+− ˜w⊤xn
+)
+W⊤
+k,mQkPm−1xn =
+
+∑
+n∈Sk
+exp
+(
+− ˜w⊤xn
+)
+W⊤
+k,mQkxnx⊤
+n QkWk,m
+
+ uk,m.
+(117)
+41
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Denoting Ek ∈ R|Sk|×|Sk| as diagonal matrix for which Enn,k = exp
+(
+− 1
+2 ˜w⊤xn
+)
+, the matrix in the
+square bracket in the left hand side can be written as
+W⊤
+k,mQkXSk EkEkX⊤
+Sk QkWk,m. (118)
+Since rank
+(
+AA⊤)
+= rank (A) for any matrix A, the rank of this matrix is equal to
+rank [EXSkQkWk,m]
+(1)
+= rank [ XSk QkWk,m]
+(2)
+= dk
+where in (1) we used that Ek is diagonal and non-zero, and in (2) we used eq. 116. This implies
+that thedk ×dk matrix in eq. 118 is full rank, and so eq. 117 has a unique solut ion uk,m. Therefore,
+there exists a unique solution ˇwk,m.C.6 Proof of Lemma 15
+Lemma 15 Letφ (t),h (t),z (t) be three functions from N to R≥0, andC1,C 2,C 3 be three positive
+constants. Then, if ∑ ∞
+t=1h (t) ≤C1 < ∞, and
+φ2 (t + 1) ≤z (t) +h (t)φ (t) +φ2 (t) (75)
+we have
+φ2 (t + 1) ≤C2 +C3
+t∑
+u=1
+z (u) (76)
+Proof We deﬁne ψ (t) = z (t) +h (t), and start from eq. 75
+φ2 (t + 1)
+≤z (t) +h (t)φ (t) +φ2 (t)
+≤z (t) +h (t) max
+[
+1,φ 2 (t)
+]
++φ2 (t)
+≤z (t) +h (t) +h (t)φ2 (t) +φ2 (t)
+≤ψ (t) + (1 +h (t))φ2 (t)
+≤ψ (t) + (1 +h (t))ψ (t − 1) + (1 +h (t)) (1 +h (t − 1))φ2 (t − 1)
+≤ψ (t) + (1 +h (t))ψ (t − 1) + (1 +h (t)) (1 +h (t − 1))ψ (t − 2)
++ (1 +h (t)) (1 +h (t − 1)) (1 +h (t − 2))φ2 (t − 2)
+42
+GRADIENT DESCENT ON SEPARABLE DATA
+we keep iterating eq. 75, until we obtain
+≤
+[ t−1∏
+m=1
+(1 +h (t −m))
+]
+φ (t1) +
+t−t1∑
+k=0
+[ k−1∏
+m=0
+(1 +h (t −m))
+]
+ψ (t −k)
+≤
+[
+exp
+(t−1∑
+m=1
+h (t −m)
+)]
+φ (t1) +
+t−1∑
+k=0
+[
+exp
+(k−1∑
+m=1
+h (t −m)
+)]
+ψ (t −k)
+≤ exp (C)
+[
+φ (1) +
+t−1∑
+k=0
+ψ (t −k)
+]
+≤ exp (C)
+[
+φ (1) +
+t∑
+u=1
+ψ (u)
+]
+≤ exp (C)
+[
+φ (1) +
+t∑
+u=1
+(z (u) +h (u))
+]
+≤ exp (C)
+[
+φ (1) +C +
+t∑
+u=1
+z (u)
+]
+Therefore, the Lemma holds with C2 = (φ (1) +C) exp (C) andC3 = exp (C).
+43
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Appendix D. Calculation of convergence rates
+In this section we calculate the various rates mentioned in s ection 3.
+D.1 Proof of Theorem 5
+From Theorems 4 and 13, we can write w (t) = ˆw logt + ρ (t), where ρ (t) has a bounded norm for
+almost all datasets, while in zero measure case ρ (t) contains additional O(log log(t)) components
+which are orthogonal to the support vectors in S1, and, asymptotically, have a positive angle with
+the other support vectors. In this section we ﬁrst calculate the various convergence rates for the
+non-degenerate case of Theorem 4, and then write the correct ion in the zero measure cases, if there
+is such a correction.
+First, we calculated of the normalized weight vector (eq. 8) , for almost every dataset:
+w (t)
+∥w (t)∥
+= ρ (t) + ˆw logt√
+ρ (t)⊤ ρ (t) + ˆw⊤ ˆw log2t + 2ρ (t)⊤ ˆw logt
+= ρ (t)/ logt + ˆw
+∥ ˆw∥
+√
+1 + 2ρ (t)⊤ ˆw/
+(
+∥ ˆw∥2 logt
+)
++ ∥ρ (t)∥2/
+(
+∥ ˆw∥2 log2t
+)
+= 1
+∥ ˆw∥
+(
+ρ (t) 1
+logt + ˆw
+)
+1 − ρ (t)⊤ ˆw
+∥ ˆw∥2 logt
++
+
+ 3
+2
+(
+ρ (t)⊤ ˆw
+∥ ˆw∥2
+)2
+− ∥ρ (t)∥2
+2 ∥ ˆw∥2
+
+ 1
+log2t +O
+( 1
+log3t
+)
+
+(119)
+= ˆw
+∥ ˆw∥ +
+(
+ρ (t)
+∥ ˆw∥ − ˆw
+∥ ˆw∥
+ρ (t)⊤ ˆw
+∥ ˆw∥2
+)
+1
+logt +O
+( 1
+log2t
+)
+= ˆw
+∥ ˆw∥ +
+(
+I − ˆw ˆw⊤
+∥ ˆw∥2
+) ρ (t)
+∥ ˆw∥
+1
+logt +O
+( 1
+log2t
+)
+,
+where to obtain eq. 119 we used 1√1+x = 1 − 1
+2x + 3
+4x2 +O
+(
+x3)
+, and in the last line we used the
+fact that ρ (t) has a bounded norm for almost every dataset. Thus, in this cas e
+
+
+
+
+w (t)
+∥w (t)∥ − ˆw
+∥ ˆw∥
+
+
+
+ =O
+( 1
+logt
+)
+.
+For the measure zero cases, we instead have from eq. 62, w(t) = ∑ M
+m=1 ˆw log◦m(t) + ρ(t),
+where ∥ρ(t)∥ is bounded (Theorem 3). Let ˜ρ(t) = ∑ M
+m=2 ˆw log◦m(t) + ρ(t), such that w(t) =
+ˆw log(t) + ˜ρ(t) with ˜ρ(t) = O(log log(t)). Repeating the same calculations as above, we have for
+the degenerate cases,
+
+
+
+
+w (t)
+∥w (t)∥ − ˆw
+∥ ˆw∥
+
+
+
+ =O
+(log logt
+logt
+)
+44
+GRADIENT DESCENT ON SEPARABLE DATA
+Next, we use eq. 119 to calculate the angle (eq. 9)
+w (t)⊤ ˆw
+∥w (t)∥ ∥ ˆw∥
+= ˆw⊤
+∥ ˆw∥2
+(
+ρ (t) 1
+logt + ˆw
+)
+1 − 1
+logt
+ρ (t)⊤ ˆw
+∥ ˆw∥2 +
+
+ 3
+4
+(
+2 ρ (t)⊤ ˆw
+∥ ˆw∥2
+)2
+− ∥ρ (t)∥2
+2 ∥ ˆw∥2
+
+ 1
+log2t +O
+( 1
+log3t
+)
+
+=1 + 2 ∥ρ (t)∥2
+∥ ˆw∥2
+
+
+(
+ρ (t)⊤ ˆw
+∥ ˆw∥ ∥ρ (t)∥
+)2
+− 1
+4
+
+ 1
+log2t +O
+( 1
+log3t
+)
+for almost every dataset. Thus, in this case
+w (t)⊤ ˆw
+∥w (t)∥ ∥ ˆw∥ =O
+( 1
+log2t
+)
+Repeating the same calculation for the measure zero case, we have instead
+w (t)⊤ ˆw
+∥w (t)∥ ∥ ˆw∥ =O
+((log logt
+logt
+)2)
+Next, we calculate the margin (eq. 10)
+min
+n
+x⊤
+n w (t)
+∥w(t)∥ − 1
+∥ ˆw∥
+= min
+n
+x⊤
+n
+[(
+ρ (t)
+∥ ˆw∥ − ˆw
+∥ ˆw∥
+ρ (t)⊤ ˆw
+∥ ˆw∥2
+)
+1
+logt +O
+( 1
+log2t
+)]
+= 1
+∥ ˆw∥
+(
+min
+n
+x⊤
+n ρ (t) − ρ (t)⊤ ˆw
+∥ ˆw∥2
+)
+1
+logt +O
+( 1
+log2t
+)
+(120)
+for almost every dataset, where in eq. 120 we used eq. 20. Inte restingly the measure zero case has
+a similar convergence rate, since after a sufﬁcient number o f iterations, theO(log log(t)) correction
+is orthogonal to xk, wherek = argminnx⊤
+n w(t). Thus, for all datasets,
+min
+n
+x⊤
+n w (t) − 1
+∥ ˆw∥ =O
+( 1
+logt
+)
+(121)
+Calculation of the training loss (eq. 11):
+L (w (t)) ≤
+N∑
+n=1
+(
+1 + exp
+(
+−µ+w (t)⊤ xn
+))
+exp
+(
+−w (t)⊤ xn
+)
+=
+N∑
+n=1
+(
+1 + exp
+(
+−µ+ (ρ (t) + ˆw logt)⊤ xn
+))
+exp
+(
+− (ρ (t) + ˆw logt)⊤ xn
+)
+=
+N∑
+n=1
+(
+1 +t−µ+ ˆw⊤xn exp
+(
+−µ+ρ (t)⊤ xn
+))
+exp
+(
+−ρ (t)⊤ xn
+)
+t− ˆw⊤xn
+= 1
+t
+∑
+n∈S
+e−ρ (t)⊤xn +O
+(
+t− max(θ,1+µ+)
+)
+.
+45
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Thus, for all datasets L (w (t)) = O(t−1). Note that the zero measure case has the same behavior,
+since after a sufﬁcient number of iterations, the O(log log(t)) correction has a non-negative angle
+with all the support vectors.
+Next, we give an example demonstrating the bounds above, for the non-degenerate case, are
+strict. Consider optimization with and exponential loss ℓ (u) = e−u, and a single data point x =
+(1, 0). In this case ˆw = (1, 0) and ∥ ˆw∥ = 1 . We take the limit η → 0, and obtain the continuous
+time version of GD:
+˙w1 (t) = exp ( −w (t)) ; ˙w2 (t) = 0.
+We can analytically integrate these equations to obtain
+w1 (t) = log (t + exp (w1 (0))) ; w2 (t) = w2 (0).
+Using this example with w2 (0) > 0, it is easy to see that the above upper bounds are strict in
+the non-degenerate case. ■
+D.2 Validation error lower bound
+Lastly, recall that V is a set of indices for validation set samples. We calculate o f the validation
+loss for logistic loss, if the error of the L2 max margin vector has some classiﬁcation errors on the
+validation, i.e., ∃k ∈ V : ˆw⊤xk < 0:
+Lval (w (t)) =
+∑
+n∈V
+log
+(
+1 + exp
+(
+−w (t)⊤ xn
+))
+≥ log
+(
+1 + exp
+(
+−w (t)⊤ xk
+))
+= log
+(
+1 + exp
+(
+− (ρ (t) + ˆw logt)⊤ xk
+))
+= log
+(
+exp
+(
+− (ρ (t) + ˆw logt)⊤ xk
+)(
+1 + exp
+(
+(ρ (t) + ˆw logt)⊤ xk
+)))
+≥ − (ρ (t) + ˆw logt)⊤ xk + log
+(
+1 + exp
+(
+(ρ (t) + ˆw logt)⊤ xk
+))
+≥ − logt ˆw⊤xk + ρ (t)⊤ xk
+Thus, for all datasets Lval (w (t)) = Ω(log( t)).
+Appendix E. Softmax output with cross-entropy loss
+We examine multiclass classiﬁcation. In the case the labels are the class indexyn ∈ {1,...,K } and
+we have a weight matrix W ∈ RK×d with wk being thek-th row of W.
+Furthermore, we deﬁne w = vec
+(
+W⊤)
+, a basis vector ek ∈ RK so that (ek)i = δki, and
+the matrix Ak ∈ RdK×d so that Ak = ek ⊗ Id, where ⊗ is the Kronecker product and Id is the
+d-dimension identity matrix. Note that A⊤
+k w = wk.
+Consider the cross entropy loss with softmax output
+L (W) = −
+N∑
+n=1
+log
+(
+exp
+(
+w⊤
+ynxn
+)
+∑ K
+k=1 exp
+(
+w⊤
+k xn
+)
+)
+46
+GRADIENT DESCENT ON SEPARABLE DATA
+Using our notation, this loss can be re-written as
+L (w) = −
+N∑
+n=1
+log
+(
+exp
+(
+w⊤Aynxn
+)
+∑ K
+k=1 exp (w⊤Akxn)
+)
+=
+N∑
+n=1
+log
+( K∑
+k=1
+exp
+(
+w⊤ (Ak − Ayn) xn
+))
+(122)
+Therefore
+∇L (w) =
+N∑
+n=1
+∑ K
+k=1 exp
+(
+w⊤ (Ak − Ayn) xn
+)
+(Ak − Ayn) xn
+∑ K
+r=1 exp (w⊤ (Ar − Ayn) xn)
+=
+N∑
+n=1
+K∑
+k=1
+1
+∑ K
+r=1 exp (w⊤ (Ar − Ak) xn)
+(Ak − Ayn) xn.
+If, again, we make the assumption that the data is linearly se parable, i.e., in our notation
+Assumption 4 ∃w∗ such that w⊤
+∗ (Ak − Ayn) xn< 0 ∀k ̸=yn.
+then the expression
+w⊤
+∗ ∇L (w) =
+N∑
+n=1
+K∑
+k=1
+w⊤
+∗ (Ak − Ayn) xn
+∑ K
+r=1 exp (w⊤ (Ar − Ak) xn)
+.
+is strictly negative for any ﬁnite w. However, from Lemma 10, in gradient descent with an appropr i-
+ately small learning rate, we have that ∇L (w (t)) → 0. This implies that: ∥w (t)∥ → ∞ , and ∀k ̸=
+yn, ∃r : w (t)⊤ (Ar − Ak) xn → ∞ , which implies ∀k ̸= yn, maxk w (t)⊤ (Ak − Ayn) xn →
+−∞. Examining the loss (eq. 122) we ﬁnd that L (w (t)) → 0 in this case. Thus, we arrive to an
+equivalent Lemma to Lemma 1, for this case:
+Lemma 19 Let w (t) be the iterates of gradient descent (eq. 2) with an appropria tely small learn-
+ing rate, for cross-entropy loss operating on a softmax outp ut, under the assumption of strict linear
+separability (Assumption 4), then: (1) limt→∞ L (w (t)) = 0 , (2) limt→∞ ∥w (t)∥ = ∞, and (3)
+∀n,k ̸=yn : limt→∞ w (t)⊤ (Ayn − Ak) xn = ∞.
+Using Lemma 10 and Lemma 19, we prove the following Theorem (e quivalent to Theorem 9) in the
+next section:
+Theorem 7 F or all multiclass datasets which are linearly separable (i .e. the constraints in eq. 14
+below are feasible) and for which the equation
+∀k ∈ [K], ∀n ∈ Sk : η exp
+(
+−x⊤
+n ( ˜wyn − ˜wk)
+)
+=αn,k, (15)
+has a solution { ˜wk}K
+k=1, the following holds: for any starting point w(0) and any small enough
+stepsize, the iterates of gradient descent on eq. 13 will beh ave as:
+wk(t) = ˆwk log(t) + ρk(t), (16)
+where the residual ρk(t) is bounded.
+47
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+E.1 Notations and Deﬁnitions
+To prove Theorem 7 we require additional notation. we deﬁne ˜xn,k ≜ (Ayn − Ak)xn. Using this
+notation, we can re-write eq. 14 (K-class SVM) as
+arg min
+w
+∥w∥2 s.t. ∀n, ∀k ̸=yn : w⊤˜xn,k ≥ 1 (123)
+From the KKT optimality conditions, we have for some αn,k ≥ 0,
+ˆw =
+N∑
+n=1
+K∑
+k=1
+αn,k ˜xn,k1{n∈Sk} (124)
+In addition, for each of the K classes, we deﬁne Sk = arg minn( ˆwyn − ˆwk)⊤xn (the k’th class
+support vectors).
+Using this deﬁnition, we deﬁne XSk ∈ RdK×|Sk| as the matrix which columns are ˜xn,k, ∀n ∈ Sk.
+We also deﬁne S ≜
+K⋃
+k=1
+Sk and ˜XS ≜
+K⋃
+k=1
+XSk .
+We recall that we deﬁned W ∈ RK×d with wk being the k-th row of W and w = vec( W⊤).
+Similarly, we deﬁne:
+1. ˆW ∈ RK×d with ˆwk being the k-th row of ˆW
+2. P ∈ RK×d with ρk being the k-th row of P
+3. ˜W ∈ RK×d with ˜wk being the k-th row of ˜W
+and ˆw = vec( ˆW⊤), ρ = vec(P⊤), ˜w = vec( ˜W⊤).
+Using our notations, eq. 16 can be re-written as w = ˆw log(t) + ρ (t) when ρ (t) is bounded.
+For any solution w(t), we deﬁne
+r(t) = w(t) − ˆw logt − ˜w, (125)
+where ˆw is the concatenation of ˆw1,..., ˆwk which are the K-class SVM solution, so
+∀k, ∀n ∈ Sk : ˜x⊤
+n,k ˆw = 1 ; θ = min
+k
+[
+min
+n/∈Sk
+˜x⊤
+n,k ˆw
+]
+> 1 (126)
+and ˜w satisﬁes the equation:
+∀k, ∀n ∈ Sk : η exp(( ˜wk − ˜wyn)⊤xn) = αn,k (127)
+As we assume in the Theorem, this equation has a solution.
+For each of the K classes, we deﬁne Pk
+1 ∈ Rd×d as the orthogonal projection matrix to the subspace
+spanned by the support vector of the k’th class, and ¯Pk
+1 = I − Pk
+1 as the complementary projection.
+Finally, we deﬁne P1 ∈ RKd×Kd and ¯P1 ∈ RKd×Kd as follows:
+P1 = diag(P1
+1, P2
+1,..., PK
+1 ), ¯P1 = diag( ¯P1
+1, ¯P2
+1,..., ¯PK
+1 )
+(P1 + ¯P1 = I ∈ RKd×Kd)
+In the following section we will also use 1{A}, the indicator function, which is 1 ifA is satisﬁed
+and 0 otherwise.
+48
+GRADIENT DESCENT ON SEPARABLE DATA
+E.2 Auxiliary Lemma
+Lemma 20 We have
+∃C1,t 1 : ∀t>t 1 : (r(t + 1) − r(t))⊤r(t) ≤C1t−θ +C2t−2 (128)
+Additionally, ∀ǫ1 > 0, ∃C2,t 2, such that ∀t>t 2, such that if
+||P1r(t)||>ǫ 1 (129)
+then we can improve this bound to
+(r(t + 1) − r(t))⊤ r(t) ≤ −C3t−1 < 0 (130)
+We prove the Lemma below, in appendix section E.4
+E.3 Proof of Theorem 7
+Our goal is to show that ||r(t)|| is bounded, and therefore ρ (t) = r(t) + ˜w is bounded.
+To show this, we will upper bound the following equation
+∥r (t + 1)∥2 = ∥r (t + 1) − r (t)∥2 + 2 (r (t + 1) − r (t))⊤ r (t) + ∥r (t)∥2 (131)
+First, we note that ﬁrst term in this equation can be upper-bo unded by
+∥r (t + 1) − r (t)∥2
+(1)
+= ∥w (t + 1) − ˆw log (t + 1) − ˜w − w (t) + ˆw log (t) + ˜w∥2
+(2)
+= ∥−η∇L (w (t)) − ˆw [log (t + 1) − log (t)]∥2
+=η2 ∥∇L (w (t))∥2 + ∥ ˆw∥2 log2(
+1 +t−1)
++ 2η ˆw⊤∇L (w (t)) log
+(
+1 +t−1)
+(3)
+≤ η2 ∥∇L (w (t))∥2 + ∥ ˆw∥2t−2, (132)
+where in (1) we used eq. 125, in (2) we used eq 2.2, and in (3) we u sed ∀x> 0 : x ≥ log(1+x)> 0,
+and also that
+ˆw⊤∇L(w) =
+N∑
+n=1
+K∑
+k=1
+ˆw⊤(Ayn − Ak)xn
+∑ K
+r=1 exp(w⊤(Ar − Ak)xn)
+< 0 (133)
+since ˆw⊤(Ar − Ak)xn = ( ˆwr − ˆwyn)xn < 0, ∀k ̸= yn (we recall that ˆwk is the K-class SVM
+solution).
+Also, from Lemma 10 we know that
+∥∇L (w (t))∥2 =o (1) and
+∞∑
+t=0
+∥∇L (w (t))∥2< ∞. (134)
+Substituting eq. 134 into eq. 132, and recalling that a t−ν power series converges for anyν >1, we
+can ﬁnd C0 such that
+∥r (t + 1) − r (t)∥2 =o (1) and
+∞∑
+t=0
+∥r (t + 1) − r (t)∥2 =C0< ∞. (135)
+49
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+Note that this equation also implies that ∀ǫ0
+∃t0 : ∀t>t 0 : |∥r (t + 1)∥ − ∥r (t)∥|<ǫ 0. (136)
+Next, we would like to bound the second term in eq. 131. From eq . 128 in Lemma 20, we can ﬁnd
+t1,C 1 such that ∀t>t 1:
+(r(t + 1) − r(t))⊤r(t) ≤C1t−θ +C2t−2 (137)
+Thus, by combining eqs. 137 and 135 into eq. 131, we ﬁnd:
+||r(t)||2 − ||r(t1)||2
+=
+t−1∑
+u=t1
+[
+||r(u + 1)||2 − ||r(u)||2]
+≤C0 + 2
+t−1∑
+u=t1
+[
+C1u−θ +C2u−2
+]
+which is bounded, since θ >1 (eq. 126). Therefore, ||r(t)|| is bounded.
+E.4 Proof of Lemma 20
+Lemma 20 We have
+∃C1,t 1 : ∀t>t 1 : (r(t + 1) − r(t))⊤r(t) ≤C1t−θ +C2t−2 (128)
+Additionally, ∀ǫ1 > 0, ∃C2,t 2, such that ∀t>t 2, such that if
+||P1r(t)||>ǫ 1 (129)
+then we can improve this bound to
+(r(t + 1) − r(t))⊤ r(t) ≤ −C3t−1 < 0 (130)
+We wish to bound (r(t + 1) − r(t))⊤r(t). First, we recall we deﬁned ˜xn,k ≜ (Ayn − Ak)xn.
+(r(t + 1) − r(t))⊤r(t) = ( −η∇L(w(t)) − ˆw[log(t + 1) − log(t)])⊤r(t)
+=
+(
+η
+N∑
+n=1
+∑ K
+k=1 exp(−w(t)⊤ ˜xn,k)˜xn,k
+∑ K
+r=1 exp(−w(t)⊤ ˜xn,r)
+− ˆw log(1 +t−1)
+)⊤
+r(t)
+= ˆw⊤r(t)[t−1 − log(1 +t−1)] (138)
++η
+N∑
+n=1
+K∑
+k=1
+[
+exp
+(
+−w(t)⊤ ˜xn,k
+)˜x⊤
+n,kr(t)
+∑ K
+r=1 exp (−w(t)⊤ ˜xn,r)
+−t−1 exp
+(
+− ˜w⊤˜xn,k
+)
+˜x⊤
+n,kr(t)1{n∈Sk}
+]
+, (139)
+where in the last line we used eqs. 124 and 127 to obtain
+ˆw =η
+N∑
+n=1
+K∑
+k=1
+αn,k ˜xn,k1{n∈Sk} =η
+N∑
+n=1
+K∑
+k=1
+exp
+(
+− ˜w⊤ ˜xn,k)
+)
+˜xn,k1{n∈Sk},
+where 1{A} is the indicator function which is 1 ifA is satisﬁed and 0 otherwise.
+50
+GRADIENT DESCENT ON SEPARABLE DATA
+The ﬁrst term can be upper bounded by
+ˆw⊤r (t)
+[
+t−1 − log
+(
+1 +t−1)]
+≤ max
+[
+ˆw⊤r (t), 0
+] [
+t−1 − log
+(
+1 +t−1)]
+(1)
+≤ max
+[
+ˆw⊤P1r (t), 0
+]
+t−2
+(2)
+≤
+{
+∥ ˆ w∥ǫ1t−2 , if ∥P1r (t)∥ ≤ ǫ1
+o
+(
+t−1)
+, if ∥P1r (t)∥>ǫ 1
+(140)
+where in (1) we used that P2 ˆw = 0, and in (2) we used that ˆw⊤r (t) = o (t), since
+ˆw⊤r (t) = ˆw⊤
+(
+w (0) −η
+t∑
+u=0
+∇L (w (u)) − ˆw log (t) − ˜w
+)
+≤ ˆw⊤ (w (0) − ˜w − ˆw log (t)) +η ∥ ˆw∥
+t∑
+u=0
+∥∇L (w (u))∥
+≤O (log (t)) +η ∥ ˆw∥
+⌈
+√
+t⌉∑
+u=0
+∥∇L (w (u))∥ +η ∥ ˆw∥
+t∑
+u=⌈
+√
+t⌉
+∥∇L (w (u))∥
+≤O (log (t)) +η
+⌈√
+t
+⌉
+∥ ˆw∥ max
+0≤u≤⌈
+√
+t⌉
+∥∇L (w (u))∥ +ηt ∥ ˆw∥ max
+⌈
+√
+t⌉≤u≤t
+∥∇L (w (u))∥
+=O (log (t)) +
+⌈√
+t
+⌉
+O (1) +o (1)t =o (t) ,
+where in the last line we used that ∇L (w (t)) = o (1), from Lemma 10.
+Next, we wish to upper bound the second term in eq. 138:
+η
+N∑
+n=1
+K∑
+k=1
+[
+exp
+(
+−w(t)⊤ ˜xn,k
+)˜x⊤
+n,kr(t)
+∑ K
+r=1 exp (−w(t)⊤ ˜xn,r)
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{n∈Sk}
+]
+(141)
+51
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+We examine each termn in the sum:
+K∑
+k=1
+[
+exp
+(
+−w(t)⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)
+∑ K
+r=1 exp (−w(t)⊤ ˜xn,r)
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{n∈Sk}
+]
+=
+K∑
+k=1
+
+
+
+
+
+
+
+exp
+(
+−w(t)⊤ ˜xn,k
+)˜x⊤
+n,kr(t)
+1 +
+K∑
+r=1
+r̸=yn
+exp (−w(t)⊤ ˜xn,r)
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{n∈Sk}
+
+
+
+
+
+
+
+(1)
+≤
+K∑
+k=1
+(
+exp
+(
+−w(t)⊤ ˜xn,k
+)
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+1{n∈Sk}
+)
+1{˜x⊤
+n,kr(t)≥0} ˜x⊤
+n,kr(t)
++
+K∑
+k=1
+
+
+exp
+(
+−w(t)⊤ ˜xn,k
+)
+
+
+1 −
+K∑
+r=1
+r̸=yn
+exp
+(
+−w(t)⊤ ˜xn,r
+)
+
+
+
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+1{n∈Sk}
+)
+1{˜x⊤
+n,kr(t)<0} ˜x⊤
+n,kr(t)
+=
+K∑
+k=1
+(
+exp
+(
+−w(t)⊤ ˜xn,k
+)
+−t−1 exp
+(
+− ˜w⊤˜xn,k
+)
+1{n∈Sk}
+)
+˜x⊤
+n,kr(t)
+−
+K∑
+k=1
+K∑
+r=1
+r̸=yn
+exp
+(
+−w(t)⊤(˜xn,k + ˜xn,r)
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0}
+(2)
+≤
+K∑
+k=1
+(
+exp
+(
+−w(t)⊤ ˜xn,k
+)
+−t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)
+1{n∈Sk}
+)
+˜x⊤
+n,kr(t)
+−K 2 exp
+(
+−w(t)⊤(˜xn,k1 + ˜xn,r1)
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}, (142)
+where in (1) we used ∀x ≥ 0 : 1 −x ≤ 1
+1+x ≤ 1 and in (2) we deﬁned:
+(k1,r 1) = argmax
+k,r
+⏐
+⏐
+⏐exp
+(
+−w(t)⊤(˜xn,k + ˜xn,r)
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0}
+⏐
+⏐
+⏐
+52
+GRADIENT DESCENT ON SEPARABLE DATA
+Recalling that w(t) = ˆw log(t) + ˜w + r(t), eq. 142 can be upper bounded by
+K∑
+k=1
+t− ˆw⊤ ˜xn,k exp
+(
+− ˜w⊤ ˜xn,k
+)
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)≥0 , n/∈Sk}
++
+K∑
+k=1
+t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)≥0 , n∈Sk}
++
+K∑
+k=1
+t− ˆw⊤ ˜xn,k exp
+(
+− ˜w⊤ ˜xn,k
+)
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0 , n/∈Sk}
++
+K∑
+k=1
+t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0 , n∈Sk}
+−K 2 exp(−w(t)⊤ ˜xn,r1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤˜xn,k1
+)
+exp
+(
+−r(t)⊤ ˜xn,k1
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+(1)
+≤ Kt −θ exp
+(
+− min
+n,k
+˜w⊤ ˜xn,k
+)
++φ(t), (143)
+where in (1) we used xe−x< 1, ∀x : ( e−x − 1)x< 0,θ = mink
+[
+minn/∈Sk ˜x⊤
+n,k ˆw
+]
+> 1 (eq. 126)
+and denoted:
+φ(t) =
+K∑
+k=1
+t− ˆw⊤ ˜xn,k exp
+(
+− ˜w⊤˜xn,k
+)
+exp
+(
+−r(t)⊤ ˜xn,k
+)˜x⊤
+n,k r(t)1{˜x⊤
+n,kr(t)<0, n / ∈Sk}
++
+K∑
+k=1
+t−1 exp
+(
+− ˜w⊤˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,k r(t)1{˜x⊤
+n,kr(t)<0,n ∈Sk}
+−K 2 exp(−w(t)⊤ ˜xn,r 1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤˜xn,k 1
+)
+exp
+(
+−r(t)⊤ ˜xn,k 1
+)˜x⊤
+n,k 1 r(t)1{˜x⊤
+n,k1 r(t)<0}.
+We use the fact that ∀x : (e−x − 1)x< 0 and therefore ∀(n,k ):
+t− ˆw⊤ ˜xn,k exp
+(
+− ˜w⊤˜xn,k
+)
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0} < 0
+t−1 exp
+(
+− ˜w⊤˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0} < 0, (144)
+to show that φ(t) is strictly negative. If ˜x⊤
+n,k1r ≥ 0 then from the last two equations:
+φ(t) =
+K∑
+k=1
+t− ˆw⊤ ˜xn,k exp
+(
+− ˜w⊤ ˜xn,k
+)
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0, n/∈Sk}
++
+K∑
+k=1
+t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,kr(t)1{˜x⊤
+n,kr(t)<0, n∈Sk} < 0 (145)
+If ˜x⊤
+n,k1r< 0 then we note that −˜x⊤
+n,r1r(t) ≤ − ˜x⊤
+n,k1r(t) since:
+1. If ˜x⊤
+n,r1r(t) ≥ 0 then this is immediate since −˜x⊤
+n,r1r(t) ≤ 0 ≤ − ˜x⊤
+n,k1r(t).
+2. If ˜x⊤
+n,r1r(t)< 0 then from (k1,r 1) deﬁnition:
+⏐
+⏐
+⏐exp
+(
+−w(t)⊤(˜xn,k1 + ˜xn,r1)
+)
+˜x⊤
+n,r1r(t)
+⏐
+⏐
+⏐ ≤
+⏐
+⏐
+⏐exp
+(
+−w(t)⊤(˜xn,k1 + ˜xn,r1)
+)
+˜x⊤
+n,k1r(t)
+⏐
+⏐
+⏐,
+53
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+and therefore
+−˜x⊤
+n,r1r(t) =
+⏐
+⏐
+⏐˜x⊤
+n,r1r(t)
+⏐
+⏐
+⏐ ≤
+⏐
+⏐
+⏐˜x⊤
+n,k1r(t)
+⏐
+⏐
+⏐ = −˜x⊤
+n,k1r(t).
+We divide into cases:
+1. If n /∈ Sk1 then we examine the sum
+t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤ ˜xn,k1
+)
+exp
+(
+−r(t)⊤ ˜xn,k1
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+−K 2 exp(−w(t)⊤ ˜xn,r1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤˜xn,k1
+)
+exp
+(
+−r(t)⊤ ˜xn,k1
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+The ﬁrst term is negative and the second is positive. From Lem ma 19 w(t)⊤ ˜xn,r1 → ∞. Therefore
+∃t3 so that ∀t>t 3 : exp( −w(t)⊤ ˜xn,r1)<K 2 and therefore this sum is strictly negative since
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+K 2 exp(−w(t)⊤ ˜xn,r1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤ ˜xn,k1)
+)
+exp
+(
+−˜x⊤
+n,k1r(t)
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+t− ˆw⊤ ˜xn,k1 exp (− ˜w⊤ ˜xn,k1) exp (−r(t)⊤ ˜xn,k1) ˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+=
+⏐
+⏐
+⏐K 2 exp(−w(t)⊤ ˜xn,r1)
+⏐
+⏐
+⏐< 1, ∀t>t 3
+2. If n ∈ Sk1 then we examine the sum
+t−1 exp
+(
+− ˜w⊤˜xn,k 1
+)[
+exp
+(
+−r(t)⊤ ˜xn,k 1
+)
+− 1
+]
+˜x⊤
+n,k 1 r(t)1{˜x⊤
+n,k1 r(t)<0}
+−K 2 exp(−w(t)⊤ ˜xn,r 1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤˜xn,k 1
+)
+exp
+(
+−r(t)⊤ ˜xn,k 1
+)
+˜x⊤
+n,k 1 r(t)1{˜x⊤
+n,k1 r(t)<0}
+a. If |˜x⊤
+n,k1r(t)|>C 0 then ∃t4 such that ∀t>t 4 this sum can be upper bounded by zero since
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+K 2 exp(−w(t)⊤ ˜xn,r1)t− ˆw⊤ ˜xn,k1 exp
+(
+− ˜w⊤ ˜xn,k1)
+)
+exp
+(
+−˜x⊤
+n,k1r(t)
+)
+˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+t−1 exp (− ˜w⊤ ˜xn,k1) [exp (−r(t)⊤ ˜xn,k1) − 1] ˜x⊤
+n,k1r(t)1{˜x⊤
+n,k1 r(t)<0}
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+⏐
+= K 2 exp(−w(t)⊤ ˜xn,r1)
+1 − exp (r(t)⊤ ˜xn,k1) ≤ K 2 exp(−w(t)⊤ ˜xn,r1)
+1 − exp (−C0) < 1, ∀t>t 4 (146)
+where in the last transition we used Lemma 19.
+b. If |˜x⊤
+n,k1r(t)| ≤ C0 then we can ﬁnd constant C5 so that eq. 146 can be upper bounded by
+K 2t− ˆw⊤(˜xn,k1 +˜xn,r1 ) exp
+(
+− ˜w⊤(˜xn,k1 + ˜xn,r1)
+)
+exp (2C0)C0 ≤C5t−2, (147)
+since −˜x⊤
+n,r1r(t) ≤ − ˜x⊤
+n,k1r(t) ≤C0 and by deﬁnition, ∀(n,k ) : ˆw⊤ ˜xn,k ≥ 1.
+Therefore, eq. 142 can be upper bounded by
+Kt −θ exp
+(
+− min
+n,k
+˜w⊤˜xn,k
+)
++C5t−2 (148)
+If, in addition, ∃k,n ∈ Sk : |˜x⊤
+n,kr(t)|>ǫ 2 then
+t−1 exp
+(
+− ˜w⊤ ˜xn,k
+)[
+exp
+(
+−r(t)⊤ ˜xn,k
+)
+− 1
+]
+˜x⊤
+n,kr(t) (149)
+≤
+{
+−t−1 exp
+(
+− maxn,k ˜w⊤ ˜xn,k
+)
+[1 − exp (−ǫ2)]ǫ2 , if r(t)⊤ ˜xn,k ≥ 0
+−t−1 exp
+(
+− maxn,k ˜w⊤ ˜xn,k
+)
+[exp (ǫ2) − 1]ǫ2 , if r(t)⊤ ˜xn,k < 0 (150)
+54
+GRADIENT DESCENT ON SEPARABLE DATA
+and we can improve this bound to
+−C ′′t−1< 0, (151)
+whereC ′′ is the minimum between exp
+(
+− maxn,k ˜w⊤ ˜xn,k
+)
+[1 − exp (−ǫ2)]ǫ2 and
+exp
+(
+− maxn,k ˜w⊤ ˜xn,k
+)
+[exp (ǫ2) − 1]ǫ2. To conclude:
+1. If ∥P1r (t)∥ ≥ ǫ1 (as in Eq. 140), we have that
+max
+k,n∈Sk
+⏐
+⏐
+⏐˜x⊤
+n,kr (t)
+⏐
+⏐
+⏐
+2 (1)
+≥ 1
+|S|
+∑
+k,n∈Sk
+⏐
+⏐
+⏐˜x⊤
+n,kP1r (t)
+⏐
+⏐
+⏐
+2
+= 1
+|S|
+
+
+X⊤
+S P1r (t)
+
+
+
+2 (2)
+≥ 1
+|S|σ2
+min (XS )ǫ2
+1 (152)
+where in (1) we used P⊤
+1 ˜xn,k = ˜xn,k ∀k, n ∈ Sk, in (2) we denoted by σmin (XS ), the minimal
+non-zero singular value of XS and used eq. 129. Therefore, for some (n,k ),
+⏐
+⏐
+⏐˜x⊤
+n,kr
+⏐
+⏐
+⏐ ≥ ǫ2 ≜
+|S|−1σ2
+min (XS )ǫ2
+1. If ||P1r(t)|| ≥ ǫ1, then combining eq. 140 with eq. 151 we ﬁnd that eq. 138
+can be upper bounded by:
+(r(t + 1) − r(t))⊤ r(t) ≤ −C ′′t−1 +o(t−1)
+This implies that ∃C2 < C′′ and ∃t2 > 0 such that eq. 130 holds. This implies also that eq. 128
+holds for ||P1r(t)|| ≥ ǫ1.
+2. If ||P1r(t)||<ǫ 1, we obtain (for some positive constants C3,C 4):
+(r(t + 1) − r(t))⊤r(t) ≤C3t−θ +C4t−2
+Therefore, ∃t1> 0 andC1 such that eq. 128 holds.
+Appendix F . An experiment with stochastic gradient descent
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+50
+0.5
+1
+Normalized ||w(t)||
+t
+(B)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+510
+−10
+10
+−5
+10
+0
+L(w(t))
+t
+(C)
+ 
+ 
+GD
+GDMO
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+50
+1
+2
+3
+x 10
+−3
+Angle gap
+t
+(D)
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+50
+0.02
+0.04
+0.06Margin gap
+t
+(E)
+−3 −2 −1 0 1 2 3
+−3
+−2
+−1
+0
+1
+2
+3
+x1
+x2
+(A)
+Figure 4: Same as Fig. 1, except stochastic gradient decent i s used (with mini-batch of size 4),
+instead of GD.
+55
+SOUDRY, H OFFER , N ACSON , G UNASEKAR , AND SREBRO
+References
+Mor Shpigel Nacson, Nati Srebro, and Daniel Soudry. Stochas tic Gradient Descent on Separable
+Data Exact Convergence with a Fixed Learning Rate. AISTATS, 2019.
+Suriya Gunasekar, Jason Lee, Daniel Soudry, and Nathan Sreb ro. Implicit Bias of Gradient Descent
+on Linear Convolutional Networks. NIPS, 2018.
+John Duchi, Elad Hazan, and Y oram Singer. Adaptive subgradient methods for online learning and
+stochastic optimization. Journal of Machine Learning Research, 12(Jul):2121–2159, 2011.
+Radha Krishna Ganti. EE6151, Convex optimization algorith ms. Unconstrained minimization: Gra-
+dient descent algorithm, 2015. URL
+Suriya Gunasekar, Blake Woodworth, Srinadh Bhojanapalli, Behnam Neyshabur, and Nathan Sre-
+bro. Implicit Regularization in Matrix Factorization. NIPS, pages 1–10, 2017.
+Suriya Gunasekar, Jason Lee, Daniel Soudry, and Nathan Sreb ro. Characterizing implicit bias in
+terms of optimization geometry. ICML, 2018.
+Moritz Hardt, Benjamin Recht, and Y Singer. Train faster, ge neralize better: Stability of stochastic
+gradient descent. ICML, pages 1–24, 2016.
+Elad Hoffer, Itay Hubara, and D. Soudry. Train longer, gener alize better: closing the generalization
+gap in large batch training of neural networks. In NIPS, pages 1–13, may 2017.
+I Hubara, M Courbariaux, D. Soudry, R El-yaniv, and Y Bengio. Quantized Neural Networks:
+Training Neural Networks with Low Precision Weights and Act ivations. JMLR, 2018.
+Ziwei Ji and Matus Telgarsky. Risk and parameter convergenc e of logistic regression. Communi-
+cated by the authors, 2018.
+Nitish Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy, and Ping Tak Pe-
+ter Tang. On Large-Batch Training for Deep Learning: Genera lization Gap and Sharp Minima.
+ICLR, pages 1–16, 2017.
+Diederik P Kingma and Jimmy Lei Ba. Adam: a Method for Stochas tic Optimization. In ICLR,
+pages 1–13, 2015.
+Mor Shpigel Nacson, Jason Lee, Suriya Gunasekar, Nathan Sre bro, and Daniel Soudry. Conver-
+gence of Gradient Descent on Separable Data. AISTATS, pages 1–45, 2019.
+Behnam Neyshabur, Ryota Tomioka, and Nathan Srebro. In sear ch of the real inductive bias: On
+the role of implicit regularization in deep learning. arXiv:1412.6614, 2014.
+Behnam Neyshabur, Ruslan R Salakhutdinov, and Nati Srebro. Path-sgd: Path-normalized optimiza-
+tion in deep neural networks. In NIPS, 2015.
+Behnam Neyshabur, Srinadh Bhojanapalli, David McAllester , and Nathan Srebro. Exploring Gen-
+eralization in Deep Learning. arXiv, jun 2017.
+56
+GRADIENT DESCENT ON SEPARABLE DATA
+Hrithik Ravi, Clayton Scott, Daniel Soudry, and Y utong Wang The implicit bias of gradient descent
+on separable multiclass data. In NeurIPS, 2024.
+Saharon Rosset, Ji Zhu, and Trevor J Hastie. Margin Maximizi ng Loss Functions. In NIPS, pages
+1237–1244, 2004.
+Robert E Schapire, Y oav Freund, Peter Bartlett, Wee Sun Lee, et al. Boosting the margin: A new
+explanation for the effectiveness of voting methods. The annals of statistics , 26(5):1651–1686,
+1998.
+Daniel Soudry, Elad Hoffer, Mor Shpigel Nacson, and N Srebro . The Implicit Bias of Gradient
+Descent on Separable Data. In ICLR, 2018.
+Matus Telgarsky. Margins, shrinkage and boosting. In Proceedings of the 30th International Con-
+ference on International Conference on Machine Learning-Volume 28, pages II–307. JMLR. org,
+2013.
+Ashia C Wilson, Rebecca Roelofs, Mitchell Stern, Nathan Sre bro, and Benjamin Recht. The
+Marginal V alue of Adaptive Gradient Methods in Machine Learning. arXiv, pages 1–14, 2017.
+Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, a nd Oriol Vinyals. Understanding
+deep learning requires rethinking generalization. In ICLR, 2017.
+Tong Zhang, Bin Y u, et al. Boosting with early stopping: Convergence and consistency. The Annals
+of Statistics, 33(4):1538–1579, 2005.
+57

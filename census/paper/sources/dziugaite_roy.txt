@@ -1,0 +1,1409 @@
+Computing Nonvacuous Generalization Bounds for Deep (Stochastic) Neural
+Networks with Many More Parameters than Training Data
+Gintare Karolina Dziugaite
+Department of Engineering
+University of Cambridge
+Daniel M. Roy
+Department of Statistical Sciences
+University of Toronto
+Abstract
+One of the deﬁning properties of deep learn-
+ing is that models are chosen to have many
+more parameters than available training data.
+In light of this capacity for overﬁtting, it is
+remarkable that simple algorithms like SGD re-
+liably return solutions with low test error. One
+roadblock to explaining these phenomena in
+terms of implicit regularization, structural prop-
+erties of the solution, and/or easiness of the
+data is that many learning bounds are quan-
+titatively vacuous when applied to networks
+learned by SGD in this “deep learning” regime.
+Logically, in order to explain generalization,
+we need nonvacuous bounds. We return to an
+idea by Langford and Caruana (2001), who
+used PAC-Bayes bounds to compute nonvac-
+uous numerical bounds on generalization error
+for stochastic two-layer two-hidden-unit neural
+networks via a sensitivity analysis. By optimiz-
+ing the PAC-Bayes bound directly, we are able
+to extend their approach and obtain nonvacu-
+ous generalization bounds for deep stochastic
+neural network classiﬁers with millions of pa-
+rameters trained on only tens of thousands of
+examples. We connect our ﬁndings to recent
+and old work on ﬂat minima and MDL-based
+explanations of generalization.
+1 INTRODUCTION
+By optimizing a PAC-Bayes bound, we show that it is
+possible to compute nonvacuous numerical bounds on the
+generalization error of deep stochastic neural networks
+with millions of parameters, despite the training data sets
+being one or more orders of magnitude smaller than the
+number of parameters. To our knowledge, these are the
+ﬁrst explicit and nonvacuous numerical bounds computed
+for trained neural networks in the modern deep learning
+regime where the number of network parameters eclipses
+the number of training examples.
+The bounds we compute are data dependent, incorporating
+millions of components optimized numerically to identify
+a large region in weight space with low average empirical
+error around the solution obtained by stochastic gradient
+descent (SGD). The data dependence is essential: indeed,
+the VC dimension of neural networks is typically bounded
+below by the number of parameters, and so one needs as
+many training data as parameters before (uniform) PAC
+bounds are nonvacuous, i.e., before the generalization
+error falls below 1. To put this in concrete terms, on
+MNIST, having even 72 hidden units in a fully connected
+ﬁrst layer yields vacuous PAC bounds.
+Evidently, we are operating far from the worst case: ob-
+served generalization cannot be explained in terms the
+regularizing effect of the size of the neural network alone.
+This is an old observation, and one that attracted con-
+siderable theoretical attention two decades ago: Bartlett
+[Bar97; Bar98] showed that, in large (sigmoidal) neural
+networks, when the learned weights are small in magni-
+tude, the fat-shattering dimension is more important than
+the VC dimension for characterizing generalization. In
+particular, Bartlett established classiﬁcation error bounds
+in terms of the empirical margin and the fat-shattering
+dimension, and then gave fat-shattering bounds for neu-
+ral networks in terms of the magnitudes of the weights
+and the depth of the network alone. Improved norm-
+based bounds were obtained using Rademacher and Gaus-
+sian complexity by Bartlett and Mendelson [BM02] and
+Koltchinskii and Panchenko [KP02].
+These norm-based bounds are the foundation of our cur-
+rent understanding of neural network generalization. It
+is widely accepted that these bounds explain observed
+generalization, at least “qualitatively” and/or when the
+weights are explicitly regularized. Indeed, recent work
+by Neyshabur, Tomioka, and Srebro [NTS14] puts forth
+arXiv:1703.11008v2  [cs.LG]  19 Oct 2017
+the idea that SGD performs implicit norm-based regular-
+ization. Somewhat surprisingly, when we investigated
+state-of-the-art Rademacher bounds for ReLU networks,
+the bounds were vacuous when applied to solutions ob-
+tained by SGD on real networks/datasets. We discuss the
+details of this analysis in Appendix D. While most theo-
+reticians would assume these bounds were numerically
+loose to some extent, they might be surprised to learn that
+the bounds do not logically establish generalization on
+their own. It is worth highlighting that this observation
+does not necessarily rule out the existence of nonvacuous
+bounds under the same or similar hypotheses. This is an
+important avenue to investigate.
+1.1 UNDERSTANDING SGD
+Our investigation was instigated by recent empirical work
+by Zhang, Bengio, Hardt, Recht, and Vinyals [Zha+17],
+who show that stochastic gradient descent (SGD), applied
+to deep networks with millions of parameters, is:
+1. able to achieve≈ 0 training error on CIFAR10 and
+IMAGENET and still generalize (i.e., test error re-
+mains small, despite the potential for overﬁtting);
+2. still able to achieve≈ 0 training error even after the
+labels are randomized, and does so with only a small
+factor of additional computational time.
+Taken together, these two observations demonstrate that
+these networks have a tremendous capacity to overﬁt and
+yet SGD does not abuse this capacity as it optimizes the
+surrogate loss, despite the lack of explicit regularization.
+It is a major open problem to explain this phenomenon.
+A natural approach would be to show that, under realis-
+tic hypotheses, SGD performs implicit regularization or
+tends to ﬁnd solutions that possess some particular struc-
+tural property that we already know to be connected to
+generalization. However, in order to complete the logical
+connection, we need an associated error bound to be non-
+vacuous in the regime of model size / data size where we
+hope to explain the phenomenon.
+This work establishes a potential candidate, building off
+ideas by Langford [Lan02] and Langford and Caruana
+[LC02]: On a binary class variant of MNIST, we ﬁnd that
+SGD solutions are nearby to relatively large regions in
+weight space with low average empirical error. We ﬁnd
+this structure by optimizing a PAC-Bayes bound, starting
+at the SGD solution, obtaining a nonvacuous generaliza-
+tion bound for a stochastic neural network. Across a
+variety of network architectures, our PAC-Bayes bounds
+on the test error are in the range 16–22%. These are
+far from nonvacuous but loose: Chernoff bounds on the
+test error based on held-out data are consistently around
+3%. Despite the gap, theoreticians aware of the numeri-
+cal performance of generalization bounds will likely be
+surprised that it is possible at all to obtain nonvacuous
+numerical bounds for models with such large capacity
+trained on so few training examples. While we cannot
+entirely explain the magnitude of generalization, we can
+demonstrate nontrivial generalization.
+Our approach was inspired by a line of work in physics
+by Baldassi, Ingrosso, Lucibello, Saglietti, and Zecchina
+[Bal+15] and the same authors with Borgs and Chayes
+[Bal+16]. Based on theoretical results for discrete opti-
+mization linking computational efﬁciency to the existence
+of nonisolated solutions, the authors propose a number of
+new algorithms for learning discrete neural networks by
+explicitly driving a local search towards nonisolated solu-
+tions. On the basis of Bayesian ideas, they posit that these
+solutions have good generalization properties. In a recent
+work with Chaudhari, Choromanska, Soatto, and LeCun
+[Cha+17], they introduce local-entropy loss and Entropy-
+SGD, extending these algorithmic ideas to modern deep
+learning architectures with continuous parametrizations,
+and obtaining impressive empirical results.
+In the continuous setting, nonisolated solutions corre-
+spond to “ﬂat minima”. The existence and regularizing
+effects of ﬂat minima in the empirical error surface was
+recognized early on by researchers, going back at work
+by Hinton and Camp [HC93] and Hochreiter and Schmid-
+huber [HS97]. Hochreiter and Schmidhuber discuss sharp
+versus ﬂat minima using the language of minimum de-
+scription length (MDL; [Ris83; Gr¨u07]). In short, describ-
+ing weights in sharp minima requires high precision in
+order to not incur nontrivial excess error, whereas ﬂat min-
+imum can be described with lower precision. A similar
+coding argument appears in [HC93].
+Hochreiter and Schmidhuber propose an algorithm to ﬁnd
+ﬂat minima by minimizing the training error while max-
+imizing the log volume of a connected region of the pa-
+rameter space that yields similar classiﬁers with similarly
+good training error. There are very close connections—
+at both the level of analysis and algorithms—with the
+work of Chaudhari et al. [Cha+17] and close connections
+with the approach we take to compute nonvacuous error
+bounds by exploiting the local error surface. (We discuss
+more related work in Section 6.)
+Despite the promising underpinnings, the generalization
+theorems given by [Cha+17] have admittedly unrealistic
+assumptions, and fall short of connecting local-entropy
+minimization to observed generalization.
+The goal of this work is to identify structure in the so-
+lutions obtained by SGD that provably implies small
+generalization error. Computationally, it is much easier
+to demonstrate that a randomized classiﬁer will general-
+ize, and so our results actually pertain to the generaliza-
+tion error of a stochastic neural network, i.e., one whose
+weights/biases are drawn at random from some distribu-
+tion on every forward evaluation of the network. Under
+bounded loss, Fubini’s theorem implies that we also ob-
+tain a bound on the expected error of a neural network
+whose weights have been randomly perturbed. It would
+be interesting to achieve tighter control on the distribution
+of error or on the error of the mean neural network.
+Returning to the goal of explaining SGD and general-
+ization in deep learning more generally, one could study
+whether the type of structure we exploit to obtain bounds
+necessarily arises from performing SGD under natural
+conditions. (We suspect one condition may be that the
+Bayes error rate is close to zero.) More ambitiously, per-
+haps the existence of the same structure can explain the
+success of SGD in practice.
+1.2 APPROACH
+Our working hypothesis is that SGD ﬁnds good solutions
+only if they are surrounded by a relatively large volume
+of solutions that are nearly as good. This hypothesis sug-
+gests that PAC-Bayes bounds may be fruitful: if SGD
+ﬁnds a solution contained in a large volume of equally
+good solutions, then the expected error rate of a classiﬁer
+drawn at random from this volume should match that of
+the SGD solution. The PAC-Bayes theorem [McA99]
+bounds the expected error rate of a classiﬁer chosen from
+a distributionQ in terms of the Kullback–Liebler diver-
+gence from some a priori ﬁxed distributionP , and so if
+the volume of equally good solutions is large, and not
+too far from the mass ofP , we will obtain a nonvacuous
+bound.
+Our approach will be to use optimization to ﬁnd a broad
+distributionQ over neural network parameters that min-
+imizes the PAC-Bayes bound, in effect mapping out the
+volume of equally good solutions surrounding the SGD
+solution. This idea is actually a modern take on an old
+idea by Langford and Caruana [LC02], who apply PAC-
+Bayes bounds to small two-layer stochastic neural net-
+works (with only 2 hidden units) that were trained on
+(relatively large, in comparison) data sets of several hun-
+dred labeled examples.
+The basic idea can be traced back even further to work
+by Hinton and Camp [HC93], who propose an algorithm
+for controlling overﬁtting in neural networks via the min-
+imum description length principle. In particular, they
+minimize the sum of the empirical squared error and the
+KL divergence between a prior and posterior distribution
+on the weights. Their algorithm is applied to networks
+with 100’s of inputs and 4 hidden units, trained on sev-
+eral hundred labeled examples. Hinton and Camp do
+not compute numerical generalization bounds to verify
+that MDL principles alone sufﬁce to explain the observed
+generalization.
+Our algorithm more directly extends the work by Lang-
+ford and Caruana, who propose to construct a distribution
+Q over neural networks by performing a sensitivity anal-
+ysis on each parameter after training, searching for the
+largest deviation that does not increase the training error
+by more than, e.g., 1%. For Q, Langford and Caruana
+choose a multivariate normal distribution over the net-
+work parameters, centered at the parameters of the trained
+neural network. The covariance matrix is diagonal, with
+the variance of each parameter chosen to be the estimated
+sensitivity, scaled by a global constant. (The global scale
+is chosen so that the training error ofQ is within, e.g., 1%
+of that of the original trained network.) Their priorP is
+also a multivariate normal, but with zero mean and covari-
+ance given by some scalar multiple of the identity matrix.
+By employing a union bound, they allow themselves to
+choose the scalar multiple in a data-dependent fashion to
+optimize the PAC-Bayes bound.
+The algorithm sketched by Langford and Caruana does
+not scale to modern neural networks for several reasons,
+but one dominates: in massively overparametrized net-
+works, individual parameters often have negligible effect
+on the training classiﬁcation error, and so it is not possible
+to estimate the relative sensitivity of large populations of
+neurons by studying the sensitivity of neurons in isolation.
+Instead, we use stochastic gradient descent to directly
+optimize the PAC-Bayes bound on the error rate of a
+stochastic neural network. At each step, we update the
+network weights and their variances by taking a step along
+an unbiased estimate of the gradient of (an upper bound
+on) the PAC-Bayes bound. In effect, the objective func-
+tion is the sum of i) the empirical surrogate loss averaged
+over a random perturbation of the SGD solution, and ii) a
+generalization error bound that acts like a regularizer.
+Having demonstrated that this simple approach can con-
+struct a witness to generalization, it is worthwhile asking
+whether these ideas can be extended to the setting of local-
+entropic loss [Cha+17]. If we view the distribution that
+deﬁnes the local-entropic loss as deﬁning a stochastic neu-
+ral network, can we use PAC-Bayes bounds to establish
+nonvacuous bounds on its generalization error?
+2 PRELIMINARIES
+Much of our setup is identical to that of [LC02]: We are
+working in the batch supervised learning setting. Data
+points are elementsx∈X⊆ Rk with binary class labels
+y∈{− 1, 1}. LetSm denote a training set of sizem,
+Sm ={(xi,yi)}i=1,...,m, where (xi,yi)∈ (X×Y ).
+LetM denote the set of all probability measures on the
+data space Rk×{−1, 1}. We will assume that the training
+examples are i.i.d. samples from someµ∈M .
+A parametric family of classiﬁers is a functionH : Rd×
+Rk→{− 1, 1}, wherehw := H(w,·) : Rk→{− 1, 1}
+is the classiﬁer indexed by the parameter w∈ Rd. The
+hypotheses space induced by H isH = {hw : w ∈
+Rd}. A randomized classiﬁer is a distribution Q on Rd.
+Informally, we will speak of distributions onH when we
+mean distributions on the underlying parametrization.
+We are interested in the 0–1 lossℓ : R×{−1, 1}→{ 0, 1}
+ℓ(ˆy,y ) = I(sign(ˆy) =y).
+We will also make use of the logistic loss ˘ℓ : R×
+{−1, 1}→ R+
+˘ℓ(ˆy,y ) = 1
+log(2) log
+(
+1 + exp(−ˆyy)
+)
+,
+which will serve as a convex surrogate (i.e., upper bound)
+to the 0–1 loss.
+We deﬁne the following notions of error:
+• ˆe(h,Sm) = 1
+m
+m∑
+i=1
+ℓ(h(xi),yi) empirical classiﬁca-
+tion error of hypothesish for sampleSm;
+• ˘e(h,Sm) = 1
+m
+m∑
+i=1
+˘ℓ(h(xi),yi) empirical (surro-
+gate) error of a hypothesis h on the training data
+setSm. We will use this for training purposes when
+we need our empirical loss to be differentiable;
+• eµ(h) = E
+Sm∼µm
+[ˆe(h,Sm)] expected error for hy-
+pothesis h under the data distribution µ (we will
+often drop the subscriptµ and just writee(h));
+• ˆe(Q,Sm) = E
+w∼Q
+[ˆe(hw,Sm)] expected empirical
+error under the randomized classiﬁerQ onH;
+• e(Q) = E
+w∼Q
+[eµ(hw)] expected error forQ onH.
+2.1 KL DIVERGENCE
+LetQ,P be probability measures deﬁned on a common
+measurable spaceH, such thatQ is absolutely continuous
+with respect to P , and write dQ
+dP :H→ R+∪{∞} for
+some Radon–Nikodym derivative of Q with respect to
+P . Then the Kullback–Liebler divergence (or relative
+entropy) ofP fromQ is deﬁned to be
+KL(Q||P ) :=
+∫
+log dQ
+dP dQ.
+We will mostly be concerned with KL divergences where
+Q andP are probability measures on Euclidean space,Rd,
+absolutely continuous with respect to Lebesgue measure.
+Letq andp denote the respective densities. In this case,
+the deﬁnition of the KL divergence simpliﬁes to
+KL(Q||P ) =
+∫
+logq(x)
+p(x)q(x)dx.
+Of particular interest to us is the KL divergence be-
+tween multivariate normal distributions in Rd. LetNq =
+N (µq, Σq) be a multivariate normal with mean µq and
+covariance matrix Σq, letNp =N (µp, Σp), and assume
+Σq and Σp are positive deﬁnite. Then KL(Nq||Np) is
+1
+2
+(
+tr
+(
+Σ−1
+p Σq
+)
+−k + (µp−µq)⊤ Σ−1
+p (µp−µq)
++ ln
+(det Σp
+det Σq
+))
+.
+(1)
+Forp,q∈ [0, 1], we will abuse notation and deﬁne
+KL(q||p) := KL(B(q)||B(p))
+=q logq
+p + (1−q) log 1−q
+1−p,
+whereB(p) denotes the Bernoulli distribution on{0, 1}
+with meanp.
+2.2 INVERTING KL BOUNDS
+In the following sections, we will encounter bounds on a
+quantityp∗∈ [0, 1] of the form
+KL(q||p∗)≤c
+for someq∈ [0, 1] andc≥ 0. Thus, we are interested in
+KL−1(q|c) := sup{p∈ [0, 1] : KL( q||p)≤c}.
+We are not aware of a simple formula for KL−1(q|c),
+although numerical approximations are readily obtained
+via Newton’s method (Appendix A). For the purpose of
+gradient-based optimization, we can use the well-known
+inequality, 2(q−p)2 ≤ KL(q||p), to obtain a simple
+upper bound
+KL−1(q|c)≤q +
+√
+c/2. (2)
+This bound is quantitatively loose near q≈ 0, because
+then KL−1(q|c)≈c forc≪ 1, versus the upper bound
+of Θ(√c). On the other hand, when c is large enough
+thatq +√c
+2 > 1, the derivative of KL−1(q|c) is zero,
+whereas the upper bound provides a useful derivative.
+2.3 BOUNDS
+We will employ three probabilistic bounds to control gen-
+eralization error: the union bound, a sample convergence
+bound derived from the Chernoff bound, and the PAC-
+Bayes bound due to McAllester [McA99]. We state the
+union bound for completeness.
+Theorem 2.1 (union). LetE1,E 2,... be events. Then
+P(⋃
+nEn)≤∑
+n P(En).
+Recall thatB(p) denotes the Bernoulli distribution on
+{0, 1} with mean p ∈ [0, 1]. The following bound is
+derived from the KL formulation of the Chernoff bound:
+Theorem 2.2 (sample convergence [LC02]). For every
+p,δ ∈ (0, 1) andn∈ N, with probability at least 1−δ
+overx∼B (p)n, KL(n−1∑n
+i=1xi||p)≤ log 2
+δ
+n .
+Finally, we present a variant of McAllester’s PAC-Bayes
+bound due to Langford and Seeger [LS01]. (See also
+[Lan02].)
+Theorem 2.3 (PAC-Bayes [McA99; LS01]). For every
+δ > 0, m∈ N, distribution µ on Rk×{− 1, 1}, and
+distributionP onH, with probability at least 1−δ over
+Sm∼µm, for all distributionsQ onH,
+KL(ˆe(Q,Sm)||e(Q))≤ KL(Q||P ) + logm
+δ
+m− 1 .
+The PAC-Bayes bound leads to the following learning
+algorithm [McA99]:
+1. Fix a probability δ >0 and a distributionP onH.
+2. Collect an i.i.d. dataset Sm of sizem.
+3. Compute the optimal distributionQ onH that mini-
+mizes the error bound
+KL−1
+(
+ˆe(Q,Sm)
+⏐⏐⏐⏐
+KL(Q||P ) + logm
+δ
+m− 1
+)
+. (3)
+4. Return the randomized classiﬁer given by Q.
+In all but the simplest scenarios, making predictions ac-
+cording to the optimalQ is intractable. However, we can
+attempt to approximate it.
+3 PAC-BA YES BOUND OPTIMIZA TION
+LetH be a parametric family of classiﬁers and writehw
+for H(w,·). We will interpret hw as a neural network
+with (weight/bias) parametersw∈ Rd, although the de-
+velopment below is more general.
+Fixδ∈ (0, 1) and a distributionP on Rd, and letSm∼
+µm bem i.i.d. training examples. We aim to minimize
+the PAC-Bayes bound (Eq. (3)) with respect toQ.
+For w∈ Rd and s∈ Rd
++, letNw,s =N (w, diag(s))
+denote the multivariate normal distribution with meanw
+and diagonal covariance diag(s). As our ﬁrst simpliﬁca-
+tions, we replace the PAC-Bayes with the upper bound
+described by Eq. (2), replace the empirical loss with its
+convex surrogate, and restrict Q to the family of mul-
+tivariate normal distributions with diagonal covariance
+structure, yielding the optimization problem
+min
+w∈Rd,s∈Rd
++
+˘e(Nw,s,Sm) +
+√
+KL(Nw,s||P ) + logm
+δ
+2(m− 1) .
+3.1 THE PRIOR
+In order to obtain a KL divergence in closed form, we
+chooseP to be multivariate normal. Symmetry consider-
+ations would suggest that we chooseP =N (0,λI ) for
+someλ> 0, however there is no single good choice ofλ.
+(We will also see that there are good reasons not to choose
+a zero mean, and so we will letw0 denote the mean to be
+chosen a priori.)
+In order to deal with the problem of choosingλ, we will
+follow Langford and Caruana [LC02] and use a union-
+bound argument to choose λ optimally from a discrete
+set, at the cost of a slight expansion to our generalization
+bound. In particular, we will takeλ =c exp{−j/b} for
+somej∈ N and ﬁxed b,c≥ 0. (Hence, b determines a
+level of precision andc is an upper bound.) If the PAC-
+Bayes bound for each j∈ N is designed to hold with
+probability at least 1− 6
+π2j2 , then, by the union bound
+(Theorem 2.1), it will hold uniformly for allj∈ N with
+probability at least 1−δ, as desired.During optimization,
+we will want to avoid discrete optimization, and so we
+will treatλ as if it were a continuous variable. (We will
+then discretizeλ when we evaluate the PAC-Bayes bound
+after the fact.) Solving for j, we havej = b log c
+λ, and
+so we will replacej with this term during optimization.
+Taking into account the choice ofP and the continuous
+approximation to the union bound, we have the following
+minimization problem:
+min
+w∈Rd,s∈Rd
++,λ∈(0,c)
+˘e(Nw,s,Sm) +
+√
+1
+2BRE(w,s,λ ;δ)
+(4)
+whereBRE(w,s,λ ;δ) is
+KL(Nw,s||N (w0,λI ))+2 log(b log c
+λ)+log π2m
+6δ
+m− 1 , (5)
+and, using Eq. (1), the KL term simpliﬁes to
+1
+2
+( 1
+λ∥s∥1−d + 1
+λ∥w−w0∥2
+2 +d logλ− 1d· logs
+)
+.
+We ﬁxδ = 0.025,b = 100, andc = 0.1.
+3.2 STOCHASTIC GRADIENT DESCENT
+We cannot optimize Eq. (4) directly because we cannot
+compute ˘e(Nw,s,Sm) or its gradients efﬁciently. We can,
+however, compute the gradient of the unbiased estimate
+˘e(hw+ξ⊙√s,Sm), whereξ∼N 0,Id. We will use an i.i.d.
+copy ofξ at each iteration. We did not experiment using
+mini-batches during bound optimization.
+3.3 FINAL PAC-BA YES BOUND
+While we treatλ as a continuous parameter during opti-
+mization, the union bound requires thatλ be of the form
+λ =c exp{−j/b}, for somej∈ N. We therefore roundλ
+up or down, choosing that which delivers the best bound,
+as computed below.
+According to the PAC-Bayes and union bound, with prob-
+ability 1−δ, uniformly over allw∈ Rd,s∈ Rd
++, andλ
+of the formc exp{−j/b}, forj∈ N, the error rate of the
+randomized classiﬁerQ =Nw,s is bounded by
+KL−1(ˆe(Q,Sm)|BRE(w,s,λ ;δ)).
+We cannot compute this bound exactly because comput-
+ing ˆe(Q,Sm) is intractable. However, we can obtain
+unbiased estimates and apply the sample convergence
+bound (Theorem 2.2). In particular, givenn i.i.d. samples
+w1,...,w n fromQ, we produce the Monte Carlo approx-
+imation ˆQn =∑n
+i=1δwi, for which ˆe( ˆQn,Sm) is exactly
+computable, and obtain the bound
+ˆe(Q,Sm)≤ ˆen,δ′(Q,Sm)
+:= KL−1(ˆe( ˆQn,Sm)|n−1 log 2/δ′),
+which holds with probability 1−δ′. By another applica-
+tion of the union bound,
+e(Q)≤ KL−1(ˆen,δ′(Q,Sm)|BRE(w,s,λ ;δ)), (6)
+with probability 1−δ−δ′. We use this bound in our
+reported results.
+4 EXPERIMENTS
+Starting from neural networks whose weights have been
+trained by SGD (with momentum) to achieve near-perfect
+accuracy on a binary class variant of MNIST, we then op-
+timize a PAC-Bayes bound on the error rate of stochastic
+neural network whose weights are random perturbations
+of the weights learned by SGD. We consider several dif-
+ferent network architectures, varying both the depth and
+the width of the network.
+4.1 DA TASET
+We use the MNIST handwritten digits data set [LCB10]
+as provided in Tensorﬂow [TF], where the dataset is split
+into the training set (55000 images) and test set (10000
+images). (We do not use the validation set.) Each MNIST
+image is black and white and 28-pixels square, resulting
+in a network input dimension ofk = 784. MNIST is usu-
+ally treated as a multiclass classiﬁcation problem. In order
+to use standard PAC-Bayes bounds, we produce a binary
+classiﬁcation problem by mapping numbers{0,..., 4} to
+label 1 and{5,..., 9} to label−1. In some experiments,
+we train on random labels, i.e., binary labels drawn inde-
+pendently and uniformly at random.
+4.2 INITIAL NETWORK TRAINING BY SGD
+All experiments are performed on multilayer perceptrons,
+i.e., feed-forward neural networks with 2 or more lay-
+ers, each layer fully connected to the previous and next
+layer. We choose a standard initialization scheme for
+the weights and biases: Weights are initialized randomly
+from a normal distribution (with mean zero and standard
+deviationσ = 0.04) that is truncated to [−2σ, 2σ]. Biases
+are initialized to a constant value of 0.1 for the ﬁrst layer
+and 0 for the remaining layers. We let w0 denote this
+random initialization of the weights (and biases).
+We use REctiﬁed Linear Unit (RELU) activations at every
+hidden node. The last layer is linear. In order to train
+the weights, we minimize the logistic loss by SGD with
+momentum (learning rate 0.01; momentum 0.9). SGD is
+run in mini-batches of size 100. These settings are similar
+to those in [Zha+17].
+On our binary class variant of MNIST, we train several
+neural network architectures of varying depth and width
+(see Table 1). In each case, we train for a total of 20
+epochs. We also train a small network (with one 600-unit
+hidden layer) on random labels, in order to demonstrate
+the large capacity of the network. Obtaining≈0 training
+error requires 120 epochs. See the ﬁrst two rows of Table 1
+for the train/test error rates.
+4.3 PAC-BA YES BOUND OPTIMIZA TION
+Starting from weightsw learned by SGD, we construct
+a stochastic neural network with a multivariate normal
+distributionQ =Nw,s over its weights with meanw and
+covariance diag(s). We initializes to|w| and|w|/10 for
+true- and random-label experiments, respectively.
+We optimize the PAC-Bayes bound (Eq. (4)) starting from
+an initial choice of e−6 for the prior varianceλ and the
+prior mean ﬁxed at the random initializationw0. (See Ap-
+pendix B for a discussion of this subtle but important inno-
+Experiment T-600 T-1200 T- 3002 T-6002 T-12002 T-6003 R-600
+Train error 0.001 0.002 0.000 0.000 0.000 0.000 0.007
+Test error 0.018 0.018 0.015 0.016 0.015 0.013 0.508
+SNN train error 0.028 0.027 0.027 0.028 0.029 0.027 0.112
+SNN test error 0.034 0.035 0.034 0.033 0.035 0.032 0.503
+PAC-Bayes bound 0.161 0.179 0.170 0.186 0.223 0.201 1.352
+KL divergence 5144 5977 5791 6534 8558 7861 201131
+# parameters 471k 943k 326k 832k 2384k 1193k 472k
+VC dimension 26m 56m 26m 66m 187m 121m 26m
+Table 1: Results for experiments on binary class variant of MNIST. SGD is either trained on (T) true labels or
+(R) random labels. The network architecture is expressed asNL, indicatingL hidden layers withN nodes each.
+Errors are classiﬁcation error. The reported VC dimension is the best known upper bound (in millions) for ReLU
+networks. The SNN error rates are tight upper bounds (see text for details). The PAC-Bayes bounds upper bound
+the test error with probability 0.965.
+vation.) We transform the constrained optimization over
+w∈ Rd,s∈ Rd
++, andλ∈ (0,c ), into an unconstrained
+optimization overw, 1
+2 log(s), and 1
+2 log(λ), respectively.
+We optimize the objective by gradient descent with the
+RMSprop optimizer (with decay 0.9, as is typical). We
+use the unbiased estimate of the gradient of the empirical
+surrogate error of the randomized classiﬁer Q =Nw,s.
+We set the learning rate to 0.001 for the ﬁrst 150000
+iterations, and then lower it to 0.0001 for the ﬁnal 50000
+iterations. For the random-label experiment, we optimize
+the bound with a smaller 0.0001 learning rate for 500000
+iterations. In both cases, the learning rate is tuned so that
+the objective decreases smoothly during learning.
+Algorithm 1 is pseudo code for optimizing the PAC-Bayes
+bound. The code implements vanilla SGD, although it
+can be easily modiﬁed to use an optimizer like RMSprop.
+4.4 REPORTED V ALUES
+Reported error rates correspond to classiﬁcation error.
+Train and test error rates are empirical averages for net-
+works learned by SGD. In light of 10000 test data points
+and the observed error rates, upper bounds via Theo-
+rem 2.2 are only 0.005 higher.
+Reported train and test error rates for the stochastic neural
+networks (abbreviated SNN) are upper bounds computed
+by an application of Theorem 2.2 as described in Sec-
+tion 3.3 withδ′ = 0.01 andn = 150000. These numbers
+produce estimates within 0.001–0.002.
+The PAC-Bayes bound is computed as described in Sec-
+tion 3.3. Each bound holds with probability 0.965 over the
+choice of the training set and the draws from the learned
+SNN Q. For the random-label experiment, we report√
+1
+2BRE(w,s,λ ;δ) from Eq. (5), since the PAC-Bayes
+bound is vacuous when this quantity is greater than 1.
+Our VC-dimension bounds for ReLU networks are com-
+puted from a formula communicated to us by Bartlett
+[Bar17]. These bounds are in O(LW logW ), whereL is
+the number of layers andW is the total number of tunable
+parameters across layers.
+5 RESULTS
+See Table 1. All SGD trained networks achieve perfect
+or near-perfect accuracy on the training data. On true
+labels, the SNN mean training error increases slightly
+as the weight distribution broadens to minimize the KL
+divergence. The SGD solution is close to mean of the
+SNN as measured with respect to the SNN covariance.
+(See Appendix C for a discussion.) For the random-label
+experiment, the SNN mean training error rises above 10%.
+Ideally, it might have risen to nearly 50%, while driving
+down the KL term to near zero.
+The empirical test error of the SGD classiﬁers does not
+change much across the different architectures, despite
+the potential for overﬁtting. This phenomenon is well
+known, though still remarkable. For the random-label
+experiment, the empirical test classiﬁcation error of 0.508
+represents lack of generalization, as expected. The same
+two patterns hold for the SNN test error too, with slightly
+higher error rates.
+Remarkably, the PAC-Bayes bounds do not grow much de-
+spite the networks becoming several times larger, and all
+true label experiments have classiﬁcation error bounded
+by 0.23. (This observation is consistent with [NTS14].)
+Since larger networks possess many more symmetries,
+the true PAC-Bayes bounds for our learned stochastic
+neural network classiﬁer might be substantially smaller.
+(See Appendix B for a discussion.) While these bounds
+Algorithm 1 PAC-Bayes bound optimization by SGD
+Input:
+w0∈ Rd ⊿ Network parameters (random init.)
+w∈ Rd ⊿ Network parameters (SGD solution)
+Sm ⊿ Training examples
+δ∈ (0, 1) ⊿ Conﬁdence parameter
+b∈ N,c∈ (0, 1) ⊿ Precision and bound forλ
+τ∈ (0, 1),T ⊿ Learning rate; # of iterations
+Output: Optimalw,s,λ ⊿ Weights, variances
+1: procedure PAC-BAYES-SGD
+2: ς← abs(w) ⊿ wheres(ς) = e2ς
+3: ϱ←− 3 ⊿ whereλ(ϱ) = e2ϱ
+4: B(w,s,λ,w ′) = ˘e(hw′,Sm)+
+√
+1
+2BRE(w,s,λ )
+5: fort← 1,T do ⊿ Run SGD for T iterations.
+6: Sampleξ∼N (0,Id)
+7: w′(w,ς ) =w +ξ⊙
+√
+s(ς)
+⊿ Gradient step
+8:
+
+
+w
+ς
+ϱ
+
+ -=τ
+
+
+∇wB(w,s (ς),λ (ϱ),w′(w,ς ))
+∇ςB(w,s (ς),λ (ϱ),w′(w,ς ))
+∇ϱB(w,s (ς),λ (ϱ),w′(w,ς ))
+
+
+9: returnw,s (ς),λ (ϱ)
+are several times larger than the test error estimated on
+held-out data (approximately, 0.03), they demonstrate
+nontrivial generalization. The PAC-Bayes bound for the
+random-label experiment is vacuous.
+The VC-dimension upper bounds indicate that data in-
+dependent bounds will be vacuous by several orders of
+magnitude. Because the number of parameters exceeds
+the available training data, lower bounds imply that gener-
+alization cannot be explained in a data independent way.
+6 RELA TED WORK
+As we mention in the introduction, our approach scales the
+ideas in [HC93] and [LC02] to the modern deep learning
+regime where the networks have millions of parameters,
+but are trained on one or two orders of magnitude fewer
+training examples. The objective we optimize is an upper
+bound on the PAC-Bayes bound, which we know from the
+discussion in Section 2.2 will be very loose when the em-
+pirical classiﬁcation error is approximately zero. Indeed,
+in that case, the PAC-Bayes bound is approximately
+ˆe(Nw,s,Sm) + KL(Nw,s||P ) + logm
+δ
+(m− 1) . (7)
+The objective optimized by Hinton and Camp is of the
+same essential form as this one, except for the choice of
+squared error and different prior and posterior distribu-
+tions. We explored using Eq. (7) as our objective with a
+surrogate loss, but it did not produce different results.
+In the introduction we discuss the close connection of our
+work to several recent papers [Bal+15; Bal+16; Cha+17]
+that study “ﬂat” or nonisolated minima on the account of
+their generalization and/or algorithmic properties.
+Based on theoretical results for k-SAT that efﬁcient algo-
+rithms ﬁnd nonisolated solutions, Baldassi et al. [Bal+16]
+model efﬁcient neural network learning algorithms as
+minimizers of a replicated version of the empirical loss
+surface, which emphasizes nonisolated minima and deem-
+phasizes isolated minima. They then propose several
+algorithms for learning discrete neural networks using
+these ideas.
+In follow-up work with Chaudhari, Choromanska, Soatto,
+and LeCun [Cha+17], they translate these ideas into the
+setting of continuously parametrized neural networks.
+They introduce an algorithm, called Entropy-SGD, which
+seeks out large regions of dense local minima: it max-
+imizes the depth and ﬂatness of the energy landscape.
+Their objective integrates both the energy of nearby pa-
+rameters and the weighted distance to the parameters. In
+particular, rather than directly minimizing an error surface
+w↦→L(hw,Sm), they propose the following minimiza-
+tion problem over the so-called local-entropic loss:
+min
+w∈Rd
+log E
+W∼Nw,1/γ
+[C(γ) exp{−L(hW,Sm)}], (8)
+where γ > 0 is a parameter and C(γ) a constant. In
+comparison, our algorithm can be interpreted as an opti-
+mization of the form
+min
+w∈Rp,s∈Rp
++
+E
+W∼Nw,s
+[L(hW,Sm)] + R(w,s ) (9)
+whereR serves as a regularizer that accounts for the gener-
+alization error by, roughly speaking, trying to expand the
+axis-aligned ellipsoid{x∈ Rd : (w−x)T diag(s)−1(w−
+x) = 1} and draw it closer to some pointw0 near the ori-
+gin. Comparing Eqs. (8) and (9) highlights similarities
+and differences. The local-entropic loss is sensitive to the
+volume of the regions containing good solutions. While
+the ﬁrst term in our objective function looks similar, it
+does not, on its own, account for the volume of regions.
+This role is played by the second term, which prefers
+large regions (but also ones near the initialization w0).
+In our formulation, the ﬁrst term is the empirical error
+of a stochastic neural network, which is precisely the
+term whose generalization error we are trying to bound.
+Entropy-SGD was not designed for the purpose of ﬁnding
+good stochastic neural networks, although it seems pos-
+sible that having small local-entropic loss would lead to
+generalization for neural networks whose parameters are
+drawn from the local Gibbs distribution. Another differ-
+ence is that, in our formulation, the diagonal covariance of
+the multivariate normal perturbation is learned adaptively,
+and driven by the goal of minimizing error. The shape
+of the normal perturbation is not learned, although the
+region whose volume is being measured is determined by
+the error surface, and it seems likely that this volume will
+be larger than that spanned by a multivariate Gaussian
+chosen to lie entirely in a region with good loss.
+Chaudhari et al. [Cha+17] give an informal characteri-
+zation of the generalization properties of local-entropic
+loss in Bayesian terms by comparing the marginal likeli-
+hood of two Bayesian priors centered at a solution with
+small and large local-entropic loss. Informally, a Bayesian
+prior centered on an isolated solution will lead to small
+marginal likelihood in contrast to one centered in a wide
+valley. They give a formal result relying on the uniform
+stability of SGD [HRS15] to show under some strong
+(and admittedly unrealistic) conditions that Entropy-SGD
+generalizes better than SGD. The key property is that the
+local-entropic loss surface is smoother than the original
+error surface.
+Other authors have found evidence of the importance of
+“ﬂat” minima: Recent work by Keskar, Mudigere, No-
+cedal, Smelyanskiy, and Tang [Kes+17] ﬁnds that large-
+batch methods tend to converge to sharp / isolated minima
+and have worse generalization performance compared to
+mini-batch algorithms, which tend to converge to ﬂat min-
+ima and have good generalization performance. The bulk
+of their paper is devoted to the problem of restoring good
+generalization behavior to batch algorithms.
+Finally, our algorithm also bears resemblance to gradu-
+ated optimization, an approach toward non-convex op-
+timization attributed to Blake and Zisserman [BZ87]
+whereby a sequence of increasingly ﬁne-grained versions
+of an optimization problem are solved in succession. (See
+[HLS16] and references therein.) In this context, Eq. (8)
+is the result of a local smoothing operation acting on
+the objective functionw↦→ ˘ℓ(hw,SM). In graduate op-
+timization, the effect of the local smoothing operation
+would be decreased over time, eventually disappearing.
+In our formulation, the act of balancing the empirical loss
+and generalization error serve to drive the evolution of
+the local smoothing in an adaptive fashion. Moreover,
+in the limit, the local smoothing does not vanish in our
+algorithm, as the volume spanned by the perturbations
+relates to the generalization error. Our results suggest that
+SGD solutions live inside relatively large volumes, and
+so perhaps SGD can be understood in terms of graduated
+optimization.
+7 CONCLUSION AND FUTURE WORK
+We obtain nonvacuous generalization bounds for deep
+neural networks with millions of parameters trained on
+55000 MNIST examples. These bounds are obtained
+by optimizing an objective derived from the PAC-Bayes
+bound, starting from the solution produced by SGD. De-
+spite the weights changing, the SGD solution remains
+well within the 1% ellipsoidal quantile, i.e., the volume
+spanned by the stochastic neural network contains the
+original SGD solution. (When labels are randomized,
+however, optimizing the PAC-Bayes bound causes the
+solution to shift considerably.)
+Our experiments look only at fully connected feed for-
+ward networks trained on a binary class variant of MNIST.
+It would be interesting to see if the results extend to mul-
+ticlass classiﬁcation, to other data sets, and to other types
+of architectures, especially convolutional ones.
+Our PAC-Bayes bound can be tightened in several ways.
+Highly dependent weights constrain the size of the axis-
+aligned ellipsoid representing the stochastic neural net-
+work. We can potentially recognize small populations of
+highly dependent weights, and optimize their covariance
+parameters, rather than enforcing independence in the
+posterior.
+One might also consider replacing the multivariate normal
+posterior with a distribution that is more tuned to the loss
+surface. One promising avenue is to follow the lines of
+Chaudhari et al. [Cha+17] and consider (local) Gibbs
+distributions. If the solutions obtained by minimizing the
+local-entropic loss are ﬂatter than those obtained by SGD,
+than we may be able to demonstrate quantitatively tighter
+bounds.
+Finally, there is the hard work of understanding the gen-
+eralization properties of SGD. In light of our work, it
+may be useful to start by asking whether SGD ﬁnds solu-
+tions in ﬂat minima. Such solutions could then be lifted
+to stochastic neural networks with good generalization
+properties. Going from stochastic networks back to deter-
+ministic ones may require additional structure.
+Acknowledgments This research was carried out while
+the authors were visiting the Simons Institute for the The-
+ory of Computing at UC Berkeley. The authors would
+like to thank Peter Bartlett, Shai Ben-David, Dylan Foster,
+Matus Telgarsky, and Ruth Urner for helpful discussions.
+GKD is supported by an EPSRC studentship. DMR is
+supported by an NSERC Discovery Grant, Connaught
+Award, and U.S. Air Force Ofﬁce of Scientiﬁc Research
+grant #FA9550-15-1-0074.
+REFERENCES
+[Bal+15] C. Baldassi, A. Ingrosso, C. Lucibello, L. Saglietti,
+and R. Zecchina. “Subdominant Dense Clusters
+Allow for Simple Learning and High Computa-
+tional Performance in Neural Networks with Dis-
+crete Synapses”. Phys. Rev. Lett. 115 (12 Sept.
+2015), p. 128101.
+[Bal+16] C. Baldassi, C. Borgs, J. T. Chayes, A. Ingrosso, C.
+Lucibello, L. Saglietti, and R. Zecchina. “Unrea-
+sonable effectiveness of learning neural networks:
+From accessible states and robust ensembles to ba-
+sic algorithmic schemes”. Proceedings of the Na-
+tional Academy of Sciences113.48 (2016), E7655–
+E7662. eprint: http://www.pnas.org/content/113/
+48/E7655.full.pdf.
+[Bar17] P. L. Bartlett. “The impact of the nonlinearity on
+the VC-dimension of a deep network”. Preprint.
+2017.
+[Bar97] P. L. Bartlett. “For valid generalization the size
+of the weights is more important than the size of
+the network”. In: Advances in Neural Information
+Processing Systems. 1997, pp. 134–140.
+[Bar98] P. L. Bartlett. “The sample complexity of pattern
+classiﬁcation with neural networks: the size of
+the weights is more important than the size of
+the network”. IEEE Transactions on Information
+Theory 44.2 (1998), pp. 525–536.
+[BM02] P. L. Bartlett and S. Mendelson. “Rademacher and
+Gaussian complexities: Risk bounds and structural
+results”. Journal of Machine Learning Research
+3.Nov (2002), pp. 463–482.
+[BZ87] A. Blake and A. Zisserman. Visual Reconstruction.
+Cambridge, MA, USA: MIT Press, 1987.
+[Cha+17] P. Chaudhari, A. Choromanska, S. Soatto, Y . Le-
+Cun, C. Baldassi, C. Borgs, J. Chayes, L. Sagun,
+and R. Zecchina. “Entropy-SGD: Biasing Gradi-
+ent Descent Into Wide Valleys”. In:International
+Conference on Learning Representations (ICLR).
+2017. arXiv: 1611.01838v4 [cs.LG].
+[Gr¨u07] P. D. Gr¨unwald. The minimum description length
+principle. MIT press, 2007.
+[HC93] G. E. Hinton and D. van Camp. “Keeping the Neu-
+ral Networks Simple by Minimizing the Descrip-
+tion Length of the Weights”. In: Proceedings of
+the Sixth Annual Conference on Computational
+Learning Theory. COLT ’93. Santa Cruz, Califor-
+nia, USA: ACM, 1993, pp. 5–13.
+[HLS16] E. Hazan, K. Y . Levy, and S. Shalev-Shwartz.
+“On Graduated Optimization for Stochastic Non-
+Convex Problems”. In: Proceedings of the 33rd
+International Conference on Machine Learning
+(ICML). 2016, pp. 1833–1841.
+[HRS15] M. Hardt, B. Recht, and Y . Singer. “Train faster,
+generalize better: Stability of stochastic gradient
+descent”. CoRR abs/1509.01240 (2015).
+[HS97] S. Hochreiter and J. Schmidhuber. “Flat Minima”.
+Neural Comput. 9.1 (Jan. 1997), pp. 1–42.
+[Kes+17] N. S. Keskar, D. Mudigere, J. Nocedal, M.
+Smelyanskiy, and P. T. P. Tang. “On Large-Batch
+Training for Deep Learning: Generalization Gap
+and Sharp Minima”. In: International Conference
+on Learning Representations (ICLR). 2017. arXiv:
+1609.04836v2 [cs.LG].
+[KP02] V . Koltchinskii and D. Panchenko. “Empirical mar-
+gin distributions and bounding the generalization
+error of combined classiﬁers”. Ann. Statist. 30.1
+(2002), pp. 1–50.
+[Lan02] J. Langford. “Quantitatively tight sample complex-
+ity bounds”. Carnegie Mellon University, 2002.
+[LC02] J. Langford and R. Caruana. “(Not) Bounding the
+True Error”. In: Advances in Neural Information
+Processing Systems 14. Ed. by T. G. Dietterich,
+S. Becker, and Z. Ghahramani. MIT Press, 2002,
+pp. 809–816.
+[LCB10] Y . LeCun, C. Cortes, and C. J. C. Burges.
+MNIST handwritten digit database .
+http://yann.lecun.com/exdb/mnist/. 2010.
+[LS01] J. Langford and M. Seeger. Bounds for Averaging
+Classiﬁers. Tech. rep. CMU-CS-01-102. Carnegie
+Mellon University, 2001.
+[McA99] D. A. McAllester. “PAC-Bayesian Model Averag-
+ing”. In: Proceedings of the Twelfth Annual Con-
+ference on Computational Learning Theory. COLT
+’99. Santa Cruz, California, USA: ACM, 1999,
+pp. 164–170.
+[NSS15] B. Neyshabur, R. Salakhutdinov, and N. Sre-
+bro. “Path-SGD: Path-Normalized Optimization
+in Deep Neural Networks”. In: Advances in Neu-
+ral Information Processing Systems. 2015. arXiv:
+1506.02617v1 [cs.LG].
+[NTS14] B. Neyshabur, R. Tomioka, and N. Srebro. In
+Search of the Real Inductive Bias: On the Role of
+Implicit Regularization in Deep Learning. Work-
+shop track poster at ICLR 2015. 2014. arXiv: 1412.
+6614v4 [cs.LG].
+[NTS15] B. Neyshabur, R. Tomioka, and N. Srebro. “Norm-
+based capacity control in neural networks”. In:
+Proceedings of the Eigth Annual Conference on
+Learning Theory. COLT 2016. 2015, pp. 1376–
+1401. arXiv: 1503.00036v2 [cs.LG].
+[Ris83] J. Rissanen. “A Universal Prior for Integers and Es-
+timation by Minimum Description Length”. Ann.
+Statist. 11.2 (June 1983), pp. 416–431.
+[TF] M. Abadi, A. Agarwal, P. Barham, E. Brevdo,
+Z. Chen, C. Citro, G. S. Corrado, A. Davis, J.
+Dean, M. Devin, S. Ghemawat, I. Goodfellow, A.
+Harp, G. Irving, M. Isard, Y . Jia, R. Jozefowicz,
+L. Kaiser, M. Kudlur, J. Levenberg, D. Man´e, R.
+Monga, S. Moore, D. Murray, C. Olah, M. Schus-
+ter, J. Shlens, B. Steiner, I. Sutskever, K. Talwar, P.
+Tucker, V . Vanhoucke, V . Vasudevan, F. Vi´egas, O.
+Vinyals, P. Warden, M. Wattenberg, M. Wicke, Y .
+Yu, and X. Zheng. TensorFlow: Large-Scale Ma-
+chine Learning on Heterogeneous Systems. Soft-
+ware available from tensorﬂow.org. 2015.
+[Zha+17] C. Zhang, S. Bengio, M. Hardt, B. Recht, and O.
+Vinyals. “Understanding deep learning requires
+rethinking generalization”. In: International Con-
+ference on Representation Learning (ICLR). 2017.
+arXiv: 1611.03530v2 [cs.LG].
+A APPROXIMA TING KL−1(Q|C)
+There is no simple formula for KL−1(q|c), but we can
+approximate it via root-ﬁnding techniques. For all q∈
+(0, 1) andc≥ 0, deﬁne hq,c(p) = KL(q||p)−c. Then
+h′
+q,c(p) = 1−q
+1−p− q
+p. Given a sufﬁciently good initial
+estimatep0 of a root ofhq,c(·), we can obtain improved
+estimates of a root via Newton’s method:
+pn+1 = N(pn;q,c ) where N(p;q,c ) =p− hq,c(c)
+h′q,c(p).
+This suggests the following approximation to KL−1(q|c):
+1. Let ˜b =q +√c
+2.
+2. If ˜b≥ 1, then return 1.
+3. Otherwise, return Nk(˜b), for some integerk> 0.
+Our reported results use ﬁve steps of Newton’s method.
+B NETWORK SYMMETRIES
+In an ideal world, we would account for all the network
+symmetries when computing the KL divergence in the
+PAC-Bayes bound. However, it does not seem to be com-
+putationally feasible to account for the symmetries, as we
+discuss below. Given this, it makes sense to try to break
+the symmetries somehow. Indeed, one consequence of
+randomly initializing a neural network’s weights is that
+some symmetries are broken. If we do not expect SGD
+to reverse (many of) these symmetries, then the initial
+weight conﬁguration, w0, will be a better mean for the
+PAC-Bayes prior P than the origin. In fact, breaking
+symmetries in this way lead to much better bounds than
+setting the means to zero.
+B.1 BOUNDS FROM MIXTURES
+Fix a neural network architecture H : Rd× Rk →
+{−1, 1} and write hw forH(w,·). It has long been ap-
+preciated that distinct parametrizations w,w′∈ Rd can
+lead to the same functions hw = hw′, and so the set
+H ={hw : w∈ Rd} of classiﬁers deﬁned by a neural
+network architecture is a quotient space of Rd.
+For the purposes of understanding the generalization er-
+ror of neural networks, we would ideally work directly
+withH. Let P,Q be a distributions on Rd, i.e., stochas-
+tic neural networks. Then P and Q induce distribu-
+tions onH, which we will denote by ¯P and ¯Q, respec-
+tively. For the purposes of the PAC-Bayes bound, it is
+the KL divergence KL( ¯Q|| ¯P ) that upper bounds the per-
+formance of the stochastic neural networkQ. In general,
+KL( ¯Q|| ¯P )≤ KL(Q||P ), but it is difﬁcult in practice
+to approximate the former because the quotient space is
+extremely complex.
+One potential way to approachH is to account for sym-
+metries in the parameterization. A network symmetry is
+a mapσ : Rd→ Rd such that, for allw∈ Rd, we have
+hw = hσ(w). As an example of such a symmetry, in a
+fully connected network with identical activation func-
+tions at every unit, the function computed by the network
+is invariant to permuting the nodes with a hidden layer.
+Let S be any ﬁnite set of symmetries possessed by the
+architecture. For every distributionQ on Rd and network
+symmetry σ, we may deﬁne Qσ = Q◦σ−1 to be the
+distribution over networks obtained by ﬁrst sampling net-
+work parameters fromQ and then applying the mapσ to
+obtain a network that computes the same function.
+Deﬁne QS = 1
+|S|
+∑
+σ∈SQσ. Informally, Q andQS are
+identical when viewed as distributions on functions, yet
+QS spreads its mass evenly over equivalent parametriza-
+tions. In particular, for any data setS, we have ˆe(Q,S ) =
+ˆe(QS,S ). We callQS a symmetrized version ofQ. The
+following lemma states that symmetrized versions always
+have smaller KL divergence with respect to distributions
+that are invariant to symmetrization: Before stating the
+lemma, recall that the differential entropy of an abso-
+lutely continuous distributionQ on Rd with densityq is∫
+q(x) logq(x)dx∈ R∪{−∞,∞}.
+Lemma B.1. Let S be a ﬁnite set of network symmetries,
+letP be an absolutely continuous distribution such that
+P = Pσ for all σ ∈ S, and deﬁne QS as above for
+some arbitrary absolutely continuous distributionQ on
+Rd with ﬁnite differential entropy. Then KL(QS||P ) =
+KL(Q||P )− KL(Q||QS)≤ KL(Q||P ).
+The above lemma can be generalized to distributions over
+(potentially inﬁnite) sets of network symmetries.
+It follows from this lemma that one can do no worse
+by accounting for symmetries using mixtures, provided
+that one is comparing to a distributionP that is invariant
+to those symmetries. In light of the PAC-Bayes theo-
+rem, this means that a generalization bound based upon a
+KL divergence that does not account for symmetries can
+likely be improved. However, for a ﬁnite set S of symme-
+tries, it is easy to show that the improvement is bounded
+by log|S|, which suggests that, in order to obtain appre-
+ciable improvements in a numerical bound, one would
+need to account for an exponential number of symmetries.
+Unfortunately, exploiting this many symmetries seems
+intractable. It is hard to obtain useful lower bounds to
+KL(Q||QS), while upper bounds from Jensen’s inequal-
+ity lead to negative (hence vacuous) lower bounds on
+KL(QS||P ).
+In this work, we therefore take a different approach to
+dealing with symmetries. Neural networks are randomly
+initialized in order to break symmetries. Combined with
+the idea that the learned parameters will reﬂect these
+broken symmetries, we choose our priorP to be located
+at the random initialization, rather than at zero.
+C COMPARING WEIGHTS BEFORE
+AND AFTER PAC-BA YES OPTIMIZA-
+TION
+In the course of optimizing the PAC-Bayes bound, we
+allow the meanw to deviate from the SGD solutionwSGD
+that serves as the starting point. This is necessary to
+obtain bounds as tight as those that we computed. Do the
+weights change much during optimization of the bound?
+How would we measure this change?
+To answer these questions, we calculated the p-value of
+the SGD solution under the distribution of the stochastic
+neural network.
+LetQSNN denote the distribution obtained by optimizing
+the PAC-Bayes bound, writewSNN and ΣSNN for its mean
+and covariance, and let∥w∥ΣSNN = wT Σ−1
+SNNw denote
+the induced norm. Using 10000 samples, we estimated
+P
+w∼QSNN
+(
+∥w−wSNN∥ΣSNN <∥wSGD−wSNN∥ΣSNN
+)
+.
+The estimate was 0 for all true label experiments, i.e.,
+wSGD is less extreme of a perturbation of wSNN than a
+typical perturbation. For the random-label experiments,
+wSNN andwSGD differ signiﬁcantly, which is consistent
+with the bound being optimized in the face of random
+labels.
+D EV ALUA TING RADEMACHER ER-
+ROR BOUNDS
+Fix a class F of measurable functions from RD to R
+and letRm(F) denote the Rademacher complexity ofF
+associated with m i.i.d. samples. For h∈F , we will
+obtain binary classiﬁcations (and measure error and em-
+pirical error) by computing the sign of its output, i.e., by
+thresholding. The following error bound is a straightfor-
+ward adaptation of [BM02, Thm. 7], which is itself an
+adaptation of [KP02, Thm. 2].
+Theorem D.1. For everyL> 0, with probability at least
+1−δ over the choice ofSm∼µm, for allh∈F ,
+e(h)≤ ˆe(h,Sm,L ) + 2LRm(F) +
+√
+log( 2
+δ )
+2m , (10)
+where
+ˆe(h,Sm,L ) = 1
+m
+m∑
+i=1
+max(min(1−Lyih(xi), 1), 0).
+In order to compute these bounds, we must compute
+(bounds on) the Rademacher complexity of appropri-
+ate function classes. To that end, we will use results
+by Neyshabur, Tomioka, and Srebro [NTS15] for ReLU
+networks (i.e., multilayer perceptrons with ReLU activa-
+tions).
+Letw be the weights of a ReLU network and let w(k)
+i,j
+denote the weight associated with the edge from neuroni
+in layerk−1 to neuronj in layerk. Neyshabur, Tomioka,
+and Srebro [NTS15] deﬁne theℓ1 path norm
+φ1(w) =
+∑
+j
+[
+|w(2)
+j,1|
+∑
+i
+|w(1)
+i,j|
+]
+, (11)
+stated here in the special case of a 2-layer network with 1
+output neuron. For any number of layers, the path norm
+can be computed easily in a forward pass, requiring only
+a matrix–vector product at each layer.
+Neyshabur, Tomioka, and Srebro also provide the follow
+Rademacher bound in terms of the path norm:
+Theorem D.2 ([NTS15, Cor. 7]) . Given m datapoints
+x1,...,x m ∈ RD, the Rademacher complexity of the
+class of depth-d ReLU networks, whose ℓ1 path norms
+are bounded byφ, is no greater than
+2dφ
+√
+log(2D)
+m max
+i
+∥xi∥∞. (12)
+Letw(k)
+j for the jth column of w(j), i.e., the vector of
+weights for edges from layerk− 1 to neuronj in layerk.
+Theℓ1 path norm is closely related to the norm
+γ1,∞(w) =
+d∏
+i=1
+max
+j
+w(k)
+j
+
+1.
+If the upper bound φ appearing in the bound of Theo-
+rem D.2 is instead taken to be a bound onγ1,∞(w), then
+one essentially obtains the Gaussian complexity bounds
+for neural networks established by Bartlett and Mendelson
+[BM02] and Koltchinskii and Panchenko [KP02]. How-
+ever, their bounds apply only to networks with bounded
+activation functions, ruling out ReLU networks.
+Regardless, the path-norm bound is tighter for ReLU net-
+works. In order to establish the connection, let W(w)
+denote the set of all weightsw′ obtained from redistribut-
+ing the weightsw across layers, i.e., by multiplying the
+weightsw(k−1) in a layer by a constantc> 0 and multi-
+plying the weights in the subsequent layer w(k) byc−1.
+Note that the function computed by a ReLU network is
+invariant to this transformation. This is the key insight of
+Neyshabur, Tomioka, and Srebro. Obviously,φ1(w) =
+φ1(w′) for all w′∈W (w). Neyshabur, Tomioka, and
+Srebro show thatφ1(w) = infw′∈W(w)γ1,∞(w′), and so
+the path norm better captures the complexity of a ReLU
+network.
+In our experiments, we will compute the bound obtained
+by combining Theorems D.1 and D.2.
+Note that the constantL in Theorem D.1 must be chosen
+independently of the data Sm. As in the original result
+[KP02, Thm. 2], one can use a union bound to allow
+oneself to chooseL based on the data in order to minimize
+the bound. Even though the effect of this change is usually
+(relatively) small, its magnitude depends on the particular
+weight function employed in the union bound. Instead,
+we will apply the bound with an optimizedL, yielding an
+optimistic bound (formally, a lower bound on any upper
+bound obtained from a union bound). We optimize L
+over a grid of values, and handle the vacuous edge cases
+analytically. Nevertheless, we will see even the resulting
+(optimistic) bound is vacuous.
+D.1 EXPERIMENT DETAILS
+We use SGD to train a two-layer 600-hidden-unit ReLU
+network on the same binary class variant of MNIST used
+to evaluate our PAC-Bayes bounds. We set the global
+learning rate to 0.005. As in our PAC-Bayes experi-
+ments, we optimize the average logistic loss during train-
+ing. The random initializations commonly used for ReLU
+networks lead to initial path norms that produce vacuous
+error bounds. In order to visualize the behavior of the
+path-norm bound under SGD, we reduce the standard de-
+viation of the truncated-normal initialization from 0.04 to
+0.0001. As before, we use mini-batches of 100 training
+examples, yielding 550 iterations per epoch.
+For comparison, we also train the same network ar-
+chitecture while explicitly regularizing the path norm.
+(Neyshabur, Salakhutdinov, and Srebro [NSS15] propose
+training neural networks via steepest descent with respect
+to the path norm. We leave this comparison to future
+work.)
+D.2 RESULTS
+When the network is trained by optimizing the logistic
+cost function without regularization, the error bound be-
+comes vacuous within a fraction of a single epoch. This
+occurs before the training error dips appreciable below
+chance. The bound’s behavior is due to the path norm di-
+verging. While the level sets ˆe(h,S,·)−1 of the empirical
+margin distribution are growing, they are not growing fast
+enough to counteract the growth of the path norm. (See
+the left column of Fig. 1.)
+When the network is trained with explicit path-norm reg-
+ularization, we obtain vacuous error bounds, unless we
+apply excessive amounts of regularization. We report re-
+sults when the regularization parameter is 0.01 and 0.05.
+Both settings are clearly too large, as evidenced by the
+training error converging to ~20% and ~30%, respec-
+tively. A cursory study of overallℓ1 andℓ2 regularization
+produced qualitatively similar results. Further study is
+necessary.
+0 1 2 3 4 5
+0.0
+0.2
+0.4
+0.6
+0.8
+1.00-1 Error
+Unregularized
+0 1 2 3 4 5
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Regularized (0.01)
+Train error
+Test error
+Bound
+0 1 2 3 4 5
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Regularized (0.05)
+0 1 2 3 4 5
+10 2
+10 1
+100
+101
+102
+103
+Path norm
+0 1 2 3 4 5
+10 2
+10 1
+100
+101
+102
+103
+0 1 2 3 4 5
+10 3
+10 2
+10 1
+100
+101
+102
+103
+0 1 2 3 4 5
+Epoch
+0.0
+3.0
+6.0
+9.0
+12.0
+15.0Margin
+0 1 2 3 4 5
+Epoch
+0.0
+3.0
+6.0
+9.0
+12.0
+15.0
+0 1 2 3 4 5
+Epoch
+0.0
+3.0
+6.0
+9.0
+12.0
+15.0
+Figure 1: Unregularized ( left column ) and path-norm regularized ( center and right columns with regularization
+parameter speciﬁed in parenthesis) optimization of two-layer 600-hidden-unit ReLU network by SGD for 5 epochs. (We
+ran 20 epochs and found no new patterns. Plots for longer experiment obscured the initial behavior.) (top row) Training
+error, testing error, and error bounds versus (iterations measured in) epochs. Without regularization, the bounds are
+immediately vacuous once the network performance deviates from chance, and this remains true under regularization
+unless the explicit regularization is very strong. In this case, the bound is nonvacuous, but trivial in the sense that the
+error rate of guessing is 50%. Note that training/testing error is also very large in this case. (center row) Log plot of
+path norm versus epochs. Without regularization, the path norm diverges quickly. ( bottom row) Empirical margin
+distributions versus epochs. The margin that attains a ﬁxed average loss is growing, but not rapidly enough to counteract
+the rapidly increasing path norm.

@@ -1,0 +1,1211 @@
+arXiv:2204.01050v2  [math.OC]  9 Jun 2022
+Understanding the Unstable Convergence of Gradient Descen t
+Kwangjun Ahn 1 2 Jingzhao Zhang 3 Suvrit Sra 1
+Abstract
+Most existing analyses of (stochastic) gradient
+descent rely on the condition that for L-smooth
+costs, the step size is less than 2/L. However,
+many works have observed that in machine learn-
+ing applications step sizes often do not fulﬁll this
+condition, yet (stochastic) gradient descent still
+converges, albeit in an unstable manner. We in-
+vestigate this unstable convergence phenomenon
+from ﬁrst principles, and discuss key causes be-
+hind it. We also identify its main characteristics,
+and how they interrelate based on both theory and
+experiments, offering a principled view toward
+understanding the phenomenon.
+1. Introduction
+Gradient descent (GD) runs the iteration
+θ t+1 = θ t − η∇f (θ t) ,
+seeking to optimize a cost function f . It also provides
+a conceptual foundation for stochastic gradient descent
+(SGD), one of the key algorithms in modern machine learn-
+ing. A vast body of literature that analyzes (S)GD as-
+sumes that the cost f is L-smooth (we say f is L-smooth
+if ∥∇f (θ ) − ∇ f (θ
+′
+)∥ ≤ L∥θ − θ
+′
+∥ for all θ , θ
+′
+), and
+subsequently exploits the associated “ descent lemma”:
+f (θ t+1) ≤ f (θ t) − η
+(
+1 − L η
+2
+) 
+∇f (θ t)
+
+2
+. (1.1)
+To ensure descent via inequality (
+1.1), the condition
+L < 2
+η , (1.2)
+is imposed. This condition ensure that GD decreases the
+cost f at each iteration. Whenever condition (
+1.2) holds,
+we call it the “stable” regime in this paper.
+1Department of EECS, MIT , Cambridge, MA, USA 2Part
+of this work was done while Kwangjun Ahn was visiting the Si-
+mons Institute for the Theory of Computing, Berkeley, CA, US A.
+3IIIS, Tsinghua University , Beijing, China. Correspondence to:
+Kwangjun Ahn <kjahn@mit.edu>.
+Proceedings of the 39 th International Conference on Machine
+Learning, Baltimore, Maryland, USA, PMLR 162, 2022. Copy-
+right 2022 by the author(s).
+500 1000 1500
+1
+2
+500 1000 1500
+50
+100
+150
+Figure 1: Example of unstable convergence for training
+CIFAR-10 with GD. We follow the experimental setup of
+(Cohen et al. , 2021); see Experiment 1 for details. We use a
+ReLU network. Here, condition ( 1.2) fails, but the training
+loss still (non-monotonically) decreases in the long run.
+When the cost is quadratic, condition ( 1.2) is in fact neces-
+sary for stablility: if η > 2
+L , then GD diverges (see Fact 1).
+This observation carries over to most convex optimiza-
+tion settings and also neural networks when using the
+neural tangent kernel approximations (
+Jacot et al. , 2018;
+Li and Liang , 2018; Lee et al. , 2019). Thus, it is reasonable
+to assume condition ( 1.2) for those analyses. However, for
+general nonconvex costs, it is not clear whether the stable
+regime condition (
+1.2) is required or even reasonable.
+Recently, it has been observed that GD on neural net-
+works often violates condition ( 1.2). More speciﬁcally,
+Cohen et al. (2021) observe that when we run GD to train
+a neural network, the condition ( 1.2) fails, but contrary to
+the common wisdom from convex optimization, the train-
+ing loss still (non-monotonically) decreases in the long ru n.
+See Figure
+1 for an example of this phenomenon. We call
+this phenomenon “unstable” convergence .
+Unfortunately, very little is known about unstable conver-
+gence. The causes and implications of this phenomenon
+have not been explored in the literature. More importantly,
+the main features as well as the scope of this phenomenon
+have not been discussed. Characterizing the main features
+is important because it not only furnishes better understand-
+ing of this bizarre phenomenon, but also lays a foundation
+for future theoretical studies; especially, the main character-
+istics of this phenomenon will help build a more practical
+theory of the neural network optimization.
+Contributions. In light of the above motivation, the main
+contributions of this paper are as follows:
+Unstable Convergence of GD
+Unstable Convergence
+What are its causes ( Section 3):
+■ Lack of (ﬂat) stationary points near GD trajectory
+■ Forward-invariance (F (S) ⊆ S) of the GD dynamics
+What are its main features ( Section 4):
+Object Quantity Behavior
+Loss (§4.1) RP(θ t) oscillates near 0
+Iterates (§4.2) L(θ t; η∇f (θ t)) oscillates near 2/ η
+Sharpness (§4.4) λ max(∇2f (θ t)) oscillates near
+above
+2/ η
+- Relative Progress: RP(θ ) := f (θ −η ∇f (θ ))−f (θ )
+η ∥∇ f (θ )∥ 2
+- Directional smoothness: L(θ ; v) := ⟨ v, ∇f (θ )−∇f (θ −v)⟩
+∥ v∥ 2
+■ Loss behavior ⇔ Iterates behavior (Subsection 4.3)
+■ Loss behaviour ⇒ Sharpness behavior (Subsection 4.4)
+Extenson to SGD ( Section 5)
+Figure 2: Overview/summary of results.
+1. We discuss the main causes driving the unstable con-
+vergence phenomenon (Section 3).
+2. We identify the main features that characterize unsta-
+ble convergence in terms of how loss, iterates, and
+sharpness
+1 evolve with GD updates. Moreover, we in-
+vestigate and clarify the relations between them. Our
+characterizations demonstrate that the features of un-
+stable convergence are in stark contrast with those of
+traditional stable convergence, suggesting that their
+optimization mechanisms are signiﬁcantly different.
+3. In particular, the main features considered in this work
+provide alternative ways to identify unstable conver-
+gence in practice.
+Figure 2 provides a more technical overview of our main
+ﬁndings, along with their interpretations.
+1.1. Related Work
+Under various contexts, several recents works have ob-
+served the unstable convergence phenomenon in training
+neural networks with (S)GD (
+Wu et al., 2018; Xing et al. ,
+2018; Lewkowycz et al., 2020; Jastrzkebski et al. , 2017;
+2018). We refer readers to the related work section of
+Cohen et al. (2021) for greater context.
+The unstable convergence phenomenon is ﬁrst formally
+identiﬁed by Cohen et al. (2021), and in their paper it is
+named edge of stability . More speciﬁcally, they observe
+a more reﬁned version of the unstable convergence: when
+1In this paper, following ( Cohen et al., 2021), sharpness
+means the maximum eigenvalue of the loss Hessian, i.e.,
+λ max(∇2f (θ t)).
+training a neural network with GD, the sharpness at the iter-
+ate goes beyond the threshold η/2, and often saturates right
+at (or above) the threshold. In
+Section 5, we will explore
+the relations between our main features and their observed
+phenomenon.
+Concurrent works. Recently,
+Ma et al. (2022) also inves-
+tigate the causes of unstable convergence based on their
+empirical observations. Their main observation is that un-
+stable convergence might be due to the landscape of loss
+function where the loss grows slower than a quadratic near
+the local minima. As we will see in
+Subsection 3.2, their
+main ﬁnding is consistent with our explanation. They also
+demonstrate through examples that such “sub-quadratic”
+growth near the minima is caused by the heterogeneity of
+data; see their Section 6 for details.
+Another work by
+Arora et al. (2022) identiﬁes a setting
+in which one can prove the unstable convergence phe-
+nomenon theoretically. More speciﬁcally, they show that
+the normalized gradient descent dynamics of form θ t+1 =
+θ t − η∇f (θ t)/ ∥∇f (θ t)∥ can provably exhibit the unsta-
+ble convergence phenomenon near the minima under some
+suitable assumptions; see their Section 4 for details.
+2. Unstable GD Can’t Reach Stationary
+Points
+In this section, we build intuitions about what the unsta-
+ble regime η > 2/L suggests. First, note that the ﬁxed
+points θ ∞ of the GD dynamics θ t+1 = θ t − η∇f (θ t) are
+the stationary points, i.e., points such that ∇f (θ ∞) = 0 .
+Hence, the GD dynamics will eventually approach one of
+the stationary points, and in order to understand the un-
+stable regime, we ﬁrst need to understand the behavior of
+the dynamics near the stationary points whose sharpness is
+greater than 2/η.
+As a warm up, we ﬁrst consider the simplest setting of
+quadratic costs where the sharpness is constant globally.
+We begin with the following well-known fact.
+Fact 1. On a quadratic cost f (θ ) = 1
+2 θ ⊤P θ + q⊤θ + r,
+GD will diverge if any eigenvalue of P exceeds the thresh-
+old 2/η. F or convex quadratics, this condition is “iff. ”
+Below we quickly illustrate this fact through an example.
+Example 1. Consider optimizing a quadratic cost
+f (θ1, θ2) = 20 θ2
+1 + θ2
+2. Note that in this case L = 40 .
+Let us run GD on this cost with η = 2/39, 2/40, 2/41.
+Unstable Convergence of GD
+As shown in the above plots, GD converges to the optimum
+if η < 2/L and it diverges if η > 2/L.
+Due to the above fact, one can build the following intuition:
+when a stationary point has sharpness greater than 2/η, the
+GD dynamics cannot converge to the stationary point.
+We ﬁrst formalize this intuition. In particular, we show tha t
+GD cannot converge to a stationary point that has sharp-
+ness greater than 2/η. We make the following assumptions
+about the spectrum of Hessian at stationary points and the
+non-degeneracy of the GD dynamics.
+Assumption 1. Let F (θ ) = θ − η∇f (θ ) and assume
+that for any subset S of measure zero, F −1(S) is of mea-
+sure zero. Moreover , each stationary point p satisﬁes 1
+η ̸∈
+λ(∇2f (p)), where λ(∇2f (p)) denotes the set of eigenval-
+ues of the Hessian of f at p.
+Theorem 1. F or a given subsetX of the domain of param-
+eter θ , assume that f is C2 in X . Suppose that for each sta-
+tionary point p ∈ X , it holds that either λmin(∇2f (p)) <
+0 or λmax(∇2f (p)) > 2
+η . Then under Assumption 1,
+there is a measure-zero subset N s.t. for all initializations
+θ 0 ∈ X \ N , the GD dynamics θ t+1 = θ t − η∇f (θ t) do
+not converge to any of the stationary points in X .
+Proof of Theorem 1. The proof is inspired by those of
+(Lee et al. , 2016; Panageas and Piliouras, 2017). First, we
+recall Stable Manifold Theorem ( Shub, 2013, Thm III.7).
+Lemma 1. Let p be a ﬁxed point for the Cr local diffeomor-
+phism h : U → Rn where U is an open neighborhood of p
+in Rn and r ≥ 1. Let Es ⊕ Ec ⊕ Eu be the invariant spli-
+iting of Rn into the generalized eigenspaces of Dh(p) cor-
+responding to eigenvalues of absolute value less than one,
+equal to one, and greater than one. T o theDh(p)-invariant
+subspace Es ⊕ Ec there is an associated local h-invariant
+Cr embedded disc W s⊕c
+loc of dimension dim(Es ⊕ Ec) and
+ball B around p such that h(W s⊕c
+loc ) ∩ B ⊂ W s⊕c
+loc . More-
+over , ifhn(x) ∈ B for all n ≥ 0, then x ∈ W s⊕c
+loc .
+To apply
+Lemma 1, we ﬁrst show that the GD dynamics
+F is a local diffeomorphism at each stationary point p
+satisfying 1
+η /∈ λ(∇2f (p)). This follows from the in-
+verse function theorem: (i) Note that F is a C1 vector
+ﬁeld since f is C2, (ii) the Jacobian of F is equal to
+DF (p) = I − η∇2f (p), and since 1
+η /∈ λ(∇2f (p)), the
+Jacobian is invertible. Hence, by inverse function theorem ,
+we conclude that F is a local diffeomorphism around p.
+Hence for each stationary point p satisfying 1/η / ∈
+λ(∇2f (p)), we can apply Lemma 1 at p. Let Bp be the
+open ball due to Lemma 1. Let S be the set of stationary
+points. Consider the following open cover
+C :=
+⋃
+p: stationary point
+1
+η /∈λ (∇2f (p))
+Bp . (2.1)
+Then from Assumption 1, it follows that S ⊂ C and hence
+C is an open cover of S. Thus, Lindel¨ of’s lemma guaran-
+tees that there exists a countable subcover of C, i.e., there
+exist p1, p2, . . . s.t. C = ∪∞
+i=1Bpi . If GD converges to
+a stationary point p, there must exist t0 and i such that
+F t(p0) ∈ Bpi for all t ≥ t0. From
+Lemma 1, we con-
+clude that F t(θ0) ∈ W s⊕c
+loc (pi). In other words, we have
+θ0 ∈ F −t(W s⊕c
+loc (pi)) for all t ≥ t0. Hence the set of
+initial points in X for which GD converges to a stationary
+point is a subset of
+N :=
+∞⋃
+i=1
+∞⋃
+t=0
+F −t(W s⊕c
+loc (pi)) .
+Now from the assumption that either λmin(∇2f (p)) < 0
+or λmax(∇2f (p)) > 2
+η , it follows that I − η∇2f (p) has an
+eigenvalue whose absolute value is greater than 1. Hence,
+for each stationary point p, dim(Eu) ≥ 1. This implies that
+each W s⊕c
+loc (p) has measure zero, and from the assumption
+that F −1(X ) is of measure zero if X is of measure zero, it
+holds that each F −t(W s⊕c
+loc (pi)) is of measure zero. Thus,
+being a countable union of measure zero sets, N is measure
+zero. It follows that for initialization θ0 ∈ X \ N , the GD
+dynamics never converge to a stationary point in X .
+Remark 1. Note that Theorem 1 applies to the case when
+stationary points are not isolated. Moreover, the conditio n
+that every stationary point p satisﬁes 1
+η ̸∈λ(∇2f (p)) can
+be relaxed to the condition that the open cover C in ( 2.1)
+covers the entire set of stationary points S.
+The main takeaway of Theorem 1 is that for almost all ini-
+tializations, GD cannot converge to the stationary point
+whose sharpness is larger than 2/η even when there is only
+a single eigenvector whose eigenvalue exceeds the thresh-
+old 2/η. Having this intuition, we next discuss how “con-
+vergence” could happen under the unstable regime.
+3. How Can Unstable GD “Converge”?
+In the previous section, we saw that when stationary points
+have large sharpness relative to the step size, GD cannot
+converge to those stationary points. However, as we saw
+in
+Figure 1, GD can still “converge” under the unstable
+regime; GD still manages to (non-monotonically) decrease
+the training loss in the long run. In this section, we un-
+derstand this bizzare co-occurrence. We ﬁrst discuss some
+possible causes for the unstable regime.
+Unstable Convergence of GD
+3.1. What Causes the Unstable Regime
+One possible cause for the unstable regime is that the land-
+scape has only “trivial” stationary points; we will formali ze
+the meaning of “trivial” shortly. This situation turns out t o
+be quite common for neural networks as illustrated by the
+following result.
+Proposition 1. Assume the loss of neural network
+parametrized θ contains a weight decay term as follows,
+ℓ(θ ) = 1
+n
+n∑
+i=1
+f (xi, θ ) + γ∥θ ∥2
+2.
+If we partition the network parameter θ = [ ξ; ζ] such that
+a subset of the network parameters ζ is positive homoge-
+neous, i.e. for any input data xi and positive number c > 0
+f (xi, [ξ, ζ]) = f (xi, [ξ, cζ]),
+Then the loss ℓ(θ ) has no stationary point if ζ ̸= 0.
+Proof of
+Proposition 1. This statement follows by a sim-
+ple observation that from positive homogeneity,
+⟨∇ζ f (xi, [ξ, ζ]), ζ⟩ = 0.
+Therefore, if ∇ζ γ∥θ ∥2
+2 ̸= 0, we have
+∇ζ f (xi, [ξ, ζ]) + ∇ζ γ∥θ ∥2
+2 ̸= 0,
+which concludes the proof.
+Notice that the positive homogeneity parameters exist in
+many networks such as ResNet or Transformer when nor-
+malization layers exist ( aL+1 = aL/∥aL∥, where aL de-
+note the input to layer L, and ∥·∥ denotes a norm of choice).
+Note that in practical settings,
+Proposition 1 also suggests
+that there could be lack of ﬂat minima near the GD tra-
+jectory. In the above example of ResNet or Transformer,
+the networks often add a small ǫ term to the normalization
+aL+1 = aL/(ǫ + ∥aL∥) to avoid the loss being undeﬁned
+at aL = 0 . However, the stationary points only exist when
+∥aL∥ ≈ ǫ, in which case the sharpness of the stationary
+point is very large (on the order of ∼ 1/ǫ).
+In fact, it has been extensively observed in the literature that
+the sharpness around GD with practical stepsize choices of-
+ten goes beyond the threshold 2/η. This claim is veriﬁed
+through a comprehensive set of experiments and called pro-
+gressive sharpening in (
+Cohen et al. , 2021); we refer read-
+ers to their Section 3.1 for details. For instance, the sharp -
+ness curve in Figure 1 shows this phenomenon. Moreover,
+a similar phenomenon was observed in ( Wu et al., 2018),
+and they speculated that the density of sharp minima is
+much larger than the density of ﬂat minima in the neural
+network landscape. See their Section 4.1 for details.
+We summarize our discussion regarding the causes of un-
+stable regime as follows.
+T akeaway 1. F or practical stepisze choices, lack of (ﬂat)
+non-trivial stationary points near the GD trajectory can
+cause GD to enter the unstable regime.
+3.2. Causes for Convergence
+As we discussed in
+Fact 1, for quadratic costs (or more
+generally for most convex costs), GD being in the unsta-
+ble regime implies that GD will diverge entirely. However,
+as demonstrated by (
+Cohen et al. , 2021) through a compre-
+hensive set of experiments, in neural network training, thi s
+situation no longer holds. In this section, we discuss how in
+the unstable regime “convergence” could happen through
+examples. As a warm-up, let us revisit the quadratic cost
+considered in
+Fact 1, but this time with some modiﬁcations.
+Example 2 (“Flattened” quadratic cost) . F or the same
+quadratic cost as in Fact 1, we chose the same diverging
+step size η = 2/39 > 2/L, but this time we change the cost
+a bit by applying tanh(·) on top of the quadratic cost. More
+formally, we consider the cost tanh(20 · θ2
+1 + θ2
+2). Due to
+the fact tanh ≈ x near zero, this transformation wouldn’t
+change the geometry near the global minimum. W e run GD
+on the modiﬁed cost, and the result looks as follows (we
+include the result for the original quadratic cost on the lef t
+for comparison):
+As one can see from the above plot, for the transformed cost,
+GD does not diverge in the unstable regime.
+The above toy example illustrates that indeed for noncon-
+vex costs, being in the unstable regime does not necessarily
+imply complete divergence. For the above example, this
+was possible because of tanh(·), which ‘ﬂattens” out the
+landscape of the quadratic cost away from the minimum.
+More formally, let us denote the GD dynamics by F (θ ) :=
+θ −η∇f (θ ). Then the role of tanh(·) in the above example
+is that it creates a compact subset near the minimum that is
+forward-invariant: we say S is forward-invariant with re-
+spect to the dynamics F if F (S) ⊆ S. Because the gra-
+dient of tan(quadratic) vanishes as the point gets farther
+away from the minimum, there exists a forward-invariant
+compact subset X near the minimum.
+Remark 2. In a very recent concurrent work by (
+Ma et al. ,
+2022), this phenomenon is discussed in a more principled
+manner using the subquadratic growth property . More
+speciﬁcally, they observed that for practical neural net-
+Unstable Convergence of GD
+work settings, the loss landscape near the minima exhibits
+growth that is slower that quadratic, in which case the
+GD dynamics do not diverge entirely even in the unstable
+regime. See their Section 4 for details.
+We demonstrate this point for neural network examples.
+We ﬁrst consider the simplest neural network example,
+namely a single hidden neuron network.
+Example 3 (Single neuron networks) . W e consider a triv-
+ial task of ﬁtting the data (1, 0) with a single hidden neu-
+ron neural network. F ormally, we consider two types of
+networks:
+• linear network: f (θ1, θ2) = ( θ1 · (1 · θ2) − 0)2.
+• tanh network: f (θ1, θ2) = ( θ1 · tanh(1 · θ2) − 0)2.
+W e initialize both networks at θ 0 = (13 , 0.01) choose step
+size η = 2/150 to train them.
+As one can see from the above plots, for a linear net-
+work, the iterate quickly diverges, while for the tanh net-
+work, the iterate does not diverge and converges to a min-
+imum (whose sharpness is indeed approximately equal to
+2/η).
+Example 3 illustrates that the use of activation function like
+tanh can create a compact forward-invariant subset near
+the minima, which helps GD not diverge in the unstable
+regime. In fact, the above example suggests that GD indeed
+exhibits some convergence behaviour where while being in
+the unstable regime, GD travels along the valley of minima
+until it ﬁnds a ﬂat enough minimum where it can stabilize.
+We now consider more practical neural network examples
+inspired by the settings considered in (
+Cohen et al. , 2021).
+Experiment 1 (CIFAR-10 experiment). F or this example,
+we follow the setting of the main experiment ( Cohen et al.,
+2021) in their Section 3. Speciﬁcally, we use (full-batch)
+GD to train a neural network on 5, 000 examples from
+CIF AR-10 with the CrossEntropy loss, and the network is
+a fully-connected architecture with two hidden layers of
+width 200. Under this common setting, we consider three
+types of networks: (i) linear network without activations;
+(ii) tanh activations; (ii) ReLU activations. W e choose the
+step size η = 2/30 and the results are as follows:
+250 500 750
+1
+2
+3
+4
+250 500 750
+10
+30
+50
+70
+90
+As one can see from the above plot, GD converges for the
+networks with activation functions, while GD diverges with-
+out activation functions.
+We summarize our discussion regarding the causes for con-
+vergence as follows.
+T akeaway 2. Ingredients of neural networks such as ac-
+tivation functions create a compact forward-invariant set
+near the minima, which helps GD (non-monotonically) con-
+verge in the unstable regime.
+In this section, we have discussed the causes of unstable
+convergence and explain how the intuitions differ from
+those of conventional convex optimization. We next move
+on to study the main characteristics of unstable conver-
+gence. For instance, we observe that under the unstable
+convergence phenomenon, the loss is very non-monotonic.
+Can we understand the behavior of loss in a more princi-
+pled way?
+4. Characteristics of the Unstable
+Convergence
+In this section, we aim to quantify unstable convergence
+through several quantities that can be computed during the
+training. In particular, we will characterize the unstable
+convergence in terms of the loss behavior and the iterate
+behavior. We will later demonstrate that the two different
+behaviors are interconnected with each other.
+4.1. Characteristics in Loss Behavior
+We ﬁrst investigate what happens to the loss under unsta-
+ble convergence. As a warm-up, we ﬁrst consider the loss
+behavior under stable convergence.
+4.1.1. W ARM -UP: T HE STABLE REGIME
+Recall from the descent lemma (
+1.1) that when GD is
+in the stable regime, then we have f (θ t+1) − f (θ t) ≤
+−cη ∥∇f (θ t)∥2 for some constant c > 0. Putting it dif-
+ferently, we have
+f (θ t+1) − f (θ t)
+η ∥∇f (θ t)∥2 ≤ −const.
+Let us give the ratio on the LHS a name for convenience:
+Unstable Convergence of GD
+Deﬁnition 1 (Relative progress ratio). W e deﬁne
+RP(θ ) := f (θ − η∇f (θ )) − f (θ )
+η ∥∇f (θ )∥2 .
+Let us revisit Experiment 1 and verify that for smaller step
+sizes the relative progress ratio is indeed a negative number.
+Experiment 2 (CIFAR-10; stable regime) . W e use the
+same setting as Experiment 1, which follows the setting of
+the main experiment in ( Cohen et al. , 2021). F or activa-
+tions, we choose tanh following ( Cohen et al. , 2021). W e
+choose much smaller step sizes so that GD is in the stable
+regime. W e plot the loss and the relative progress ratio until
+the training accuracy hits 95%.
+1000 3000 5000 7000
+1
+2
+1000 3000 5000 7000
+-1
+-0.5
+0
+From the above plots, one can see that the relative progress
+ratio stays negative for all iterations. Moreover , there is no
+non-monotonic behavior in the loss curve.
+Remark 3. Given the result above, one might wonder why
+the relative progress saturates around −1. Although we do
+not have a clear explanation, we suspect that this happens
+because the trajectory of GD quickly converges to a single
+direction. We will quickly revisit this later this section. See
+Remark 6.
+4.1.2. R ELATIVE PROGRESS RATIO UNDER UNSTABLE
+CONVERGENCE
+Given that relative progress is strictly negative number in
+the stable regime, we now investigate how relative progress
+ratio behaves in the case of unstable convergence.
+Experiment 3 (CIFAR-10; unstable regime) . W e use the
+same setting as
+Experiment 2. This time we choose step
+sizes larger so that GD operates in the unstable conver-
+gence regime. W e plot the loss and the relative progress
+ratio until the training accuracy hits 95%.
+500 1000 1500
+1
+2
+500 1000 1500
+-3
+-2.5
+-2
+-1.5
+-1
+-0.5
+0
+0.5
+500 1000 1500
+30
+60
+90
+120
+150
+180
+The above experiment shows that in the the unstable regime,
+the relative progress ratio saturates around0 unlike the sta-
+ble regime.
+Remark 4. One curious aspect of the above results is that
+the optimization seems to get faster as we choose larger
+step sizes. This is in fact one of the main observations
+in (
+Cohen et al. , 2021), suggesting that the unstable con-
+vergence is preferred in practice for its faster optimizati on.
+However, that does not mean one can increase the step size
+too large. For example, in the above experiment, we ob-
+serve that the training loss diverges for step size η = 2/10.
+Based on
+Experiment 3, we raise the following question:
+Q. why does RP(θ t) oscillate around 0 under unstable
+convergence?
+We begin with explaining why RP(θ t) cannot stay above 0.
+Since the loss is converging in a long term, it cannot be that
+RP(θ t) > 0 for many iterations; otherwise, the loss will
+keep increasing, contradicting the convergence.
+More curious part is the fact that RP(θ t) cannot stay below
+zero, which directly contrasts with the stable regime. To un-
+derstand this phenomenon, we begin with some intuition.
+We have seen that when GD encounters sharp minima, it
+oscillates near the minima because it cannot stabilize to
+the minima (due to
+Theorem 1). In other words, the loss
+change f (θ t+1) − f (θ t) would be much smaller com-
+pared to
+
+η2∇f (θ t)
+
+2
+the square of the distance that GD
+travels. Hence, intuitively, one might expect that relativ e
+progress cannot be too negative under the unstable conver-
+gence regime. We would like to formalize this intuition
+next.
+4.2. Characteristics in Iterates Movement
+To that end, let us formally deﬁne what it means for GD to
+oscillate. More generally, consider the situation where θ is
+updated by moving along the vector −v. Then this update
+is oscillatory if the directional derivative at the updated pa-
+rameter θ − v is nearly negative of that at θ , i.e.,
+⟨v, ∇f (θ − v)⟩ ≈ − ⟨v, ∇f (θ )⟩ .
+Inspired by this, we consider the following deﬁnition.
+Deﬁnition 2 (Directional smoothness). F or an update vec-
+tor v, we deﬁne
+L(θ ; v) := 1
+∥v∥2
+⟨
+v, ∇f (θ ) − ∇f
+(
+θ − v
+)⟩
+.
+Now coming back to the gradient descent where the update
+vector is v = η∇f (θ ), we have
+L(θ ; η∇f (θ )) =
+⟨
+∇f (θ ), ∇f (θ ) − ∇f
+(
+θ − η∇f (θ )
+)⟩
+η ∥∇f (θ )∥2 .
+Unstable Convergence of GD
+When GD is exhibiting oscillatory behaviour, we would
+have
+⟨∇f (θ ), ∇f (θ − v)⟩ ≈ − ⟨∇f (θ ), ∇f (θ )⟩ ,
+in which case, it holds that
+L(θ ; η∇f (θ )) ≈ 2
+η (when GD iterates oscillate) . (4.1)
+For intuition, let us quickly verify ( 4.1) for quadratic costs.
+Example 4 (Quadratics). Consider a quadratic loss func-
+tion f (θ ) = θ ⊤P θ with P ⪰ 0. Then, the GD update
+reads θ t+1 = ( I − ηP )θ t. F or an eigenvector/eigenvalue
+pair (q, λ) of P , the quantity ⟨qmax, θ t⟩ evolves as
+⟨
+qmax, θ t⟩
+= q⊤(I − ηP )θ t−1 = (1 − ηλ)
+⟨
+qmax, θ t−1⟩
+= (1 − ηλ)t ⟨
+qmax, θ 0⟩
+.
+This implies that if λ < 2/η, then q⊤θ t → 0. Hence,
+if η = 2 /λmax(P ), then after sufﬁciently large iterations
+t, we have θ t ≈ (−1)t ⟨
+qmax, θ 0⟩
+qmax, in which case
+L(θ ; η∇f (θ )) ≈ 2
+η .
+Given the above view on “oscillating” iterates, we now
+measure directional smoothness under unstable conver-
+gence.
+Experiment 4 (Directional smoothness in stable and unsta-
+ble regimes). Under the same setting as Experiments
+2 and
+3, we measure the value L(θ t; η∇f (θ t)) at each iteration.
+500 1000 1500
+-0.2
+0
+0.2
+0.4
+0.6
+0.8
+500 1000 1500
+30
+60
+90
+Indeed, one can see that for the unstable regime
+L(θ t; η∇f (θ t)) saturates around 2/η, indicating that GD
+is exhibiting an oscillating behavior .
+Experiment 4 veriﬁes that GD is indeed showing an oscil-
+lating behavior under unstable convergence. We remark
+that a similar conclusion is made in (
+Xing et al., 2018)
+as well as the recent concurrent works ( Ma et al. , 2022;
+Arora et al. , 2022). Now coming back to our original ques-
+tion: can we show a formal relation between the directional
+smoothness and the relative progress ratio?
+4.3. Relation between Relative Progress Ratio and
+Directionl Smoothness
+Theorem 2 formalizes our intuition that under the oscillat-
+ing behavior of GD, RP(θ t) cannot stay below zero.
+Theorem 2. The following identity holds:
+RP(θ ) = −1 + η
+2 · 2
+∫ 1
+0
+τ · L(θ ; ητ ∇f (θ )) dτ . (4.2)
+Proof. See Appendix A.
+Theorem 2 implies that if the weighted average of
+L(θ ; ητ ∇f (θ )) is close to 2/η, namely
+2
+∫ 1
+0
+τ · L(θ ; ητ ∇f (θ )) dτ ≈ 2
+η ,
+then RP(θ ) is indeed approximately equal to zero. This for-
+mally justiﬁes that when GD shows an oscillating behavior,
+RP(θ t) cannot stay below zero.
+In our last experiment of this subsection, we verify that the
+above weighted average is approximately equal to the sin-
+gle value L(θ ; η∇f (θ )), building a stronger relation be-
+tween the directional smoothness and the relative progress
+ratio.
+Experiment 5. In the same setting as
+Experiment 3, we
+choose step size η = 2 /60 and in every 5 iterations, we
+compute the following values:
+L(θ t; ητ ∇f (θ t)) for τ ∈ {0.01, 0.02, . . . ,1}.
+In the plot below, we report the mean of L(θ t; ητ ∇f (θ t))
+among τ ∈ { 0.01, 0.02, . . . ,1} together with the shades
+which indicate the standard deviations.
+250 500 750 1000 1250
+60
+This experiment veriﬁes that L(θ t; ητ ∇f (θ t)) does vary
+too much across τ ∈ [0, 1]. Hence, the single value
+L(θ ; η∇f (θ )) well represents the weighted average in
+Theorem 2.
+Hence, Experiment 5 justiﬁes the relation
+RP(θ ) ≈ −1 + η
+2 · L(θ ; η∇f (θ )) , (4.3)
+which precisely explains how the oscillatory behavior of
+GD results in a small relative progress ratio.
+Remark 5. Interestingly, the validity of equation ( 4.3) and
+Experiment 5 suggests that even though the gradient Lip-
+schitzness is not a good assumption for neural networks,
+some form of Hessian Lipschitzness is valid along the GD
+trajectory.
+Unstable Convergence of GD
+We summarize the ﬁnding in this section as follows.
+T akeaway 3. Under the unstable convergence regime,
+RP(θ t) oscillates near 0 for the following two reasons:
+• RP(θ t) can’t stay above 0 because otherwise the loss
+would not decrease in the long run.
+• RP(θ t) can’t stay below 0 due to the oscillating be-
+havior of GD iterates. This is formalized via (4.3).
+Remark 6. Given ( 4.3), one can have a better explana-
+tion for Remark 3 regarding why RP(θ t) saturates around
+−1. In the second result of Experiment 4, the directional
+smoothness remains very small in the stable regime. Based
+on (
+4.3), this implies that RP(θ t) is close to −1, which was
+indeed the case in Experiment 2.
+4.3.1. A DDITIONAL EXPERIMENTS
+In this subsection, we verify the relation ( 4.3) for other ex-
+perimental settings.
+Experiment 6 (CIFAR-10; ReLU networks) . Under the
+same setting as
+Experiment 2 (the setting of the main exper-
+iments in ( Cohen et al., 2021)), this time we choose ReLU
+as activation functions.
+500 1000 1500
+1
+2
+500 1000 1500
+-1
+-0.5
+0
+0.5
+500 1000 1500
+30
+60
+90
+In the next set of experiments, we put 2 more hidden layers
+of width 200 (total 4 hidden layers of width 200).
+500 1000 1500 2000 2500 3000
+1
+2
+500 1000 1500 2000 2500 3000
+-1
+-0.5
+0
+0.5
+500 1000 1500 2000 2500 3000
+30
+60
+90
+The results are largely similar to those for tanh activations,
+and the relation (4.3) holds for all cases.
+4.4. Implications for Sharpness
+In the previous subsection, we saw that one characteristics
+of unstable convergence is that RP(θ t) saturates around
+zero. In this section, we investigate implications of this
+characteristics for sharpness. In particular, we discuss
+some relations to a curious phenomenon called edge of sta-
+bility (EoS) recently observed in (
+Cohen et al. , 2021). The
+gist of their observation is that for GD on neural networks
+often satisﬁes the following properties:
+A. λmax(∇2f (θ t)) > 2/η for most iterates.
+B. In fact, in many cases λmax(∇2f (θ t)) saturates right
+at (or slightly above) 2/η.
+To that end, we begin with the following consequence of
+Theorem 2.
+Corollary 1. Let Lt be the maximum sharpness along
+the line segment between the iterates θ t and θ t+1, i.e.,
+Lt := sup θ ∈θ tθ t+1{λmax(∇2f (θ ))}. Then, the following
+inequality holds:
+2
+η · (RP(θ ) + 1) ≤ Lt .
+Proof. It follows from the fact that for each τ ∈ [0, 1]
+L(θ ; ητ ∇f (θ )) ≤ sup{λmax(∇2f (θ )) : θ lies on the
+line segment between θ t and θ t − ητ ∇f (θ )}. Clearly, the
+right hand side is upper bounded by Lt.
+Corollary 1 implies that when RP(θ t) oscillates around
+zero, then Lt has to be frequently above the threshold 2/η.
+One can actually reﬁne this statement to understand the part
+A of EoS, given our results so far. In light of Experiment 5,
+if L(θ t; ητ ∇f (θ t)) does vary much across τ ∈ [0, 1], then
+one can actually write
+2
+η (RP(θ t) + 1) ≈ lim
+τ →0
+L(θ t; ητ ∇f (θ t))
+♣
+≤ λmax(∇2f (θ t)) ,
+which is the part A of EoS.
+Moreover, let us for a moment additionally assume that
+∇f (θ t) is approximately parallel to the largest eigenvec-
+tor of the Hessian ∇2f (θ t). This might look stringent at
+ﬁrst glance, but given the calculations in
+Example 4, this
+assumption is true for unstable GD on a quadratic cost.
+Also, recently, this behavior is theoretically proven for t he
+normalized gradient descent dynamics ( Arora et al. , 2022).
+Under this assumption, one can further deduce that the in-
+equality (♣) holds with approximate equality, and the part
+B of EoS would hold in that case.
+5. Relative Progress for SGD
+In this section, we extend our discussion to the stochastic
+gradient descent (SGD):
+θ t+1 = θ t − ηg(θ t), where E[g(θ t)] = ∇f (θ t) .
+For the case of SGD, there is one obvious challenge. With
+SGD, the training loss does not decrease monotonically
+since SGD is a random algorithm. Hence, it is not clear
+how to precisely deﬁne what it means for SGD to be in the
+unstable regime. On the other hand, inspired by our discus-
+sion in
+Subsection 4.1, a more transparent way to deﬁne the
+unstable regime for SGD is via the relative progress ratio.
+In particular, we consider the following extension.
+Deﬁnition 3 (Expected relative progress ratio) .
+E[RP(θ )] := Ef (θ − ηg(θ )) − f (θ )
+η ∥∇f (θ )∥2 .
+Unstable Convergence of GD
+Experiment 7 (CIFAR-10; SGD on ReLU networks) . Un-
+der the same setting as Experiment 6, this time we train
+the network with SGD with minibatch size of 32 and step
+size η = 2 /100. W e compute the full-batch loss and the
+expected relative progress ratio at the end of each epoch.
+100 200 300
+0
+0.5
+1
+1.5
+2
+2.5
+100 200 300
+-2
+0
+2
+4
+6
+8
+100 200 300
+-1
+-0.5
+0
+0.5
+1
+Note that E[RP(θ t)] does not stay below zero. Based on
+our discussion in Subsection 4.1, this suggests that SGD is
+in the unstable regime.
+Remark 7 (Expected loss change is not negative?!) . One
+very surprising aspect of the above results is that E[RP(θ t)]
+is not negative for a majority of iterations. This is rather
+counter-intuitive given that in the loss plot SGD decreases
+the loss in the long run. On the other hand, we note
+that this counter-intuitive phenomenon is also observed by
+(
+Cohen et al. , 2021) in a comprehensive set of experiments.
+In particular, they mention “ what may be more surprising
+is that SGD is not even decreasing the training loss in
+expectation.” See (
+Cohen et al. , 2021, Appendix H) and
+(Cohen et al. , 2021, Figures 25 and 26) for details.
+We now establish a relation analogous to ( 4.3) for SGD.
+Similarly to Theorem 2, one can prove the following:
+E[RP(θ )] = −1 + η
+2 · 2
+∫ 1
+0
+τ Eg
+[
+∥g(θ )∥ 2·L(θ ;ητ g (θ ))
+∥∇f (θ )∥ 2
+]
+dτ .
+See Appendix A for derivation. Hence, the analogous rela-
+tion to ( 4.3) is:
+E[RP(θ )] ≈ −1 + η
+2 · E
+[
+∥g(θ )∥ 2
+∥∇f (θ )∥ 2 L(θ ; ηg(θ ))
+]
+. (5.1)
+Experiment 8 (CIFAR-10; verifying ( 5.1) for ReLU) .
+Under the same setting as Experiment 7, we compute
+E[RP(θ )] and the RHS of (5.1) at the end of each epoch
+and compare those values. W e choose step sizes η =
+2/50, 2/100, 2/150.
+100 200 300
+0
+10
+20
+30
+100 200 300
+0
+5
+10
+15
+100 200 300
+0
+10
+20
+30
+40
+Note that the LHS and RHS of (5.1) are very similar in all
+results, verifying the relation (5.1).
+Experiment 9 (CIFAR-10; verifying ( 5.1) for tanh). W e
+repeat Experiment 8 with tanh activations.
+100 200 300
+-5
+0
+5
+10
+15
+20
+100 200 300
+0
+5
+10
+100 200 300
+0
+5
+10
+100 200 300
+-1
+-0.5
+0
+0.5
+1
+100 200 300
+-1
+-0.5
+0
+0.5
+1
+100 200 300
+-1
+-0.5
+0
+0.5
+1
+The results are similar to those for ReLU networks.
+6. Discussion and Future Directions
+This work demonstrated characteristics of unstable conver -
+gence that are in stark contrast with those of stable conver-
+gence. Consequently, this work leads to several interestin g
+future directions.
+■ Better optimizer? The characteristics based on the di-
+rectional smoothness suggests that the adjacent iterates
+have nearly opposite gradients in the unstable regime.
+This obviates the efﬁcacy of many efﬁcient methods
+(e.g. variance reduced methods) which are designed
+based on the intuition that the adjacent iterates have
+similar gradients. Hence, it would be interesting to de-
+sign an efﬁcient optimizer that respects the new charac-
+teristics.
+■ Faster training under unstable convergence? As dis-
+cussed in
+Remark 4, another striking feature of unstable
+convergence is that the training loss seems to converge
+faster. One interesting question is whether one can elu-
+cidate this faster optimization by further exploring our
+characterization of relative progress.
+■ What assumptions are valid for neural network opti-
+mization? It is clear that unstable convergence cannot
+be reasoned with the widespread condition of η < 2
+L .
+Then what assumptions would be valid for neural net-
+works? As discussed in
+Remark 5, our Experiment 5
+suggests that although the gradient Lipschitzness is not
+a good assumption for neural networks, some form of
+Hessian Lipschitzness might be a valid one.
+■ Unstable regime for adaptive methods? Our character-
+izations are limited to constant step size (S)GD, and it
+is not clear how these characterizations carry over to
+adaptive methods such as Adam and RMSProp. Inves-
+tigating adaptive methods will help us understand how
+they differ from (S)GD for neural network optmization.
+Unstable Convergence of GD
+Acknowledgements
+Kwangjun Ahn thanks Pourya Habib Zadeh for various
+discussions and his help with experiments during the initia l
+stage of this work. Kwangjun Ahn also thanks Stephen
+J. Wright and Sinho Chewi for helpful discussions while
+visiting the Simons Institute for the Theory of Computing.
+Kwangjun Ahn also thanks Daniel Soudry for fruitful dis-
+cussions regarding
+Theorem 1.
+Kwangjun Ahn and Suvrit Sra acknowledge support
+from an NSF CAREER grant (1846088), and NSF CCF-
+2112665 (TILOS AI Research Institute). Kwangjun Ahn
+also acknowledges support from Kwanjeong Educational
+Foundation. Jingzhao Zhang acknowledges support from
+IIIS young scholar fellowship.
+References
+S. Arora, Z. Li, and A. Panigrahi. Understanding gradi-
+ent descent on edge of stability in deep learning. T o ap-
+pear at International Conference on Machine Learning
+(ICML) 2022 arXiv:2205.09745 , 2022.
+J. Cohen, S. Kaur, Y . Li, J. Z. Kolter, and A. Talwalkar. Gra-
+dient descent on neural networks typically occurs at the
+edge of stability. In International Conference on Learn-
+ing Representations, 2021.
+A. Jacot, F. Gabriel, and C. Hongler. Neural tangent kernel:
+convergence and generalization in neural networks. In
+Proceedings of the 32nd Advances in Neural Information
+Processing Systems, pages 8580–8589, 2018.
+S. Jastrzkebski, Z. Kenton, D. Arpit, N. Ballas, A. Fischer,
+Y . Bengio, and A. Storkey. Three factors inﬂuencing min-
+ima in SGD. arXiv preprint arXiv:1711.04623 , 2017.
+S. Jastrzkebski, Z. Kenton, N. Ballas, A. Fischer, Y . Bengio,
+and A. Storkey. On the relation between the sharpest
+directions of dnn loss and the sgd step length. arXiv
+preprint arXiv:1807.05031, 2018.
+J. Lee, L. Xiao, S. Schoenholz, Y . Bahri, R. Novak, J. Sohl-
+Dickstein, and J. Pennington. Wide neural networks of
+any depth evolve as linear models under gradient descent.
+Advances in Neural Information Processing Systems , 32:
+8572–8583, 2019.
+J. D. Lee, M. Simchowitz, M. I. Jordan, and B. Recht. Gra-
+dient descent only converges to minimizers. In Con-
+ference on learning theory , pages 1246–1257. PMLR,
+2016.
+A. Lewkowycz, Y . Bahri, E. Dyer, J. Sohl-Dickstein,
+and G. Gur-Ari. The large learning rate phase of
+deep learning: the catapult mechanism. arXiv preprint
+arXiv:2003.02218, 2020.
+Y . Li and Y . Liang. Learning overparameterized neural
+networks via stochastic gradient descent on structured
+data. In Proceedings of the 32nd International Confer-
+ence on Neural Information Processing Systems , pages
+8168–8177, 2018.
+C. Ma, D. Kunin, L. Wu, and L. Ying. The multiscale struc-
+ture of neural network loss functions: The effect on op-
+timization and origin. arXiv preprint arXiv:2204.11326 ,
+2022.
+I. Panageas and G. Piliouras. Gradient descent only
+converges to minimizers: Non-isolated critical points
+and invariant regions. In 8th Innovations in Theoreti-
+cal Computer Science Conference (ITCS 2017) . Schloss
+Dagstuhl-Leibniz-Zentrum fuer Informatik, 2017.
+M. Shub. Global stability of dynamical systems . Springer
+Science & Business Media, 2013.
+L. Wu, C. Ma, et al. How SGD selects the global minima in
+over-parameterized learning: A dynamical stability per-
+spective. Advances in Neural Information Processing
+Systems, 31:8279–8288, 2018.
+C. Xing, D. Arpit, C. Tsirigotis, and Y . Bengio. A walk
+with SGD. arXiv preprint arXiv:1802.08770 , 2018.
+Unstable Convergence of GD
+A. Proof of Theorem 2
+Using the fact
+d
+dτ [f (θ − ητ ∇f (θ )] =
+⟨
+−η∇f (θ ), ∇f
+(
+θ − ητ ∇f (θ )
+)⟩
+,
+we obtain
+f
+(
+θ − η∇f (θ )
+)
+− f (θ ) = −η
+∫ 1
+0
+⟨
+∇f (θ ), ∇f
+(
+θ − ητ ∇f (θ )
+)⟩
+dτ
+= −η ∥∇f (θ )∥2 − η
+∫ 1
+0
+⟨
+∇f (θ ), ∇f
+(
+θ − ητ ∇f (θ )
+)
+− ∇f (θ )
+⟩
+dτ .
+Hence, after rearranging, we get
+η
+2 · 2
+∫ 1
+0
+τ · L(θ ; ητ ∇f (θ )) dτ − 1 = f
+(
+θ − η∇f (θ )
+)
+− f (θ )
+η · ∥∇f (θ )∥2 = RP(θ ) ,
+which is precisely the relation in Theorem 2.
+Derivation for the SGD case. For the SGD case, the derivation is similar.
+f
+(
+θ − ηg(θ )
+)
+− f (θ )
+(a)
+= −η
+∫ 1
+0
+⟨
+g(θ ), ∇f
+(
+θ − ητ g(θ )
+)⟩
+dτ
+= −η ⟨g(θ ), ∇f (θ )⟩ − η
+∫ 1
+0
+⟨
+g(θ ), ∇f
+(
+θ − ητ g(θ )
+)
+− ∇f (θ )
+⟩
+dτ
+where (a) is due to the fact
+d
+dτ [f (θ − ητ g(θ )] =
+⟨
+−ηg(θ ), ∇f
+(
+θ − ητ g(θ )
+)⟩
+.
+After taking expectation over the randomness in the stochas tic gradient, we obtain
+Ef
+(
+θ − ηg(θ )
+)
+− f (θ ) = −η ∥∇f (θ )∥2 − η
+∫ 1
+0
+E
+⟨
+g(θ ), ∇f
+(
+θ − ητ g(θ )
+)
+− ∇f (θ )
+⟩
+dτ
+Hence, after rearranging we obtain the desired equation:
+Ef
+(
+θ − ηg(θ )
+)
+− f (θ )
+η ∥∇f (θ )∥2 = −1 + η
+2 · 2
+∫ 1
+0
+τ · Eg
+[
+∥g(θ )∥2 · L(θ ; ητ g(θ ))
+∥∇f (θ )∥2
+]
+dτ .
+This completes the derivation.
