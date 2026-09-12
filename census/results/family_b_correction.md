@@ -73,7 +73,7 @@ required-scale account does not govern findability at all.**
 
 The four-family relationship eps_onset ~ B^{-alpha/beta} (T44) stands **on its
 own four families**, whose betas were verified analytically and whose measured
-exponents track 1/beta (through-origin slope 1.0969 vs measured alpha 1.1172).
+exponents track 1/beta (five-point through-origin slope 1.0984 vs measured alpha 1.1172).
 What it loses is its claimed limiting case and the dissociation framing:
 
 - family B is **not** evidence that the law "predicts an absence";
@@ -88,3 +88,6 @@ homogeneity means B can supply unlimited amplification by trading w1 against
 w2 at no cost, so amplification is never the binding constraint; whatever
 limits family B's findability is something else, and we have not identified
 it. That is an open question, not a resolved one.
+
+
+> **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.

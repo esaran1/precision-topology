@@ -103,7 +103,7 @@ The substitution requires that terminal weight scale follow a power law in
 budget. **That is not given; it is measured, and it is not universal:**
 
 - **alpha is not range-stable.** Fitted over every contiguous sub-range it
-  falls monotonically from **1.5123** (1k-4k) to **0.7193** (40k-160k), with
+  falls monotonically from **1.5109** (1k-4k) to **0.7193** (40k-160k), with
   R^2 >= 0.983 in every window. Growth is sub-power-law -- locally
   power-law-like at every scale with a drifting exponent, the signature of a
   logarithmic or saturating process. A "trivial substitution" presumes a

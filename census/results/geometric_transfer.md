@@ -54,7 +54,7 @@ cross-optimizer comparison at fixed beta = 1.25** against Adam's measured
 ## Status of the geometric claim
 
 **Open.** Tested under Adam across four families (T44, through-origin slope
-1.1240 [1.008, 1.240] against an independently measured alpha 1.1173
+1.0984 [0.958, 1.239] (five-point fit, q2 and family A both included at matched beta = 1.5) against an independently measured alpha 1.1173
 [0.999, 1.236]); **untested across optimizers**, because the second optimizer
 cannot reach the families the test requires at feasible budgets. The
 four-family result remains a single-optimizer result and the paper should say
@@ -134,3 +134,6 @@ ratio 0.447 misses the alpha ratio 0.643), the honest position is:
 > **The four-family geometric relationship is an Adam result.** Its transfer
 > to other optimizers is untested for three of four families (unreachable at
 > feasible budgets) and **fails for the one family that could be measured**.
+
+
+> **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.

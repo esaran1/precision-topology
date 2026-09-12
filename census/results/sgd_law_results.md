@@ -78,7 +78,7 @@ exponent alone, because grid resolution partially cancels, and it fails.
 
 With the strong form unsupported here, **the four-family relationship (T44) is
 now the only relationship in this project that holds quantitatively rather
-than directionally** -- through-origin slope 1.1240 [1.008, 1.240] against an
+than directionally** -- through-origin slope 1.0984 [0.958, 1.239] (five-point fit, q2 and family A both included at matched beta = 1.5) against an
 independently measured alpha of 1.1173 [0.999, 1.236], with all four families
 overlapping their propagated intervals. It is correspondingly more
 load-bearing, and its own limitations (n = 4 families, per-family grid
@@ -128,3 +128,6 @@ further. What it establishes is only that **the missing dependence plausibly
 concerns the spread of where training lands rather than how far it travels on
 average** -- which is a different quantity from alpha, and would explain why
 alpha alone is insufficient.
+
+
+> **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.

@@ -11,7 +11,7 @@ Alpha fitted over every contiguous sub-range of >=3 cells (8 budgets,
 
 | range | n | alpha | R^2 |
 |---|---|---|---|
-| 1k-4k | 3 | **1.5123** | 0.991 |
+| 1k-4k | 3 | **1.5109** | 0.991 |
 | 1k-16k | 5 | 1.3456 | 0.993 |
 | 1k-160k | 8 | **1.1173** | 0.983 |
 | 2k-160k | 7 | 1.0387 | 0.988 |
@@ -19,8 +19,8 @@ Alpha fitted over every contiguous sub-range of >=3 cells (8 budgets,
 | 16k-160k | 4 | 0.8464 | 0.988 |
 | 40k-160k | 3 | **0.7193** | 0.995 |
 
-**Spread across sub-ranges: 0.7193 to 1.5123, a range of 0.79.** First three
-cells give 1.5123; last three give 0.7193. **Alpha is monotonically decreasing
+**Spread across sub-ranges: 0.7193 to 1.5109, a range of 0.79.** First three
+cells give 1.5109; last three give 0.7193. **Alpha is monotonically decreasing
 with the fitting window and has not stabilised at 160k.**
 
 Every sub-range fits with R^2 >= 0.983, so the *local* behaviour is
@@ -58,7 +58,7 @@ similarly. With the window-matched alpha:
 
 - **all four families still overlap their predicted intervals (4/4)**;
 - mean |error| is marginally *better*: 0.0539 vs 0.0552;
-- the through-origin slope 1.1240 [1.008, 1.240] overlaps alpha under
+- the through-origin slope 1.0984 [0.958, 1.239] (five-point fit, q2 and family A both included at matched beta = 1.5) overlaps alpha under
   **both** windows.
 
 **So the four-family relationship does not depend on which alpha is used.**
@@ -67,7 +67,7 @@ similarly. With the window-matched alpha:
 window width and window position. The two windows compared here (1k-160k and
 2k-128k) are both **wide and heavily overlapping**, so they average over the
 same drift and land within 0.009 of each other. A **narrow** window at either
-end would not: 1k-4k gives 1.5123 and 40k-160k gives 0.7193, a spread of 0.79.
+end would not: 1k-4k gives 1.5109 and 40k-160k gives 0.7193, a spread of 0.79.
 
 Both facts hold simultaneously and the writeup carries both:
 
@@ -104,7 +104,7 @@ weaker result than the numbers allow; the tighter propagated test also passes.
 
 | quantity | estimate | 95% CI |
 |---|---|---|
-| through-origin slope (4 families) | 1.1240 | [1.0084, 1.2397] |
+| through-origin slope (5 points, all families) | 1.0984 | [0.958, 1.239] |
 | independently measured alpha | 1.1173 | [0.9985, 1.2360] |
 
 **The intervals overlap on [1.0084, 1.2360].**
@@ -136,3 +136,6 @@ distinction matters:
   unsupported.
 
 Two of three objections changed what we claim. One changed only how we say it.
+
+
+> **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.

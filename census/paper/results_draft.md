@@ -169,7 +169,7 @@ check only.
 infinite-compute limit and the analytic boundary is recovered. **The
 displacement is a finite-budget claim, not a permanent gap.** Further,
 `alpha` is not range-stable: fitted over every contiguous sub-range it falls
-monotonically from **1.5123** (1k-4k) to **0.7193** (40k-160k) with `R^2 >=
+monotonically from **1.5109** (1k-4k) to **0.7193** (40k-160k) with `R^2 >=
 0.983` throughout, which is local power-law behaviour with a drifting exponent
 -- the signature of a sub-power-law process. **Extrapolation of `B(eps)`
 beyond the measured range of 160,000 steps is unsupported.**
@@ -197,17 +197,21 @@ family:
 | q0.667 | 2.50 | -0.4470 | **-0.5000** |
 
 Every measured exponent lies within its propagated interval. Plotted against
-`1/beta`, the through-origin slope is **1.1240 with 95% interval
-`[1.008, 1.240]`**, against the independently measured `alpha = 1.1173` with
-interval `[0.999, 1.236]`: **the intervals overlap**. The point estimates
-differ by 0.6%, but both carry intervals of roughly `+-10%`, so this is
-agreement within uncertainty and not a sub-percent measurement.
+`1/beta`, the through-origin slope is **1.0984 with 95% interval
+`[0.958, 1.239]`** -- a **five-point fit including both q2 and family A at
+matched `beta = 1.5`**, since those are different activation functions at the
+same analytic exponent and their agreement is the construction's cross-route
+control rather than a redundant x-position. Against the independently measured
+`alpha = 1.1173` with interval `[0.999, 1.236]`, **the intervals overlap**.
+The point estimates differ by **1.7%**, but both carry intervals of roughly
+`+-10%`, so this is agreement within uncertainty and not a sub-percent
+measurement.
 
 **Sensitivity to the choice of `beta`.** Each `beta` above is the analytic
 `a -> 1+` exponent. Over the `eps` range each family's onsets actually span,
 the effective local exponent is smaller -- by 1.7% (q4) to 10.4% (q0.667) --
-and substituting it moves the through-origin slope to **1.0547**, which is
-5.6% from `alpha` rather than 1.7%. **Both values lie inside `alpha`'s
+and substituting it moves the five-point through-origin slope to **1.0548**, which
+is 5.6% from `alpha` rather than 1.7%. **Both values lie inside `alpha`'s
 confidence interval and the conclusion is unchanged, but the headline
 agreement is 1.7% under asymptotic `beta` and 5.6% under effective `beta`.**
 We use asymptotic `beta` because it is analytically defined, so `1/beta`

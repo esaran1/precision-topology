@@ -1,17 +1,20 @@
 # Instrument limitations read as properties of the object
 
 A short methodological note, written because this project has now made
-this class of error **four times** — twice in unrelated strands, and a
-third time in a distinct form within the same instrument — and caught
-each only through an independent route. It is transferable to anyone
+this class of error **five times** — twice in unrelated strands, a
+third time in a distinct form within the same instrument, and a fifth in
+the write-up rather than the measurement — and caught each only through
+an independent route. It is transferable to anyone
 measuring a solution set by scanning, or a topological invariant by
 projection.
 
-The four instances: a projection that returns the right answer for the
+The five instances: a projection that returns the right answer for the
 wrong reason (1), a scan whose resolution floor was read as a property
 of the object (2a), the same scan's *parameter-dependent* bias
-contaminating a comparison across that parameter (2b), and a probe
-whose own construction dominated the quantity it was measuring (3).
+contaminating a comparison across that parameter (2b), a probe whose own
+construction dominated the quantity it was measuring (3), and a verifier
+that checked the document against itself and so could not see that every
+copy of a number was the same wrong number (4).
 
 ## The pattern
 
@@ -127,6 +130,50 @@ the endpoint fixed while sweeping the parameter. Constructed
 |w₂| = 1 endpoints at every `a` show the barrier is flat-to-rising,
 killing the account in one table.
 
+## Instance 4: the consistency check that could not fail (2026-09-11)
+
+The first four instances are about instruments. This one is about the
+*verification*, and it is the cheapest error on the list to make.
+
+A headline quantity — the through-origin slope of onset exponent against
+1/beta — was quoted in eleven documents, including the results draft and
+a figure caption. A cross-sentence verification pass was run over the
+draft specifically to catch disagreements: it tabulated every quantity
+appearing more than once and confirmed that no quantity appeared with two
+different values. It reported zero inconsistencies, and it was right.
+
+The number was nonetheless wrong. The fit had been written with a
+hardcoded four-tuple that merged two families sharing `beta = 1.5` into a
+single point and kept one family's measured exponent while silently
+discarding the other's. Every later document had copied the published
+figure. Recomputing from `beta_law_points.csv` gives **1.0984**, not
+1.1240 — and the headline agreement with the independently measured
+`alpha` weakens from 0.6% to **1.7%**.
+
+The failure mode is specific and worth naming:
+
+> **Internal consistency is not correctness.** A document can be
+> perfectly self-consistent and disagree with every artifact it
+> describes. A consistency check compares text to text; its pass
+> condition is that copies agree, and copies of a wrong number agree
+> perfectly. The more thoroughly a number has propagated, the more
+> confidently such a check will clear it.
+
+What caught it was a different pass entirely — recomputing each derived
+quantity **from the raw artifact at full precision** and comparing
+against what the text claimed, with no reference to whether the text
+agreed with itself. That pass also found a second, smaller case in the
+same sweep: an exponent that reproduced only when refitted from two
+decimal-place *display* values rather than from the stored data
+(1.5123 vs the artifact's 1.5109).
+
+Note what the wrong number survived: a figure regeneration script with
+inline provenance, a ledger verifier recomputing eighteen headline
+numbers, a bootstrap of the full pipeline, and an adversarial
+interpretive audit. None of those touched this fit, because it was
+written inline in a results document rather than in a checked script.
+**A quantity computed inside prose is outside every verifier you own.**
+
 ## Why all of these were caught only from outside the measurement
 
 None of these errors was found by examining the measurement more
@@ -160,9 +207,15 @@ carefully.
   first reported it, which shows a flagged-but-uncarried caveat is
   worth about as much as no caveat at all.
 
-Five independent detectors, none of them "look at the scan again":
+- Instance 4 was caught by **recomputation from source**, and could not
+  have been caught by the check designed for it: the consistency pass
+  compared copies of the number to each other, and they agreed. The
+  detector had to bypass the text entirely and go to the CSV.
+
+Six independent detectors, none of them "look at the scan again":
 a known-answer control, a theoretical prediction, a language audit, an
-independent re-derivation, and a confound-removing re-measurement.
+independent re-derivation, a confound-removing re-measurement, and a
+recomputation from source.
 
 ## Checklist this yields
 
@@ -201,6 +254,17 @@ independent re-derivation, and a confound-removing re-measurement.
    confound was noted in `gap_results.md` when the barriers were first
    reported, then not carried into the claim built on them. Either a
    caveat gates the claim or it does not exist.
-8. **Derive theory even in an empirical project.** The single highest-
+8. **Verify text against artifacts, never against other text.** A
+   cross-reference pass that checks whether a number is quoted
+   consistently has a pass condition — "the copies agree" — that a
+   propagated error satisfies exactly. Every derived quantity in a
+   document needs one line tracing it to the file and the computation
+   that produced it, and the trace has to be *re-run*, not read.
+9. **Any number computed inline in prose is unverified.** Fits,
+   averages and ratios written directly into a results document sit
+   outside every script your verifiers cover. Either the computation
+   lives in a checked script that emits the number, or it gets its own
+   recomputation pass.
+10. **Derive theory even in an empirical project.** The single highest-
    value output of the theorem work so far was not the theorem; it was
    the empirical error the theorem exposed.

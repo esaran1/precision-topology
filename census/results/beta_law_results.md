@@ -35,7 +35,10 @@ Plotting measured exponent against 1/beta, the prediction is a line through
 the origin of slope -alpha, where **alpha = 1.1172 was measured on the budget
 sweep and never fitted to these families**:
 
-- through-origin slope of the three points: **1.0878**
+- through-origin slope of the three points: **1.0878** (superseded; this is
+  the three-family fit as it stood here. The final figure is the **five-point**
+  fit over all measured families, **1.0984 [0.958, 1.239]** — see the
+  correction note at the end of this file.)
 - independently measured alpha: **1.1172** (**2.6% apart**)
 - R^2 about the *predicted* line (not a fit): **0.898**
 
@@ -110,7 +113,7 @@ compression toward the origin and no systematic departure from the law.
 R^2 about a fixed predicted line is a harsh statistic when the points span a
 narrow range in 1/beta (0.40-0.80) and each carries +-0.11 to +-0.17 of
 resolution noise; it is not evidence of a departure. The appropriate summary
-is the through-origin slope, **1.0969 against the independently measured
+is the through-origin slope, **1.0984 (five-point fit) against the independently measured
 alpha = 1.1172 (1.8% apart)**, together with the deviation table above.
 
 Reported this way rather than as "a small systematic departure", which the
@@ -128,3 +131,6 @@ Together with the earlier prefactor check (q = 2 reproduces family A's
 beta to four digits with a constant sqrt(2) ratio across three decades), this
 is the construction validating itself: same geometry, different function,
 same exponent.
+
+
+> **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.

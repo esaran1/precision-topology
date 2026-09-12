@@ -8,7 +8,9 @@ Known multi-valued quantities (watch list):
   alpha            1.1172 (1k-160k, 8 cells) | 1.1084 (2k-128k window-matched)
                    | 0.72-1.51 across sub-ranges
   onset exponent   -0.7340 (6 cells) | -0.8305 (3 cells, 2k-32k)
-  through-origin   1.0878 / 1.0969 (pre-correction) | 1.1240 [1.008,1.240]
+  through-origin   1.0984 [0.958, 1.239], five-point fit: q2 and family A
+                   both included at matched beta = 1.5 (corrected 2026-09-11;
+                   earlier 1.0878 / 1.0969 / 1.1240 all used four points)
   per-family grid  +-0.114 (4-cell families) | +-0.171 (3-cell families)
 """
 from __future__ import annotations
@@ -55,6 +57,8 @@ def fig_four_family() -> None:
     ax.set_xlabel(r"$1/\beta$   ($\beta$ analytic, verified to $\leq$0.7%)")
     ax.set_ylabel("measured onset exponent")
     ax.set_title("Onset exponent tracks $1/\\beta$ (Adam only; see T47)", fontsize=10)
+    ax.text(0.02, -1.10, "five-point fit: q2 and family A both included at matched $\\beta$=1.5",
+            fontsize=7)
     ax.text(0.02, -0.98, "error bars: per-family grid resolution\n"
             r"$\pm$0.114 (4 cells, 64$\times$) / $\pm$0.171 (3 cells, 16$\times$)",
             fontsize=7, va="bottom")
