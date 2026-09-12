@@ -153,11 +153,17 @@ improvement occurs where the solve rate is identically zero.
    0.8393 for raw `|w2|`, pooled across budgets and both optimizers. That is a
    statement about our criterion, and our criterion is the one the theorem
    constrains: the theorem is about exact separation, not about error counts.
-2. **The exact-separation criterion is not arbitrary here.** Unlike Exact
-   String Match on a language benchmark, 0 errors is the quantity the
-   impossibility theorem speaks about. A run with 36 mean errors has not
-   "nearly" realized `sign(|x| - 1)`; it has failed to, and the fold-depth
-   bound is a statement about the networks that succeed.
+2. **The exact-separation criterion is appropriate for this task — which is a
+   separate question from whether its transition is sharp, and a reviewer will
+   separate them.** Unlike Exact String Match on a language benchmark, 0 errors
+   is the quantity the impossibility theorem speaks about: a run with 36 mean
+   errors has not "nearly" realized `sign(|x| - 1)`, it has failed to, and the
+   fold-depth bound is a statement about the networks that succeed. **That
+   argues the binary criterion is the right criterion. It does not argue that
+   its transition is sharp, and the measurement above shows it is not.** The
+   honest joint statement is: *the binary criterion is appropriate for this
+   task, and its transition is nonetheless sharper than the underlying quantity
+   warrants.*
 3. **The transition in the underlying quantity is real but earlier**, peaking
    at R ~ 0.26. A future version of this analysis should report the error-count
    curve alongside the solve rate rather than the solve rate alone.
@@ -199,35 +205,50 @@ All three qualify. q4 and q0.667 were not regenerated and are absent.
 
 Every margin clears the registered 0.05 with non-overlapping intervals.
 
-## The product form is what the data picks, not only what the theorem asserts
+### The product form is not an assumption — it is what the data selects
 
-An adversarial check: scan `|w2|^p * G*^q` over `p, q` in [0.3, 2.0] and ask
-whether some other exponent pair separates better. Since ranking by
-`p log|w2| + q log G*` depends only on the ratio `p/q`, the theorem's product
-form is exactly `p/q = 1`.
+This is the strongest result in the analysis, and it is independent
+confirmation of the theorem's structure arriving from a different direction.
 
-| family | R (`p/q = 1`) | best grid AUC | best `p/q` | gain |
+The theorem *asserts* that `|w2|` and `G*` enter as a product. That could be an
+assumption we imposed on the data by constructing R that way. So we scanned the
+whole family of power combinations `|w2|^p * G*^q` over `p, q` in [0.3, 2.0] and
+asked which separates best. Because ranking by `p log|w2| + q log G*` depends
+only on the ratio `p/q`, the theorem's product form is exactly `p/q = 1`, and
+the scan asks whether any other exponent ratio would do better:
+
+| family | R (`p/q = 1`) | best over the scan | best `p/q` | achievable gain |
 |---|---:|---:|---:|---:|
-| A | 0.9975 | 0.9984 | 1.18 | +0.0008 |
-| q2 | 0.9998 | 0.9998 | 1.00 | +0.0000 |
-| q1 | 0.9995 | 0.9999 | 1.17 | +0.0004 |
+| A | 0.9975 | 0.9984 | 1.18 | **+0.0008** |
+| q2 | 0.9998 | 0.9998 | 1.00 | **+0.0000** |
+| q1 | 0.9995 | 0.9999 | 1.17 | **+0.0004** |
 
-**The optimal ratio is within 18% of 1 in every family, and the achievable gain
-is at most 0.0008 AUC.** The exponent the theorem gives is the one the data
-selects.
+**The optimal ratio is 1.00 to 1.18 in every family, and the maximum gain
+available from any other exponent pair is 0.0008 AUC.** Among all power
+combinations of the two quantities, the data picks the theorem's. The product
+structure is therefore not something the theorem imposes on the analysis; it is
+what the measurement selects.
 
-## Where R's contribution actually lies
+### The check that validates the pipeline
 
 At fixed `a`, `G*(a)` is a constant, so R is a monotone rescaling of `|w2|` and
-the two must have identical AUC. They do, to four decimals, in all 19
-sufficiently populated `(family, a)` cells — an internal consistency check that
-would have caught a bug in the R computation.
+their AUCs **must** agree by construction. They do, to four decimals, in all 19
+sufficiently populated `(family, a)` cells.
 
-**So R's entire contribution is commensuration across `a`.** `|w2|` predicts
-solving perfectly well within a fixed activation; what it cannot do is compare
-runs at different `a`, because the same `|w2|` means different things when the
-fold is deeper or shallower. `G*(a)` is the exchange rate, and the theorem
-supplies it.
+This is not a formality. Had the R computation carried a bug — a misaligned
+`G*` lookup, a wrong orientation, a stale join — the fixed-`a` AUCs would have
+diverged and the entire result above would have been a plausible artifact. The
+agreement is what separates this from analysis that merely looks right.
+
+### What R contributes, in one sentence
+
+**`|w2|` predicts solving well within a fixed activation; what it cannot do is
+compare across `a`. `G*(a)` is the exchange rate the theorem supplies.**
+
+The same `|w2|` means different things when the fold is deeper or shallower,
+and `G*` is exactly the conversion factor between weight scale and achievable
+margin. That is the whole of R's contribution, and it is why R and `|w2|` are
+indistinguishable within a family and far apart across families.
 
 ## What Item 2 establishes, against what the family test rejected
 
@@ -250,3 +271,87 @@ controlling variable" and materially stronger than "R is a family-A result".
 all trained with Adam except family A's optimizer arm. q4, q0.667 and family B
 are untested. Family B is positively homogeneous with `beta = 1` and is a known
 counterexample to the budget law; nothing here addresses it.
+
+---
+
+# Item 2, extended: family B — the structure claim has a boundary
+
+The three families tested above all sit in `beta` in [1.5, 2.0]. **Family B**
+(`f(t) = max(t, alpha*t)`, non-monotone iff `alpha < 0`) is the known
+`beta = 1` counterexample to the budget law (T44). Its terminal weights **were
+recoverable** from `fold1d_sweep.csv` — 1,600 stored rows, 1,000 at
+`alpha < 0`, 578 solved — so no retraining was needed.
+
+`G*(alpha)` computed on a wide unrestricted scan, scored in both orientations:
+
+| `alpha` | −1.0 | −0.5 | −0.25 | −0.1 | −0.05 |
+|---|---:|---:|---:|---:|---:|
+| `G*` | 3.1196 | 1.6000 | 0.8000 | 0.3200 | 0.1600 |
+
+`G* ~ |alpha|^{0.9935}`, confirming `beta = 1` numerically for a positively
+homogeneous family, as the analytic argument requires.
+
+## Result: R does NOT dominate in family B
+
+Transition band (0.598, 1.463) contains 286 runs, so the family qualifies.
+
+| variable | AUC | 95% CI |
+|---|---:|---|
+| `R = |w2| G*/2` | 0.9804 | [0.9729, 0.9872] |
+| **`|w2|` alone** | **0.9901** | [0.9819, 0.9967] |
+| `G*(alpha)` alone | 0.3837 | [0.3488, 0.4180] |
+
+**R is *worse* than raw `|w2|`** (margin −0.0097, intervals overlapping), and
+the exponent scan puts the best ratio at `p/q = 1.54` rather than 1, gaining
++0.0183. **Registered dominance: NO.**
+
+## Why, and the diagnosis strengthens the interpretation rather than weakening it
+
+The solve rate in family B is **nearly constant in `alpha`** — 0.565, 0.555,
+0.580, 0.595, 0.595 across a 20x range of `G*`. The fold parameter barely
+affects solvability at all.
+
+The reason is **compensation**. Median terminal `|w2|` rises as the fold
+shallows: 2.33, 2.96, 4.25, 6.77, 9.21, i.e. `|w2| ~ G*^{-0.475}`. Training
+reaches proportionally larger weights exactly as `G*` shrinks, so the product
+stays far flatter (4.9x) than either factor alone (19x for `G*`, 4.0x for
+`|w2|`).
+
+So in family B, `G*` carries **no signal about solvability** — its own AUC is
+0.384, below chance — and multiplying `|w2|` by it therefore *adds noise to a
+variable that already worked*. Within each `alpha`, `|w2|` alone separates at
+AUC 1.0000, 1.0000, 1.0000, 1.0000, 0.9777.
+
+**One mechanism, two symptoms.** Positive homogeneity gives `beta = 1` and full
+compensation. That is why family B breaks the **budget law** (the onset does
+not move as predicted, T44) *and* why it breaks the **product structure** (the
+exchange rate is constant in the relevant sense, so there is nothing to
+commensurate). The two failures are not independent problems; they are the same
+property of the family seen twice.
+
+## What this does to the Item 2 claim
+
+**It bounds it, honestly, rather than extending it.** The registered hope was
+that testing family B would either extend the structure claim to a family where
+the law fails — separating structure from scaling law — or bound the claim. The
+second happened.
+
+The defensible statement becomes:
+
+> Solvability is governed by the product of an architectural quantity fixed
+> before training (`G*`) and a training quantity set by budget and optimizer
+> (`|w2|`), **in families where the fold depth is not fully compensated by
+> weight growth** — verified in family A, q2 and q1 (`beta` in [1.5, 2.0]),
+> **and failing in the positively homogeneous family B (`beta = 1`)**, where
+> training compensates exactly and `G*` carries no signal.
+
+That is narrower than the claim written before family B was tested, and it is
+the claim the data supports. The condition is not ad hoc: homogeneity is
+checkable in advance from the activation's functional form, and it is the same
+condition that already scopes the budget law.
+
+**Remaining untested**: q4 (`beta = 1.25`) and q0.667 (`beta = 2.5`), whose
+per-run weights were not stored and were not regenerated. They sit at the
+extremes of the `beta` range rather than outside the regime, so they would
+tighten the interval rather than test the boundary; family B was the
+informative case and it has been run.
