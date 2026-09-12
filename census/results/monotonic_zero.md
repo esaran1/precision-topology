@@ -42,3 +42,36 @@ further monotonic width-3 zeros at depths 3 and 6) are deliberately not
 folded in here; this document states the number as of the audit
 correction, and any future update should rerun
 `src/zero_decomposition.py` and revise this file with a dated block.
+
+## Link-geometry enumeration (Item 7, 2026-09-12) — replacing "five link families"
+
+The phrase **"five link families"** appeared in ledger T1 and in
+`winding_results.md` and was **defined nowhere**: no artifact column, script,
+or document enumerated them. Reconstructing from the artifacts, the distinct
+link geometries the 5,580 runs cover are:
+
+| # | link type | `|lk|` | strata |
+|---|---|---:|---|
+| 1 | **Hopf link** | 1 | width, threshold, parametrization, protocol, restarts; also `winding q=1` and corrugation `flat` |
+| 2 | **corrugated Hopf, reading A** | 1 | corrugation (11 configurations) |
+| 3 | **corrugated Hopf, reading B** | 1 | corrugation (9 configurations) |
+| 4 | **winding link** | 2 | winding |
+| 5 | **winding link** | 3 | winding |
+| 6 | **winding link** | 4 | winding |
+
+That is **six distinct link types**, or **four families** if the three
+non-trivial winding links are counted as one parametric family. **Neither
+count is five**, so the original phrase matched no defensible enumeration and
+is withdrawn.
+
+Also covered, and distinct from link *geometry*: **12 parametrizations** of
+the Hopf link (`asymmetric_both`, `asymmetric_tube`, `baseline`, `far_offset`,
+`generic`, `near_offset`, `oblique_offset`, `rotated_30`, `rotated_generic`,
+`thick_tube`, `thin_tube`, `unequal_major`) varying major and tube radii,
+aspect, offset, obliquity and rotation.
+
+**The replacement wording used from here**: "six distinct link types (the Hopf
+link, corrugated Hopf links under two independent readings, and winding links
+at |lk| = 2, 3, 4), together with twelve parametrizations of the Hopf link".
+The zero itself is unaffected — this is a description of the pool, not a
+recount of it.

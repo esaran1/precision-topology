@@ -28,7 +28,7 @@ sample-level leaky run (0 dense).
 
 **0 monotonic separations in 240 width-3 runs across all four links**
 (tanh/ReLU/leaky-ReLU, q = 1–4). The width-3 monotonic zero now stands at
-**5,540 distinct runs** spanning five link families; bound on the rate
+**5,540 distinct runs** spanning six distinct link types (the Hopf link, corrugated Hopf links under two independent readings, and winding links at |lk| = 2, 3, 4); bound on the rate
 0.054% (`CLAIMS.md` T1/T2 updated).
 
 ## Prediction 2: non-monotonic width-3 rates fall with q — BORNE OUT

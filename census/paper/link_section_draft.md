@@ -51,11 +51,15 @@ Across every monotonic-activation width-3 configuration we have trained —
 | winding sweep | 240 | 0 | winding links, `q = 1..4` |
 | **total** | **5,580** | **0** | |
 
-The pool spans four distinct link geometries — the Hopf link, corrugated Hopf
+The pool spans **six distinct link types** — the Hopf link, corrugated Hopf
 links under two independent readings of the corrugation parameters, and
-winding links at `|lk| = 2, 3, 4` — together with twelve parametrizations of
-the Hopf link (varying major and tube radii, aspect, offset, obliquity and
-rotation), two training protocols, and four independent search methods.
+winding links at `|lk| = 2, 3, 4` — together with **twelve parametrizations**
+of the Hopf link (varying major and tube radii, aspect, offset, obliquity and
+rotation), two training protocols, and four independent search methods. (Four
+of the six are `|lk| = 1` constructions; counting the three non-trivial
+winding links as one parametric family instead gives four families. We
+enumerate rather than quote a count, because an earlier "five link families"
+in our own ledger matched no defensible enumeration.)
 
 With `k = 0` events in `n = 5,580` trials, the one-sided exact 95% upper bound
 on the per-run separation rate is

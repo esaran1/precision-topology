@@ -126,6 +126,14 @@ figures** and agrees on the sign of `lambda_min` at all six negative values.
 
 # §5 The budget law
 
+**What this section claims, stated at the top.** Over the measured range the
+onset *location* is well described by a power law in budget whose exponent
+depends on the fitting window. The law **interpolates and does not
+extrapolate** -- a held-out test of extrapolation failed, and that failure is
+reported with the law rather than after it. The claim is about the location of
+a population threshold, not about the shape of the distribution around it:
+§5.4 shows the rate curves sharpen with budget rather than translating.
+
 **Onsets are population thresholds.** For each budget we locate the smallest
 grid value of `a` at which at least 50% of 40 independent runs produce a
 correctly-classifying network, requiring a strictly smaller grid value below
@@ -152,14 +160,27 @@ rate is **0 of 200 at the standard 2,000-step budget and 40 of 40 at 80,000
 and at 160,000 steps** -- the same task, architecture and analytic threshold,
 with one hyperparameter changed.
 
-**Compute cost.** Inverting the onset exponent, the budget at which a majority
-of runs succeed within `eps` of the analytic threshold grows as
+**Compute cost, and the range it holds over.** Inverting the onset exponent,
+the budget at which a majority of runs succeed within `eps` of the analytic
+threshold grows, **over the fitted range `B` in [2,000, 160,000] and only
+there**, as
 
     B(eps) ~ eps^{-1.36},   interval [1.151, 1.670],
 
 so halving `eps` costs **2.57x** compute (2.22x to 3.18x). **This is a
 median**: at the onset budget, half of runs still fail, and we have not
-measured other quantiles. Measuring along the other axis -- bisecting on
+measured other quantiles.
+
+**This inversion is an extrapolation by construction, and we tested whether it
+extrapolates. It does not.** Fitting the onset exponent on the four smallest
+budgets and predicting the 128,000-step onset -- with the interval recorded
+before the held-out cell was consulted -- gives `eps = 0.01872`, 95% prediction
+interval `[0.01403, 0.02497]`, against a measured **0.030**: outside the
+interval and 60.3% above the point estimate. The four-budget exponent
+(**-0.8261**) is steeper than the six-budget one (**-0.7340**), so short-budget
+fits overstate how fast the onset moves. **Any use of `B(eps)` outside
+[2,000, 160,000] is unsupported by our data and is contradicted by the one
+direct test we ran.** Measuring along the other axis -- bisecting on
 budget at fixed `a`, 5 of 5 cells bracketed -- gives **-1.0242**, consistent in
 sign and order of magnitude; that check has resolution `+-0.431`, wider than
 the band it tests, so it cannot adjudicate and we report it as a consistency
@@ -171,8 +192,74 @@ displacement is a finite-budget claim, not a permanent gap.** Further,
 `alpha` is not range-stable: fitted over every contiguous sub-range it falls
 monotonically from **1.5109** (1k-4k) to **0.7193** (40k-160k) with `R^2 >=
 0.983` throughout, which is local power-law behaviour with a drifting exponent
--- the signature of a sub-power-law process. **Extrapolation of `B(eps)`
-beyond the measured range of 160,000 steps is unsupported.**
+-- the signature of a sub-power-law process.
+
+**Three independent measurements say the same thing**: the held-out prediction
+fails by 60%; the four-budget exponent (-0.8261) is steeper than the
+six-budget one (-0.7340); and `alpha` drifts 1.51 to 0.72 with the fitting
+window. The honest form of the claim is therefore narrower than "the onset
+follows a power law in budget":
+
+> **Over the measured range, the onset location is well described by a power
+> law whose exponent depends on the fitting window. The law interpolates; it
+> does not extrapolate.**
+
+## §5.4 What collapses and what does not
+
+Fitting the exponent from 50% crossings uses six numbers. The rate curves
+contain 36, and pooling them tests the law at the distributional level rather
+than at the median. With `u = (a - 1) * B^{theta}`, the claim would be that
+solve rate is a single function `F(u)`.
+
+**Location is universal.** Scanning `theta` and refitting `F` at each value,
+the residual is minimized at **`theta = 0.7250`**, bootstrap 95% interval over
+cells **[0.500, 0.888]**, which contains the onset-derived **0.7340**. Two
+estimators built on different information -- 36 rate cells against 6 crossings
+-- agree. Fitting each budget separately, the collapse midpoints span
+**1.39x** in `u` across a 32x range of budget. This is genuine corroboration
+of the location claim, from data the onset fit discards.
+
+**Shape is not.** The same per-budget fits give logistic slopes rising
+**7.6-fold**, from 3.94 at 4,000 steps to 29.82 at 128,000, with
+**`k ~ B^{0.612}`, `r = 0.974`**. The transition is not merely moving, it is
+**becoming more abrupt**: the width of the region where outcome is uncertain
+narrows as `B^{-0.612}`.
+
+**No choice of exponent can absorb this, and the reason is structural rather
+than a complaint about fitting.** Since `log u = log eps + theta * log B`,
+changing `theta` translates every curve in `log u` and leaves its slope
+untouched. Slopes that differ across budgets therefore cannot be collapsed by
+any `theta` whatsoever. Consistently, the residual minimum is shallow: it
+sits only **1.62x** below the residual at `theta = 0` and **1.48x** below that
+at `theta = 1.5`, against a factor of 2 fixed in advance as the pass
+condition. The pooled residual is **3.55x** the binomial sampling noise at 40
+seeds per cell, so the misfit is real rather than noise.
+
+**The obvious repair does not work either.** Adding one budget-dependent
+shape exponent would fix family A and q2, which sharpen at `B^{0.612}` and
+`B^{0.428}`. It would not fix **q1, which broadens** (`B^{-0.718}`,
+`r = -0.906`). The shape is not a single universal function of budget across
+families, so a one-parameter extension of the law is ruled out by the data we
+already have.
+
+**Threshold independence, in the range where it can be tested.** Extracting
+onsets at 25%, 50% and 75% and refitting: 50% and 75% agree to four decimals
+(**-0.7325** each, reproducing the committed -0.7340), while 25% gives
+**-0.5037** and is bracketed at only **3 of 6** budgets against 6 and 5. All
+three intervals overlap. The deviation at 25% is what the sharpening predicts:
+propagating the fitted per-budget shapes forward implies a 25% exponent of
+**-0.6177**, the same direction and rough size as the -0.5037 measured. The
+50% convention is therefore immaterial where the level is well bracketed, and
+the low-threshold behaviour is a consequence of the shape drift rather than a
+separate effect.
+
+**Pooled across families, the collapse is weak.** Scaling each family by its
+own `theta = alpha / beta_family` over 84 cells gives a residual of 0.2340
+against 0.2824 with no budget scaling at all -- a factor of only **1.21x** --
+and a single common `theta = 0.700` fits marginally better (0.2269) than the
+per-family exponents. The four-family law of §6 was verified on onsets and
+that verification stands; what we report here is that **the rate curves do not
+independently corroborate it**.
 
 # §6 The geometric relationship, and its scope
 
