@@ -197,3 +197,6 @@ named rather than papered over.
   the topological obstruction rather than a sign-change count.
 - **It is specific to a single fold-carrying unit and a 1-D task.** The
   extension to width d in R^d is open and is not a corollary.
+
+
+> **Correction (2026-09-12).** The asymptotic constant printed here as **8/3** is wrong. Recomputing the limit, `D(a)/(a-1)^{3/2} -> 1.885610`, which is **4*sqrt(2)/3 = 1.885618**, not 8/3 = 2.666667. The correct form is **D(a) ~ (4*sqrt(2)/3)(a-1)^{3/2}** as a -> 1+. **No computed result moves** — every use calls the exact `dip_depth()`/closed form `D(a) = 2(sqrt(a^2-1) - arccos(1/a))` — but the printed asymptotic was 41% too large. Consequently the approximation errors tabulated against 8/3 (42.7%/47.6%/70.2%/136.1% at a = 1.02/1.1/1.5/3.0) become **0.9%/4.4%/20.4%/66.9%** with the correct constant. The standing action is unchanged: state the theorem in D(a) and give the asymptotic separately, labelled as the a -> 1+ limit. (`paper/VERIFIED_NUMBERS.md` §2.1)
