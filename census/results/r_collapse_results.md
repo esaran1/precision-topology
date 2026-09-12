@@ -10,13 +10,22 @@ Date: 2026-09-12.
 
 ## Headline
 
-**R collapses far better than the budget-law variable `u` did, and the
-optimizer test passes — but R is not a perfect sufficient statistic, and one
-registered failure condition partially triggers.**
+**R collapses far better than the budget-law variable `u` did, and survives
+budget and optimizer — but it FAILS across activation families, and the
+registered rule says that means R is a correlate rather than the controlling
+variable.**
 
-The honest verdict: **R is the controlling variable within family A, across
-budgets and across both optimizers, with a residual `a`-dependence inside the
-transition band that we can measure but not explain away.**
+Two of four registered failure conditions trigger: `a` partially (at the two
+strata with almost no transition coverage, plus a residual effect at fixed R),
+and **families decisively** (`R50` = 0.247 / 0.295 / 0.373 for q1 / q2 / A,
+against a materiality threshold of 0.024; `p = 1.5e-19` in one band).
+
+The honest verdict: **R is the controlling variable within a single activation
+family, across budgets and across both optimizers. It is not a family-free
+quantity, and the paper should not be restructured around it as though it
+were.** What it does buy is real and is reported in Part 3: onsets become
+predictable rather than fitted, and the extrapolation failure becomes a
+consequence of `|w2|` growth rather than an independent defect.
 
 ## Coverage, stated before any collapse number
 
@@ -150,6 +159,46 @@ at nominal significance. The effect is not consistent across windows and the
 `a = 3.0` stratum (0/12 in the band) cuts against a simple story, but it is
 there. **R is not a perfect sufficient statistic.**
 
+## Failure condition 4 (families): FAILS
+
+720 runs regenerated from seeds for q2 (`beta = 1.5`) and q1 (`beta = 2.0`),
+6 values of `a` x 3 budgets x 20 seeds each, with each family's own `G*`.
+
+**At the extremes the families agree exactly.** Below `R = 0.2`: 0/1,829
+(family A), 0/134 (q1), 0/143 (q2). Above `R = 0.5`: 1.000 in every family.
+
+**Inside the transition they do not.**
+
+| `R` band | family A | q1 | q2 | Fisher (A vs q1 / A vs q2) |
+|---|---|---|---|---|
+| (0.2, 0.3] | **0/331 = 0.000** | **15/27 = 0.556** | **2/4 = 0.500** | **1.5e-19** / 1.1e-04 |
+| (0.3, 0.4] | 76/233 = 0.326 | 12/13 = 0.923 | 24/26 = 0.923 | 2.4e-05 / 2.8e-09 |
+| (0.4, 0.5] | 101/114 = 0.886 | 15/15 = 1.000 | — | 0.361 |
+
+Fitted `R50` per family, against the pooled 0.3705 and materiality 0.0241:
+
+| family | `R50` | shift | verdict |
+|---|---:|---:|---|
+| A | 0.3732 | 0.0027 | ok |
+| q2 | 0.2945 | **0.0761** | **MATERIAL** |
+| q1 | 0.2469 | **0.1237** | **MATERIAL** |
+
+The constructed families cross 50% at **lower** capacity than family A — they
+solve on less margin headroom.
+
+**A benign explanation was tested and rejected.** The family `G*` was computed
+on a coarser grid than family A's, and an underestimate of `G*` would depress R
+and shift `R50` down, which is the direction observed. Explaining the shifts
+would require `G*` underestimates of **21%** (q2) and **34%** (q1). Rescanning
+three times finer in the same window gives corrections of **+0.6% to +14%**.
+Applying the most generous of those, q2's shift becomes 0.0737 and q1's
+0.0891 — both still three to four times the materiality threshold. **The family
+difference is real, not a grid artifact.**
+
+(A first attempt at this check searched a 12-wide window too sparsely and
+returned values *below* the coarse maxima, which is impossible for a maximum;
+that scan was discarded rather than reported.)
+
 ## Part 2: what R is
 
 ### 2a. The reading, checked against the definitions
@@ -268,7 +317,7 @@ relation.
 
 ## Part 4: honest assessment
 
-**Does R collapse?** Yes, strongly, within family A. 0 of 2,160 below
+**Does R collapse?** Within family A, yes, strongly. **Across families, no.** 0 of 2,160 below
 `R = 0.30`; 402 of 403 above `R = 0.50`; AUC 0.9940 against 0.8175 for raw
 `|w2|`. The transition occupies a band of width 0.048 in R.
 
@@ -298,7 +347,11 @@ as inherited from `alpha`'s drift, with the direction confirmed.
 3. **The `a = 2.0` and `a = 3.0` strata** fail the registered materiality
    threshold on their fitted `R50`. Coverage explains this plausibly but not
    conclusively.
-4. **Nothing outside family A is yet established** — see the family section.
+4. **The family difference**, which is the registered failure. q1 and q2 cross
+   50% at R = 0.247 and 0.295 against family A's 0.373, and the gap survives
+   the largest defensible `G*` correction. Something about the activation
+   beyond `G*` enters solvability — `G*` captures the best achievable gap but
+   evidently not how easily training finds a placement achieving it.
 5. **Family B** (positively homogeneous) is untested here; `G*` is defined for
    it but its `beta = 1` behaviour is a known counterexample to the budget law
    and nothing in this analysis addresses it.
