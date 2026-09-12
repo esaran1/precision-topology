@@ -1,0 +1,9 @@
+figure,slug,sources,n,placement,note
+Fig 1,fig1_setting,analytic (no data),n/a,full-width,"f_a at a=0.9/1.05/2.0 with D(a) marked; task regions I=[-0.8,0.8], O=+-[1.2,2.0]"
+Fig 2,fig2_exclusions,exclusion_table.csv,"8 unreached, 4 found",full-width,"log strip charts; dagger marks the two reversals (distance, margin)"
+Fig 3,fig3_r_collapse,"r_pooled.csv, r_families.csv, r_family_b.csv","(a) 2,910  (b) 180/optimiser  (c) A 2,910 / q2 360 / q1 360 / B 1,000",full-width,Clopper-Pearson on rates; bootstrap CI on AUC; Fisher exact on (b)
+Fig 4,fig4_metric_check,"fold1d_sweep.csv, fold1d_refine.csv","2,400",full-width,"10-90% crossings: continuous [0.055,0.307], binary [0.332,0.452], disjoint"
+Fig 5,fig5_budget_law,"onset_law_extended.csv, budget_alpha.csv","(a) 6 bracketed cells, 40 seeds each  (b) 8 budgets, 30 seeds each",full-width,"held-out: fit on 4 smallest, predict 128k -> [0.01403,0.02497], measured 0.030"
+Fig 6,fig6_four_family,beta_law_points.csv,"5 points; cells per family: q0.667=3, q1=4, q2=4, familyA=6, q4=3",full-width,error bars +-0.114 (>=4 cells) / +-0.171 (3 cells); effective-beta alt 1.0547
+Fig 7,fig7_family_b,"onset_law_extended.csv, onset_family_b.csv, r_family_b.csv","(a) A 6 cells / B 2 bracketed of 3  (b) 5 alpha values, 200 runs each",full-width,compensation exponent -0.475; product range 4.9x vs G* 19x
+Fig 8,fig8_link,"gelu_scale_*.csv, monotonic_zero.md","200 per arm; floor n=5,580",single-column,Clopper-Pearson 95%; up-vs-down Fisher one-sided p=1.5e-6

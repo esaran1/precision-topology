@@ -7,7 +7,13 @@ FINDING: and reported, never silently reconciled.
 Known multi-valued quantities (watch list):
   alpha            1.1172 (1k-160k, 8 cells) | 1.1084 (2k-128k window-matched)
                    | 0.72-1.51 across sub-ranges
-  onset exponent   -0.7340 (6 cells) | -0.8305 (3 cells, 2k-32k)
+  onset exponent   -0.7340 (6 cells, 2k-128k) | -0.8261 (family A, 4 cells,
+                   2k-32k: the held-out fit). CORRECTED 2026-09-12: this line
+                   previously read "-0.8305 (3 cells, 2k-32k)" as if -0.8305
+                   were a family-A window variant. It is q4's measured onset
+                   exponent -- a DIFFERENT FAMILY. Figure data was always
+                   correct (fig_four_family labels it q4); only this watch-list
+                   comment was wrong.
   through-origin   1.0984 [0.958, 1.239], five-point fit: q2 and family A
                    both included at matched beta = 1.5 (corrected 2026-09-11;
                    earlier 1.0878 / 1.0969 / 1.1240 all used four points)
