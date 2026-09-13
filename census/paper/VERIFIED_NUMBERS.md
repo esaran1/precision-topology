@@ -205,8 +205,47 @@ sample and cannot separate the region.**
 
 **Dense verification**: of 163 width-3 separations re-checked at 100,000
 points, **56 failed = 34.4%**. For GELU specifically, **46 of 81 = 56.8%**.
-Print "roughly a third overall, and more than half of GELU's". Strongest
-witness: **0 errors on 2,000,000 points**, margin 0.28.
+Print "roughly a third overall, and more than half of GELU's".
+
+**Two separate width-3 witnesses, both in this setting. Do not merge them.**
+
+| | the `a = 1.02` offset exhibit | the absolute-value witness |
+|---|---|---|
+| module | `src/offset_witness.py` | `src/witness.py` |
+| fold | frozen `f_{1.02}`, amplified 600x | `pwl_family(-1)`, i.e. `|x|` |
+| points | **1,400,000** (4 samples x 175,000/class) | **2,000,000** (5 x 200k + 1 x 1M) |
+| errors | **0** | **0** |
+| margins | **0.54–0.85** (committed run) | worst **0.284**, per-sample 0.28–0.56 |
+| linking | lk −1 → 0 at the `f_{1.02}` layer | lk −1 → 0 at the fold |
+| artifact | `offset_witness_dense.csv` | `witness.md` |
+
+Neither is a GELU witness — the second is an absolute-value (`pwl_family`)
+construction.
+
+**Margins for the 1.4M exhibit: print 0.54–0.85**, from
+`offset_witness_dense.csv` (0.5406, 0.6205, 0.8455, 0.7068). The figure
+**0.53–0.91** in ledger T25 is from the **original uncommitted run** whose
+sample seeds were not recorded (`AUDIT.md` finding 8); the committed
+reconstruction is the one to cite.
+
+**The four searches at `a = 1.02`** (`offset_search.csv`, 476 rows, **0
+separations**, best 3 eval errors) — all width-3 on linked tori, at the
+**non-monotonic** value `a = 1.02`:
+
+| family | attempts |
+|---|---:|
+| restarts | 400 |
+| CMA-ES | 40 |
+| fine-tunes | 24 |
+| annealing | 12 |
+| **total** | **476** |
+
+**This is a different population from the monotonic searches** behind the
+5,580-run zero. In particular the **120 CMA-ES restarts** reported above are
+**monotonic** (positive control 12/20 at depth 3); the **40** here are at
+`a = 1.02`, which is non-monotonic. Likewise `offset_search.csv`'s 400
+restarts are at `a = 1.02`, while `search_restarts.csv`'s 400 are tanh and
+`sin(0.95)`, both monotonic. **Never add the two 400s or the 40 and 120.**
 
 **Width dependence** (`width_effect.csv`, depth 3, 100 seeds/cell,
 dense-verified):
@@ -296,12 +335,31 @@ correction applied to one-sided values. Either way the arm fails.
   Ahn–Zhang–Sra's *first* condition applicable and was our error to have
   checked only the second.
 
-**The `a = 1.02` exhibit**: a width-3 network whose only non-monotonicity is
-`f_{1.02}` separates **1,400,000 fresh points at 0 errors**, margins 0.53–0.91.
-Four search families find nothing at the same value: **476 attempts total**
-(400 restarts + 24 fine-tunes + 12 anneals + 40 CMA-ES); SGD's best is 3
-errors. (A separate 2,000,000-point witness at 0 errors, margin 0.28, exists
-for the GELU width-3 case — do not merge the two.)
+**What the 1D unreachability claim rests on — corrected 2026-09-13.** An
+earlier version of this section placed the `a = 1.02` exhibit and the "476
+attempts" figure here. **Both belong to the link setting (§3), not to the 1D
+task**, and they have been moved there. See §14.13.
+
+**There is no dedicated four-family search at any 1D parameter value.**
+`src/cmaes.py` is imported only by `src/offset_search.py` and
+`src/search_direct.py`, both of which operate on linked tori at width 3. No 1D
+module runs CMA-ES, annealing, or swap-descent.
+
+The 1D claim rests on **sweep failure, not on a targeted search**, and should
+be stated that way:
+
+| evidence | count |
+|---|---|
+| `fold1d_sweep.csv` | 4,800 per-run rows (6 activations x 12 parameters, 200 seeds/cell at width 1) |
+| `fold1d_refine.csv` | 800 per-run rows |
+| onset sweep cells | 36 cells x 40 seeds = **1,440 runs** |
+| **at `a = 1.02` specifically** | **0 of 200 solved; best run 100 eval errors** |
+
+The honest sentence: *at `a = 1.02` in the 1D task, 200 Adam runs at the
+standard budget produce no solution and the best reaches 100 eval errors,
+while a solution provably exists* (the `|w2| = 1` construction, margin
+2.7e-4). This is weaker than a targeted multi-method search and must not be
+written as one.
 
 ---
 
@@ -847,17 +905,37 @@ The 30-seed `budget_alpha` arm gives 0/30, 0/30, 2/30, 25/30, 27/30, 28/30,
 160,000" is from the larger onset sweep. **Both are right; do not mix the n's
 in one sentence.**
 
-### 14.10 Two witness exhibits, different point counts
+### 14.10 Two witness exhibits, different point counts — and neither is GELU
 
-**1,400,000 points at 0 errors** is the `a = 1.02` all-`f_a` width-3 exhibit
-(margins 0.53–0.91). **2,000,000 points at 0 errors, margin 0.28** is the GELU
-width-3 witness. Different objects — do not merge.
+**1,400,000 points at 0 errors** is the `a = 1.02` offset exhibit
+(`src/offset_witness.py`), margins **0.54–0.85** from the committed run.
+**2,000,000 points at 0 errors, worst margin 0.284** is the **absolute-value**
+witness (`src/witness.py`, `pwl_family(-1)`), **not GELU**. An earlier version
+of this document called the second a "GELU width-3 witness"; that was wrong.
+Both are width-3 link-setting objects. Do not merge them.
 
 ### 14.11 The 4.98x contrast is GELU-over-ReLU
 
 Not GELU-over-tanh. The GELU-over-tanh advantage in the same experiment
 *increases* with budget (251.4 → 478.4), which is the flip seen from the other
 side.
+
+### 14.13 The `a = 1.02` exhibit and the 476 attempts belong to §3, not §4
+
+Traced in source: `src/offset_witness.py` builds `nn.Linear(3,3)` layers on
+`linked_tori` data with `tube_radius = 0.2`, evaluates 175,000 points per class
+across four samples in `R^3`, and reports a linking trace `lk −1 → 0`. It is a
+**width-3 link-setting object**. `src/offset_search.py` (the 476) imports
+`cmaes` and runs on the same data at depths 3, 5 and 8.
+
+An earlier version of this document placed both in §4, which is the **1D**
+exclusion table. That was a mis-scoping in this document; **the paper draft did
+not make the error** — `results_draft.md` and `link_section_draft.md` never
+cite the 1.4M exhibit or the 476 figure. Corrected above.
+
+**Consequence for §4 of the paper**: it has no targeted search to cite, and
+must rest on sweep failure (0 of 200 at `a = 1.02`, best 100 eval errors)
+stated as such.
 
 ### 14.12 Things listed in the brief that do not exist
 
