@@ -1,7 +1,7 @@
 # Part 2b: kappa. Derivation partial; and no conclusion depends on its value.
 
-**Provenance: raised in external expert review** -- "the numerical kappa bound
-needs justification beyond the grid search."
+**Provenance: raised in external review** -- paraphrased, the numerical kappa bound
+needs justification beyond the grid search.
 
 ## The derivation: partial success, reported as such
 

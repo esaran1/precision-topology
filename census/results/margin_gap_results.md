@@ -1,6 +1,6 @@
 # Part 2a: the margin gap. Option 1 unavailable, option 3 succeeds.
 
-**Provenance: raised in external expert review.** The theorem is stated at
+**Provenance: raised in external review.** The theorem is stated at
 fixed margin m; the experiments count sign correctness, which is the m -> 0
 limit where |w2| >= 2m/(kappa*D(a)) degenerates to |w2| >= 0 and says nothing.
 

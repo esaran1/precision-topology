@@ -77,7 +77,7 @@ separates it from the trivial version.
 > (β_B = 1). (2) The "exponent 0.0000" here spans only 8× (2k–16k). Over a
 > matched 64× range (2k–128k) the measured exponent is **+0.25** — family B's
 > onset moves *away* from the threshold as budget grows. See
-> `review_objection1.md`. Both errors were found through external expert
+> `review_objection1.md`. Both errors were found through external
 > review.
 
 

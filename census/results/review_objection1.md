@@ -1,12 +1,11 @@
 # Review objection 1: the amplification measure. Upheld in part, refuted in part.
 
-**Provenance: raised in external expert review** by an author of the paper
-this work builds on, after reading the released code and results. Recorded
-here because the objection changed a committed claim.
+**Provenance: raised in external review.** Recorded here because the
+objection changed a committed claim.
 
-> "For the piecewise family, bounded output weight does not imply bounded
-> amplification: the required scale can diverge through the first-layer
-> weight."
+*Objection, paraphrased:* for the piecewise family, a bounded output weight
+does not imply bounded amplification, because the required scale can diverge
+through the first-layer weight instead.
 
 ## Upheld: family B's requirement diverges, and T28 was wrong
 

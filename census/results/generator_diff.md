@@ -1,6 +1,6 @@
 # Part 4: generator diff against the published appendix
 
-**Provenance: raised in external expert review** -- a mismatch between the
+**Provenance: raised in external review** -- a mismatch between the
 appendix description and our released generator, with details to follow.
 Posture per the brief: **assume ours is wrong until shown otherwise.**
 

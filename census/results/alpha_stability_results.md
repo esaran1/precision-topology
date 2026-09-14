@@ -1,8 +1,8 @@
 # Part 3: alpha stability and error propagation. Objection upheld on 3a.
 
-**Provenance: raised in external expert review** -- "the fitted weight-growth
+**Provenance: raised in external review** -- paraphrased, the fitted weight-growth
 exponent changes substantially with the budget range, so its stability and the
-uncertainty in the onset exponents need closer examination."
+uncertainty in the onset exponents need closer examination.
 
 ## 3a: alpha is NOT stable. It is still drifting at the largest budget.
 
