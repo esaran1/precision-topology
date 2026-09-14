@@ -25,18 +25,34 @@ depth `D(a) = f_a(t_max) - f_a(t_min)` vanishes as the threshold is approached.
 where `G(w1, b1)` is the class gap realized by that traversal, and
 `kappa = G*/D` with `G*` the maximum gap over all `(w1, b1)`.
 
-The bound is stated in terms of `D(a)`. In the limit `a -> 1+`,
-`D(a) ~ (8/3)(a-1)^{3/2}`; **we state this asymptotic separately because it is
-inaccurate over the range we measure**, overstating `D` by 42.7% at `a = 1.02`
-and by 136.1% at `a = 3.0`. All computations use `D(a)` exactly. The local
+The bound is stated in terms of `D(a)`, which has the closed form
+`D(a) = 2(sqrt(a^2 - 1) - arccos(1/a))`. In the limit `a -> 1+`,
+`D(a) ~ (4*sqrt(2)/3)(a-1)^{3/2}`; **we state this asymptotic separately
+because its accuracy degrades across the range we measure**, from 0.9% at
+`a = 1.02` to 66.9% at `a = 3.0`. All computations use `D(a)` exactly. The local
 logarithmic slope of `D` over the range our onsets span (`eps = 0.03` to
-`0.60`) is **1.4364**, so the asymptotic exponent 3/2 describes the measured
-range to 4.2% even though its prefactor does not.
+`0.60`) is **1.4233**, so the asymptotic exponent 3/2 describes the measured
+range to 5.1% even though its prefactor does not.
 
 Two features of the bound are worth stating precisely. `b2` cancels in the
 derivation, so the bound holds for the optimal `b2` and no choice of `b2`
 evades it. And `w1` cannot substitute for `w2`: `w1` enters only through `G`,
 which is bounded above by `kappa * D(a)` however `w1` is chosen.
+
+**Scope: the bound is for a single hidden unit and does not extend to wider
+networks.** At width `> 1` several units can split the two required sign
+changes between them, and the argument yields only
+`sum_i |w2_i| G_i >= 2m`, which no single coordinate need satisfy. Every use
+of the bound in this paper is at width 1; the width-3 experiments of §2 are
+governed by the topological impossibility of Ren & Lim, not by this bound.
+
+**`G*` is obtained by numerical maximisation**, over a neighbourhood of the
+analytic optimum rather than the whole `(w1, b1)` plane. High-resolution
+refinement finds gaps 0.3-0.7% larger, so our estimate is a **lower bound** on
+the true `G*` and the bound we check against is correspondingly slightly too
+strong: the verification is **conservative**, and re-checking all 66 solvers
+with `G*` inflated by 0.7% still gives 0 violations (minimum slack 1.0394 ->
+1.0467). We do not claim the maximisation is global.
 
 **`kappa` is a numerically obtained constant, not a derived one.** We prove
 that it depends only on the window *ratios* and not their absolute scale --
