@@ -212,46 +212,48 @@ than at the median. With `u = (a - 1) * B^{theta}`, the claim would be that
 solve rate is a single function `F(u)`.
 
 **Location is universal.** Scanning `theta` and refitting `F` at each value,
-the residual is minimized at **`theta = 0.7250`**, bootstrap 95% interval over
+the residual is minimized at **`theta = 0.7500`**, bootstrap 95% interval over
 cells **[0.500, 0.888]**, which contains the onset-derived **0.7340**. Two
 estimators built on different information -- 36 rate cells against 6 crossings
--- agree. Fitting each budget separately, the collapse midpoints span
-**1.39x** in `u` across a 32x range of budget. This is genuine corroboration
+-- agree to within 2.2%. Fitting each budget separately, the collapse
+midpoints span **1.41x** in `u` across a 32x range of budget. This is genuine corroboration
 of the location claim, from data the onset fit discards.
 
 **Shape is not.** The same per-budget fits give logistic slopes rising
-**7.6-fold**, from 3.94 at 4,000 steps to 29.82 at 128,000, with
-**`k ~ B^{0.612}`, `r = 0.974`**. The transition is not merely moving, it is
+**16-fold**, from 3.72 at 4,000 steps to 60.0 at 128,000, with
+**`k ~ B^{0.777}`, `r = 0.944`**. The transition is not merely moving, it is
 **becoming more abrupt**: the width of the region where outcome is uncertain
-narrows as `B^{-0.612}`.
+narrows as `B^{-0.777}`.
 
 **No choice of exponent can absorb this, and the reason is structural rather
 than a complaint about fitting.** Since `log u = log eps + theta * log B`,
 changing `theta` translates every curve in `log u` and leaves its slope
 untouched. Slopes that differ across budgets therefore cannot be collapsed by
 any `theta` whatsoever. Consistently, the residual minimum is shallow: it
-sits only **1.62x** below the residual at `theta = 0` and **1.48x** below that
+sits only **1.82x** below the residual at `theta = 0` and **1.63x** below that
 at `theta = 1.5`, against a factor of 2 fixed in advance as the pass
-condition. The pooled residual is **3.55x** the binomial sampling noise at 40
+condition. The pooled residual is **3.24x** the binomial sampling noise at 40
 seeds per cell, so the misfit is real rather than noise.
 
 **The obvious repair does not work either.** Adding one budget-dependent
-shape exponent would fix family A and q2, which sharpen at `B^{0.612}` and
+shape exponent would fix family A and q2, which sharpen at `B^{0.777}` and
 `B^{0.428}`. It would not fix **q1, which broadens** (`B^{-0.718}`,
 `r = -0.906`). The shape is not a single universal function of budget across
 families, so a one-parameter extension of the law is ruled out by the data we
 already have.
 
-**Threshold independence, in the range where it can be tested.** Extracting
-onsets at 25%, 50% and 75% and refitting: 50% and 75% agree to four decimals
-(**-0.7325** each, reproducing the committed -0.7340), while 25% gives
-**-0.5037** and is bracketed at only **3 of 6** budgets against 6 and 5. All
-three intervals overlap. The deviation at 25% is what the sharpening predicts:
-propagating the fitted per-budget shapes forward implies a 25% exponent of
-**-0.6177**, the same direction and rough size as the -0.5037 measured. The
-50% convention is therefore immaterial where the level is well bracketed, and
-the low-threshold behaviour is a consequence of the shape drift rather than a
-separate effect.
+**Threshold independence holds.** Extracting onsets at 25%, 50% and 75% and
+refitting gives **-0.6581** (4 of 6 bracketed), **-0.7367** (6 of 6) and
+**-0.7487** (5 of 6). All three intervals overlap and all three contain the
+headline **-0.7340**, so **the 50% convention is immaterial** -- the whole
+curve translates, and any crossing level recovers the same exponent. The
+residual ordering (25% shallowest) is the direction the sharpening predicts,
+since a steepening curve moves its low quantile least.
+
+*An earlier version of this paragraph reported the 25% level as an anomaly
+(-0.5037, bracketed at only 3 of 6 budgets). That was traced to three
+mistyped rate cells in a committed artifact, found by regenerating the sweep
+from source and corrected; see the reproducibility statement.*
 
 **Pooled across families, the collapse is weak.** Scaling each family by its
 own `theta = alpha / beta_family` over 84 cells gives a residual of 0.2340

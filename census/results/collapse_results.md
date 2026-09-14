@@ -211,3 +211,19 @@ over 32x of budget.
 
 These belong together in the paper: the law's *location* claim survives four
 tests and its *distributional* claim does not survive any of them.
+
+
+> **Correction (2026-09-13), from end-to-end regeneration.** Three `B = 8,000` rate cells in `onset_curves.csv` were hand-transcribed wrongly by `onset_resume.py` (0.875/0.850/0.475 at a = 1.20/1.18/1.16 against the logged and regenerated 0.775/0.600/0.200). Every number on this page that consumes those rates is superseded:
+>
+> | quantity | as reported here | corrected |
+> |---|---:|---:|
+> | collapse minimising `theta` | 0.7250 | **0.7500** |
+> | residual at minimum | 0.1780 | **0.1644** |
+> | selectivity vs `theta=0` / `1.5` | 1.62x / 1.48x | **1.82x / 1.63x** |
+> | residual / binomial noise | 3.55x | **3.24x** |
+> | midpoint spread | 1.39x | **1.41x** |
+> | sharpening | `k ~ B^0.612`, r = 0.974, 7.6-fold | **`k ~ B^0.777`, r = 0.944, 16-fold** |
+> | 25% exponent | −0.5037 (3 of 6 bracketed) | **−0.6581 (4 of 6)** |
+> | 50% / 75% exponent | −0.7325 / −0.7325 | **−0.7367 / −0.7487** |
+>
+> **The registered verdicts do not change**: the factor-2 collapse condition is still NOT met (1.82x < 2), so the shape claim still fails, and the sharpening is if anything stronger. **Threshold independence now PASSES** rather than being partial — all three levels overlap and contain the headline −0.7340. The 25% anomaly was the transcription error. See `regeneration_finding.md` and `notes/instrument_artifacts.md` instance 5.

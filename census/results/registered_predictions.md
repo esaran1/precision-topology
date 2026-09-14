@@ -77,9 +77,9 @@ the paper's central claim and is reported in the abstract.
 | `P-1c` | 2026-09-05 | **FAIL** | risky SGD prediction alpha_SGD=0.479 band [0.38,0.58]; measured 0.719 |
 | `P-mnist-2a` | 2026-09-11 | **FAIL** | control failed: monotonic never fails where non-monotonic succeeds; width-1 ordering reverses, p=0.0002 |
 | `P-mnist-2b` | 2026-09-11 | unresolved | not run — gated on 2a, which failed |
-| `P-collapse` | 2026-09-12 | **FAIL** | factor-2 collapse selectivity not met (1.62x/1.48x); curves sharpen rather than translate |
+| `P-collapse` | 2026-09-12 | **FAIL** | factor-2 collapse selectivity not met (**1.82x/1.63x** after the 2026-09-13 artifact correction; was 1.62x/1.48x); curves sharpen rather than translate (**`k ~ B^0.777`, 16-fold**) |
 | `P-heldout` | 2026-09-12 | **FAIL** | predicted eps 0.01872 [0.01403,0.02497] at 128k; measured 0.030, outside, +60.3% |
-| `P-threshold` | 2026-09-12 | PARTIAL | 50% and 75% agree to 4dp; 25% differs (-0.5037) and is bracketed 3/6 |
+| `P-threshold` | 2026-09-12 | **PASS** *(upgraded 2026-09-13)* | all three levels overlap and contain -0.7340: -0.6581 (4/6), -0.7367 (6/6), -0.7487 (5/6). The earlier PARTIAL rested on a 25% value of -0.5037 that was a transcription error in the artifact, found by end-to-end regeneration |
 
 ## Notes on the accounting
 

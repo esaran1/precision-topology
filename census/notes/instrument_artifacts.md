@@ -1,7 +1,7 @@
 # Instrument limitations read as properties of the object
 
 A short methodological note, written because this project has now made
-this class of error **five times** — twice in unrelated strands, a
+this class of error **six times** — twice in unrelated strands, a
 third time in a distinct form within the same instrument, and a fifth in
 the write-up rather than the measurement — and caught each only through
 an independent route. It is transferable to anyone
@@ -12,9 +12,11 @@ The five instances: a projection that returns the right answer for the
 wrong reason (1), a scan whose resolution floor was read as a property
 of the object (2a), the same scan's *parameter-dependent* bias
 contaminating a comparison across that parameter (2b), a probe whose own
-construction dominated the quantity it was measuring (3), and a verifier
+construction dominated the quantity it was measuring (3), a verifier
 that checked the document against itself and so could not see that every
-copy of a number was the same wrong number (4).
+copy of a number was the same wrong number (4), and a hand-transcribed value
+in a committed artifact, which inherits no check that operates on artifacts
+(5).
 
 ## The pattern
 
@@ -174,6 +176,57 @@ interpretive audit. None of those touched this fit, because it was
 written inline in a results document rather than in a checked script.
 **A quantity computed inside prose is outside every verifier you own.**
 
+## Instance 5: a hand-transcribed value in a committed artifact (2026-09-13)
+
+Every verifier in this project checks **numbers against artifacts**. That
+structure has an exact blind spot, and this instance is it.
+
+`results/onset_curves.csv` held three wrong rate values at `B = 8,000`:
+0.875 / 0.850 / 0.475 at `a` = 1.20 / 1.18 / 1.16, against 0.775 / 0.600 /
+0.200 in the run's own log and in a from-source regeneration. **The log and
+the regeneration agree exactly; the artifact was wrong.**
+
+The cause is mechanical. `src/onset_resume.py` was written to resume a sweep
+killed mid-run by a stray `pkill`. The cells that had already completed were
+**not recomputed** — they were transcribed by hand from the log into a
+literal list, and three were mistyped. The script then wrote those literals
+into the artifact in the same format as measured values, where nothing
+distinguishes them.
+
+> **A hand-transcribed value inherits no check that operates on artifacts.**
+> Every verifier we own — the ledger verifier, the figure audit, the
+> quotation checker, the full-precision recomputation of §14 — compares a
+> claim against an artifact. All of them passed, correctly, because the claim
+> *did* match the artifact. The artifact did not match the code that was
+> supposed to have produced it, and no check we had was pointed in that
+> direction.
+
+**What caught it**: regenerating the sweep from current source and diffing
+against the committed artifact. This is the only detector in the project that
+compares **artifact against code** rather than claim against artifact, and it
+was run once, at the end, because the brief asked for it.
+
+**`onset_resume.py` is the only script in the repository that hardcodes prior
+measurements** (checked across all of `src/`). It is now annotated to say so.
+That is the transferable rule: any script that embeds previously-measured
+values rather than recomputing them is outside every artifact-based check, and
+should be marked as such at the point where the literals appear.
+
+**Two things this instance also settled, both favourable and neither
+anticipated:**
+
+1. **The bracketing rule absorbed the error.** The onset at `B = 8,000` is
+   1.18 under both sets of values, because 0.475 and 0.200 are both below the
+   50% threshold and 1.20 is above it either way. A rule that reads only
+   *which side of a threshold* a cell falls on is insensitive to exactly this
+   class of corruption — an unintended argument for the rule.
+2. **Both derived quantities moved toward the rest of the evidence.** The
+   collapse minimising `theta` went 0.7250 → **0.7500** against an
+   onset-derived 0.7340, and the 25% threshold exponent went −0.5037 at 3 of 6
+   bracketed → **−0.6581 at 4 of 6**, close to the 50% level's −0.7367. **The
+   outlier that made threshold-independence look weak was the transcription
+   error.** A caveat in the paper became supporting evidence.
+
 ## Why all of these were caught only from outside the measurement
 
 None of these errors was found by examining the measurement more
@@ -207,12 +260,17 @@ carefully.
   first reported it, which shows a flagged-but-uncarried caveat is
   worth about as much as no caveat at all.
 
+- Instance 5 was caught by **regenerating the artifact from code and diffing**
+  — the only check that runs in that direction. Every artifact-based verifier
+  passed, and each was right to: the claim matched the artifact. The defect
+  was upstream of everything they inspect.
+
 - Instance 4 was caught by **recomputation from source**, and could not
   have been caught by the check designed for it: the consistency pass
   compared copies of the number to each other, and they agreed. The
   detector had to bypass the text entirely and go to the CSV.
 
-Six independent detectors, none of them "look at the scan again":
+Seven independent detectors, none of them "look at the scan again":
 a known-answer control, a theoretical prediction, a language audit, an
 independent re-derivation, a confound-removing re-measurement, and a
 recomputation from source.
@@ -265,6 +323,15 @@ recomputation from source.
    outside every script your verifiers cover. Either the computation
    lives in a checked script that emits the number, or it gets its own
    recomputation pass.
-10. **Derive theory even in an empirical project.** The single highest-
+10. **Regenerate artifacts from code, not just claims from artifacts.** Every
+    verifier that compares a claim to a stored number shares one blind spot:
+    it cannot see an artifact that the current code would not produce. Run the
+    sweep again and diff. Once, before submission, is enough to find the
+    class.
+11. **Mark every hardcoded measurement at the point it appears.** A literal
+    copied from a log looks identical to a computed value once written to a
+    CSV. If a script must embed prior results, say so in a comment beside the
+    literals, because nothing downstream can tell.
+12. **Derive theory even in an empirical project.** The single highest-
    value output of the theorem work so far was not the theorem; it was
    the empirical error the theorem exposed.
