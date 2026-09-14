@@ -39,6 +39,13 @@ derivation, so the bound holds for the optimal `b2` and no choice of `b2`
 evades it. And `w1` cannot substitute for `w2`: `w1` enters only through `G`,
 which is bounded above by `kappa * D(a)` however `w1` is chosen.
 
+**Orientation.** `G` as written is the gap for `w2 > 0`; for `w2 < 0` the roles
+of the two regions mirror. Nothing is lost by computing only the first: `f_a`
+is odd and both `I` and `O` are symmetric about the origin, so
+`(w1, b1) -> (-w1, -b1)` carries one orientation's gap exactly onto the
+other's, and `G*` is therefore the same in both. The uniform bound holds for
+either sign of `w2`; only the pointwise form needs the mirror clause.
+
 **Scope: the bound is for a single hidden unit and does not extend to wider
 networks.** At width `> 1` several units can split the two required sign
 changes between them, and the argument yields only
@@ -49,10 +56,14 @@ governed by the topological impossibility of Ren & Lim, not by this bound.
 **`G*` is obtained by numerical maximisation**, over a neighbourhood of the
 analytic optimum rather than the whole `(w1, b1)` plane. High-resolution
 refinement finds gaps 0.3-0.7% larger, so our estimate is a **lower bound** on
-the true `G*` and the bound we check against is correspondingly slightly too
-strong: the verification is **conservative**, and re-checking all 66 solvers
-with `G*` inflated by 0.7% still gives 0 violations (minimum slack 1.0394 ->
-1.0467). We do not claim the maximisation is global.
+the true `G*`. Under-estimating `G*` makes the bound `2m/G*` **larger**, hence
+**harder** to satisfy, so the verification is **conservative rather than
+wrong**: re-checking all 66 solvers with `G*` inflated by 0.7% still gives 0
+violations, with minimum slack rising from 1.0394 to 1.0467. **Refinement never
+found a gap smaller than the restricted search returns**, at any `a` tested,
+which rules out the failure mode that would matter -- an over-estimate would
+make the bound too weak to constrain anything. We do not claim the maximisation
+is global.
 
 **`kappa` is a numerically obtained constant, not a derived one.** We prove
 that it depends only on the window *ratios* and not their absolute scale --
@@ -265,11 +276,6 @@ headline **-0.7340**, so **the 50% convention is immaterial** -- the whole
 curve translates, and any crossing level recovers the same exponent. The
 residual ordering (25% shallowest) is the direction the sharpening predicts,
 since a steepening curve moves its low quantile least.
-
-*An earlier version of this paragraph reported the 25% level as an anomaly
-(-0.5037, bracketed at only 3 of 6 budgets). That was traced to three
-mistyped rate cells in a committed artifact, found by regenerating the sweep
-from source and corrected; see the reproducibility statement.*
 
 **Pooled across families, the collapse is weak.** Scaling each family by its
 own `theta = alpha / beta_family` over 84 cells gives a residual of 0.2340
