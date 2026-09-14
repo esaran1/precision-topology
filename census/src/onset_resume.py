@@ -23,6 +23,14 @@ def rate_at(a: float, budget: int) -> float:
 
 
 def main() -> None:
+    # WARNING (2026-09-13): these are HAND-TRANSCRIBED literals from
+    # onset_law.log, not measurements made by this script.  End-to-end
+    # regeneration found three of the B=8,000 values mistyped
+    # (1.20/1.18/1.16 written as 0.875/0.850/0.475 against the logged and
+    # regenerated 0.775/0.600/0.200).  onset_curves.csv has been corrected.
+    # The onset (1.18, bracketed at 1.16) and every reported number are
+    # unaffected.  See results/regeneration_finding.md.
+    # Hardcoded values like these sit outside every verifier in the repo.
     # recovered from the killed run's log
     curves = [(2_000, 1.60, 0.550), (2_000, 1.55, 0.450),
               (8_000, 1.30, 0.900), (8_000, 1.25, 0.875), (8_000, 1.22, 0.875),
