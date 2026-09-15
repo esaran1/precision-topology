@@ -343,100 +343,119 @@ def fig2_exclusions() -> None:
 
 # ------------------------------------------------------------ Figure 3 ----
 def fig3_r_collapse() -> None:
+    """The paper's central object: P(solve | R), three optimisers, one curve.
+
+    Panel (a) pooled over 3,150 runs with Clopper-Pearson intervals.
+    Panel (b) the three optimisers as distinct series -- the point of the
+    panel is that they lie on the same curve despite terminal weight scales
+    spanning 5x (alpha 1.2627 / 0.9802 / 0.7188).  AdamW is included because
+    its decoupled weight decay OPPOSES the mechanism.
+    Panel (c) AUC: R against its two factors, per family, with bootstrap CIs.
+    Provenance: r_pooled.csv, r_adamw.csv, r_families.csv, r_family_b.csv.
+    """
+
     d = pd.read_csv(RESULTS / "r_pooled.csv")
+    aw = pd.read_csv(RESULTS / "r_adamw.csv").rename(columns={"optimizer": "opt"})
     fam = pd.read_csv(RESULTS / "r_families.csv")
     fb = pd.read_csv(RESULTS / "r_family_b.csv")
-    fig = plt.figure(figsize=(DBL, 4.4))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.25, 1.0], hspace=0.5, wspace=0.28)
 
+    pooled = pd.concat([d[["opt", "R", "solved"]], aw[["opt", "R", "solved"]]],
+                       ignore_index=True)
+    pooled["solved"] = pooled.solved.astype(bool)
+
+    fig = plt.figure(figsize=(DBL, 4.5))
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.2, 1.0], hspace=0.62, wspace=0.28)
+
+    # --- (a) pooled curve -------------------------------------------------
     ax = fig.add_subplot(gs[0, :])
-    edges = np.array([0, .1, .2, .25, .3, .32, .34, .36, .38, .4, .45, .5, .6, .8, 1.2, 2.0, 1e9])
-    d = d.copy()
-    d["bin"] = pd.cut(d.R, edges)
-    g = d.groupby("bin", observed=True).agg(n=("solved", "size"), k=("solved", "sum")).reset_index()
+    edges = np.array([0, .1, .2, .25, .3, .32, .34, .36, .38, .4, .45, .5,
+                      .6, .8, 1.2, 2.0, 1e9])
+    p2 = pooled.copy()
+    p2["bin"] = pd.cut(p2.R, edges)
+    g = p2.groupby("bin", observed=True).agg(n=("solved", "size"),
+                                             k=("solved", "sum")).reset_index()
     g["mid"] = [min(b.mid, 2.2) for b in g["bin"]]
     g = g[g.n >= 5]
     lo, hi = zip(*[clopper_pearson(int(k), int(n)) for k, n in zip(g.k, g.n)])
-    rate = g.k / g.n
-    ax.axvspan(0.30, 0.50, color="0.85", alpha=0.7, zorder=0)
+    rate = (g.k / g.n).values
+    ax.axvspan(0.30, 0.50, color="0.86", alpha=0.8, zorder=0)
     ax.errorbar(g["mid"], rate, yerr=[rate - np.array(lo), np.array(hi) - rate],
-                marker="o", ls="-", color="#1f77b4", ms=3.5, lw=1.0, capsize=1.5)
+                marker="o", ls="-", color="#222222", ms=3.5, lw=1.0, capsize=1.5)
     ax.set_xscale("log")
     ax.set_xlabel(r"$R = |w_2|\,G^*(a)/2$   (margin capacity)")
     ax.set_ylabel(r"$P(\mathrm{solve})$")
-    ax.set_ylim(-0.04, 1.06)
-    ax.text(0.315, 0.40, "transition\n0.30–0.50", fontsize=6.5)
-    ax.text(0.055, 0.72, "0 of 2,160\nsolved", fontsize=6.5, color="#1f77b4")
-    ax.text(0.70, 0.30, "402 of 403\nsolved", fontsize=6.5, color="#1f77b4")
-    ax.set_title(r"(a) pooled over 2,910 runs: 12 values of $a$, 6 budgets, both optimisers"
-                 "\n(Clopper–Pearson 95% intervals)", fontsize=7.5)
+    ax.set_ylim(-0.05, 1.08)
+    n_lo = int((pooled.R < 0.30).sum()); k_lo = int(pooled[pooled.R < 0.30].solved.sum())
+    n_hi = int((pooled.R > 0.50).sum()); k_hi = int(pooled[pooled.R > 0.50].solved.sum())
+    ax.text(0.055, 0.30, f"{k_lo} of {n_lo:,}\nsolved", fontsize=6.5, ha="center")
+    ax.text(0.95, 0.55, f"{k_hi} of {n_hi:,}\nsolved", fontsize=6.5, ha="center")
+    ax.text(0.505, 0.30, "transition\n0.30–0.50", fontsize=6.5, ha="left")
+    ax.set_title(rf"(a) pooled over {len(pooled):,} runs: 12 values of $a$, "
+                 r"8 budgets, three optimisers (Clopper–Pearson 95%)", fontsize=7.5)
     ax.grid(alpha=0.25, lw=0.3)
 
+    # --- (b) three optimisers --------------------------------------------
     axo = fig.add_subplot(gs[1, 0])
     ac = d[d.src == "alpha_comp"]
-    labels, ps = [], []
-    for (name, lo_, hi_) in (("R<0.3", 0, 0.3), ("0.3–0.5", 0.3, 0.5), ("R>0.5", 0.5, 1e9)):
-        sub = ac[(ac.R >= lo_) & (ac.R < hi_)]
-        A, S = sub[sub.opt == "adam"], sub[sub.opt == "sgd"]
-        ka, na = int(A.solved.sum()), len(A)
-        ks, ns = int(S.solved.sum()), len(S)
-        labels.append(name)
-        ps.append(fisher_two_sided(ka, na - ka, ks, ns - ks) if na and ns else np.nan)
-        for off, (k, n, c, mk) in ((-0.13, (ka, na, "#1f77b4", "o")),
-                                   (0.13, (ks, ns, "#d62728", "s"))):
-            if n:
-                r = k / n
-                l, h = clopper_pearson(k, n)
-                axo.errorbar(len(labels) - 1 + off, r, yerr=[[r - l], [h - r]],
-                             marker=mk, color=c, ms=4, capsize=1.5, lw=1.0)
-    axo.set_xticks(range(len(labels)))
-    axo.set_xticklabels(labels)
-    axo.set_ylim(-0.08, 1.15)
+    arms = [("Adam", ac[ac.opt == "adam"], "o", "#1f77b4", "-"),
+            ("AdamW", aw, "D", "#2ca02c", "--"),
+            ("SGD", ac[ac.opt == "sgd"], "s", "#d62728", "-.")]
+    labels = ["$R{<}0.3$", "$0.3{-}0.5$", "$R{>}0.5$"]
+    for off, (nm, gg, mk, c, ls) in zip((-0.16, 0.0, 0.16), arms):
+        xs, ys, el, eh = [], [], [], []
+        for i, (lo_, hi_) in enumerate(((0, 0.3), (0.3, 0.5), (0.5, 1e9))):
+            sub = gg[(gg.R >= lo_) & (gg.R < hi_)] if hi_ < 1e8 else gg[gg.R > lo_]
+            if len(sub) < 1:
+                continue
+            k, n = int(sub.solved.astype(bool).sum()), len(sub)
+            r = k / n
+            l, h = clopper_pearson(k, n)
+            xs.append(i + off); ys.append(r); el.append(r - l); eh.append(h - r)
+        axo.errorbar(xs, ys, yerr=[el, eh], marker=mk, ls="none", color=c,
+                     ms=4.5, capsize=1.5, lw=1.0, label=nm)
+    axo.set_xticks(range(3)); axo.set_xticklabels(labels)
+    axo.set_ylim(-0.1, 1.22)
     axo.set_ylabel(r"$P(\mathrm{solve})$")
-    for i, p in enumerate(ps):
-        axo.text(i, 1.04, f"$p={p:.2f}$", ha="center", fontsize=6)
-    axo.plot([], [], "o", color="#1f77b4", label="Adam")
-    axo.plot([], [], "s", color="#d62728", label="SGD")
-    axo.legend(frameon=False, loc="lower right", fontsize=6)
-    axo.set_title(r"(b) same curve for both optimisers ($a=1.25$, $n=180$ each)"
-                  "\nFisher exact, two-sided", fontsize=7.5)
+    axo.legend(frameon=False, ncol=3, fontsize=6, loc="upper left")
+    axo.set_title("(b) three optimisers, one curve\n"
+                  r"all nine Fisher tests null, min $p=0.674$", fontsize=7.5)
     axo.grid(alpha=0.25, lw=0.3)
 
+    # --- (c) AUC per family ----------------------------------------------
     axa = fig.add_subplot(gs[1, 1])
     sets = [("A", d.R.values, d.w2.values, d.gstar.values, d.solved.values),
             ("q2", *[fam[fam.q == 2.0][c].values for c in ("R", "w2", "gstar", "solved")]),
             ("q1", *[fam[fam.q == 1.0][c].values for c in ("R", "w2", "gstar", "solved")]),
             ("B", fb.R.values, fb.w2_abs.values, fb.gstar.values, fb.solved.values)]
     w = 0.26
-    for j, (lab, mk, c) in enumerate((("$R$", "o", "#1f77b4"),
-                                      (r"$|w_2|$", "s", "#d62728"),
-                                      (r"$G^*$", "^", "#2ca02c"))):
+    for j, (lab, c, hatch) in enumerate(((r"$R$", "#1f77b4", ""),
+                                         (r"$|w_2|$", "#d62728", "//"),
+                                         (r"$G^*$", "#2ca02c", ".."))):
         xs, ys, es = [], [], [[], []]
         for i, (fname, R_, W_, G_, S_) in enumerate(sets):
             v = (R_, W_, G_)[j]
-            a_ = auc(v, S_)
-            l, h = auc_ci(v, S_)
-            xs.append(i + (j - 1) * w)
-            ys.append(a_)
-            es[0].append(a_ - l)
-            es[1].append(h - a_)
+            a_ = auc(v, S_); l, h = auc_ci(v, S_)
+            xs.append(i + (j - 1) * w); ys.append(a_)
+            es[0].append(a_ - l); es[1].append(h - a_)
         axa.bar(xs, ys, width=w * 0.9, color=c, alpha=0.75, label=lab,
-                edgecolor="k", lw=0.4, hatch=["", "//", ".."][j])
+                edgecolor="k", lw=0.4, hatch=hatch)
         axa.errorbar(xs, ys, yerr=es, fmt="none", ecolor="k", capsize=1.5, lw=0.7)
     axa.set_xticks(range(len(sets)))
     axa.set_xticklabels([s[0] for s in sets])
-    axa.set_ylim(0.3, 1.04)
-    axa.axhline(0.5, color="k", lw=0.5, ls=":")
+    axa.set_ylim(0.3, 1.06); axa.axhline(0.5, color="k", lw=0.5, ls=":")
     axa.set_ylabel("AUC (solved vs not)")
     axa.set_xlabel("activation family")
     axa.legend(frameon=False, ncol=3, fontsize=6, loc="lower left")
-    axa.set_title(r"(c) $R$ dominates its factors — except family B ($\beta{=}1$)"
-                  "\n1,500-resample bootstrap 95% CI", fontsize=7.5)
+    axa.set_title(r"(c) $R$ beats both factors — except family B ($\beta{=}1$)",
+                  fontsize=7.5)
     axa.grid(alpha=0.25, lw=0.3, axis="y")
+
     save(fig, "fig3_r_collapse")
-    record("Fig 3", ["r_pooled.csv", "r_families.csv", "r_family_b.csv"],
-           "(a) 2,910  (b) 180/optimiser  (c) A 2,910 / q2 360 / q1 360 / B 1,000",
-           "Clopper-Pearson on rates; bootstrap CI on AUC; Fisher exact on (b)")
+    record("Fig 3", ["r_pooled.csv", "r_adamw.csv", "r_families.csv", "r_family_b.csv"],
+           f"(a) {len(pooled):,}  (b) Adam 180 / AdamW 240 / SGD 180  "
+           "(c) A 2,910 / q2 360 / q1 360 / B 1,000",
+           "Clopper-Pearson on rates; 1,500-resample bootstrap on AUC; "
+           "Fisher exact two-sided on (b)")
 
 
 # ------------------------------------------------------------ Figure 4 ----

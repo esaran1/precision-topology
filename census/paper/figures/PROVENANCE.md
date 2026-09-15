@@ -19,9 +19,9 @@ their artifacts on each run (see the audit block at the top of output).
 
 ## Fig 3 (`fig3_r_collapse.pdf`, full-width)
 
-- **sources**: r_pooled.csv, r_families.csv, r_family_b.csv
-- **n**: (a) 2,910  (b) 180/optimiser  (c) A 2,910 / q2 360 / q1 360 / B 1,000
-- **uncertainty / notes**: Clopper-Pearson on rates; bootstrap CI on AUC; Fisher exact on (b)
+- **sources**: r_pooled.csv, r_adamw.csv, r_families.csv, r_family_b.csv
+- **n**: (a) 3,150  (b) Adam 180 / AdamW 240 / SGD 180  (c) A 2,910 / q2 360 / q1 360 / B 1,000
+- **uncertainty / notes**: Clopper-Pearson on rates; 1,500-resample bootstrap on AUC; Fisher exact two-sided on (b)
 
 ## Fig 4 (`fig4_metric_check.pdf`, full-width)
 

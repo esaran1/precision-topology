@@ -7,7 +7,16 @@ Date: 2026-09-14. Data: `results/r_adamw.csv` (240 runs).
 
 ---
 
-## The result
+## The result, aggregate first
+
+> **Across three optimisers at `a = 1.25`: no run below `R = 0.30` solved
+> (0 of 361), and every run above `R = 0.50` did (154 of 154). In the
+> transition band all nine pairwise Fisher tests are null, minimum
+> `p = 0.674`, with all three `R50` intervals overlapping.**
+
+Pooled with the rest of the R dataset (3,150 runs, 12 values of `a`, 8
+budgets, three optimisers): **0 of 2,285 below R = 0.30, 460 of 461 above
+R = 0.50.**
 
 **Three optimisers, three different terminal weight scales, one
 `P(solve | R)` curve.**
