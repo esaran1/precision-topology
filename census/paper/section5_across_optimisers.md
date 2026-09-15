@@ -12,8 +12,9 @@ distinction is testable by changing the optimiser, because different optimisers
 reach different weight scales on the same task. **In the three-optimiser
 comparison at `a = 1.25` (600 runs; Figure 3b)**, no run below `R = 0.30`
 solved (**0 of 361**), and every run above `R = 0.50` did (**154 of 154**). The
-same threshold holds over the whole `R` dataset (Figure 3a, 3,150 runs across
-every activation value and budget: 0 of 2,285 below, 460 of 461 above). In the transition band the three agree
+same threshold holds over the **whole pooled dataset** (Figure 3a; 3,150 runs
+across 12 activation values, 8 budgets and all three optimisers: **0 of 2,285**
+below, **460 of 461** above). In the transition band the three agree
 within sampling error: **all nine pairwise Fisher exact tests are null, minimum
 `p = 0.674`**, and the fitted 50% crossings are **Adam 0.3350 [0.3203, 0.3939],
 AdamW 0.3454 [0.3342, 0.3597], SGD 0.3709 [0.3587, 0.3753]**, with all three

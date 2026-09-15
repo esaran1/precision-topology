@@ -369,10 +369,54 @@ written as one.
 terminal weight scale could support under optimal placement. By the theorem
 `R >= m`, so R is the quantity the bound constrains.
 
-**Pooled (2,910 runs; 12 values of `a`, 6 budgets, both optimisers):**
+**THREE populations exist and must never be conflated.** All three are
+correct; each is a different set of runs.
 
-- **below R = 0.30: 0 of 2,160 solved**
-- **above R = 0.50: 402 of 403 solved**
+| population | what it is | n | below R=0.30 | above R=0.50 |
+|---|---|---:|---|---|
+| **pooled, all runs** | `r_pooled.csv` + `r_adamw.csv`; 12 values of `a`, 8 budgets, three optimisers | **3,150** | **0 of 2,285** | **460 of 461** |
+| *pooled, pre-AdamW* | `r_pooled.csv` alone; 12 values of `a`, 6 budgets, Adam+SGD | *2,910* | *0 of 2,160* | *402 of 403* |
+| **three-optimiser comparison** | `a = 1.25` only, Adam/AdamW/SGD | **600** | **0 of 361** | **154 of 154** |
+
+**Print the 3,150 row for any pooled claim** (abstract, Figure 3a). The 2,910
+row is **superseded and stale** — it is the same dataset before AdamW was
+added, not a different quantity. **Print the 600 row only where the text is
+explicitly about the optimiser comparison** (§5.5, Figure 3b).
+
+**Note on the file layout**: AdamW lives in `results/r_adamw.csv`, *not* inside
+`r_pooled.csv`, which still holds 2,910 Adam+SGD rows. The 3,150 figure is the
+union, computed at render time by `make_figures.py`. Any script quoting a
+pooled figure must read **both** files.
+
+**The single non-solving run above R = 0.50, identified.** Both `402 of 403`
+and `460 of 461` have exactly **one** exception, and it is the **same run** —
+AdamW contributed 58 runs above R = 0.50, all solving, so numerator and
+denominator each rose by 58.
+
+| | |
+|---|---|
+| run | `a = 3.0`, seed **13**, Adam, 2,000 steps (`fold1d_sweep.csv`) |
+| weights | `w1 = -1.4521`, `b1 = -1.9446`, `w2 = 1.0994`, `b2 = 2.3314` |
+| `R` | **0.5766** (capacity is adequate) |
+| 200-point sample | **0 errors** — it looks solved at sample level |
+| dense check (4,001 pts) | **11 outer violations**, `x` in [1.2000, 1.2040], worst logit **-0.011** |
+
+**It is a sample-level-only apparent solution**: correct on all 200 sampled
+points, violating the region on a sliver at the very edge of the outer window
+that the sample missed. This is the failure mode the dense regional criterion
+exists to catch — the same one that removed 56 of 163 claimed separations in
+the link setting (§3).
+
+**Ready answer for a reviewer**: R measures *capacity* at optimal placement,
+not achieved placement. This run has the capacity and did not use it; its
+`(w1, b1)` is slightly off, and the shortfall shows up only in a 4-thousandth
+of the outer window. One such run in 461 is consistent with R being necessary
+and very nearly sufficient, which is what we claim.
+
+**AdamW adds no new `a` value** — all 240 of its runs are at `a = 1.25`, which
+is already among the 12 — so the activation-value count stays 12 while the
+budget count rises 6 -> 8 (5,000 and 6,000 were added to populate the
+transition band).
 
 | R bin | n | solved | rate |
 |---|---:|---:|---:|
@@ -404,7 +448,7 @@ binned rate is strictly between 5% and 95%):
 
 | family | n | solved | band n | R | `|w2|` | `G*` | margin |
 |---|---:|---:|---:|---|---|---|---:|
-| A | 2,910 | 579 | 415 | **0.9975** [0.9965, 0.9984] | 0.8393 [0.8246, 0.8543] | 0.8009 [0.7794, 0.8219] | **+0.1583** |
+| A (Adam+SGD only) | 2,910 | 579 | 415 | **0.9975** [0.9965, 0.9984] | 0.8393 [0.8246, 0.8543] | 0.8009 [0.7794, 0.8219] | **+0.1583** |
 | q2 | 360 | 213 | 26 | **0.9998** [0.9994, 1.0000] | 0.9439 [0.9205, 0.9637] | 0.6281 [0.5667, 0.6869] | **+0.0559** |
 | q1 | 360 | 213 | 25 | **0.9995** [0.9982, 1.0000] | 0.9250 [0.8960, 0.9488] | 0.6330 [0.5735, 0.6911] | **+0.0745** |
 | **B** | 1,000 | 578 | 286 | 0.9804 [0.9729, 0.9873] | **0.9901** [0.9821, 0.9965] | 0.3837 [0.3501, 0.4192] | **−0.0097** |
