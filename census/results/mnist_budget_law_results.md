@@ -155,3 +155,6 @@ merely vanish off the obstruction, it can reverse.
 `mnist_fold_id.csv`, `mnist_fold_pilot.csv`, `mnist_fold_pilot_narrow.csv`,
 `mnist_fold_pilot_longbudget.csv`; module `src/mnist_fold.py`; registration
 `results/mnist_budget_law_prediction.md`.
+
+
+> **Reframed for the paper (2026-09-14), numbers unchanged.** This page reports the result as a failed transfer, which is how it was scored against the registration. The paper states the same evidence as a **characterisation**: the phenomenon requires classes not separable by a monotone map through the bottleneck; MNIST does not satisfy that condition at any width tested; and the width-1 reversal shows why — folding identifies distant inputs, so where a fold is unnecessary it is a **cost**. That condition joins the four requirements from the width-axis attempt (§7.5) and is the cheapest of the five to check, since it can be settled by inspecting the task before any network is trained. See `paper/section7_mnist_reframe.md`. Every number is verified unchanged against the artifacts.

@@ -390,7 +390,7 @@ def fig3_r_collapse() -> None:
     ax.text(0.055, 0.30, f"{k_lo} of {n_lo:,}\nsolved", fontsize=6.5, ha="center")
     ax.text(0.95, 0.55, f"{k_hi} of {n_hi:,}\nsolved", fontsize=6.5, ha="center")
     ax.text(0.505, 0.30, "transition\n0.30–0.50", fontsize=6.5, ha="left")
-    ax.set_title(rf"(a) pooled over {len(pooled):,} runs: 12 values of $a$, "
+    ax.set_title(rf"(a) ALL runs pooled: {len(pooled):,} across 12 values of $a$, "
                  r"8 budgets, three optimisers (Clopper–Pearson 95%)", fontsize=7.5)
     ax.grid(alpha=0.25, lw=0.3)
 
@@ -417,8 +417,8 @@ def fig3_r_collapse() -> None:
     axo.set_ylim(-0.1, 1.22)
     axo.set_ylabel(r"$P(\mathrm{solve})$")
     axo.legend(frameon=False, ncol=3, fontsize=6, loc="upper left")
-    axo.set_title("(b) three optimisers, one curve\n"
-                  r"all nine Fisher tests null, min $p=0.674$", fontsize=7.5)
+    axo.set_title(r"(b) three-optimiser comparison at $a=1.25$ ($n=600$)"
+                  "\n" r"all nine Fisher tests null, min $p=0.674$", fontsize=7.5)
     axo.grid(alpha=0.25, lw=0.3)
 
     # --- (c) AUC per family ----------------------------------------------
