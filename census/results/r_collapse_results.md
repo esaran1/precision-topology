@@ -362,3 +362,6 @@ optimizers where the budget law is budget-specific and Adam-specific, and it
 makes the onsets predictable rather than fitted. But the registered failure
 conditions did not all pass cleanly, and restructuring the entire paper around
 R would overstate what 2,910 runs from one activation family support.
+
+
+> **Superseded on the optimiser question (2026-09-14).** A third arm (AdamW, weight decay 0.01, 240 runs, **57 in-band** against Adam's 10) was added with budgets chosen to populate the transition band. All three `R50` intervals overlap and all nine regime-wise Fisher tests are null (min p = 0.6744), so the hedge on this page — 'undetectable at this coverage, not absent' — is replaced by the positive claim that **the optimiser enters only through where on the R axis its runs land**. See `third_optimizer_results.md`.

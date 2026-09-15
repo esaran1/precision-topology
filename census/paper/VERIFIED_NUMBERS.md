@@ -441,12 +441,40 @@ orientation.
 | 0.3 ≤ R ≤ 0.5 | 7/10 | 14/18 | **0.674** |
 | R > 0.5 | 75/75 | 21/21 | **1.000** |
 
-Parametric `R50`: **Adam 0.3350** [0.3203, 0.3933], **SGD 0.3709**
-[0.3586, 0.3753]. The point estimates differ by **0.0359**, which exceeds the
-registered **0.0241** — but the intervals overlap with SGD's nested inside
-Adam's, and Adam has almost no runs in the band. **Print: the optimiser
-difference is undetectable at this coverage, not absent.** Do not claim the
-Adam-only limitation dissolves.
+**Three optimisers, 2026-09-14** (`r_adamw.csv`, registered in
+`third_optimizer_prediction.md`). AdamW was added because decoupled weight
+decay **opposes** the mechanism -- it shrinks `|w2|` at every step -- so
+agreement under it is informative in a way a third adaptive method would not
+be. Budgets 5k/6k were chosen after an 8-seed pilot **to populate the
+transition band**; the pilot measured where runs land, not whether they solve.
+
+| optimiser | n | solved | in-band | `R50` | 95% CI |
+|---|---:|---:|---:|---:|---|
+| Adam | 180 | 82 | 10 | 0.3350 | [0.3203, 0.3939] |
+| AdamW (wd 0.01) | 240 | 99 | **57** | 0.3454 | [0.3342, 0.3597] |
+| SGD | 180 | 35 | 18 | 0.3709 | [0.3587, 0.3753] |
+
+**All three intervals overlap** on [0.3587, 0.3597]. Regime-wise Fisher exact,
+all nine pairwise tests: `R < 0.3` all p = 1.0000 (0/95, 0/125, 0/141);
+`0.3 <= R <= 0.5` p = 1.0000 / 0.6744 / 0.7647 (7/10, 41/57, 14/18);
+`R > 0.5` all p = 1.0000 (75/75, 58/58, 21/21). **Minimum p = 0.6744.**
+
+Across **361 runs below R = 0.3 spanning three optimisers, none solved**;
+across **154 runs above R = 0.5, all solved**.
+
+`alpha` on the shared 1k-40k window: **Adam 1.2627 +- 0.0593**, **AdamW
+0.9802 +- 0.1269**, **SGD 0.7188 +- 0.0238**; terminal `|w2|` at 40k is 97.48,
+30.55, 19.38 (a 5x spread). Different scales, different growth exponents, one
+curve. The registered directional sub-prediction `alpha_adamw < alpha_adam` is
+**confirmed**.
+
+**Print: the optimiser enters only through where on the R axis its runs land.**
+The earlier hedge ("undetectable at this coverage, not absent") is **replaced**.
+Note that on point estimates alone AdamW's gap (0.0251) and Adam's (0.0355)
+both exceed 0.0241; the registered criterion required interval separation **and**
+a significant Fisher test, neither of which occurs. Scope: one task, `a = 1.25`,
+width 1 -- a statement about optimisers, not settings. R remains
+family-specific (T52, T54).
 
 **Residual `a` effect** (logistic `solved ~ log R + a` inside narrow R windows):
 
