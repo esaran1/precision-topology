@@ -85,7 +85,9 @@ def audit_placement() -> None:
         if not pdf.exists():
             continue
         w = float(pypdf.PdfReader(str(pdf)).pages[0].mediabox.width) / 72
-        target = COL_IN if row["placement"] == "single-column" else DBL_IN
+        target = (COL_IN if row["placement"] == "single-column"
+                  else 2 * COL_IN + 0.25 if row["placement"] == "single-column-pair"
+                  else DBL_IN)
         scale = min(target / w, 1.0)
         smallest = 6.5 * scale
         flag = "ok " if smallest >= SMALLEST_PT else "BAD"
@@ -242,61 +244,112 @@ def audit_canonical() -> None:
 
 # ------------------------------------------------------------ Figure 1 ----
 def fig1_setting() -> None:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(DBL, 2.5))
-    t = np.linspace(-6, 6, 800)
-    for (mk, ls, c), a in zip(STYLE, (0.9, 1.05, 2.0)):
-        lab = {0.9: r"$a=0.9$ (monotone)", 1.05: r"$a=1.05$ (just past)",
-               2.0: r"$a=2.0$"}[a]
-        ax1.plot(t, t + a * np.sin(t), ls=ls, color=c, label=lab)
-    # fold depth D on the a=2 curve
+    """The setting: the activation family with its fold, and the task.
+
+    Panel (b)'s two curves are REAL TRAINED PARAMETERS, recovered
+    deterministically from seeds (float64, Adam lr 1e-2, 2,000 steps, the
+    config used for the theorem verification -- note fold1d_sweep.csv runs
+    float32 and its seed-0 run differs):
+
+      solving      a = 1.5, seed 0  -- solves() dense 4,001-point check: True
+      best monotone a = 1.0, seed 38 -- 91/200 sample errors, cannot solve
+
+    a = 1.0 is the monotonicity threshold, so the second curve is the best the
+    monotone regime achieves.  It crosses zero ONCE; the task needs twice.
+    Fold depth is the exact closed form, not measured off the plot.
+    """
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(COL * 2.02, 1.95))
+
+    # --- (a) the activation family ---------------------------------------
+    t = np.linspace(-6.5, 6.5, 900)
+    for (mk, ls, c), a_ in zip(STYLE, (0.9, 1.05, 2.0)):
+        lab = {0.9: r"$a=0.9$", 1.05: r"$a=1.05$", 2.0: r"$a=2.0$"}[a_]
+        ax1.plot(t, t + a_ * np.sin(t), ls=ls, color=c, lw=1.1, label=lab)
+
     a = 2.0
-    crit = np.arccos(-1.0 / a)
+    crit = np.arccos(1.0 / a)                 # local max/min at pi -+ crit
     tmax, tmin = np.pi - crit, np.pi + crit
-    fmax, fmin = tmax + a * np.sin(tmax), tmin + a * np.sin(tmin)
-    ax1.annotate("", xy=(tmin, fmin), xytext=(tmin, fmax),
-                 arrowprops=dict(arrowstyle="<->", lw=0.8, color="k"))
-    ax1.text(tmin + 0.25, (fmax + fmin) / 2, r"$D(a)$", fontsize=7.5)
-    ax1.plot([tmax, tmin], [fmax, fmin], "k.", ms=3.5)
+    fmax = tmax + a * np.sin(tmax)
+    fmin = tmin + a * np.sin(tmin)
+    d_exact = 2.0 * (np.sqrt(a * a - 1.0) - np.arccos(1.0 / a))
+    if abs((fmax - fmin) - d_exact) > 1e-9:
+        finding(f"Fig 1a fold depth {fmax - fmin:.6f} != closed form {d_exact:.6f}")
+    ax1.plot([tmax, tmin], [fmax, fmin], "k.", ms=3.5, zorder=5)
+    xbar = tmin + 1.5
+    ax1.annotate("", xy=(xbar, fmin), xytext=(xbar, fmax),
+                 arrowprops=dict(arrowstyle="<->", lw=0.7, color="k"))
+    ax1.plot([tmax, xbar], [fmax, fmax], color="k", lw=0.4, ls=":")
+    ax1.plot([tmin, xbar], [fmin, fmin], color="k", lw=0.4, ls=":")
+    ax1.text(xbar + 0.25, (fmax + fmin) / 2, r"$D(a)$", fontsize=7, va="center")
     ax1.axhline(0, color="0.85", lw=0.5, zorder=0)
     ax1.set_xlabel(r"$t$")
-    ax1.set_ylabel(r"$f_a(t) = t + a\sin t$")
-    ax1.set_title(r"(a) the activation family", fontsize=8)
-    ax1.legend(loc="upper left", frameon=False)
+    ax1.set_ylabel(r"$f_a(t)$")
+    ax1.set_title("(a) the fold appears at $a=1$", fontsize=7.5)
+    ax1.legend(loc="upper left", frameon=False, fontsize=6, handlelength=1.6,
+               borderpad=0.1, labelspacing=0.25)
+    ax1.grid(alpha=0.2, lw=0.3)
 
-    x = np.linspace(-2.3, 2.3, 700)
-    ax2.axvspan(-0.8, 0.8, color="#1f77b4", alpha=0.13)
-    for lo, hi in ((1.2, 2.0), (-2.0, -1.2)):
-        ax2.axvspan(lo, hi, color="#d62728", alpha=0.13)
-    ax2.plot(x, np.sign(np.abs(x) - 1), color="0.35", lw=1.0, ls=":",
-             label=r"target $\mathrm{sign}(|x|-1)$")
+    # --- (b) the task, two real networks ---------------------------------
+    x = np.linspace(-2.3, 2.3, 900)
+    ax2.axvspan(-0.8, 0.8, color="#1f77b4", alpha=0.13, lw=0)
+    for lo_, hi_ in ((1.2, 2.0), (-2.0, -1.2)):
+        ax2.axvspan(lo_, hi_, color="#d62728", alpha=0.13, lw=0)
 
-    # Parameters are RECOVERED FROM SEEDS, not invented: Adam/lr 1e-2/2,000 steps
-    # at a = 1.5, seed 0 (solves) and seed 3 (fails).  Verified on this grid:
-    # solver inner max logit -0.509 < 0 < 0.051 outer min.
-    def net(w1, b1, w2, b2, a=1.5):
-        return w2 * ((w1 * x + b1) + a * np.sin(w1 * x + b1)) + b2
+    def net(p, a_):
+        z = p[0] * x + p[1]
+        return p[2] * (z + a_ * np.sin(z)) + p[3]
 
-    solver = (0.9437292267391273, 2.3593122836987837,
-              -4.400602112045125, 13.150372704129833)
-    failure = (-0.9983804107073221, -2.306300277491995,
-               3.457569886689401, 10.09746721514516)
+    SOLVER = (0.9437292267391273, 2.3593122836987837,
+              -4.400602112045125, 13.150372704129833)      # a=1.5, seed 0
+    MONO = (-0.8161124460820061, -2.3657288524708325,
+            2.6410341930922247, 7.321862160553577)          # a=1.0, seed 38
+    sv, mv = net(SOLVER, 1.5), net(MONO, 1.0)
+
     inner_m = np.abs(x) <= 0.8
     outer_m = (np.abs(x) >= 1.2) & (np.abs(x) <= 2.0)
-    sv = net(*solver)
     if not (sv[inner_m].max() < 0 < sv[outer_m].min()):
-        finding("Fig 1b 'solving' parameters do not separate on the plot grid")
-    ax2.plot(x, np.tanh(sv), color="#2ca02c", ls="-",
-             label="solving (seed 0, squashed)")
-    ax2.plot(x, np.tanh(net(*failure)), color="#ff7f0e", ls="--",
-             label="non-solving (seed 3)")
-    ax2.axhline(0, color="k", lw=0.5)
+        finding("Fig 1b solving parameters do not separate on the plot grid")
+    # The impossibility argument counts sign changes ACROSS THE TASK WINDOWS
+    # (outer-negative, inner, outer-positive), not on the whole line: the gaps
+    # [0.8, 1.2] are undefined and a crossing there is unconstrained.
+    def window_signs(v):
+        left = np.sign(v[(x >= -2.0) & (x <= -1.2)])
+        mid = np.sign(v[np.abs(x) <= 0.8])
+        right = np.sign(v[(x >= 1.2) & (x <= 2.0)])
+        if not (np.all(left == left[0]) and np.all(mid == mid[0])
+                and np.all(right == right[0])):
+            return None                       # sign not constant on a window
+        return (left[0], mid[0], right[0])
+    ss, ms = window_signs(sv), window_signs(mv)
+    if ss != (1.0, -1.0, 1.0):
+        finding(f"Fig 1b solver window signs {ss}, expected (+,-,+)")
+    if ms is not None and ms == (1.0, -1.0, 1.0):
+        finding("Fig 1b 'monotone' curve achieves the +,-,+ pattern -- "
+                "it would be a solution, which is impossible")
+
+    ax2.plot(x, np.tanh(sv), color="#2ca02c", ls="-", lw=1.2,
+             label=r"non-monotone $a{=}1.5$: solves")
+    ax2.plot(x, np.tanh(mv), color="#ff7f0e", ls="--", lw=1.2,
+             label=r"best monotone $a{=}1.0$: cannot")
+    for c_, v in (("#2ca02c", sv), ("#ff7f0e", mv)):
+        idx = np.where(np.diff(np.sign(v)) != 0)[0]
+        ax2.plot(x[idx], np.zeros(len(idx)), "o", color=c_, ms=3.5, zorder=6)
+    ax2.axhline(0, color="k", lw=0.6)
     ax2.set_xlabel(r"$x$")
-    ax2.set_ylabel("network output")
-    ax2.set_title(r"(b) the task: inner (blue) vs outer (red)", fontsize=8)
-    ax2.legend(loc="lower right", frameon=False)
+    ax2.set_ylabel("output (squashed)")
+    ax2.set_ylim(-1.35, 1.6)
+    ax2.set_title("(b) inner (blue) negative, outer (red) positive",
+                  fontsize=7.5)
+    ax2.legend(loc="lower center", frameon=False, fontsize=6,
+               handlelength=1.8, borderpad=0.1, labelspacing=0.25)
+
     save(fig, "fig1_setting")
-    record("Fig 1", ["analytic (no data)"], "n/a",
-           "f_a at a=0.9/1.05/2.0 with D(a) marked; task regions I=[-0.8,0.8], O=+-[1.2,2.0]")
+    record("Fig 1", ["closed form D(a)", "recovered from seeds (float64)"],
+           "(b) 2 runs: a=1.5 seed 0 (solves, dense-verified); "
+           "a=1.0 seed 38 (best monotone, 91/200 errors)",
+           "fold depth is the exact closed form; sign-change counts asserted "
+           "at render (2 vs 1)", placement="single-column-pair")
 
 
 # ------------------------------------------------------------ Figure 2 ----

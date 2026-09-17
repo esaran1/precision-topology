@@ -5,11 +5,11 @@ Every number is recomputed from the artifact at render time; no
 hand-entered values. Canonical quantities are re-verified against
 their artifacts on each run (see the audit block at the top of output).
 
-## Fig 1 (`fig1_setting.pdf`, full-width)
+## Fig 1 (`fig1_setting.pdf`, single-column-pair)
 
-- **sources**: analytic (no data)
-- **n**: n/a
-- **uncertainty / notes**: f_a at a=0.9/1.05/2.0 with D(a) marked; task regions I=[-0.8,0.8], O=+-[1.2,2.0]
+- **sources**: closed form D(a), recovered from seeds (float64)
+- **n**: (b) 2 runs: a=1.5 seed 0 (solves, dense-verified); a=1.0 seed 38 (best monotone, 91/200 errors)
+- **uncertainty / notes**: fold depth is the exact closed form; sign-change counts asserted at render (2 vs 1)
 
 ## Fig 2 (`fig2_exclusions.pdf`, full-width)
 
