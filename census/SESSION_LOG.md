@@ -33,9 +33,18 @@ Updated as outcomes change. Three most important results so far.
    dropped. Block E runs the **reduced arm set** (control, null, freeze-low,
    freeze-high, jump) at the single switch point, per the registration. The
    freeze-mid and down-hold-mid arms are not defined and are not run.
-   **Still standing**: the measured crossing 0.2332 sits **+8.7% above** the
-   single switch point 0.2145 — a real, consistent offset that Block C's
-   relaxation-lag measurement must explain.
+   Confirmed a second way: the `G > 0` branch followed **downward** from a
+   known good placement is lost at `|w2| = 4.75` (`R = 0.2037`), one grid step
+   below the switch. (The automated scan's `R_fold = 0.1072` was **spurious** —
+   its downward seeding fell through to an unrelated basin; fixed and rerun.)
+   **Block C explains the offset**: measured crossing 0.2332 against switch
+   0.2145 is **+8.7%**, and runs track the conditional branch to **0.8%** in the
+   400 steps before crossing and **0.17%** after, having relaxed onto it from
+   random initialisation (distance 1.09 → 0.83 → 0.39 → 0.15 → 0.008). The
+   offset is **relaxation lag**: a residual gap deficit of 0.0144 on a branch of
+   slope 0.033 per unit `|w2|`. Small, one-signed, consistent.
+   **The derived threshold stands**: `R = 0.2145` at `a = 1.30` from the loss
+   landscape with no training run in it, against a measured 0.2332.
 
 ---
 
@@ -79,3 +88,19 @@ That is the **constant predictor** (`w1 -> 0`): a genuine stationary point of th
 Excluded by `is_degenerate` (`|loss - log 2| < 1e-4` or `|w1| < 1e-3`) at both screening and convergence stages. With it excluded the gap is cleanly monotone at `a = 1.30`: **-0.0401 (4.0), +0.0014 (5.0), +0.0283 (6.0), +0.0606 (8.0)**.
 
 Also in this pass: the scan cost was 21 s per grid point at 50 restarts x 3,000 steps, which is ~0.5 h per `a` for the global scan alone. Restructured to **coarse-bracket then refine**, plus **screen at 600 steps and converge only the best 8** -- 5.8 s per grid point, same answers.
+
+## 2026-09-21 — Block B: `R_fold` from the automated scan is SPURIOUS
+
+The scan reported `R_fold = 0.1072` at `a = 1.30`, which would be a hysteresis window of width 0.107 and would contradict the falsifier already recorded. **Checked directly and it does not hold.**
+
+Seeding the downward continuation from the known good placement at `|w2| = 6.0` (`gap +0.0283`) and stepping down:
+
+| `|w2|` | 5.50 | 5.25 | **5.00** | 4.75 |
+|---|---:|---:|---:|---:|
+| gap | +0.01618 | +0.00916 | **+0.00139** | **−0.00726 LOST** |
+
+The `G > 0` branch is lost at `|w2| = 4.75`, `R = 0.2037` — **one 0.25 grid step below** `R_glob = R_spin = 0.2145`. That is grid resolution, not a window.
+
+**Why the scan was wrong**: its downward pass seeds by screening at the top of the range, and at `|w2| = 9.0` *every* non-degenerate screened candidate is absent — the log-2 constant predictor dominates there, so the seeding fell through to a lower `|w2|` and picked up an unrelated basin. Fixed by seeding the downward branch from `best_conditional` at a mid-range `|w2|` where the good placement is the actual minimiser.
+
+**The falsifier stands: there is no hysteresis window.** `R_fold ≈ R_glob ≈ R_spin ≈ 0.21` to within a grid step. Block E keeps the reduced arm set.

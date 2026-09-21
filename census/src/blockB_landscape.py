@@ -177,18 +177,26 @@ def scan(a: float, x, y, w2max=11.0, step=0.05, w2min=1.5):
     spin = bracket_then_refine(spin_pos, w2min, w2max)
 
     # --- lower spinodal: follow the G>0 branch downward -----------------
+    # Seed the downward branch from a MID-range |w2| where the good placement is
+    # the actual minimiser.  Screening at the top of the range fails: there the
+    # log-2 constant predictor dominates and the seeding falls through to an
+    # unrelated basin, which produced a spurious R_fold of 0.107 at a = 1.30.
     fold = None
-    cur = None
-    for w2 in np.arange(w2max, w2min - 1e-9, -0.25):
+    seed_w2 = None
+    for v in np.arange(w2min, w2max + 1e-9, 0.5):
+        b = best_conditional(a, float(v), x, y, restarts=24)
+        if b is not None and b["gap"] > 0:
+            seed_w2, cur = float(v) + 1.0, None
+            break
+    if seed_w2 is None:
+        return {"a": a, "gstar": gs, "w2_glob": glob,
+                "R_glob": None if glob is None else glob * gs / 2,
+                "w2_spin": spin, "R_spin": None if spin is None else spin * gs / 2,
+                "w2_fold": None, "R_fold": None, "w2_solve": None, "R_solve": None}
+    cur = best_conditional(a, seed_w2, x, y, restarts=24)
+    for w2 in np.arange(seed_w2 - 0.25, w2min - 1e-9, -0.25):
         if cur is None:
-            cands = [minimise(a, float(w2), x, y, seed=sd, steps=SCREEN)
-                     for sd in range(16)]
-            cands = [c for c in cands if not is_degenerate(c) and c["gap"] > 0]
-            if not cands:
-                continue
-            c = min(cands, key=lambda z: z["loss"])
-            cur = minimise(a, float(w2), x, y, start=[c["w1"], c["b1"], c["b2"]])
-            continue
+            break
         nxt = minimise(a, float(w2), x, y, start=[cur["w1"], cur["b1"], cur["b2"]])
         if is_degenerate(nxt) or nxt["gap"] <= 0:
             fold = float(w2)
