@@ -35,6 +35,13 @@ def main() -> None:
     chk("runs above R=0.50", float(len(high)), 461.0, 0)
     chk("solved above R=0.50", float(high.solved.sum()), 460.0, 0)
 
+    print("T56 per-placement theorem check")
+    t = pd.read_csv(R / "theorem_perplacement.csv")
+    chk("solvers checked", float(len(t)), 66.0, 0)
+    chk("per-placement violations", float((~t.ok.astype(bool)).sum()), 0.0, 0)
+    chk("solvers with w2<0", float((t.w2 < 0).sum()), 22.0, 0)
+    chk("median slack", float((t.w2.abs() / t.bound_perplace).median()), 1.2488, 0.001)
+
     print("T43 budget law")
     d = pd.read_csv(R / "onset_law_extended.csv"); d = d[d.bracketed & d.onset.notna()]
     chk("bracketed cells", float(len(d)), 6.0, 0)

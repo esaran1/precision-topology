@@ -1,3 +1,33 @@
+# RETRACTED 2026-09-21 — the effect it registers against does not exist
+
+> **This registration is void.** It was written against a 'precision effect' that
+> was an artifact of my own measurement. `torch.empty(4, dtype=d).uniform_(-1,1)`
+> consumes the RNG stream differently for float32 and float64, so the two arms
+> **started from completely different initialisations** and were never the same
+> seed. The comparison measured ordinary sampling variation between two
+> independent draws, not arithmetic.
+>
+> **The tell was in the data before I interpreted it**: a seed-set overlap ratio
+> of 1.0 against the independence expectation *is* what independent samples look
+> like. I read it as decorrelation caused by the perturbation.
+>
+> **Controlled test, initialisation held fixed and only arithmetic varied:**
+>
+> | `a` | shared init | per-dtype init |
+> |---|---|---|
+> | 1.45 | **60/60 agree (100%)** | 46/60 (77%) |
+> | 1.50 | **60/60 agree (100%)** | 36/60 (60%) |
+>
+> Plus 180 paired runs at a = 1.40/1.45/1.50 with shared init: **0 flips,
+> relative final-parameter distance 0.0000**.
+>
+> **float32 and float64 agree run-for-run.** There is no divergence, no
+> knife-edge, and no reason to treat the transition band as irreproducible.
+> H-divergence and H-knife-edge are both moot. `src/phase1_relog.py` is fixed to
+> draw the initialisation once and cast.
+
+---
+
 # Registration: is the precision effect a terminal knife-edge or trajectory divergence?
 
 **Written before any trajectory distance or divergence step was computed.** The

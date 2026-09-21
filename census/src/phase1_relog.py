@@ -34,8 +34,13 @@ def train(a: float, seed: int, budget: int = STEPS, double: bool = False):
     f = activation("sin_family", a)
     x, y = make_data(N_PER_CLASS, seed)
     torch.manual_seed(seed)
-    theta = torch.empty(4, dtype=torch.float64 if double else torch.float32)
-    theta = theta.uniform_(-1.0, 1.0).requires_grad_(True)
+    # CRITICAL: draw the initialisation in ONE dtype and cast, never per-dtype.
+    # torch's uniform_ consumes the RNG stream differently per dtype, so
+    # `torch.empty(4, dtype=d).uniform_()` gives DIFFERENT VALUES for float32
+    # and float64 at the same seed -- the two runs would not share a seed at
+    # all, and the comparison would measure sampling, not precision.
+    init = torch.empty(4).uniform_(-1.0, 1.0)
+    theta = (init.double() if double else init).clone().requires_grad_(True)
     xx, yy = (x.double(), y.double()) if double else (x, y)
     optimizer = torch.optim.Adam([theta], lr=LR)
     for _ in range(budget):
