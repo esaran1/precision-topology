@@ -39,26 +39,58 @@ def _windows(dtype=torch.float64):
     return inner, torch.cat([pos, -pos])
 
 
+# Grid spacings of the windows solves() uses.  The identity between
+# (placement and bias) and sign correctness holds EXACTLY only when M_I and
+# m_O are extrema over the same points solves() evaluates.
+H_INNER = 2.0 * INNER_MAX / (N_DENSE - 1)
+H_OUTER = (OUTER_MAX - OUTER_MIN) / (N_DENSE // 2 - 1)
+H_MAX = max(H_INNER, H_OUTER)
+
+
 def decompose(a: float, w1: float, b1: float, w2: float, b2: float) -> dict:
-    """Placement gap at this run's own (w1,b1), and the bias condition."""
+    """Placement gap at this run's own (w1,b1), and the bias condition.
+
+    Computed on EXACTLY the grid solves() uses, so the identity is exact.
+    A continuous-extrema version is returned alongside as `gap_continuous`;
+    any difference between the two is a grid effect, not a bug.
+    """
 
     f = activation("sin_family", a)
     inner, outer = _windows()
+    w = torch.tensor(w1, dtype=torch.float64)
     with torch.no_grad():
-        vi = f(torch.tensor(w1, dtype=torch.float64) * inner + b1)
-        vo = f(torch.tensor(w1, dtype=torch.float64) * outer + b1)
+        vi = f(w * inner + b1)
+        vo = f(w * outer + b1)
+        # continuous-extrema reference: 20x finer, labelled separately
+        fi = torch.linspace(-INNER_MAX, INNER_MAX, 20 * N_DENSE, dtype=torch.float64)
+        fp = torch.linspace(OUTER_MIN, OUTER_MAX, 10 * N_DENSE, dtype=torch.float64)
+        fo = torch.cat([fp, -fp])
+        ci, co = f(w * fi + b1), f(w * fo + b1)
     M_I, m_O = float(vi.max()), float(vo.min())
     mi_I, M_O = float(vi.min()), float(vo.max())
     if w2 > 0:                       # outer must exceed inner
         gap = m_O - M_I
+        gap_c = float(co.min()) - float(ci.max())
         lo, hi = -w2 * m_O, -w2 * M_I
     else:                            # mirrored: inner must exceed outer
         gap = mi_I - M_O
-        lo, hi = -w2 * mi_I, -w2 * M_O
+        gap_c = float(ci.min()) - float(co.max())
+        # w2 < 0: need w2*mi_I + b2 < 0 and w2*M_O + b2 > 0, so
+        #   b2 < -w2*mi_I  and  b2 > -w2*M_O.  Dividing by a negative w2
+        #   flips the order, so the endpoints are (-w2*M_O, -w2*mi_I).
+        lo, hi = -w2 * M_O, -w2 * mi_I
     placement_ok = gap > 0
     bias_ok = lo < b2 < hi
-    return {"gap": gap, "placement_ok": placement_ok, "bias_ok": bias_ok,
-            "bias_lo": lo, "bias_hi": hi, "bias_width": abs(w2) * gap}
+    # Region-wide certificate: |N'(x)| <= |w2||w1|(1+a), so a grid margin
+    # exceeding that bound times h/2 certifies correctness BETWEEN grid points.
+    lip = abs(w2) * abs(w1) * (1.0 + a)
+    margin_grid = min(float(-(w2 * vi + b2).max()), float((w2 * vo + b2).min()))
+    certified = bool(margin_grid > lip * H_MAX / 2.0)
+    return {"gap": gap, "gap_continuous": gap_c,
+            "placement_ok": placement_ok, "bias_ok": bias_ok,
+            "bias_lo": lo, "bias_hi": hi, "bias_width": abs(w2) * gap,
+            "margin_grid": margin_grid, "lipschitz": lip,
+            "certify_threshold": lip * H_MAX / 2.0, "certified": certified}
 
 
 def main() -> None:
@@ -77,9 +109,28 @@ def main() -> None:
                      "failure": ("solved" if predicted else
                                  "placement" if not d["placement_ok"] else "bias")})
     frame = pd.DataFrame(rows)
-    print(f"cross-check against solves(): {bugs} disagreements of {len(frame)}")
+    # Near-misses: 0 errors on the 200-point sample, fail the dense region.
+    # These are the runs a reviewer will ask about; classify each.
+    NEAR = [(1.5, 132), (1.5, 145), (1.5, 178), (3.0, 13)]
+    near = frame[[(round(r.a, 4), int(r.seed)) in NEAR and r.precision == "float32"
+                  for _, r in frame.iterrows()]]
+    if len(near):
+        print("\nnear-misses (0 sample errors, fail the dense region):")
+        for _, r in near.iterrows():
+            print(f"  a={r.a:<5} seed={int(r.seed):3d}  {r.failure:9s} "
+                  f"gap={r.gap:+.5f}  |w2|={abs(r.w2):.3f}  "
+                  f"bias in ({r.bias_lo:+.4f},{r.bias_hi:+.4f}) b2={r.b2:+.4f}")
+    print(f"\ncross-check against solves(): {bugs} disagreements of {len(frame)}")
     if bugs:
         print("  *** DISAGREEMENT IS A BUG -- investigate before continuing ***")
+    sol = frame[frame.predicted_solved]
+    if len(sol):
+        print(f"region-wide certification of solved runs: "
+              f"{int(sol.certified.sum())} of {len(sol)} "
+              f"({100 * sol.certified.mean():.1f}%)")
+    gridfx = int((frame.placement_ok != (frame.gap_continuous > 0)).sum())
+    print(f"grid vs continuous placement sign differs on {gridfx} runs "
+          f"(grid effect, not a bug)")
     stem = RESULTS / "phase1_decomposition"
     with artifact_lock(stem, "phase1 decomposition"):
         tmp = stem.with_suffix(".csv.tmp")
