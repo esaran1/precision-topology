@@ -24,6 +24,17 @@ def main() -> None:
     chk("total runs", float(d.runs.sum()), 5580.0, 0)
     chk("separations", float(d.separations.sum()), 0.0, 0)
 
+    print("pooled R union (abstract numbers)")
+    u = pd.read_csv(R / "r_pooled_union.csv")
+    u["solved"] = u.solved.astype(bool)
+    chk("pooled runs", float(len(u)), 3150.0, 0)
+    chk("optimisers", float(u.opt.nunique()), 3.0, 0)
+    low, high = u[u.R < 0.30], u[u.R > 0.50]
+    chk("runs below R=0.30", float(len(low)), 2285.0, 0)
+    chk("solved below R=0.30", float(low.solved.sum()), 0.0, 0)
+    chk("runs above R=0.50", float(len(high)), 461.0, 0)
+    chk("solved above R=0.50", float(high.solved.sum()), 460.0, 0)
+
     print("T43 budget law")
     d = pd.read_csv(R / "onset_law_extended.csv"); d = d[d.bracketed & d.onset.notna()]
     chk("bracketed cells", float(len(d)), 6.0, 0)

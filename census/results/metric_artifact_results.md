@@ -355,3 +355,6 @@ per-run weights were not stored and were not regenerated. They sit at the
 extremes of the `beta` range rather than outside the regime, so they would
 tighten the interval rather than test the boundary; family B was the
 informative case and it has been run.
+
+
+> **SUSPENDED 2026-09-21 pending Phase 6.** Every quantity on this page derived from family B's `Ĝ` used a **box-limited** search: `f(t)=max(t,αt)` is positively homogeneous, so `G(c·w₁,c·b₁)=c·G(w₁,b₁)` and the unrestricted supremum is **infinite**. Measured, `Ĝ` scales exactly with the box (0.2/0.4/0.8/1.6/3.2 as `w₁≤1/2/4/8/16` at α=−0.5), and the committed values are exactly `3.2|α|` — an implicit normalisation nowhere stated. **Suspended: the measured `β = 0.9935`, the 900–1,200× overshoot, and the AUC comparison.** **Not suspended: the onset exponent +0.25**, which comes from solve rates and never touched `Ĝ`. Phase 6 recomputes under an explicit scale-invariant normalisation; `β = 1` should survive by homogeneity, so the predicted −1.1172 will be re-scored there. See `phase0_blockers.md` §0c.

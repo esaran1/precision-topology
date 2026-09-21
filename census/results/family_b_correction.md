@@ -91,3 +91,6 @@ it. That is an open question, not a resolved one.
 
 
 > **Correction (2026-09-11).** The through-origin slope quoted here was a **four-point** fit that merged q2 and family A into a single point at beta = 1.5 and used family A's value (−0.7340), discarding q2's measured −0.6749. The correct **five-point** fit, using every measured family, is **1.0984 [0.958, 1.239]**, which is **1.7%** from alpha = 1.1173 rather than 0.6%. Intervals still overlap; the agreement is weaker than stated. See `paper/rounded_source_audit.md`.
+
+
+> **SUSPENDED 2026-09-21 pending Phase 6.** Every quantity on this page derived from family B's `Ĝ` used a **box-limited** search: `f(t)=max(t,αt)` is positively homogeneous, so `G(c·w₁,c·b₁)=c·G(w₁,b₁)` and the unrestricted supremum is **infinite**. Measured, `Ĝ` scales exactly with the box (0.2/0.4/0.8/1.6/3.2 as `w₁≤1/2/4/8/16` at α=−0.5), and the committed values are exactly `3.2|α|` — an implicit normalisation nowhere stated. **Suspended: the measured `β = 0.9935`, the 900–1,200× overshoot, and the AUC comparison.** **Not suspended: the onset exponent +0.25**, which comes from solve rates and never touched `Ĝ`. Phase 6 recomputes under an explicit scale-invariant normalisation; `β = 1` should survive by homogeneity, so the predicted −1.1172 will be re-scored there. See `phase0_blockers.md` §0c.

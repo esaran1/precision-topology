@@ -129,3 +129,6 @@ Restated for the record: **family B lies outside the law's class by
 homogeneity, and its onset exponent -- now measured at +0.25 over 64x, not
 0.00 -- is not accounted for by any amplification measure we tested.** Open
 question.
+
+
+> **SUSPENDED 2026-09-21 pending Phase 6.** Every quantity on this page derived from family B's `Ĝ` used a **box-limited** search: `f(t)=max(t,αt)` is positively homogeneous, so `G(c·w₁,c·b₁)=c·G(w₁,b₁)` and the unrestricted supremum is **infinite**. Measured, `Ĝ` scales exactly with the box (0.2/0.4/0.8/1.6/3.2 as `w₁≤1/2/4/8/16` at α=−0.5), and the committed values are exactly `3.2|α|` — an implicit normalisation nowhere stated. **Suspended: the measured `β = 0.9935`, the 900–1,200× overshoot, and the AUC comparison.** **Not suspended: the onset exponent +0.25**, which comes from solve rates and never touched `Ĝ`. Phase 6 recomputes under an explicit scale-invariant normalisation; `β = 1` should survive by homogeneity, so the predicted −1.1172 will be re-scored there. See `phase0_blockers.md` §0c.
