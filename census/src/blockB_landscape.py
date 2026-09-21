@@ -146,7 +146,7 @@ def bracket_then_refine(pred, lo, hi, coarse=0.5, fine=0.05):
     return None
 
 
-def scan(a: float, x, y, w2max=14.0, step=0.05):
+def scan(a: float, x, y, w2max=11.0, step=0.05, w2min=1.5):
     """All four switch points at this a.  Coarse bracket then fine refine."""
 
     gs = maximum_gap(a, resolution=600)
@@ -156,11 +156,11 @@ def scan(a: float, x, y, w2max=14.0, step=0.05):
     def glob_pos(w2):
         b = best_conditional(a, w2, x, y)
         return b is not None and b["gap"] > 0
-    glob = bracket_then_refine(glob_pos, 0.5, w2max)
+    glob = bracket_then_refine(glob_pos, w2min, w2max)
     # --- upper spinodal: follow the G<=0 branch upward ------------------
     def spin_pos(w2):
         cur = None
-        for v in np.arange(0.5, w2 + 1e-9, 0.25):
+        for v in np.arange(w2min, w2 + 1e-9, 0.25):
             if cur is None:
                 cands = [minimise(a, float(v), x, y, seed=sd, steps=SCREEN)
                          for sd in range(16)]
@@ -174,12 +174,12 @@ def scan(a: float, x, y, w2max=14.0, step=0.05):
             if is_degenerate(cur):
                 return True                       # branch dissolved
         return cur is None or cur["gap"] > 0
-    spin = bracket_then_refine(spin_pos, 0.5, w2max)
+    spin = bracket_then_refine(spin_pos, w2min, w2max)
 
     # --- lower spinodal: follow the G>0 branch downward -----------------
     fold = None
     cur = None
-    for w2 in np.arange(w2max, 0.5 - 1e-9, -0.25):
+    for w2 in np.arange(w2max, w2min - 1e-9, -0.25):
         if cur is None:
             cands = [minimise(a, float(w2), x, y, seed=sd, steps=SCREEN)
                      for sd in range(16)]
@@ -199,7 +199,7 @@ def scan(a: float, x, y, w2max=14.0, step=0.05):
     def solve_pos(w2):
         b = best_conditional(a, w2, x, y, restarts=24)
         return b is not None and b["solves"]
-    solve = bracket_then_refine(solve_pos, 0.5, w2max)
+    solve = bracket_then_refine(solve_pos, w2min, w2max)
 
     return {"a": a, "gstar": gs,
             "w2_glob": glob, "R_glob": None if glob is None else glob * gs / 2,

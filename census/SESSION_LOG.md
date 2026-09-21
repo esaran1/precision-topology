@@ -22,7 +22,20 @@ Updated as outcomes change. Three most important results so far.
    (`CV(R) <= 0.15` and `CV(R) < CV(|w2|)/2`). `|w2|` falls as `Ĝ` rises; `R`
    does not move. Within-cell CV is ~0.067, so `R` varies no more across `a`
    than within one cell.
-3. *(bifurcation outcome pending Block B)*
+3. **Block B at `a = 1.30`: NO HYSTERESIS WINDOW — a registered falsifier.**
+   `R_glob = R_spin = 0.2145` exactly. Following the `G <= 0` branch upward by
+   continuation, the gap rises **smoothly through zero** (d(gap) per 0.05 step
+   in `|w2|` is 0.00185, 0.00181, 0.00177, 0.00173, 0.00169, 0.00166, ...,
+   monotone and continuous). There is **one branch, not two**: the crossing is
+   transcritical/continuous, not a saddle-node, so there is no bistability and
+   nothing to be hysteretic about.
+   **Consequences**: the "loss-landscape bifurcation with hysteresis" framing is
+   dropped. Block E runs the **reduced arm set** (control, null, freeze-low,
+   freeze-high, jump) at the single switch point, per the registration. The
+   freeze-mid and down-hold-mid arms are not defined and are not run.
+   **Still standing**: the measured crossing 0.2332 sits **+8.7% above** the
+   single switch point 0.2145 — a real, consistent offset that Block C's
+   relaxation-lag measurement must explain.
 
 ---
 
