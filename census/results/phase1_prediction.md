@@ -64,6 +64,14 @@ decomposition and must be found before any Phase 1 number is reported** — the
 algebra above is an identity, so disagreement means the implementation is
 wrong, not the theory.
 
+## Sign balance, required in the report
+
+Roughly half of runs have `w2 < 0`. The placement/bias split is therefore
+reported **separately for each sign of `w2`**. If the split differs materially
+between signs *after* the orientation fix, that points to a remaining
+orientation error rather than a real effect, and must be investigated before
+the Phase 1 numbers are reported.
+
 ## Precision
 
 The rerun records **both float32 and float64 on the same seeds**, because the

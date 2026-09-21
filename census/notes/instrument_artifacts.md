@@ -1,7 +1,7 @@
 # Instrument limitations read as properties of the object
 
 A short methodological note, written because this project has now made
-this class of error **six times** — twice in unrelated strands, a
+this class of error **seven times** — twice in unrelated strands, a
 third time in a distinct form within the same instrument, and a fifth in
 the write-up rather than the measurement — and caught each only through
 an independent route. It is transferable to anyone
@@ -227,6 +227,49 @@ anticipated:**
    outlier that made threshold-independence look weak was the transcription
    error.** A caveat in the paper became supporting evidence.
 
+## Instance 6: an orientation sign flip that would have produced a *clean, wrong* answer (2026-09-21)
+
+The others produced numbers that were wrong. This one would have produced the
+**opposite conclusion**, cleanly, with no tell.
+
+The Phase 1 decomposition splits every failure into *placement* (`G <= 0`) or
+*bias* (`b2` outside the admissible interval). For `w2 > 0` that interval is
+`(-w2 m_O, -w2 M_I)`. For `w2 < 0` the roles of the windows mirror, and
+dividing the defining inequality by a negative `w2` **flips the order of the
+endpoints**: the interval is `(-w2 M_O, -w2 mi_I)`. The first implementation
+kept the `w2 > 0` ordering, giving `lo > hi` — **an empty interval, always**.
+
+Every one of the roughly half of runs with `w2 < 0` would have been classified
+a **bias failure**. That is not noise: it is exactly the registered competing
+hypothesis P1-c ("bias failures dominate, and the paper reframes around the
+output bias"). The bug would have *manufactured* the alternative finding, in a
+form indistinguishable from a real result.
+
+**What caught it**: a validity condition registered *before* the data — that
+the placement/bias classification must agree with `solves()` **run for run**,
+because the decomposition is an algebraic identity rather than a model. It
+fired on the first test case, a known solver: predicted not-solved, `solves()`
+True. A single disagreement was enough, because an identity admits none.
+
+**The generalisable rule**: *when an analysis is an identity, register the
+identity as a test.* Most checks compare a measurement against an expectation
+and must tolerate slack. An identity tolerates none, which makes it the
+sharpest possible detector — and it costs one assertion.
+
+**Audit of every other orientation-dependent site**, done immediately after,
+since the same flip could sit elsewhere:
+
+| site | verdict |
+|---|---|
+| `fold1d_theorem` margin and bound | **safe** — margin is read off *signed logits*, never reconstructed from a sign-branched interval; 0 of 66 violations, min slack 1.0394 |
+| per-placement bound `\|w2\| >= 2m/G(w1,b1)` | **safe** — never previously computed; computed now with orientation handled: **0 violations of 66**, 22 of them `w2 < 0`, median slack 1.2488 |
+| `exclusion_table` (Table 1) | **safe** — every row has `w2 > 0`, so the branch is never exercised |
+| `r_variable.oriented_gap` | **safe** — takes `max` over both orientations rather than branching; agrees with the sign-branch on 66 of 66 solvers |
+| `R = \|w2\| G*(a)/2` in the pooled data | **safe** — uses the *uniform* `G*`, orientation-free by the symmetry argument |
+
+**Nothing changed.** The flip was confined to the new code, which is where the
+identity test was pointed.
+
 ## Why all of these were caught only from outside the measurement
 
 None of these errors was found by examining the measurement more
@@ -259,6 +302,12 @@ carefully.
   cost: it was *not* caught by the passing caveat in the document that
   first reported it, which shows a flagged-but-uncarried caveat is
   worth about as much as no caveat at all.
+
+- Instance 6 was caught by **registering an identity as a test before the data
+  existed**. No external route was needed because the relation is exact: one
+  disagreement falsifies the implementation. Unlike the others, this detector
+  was cheap and immediate, and the error it caught was the most dangerous —
+  a clean answer of the opposite sign.
 
 - Instance 5 was caught by **regenerating the artifact from code and diffing**
   — the only check that runs in that direction. Every artifact-based verifier
@@ -332,6 +381,15 @@ recomputation from source.
     copied from a log looks identical to a computed value once written to a
     CSV. If a script must embed prior results, say so in a comment beside the
     literals, because nothing downstream can tell.
-12. **Derive theory even in an empirical project.** The single highest-
+12. **When an analysis is an identity, register the identity as a test.** An
+    identity admits no slack, so a single run-for-run disagreement falsifies
+    the implementation. This is the cheapest detector in the list and it caught
+    the only error that would have produced a clean result of the opposite
+    sign.
+13. **Audit every sign branch the moment one is found wrong.** A flipped
+    orientation is a copy-paste class of error; if it appears once, enumerate
+    every site that branches on the same sign and check each, rather than
+    assuming the one found was the only one.
+14. **Derive theory even in an empirical project.** The single highest-
    value output of the theorem work so far was not the theorem; it was
    the empirical error the theorem exposed.
