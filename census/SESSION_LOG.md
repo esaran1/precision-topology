@@ -56,3 +56,13 @@ Restated in `results/phase2b_results.md` and in the Block B registration.
 Convergence swept at `|w2|` = 4.0, 5.0, 6.0 over 900/2,000/3,000/5,000/8,000 steps: every point is **still moving at 2,000 and settled by 3,000**, unchanged through 8,000. `STEPS` raised 900 -> 3,000.
 
 **Nothing was committed from the under-converged code**; the earlier `phase2b_conditional.py` run (600 inner steps) is therefore also suspect and its R_cross/R_solve numbers are **superseded by Block B** rather than trusted. Those were the 0.2037 / 0.3600 figures; they will be recomputed.
+
+## 2026-09-21 — VALIDITY GATE 2 (rule 7): the log-2 constant predictor
+
+The two-stage screening initially returned **loss 0.693147 = log 2** as the conditional minimiser at `|w2| = 6.0`, with `gap` exactly 0. All six top cheap candidates converged there.
+
+That is the **constant predictor** (`w1 -> 0`): a genuine stationary point of the loss with **no placement content**, which wins the cheap screen at large `|w2|` because driving `w1` to zero is an easy way to reduce the loss from a bad start. Taking it as 'the minimiser' would have set `gap = 0` at every large `|w2|` and corrupted all four switch points.
+
+Excluded by `is_degenerate` (`|loss - log 2| < 1e-4` or `|w1| < 1e-3`) at both screening and convergence stages. With it excluded the gap is cleanly monotone at `a = 1.30`: **-0.0401 (4.0), +0.0014 (5.0), +0.0283 (6.0), +0.0606 (8.0)**.
+
+Also in this pass: the scan cost was 21 s per grid point at 50 restarts x 3,000 steps, which is ~0.5 h per `a` for the global scan alone. Restructured to **coarse-bracket then refine**, plus **screen at 600 steps and converge only the best 8** -- 5.8 s per grid point, same answers.

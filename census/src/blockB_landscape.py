@@ -33,6 +33,10 @@ N_DENSE = 4_001
 A_VALUES = (1.30, 1.35, 1.40, 1.45, 1.50, 1.60)
 RESTARTS = 50
 STEPS = 3_000   # convergence-checked: gaps settle by 3k, NOT by 900
+SCREEN = 600    # cheap screening pass before converging the best candidates
+KEEP = 8        # candidates carried from screening to full convergence
+LOG2 = float(np.log(2.0))
+DEGEN = 1e-4    # |loss - log2| below this is the constant predictor
 
 _inner = torch.linspace(-INNER_MAX, INNER_MAX, N_DENSE, dtype=torch.float64)
 _pos = torch.linspace(OUTER_MIN, OUTER_MAX, N_DENSE // 2, dtype=torch.float64)
@@ -56,6 +60,28 @@ def gap_of(f, w1: float, b1: float, w2: float) -> float:
         vi = f(torch.tensor(w1, dtype=torch.float64) * _inner + b1)
         vo = f(torch.tensor(w1, dtype=torch.float64) * _outer + b1)
     return float(vo.min() - vi.max()) if w2 > 0 else float(vi.min() - vo.max())
+
+
+def is_degenerate(c) -> bool:
+    """The constant predictor (w1 -> 0, loss -> log 2) is a stationary point of
+    the loss with no placement content: its gap is identically 0 and it wins the
+    cheap screen at large |w2|.  It must never be taken as THE minimiser."""
+
+    return abs(c["loss"] - LOG2) < DEGEN or abs(c["w1"]) < 1e-3
+
+
+def best_conditional(a, w2, x, y, restarts=RESTARTS):
+    """Two-stage: screen cheaply, converge the best non-degenerate candidates."""
+
+    cheap = [minimise(a, w2, x, y, seed=s, steps=SCREEN) for s in range(restarts)]
+    cheap = [c for c in cheap if not is_degenerate(c)]
+    if not cheap:
+        return None
+    cheap.sort(key=lambda c: c["loss"])
+    full = [minimise(a, w2, x, y, start=[c["w1"], c["b1"], c["b2"]], steps=STEPS)
+            for c in cheap[:KEEP]]
+    full = [c for c in full if not is_degenerate(c)]
+    return min(full, key=lambda c: c["loss"]) if full else None
 
 
 def minimise(a, w2, x, y, start=None, seed=0, steps=STEPS):
@@ -102,70 +128,79 @@ def hessian_min_eig(a, w2, p, x, y) -> float:
     return float(torch.linalg.eigvalsh(H).min())
 
 
+def bracket_then_refine(pred, lo, hi, coarse=0.5, fine=0.05):
+    """Find the smallest x in [lo,hi] with pred(x) true: coarse bracket, then refine.
+
+    pred must be monotone in x over the range (false then true), which is the
+    case for every switch here: all four are first-crossing definitions.
+    """
+
+    prev = lo
+    for x in np.arange(lo, hi + 1e-9, coarse):
+        if pred(float(x)):
+            for xf in np.arange(prev, x + 1e-9, fine):
+                if pred(float(xf)):
+                    return float(xf)
+            return float(x)
+        prev = x
+    return None
+
+
 def scan(a: float, x, y, w2max=14.0, step=0.05):
-    """All four switch points at this a."""
+    """All four switch points at this a.  Coarse bracket then fine refine."""
 
     gs = maximum_gap(a, resolution=600)
     grid = np.arange(0.5, w2max + 1e-9, step)
 
     # --- global minimiser, many restarts -------------------------------
-    glob = None
-    glob_rows = []
-    for w2 in grid:
-        cands = [minimise(a, float(w2), x, y, seed=s) for s in range(RESTARTS)]
-        best = min(cands, key=lambda c: c["loss"])
-        glob_rows.append((float(w2), best["gap"], best["loss"], best["solves"]))
-        if glob is None and best["gap"] > 0:
-            glob = float(w2)
-            break
+    def glob_pos(w2):
+        b = best_conditional(a, w2, x, y)
+        return b is not None and b["gap"] > 0
+    glob = bracket_then_refine(glob_pos, 0.5, w2max)
     # --- upper spinodal: follow the G<=0 branch upward ------------------
-    spin = None
-    cur = None
-    for w2 in grid:
-        cands = [minimise(a, float(w2), x, y, seed=s) for s in range(12)] if cur is None else []
-        if cur is None:
-            neg = [c for c in cands if c["gap"] <= 0]
-            if not neg:
-                spin = float(w2)                     # no G<=0 branch at all
-                break
-            cur = min(neg, key=lambda c: c["loss"])
-            continue
-        nxt = minimise(a, float(w2), x, y, start=[cur["w1"], cur["b1"], cur["b2"]])
-        if nxt["gap"] > 0:
-            spin = float(w2)
-            break
-        cur = nxt
+    def spin_pos(w2):
+        cur = None
+        for v in np.arange(0.5, w2 + 1e-9, 0.25):
+            if cur is None:
+                cands = [minimise(a, float(v), x, y, seed=sd, steps=SCREEN)
+                         for sd in range(16)]
+                cands = [c for c in cands if not is_degenerate(c) and c["gap"] <= 0]
+                if not cands:
+                    continue
+                c = min(cands, key=lambda z: z["loss"])
+                cur = minimise(a, float(v), x, y, start=[c["w1"], c["b1"], c["b2"]])
+                continue
+            cur = minimise(a, float(v), x, y, start=[cur["w1"], cur["b1"], cur["b2"]])
+            if is_degenerate(cur):
+                return True                       # branch dissolved
+        return cur is None or cur["gap"] > 0
+    spin = bracket_then_refine(spin_pos, 0.5, w2max)
+
     # --- lower spinodal: follow the G>0 branch downward -----------------
     fold = None
     cur = None
-    for w2 in grid[::-1]:
+    for w2 in np.arange(w2max, 0.5 - 1e-9, -0.25):
         if cur is None:
-            cands = [minimise(a, float(w2), x, y, seed=s) for s in range(12)]
-            pos = [c for c in cands if c["gap"] > 0]
-            if not pos:
+            cands = [minimise(a, float(w2), x, y, seed=sd, steps=SCREEN)
+                     for sd in range(16)]
+            cands = [c for c in cands if not is_degenerate(c) and c["gap"] > 0]
+            if not cands:
                 continue
-            cur = min(pos, key=lambda c: c["loss"])
+            c = min(cands, key=lambda z: z["loss"])
+            cur = minimise(a, float(w2), x, y, start=[c["w1"], c["b1"], c["b2"]])
             continue
         nxt = minimise(a, float(w2), x, y, start=[cur["w1"], cur["b1"], cur["b2"]])
-        if nxt["gap"] <= 0:
+        if is_degenerate(nxt) or nxt["gap"] <= 0:
             fold = float(w2)
             break
         cur = nxt
+
     # --- solve point on the fold branch ---------------------------------
-    solve = None
-    cur = None
-    for w2 in grid:
-        cands = [minimise(a, float(w2), x, y, seed=s) for s in range(12)] if cur is None else []
-        if cur is None:
-            pos = [c for c in cands if c["gap"] > 0]
-            if not pos:
-                continue
-            cur = min(pos, key=lambda c: c["loss"])
-        else:
-            cur = minimise(a, float(w2), x, y, start=[cur["w1"], cur["b1"], cur["b2"]])
-        if cur["solves"]:
-            solve = float(w2)
-            break
+    def solve_pos(w2):
+        b = best_conditional(a, w2, x, y, restarts=24)
+        return b is not None and b["solves"]
+    solve = bracket_then_refine(solve_pos, 0.5, w2max)
+
     return {"a": a, "gstar": gs,
             "w2_glob": glob, "R_glob": None if glob is None else glob * gs / 2,
             "w2_spin": spin, "R_spin": None if spin is None else spin * gs / 2,
