@@ -248,11 +248,17 @@ def fig1_setting() -> None:
 
     Panel (b)'s two curves are REAL TRAINED PARAMETERS, recovered
     deterministically from seeds (float64, Adam lr 1e-2, 2,000 steps, the
-    config used for the theorem verification -- note fold1d_sweep.csv runs
-    float32 and its seed-0 run differs):
+    config used for the theorem verification; fold1d_sweep.csv runs float32 and
+    draws its init in float32, which is a different draw, not a different
+    arithmetic outcome):
 
       solving      a = 1.5, seed 0  -- solves() dense 4,001-point check: True
       best monotone a = 1.0, seed 38 -- 91/200 sample errors, cannot solve
+
+    float32 reproduces both given the SAME initialisation (0 errors, params
+    agreeing to ~1e-5).  The apparent float32/float64 disagreement was an RNG
+    artifact: torch's uniform_ consumes the stream differently per dtype, so
+    drawing the init separately in each precision gives different networks.
 
     a = 1.0 is the monotonicity threshold, so the second curve is the best the
     monotone regime achieves.  It crosses zero ONCE; the task needs twice.

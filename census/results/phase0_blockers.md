@@ -70,10 +70,19 @@ max_steps 2,000**, width 3. This is the optimiser and budget for the pooled
 link runs, the search families, the depth comparison and the constructed-vs-found
 comparison.
 
-**Precision**: `fold1d_sweep` and the sweep drivers run **float32**. The
-theorem verification and Figure 1's recovered parameters run **float64**. These
-differ materially — `a = 1.5` seed 0 solves in float64 and does not in float32
-(169 errors). Any comparison across the two must say which.
+**Precision**: `fold1d_sweep` and the sweep drivers run **float32**; the
+theorem verification and Figure 1's recovered parameters run **float64**.
+
+**Corrected 2026-09-21**: an earlier version of this note said the two "differ
+materially", citing `a = 1.5` seed 0 as solving in float64 and failing in
+float32 (169 errors). **That was an RNG artifact, not an arithmetic one.**
+`torch.empty(4, dtype=d).uniform_()` consumes the random stream differently per
+dtype, so drawing the initialisation separately in each precision yields
+**different networks**, not the same network computed two ways. Given the
+**same** initialisation, float32 reproduces the float64 solver exactly: 0
+errors, `solves()` True, parameters agreeing to ~1e-5. Across 180 paired runs
+at `a = 1.40/1.45/1.50`, **0 flips**. **float32 and float64 agree run-for-run
+given a shared initialisation.**
 
 ## 0c. Family B — **the geometric quantity is not well defined**
 
@@ -144,6 +153,7 @@ for orientation, and `w1_abs`/`w2_abs` discard them.
 | Phase 2b grid (9 `a` × 5 budgets × 40 seeds) | 1,800 | **~12 min** on 4 cores |
 
 Cheap, as the brief anticipated. Phase 1 therefore reruns with full logging
-rather than analysing stored magnitudes, and **the rerun is float64** — which
-must be stated, since the original sweeps are float32 and the two disagree on
-at least one known cell.
+rather than analysing stored magnitudes. The rerun records both precisions, and
+they **agree run-for-run given a shared initialisation** (see the corrected
+precision note above), so Phase 1 describes the same population as the
+headlines.

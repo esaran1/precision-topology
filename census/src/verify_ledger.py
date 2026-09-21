@@ -42,6 +42,17 @@ def main() -> None:
     chk("solvers with w2<0", float((t.w2 < 0).sum()), 22.0, 0)
     chk("median slack", float((t.w2.abs() / t.bound_perplace).median()), 1.2488, 0.001)
 
+    print("T57 placement/bias decomposition")
+    d = pd.read_csv(R / "phase1_decomposition.csv")
+    f = d[d.precision == "float32"]
+    chk("identity disagreements", float((f.predicted_solved != f.solved).sum()), 0.0, 0)
+    u = f[~f.predicted_solved]
+    chk("placement failures", float((u.failure == "placement").sum()), 1664.0, 0)
+    chk("bias failures", float((u.failure == "bias").sum()), 306.0, 0)
+    s_ = f[f.predicted_solved]
+    chk("median solved rho", float(s_.rho.median()), 0.9674, 0.001)
+    chk("rho>0.9 all solve", float((f[f.rho > 0.9].predicted_solved).all()), 1.0, 0)
+
     print("T43 budget law")
     d = pd.read_csv(R / "onset_law_extended.csv"); d = d[d.bracketed & d.onset.notna()]
     chk("bracketed cells", float(len(d)), 6.0, 0)
