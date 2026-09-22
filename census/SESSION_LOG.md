@@ -267,3 +267,52 @@ measured `kappa(1.02)` within **0.81%, 5 of 5**, across an **8.1x** range of
 `kappa_0`. G-1 fails 6/10 on a flat 15% tolerance, but the offset is a property
 of `a` not the window (sd 0.014/0.016; all ten within **2.72%** after
 normalising by the base task's own offset).
+
+## 2026-09-22 — push: `main` carries the full history, the 2.7 GB CSV stripped
+
+The first push of `master` **failed**: `results/phase2b_checkpoints.csv` is
+**2.7 GB** in the current tree and ~9.7 GiB across the **seven** versions it had
+been committed in — far over GitHub's 100 MiB hard limit, and sitting in the
+middle of the 28 unpushed commits, so no incremental push could succeed. (The
+attempt appeared to succeed because `git push ... | tail` returns `tail`'s exit
+status, not git's; the real error was `RPC failed; HTTP 500`. Exit status is
+checked directly now.)
+
+An intermediate single-commit snapshot branch (`clean-master`) was pushed and
+then **deleted**: it discarded the per-commit registration trail, which is the
+evidence for which predictions were registered before the data that tested them.
+
+**What is on the remote now: branch `main`, 318 commits.**
+
+The 289 already-published commits were **never touched** — `origin/master` was
+verified to contain no oversized blob and to be a clean ancestor of the new work,
+so only the 28 new commits needed rewriting. Those 28 were **replayed** onto it
+with the CSV removed from each tree, preserving every message, author and **both
+timestamps**; one further commit adds the `.gitignore` entry.
+
+**The audit chain is intact and verifiable from the remote**, which is the point:
+
+| time | commit | event |
+|---|---|---|
+| 18:38:04 | `c05c03e` | Block B registered |
+| 18:41:03 | `94121eb` | Block A interim — crossing medians read for 1.30/1.35/1.40 |
+| 18:56:15 | `b7734c2` | seeding fix + frozen sha `9f1b10741d8bf48c` |
+
+Same times as the originals (`9e30027`, `f00ce39`, `3497f7f`); only the SHAs
+differ, because the trees differ by the removed CSV. The timestamp audit of
+2026-09-21 — which downgraded the prospective set from 4 to 3 on exactly these
+three commits — remains reproducible from `origin/main` alone.
+
+Verified: the `main` tree differs from the original `master` **only** by the
+removed CSV and the `.gitignore` line; no blob over 50 MiB anywhere in the new
+commits; `verify_ledger.py` passes from it with 0 findings.
+
+**Branches**: remote default is now `main`. `origin/master` is kept as a frozen
+pointer to the old 289-commit state and is fully contained in `main`. Locally,
+`master` and `master-full-local-20260922` both still hold the original 28 commits
+**with** the CSV, as backups.
+
+`phase2b_checkpoints.csv` is a raw per-step training log — an input, not a
+result. Regenerate with `src/phase2b_ordering.py`. Every number derived from it
+(Blocks A and C) is committed in `blockA_crossings.csv`, `blockA_per_a.csv` and
+`blockC_adiabatic.csv`.
