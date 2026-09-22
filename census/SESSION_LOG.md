@@ -25,7 +25,18 @@ Updated as outcomes change. Three most important results so far.
    drifts **+6.5%** and `R_spin` **+16.9%**, both the **same sign**, with
    `corr(measured, R_glob) = +0.980` and `corr(measured, R_spin) = +0.947`.
    The predicted switch drifts the same way the measurement does.
-3. **Block B at `a = 1.30`: NO HYSTERESIS WINDOW — a registered falsifier.**
+3. **`R_spin` DROPPED: a single continuous switch at `R_glob`.** On a 0.01 grid
+   `R_glob = R_spin` to 1e-15 at **all six `a`**, and every apparent hysteresis
+   window is **exactly one grid step** (0.00053 to 0.00111). The 0.05-grid
+   windows were resolution. Confirmed independently in the scaling limit
+   (`R_glob^inf = R_spin^inf = 0.19991`). **Withdrawn**: the `R_spin` drift of
+   +16.9%, the "crossings track the upper spinodal" test and its 3-of-3
+   prospective result, and **D-1, which is now vacuous** (its two models are
+   identical). **Replaces it**: crossings sit above `R_glob` by 1.087-1.144
+   (mean 1.115, sd 0.020), one-signed; drift measured +10.0% vs `R_glob` +4.5%,
+   **r = +0.9965** (the refinement *improves* the correlation from +0.980).
+   Original falsifier entry, still accurate for `a = 1.30`, follows:
+   **Block B at `a = 1.30`: NO HYSTERESIS WINDOW — a registered falsifier.**
    `R_glob = R_spin = 0.2145` exactly. Following the `G <= 0` branch upward by
    continuation, the gap rises **smoothly through zero** (d(gap) per 0.05 step
    in `|w2|` is 0.00185, 0.00181, 0.00177, 0.00173, 0.00169, 0.00166, ...,
@@ -216,3 +227,43 @@ Running. `a = 1.60` already refuted its own window (0.0279 at step 0.05 -> 0.001
 at 0.01, with `R_glob = R_spin` exactly). If 1.35-1.50 follow, every `R_spin`
 above `a = 1.30` in `blockB_switches.csv` is a grid-limited upper bound and D-1's
 two models coincide identically.
+
+## 2026-09-21 — four-item follow-up: what changed
+
+**Item 1 — `hold_high` restated.** Its held `R = 0.24663` lies **strictly
+between** `R_glob = 0.21446` and `R_solve = 0.30667`, so 33/37 placed and 0/40
+solved is the landscape's prediction met, not a shortfall. Verified against the
+conditional minimiser at exactly `|w2| = 5.750`: gap `+0.022543`, **does not
+solve** — solving is *impossible* there. Block E therefore tests **both**
+switch points.
+
+**Item 2 — the stall is SATURATION, not trapping.** Registered expectation was
+trapping; it is wrong. Gradients fall to **0.07% of control's** and a 5x budget
+recovers placement **2/15 -> 7/15** (S-A satisfied); the loss sits **+0.34**
+above the conditional minimum (S-B's signature) but that is explained by the
+endpoint: an **ill-conditioned flat valley** near the constant predictor
+(`w1 ~ -0.003`, loss ~ log 2, Hessian eigenvalues ~1e-6 against ~25-50,
+condition number >1e7). **Not a stationary point** — at `w1 = 0` the gradient is
+0.18-0.36, because the sampled classes' first moments differ (+0.063 vs +0.148).
+**Consequence: the annealing framing is NOT adopted.**
+
+**Item 3 — Block H's validity gate FAILED.** `m = 1` places 20/40 against the
+unconstrained control's 37/40: **42.5 pp, p = 4.3e-5**. Cause: the natural `|w2|`
+trajectory is **non-monotone** (seed 0 falls 0.371 -> 0.162 before rising to
+9.45), so a linear schedule forces growth through the phase where the run
+naturally shrinks `|w2|` while re-orienting `(w1,b1)`. The dose-response is
+present and strictly monotone (**0.550 / 0.500 / 0.375 / 0.000**, endpoint
+p = 8.4e-09) but is **not a valid rate test**. `m=0.5` vs `m=1` is **not
+separated** (p = 0.823), so there is no "slower is better", only a penalty for
+speed. The valid design — replay each seed's own trajectory time-warped — is
+recorded, not run.
+
+**Item 4 — done, see Read first #3.**
+
+**Block G — the machinery transfers.** Four unseen task windows, nothing
+refitted. `|w2|` at crossing spans **5.8x** while `CV(R) < CV(|w2|)/2` at both
+`a` (**3.36x, 3.01x**); each window's `kappa_0` from the cubic alone matches its
+measured `kappa(1.02)` within **0.81%, 5 of 5**, across an **8.1x** range of
+`kappa_0`. G-1 fails 6/10 on a flat 15% tolerance, but the offset is a property
+of `a` not the window (sd 0.014/0.016; all ten within **2.72%** after
+normalising by the base task's own offset).

@@ -5,7 +5,8 @@ what an earlier note said; **new claim** is what the artifacts support now.
 Every new claim has a ledger ID and passes `verify_ledger.py` unless marked
 pending.
 
-Updated during the unattended session of 2026-09-21. Append-only.
+Updated during the unattended session of 2026-09-21, and again after the
+four-item follow-up of the same date. Append-only.
 
 ---
 
@@ -42,12 +43,58 @@ Updated during the unattended session of 2026-09-21. Append-only.
 | R2 | any conditional-landscape number from the 600-step or 900-step runs (`R_cross = 0.2037`, `R_solve = 0.3600`) | **Under-converged.** At `a=1.30`, `\|w2\|=6.0`, 900 steps gives gap `−0.003070` and 3,000 gives `+0.028333` — the *sign* was wrong. Superseded by Block B at 3,000 steps. |
 | R3 | "the precision effect shows transition-band outcomes are irreproducible" | Retracted: it was the per-dtype RNG bug, not arithmetic. |
 
+## Second session: the scaling limit, the causal test, and transfer
+
+| # | old claim | new claim | ledger | section |
+|---|---|---|---|---|
+| 16 | `R` is the right variable, on the evidence that `CV(R) = 0.0311` vs `CV(\|w₂\|) = 0.2821` | **Derived, not just observed.** Near the fold `f_a(π+s) − π = ε^{3/2}[−σ + (1+ε)σ³/6] + O(ε^{5/2})` with `σ = s/√ε`, so `\|w₂\|` and `ε` enter only through `w₂ε^{3/2}`, whose scale-free form is `R = \|w₂\|Ĝ/2` with `Ĝ = K·ε^{3/2}`. **`R` is the only combination the limit problem sees.** | T58 | §5 |
+| 17 | `κ ≈ 0.31`, "fixed by the task windows", measured | **`κ₀ = K/(4√2/3) = 0.307302`, computed from the cubic `h(σ) = −σ + σ³/6` alone**, against measured `κ(1.02) = 0.307483` — **0.061%**. `K = 0.579454926`. The dip depth `4√2/3 = 1.885618083` is exact. | T58 | §3 |
+| 18 | *(none — new)* | **κ's near-constancy across `a` is a cancellation, not a coincidence**: `Ĝ/ε^{3/2}` and `D/ε^{3/2}` each drift ~16% over ε = 0.02–0.60 and the corrections cancel in their ratio, leaving κ within 2.7%. | T58 | §3 |
+| 19 | *(none — new)* | **Training-free switch points exist in the scaling limit**: Block B run directly on `h(σ)` gives `R_glob^∞ = R_spin^∞ = 0.19991` and `R_solve^∞ = 0.30711`. Finite-`a` `R_glob` converges to it as `R_glob(a) = 0.19991(1 + 0.231ε)`, six points, max residual **0.00133** (inside the 0.002 grid spread), log-log slope **0.947**. `R_solve` is **already at** its limit value at every `a` (mean deviation **−0.29%**), which is why its across-`a` CV was 0.0020. | T58 | §5 |
+| 20 | "the loss at fixed `\|w₂\|` depends on `w₂` only through `w₂ε^{3/2}`" | **False at the ε this paper uses.** The neglected term is **6.3% of the leading one at a = 1.30 and 16.4% at a = 1.60**; holding `w₂ε^{3/2}` fixed drifts the conditional gap +0.001388 → −0.055321. The invariance is **asymptotic only**, because the task windows are fixed in `x` while the fold narrows as `√ε`. | T58 | §5 |
+| 21 | four switch points `R_fold < R_glob < R_spin`, a hysteresis window | **`R_spin` does not exist as a distinct switch.** On a 0.01 grid, `R_glob = R_spin` to 1e-15 at **all six `a`**, and every apparent window is **exactly one grid step**. The conditional landscape has a **single continuous switch at `R_glob(a)`**. The `+16.9%` `R_spin` drift is **withdrawn** (coarse-grid artifact; its a = 1.60 endpoint moves 0.25077 → 0.22402). | T60 | §5 |
+| 22 | measured crossings track the upper spinodal (3 of 3 prospective) | **Withdrawn as meaningless** — there is no upper spinodal distinct from the global switch. Replaced by: **measured crossings sit above `R_glob` by 1.087–1.144 (mean 1.115, sd 0.020), one-signed at every `a`**, which is relaxation lag. Drift: measured **+10.0%**, `R_glob` **+4.5%**, **r = +0.9965**. | T60 | §5 |
+| 23 | *(none — new)* | **Causal test of the threshold.** Same run, trained to placement, then `\|w₂\|` pinned to one side of `R_glob` and held: placement kept **0/37** below (0.85 R_glob) and **33/37** above (1.15 R_glob), **Fisher p = 1.2e-16**; a ×(1+1e-6) noise-floor arm keeps 37/37. Placement is lost **within 50 steps** in all 37. | T59 | §6 |
+| 24 | *(none — new)* | **The second threshold confirmed causally too.** `hold_high`'s held `R = 0.24663` lies **strictly between** `R_glob = 0.21446` and `R_solve = 0.30667`, and gives **33/37 placed, 0/40 solved** — the regime the decomposition predicts. Verified against the landscape: the conditional minimiser at exactly that `\|w₂\| = 5.750` has gap **+0.022543** and **does not solve**, so solving is *impossible* there, not merely unattained. | T59 | §6 |
+| 25 | *(none — new)* | **`R > R_glob` is necessary for placement to persist, NOT sufficient for it to be found.** Cold starts above the threshold place **2/40** (0/9 at 1.50 R_glob over 20,000 steps); pre-supplying `\|w₂\|` and releasing gives **9/40 against control's 37/40, Fisher p = 1.3e-10**. Growth and placement are coupled and ordered. | T59 | §6 |
+| 26 | *(none — new)* | **Why the jump arm fails: saturation and conditioning, not a wrong basin.** Gradients fall to **0.07% of control's**; a 5× budget recovers placement **2/15 → 7/15**; the endpoint is a near-constant-predictor region (`w₁ ≈ −0.003`, loss ≈ log 2) with Hessian condition number above 10⁷ (eigenvalues ~1e-6 against ~25–50). **Not a stationary point** — `w₁ = 0` has gradient 0.18–0.36 because the sampled classes' first moments differ. | pending | §6 |
+| 27 | *(none — new)* | **The machinery transfers to four unseen task windows.** Across five windows at fixed `a`, `\|w₂\|` at crossing spans **2.34–13.65 (5.8×)** while `CV(R) < CV(\|w₂\|)/2` at both `a` (**3.36× and 3.01×**). Each window's `κ₀`, computed from `h(σ)` alone, matches its measured `κ(1.02)` within **0.81%, 5 of 5**, across κ₀ values spanning **8.1×**. Nothing was refitted per window. | T61 | §7 |
+| 28 | *(none — new)* | **The per-`a` lag is a property of `a`, not of the task.** Measured/predicted ratios have sd **0.014** at a = 1.30 and **0.016** at a = 1.50 across five windows; normalised by the base task's own offset at the same `a`, all ten land within **2.72%** of 1.0. | T61 | §7 |
+
+## Claims to REMOVE (second session)
+
+| # | claim to remove | reason |
+|---|---|---|
+| R4 | `R_spin`, the upper spinodal, and any number derived from it (drift +16.9%, "crossings track `R_spin`", the 3-of-3 prospective result) | **`R_spin = R_glob` at all six `a`** on a 0.01 grid; the apparent windows were the 0.05 grid. D-1 (`blockF_lag_prediction.md`) becomes **vacuous** — its two models are identical. |
+| R5 | any suggestion that reaching `R > R_glob` *produces* sign-correct placement | Falsified by intervention: cold starts above the threshold place 2/40, jump-started runs 9/40 vs control 37/40. The threshold governs **stability**, not discovery. |
+| R6 | the registered `G3_far_outer ≥ base` sub-claim | Backwards by a provable inequality: `O' ⊃ O` ⟹ `Ĝ(O',I) ≤ Ĝ(O,I)`. Corrected before any Block G crossing was measured. |
+
+## Registered predictions that FAILED, with their explanations
+
+| prediction | outcome |
+|---|---|
+| P1-b (median solved ρ in [0.5,0.95]) | median **0.9674**; the inference from the theorem's slack was invalid |
+| `R·ρ` governs the second stage | `R` has CV 0.0830 vs `R·ρ` 0.1933 |
+| precision effect | retracted — an RNG artifact of per-dtype `uniform_()` |
+| S-3 for `R_solve` (positive, increasing in ε) | all six **negative**, mean −0.29% — `R_solve` is *already at* its limit value, so a constant sequence cannot show the predicted approach |
+| Block E `cold_high` ("placement achieved") | **2/40** |
+| Block E `jump` ("places well before control") | **falsified in the opposite direction**, 9/40 vs 37/40, p = 1.3e-10 |
+| G-1 (crossing within 15% of `R_glob`, all windows) | **6/10** on the letter; the four misses are the per-`a` lag, which varies **under 3%** between windows |
+| G-3 sub-claim on `G3_far_outer` | direction backwards by a provable inequality; corrected before measuring |
+| Block E stall: registered expectation **trapping** | **saturation** — gradients 0.07% of control, and a 5× budget recovers 2/15 → 7/15 |
+| Block H H-3 (validity gate) | **FAILED**, 42.5 pp, p = 4.3e-5 — a linear schedule is not a null because the natural `\|w₂\|` trajectory is non-monotone |
+
+## Framings considered and NOT adopted
+
+- **Loss-landscape bifurcation with hysteresis** — dropped on its own registered falsifier at a = 1.30 and now excluded at all six `a` (claim 21).
+- **Output scale as an annealing parameter** — the registration made it conditional on the stall being **trapping**; it is **saturation**, and Block H's validity gate failed independently. Not adopted.
+
 ## Open / pending
 
-- Block B switch points (`R_glob`, `R_spin`, `R_fold`, `R_solve`) and whether
-  measured crossings track the upper spinodal — **decides the paper's mechanism
-  claim**.
-- Block D: `R` vs `R·ρ` at the solve step. **Interim result contradicts the
-  registered prediction** — `R` has CV 0.0775 against `R·ρ` at 0.1935, so `R`
-  governs the second stage, not `R·ρ`. Logged as a failed registered prediction.
-- Blocks E, G: intervention and out-of-distribution windows.
+- **Block F** (three-optimiser crossing `R`, F-1/F-2/F-3) — the remaining
+  registered test. D-1 is now **vacuous** (T60) and is not run.
+- **Block H, valid version**: a control-matched arm must replay each seed's own
+  `|w₂|(t)` time-warped by `m`, so `m = 1` is the natural trajectory exactly.
+  Not run; recorded as the correct design in `blockH_rate_results.md`.
+- **Family B** (`Ĝ`-derived claims) — still suspended pending Block K.
+- Claim 26 (saturation/conditioning of the stall) has no ledger ID yet.

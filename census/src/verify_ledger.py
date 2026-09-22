@@ -150,6 +150,38 @@ def main() -> None:
     chk("held R above R_glob", float(held > float(sw13.R_glob)), 1.0, 0)
     chk("held R below R_solve", float(held < float(sw13.R_solve)), 1.0, 0)
 
+    print("T60 R_spin dropped")
+    fw = pd.read_csv(R / "blockB_fine_windows.csv").sort_values("a")
+    chk("R_glob == R_spin, all a", float(np.allclose(fw.R_glob, fw.R_spin, atol=1e-12)), 1.0, 0)
+    chk("every window 1 grid step",
+        float(np.allclose((fw.w2_spin - fw.w2_fold) / 0.01, 1.0, atol=0.05)), 1.0, 0)
+    chk("a=1.60 window width", float(fw[fw.a == 1.60].R_spin.iloc[0] - fw[fw.a == 1.60].R_fold.iloc[0]),
+        0.00111, 1e-5)
+    meas = np.array([0.2330, 0.2375, 0.2418, 0.2456, 0.2489, 0.2563])
+    bb = pd.read_csv(R / "blockB_switches.csv").sort_values("a")
+    rg = [float(bb[bb.a == 1.30].R_glob.iloc[0])] + [float(fw[fw.a == a].R_glob.iloc[0])
+                                                     for a in (1.35, 1.40, 1.45, 1.50, 1.60)]
+    rg = np.array(rg)
+    chk("R_glob drift (%)", (rg[-1] / rg[0] - 1) * 100, 4.5, 0.1)
+    chk("corr(measured, R_glob)", float(np.corrcoef(meas, rg)[0, 1]), 0.9965, 0.001)
+    chk("mean offset measured/R_glob", float(np.mean(meas / rg)), 1.1153, 1e-3)
+
+    print("T61 Block G transfer")
+    gs = pd.read_csv(R / "blockG_switches.csv")
+    gc = pd.read_csv(R / "blockG_crossings.csv")
+    for a, want_r, want_w in ((1.30, 0.2189, 0.7358), (1.50, 0.2304, 0.6925)):
+        c = gc[(gc.a == a) & gc.cross_R.notna()]
+        med = c.groupby("window").agg(Rm=("cross_R", "median"), wm=("cross_w2", "median"))
+        cvR = float(med.Rm.std(ddof=1) / med.Rm.mean())
+        cvW = float(med.wm.std(ddof=1) / med.wm.mean())
+        chk(f"a={a} CV(R)", cvR, want_r, 1e-3)
+        chk(f"a={a} CV(|w2|)", cvW, want_w, 1e-3)
+        chk(f"a={a} CV(R) < CV(w2)/2", float(cvR < cvW / 2), 1.0, 0)
+    sc = pd.read_csv(R / "blockG_scaling.csv")
+    chk("G-4 windows within 3%", float((sc.err_pct.abs() <= 3).sum()), 5.0, 0)
+    chk("G-4 worst error (%)", float(sc.err_pct.abs().max()), 0.808, 0.01)
+    chk("kappa_0 spread (x)", float(sc.kappa_0.max() / sc.kappa_0.min()), 8.077, 0.01)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 
