@@ -203,13 +203,34 @@ def analyze(path=MAIN, label="new"):
     return out, point
 
 
+def _cli_analyze():
+    new, _ = analyze()
+    new.to_csv(VERDICTS, index=False)
+    print(f"written {VERDICTS.name}")
+
+
+def analyze_existing():
+    """Context only (registered): the untargeted 600-run comparison, same estimator and test."""
+    a = pd.read_csv(RESULTS / "alpha_composition.csv")
+    w = pd.read_csv(RESULTS / "r_adamw.csv")
+    d = pd.concat([a[["optimizer", "budget", "seed", "w2", "solved"]],
+                   w[["optimizer", "budget", "seed", "w2", "solved"]]])
+    d["R"] = d.w2 * GHAT / 2
+    d["solved"] = d.solved.astype(str).str.lower() == "true"
+    tmp = RESULTS / "_blockC_existing_input.csv"
+    d.to_csv(tmp, index=False)
+    out, _ = analyze(tmp, label="existing (untargeted, context only)")
+    tmp.unlink()
+    out.to_csv(RESULTS / "blockC_existing_context.csv", index=False)
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "pilot":
         pilot()
     elif cmd == "main":
         main_runs()
+    elif cmd == "existing":
+        analyze_existing()
     elif cmd == "analyze":
-        new, _ = analyze()
-        new.to_csv(VERDICTS, index=False)
-        print(f"written {VERDICTS.name}")
+        _cli_analyze()

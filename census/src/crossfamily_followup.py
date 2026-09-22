@@ -99,31 +99,48 @@ def verify():
 
 
 def job(args):
+    """Thresholds with the scale-equivariant Block B minimisation (src/blockB_scaled.py).
+    The frozen raw-coordinate version fails its validity gate at these eps
+    (results/blockB_scaled_validity.md)."""
     family, a, which = args
     import torch
     from . import blockB_landscape as bb
+    from .blockB_scaled import best_conditional
     torch.set_num_threads(1)
-    if family == "q2":
-        fq = _q2()
-        bb.activation = lambda name, par, _a=a: (lambda v: fq(v, _a))
-        g, _, _ = ghat_q2(a)
-    else:
-        g, _, _ = ghat_A(a)             # activation stays sin_family: procedure untouched
+    g = ghat_q2(a)[0] if family == "q2" else ghat_A(a)[0]
     x, y = bb.population_data()
     lo, hi = 2 * R_LO / g, 2 * R_HI / g
     coarse, fine = 2 * DR_COARSE / g, 2 * DR_FINE / g
     restarts = 50 if which == "glob" else 24
     def pred(w2):
-        b = bb.best_conditional(a, w2, x, y, restarts=restarts)
+        b = best_conditional(family, a, w2, x, y, restarts=restarts)
         return b is not None and (b["gap"] > 0 if which == "glob" else b["solves"])
     w2 = bb.bracket_then_refine(pred, lo, hi, coarse=coarse, fine=fine)
     tmin = tmax = frac = None
-    if w2 is not None and family == "q2":
-        b = bb.best_conditional(a, w2, x, y, restarts=restarts)
-        tmin, tmax, frac = _t_range(b["w1"], b["b1"])
+    if w2 is not None:
+        b = best_conditional(family, a, w2, x, y, restarts=restarts)
+        if family == "q2" and b is not None:
+            tmin, tmax, frac = _t_range(b["w1"], b["b1"])
     return {"family": family, "a": a, "threshold": which, "ghat": g, "w2": w2,
             "R": None if w2 is None else w2 * g / 2, "t_min": tmin, "t_max": tmax,
             "frac_outside": frac}
+
+
+def validity():
+    """Gate: at a = 1.30 the scaled procedure must reproduce the frozen thresholds."""
+    ref = {("A", "glob"): 0.215254, ("A", "solve"): 0.307814,
+           ("q2", "glob"): 0.204983, ("q2", "solve"): 0.295390}
+    jobs = [(f, 1.30, w) for f in ("A", "q2") for w in ("glob", "solve")]
+    with Pool(4) as pool:
+        res = pool.map(job, jobs)
+    rows = []
+    for r in res:
+        k = (r["family"], r["threshold"])
+        rows.append({"family": k[0], "threshold": k[1], "R_frozen": ref[k], "R_scaled": r["R"],
+                     "diff": r["R"] - ref[k], "one_grid_step": DR_FINE,
+                     "pass": abs(r["R"] - ref[k]) <= DR_FINE + 1e-9})
+        print(rows[-1], flush=True)
+    pd.DataFrame(rows).to_csv(RESULTS / "blockB_scaled_validity.csv", index=False)
 
 
 def run():
@@ -167,4 +184,4 @@ def score():
 
 
 if __name__ == "__main__":
-    {"verify": verify, "run": run, "score": score}[sys.argv[1]]()
+    {"verify": verify, "run": run, "score": score, "validity": validity}[sys.argv[1]]()

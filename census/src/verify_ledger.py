@@ -469,7 +469,8 @@ PRODUCERS = {
     "blockA5d_runs.csv": ("blockA5d", "_run", "full", ""),
     "blockC_pilot.csv": ("blockC_equivalence", "_append", "full", ""),
     "blockC_runs.csv": ("blockC_equivalence", "_append", "full", ""),
-    "blockC_verdicts.csv": ("blockC_equivalence", "analyze", "full", ""),
+    "blockC_verdicts.csv": ("blockC_equivalence", "_cli_analyze", "full", ""),
+    "blockC_existing_context.csv": ("blockC_equivalence", "analyze_existing", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
