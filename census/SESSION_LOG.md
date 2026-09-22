@@ -316,3 +316,60 @@ pointer to the old 289-commit state and is fully contained in `main`. Locally,
 result. Regenerate with `src/phase2b_ordering.py`. Every number derived from it
 (Blocks A and C) is committed in `blockA_crossings.csv`, `blockA_per_a.csv` and
 `blockC_adiabatic.csv`.
+
+## 2026-09-22 — priority run: K, F, and the kappa certification
+
+**Block K — family B suspension resolved.** `Ĝ_norm(α) = 0.4|α|` (max gap at
+`|w₁| = 1`) is **forced by homogeneity**, not chosen. The committed box-limited
+`Ĝ` was exactly **8.000× Ĝ_norm** at every α, confirming the diagnosis.
+- **`β_B = 1` RESTORED** — exponent 1.000000. The suspended 0.9935 was
+  *accidentally right*: homogeneity forces linearity at any box size.
+- **Overshoot RESTORED at 11.8×–145×** (was 922–1,160×, inflated exactly 8×).
+  *My registered range "115–145×" was arithmetically wrong — I omitted the
+  2,000-budget row at 11.8×. The 8× factor and the >10× floor both hold.*
+- **AUC comparison REMOVED permanently.** Margin over `|w₂|` is **0.0089** vs a
+  registered ≥ 0.10. Two fatal reasons: within fixed α, `R_B` and `|w₁w₂|` have
+  **identical AUC by construction**; and 4 of 5 α cells are perfectly separable
+  (α = −1: unsolved max **0.295** vs solved min **7.26**, **2 runs between**)
+  against T54's own ≥20 band-run requirement. **The box was a second defect —
+  this claim was never supportable at any `Ĝ`.**
+- Onset exponent and the counterexample status unchanged (never used `Ĝ`).
+
+**Block F — the relaxation-lag account is a LABEL, not a mechanism.** Instrumented
+crossing `R` fresh, since no artifact had per-optimiser *crossing* `R` (only
+terminal `|w₂|`). `R_glob(1.25) = 0.21066`, new.
+- Adam **0.23094** / AdamW **0.22980** / SGD **0.22888**, with a **3.9× spread**
+  in growth rate.
+- **F-1's ordering holds exactly but has no power**: bootstrap CIs overlap almost
+  completely, **P(full ordering) = 0.290** vs 0.167 by chance.
+- **F-2 FAILS**: SGD's predicted offset **2.46%** against **8.65%** measured, a
+  **6.19 pp** miss. The account says SGD's offset should be a quarter of Adam's;
+  it is **90%** of it. Offsets span **0.98 pp while rate spans 3.9×**.
+- **F-3 passes (Spearman +0.783, restated against `R_glob` per T60) but is
+  confounded**: rate and offset both rise with `a` while rates vary only 9%.
+- Per the registration's own falsifier, **dropped**. **What survives**: the offset
+  is robust and one-signed (8.6–9.6% across optimisers, 8.6–14.4% across `a`),
+  which is what makes the training-free prediction useful; Block C's
+  relaxation-then-tracking is unaffected. **Second failed rate account**, after
+  Block H.
+
+**The κ certification** (registered separately — *not* Block H, which is the
+already-run dose-response). `Ĝ` is a **supremum**, so a grid can only
+**under-estimate** it; T50's interval had no error bar.
+- **C-1 PASSES**: certificate widths **0.022–0.086%** at ten `a` (registered
+  < 0.2%), via `Ĝ_grid ≤ Ĝ ≤ Ĝ_grid + Lh/2` with `L = (1+a)·max(1,max|x|)`.
+- **C-2 splits**: magnitude passes (endpoints move **+0.755%**, **+0.693%**), but
+  **containment FAILS** — certified `[0.307747, 0.317616]` excludes T50's lower
+  endpoint 0.30544. The grid was low at **every** `a` (0.13–0.68%). **T50's
+  substance survives**: the *width* the theorem chain uses is **3.207% certified
+  vs 3.271% reported**. The interval's **location** is corrected upward.
+- **C-3 PASSES**: boundary-shell gap **non-positive**, so the domain cut is sound.
+- **C-4 PASSES**: `K ∈ [0.579454977, 0.579950977]` (width 0.086%), with the
+  reported `K` and `κ₀` at the **lower endpoints** to 7 and 6 digits.
+- **Consequence for T58**: certified `κ(1.02)` and `κ₀` are **disjoint**, closest
+  approach **0.145%**. The reported **0.061%** was a coincidence of two
+  under-estimates. S-1 unaffected (3% tolerance), but quote **0.15% certified**.
+
+**Naming note**: the priority list called the κ certification "Block H". Block H
+is the growth-rate dose-response (registered `3c1c0f4`, run, reported). The
+certification is recorded under its own name to keep the register unambiguous.
