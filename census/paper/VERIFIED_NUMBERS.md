@@ -538,6 +538,32 @@ curve. The registered directional sub-prediction `alpha_adamw < alpha_adam` is
 
 **Print: the optimiser enters only through where on the R axis its runs land.**
 The earlier hedge ("undetectable at this coverage, not absent") is **replaced**.
+
+**SUPERSEDED FOR THE EQUIVALENCE CLAIM, 2026-09-22 (Block C, T73).** Overlapping
+intervals and null Fisher tests show no *detected* difference, not equivalence.
+A registered two-one-sided test (`blockC_equivalence_prediction.md`), margin
+**δ = 0.024** (half the 0.048 transition width), on **new band-targeted runs**
+(cells chosen by an 8-seed placement pilot; ≥ 500 in-band runs per optimizer,
+the registered TOST sample size), MLE logistic `R₅₀` with certified
+`Ĝ(1.25) = 0.0665056`, 4,000 cell-level bootstrap resamples:
+
+| optimiser | n | in-band | cells | `R₅₀` |
+|---|---:|---:|---:|---:|
+| Adam | 1,200 | 708 | 10 | **0.3471** |
+| AdamW (wd 0.01) | 960 | 687 | 8 | **0.3479** |
+| SGD (lr 0.3) | 840 | 653 | 7 | **0.3442** |
+
+| pair | difference | 90% interval | verdict |
+|---|---:|---|---|
+| Adam − AdamW | −0.0008 | [−0.0052, +0.0043] | **equivalent** |
+| Adam − SGD | +0.0029 | [−0.0040, +0.0086] | **equivalent** |
+| AdamW − SGD | +0.0037 | [−0.0038, +0.0092] | **equivalent** |
+
+**Print: the solve threshold `R₅₀` is equivalent across Adam, AdamW and SGD
+within δ = 0.024, for all three pairs.** The untargeted 600-run table above gives
+**inconclusive** for all three pairs under the same test (`blockC_existing_context.csv`),
+so the targeted design is what establishes equivalence. The old SGD estimate
+(0.3709/0.3723) came from 18 in-band runs; with 653 it is 0.3442.
 Note that on point estimates alone AdamW's gap (0.0251) and Adam's (0.0355)
 both exceed 0.0241; the registered criterion required interval separation **and**
 a significant Fisher test, neither of which occurs. Scope: one task, `a = 1.25`,

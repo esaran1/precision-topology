@@ -171,3 +171,33 @@ requirement). The box was a *second* defect. Claim removed entirely.
 
 **Nine registered predictions failed.** Every one is logged with its explanation,
 and two of them (E-5, K-3) changed what the paper claims.
+
+---
+
+## Added 2026-09-22 (paper-submitted-v2)
+
+### Block A5d at k = 10 (`blockA5d_k10_results.md`)
+
+| # | prediction | measured | verdict |
+|---|---|---|---|
+| A1 | zero perfect runs for a ≤ 1 | 0 of 160 | passes; **no information** (nothing is perfect anywhere) |
+| A2 | bracketed onset > 1 at every budget | no onset at any budget | **FAIL** |
+| A3 | onset non-increasing in B | — | undecidable |
+| A4 | a = 3.0, 64k: ≥ 1 perfect | 0 of 20 | **FAIL** |
+| A5 | γ, α_L/β positive | γ undefined | undecidable |
+
+### Block C — optimizer equivalence (`blockC_equivalence_prediction.md`), δ = 0.024
+
+| pair | 90% interval | verdict | registered expectation |
+|---|---|---|---|
+| Adam − AdamW | [−0.0052, +0.0043] | **equivalent** | equivalent — met |
+| Adam − SGD | [−0.0040, +0.0086] | **equivalent** | not equivalent / inconclusive — **failed, favourable** |
+| AdamW − SGD | [−0.0038, +0.0092] | **equivalent** | not equivalent / inconclusive — **failed, favourable** |
+
+### Cross-family test (`crossfamily_results.md`)
+
+| # | prediction | measured | verdict |
+|---|---|---|---|
+| X1 | q2 = A on `R_glob` and `R_solve`, a = 1.30–1.60 | `R_glob` 6/6, `R_solve` 0/6 | **FAIL** (stays failed) |
+| X2 | q1 ≠ A at ≥ 4 of 6 | `R_glob` 6/6 outside | PASS |
+
