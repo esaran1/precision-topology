@@ -54,20 +54,50 @@ released generator.** Their published data are **1-D curves plus isotropic
 Gaussian noise**, not thickened tubes. Both of our readings assumed a tube,
 because the appendix describes one.
 
-## A further structural finding
+## A further structural finding: their curve self-intersects
 
-Their oscillated curve comes within **6.07e-04** of itself (20,000-point
-sampling, ignoring near-diagonal `|Δt| > 50` steps), against a between-component
-separation of **0.1275**. The self-approach is three orders of magnitude smaller
-than the class separation.
+The oscillated curve is **not embedded**. Proven analytically, not just measured.
 
-*(A resolution-refinement check to establish whether this is a true self-contact
-or a sampling artifact was started and did not complete before the experiment
-cutoff. Reported as measured at 20,000 points, not as a claim about the embedding.
-If it matters for the paper, it needs the convergence check.)*
+**The argument.** For `curve1`,
 
-The smooth (un-oscillated) pair in the same parametrisation has between-component
-minimum distance **1.0000**, so the oscillation reduces the separation by ~8×.
+    x(t) − y(t) = cos t − sin t
+
+**independent of the oscillation**, since `+0.3 sin(100t)` is added to *both*
+`x` and `y`. So any self-intersection needs `cos t₁ − sin t₁ = cos t₂ − sin t₂`,
+i.e. `cos(t₁ + π/4) = cos(t₂ + π/4)`, giving the one-parameter family
+
+    t₂ = −t₁ − π/2   (mod 2π)
+
+Searching that family and refining 60×:
+
+| | |
+|---|---|
+| minimum self-distance | **7.8e−15** |
+| at | `t₁ = 2.5171476033`, `t₂ = 2.1952412700` |
+| parameter separation | **0.3219** — not a near-diagonal artifact |
+
+**7.8e−15 is float64 epsilon on coordinates of order 1.** This is a genuine
+self-intersection.
+
+Consistent with the numerical refinement, which **fails to converge to a positive
+reach**: minimum self-distance **6.07e−04 → 2.42e−05 → 1.50e−05** at 20,000 /
+60,000 / 180,000 sample points. An embedded curve has positive reach and the
+measured minimum would converge; here it keeps shrinking.
+
+For scale: the between-component separation is **0.1275**, and the smooth
+un-oscillated pair has separation **1.0000** — so the oscillation reduces
+between-class separation ~8× *and* destroys embeddedness of each component.
+
+**Why this matters.** A self-intersecting curve is not a knot, and the pair is not
+a link in the usual sense — the linking number of the *cores* is still defined,
+but each component fails to be an embedded `S¹`. The sampled dataset is
+unaffected as a **classification problem** (the two classes stay 0.1275 apart, so
+it is well-posed), but the topological description of the data does not hold as
+stated.
+
+Reported neutrally as a property of the released generator. It is not a claim
+that their empirical results are wrong — those are about a classification task
+that remains well-posed.
 
 ## What this settles for §2
 
