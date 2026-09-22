@@ -14,14 +14,17 @@ Updated as outcomes change. Three most important results so far.
    (`R = 0.2145`), so its switch lies in `R in (0.172, 0.215)` and the measured
    crossing at 0.2332 sits **at least 8% above** that interval. The offset is in
    the direction a bifurcation picture predicts — Block B tests it.
-2. **Block A: O1 — geometry carries the threshold.** Across `a` = 1.30/1.35/1.40
-   (interim; sweep still running), per-`a` median crossing `R` is
-   **0.2330 / 0.2375 / 0.2418** while median `|w2|` is **5.43 / 4.45 / 3.76**.
-   **CV(R) = 0.0152** [0.000, 0.018] against **CV(|w2|) = 0.1508** [0.000, 0.183]
-   — a 10x separation, comfortably inside the registered O1 criterion
-   (`CV(R) <= 0.15` and `CV(R) < CV(|w2|)/2`). `|w2|` falls as `Ĝ` rises; `R`
-   does not move. Within-cell CV is ~0.067, so `R` varies no more across `a`
-   than within one cell.
+2. **Block A FINAL, all six `a`: O1 — geometry carries the threshold.**
+   Per-`a` median crossing `R` = **0.2330 / 0.2375 / 0.2418 / 0.2456 / 0.2489 /
+   0.2563** while median `|w2|` falls **5.43 / 4.45 / 3.76 / 3.25 / 2.85 /
+   2.30**. **CV(R) = 0.0311** [0.013, 0.041] against **CV(|w2|) = 0.2821**
+   [0.121, 0.364] — 9x apart, registered O1 satisfied
+   (`CV(R) <= 0.15` and `CV(R) < CV(|w2|)/2`). Within-cell CV is ~0.065, so `R`
+   varies little more across `a` than within one cell.
+   **Drift check**: measured `R` drifts **+10.0%** over the range; `R_glob`
+   drifts **+6.5%** and `R_spin` **+16.9%**, both the **same sign**, with
+   `corr(measured, R_glob) = +0.980` and `corr(measured, R_spin) = +0.947`.
+   The predicted switch drifts the same way the measurement does.
 3. **Block B at `a = 1.30`: NO HYSTERESIS WINDOW — a registered falsifier.**
    `R_glob = R_spin = 0.2145` exactly. Following the `G <= 0` branch upward by
    continuation, the gap rises **smoothly through zero** (d(gap) per 0.05 step
