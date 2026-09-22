@@ -324,6 +324,14 @@ def main() -> None:
     chk("alpha max", float(ae.alpha.max()), 1.3411, 1e-3)
     chk("alpha median over onset region", float(ae.alpha.median()), 1.2797, 1e-3)
 
+    print("T68 our link construction")
+    ol = pd.read_csv(R / "our_link_verification.csv").iloc[0]
+    chk("Gauss linking number", float(ol.linking_number), -1.0, 0.02)
+    chk("core separation = R", float(ol.core_separation), 1.0, 1e-6)
+    chk("no core self-intersection", float(ol.core_self_min > 1e-6), 1.0, 0)
+    chk("tubes disjoint (2rho < sep)", float(bool(ol.tubes_disjoint)), 1.0, 0)
+    chk("tube embedded (rho < reach)", float(bool(ol.tube_embedded)), 1.0, 0)
+
     print("T69 S2uS2 budget sweep")
     s2 = pd.read_csv(R / "blockS2_budget.csv")
     gaps = {int(B): float(g[g.activation == "gelu"].accuracy.mean()
