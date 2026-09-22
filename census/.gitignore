@@ -9,3 +9,6 @@ __pycache__/
 # 2.7 GB raw per-step training log — over GitHub limits.
 # Regenerate with src/phase2b_ordering.py; derived results are committed.
 results/phase2b_checkpoints.csv
+
+# built supplementary archives (rebuild from the tag, never commit)
+dist/
