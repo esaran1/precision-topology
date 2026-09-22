@@ -46,8 +46,8 @@ preconditions independently.
 
 | item | status | why |
 |---|---|---|
-| **Corrugated-Hopf generator check** | **BLOCKED on an external input** | `generator_diff.md`: the repository does not hold the published appendix's torus construction text (radii, offsets, sampling law). The diff **cannot be performed** without the appendix text or the reviewer's details. What *was* done: our generator characterised from **200,000 samples** and checked for internal consistency. Reconstructing the appendix from memory to diff against would manufacture agreement or disagreement with equal ease, and was deliberately declined. |
-| **Ren–Lim S²⊔S² budget sweep** | **NOT STARTED** | No budget/epoch axis exists in any link artifact — `linking_width3.csv` and `linking_projected.csv` have no `epochs` column. The budget law (T44, `budget_law_results.md`) is established **only for the 1D fold task**. Extending it to the link setting is a genuinely new experiment: 5,120 existing link runs span depth/width/activation/seed at a **single** budget. Per the plan, **not started**. |
+| **Corrugated-Hopf generator check** | **RESOLVED 2026-09-22 (T68)** — unblocked by the repository reference; their code read directly. Their generator implements **neither** of our readings nor its own Appendix G.1: no thickening at all, and `curve1` **self-intersects** (7.8e−15, proven analytically). See `hopf_generator_resolved.md`. *(Original blocked note:)* | `generator_diff.md`: the repository does not hold the published appendix's torus construction text (radii, offsets, sampling law). The diff **cannot be performed** without the appendix text or the reviewer's details. What *was* done: our generator characterised from **200,000 samples** and checked for internal consistency. Reconstructing the appendix from memory to diff against would manufacture agreement or disagreement with equal ease, and was deliberately declined. |
+| **Ren–Lim S²⊔S² budget sweep** | **COMPLETE 2026-09-22 (T69), exploratory** — 23 min estimated, registered, run. The gap **widens** with budget (P = 0.9998), the registered falsifier: the budget law does **not** extend. See `blockS2_results.md`. *(Original not-started note:)* | No budget/epoch axis exists in any link artifact — `linking_width3.csv` and `linking_projected.csv` have no `epochs` column. The budget law (T44, `budget_law_results.md`) is established **only for the 1D fold task**. Extending it to the link setting is a genuinely new experiment: 5,120 existing link runs span depth/width/activation/seed at a **single** budget. Per the plan, **not started**. |
 | **Block H, valid version** | design recorded, not run | Requires replaying each seed's own `\|w₂\|(t)` time-warped by `m`, so `m = 1` is the natural trajectory by construction. Recorded in `blockH_rate_results.md`. |
 | **Block D** | superseded | D-1 became **vacuous** when `R_spin = R_glob` (T60); the two models it compared are identical. |
 | **Blocks I, J** | not started | Never registered; not on the critical path. |
@@ -63,10 +63,16 @@ is **pending the appendix text**. Do not claim agreement or disagreement.
 the budget law generalises, the honest answer is that it is untested there, and the
 1D result plus the R-threshold mechanism is what is offered.
 
-## Reproducibility gap found today
+## Reproducibility: RESOLVED 2026-09-22
 
-**The code producing the committed `R50 = 0.3705` is not in the repository.**
-`grep -rn "R50\|r50" src/*.py` returns nothing. The value is recorded in
-`r_collapse_results.md` with no committed script, so it cannot be replicated.
-A reimplementation converges to 0.3669 (restricted `Ĝ`) — 0.0036 below. See
-`r50_certified_results.md`. **Worth fixing before submission regardless of `Ĝ`.**
+**The `R50` script was confirmed absent from all history** — `git log -S` on both
+spellings, every blob ever committed, untracked files, stashes and `git fsck`
+dangling objects. Replaced by the committed `src/r50_fit.py`:
+**`R50 = 0.3682` [0.3603, 0.3730]**, materiality `0.5W` **0.0224**. The old 0.3705
+lies inside the new interval, so no verdict changes. See `r50_provenance.md`.
+
+**The verifier now enforces this**: every artifact it reads must have a committed
+producing script. The check found **7 gaps** (6 from this session's ad-hoc
+analysis, 2 pre-existing: `theorem_perplacement.csv`, `blockB_fine_windows.csv`);
+all are closed by `src/session_artifacts.py`. Verified functional by removing the
+module — the check flags all 7 and passes when restored.

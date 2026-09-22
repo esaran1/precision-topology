@@ -324,6 +324,29 @@ def main() -> None:
     chk("alpha max", float(ae.alpha.max()), 1.3411, 1e-3)
     chk("alpha median over onset region", float(ae.alpha.median()), 1.2797, 1e-3)
 
+    print("T69 S2uS2 budget sweep")
+    s2 = pd.read_csv(R / "blockS2_budget.csv")
+    gaps = {int(B): float(g[g.activation == "gelu"].accuracy.mean()
+                          - g[g.activation == "relu"].accuracy.mean())
+            for B, g in s2.groupby("budget")}
+    Bs = sorted(gaps)
+    chk("S2 gap at 1k", gaps[Bs[0]], 0.0138, 5e-4)
+    chk("S2 gap at 64k", gaps[Bs[-1]], 0.0402, 5e-4)
+    chk("S2 gap widens monotonically",
+        float(all(gaps[Bs[i]] < gaps[Bs[i + 1]] for i in range(len(Bs) - 1))), 1.0, 0)
+    chk("S2-1 falsified (gap grew)", float(gaps[Bs[-1]] > gaps[Bs[0]]), 1.0, 0)
+    relu = [float(s2[(s2.budget == B) & (s2.activation == "relu")].accuracy.mean())
+            for B in Bs]
+    gelu = [float(s2[(s2.budget == B) & (s2.activation == "gelu")].accuracy.mean())
+            for B in Bs]
+    chk("ReLU flat across 64x budget", relu[-1] - relu[0], 0.0084, 1e-3)
+    chk("ReLU perfect runs, all budgets", float(s2[s2.activation == "relu"].perfect.sum()), 0.0, 0)
+    chk("GELU perfect at 64k",
+        float(s2[(s2.budget == Bs[-1]) & (s2.activation == "gelu")].perfect.sum()), 8.0, 0)
+    chk("both non-decreasing in budget",
+        float(all(relu[i] <= relu[i + 1] + 1e-9 for i in range(3))
+              and all(gelu[i] <= gelu[i + 1] + 1e-9 for i in range(3))), 1.0, 0)
+
     print("PROVENANCE: every verified artifact has a producing script")
     import pathlib as _pl
     import re as _re
