@@ -187,3 +187,48 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ---------------------------------------------------------------------------
+# Item #2 (Junyu): use EXACT extrema for G(w1,b1) in the certified search, so
+# the certificate rests on exact evaluation in x rather than a grid in x.
+#
+# The (w1,b1) grid and its Lipschitz slack are unchanged -- that is the outer
+# certificate.  What changes is the INNER evaluation of G at each grid point:
+# previously a 4,001/2,000-point sample over the windows, now endpoints plus the
+# exact interior roots of 1 + a cos(w1 x + b1) = 0.  The grid could only
+# UNDER-state max_I and OVER-state min_O, so this can only lower G at each point
+# and therefore tighten nothing spuriously.
+# ---------------------------------------------------------------------------
+
+def gap_exact_grid(a, w1s, b1s):
+    """max over the (w1,b1) grid of the oriented class gap, x-extrema EXACT."""
+
+    from .exact_extrema import exact_gap
+
+    best, arg = -np.inf, None
+    for w1 in np.asarray(w1s, float):
+        if abs(w1) < 1e-12:
+            continue
+        for b1 in np.asarray(b1s, float):
+            g, _ = exact_gap(a, float(w1), float(b1))
+            if g > best:
+                best, arg = g, (float(w1), float(b1))
+    return best, arg
+
+
+def certify_exact(a, W=3.0, B=6.0, target_rel=1e-3, h0=0.05, hmin=1e-6):
+    """Same certificate as certify(), with exact x-extrema at every grid point."""
+
+    L = lipschitz(a)
+    h = h0
+    lo, arg = gap_exact_grid(a, np.arange(-W, W + 1e-12, h),
+                             np.arange(math.pi - B, math.pi + B + 1e-12, h))
+    while L * h / 2.0 >= target_rel * lo and h > hmin:
+        h = h / 5.0
+        w0, b0 = arg
+        pad = 12 * h
+        lo, arg = gap_exact_grid(a, np.arange(w0 - pad, w0 + pad + 1e-12, h),
+                                 np.arange(b0 - pad, b0 + pad + 1e-12, h))
+    return {"a": a, "L": L, "h": h, "Ghat_lo": lo, "Ghat_hi": lo + L * h / 2.0,
+            "slack": L * h / 2.0, "w1": arg[0], "b1": arg[1]}

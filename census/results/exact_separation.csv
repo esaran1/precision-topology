@@ -1,0 +1,3 @@
+case,a,exact_separates,grid_solves,agree,inner_max_logit,outer_min_logit,n_crit_inner,n_crit_outer_pos,n_crit_outer_neg
+fig1 solver a=1.5 seed0,1.5,True,True,True,-0.5068328288543142,0.04904836361853526,1,1,0
+fig1 monotone a=1.0 seed38,1.0,False,False,True,0.18375998484602718,-1.2416657366797974,0,0,0
