@@ -1,6 +1,16 @@
 # Every number the paper needs, recomputed from raw artifacts
 
-> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
+> **Two `R₅₀` populations — they are not the same quantity.**
+> (i) **Pooled `R₅₀`** = 0.3682 (binned logistic, `src/r50_fit.py`) / 0.3723 (MLE logistic, family A in T52):
+> the pooled population, 3,150 untargeted runs over 12 values of a × 8 budgets × Adam/SGD/AdamW
+> (`r_pooled.csv` + `r_adamw.csv`), certified `Ĝ(a)`.
+> (ii) **Block C in-band `R₅₀`** = 0.3471 (Adam), 0.3479 (AdamW), 0.3442 (SGD): MLE logistic on new
+> band-targeted runs at **a = 1.25 only** (1,200 / 960 / 840 runs, cells chosen to sit in the transition band).
+> They are different populations of runs (different a, budget mix and sampling design), so the
+> difference between (i) and (ii) is not a discrepancy and is not interpreted. Every `R₅₀` below is
+> labelled with the population it belongs to.
+
+> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **pooled `R50 = 0.3682` [0.3603, 0.3730]** (population (i)) (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
 
 
 **Method**: each value below was recomputed in this pass from the raw CSV or by
@@ -464,7 +474,7 @@ transition band).
 | (1.2, 2.0] | 138 | 138 | 1.000 |
 | > 2.0 | 43 | 43 | 1.000 |
 
-**`R50` = 0.3682**, `R25 = 0.3472`, `R75 = 0.3954`, **transition width
+**Pooled `R50` = 0.3682** (population (i): 3,150 untargeted runs, all a, all optimizers), `R25 = 0.3472`, `R75 = 0.3954`, **transition width
 W = 0.0481**. Registered materiality threshold **0.5W = 0.0241**.
 
 **AUC** (1,200-resample bootstrap 95% CI; transition-band n = runs where the
@@ -547,7 +557,7 @@ A registered two-one-sided test (`blockC_equivalence_prediction.md`), margin
 the registered TOST sample size), MLE logistic `R₅₀` with certified
 `Ĝ(1.25) = 0.0665056`, 4,000 cell-level bootstrap resamples:
 
-| optimiser | n | in-band | cells | `R₅₀` |
+| optimiser | n | in-band | cells | Block C in-band `R₅₀` (population (ii), a = 1.25) |
 |---|---:|---:|---:|---:|
 | Adam | 1,200 | 708 | 10 | **0.3471** |
 | AdamW (wd 0.01) | 960 | 687 | 8 | **0.3479** |
@@ -563,7 +573,8 @@ the registered TOST sample size), MLE logistic `R₅₀` with certified
 within δ = 0.024, for all three pairs.** The untargeted 600-run table above gives
 **inconclusive** for all three pairs under the same test (`blockC_existing_context.csv`),
 so the targeted design is what establishes equivalence. The old SGD estimate
-(0.3709/0.3723) came from 18 in-band runs; with 653 it is 0.3442.
+(0.3709/0.3723, from the 600-run untargeted three-optimiser table at a = 1.25) came from 18 in-band runs;
+the Block C in-band estimate (population (ii)), from 653 in-band runs, is 0.3442.
 Note that on point estimates alone AdamW's gap (0.0251) and Adam's (0.0355)
 both exceed 0.0241; the registered criterion required interval separation **and**
 a significant Fisher test, neither of which occurs. Scope: one task, `a = 1.25`,
