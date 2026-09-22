@@ -2,6 +2,8 @@
 
   python -m src.blockA5d_analyze bracket   # which a values get stage-2 seeds
   python -m src.blockA5d_analyze score     # A1-A5, writes blockA5d_scores.csv + figure data
+  python -m src.blockA5d_analyze bracket k1 | score k1   # the k = 1 registration
+                                           # (blockA5d_k1_prediction.md; perfect = 0 uniform AND 0 stratified)
 """
 
 from __future__ import annotations
@@ -21,20 +23,38 @@ A_VALUES = (0.9, 1.0, 1.05, 1.1, 1.2, 1.35, 1.5, 2.0, 3.0)
 BETA = 1.5
 
 
+def use_k1():
+    """Point the module at the k = 1 artifacts (registration blockA5d_k1_prediction.md)."""
+    global RUNS, SCORES, CURVE, CONTROLS_OUT, K1
+    RUNS = RESULTS / "blockA5d_k1_runs.csv"
+    SCORES = RESULTS / "blockA5d_k1_scores.csv"
+    CURVE = RESULTS / "blockA5d_k1_perfect_fraction.csv"
+    CONTROLS_OUT = RESULTS / "blockA5d_k1_controls.csv"
+    K1 = True
+
+
+CONTROLS_OUT = RESULTS / "blockA5d_controls.csv"
+K1 = False
+
+
 def load():
     d = pd.read_csv(RUNS, dtype={"act": str})
     d["perfect"] = d.perfect.astype(str).str.lower() == "true"
+    if K1:   # secondary: also zero errors on the 200,000-point uniform sample
+        d["perfect_big"] = d.perfect & (pd.to_numeric(d.big_errors, errors="coerce") == 0)
     return d
 
 
 def curve(d):
     fa = d[~d.act.isin(["relu", "gelu"])].copy()
     fa["a"] = fa.a.astype(float)
+    extra = {"k_big": ("perfect_big", "sum")} if K1 else {}
     g = fa.groupby(["budget", "a"]).agg(n=("perfect", "size"), k=("perfect", "sum"),
-                                        acc_med=("heldout_acc", "median")).reset_index()
+                                        acc_med=("heldout_acc", "median"), **extra).reset_index()
     g["frac"] = g.k / g.n
     c = d[d.act.isin(["relu", "gelu"])].groupby(["budget", "act"]).agg(
-        n=("perfect", "size"), k=("perfect", "sum"), acc_med=("heldout_acc", "median")).reset_index()
+        n=("perfect", "size"), k=("perfect", "sum"), acc_med=("heldout_acc", "median"),
+        **({"k_big": ("perfect_big", "sum")} if K1 else {})).reset_index()
     c["frac"] = c.k / c.n
     return g, c
 
@@ -67,14 +87,23 @@ def score():
     d = load()
     g, c = curve(d)
     g.to_csv(CURVE, index=False)
-    c.to_csv(RESULTS / "blockA5d_controls.csv", index=False)
+    c.to_csv(CONTROLS_OUT, index=False)
     rows = []
     # A1
     low = d[d.act.isin(["0.9", "1.0"])]
-    rows.append({"id": "A1", "prediction": "zero perfect runs for a <= 1, every budget",
-                 "measured": f"{int(low.perfect.sum())} perfect of {len(low)} run-budgets; "
-                             f"min held-out errors {int(low.heldout_errors.min())}",
-                 "pass": int(low.perfect.sum()) == 0})
+    if K1:   # violation rule: zero on uniform, stratified AND the 200,000-point sample
+        viol = int(low.perfect_big.sum())
+        rows.append({"id": "A1", "prediction": "zero perfect runs for a <= 1, every budget",
+                     "measured": f"{int((low.heldout_errors == 0).sum())} zero-uniform, "
+                                 f"{int(low.perfect.sum())} zero on uniform+stratified, {viol} also zero "
+                                 f"on 200k, of {len(low)} run-budgets; min uniform errors "
+                                 f"{int(low.heldout_errors.min())}, min stratified {int(low.strat_errors.min())}",
+                     "pass": viol == 0})
+    else:
+        rows.append({"id": "A1", "prediction": "zero perfect runs for a <= 1, every budget",
+                     "measured": f"{int(low.perfect.sum())} perfect of {len(low)} run-budgets; "
+                                 f"min held-out errors {int(low.heldout_errors.min())}",
+                     "pass": int(low.perfect.sum()) == 0})
     # A2 / A3
     ons = {}
     for B in BUDGETS:
@@ -121,4 +150,6 @@ def score():
 
 
 if __name__ == "__main__":
+    if sys.argv[2:] == ["k1"]:
+        use_k1()
     {"bracket": bracket, "score": score}[sys.argv[1]]()

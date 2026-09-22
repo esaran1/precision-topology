@@ -62,7 +62,8 @@ def record(name: str, sources: list[str], n: str, note: str,
 SLUG = {"Fig 1": "fig1_setting", "Fig 2": "fig2_exclusions",
         "Fig 3": "fig3_r_collapse", "Fig 4": "fig4_metric_check",
         "Fig 5": "fig5_budget_law", "Fig 6": "fig6_four_family",
-        "Fig 7": "fig7_family_b", "Fig 8": "fig8_link"}
+        "Fig 7": "fig7_family_b", "Fig 8": "fig8_link",
+        "Fig 9": "fig9_expressivity"}
 
 SMALLEST_PT = 6.0          # nothing may render below this at final size
 COL_IN, DBL_IN = 3.25, 6.75
@@ -768,12 +769,64 @@ def fig8_link() -> None:
            placement="single-column")
 
 
+def fig9_expressivity() -> None:
+    """Block A5d at k = 1: fraction perfect vs a per budget; threshold a = 1; controls."""
+    g = pd.read_csv(RESULTS / "blockA5d_k1_perfect_fraction.csv")
+    c = pd.read_csv(RESULTS / "blockA5d_k1_controls.csv")
+    a_vals = sorted(g.a.unique())
+    xpos = {a: i for i, a in enumerate(a_vals)}
+    ctrl = ["relu", "gelu"]
+    for j, act in enumerate(ctrl):
+        xpos[act] = len(a_vals) + 0.6 + j
+    budgets = sorted(g.budget.unique())
+    fig, ax = plt.subplots(figsize=(DBL * 0.62, 2.5))
+    width = 0.16
+    for i, B in enumerate(budgets):
+        mk, ls, col = STYLE[i]
+        off = (i - (len(budgets) - 1) / 2) * width
+        sub = g[g.budget == B].sort_values("a")
+        xs = [xpos[a] + off for a in sub.a]
+        cis = [clopper_pearson(int(k), int(n)) for k, n in zip(sub.k, sub.n)]
+        ax.errorbar(xs, sub.frac, yerr=[[f - lo for f, (lo, _) in zip(sub.frac, cis)],
+                                        [hi - f for f, (_, hi) in zip(sub.frac, cis)]],
+                    marker=mk, ls=ls, color=col, ms=3.5, lw=0.9, capsize=1.5,
+                    label=f"{B // 1000}k steps")
+        cs = c[c.budget == B].set_index("act")
+        for act in ctrl:
+            if act in cs.index:
+                k, n = int(cs.loc[act, "k"]), int(cs.loc[act, "n"])
+                lo, hi = clopper_pearson(k, n)
+                ax.errorbar(xpos[act] + off, k / n, yerr=[[k / n - lo], [hi - k / n]],
+                            marker=mk, color=col, ms=3.5, lw=0.9, capsize=1.5)
+    thr = (xpos[1.0] + xpos[a_vals[a_vals.index(1.0) + 1]]) / 2
+    ax.axvline(thr, color="k", ls="--", lw=0.9)
+    ax.text(thr + 0.08, 1.03, "expressivity threshold $a = 1$\n(Ren–Lim Thm 4.7 bars $a \\leq 1$)",
+            fontsize=6, va="bottom")
+    ax.axvline(len(a_vals) - 0.2, color="0.6", lw=0.5)
+    ax.set_xticks([xpos[k] for k in list(a_vals) + ctrl])
+    ax.set_xticklabels([f"{a:g}" for a in a_vals] + ["ReLU", "GELU"])
+    ax.set_xlabel("activation $f_a(t) = t + a\\sin t$, parameter $a$ (controls at right)")
+    ax.set_ylabel("fraction perfect\n(0 errors, uniform + stratified)")
+    ax.set_ylim(-0.04, 1.22)
+    ax.legend(loc="center left", ncol=1, frameon=False)
+    ax.grid(alpha=0.25, lw=0.3, axis="y")
+    ax.set_title("Linked $S^2 \\sqcup S^2 \\subset \\mathbb{R}^5$, width 5, depth 5, $k = 1$",
+                 fontsize=7.5)
+    save(fig, "fig9_expressivity")
+    n = int(g.n.max())
+    record("Fig 9", ["blockA5d_k1_perfect_fraction.csv", "blockA5d_k1_controls.csv",
+                     "blockA5d_k1_prediction.md"], f"{n} seeds per cell (per a, budget)",
+           "Clopper-Pearson 95%; perfect = zero errors on 20k uniform and 20k stratified held-out",
+           placement="full-width")
+
+
 def main() -> int:
     print("Regenerating paper figures from committed artifacts\n")
     audit_canonical()
     print("\nFigures:")
     for fn in (fig1_setting, fig2_exclusions, fig3_r_collapse, fig4_metric_check,
-               fig5_budget_law, fig6_four_family, fig7_family_b, fig8_link):
+               fig5_budget_law, fig6_four_family, fig7_family_b, fig8_link,
+               fig9_expressivity):
         try:
             fn()
         except Exception as exc:                       # noqa: BLE001
