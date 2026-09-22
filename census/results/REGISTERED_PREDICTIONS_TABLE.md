@@ -30,22 +30,37 @@ Verified against the landscape itself: Block B's conditional minimiser at exactl
 **impossible** at that `R`, so 0/40 is the prediction met, not a shortfall.
 **Block E therefore tests both switch points.**
 
-### Saturation vs trapping (`blockE_stall_prediction.md`) — registered expectation was TRAPPING
+### Saturation vs trapping (`blockE_stall_prediction.md`) — **scored separately per arm**
 
-| measurement | registered signature | measured | points to |
-|---|---|---|---|
-| gradient norm at step 500 | saturation if **< 10%** of control | control **1.57e-02**, jump **1.13e-05** (**0.07%**), cold_high **4.97e-06** | **saturation** |
-| loss above the conditional minimum | trapping if **> 0.005** | jump **+0.341834**, cold_high **+0.367765** | trapping |
-| 5× budget (60,000 steps) | saturation if placement rate **> 25%** | jump **7/15 = 46.7%** (from 2/15), cold_high 3/15 | **saturation** |
+Registered **S-A (saturation)**: gradient **< 10%** of control **and** 60k placement **> 25%**.
+Registered **S-B (trapping)**: gradient **> 50%** of control **and** 60k within **10 pp** of 12k **and** loss excess **> 0.005**.
+Registered **expectation: TRAPPING** — wrong for both arms.
 
-**Verdict: SATURATION.** Two of three signatures, and the budget arm is decisive —
-a trapped run cannot be rescued by more steps, and these are. The large loss
-excess is explained by the endpoint: an ill-conditioned flat valley near the
-constant predictor (`w₁ ≈ −0.003`, Hessian condition number > 10⁷), not a wrong
-basin. **Registered expectation was wrong.**
+| arm | grad @500 (% of control) | S-A grad? | 60k placement | S-A budget? | Δ vs 12k | S-B budget? | loss excess | S-B excess? | **verdict** |
+|---|---:|---|---:|---|---:|---|---:|---|---|
+| **`jump`** | 1.13e-05 (**0.072%**) | ✓ | **7/15 = 46.7%** | ✓ | +33.3 pp | ✗ | +0.341834 | ✓ | **SATURATION** — S-A fully satisfied |
+| **`cold_high`** | 4.97e-06 (**0.032%**) | ✓ | **3/15 = 20.0%** | ✗ (needs >25%) | +13.3 pp | ✗ (needs ≤10) | +0.367765 | ✓ | **MIXED — neither S-A nor S-B satisfied** |
 
-**Consequence: the annealing framing is NOT adopted** — its precondition was
-trapping.
+(control gradient @500: **1.57e-02**.)
+
+**`jump`: SATURATION.** Both S-A criteria met. The 5× budget recovers placement
+from 2/15 to 7/15, which a trapped run cannot do. The large loss excess is
+explained by the endpoint — an ill-conditioned flat valley near the constant
+predictor (`w₁ ≈ −0.003`, Hessian condition number > 10⁷) — not by a wrong basin.
+
+**`cold_high`: MIXED, not saturation.** Its gradients collapse just as hard
+(0.032% of control), but the budget arm gives **20.0%, below the registered 25%
+threshold**, so S-A is **not** satisfied; and S-B fails independently (the 13.3 pp
+rise exceeds the 10 pp band). The registration's own fallback applies: *"If
+neither S-A nor S-B is satisfied … the result is reported as **mixed**."*
+
+Reported as mixed rather than folded into `jump`'s verdict. The two arms differ in
+a way the design anticipated: `cold_high` holds `|w₂|` **fixed** for the whole run
+while `jump` releases it, so `cold_high` has no route to grow out of the flat
+region and recovers less with budget.
+
+**Consequence for the annealing framing: unchanged and NOT adopted.** Its
+precondition was **trapping**, which neither arm shows.
 
 ## Block H — growth-rate dose-response (`a = 1.30`, 40 seeds/arm)
 
@@ -89,7 +104,7 @@ across three optimisers and 8.6–14.4% across six `a`.
 | # | registered prediction | measured | verdict |
 |---|---|---|---|
 | **G-1** | crossing within **15%** of that window's own `R_glob` | **6 of 10**; all ten ratios **one-signed above** prediction, 1.082–1.191 | **FAIL as written** |
-| **G-2** | `CV(R) < CV(\|w₂\|)/2` across windows at fixed `a` | a=1.30: **0.2189 vs 0.7358 (3.36×)**; a=1.50: **0.2304 vs 0.6925 (3.01×)** | **PASS both** |
+| **G-2** | `CV(R) < CV(\|w₂\|)/2` across windows at fixed `a` | a=1.30: `CV(R)` **0.2189** vs `CV(\|w₂\|)` **0.7358**, ratio **3.36×**, criterion `0.2189 < 0.3679` ✓; a=1.50: **0.2304** vs **0.6925**, ratio **3.01×**, criterion `0.2304 < 0.3463` ✓. `\|w₂\|` at crossing spans **2.34–13.65 (5.8×)** while `R` spans 0.144–0.241 | **PASS at both `a`** |
 | **G-3** | `Ĝ` ordering `G2_narrow < base < G1_wide` | holds at both `a` | **PASS** |
 | **G-3b** | `G3_far_outer ≥ base` | **wrong by a provable inequality** (`O' ⊃ O` ⟹ `Ĝ(O',I) ≤ Ĝ(O,I)`); corrected **before** any crossing was measured | **FAIL (my error)** |
 | **G-4** | each window's `κ₀` from `h(σ)` within **3%** of measured `κ(1.02)` | **5 of 5**, worst **0.808%**, across `κ₀` spanning **8.1×** | **PASS** |
@@ -109,11 +124,22 @@ across three optimisers and 8.6–14.4% across six `a`.
 | G3_far_outer | 1.50 | 0.20905 | 0.24527 | **1.173** |
 | G4_shifted | 1.50 | 0.16314 | 0.19424 | **1.191** |
 
-**All four misses are at `a = 1.50`, and the base task misses too (1.163)** — so
-the offset is a property of `a`, not of the window: sd **0.014** at `a = 1.30`,
-**0.016** at `a = 1.50`. Normalised by the base task's own offset at the same `a`,
-**all ten land within 2.72% of 1.0**. The registered flat 15% tolerance did not
-allow for the per-`a` lag the calibrated task itself shows.
+**G-1 stands as FAILED as registered: 6 of 10.** The registered test was a flat
+15% tolerance against the raw prediction, and four cells miss it.
+
+**The following normalisation is POST HOC.** It was constructed after seeing the
+misses and is reported as an observation, not as a passed test:
+
+> All four misses are at `a = 1.50`, and the base task misses too (1.163), so the
+> offset tracks `a` rather than the window: sd **0.014** at `a = 1.30`, **0.016**
+> at `a = 1.50`. Dividing each window's ratio by the base task's own ratio **at
+> the same `a`** puts all ten within **2.72%** of 1.0.
+
+Two caveats on that normalisation, both stated because it is post hoc: it uses the
+base task as a per-`a` reference chosen after the fact, and the per-`a` lag it
+removes is itself only partly characterised (Block F showed the lag is **not**
+explained by growth rate). It supports the reading that the window contributes
+little to the offset; it does not rescue G-1.
 
 ## Block K — family B under the forced normalisation
 

@@ -150,6 +150,22 @@ def main() -> None:
     chk("held R above R_glob", float(held > float(sw13.R_glob)), 1.0, 0)
     chk("held R below R_solve", float(held < float(sw13.R_solve)), 1.0, 0)
 
+    print("Block E stall: per-arm verdicts")
+    stl = pd.read_csv(R / "blockE_stall.csv")
+    sh12 = stl[stl.budget == 12000]
+    lo60 = stl[stl.budget == 60000]
+    ctl = float(sh12[sh12.arm == "control"].grad_500.median())
+    for arm, want_grad, want_60 in (("jump", 0.00072, 7.0), ("cold_high", 0.00032, 3.0)):
+        gfrac = float(sh12[sh12.arm == arm].grad_500.median()) / ctl
+        chk(f"{arm} grad frac of control", gfrac, want_grad, 5e-5)
+        chk(f"{arm} placed at 60k", float(lo60[lo60.arm == arm].placed.sum()), want_60, 0)
+    # the registered S-A budget criterion: >25%
+    j60 = float(lo60[lo60.arm == "jump"].placed.mean())
+    c60 = float(lo60[lo60.arm == "cold_high"].placed.mean())
+    chk("jump meets S-A budget (>25%)", float(j60 > 0.25), 1.0, 0)
+    chk("cold_high FAILS S-A budget (>25%)", float(c60 > 0.25), 0.0, 0)
+    chk("cold_high 60k rate", c60, 0.2000, 1e-4)
+
     print("T60 R_spin dropped")
     fw = pd.read_csv(R / "blockB_fine_windows.csv").sort_values("a")
     chk("R_glob == R_spin, all a", float(np.allclose(fw.R_glob, fw.R_spin, atol=1e-12)), 1.0, 0)

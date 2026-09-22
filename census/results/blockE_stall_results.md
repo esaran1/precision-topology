@@ -1,11 +1,11 @@
-# Saturation, not trapping: the jump/cold stall is an optimisation artifact
+# The jump/cold stall: SATURATION for `jump`, MIXED for `cold_high`
 
 Scored against `results/blockE_stall_prediction.md` (registered `ce4c7df`, before
 any gradient norm, loss excess or extended-budget run was inspected). Artifacts:
 `blockE_stall.csv`, `blockE_stall_loss.csv`, `src/blockE_stall.py`.
 
-**Registered expectation was TRAPPING. The data say SATURATION. The registered
-expectation is wrong.**
+**Registered expectation was TRAPPING. It is wrong for both arms** — `jump` is
+**saturation**, `cold_high` is **mixed**.
 
 ---
 
@@ -50,13 +50,30 @@ S-A required **more than 25%** at the longer budget for `jump`: **46.7%, passes*
 S-B required the 60,000-step rate to be **within 10 points** of the 12,000-step
 rate: `jump` moves **13.3 -> 46.7**, a 33-point rise, **fails**.
 
-## Verdict: S-A satisfied, S-B not — SATURATION
+## Verdict: scored SEPARATELY per arm
 
-Two of three measurements point to saturation (collapsed gradients, and a 5x
-budget substantially recovering placement); one points to trapping (loss far above
-the conditional minimum). The extended budget is decisive: **a trapped run cannot
-be rescued by more steps, and these are.** The large loss excess is consistent
-with saturation once the geometry is examined.
+| arm | S-A (saturation) | S-B (trapping) | verdict |
+|---|---|---|---|
+| **`jump`** | grad **0.072%** of control ✓, 60k placement **46.7% > 25%** ✓ | ✗ | **SATURATION** |
+| **`cold_high`** | grad **0.032%** ✓, 60k placement **20.0% < 25%** ✗ | ✗ (Δ = 13.3 pp > 10) | **MIXED** |
+
+**`jump` satisfies S-A fully.** The 5× budget recovers placement 2/15 → 7/15,
+which a trapped run cannot do.
+
+**`cold_high` satisfies neither.** Its gradients collapse just as hard, but the
+budget arm returns **20.0%, below the registered 25% threshold**, so S-A fails;
+and the 13.3 pp rise exceeds S-B's 10 pp band, so S-B fails too. The
+registration's own fallback governs: *"If neither S-A nor S-B is satisfied … the
+result is reported as **mixed**."*
+
+**Why they differ, and it is by design**: `cold_high` holds `|w₂|` **fixed for the
+whole run** while `jump` scales once and then **releases** it. `cold_high`
+therefore has no route to grow out of the flat region, and recovers less with
+budget. This was not predicted in advance and is stated as an observation.
+
+**An earlier version of this note reported a single "SATURATION" verdict covering
+both arms. That was wrong** — it pooled the two and glossed `cold_high`'s failure
+on the budget criterion.
 
 ## What the stalled runs are actually at
 
@@ -88,9 +105,9 @@ valley is a *slow region*, not a basin with a barrier.
 ## Consequence: the annealing framing is NOT adopted
 
 Per the standing instruction and the registration's own reporting condition, the
-annealing interpretation of output scale enters `paper_claims_delta.md` only if
-this test returns **trapping**. It returns **saturation**. The framing is
-therefore **not adopted**, regardless of what the growth-rate dose-response shows.
+annealing interpretation enters `paper_claims_delta.md` only if this test returns
+**trapping**. **Neither arm does** — `jump` is saturation, `cold_high` is mixed.
+The framing is **not adopted**, regardless of the growth-rate dose-response.
 
 What is reported instead, which the data do support: **pre-supplying `|w2|` at
 initialisation drives the run into an ill-conditioned near-constant-predictor
