@@ -250,6 +250,55 @@ def main() -> None:
     chk("K certified lower", float(kk.K_lo), 0.579454977, 1e-8)
     chk("K rel width (%)", (float(kk.K_hi) / float(kk.K_lo) - 1) * 100, 0.0856, 0.001)
 
+    print("T65 one Ghat everywhere")
+    gg = pd.read_csv(R / "ghat_certified_all.csv").set_index("a")
+    chk("certified/restricted min (%)", float(gg.pct.min()), 0.1313, 0.002)
+    chk("certified/restricted max (%)", float(gg.pct.max()), 0.8399, 0.002)
+    fr = []
+    for fn in ("r_pooled.csv", "r_adamw.csv"):
+        t = pd.read_csv(R / fn)
+        if "a" not in t:
+            t = t.assign(a=1.25)
+        fr.append(t[["a", "w2", "solved"]])
+    pool = pd.concat(fr, ignore_index=True)
+    gcert = pool.a.map(lambda v: float(gg.loc[round(float(v), 2), "Ghat_certified"]))
+    pool = pool.assign(R_new=pool.w2.abs() * gcert / 2)
+    below = pool[pool.R_new < 0.30]
+    above = pool[pool.R_new > 0.50]
+    chk("certified: n below 0.30", float(len(below)), 2281.0, 0)
+    chk("certified: solved below 0.30", float(below.solved.sum()), 0.0, 0)
+    chk("certified: n above 0.50", float(len(above)), 463.0, 0)
+    chk("certified: solved above 0.50", float(above.solved.sum()), 461.0, 0)
+    ba = pd.read_csv(R / "blockA_per_a.csv").sort_values("a")
+    Rn = ba.w2.values * np.array([float(gg.loc[round(float(v), 2), "Ghat_certified"])
+                                  for v in ba.a]) / 2
+    cvn = float(Rn.std(ddof=0) / Rn.mean())
+    chk("certified CV(R) across a", cvn, 0.0324, 5e-4)
+    chk("O1 still met", float(cvn <= 0.15 and cvn < float(ba.w2.std(ddof=0) / ba.w2.mean()) / 2), 1.0, 0)
+
+    print("T66 nu")
+    ns = pd.read_csv(R / "nu_sweep.csv")
+    m2 = ns.groupby(["a", "budget"]).w2_abs.median().reset_index()
+    als = [float(np.polyfit(np.log(g.budget), np.log(g.w2_abs), 1)[0])
+           for _, g in m2.groupby("a")]
+    eps = [float(a) - 1.0 for a, _ in m2.groupby("a")]
+    chk("corr(eps, alpha)", float(np.corrcoef(eps, als)[0, 1]), -0.9943, 0.002)
+    chk("alpha spread", float(max(als) - min(als)), 0.1692, 0.002)
+    nus = [-float(np.polyfit(np.log(g.a - 1), np.log(g.w2_abs), 1)[0])
+           for _, g in m2.groupby("budget")]
+    chk("fixed-budget nu mean", float(np.mean(nus)), -0.0626, 0.002)
+    chk("fixed-budget nu sign inconsistent",
+        float(any(v > 0 for v in nus) and any(v < 0 for v in nus)), 1.0, 0)
+
+    print("T67 pathwise distance")
+    pw = pd.read_csv(R / "pathwise_distance.csv")
+    chk("n runs", float(len(pw)), 400.0, 0)
+    chk("median init distance", float(pw.init_distance.median()), 5.2234, 1e-3)
+    chk("median min-along-path", float(pw.min_distance.median()), 4.8773, 1e-3)
+    chk("median ratio min/init", float((pw.min_distance / pw.init_distance).median()),
+        0.9918, 1e-3)
+    chk("min at step 0 count", float((pw.min_at_step == 0).sum()), 0.0, 0)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 
