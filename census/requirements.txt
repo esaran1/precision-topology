@@ -5,3 +5,6 @@ matplotlib==3.11.1
 pytest==9.1.1
 # Required solely because pandas needs a Parquet engine for saturation.parquet.
 pyarrow==25.0.0
+# Required by paper/make_figures.py's legibility audit, which measures the
+# rendered PDF page box against the declared column placement.
+pypdf==6.14.2
