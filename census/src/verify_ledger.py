@@ -94,6 +94,37 @@ def main() -> None:
     chk("min zero-basin grad norm", float(z.grad_norm.min()), 0.0192, 0.002)
     chk("negative lambda_min count", float((z.lambda_min < 0).sum()), 6.0, 0)
 
+    print("T58 scaling limit")
+    import math as _m
+    from .fold1d_theorem import maximum_gap as _mg, dip_depth as _dd
+    d = pd.read_csv(R / "scaling_limit_switches.csv").iloc[0]
+    K = float(d["K"]); D_inf = 4 * _m.sqrt(2) / 3
+    chk("dip depth 4sqrt2/3", D_inf, 1.885618, 1e-5)
+    chk("K", K, 0.5794549, 1e-5)
+    chk("kappa_0", K / D_inf, 0.307302, 1e-5)
+    chk("kappa(1.02) vs kappa_0 (%)",
+        (_mg(1.02, resolution=800) / _dd(1.02) / (K / D_inf) - 1) * 100, -0.38, 0.05)
+    chk("R_glob^inf", float(d["R_glob"]), 0.19991, 1e-4)
+    chk("R_spin^inf == R_glob^inf (no window)",
+        float(d["R_spin"]) - float(d["R_glob"]), 0.0, 0)
+    chk("R_solve^inf", float(d["R_solve"]), 0.30711, 1e-4)
+    b = pd.read_csv(R / "blockB_switches.csv").sort_values("a")
+    e = (b["a"] - 1).values
+    dev = (b["R_glob"] / float(d["R_glob"]) - 1).values
+    chk("R_glob dev all positive", float((dev > 0).all()), 1.0, 0)
+    chk("R_glob dev monotone", float(np.all(np.diff(dev) > 0)), 1.0, 0)
+    chk("R_glob dev at a=1.60 (%)", dev[-1] * 100, 14.29, 0.05)
+    chk("R_glob corr(eps,dev)", float(np.corrcoef(e, dev)[0, 1]), 0.9866, 0.001)
+    chk("R_glob log-log slope", float(np.polyfit(np.log(e), np.log(dev), 1)[0]), 0.947, 0.01)
+    c1 = float(np.linalg.lstsq(np.vstack([e]).T, dev, rcond=None)[0][0])
+    chk("c1", c1, 0.23099, 1e-4)
+    chk("c1 fit max residual",
+        float(np.abs(b["R_glob"].values - float(d["R_glob"]) * (1 + c1 * e)).max()),
+        0.00133, 1e-4)
+    dv = (b["R_solve"] / float(d["R_solve"]) - 1).values
+    chk("R_solve dev all negative (S-3 falsified)", float((dv < 0).all()), 1.0, 0)
+    chk("R_solve mean dev (%)", dv.mean() * 100, -0.29, 0.02)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 

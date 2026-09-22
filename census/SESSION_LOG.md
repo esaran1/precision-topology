@@ -48,6 +48,31 @@ Updated as outcomes change. Three most important results so far.
    slope 0.033 per unit `|w2|`. Small, one-signed, consistent.
    **The derived threshold stands**: `R = 0.2145` at `a = 1.30` from the loss
    landscape with no training run in it, against a measured 0.2332.
+4. **The scaling limit DERIVES why `R` is the right variable.** Near the fold,
+   `f_a(pi+s) - pi = eps^{3/2}[-sigma + (1+eps)sigma^3/6] + O(eps^{5/2})` exactly,
+   with `sigma = s/sqrt(eps)`, so `|w2|` and `eps` enter only through
+   `W = w2 eps^{3/2}` -- and `R = |w2| Ghat/2` with `Ghat = K eps^{3/2}` is the
+   scale-free form of `W`. Constants obtained with **no training and no fit**:
+   `K = 0.579454926`, **`kappa_0 = 0.307302` against measured `kappa(1.02) =
+   0.306122` (0.38%, registered tolerance 3%)**, and, from Block B run directly on
+   `h(sigma)`, **`R_glob^inf = R_spin^inf = 0.19991`** -- **no hysteresis window in
+   the limit either**, reproducing the `a = 1.30` falsifier from the limit
+   activation alone -- and **`R_solve^inf = 0.30711`**.
+   **Registered S-3 splits.** For `R_glob` it passes: deviations +7.28% to
+   **+14.29%** over `a = 1.30..1.60`, all positive, strictly monotone,
+   `corr(eps,dev) = +0.9866`, log-log slope 0.947, and
+   `R_glob(a) = 0.19991(1 + 0.231 eps)` fits all six to max residual 0.00133,
+   inside the grid spread. For `R_solve` **it fails**: all six deviations are
+   negative (mean **-0.29%**). The failure is explained, not repaired -- `R_solve`
+   is *already at* its limit value at every `a`, which is why its across-`a` CV was
+   0.0020; a constant sequence cannot show the predicted approach.
+   **Step 5 (exact loss invariance) fails at the `eps` used**: the neglected term
+   is 6.3% of the leading one at `a = 1.30` and 16.4% at `a = 1.60`. Asymptotic
+   only. **`c1 = 0.231` is fitted, not derived** (the `K(eps)` argument predicts
+   0.49, a factor 2.4 off, because `R_glob` tracks the conditional *minimiser*,
+   which trades gap against loss rather than maximising gap).
+   The measured **+10.0%** drift in crossing `R` across `a` is then the same
+   `O(eps)` correction that moves `R_glob` by +7 to +14%, same direction.
 
 ---
 
@@ -124,3 +149,20 @@ The seeding fix is what creates the `R_fold`/`R_spin` separation at `a >= 1.35`;
 **Genuinely prospective: `a` = 1.45, 1.50, 1.60.** Result on that set is 3 of 3, all within 15%. Corrected in `blockB_results_final.md`.
 
 Also recorded there: **the 4/4 (now 3/3) test does not discriminate.** `R_spin >= R_glob` always and every measured crossing exceeds `R_spin`, so 'closer to `R_spin`' follows from the ordering alone and holds equally under a pure-lag account with `R_glob` as the true switch.
+
+## 2026-09-21 — VALIDITY GATE 4 (rule 7): the scaling-limit grid was 7x too coarse
+
+Block B on `h(sigma)` uses `W = w2 eps^{3/2}`, so a 0.05 step in `W` is **0.0145
+in `R_inf`** against 0.0021 at finite `a` -- seven times coarser. The coarse scan
+returned `R_solve^inf = 0.3183`, which sits 3.8% **above** every finite-`a`
+value and would have been recorded as a clean S-3 failure with the wrong
+explanation. **Refined to step 0.005**: `R_solve^inf = 0.30711`, `R_glob^inf =
+R_spin^inf = 0.19991`. The refined `R_solve^inf` is **0.29%** from the six-`a`
+mean. Caught before the result was written up; both grids are reported in
+`scaling_limit_results.md`.
+
+## 2026-09-21 — the secondary item: `a = 1.60` window at step 0.01
+
+Running. Registered threshold: a freeze-mid arm is added only if the refined
+`R_spin - R_fold` window is **at least five grid steps of 0.01 in `|w2|`** wide.
+Reversibility remains the primary Block E result either way.
