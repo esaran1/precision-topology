@@ -305,6 +305,120 @@ def theorem_perplacement() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+# --- certified Ghat / kappa tables (T64, T65) --------------------------------
+GHAT_A = (1.02, 1.05, 1.10, 1.15, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.60, 2.00, 3.00)
+KAPPA_A = (1.02, 1.05, 1.10, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.60)
+SMALLEPS_A = (1.001, 1.002, 1.005, 1.01, 1.02, 1.05, 1.10, 1.30, 1.60)
+_CERT: dict = {}
+
+
+def _certified(a):
+    from .kappa_certify import certify_exact
+    if a not in _CERT:
+        _CERT[a] = certify_exact(a)
+    return _CERT[a]
+
+
+def ghat_certified_all() -> pd.DataFrame:
+    from .fold1d_theorem import maximum_gap
+    rows = []
+    for a in GHAT_A:
+        c = _certified(a)
+        g = maximum_gap(a, resolution=600)
+        rows.append({"a": a, "Ghat_restricted": g, "Ghat_certified": c["Ghat_lo"],
+                     "Ghat_cert_hi": c["Ghat_hi"], "ratio": c["Ghat_lo"] / g,
+                     "pct": (c["Ghat_lo"] / g - 1) * 100})
+    return pd.DataFrame(rows)
+
+
+def _kappa_rows(avals):
+    from .fold1d_theorem import dip_depth
+    rows = []
+    for a in avals:
+        c = dict(_certified(a))
+        D = dip_depth(a)
+        c.update({"D": D, "kappa_lo": c["Ghat_lo"] / D, "kappa_hi": c["Ghat_hi"] / D,
+                  "rel_width": (c["Ghat_hi"] - c["Ghat_lo"]) / c["Ghat_lo"]})
+        rows.append(c)
+    return pd.DataFrame(rows)
+
+
+def kappa_certified_exact() -> pd.DataFrame:
+    return _kappa_rows(KAPPA_A)
+
+
+def kappa_certified_full_range() -> pd.DataFrame:
+    return _kappa_rows(KAPPA_A + (2.0, 3.0))[["a", "kappa_lo", "kappa_hi"]].sort_values("a")
+
+
+def kappa_certified_smalleps() -> pd.DataFrame:
+    d = _kappa_rows(SMALLEPS_A)
+    d["eps"] = d.a - 1
+    return d[["a", "eps", "kappa_lo", "kappa_hi"]]
+
+
+# --- exact-extrema certification of Phase 1 runs (T64) -----------------------
+def exact_vs_grid() -> pd.DataFrame:
+    from .exact_extrema import exact_gap, separates
+    d = pd.read_csv(RESULTS / "phase1_decomposition.csv")
+    rows = []
+    for _, r in d.iterrows():
+        ok, im, om = separates(r.a, (r.w1, r.b1, r.w2, r.b2))
+        g, _ = exact_gap(r.a, r.w1, r.b1)
+        rows.append({"a": r.a, "seed": r.seed, "precision": r.precision,
+                     "exact_sep": ok, "grid_solved": bool(r.solved),
+                     "agree": ok == bool(r.solved), "exact_gap": g, "grid_gap": r.gap,
+                     "certified": bool(r.certified) if not pd.isna(r.certified) else None,
+                     "inner_max_logit": im, "outer_min_logit": om})
+    return pd.DataFrame(rows)
+
+
+def exact_all_solved() -> pd.DataFrame:
+    from .exact_extrema import separates
+    d = pd.read_csv(RESULTS / "phase1_decomposition.csv")
+    rows = []
+    for _, r in d[d.solved == True].iterrows():             # noqa: E712
+        ok, im, om = separates(r.a, (r.w1, r.b1, r.w2, r.b2))
+        rows.append({"a": r.a, "seed": r.seed, "precision": r.precision, "exact_sep": ok,
+                     "inner_max_logit": im, "outer_min_logit": om,
+                     "margin": min(-im, om),
+                     "lip_certified": bool(r.certified) if not pd.isna(r.certified) else False,
+                     "lipschitz": r.lipschitz, "certify_threshold": r.certify_threshold,
+                     "margin_grid": r.margin_grid})
+    return pd.DataFrame(rows)
+
+
+SESSION_PRODUCERS = {
+    "ghat_certified_all.csv": ghat_certified_all,
+    "kappa_certified_exact.csv": kappa_certified_exact,
+    "kappa_certified_full_range.csv": kappa_certified_full_range,
+    "kappa_certified_smalleps.csv": kappa_certified_smalleps,
+    "exact_vs_grid.csv": exact_vs_grid,
+    "exact_all_solved.csv": exact_all_solved,
+}
+
+
+def check_session_producers():
+    """Regenerate each session artifact in memory and compare with the committed file."""
+    out = []
+    for name, fn in SESSION_PRODUCERS.items():
+        new = fn().reset_index(drop=True)
+        ref = pd.read_csv(RESULTS / name).reset_index(drop=True)
+        common = [c for c in ref.columns if c in new.columns]
+        worst, same_other = 0.0, True
+        for c in common:
+            if ref[c].dtype.kind in "fi" and new[c].dtype.kind in "fi":
+                worst = max(worst, float(np.nanmax(np.abs(ref[c].astype(float).values
+                                                          - new[c].astype(float).values))))
+            else:
+                same_other &= bool((ref[c].astype(str).str.lower().values
+                                    == new[c].astype(str).str.lower().values).all())
+        out.append({"artifact": name, "rows_new": len(new), "rows_ref": len(ref),
+                    "max_abs_diff_numeric": worst, "non_numeric_equal": same_other})
+        print(out[-1], flush=True)
+    pd.DataFrame(out).to_csv(RESULTS / "session_producers_check.csv", index=False)
+
+
 def main() -> None:
     print("regenerating session artifacts", flush=True)
     alpha_of_eps().to_csv(RESULTS / "alpha_of_eps.csv", index=False)
