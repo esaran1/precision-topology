@@ -8,3 +8,5 @@ pyarrow==25.0.0
 # Required by paper/make_figures.py's legibility audit, which measures the
 # rendered PDF page box against the declared column placement.
 pypdf==6.14.2
+# Required by src/scaling_proposition.py (symbolic checks); also a torch dependency.
+sympy==1.14.0

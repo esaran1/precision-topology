@@ -410,13 +410,12 @@ def fig3_r_collapse() -> None:
     spanning 5x (alpha 1.2627 / 0.9802 / 0.7188).  AdamW is included because
     its decoupled weight decay OPPOSES the mechanism.
     Panel (c) AUC: R against its two factors, per family, with bootstrap CIs.
-    Provenance: r_pooled.csv, r_adamw.csv, r_families.csv, r_family_b.csv.
+    Provenance: r_pooled.csv, r_adamw.csv, r_families.csv, ghat_certified_all.csv.
     """
 
     d = pd.read_csv(RESULTS / "r_pooled.csv")
     aw = pd.read_csv(RESULTS / "r_adamw.csv").rename(columns={"optimizer": "opt"})
     fam = pd.read_csv(RESULTS / "r_families.csv")
-    fb = pd.read_csv(RESULTS / "r_family_b.csv")
 
     # Recompute R with the CERTIFIED Ghat (T65).  The committed R columns used
     # the restricted maximum_gap() search, which under-estimates the supremum by
@@ -494,10 +493,13 @@ def fig3_r_collapse() -> None:
 
     # --- (c) AUC per family ----------------------------------------------
     axa = fig.add_subplot(gs[1, 1])
-    sets = [("A", d.R.values, d.w2.values, d.gstar.values, d.solved.values),
+    # Family A uses the certified Ghat (T65).  Family B is omitted: its AUC
+    # comparison was removed in T62 (identical by construction within alpha, and
+    # ~2 transition-band runs in 4 of 5 cells).
+    gA = d.a.map(lambda v: float(_gc.loc[round(float(v), 2), "Ghat_certified"])).values
+    sets = [("A", d.R.values, d.w2.values, gA, d.solved.values),
             ("q2", *[fam[fam.q == 2.0][c].values for c in ("R", "w2", "gstar", "solved")]),
-            ("q1", *[fam[fam.q == 1.0][c].values for c in ("R", "w2", "gstar", "solved")]),
-            ("B", fb.R.values, fb.w2_abs.values, fb.gstar.values, fb.solved.values)]
+            ("q1", *[fam[fam.q == 1.0][c].values for c in ("R", "w2", "gstar", "solved")])]
     w = 0.26
     for j, (lab, c, hatch) in enumerate(((r"$R$", "#1f77b4", ""),
                                          (r"$|w_2|$", "#d62728", "//"),
@@ -517,12 +519,11 @@ def fig3_r_collapse() -> None:
     axa.set_ylabel("AUC (solved vs not)")
     axa.set_xlabel("activation family")
     axa.legend(frameon=False, ncol=3, fontsize=6, loc="lower left")
-    axa.set_title(r"(c) $R$ beats both factors — except family B ($\beta{=}1$)",
-                  fontsize=7.5)
+    axa.set_title(r"(c) $R$ against its two factors, per family", fontsize=7.5)
     axa.grid(alpha=0.25, lw=0.3, axis="y")
 
     save(fig, "fig3_r_collapse")
-    record("Fig 3", ["r_pooled.csv", "r_adamw.csv", "r_families.csv", "r_family_b.csv"],
+    record("Fig 3", ["r_pooled.csv", "r_adamw.csv", "r_families.csv", "ghat_certified_all.csv"],
            f"(a) {len(pooled):,}  (b) Adam 180 / AdamW 240 / SGD 180  "
            "(c) A 2,910 / q2 360 / q1 360 / B 1,000",
            "Clopper-Pearson on rates; 1,500-resample bootstrap on AUC; "
@@ -709,8 +710,10 @@ def fig7_family_b() -> None:
     ax.legend(frameon=False, fontsize=6)
     ax.grid(alpha=0.25, lw=0.3, which="both")
 
-    fb = pd.read_csv(RESULTS / "r_family_b.csv")
-    g = fb.groupby("parameter").agg(w2=("w2_abs", "median"), gstar=("gstar", "first"))
+    # Forced normalisation Ghat_norm = 0.4|alpha| (T62); the box-limited values
+    # were exactly 8x this, so the exponent and the range ratio are unchanged.
+    fb = pd.read_csv(RESULTS / "blockK_family_b_normalised.csv")
+    g = fb.groupby("parameter").agg(w2=("w2_abs", "median"), gstar=("gnorm", "first"))
     g["prod"] = g.w2 * g.gstar / 2
     sl, _, _ = loglog_fit(g.gstar.values, g.w2.values)
     ax2.plot(g.gstar, g.w2, "o-", color="#d62728", ms=4,
@@ -719,10 +722,10 @@ def fig7_family_b() -> None:
              label=rf"product $R$ (varies {g['prod'].max()/g['prod'].min():.1f}$\times$)")
     ax2.set_xscale("log")
     ax2.set_yscale("log")
-    ax2.set_xticks([0.16, 0.5, 1.6, 3.2])
-    ax2.set_xticklabels(["0.16", "0.5", "1.6", "3.2"])
+    ax2.set_xticks([0.02, 0.04, 0.1, 0.2, 0.4])
+    ax2.set_xticklabels(["0.02", "0.04", "0.1", "0.2", "0.4"])
     ax2.minorticks_off()
-    ax2.set_xlabel(r"$G^*(\alpha)$  (varies $%.0f\times$)" % (g.gstar.max() / g.gstar.min()))
+    ax2.set_xlabel(r"$\hat G_{\rm norm}(\alpha)=0.4|\alpha|$  (varies $%.0f\times$)" % (g.gstar.max() / g.gstar.min()))
     ax2.set_ylabel("median value")
     ax2.set_title("(b) compensation: weights grow as the fold shallows", fontsize=7.5)
     ax2.legend(frameon=False, fontsize=6)
@@ -730,7 +733,7 @@ def fig7_family_b() -> None:
     if abs(sl + 0.475) > 0.02:
         finding(f"family B compensation exponent {sl:.3f} != documented -0.475")
     save(fig, "fig7_family_b")
-    record("Fig 7", ["onset_law_extended.csv", "onset_family_b.csv", "r_family_b.csv"],
+    record("Fig 7", ["onset_law_extended.csv", "onset_family_b.csv", "blockK_family_b_normalised.csv"],
            "(a) A 6 cells / B 2 bracketed of 3  (b) 5 alpha values, 200 runs each",
            f"compensation exponent {sl:.3f}; product range {g['prod'].max()/g['prod'].min():.1f}x vs G* {g.gstar.max()/g.gstar.min():.0f}x")
 

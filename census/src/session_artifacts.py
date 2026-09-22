@@ -101,8 +101,15 @@ def blockG_scaling() -> pd.DataFrame:
 
 
 # --- blockK_*.csv (T62) ----------------------------------------------------
+# The box-limited Ghat that T62 corrects, as committed (3.2|alpha|, except the
+# alpha = -1 search, which stopped at the box corner).  Reported for comparison only.
+BOX_GSTAR = {-1.0: 3.1195979899497495, -0.5: 1.5999999999999996, -0.25: 0.7999999999999998,
+             -0.1: 0.3200000000000003, -0.05: 0.1600000000000001}
 def blockK() -> tuple[pd.DataFrame, pd.DataFrame]:
-    d = pd.read_csv(RESULTS / "r_family_b.csv")
+    # primary columns straight from the sweep; r_family_b.csv's gstar/R/bin columns
+    # are the superseded box-limited values and are not used
+    sw = pd.read_csv(RESULTS / "fold1d_sweep.csv")
+    d = sw[(sw.activation == "pwl_family") & (sw.parameter <= -0.05)].copy()
     d = d.assign(gnorm=0.4 * d.parameter.abs())
     d = d.assign(prod=d.w1_abs * d.w2_abs)
     d = d.assign(R_B=d["prod"] * d.gnorm / 2.0)
@@ -121,7 +128,7 @@ def blockK() -> tuple[pd.DataFrame, pd.DataFrame]:
         lo, hi = ns.max(), ps.min()
         band = g[(g["prod"] >= min(lo, hi)) & (g["prod"] <= max(lo, hi))]
         rows.append({"alpha": p, "n": len(g), "solved": int(s.sum()),
-                     "gstar_box": g.gstar.iloc[0], "gnorm": g.gnorm.iloc[0],
+                     "gstar_box": BOX_GSTAR[float(p)], "gnorm": g.gnorm.iloc[0],
                      "auc_R_B": auc(g.R_B, s), "auc_prod": auc(g["prod"], s),
                      "auc_w2": auc(g.w2_abs, s), "auc_w1": auc(g.w1_abs, s),
                      "unsolved_max_prod": float(ns.max()),
@@ -417,6 +424,13 @@ def check_session_producers():
                     "max_abs_diff_numeric": worst, "non_numeric_equal": same_other})
         print(out[-1], flush=True)
     pd.DataFrame(out).to_csv(RESULTS / "session_producers_check.csv", index=False)
+
+
+def write_session_producers() -> None:
+    """Write every artifact in SESSION_PRODUCERS to results/."""
+    for name, fn in SESSION_PRODUCERS.items():
+        fn().to_csv(RESULTS / name, index=False)
+        print(f"  {name}", flush=True)
 
 
 def main() -> None:

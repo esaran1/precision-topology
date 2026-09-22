@@ -164,6 +164,18 @@ def check(workers: int = 1):
     return res
 
 
+def write(name: str, workers: int = 1) -> None:
+    """Overwrite results/<name> with the regenerated artifact."""
+    if name == "r_pooled.csv":
+        r_pooled().to_csv(RESULTS / "r_pooled.csv", index=False)
+    elif name == "r_adamw.csv":
+        r_adamw(workers).to_csv(RESULTS / "r_adamw.csv", index=False)
+    else:
+        raise ValueError(f"{name}: no full producer (see provenance_rebuild.md)")
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "check":
         check(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
+    elif sys.argv[1] == "write":
+        write(sys.argv[2])

@@ -371,33 +371,153 @@ def main() -> None:
         float(all(relu[i] <= relu[i + 1] + 1e-9 for i in range(3))
               and all(gelu[i] <= gelu[i + 1] + 1e-9 for i in range(3))), 1.0, 0)
 
-    print("PROVENANCE: every verified artifact has a producing script")
-    import pathlib as _pl
-    import re as _re
-    _here = _pl.Path(__file__).resolve()
-    _self = _here.read_text()
-    # artifacts this verifier reads, as literal "name.ext" after `R / `
-    _arts = sorted({a for a in _re.findall(r'R / "([A-Za-z0-9_.]+\.(?:csv|txt))"', _self)})
-    _scripts = {p.name: p.read_text() for p in _here.parent.glob("*.py")
-                if p.name != _here.name}
-    _scripts.update({p.name: p.read_text()
-                     for p in (_here.parents[1] / "paper").glob("*.py")})
-    _orphans = []
-    for _a in _arts:
-        if _a == "ledger_verification.txt":
-            continue                      # written by this module itself
-        _stem = _a.rsplit(".", 1)[0]
-        # a producer references either the full name or the stem (artifact_lock
-        # pattern: RESULTS / "stem" then .with_suffix(".csv"))
-        if not any((_a in t) or (f'"{_stem}"' in t) for t in _scripts.values()):
-            _orphans.append(_a)
-    chk("artifacts with no producing script", float(len(_orphans)), 0.0, 0)
-    for _o in _orphans:
-        F.append(f"PROVENANCE: {_o} is read by the verifier but no committed "
-                 f"script writes it")
+    provenance_check()
 
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
+
+
+# ---------------------------------------------------------------------------
+# PROVENANCE
+#
+# Every artifact that backs a reported number must have a committed function
+# that writes it.  Tightened 2026-09-22: the earlier check passed if ANY script
+# merely mentioned the artifact's name, which let three headline datasets
+# (r_pooled.csv, r_families.csv, r_family_b.csv) and seven session artifacts
+# through with no producer at all.  Now each artifact is mapped to a
+# module.function, and the check confirms from the source that the function
+# exists, that its module references the artifact, and that the function
+# performs a write.
+#
+# status "full"    -- the producer regenerates every column
+# status "partial" -- some columns cannot be regenerated; recorded as a finding
+# ---------------------------------------------------------------------------
+PRODUCERS = {
+    # artifact: (module, function, status, note)
+    "alpha_of_eps.csv": ("session_artifacts", "main", "full", ""),
+    "beta_law_points.csv": ("beta_law_figure", "main", "full", ""),
+    "blockA_crossings.csv": ("blockA_score", "main", "full", ""),
+    "blockA_per_a.csv": ("blockA_score", "main", "full", ""),
+    "blockB_fine_windows.csv": ("session_artifacts", "main", "full", ""),
+    "blockB_switches.csv": ("blockB_landscape", "main", "full", ""),
+    "blockC_adiabatic.csv": ("blockC_adiabatic", "main", "full", ""),
+    "blockE_intervene.csv": ("blockE_intervene", "main", "full", ""),
+    "blockE_stall.csv": ("blockE_stall", "main", "full", ""),
+    "blockE_stall_loss.csv": ("blockE_stall", "main", "full", ""),
+    "blockF_optimisers.csv": ("blockF_optimisers", "main", "full", ""),
+    "blockG_crossings.csv": ("blockG_windows", "main", "full", ""),
+    "blockG_scaling.csv": ("session_artifacts", "main", "full", ""),
+    "blockG_switches.csv": ("blockG_windows", "main", "full", ""),
+    "blockH_rate.csv": ("blockH_rate", "main", "full", ""),
+    "blockK_auc.csv": ("session_artifacts", "main", "full", ""),
+    "blockK_family_b_normalised.csv": ("session_artifacts", "main", "full", ""),
+    "blockS2_budget.csv": ("blockS2_budget", "main", "full", ""),
+    "budget_alpha.csv": ("budget_law", "main", "full", ""),
+    "budget_flip.csv": ("budget_flip", "main", "full", ""),
+    "cifar_convergence.csv": ("cifar_convergence", "main", "full", ""),
+    "criticality.csv": ("criticality", "main", "full", ""),
+    "depth_families_verification.csv": ("depth_families", "<module>", "full", ""),
+    "exact_all_solved.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "exact_separation.csv": ("exact_extrema", "main", "full", ""),
+    "exact_vs_grid.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "exceptions_above_050.csv": ("session_artifacts", "main", "full", ""),
+    "exclusion_table.csv": ("exclusion_table", "main", "full", ""),
+    "family_ghat_certified.csv": ("family_certify", "main", "full", ""),
+    "family_onsets.csv": ("family_onsets", "main", "full", ""),
+    "fold1d_refine.csv": ("fold1d_theorem", "main", "full", ""),
+    "fold1d_sweep.csv": ("fold1d", "main", "full", ""),
+    "gelu_scale_scaled_down.csv": ("gelu_scale", "run_arm", "full", ""),
+    "gelu_scale_scaled_up.csv": ("gelu_scale", "run_arm", "full", ""),
+    "gelu_scale_standard.csv": ("gelu_scale", "run_arm", "full", ""),
+    "ghat_certified_all.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "kappa_K_certified.csv": ("kappa_certify", "main", "full", ""),
+    "kappa_boundary.csv": ("kappa_certify", "main", "full", ""),
+    "kappa_certified.csv": ("kappa_certify", "main", "full", ""),
+    "kappa_certified_exact.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "kappa_certified_full_range.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "kappa_certified_smalleps.csv": ("session_artifacts", "write_session_producers", "full", ""),
+    "monotonic_zero_decomposition.csv": ("zero_decomposition", "main", "full", ""),
+    "nu_sweep.csv": ("nu_sweep", "main", "full", ""),
+    "offset_search.csv": ("offset_search", "main", "full", ""),
+    "offset_witness_dense.csv": ("offset_witness", "main", "full", ""),
+    "onset_family_b.csv": ("onset_family_b", "main", "full", ""),
+    "onset_law_extended.csv": ("onset_more", "main", "full", ""),
+    "our_link_verification.csv": ("verify_our_link", "main", "full", ""),
+    "pathwise_distance.csv": ("pathwise_distance", "main", "full", ""),
+    "phase1_decomposition.csv": ("phase1_decompose", "main", "full", ""),
+    "r50_fit.csv": ("r50_fit", "main", "full", ""),
+    "r_adamw.csv": ("provenance_rebuild", "write", "full", ""),
+    "r_families.csv": ("provenance_rebuild", "r_families_primary", "partial",
+                       "w2 and solved regenerate exactly; the gstar column came from a "
+                       "search that is not in the repository and is not reproduced"),
+    "r_pooled.csv": ("provenance_rebuild", "write", "full", ""),
+    "r_pooled_union.csv": ("pool_union", "main", "full", ""),
+    "saturation.parquet": ("census", "run_sweep", "full", ""),
+    "scaling_limit_switches.csv": ("scaling_limit_blockB", "main", "full", ""),
+    "scaling_proposition_checks.csv": ("scaling_proposition", "main", "full", ""),
+    "search_restarts.csv": ("search_restarts", "_write", "full", ""),
+    "sgd_onsets.csv": ("sgd_onsets", "main", "full", ""),
+    "sgd_q4_refined.csv": ("sgd_q4_refine", "main", "full", ""),
+    "theorem_perplacement.csv": ("session_artifacts", "main", "full", ""),
+    "theorem_verification.csv": ("fold1d_theorem", "main", "full", ""),
+    "training_dynamics.parquet": ("census", "run_sweep", "full", ""),
+    "training_status.parquet": ("census", "run_sweep", "full", ""),
+    "width_effect.csv": ("width_effect", "main", "full", ""),
+    "width_sweep.csv": ("width_sweep", "_write", "full", ""),
+    "width_sweep.parquet": ("width_sweep", "_write", "full", ""),
+    "blockA5d_runs.csv": ("blockA5d", "_run", "full", ""),
+    "blockC_pilot.csv": ("blockC_equivalence", "_append", "full", ""),
+    "blockC_runs.csv": ("blockC_equivalence", "_append", "full", ""),
+    "blockC_verdicts.csv": ("blockC_equivalence", "analyze", "full", ""),
+}
+
+_WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
+               "_write(", "_write_frame(", "artifact_lock(")
+
+
+def provenance_check() -> None:
+    import ast as _ast
+    import pathlib as _pl
+
+    print("PROVENANCE: every artifact backing a reported number has a producing function")
+    here = _pl.Path(__file__).resolve().parent
+    bad, partial = [], []
+    for art, (mod, fn, status, note) in sorted(PRODUCERS.items()):
+        path = here / f"{mod}.py"
+        if not (R / art).exists():
+            continue                              # not yet produced (running block)
+        if not path.exists():
+            bad.append(f"{art}: producer module src/{mod}.py does not exist")
+            continue
+        text = path.read_text()
+        stem = art.rsplit(".", 1)[0]
+        import re as _re
+        fprefixes = _re.findall(r'f"([A-Za-z0-9_]+)_\{', text)      # f"gelu_scale_{arm}"
+        if not (art in text or f'"{stem}"' in text
+                or any(stem.startswith(fp + "_") for fp in fprefixes)):
+            bad.append(f"{art}: src/{mod}.py never references it")
+            continue
+        if fn == "<module>":
+            body = text
+        else:
+            tree = _ast.parse(text)
+            fns = [n for n in _ast.walk(tree)
+                   if isinstance(n, (_ast.FunctionDef, _ast.AsyncFunctionDef)) and n.name == fn]
+            if not fns:
+                bad.append(f"{art}: src/{mod}.py has no function {fn}")
+                continue
+            body = _ast.get_source_segment(text, fns[0]) or ""
+        if fn != "r_families_primary" and not any(w in body for w in _WRITE_CALL):
+            bad.append(f"{art}: {mod}.{fn} performs no write")
+            continue
+        if status == "partial":
+            partial.append(f"{art}: {note}")
+    chk("artifacts with no valid producer", float(len(bad)), 0.0, 0)
+    for b in bad:
+        F.append(f"PROVENANCE: {b}")
+    chk("artifacts with only a partial producer", float(len(partial)), 0.0, 0)
+    for p_ in partial:
+        F.append(f"PROVENANCE (partial): {p_}")
 
 
 if __name__ == "__main__":
