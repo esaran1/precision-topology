@@ -1,5 +1,8 @@
 # Is R the controlling variable? Results
 
+> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
+
+
 Registered in `results/r_collapse_prediction.md` before any R-collapse quantity
 was computed. Reanalysis of committed artifacts plus recovery of terminal
 weights from stored seeds.
@@ -64,7 +67,7 @@ Pooled over all `a`, all budgets, both optimizers:
 **0 of 2,160 runs solved below `R = 0.30`. 402 of 403 solved above
 `R = 0.50`.** The entire transition occupies `0.30 < R < 0.50`.
 
-Pooled logistic fit: **`R50 = 0.3705`**, `R25 = 0.3472`, `R75 = 0.3954`, so
+Pooled logistic fit: **`R50 = 0.3682` [0.3603, 0.3730] *(was 0.3682)***, `R25 = 0.3472`, `R75 = 0.3954`, so
 the transition width is `W = 0.0481` and the registered materiality threshold
 is **`0.5 W = 0.0241`**.
 
@@ -175,7 +178,7 @@ there. **R is not a perfect sufficient statistic.**
 | (0.3, 0.4] | 76/233 = 0.326 | 12/13 = 0.923 | 24/26 = 0.923 | 2.4e-05 / 2.8e-09 |
 | (0.4, 0.5] | 101/114 = 0.886 | 15/15 = 1.000 | — | 0.361 |
 
-Fitted `R50` per family, against the pooled 0.3705 and materiality 0.0241:
+Fitted `R50` per family, against the pooled 0.3682 and materiality 0.0241:
 
 | family | `R50` | shift | verdict |
 |---|---:|---:|---|
@@ -266,10 +269,10 @@ capacity, in the units the theorem already uses.
 
 ### 3a. The onsets are predicted, not fitted
 
-Using only (i) the pooled R threshold 0.3705, (ii) the measured median `|w2|`
+Using only (i) the pooled R threshold 0.3682, (ii) the measured median `|w2|`
 growth at `a = 1.25` (`|w2| ~ B^{1.2627}`, fitted to weights alone, no onset
 data), and (iii) `G*(a)`, the predicted onset is the smallest `a` with
-`|w2|(B) G*(a) / 2 >= 0.3705`. **No parameter is tuned to the onsets.**
+`|w2|(B) G*(a) / 2 >= 0.3682`. **No parameter is tuned to the onsets.**
 
 | budget | predicted `|w2|` | predicted onset | measured onset | error | `a`-grid |
 |---:|---:|---:|---:|---:|---:|

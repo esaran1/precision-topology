@@ -47,18 +47,17 @@ licenses, and it is robust.
 The reimplementation sits **0.0036 below** the committed value — a discrepancy in
 the fitting procedure, not in the data or in `Ĝ`.
 
-## What to quote
+## What to quote — SUPERSEDED 2026-09-22
 
-**Recommended**: `R50 = 0.3705 + 0.0013 = **0.3718**` — the committed value plus
-the measured `Ĝ` shift, which avoids substituting an unreplicated
-reimplementation for the committed number while still applying the correction.
+This note originally recommended `0.3705 + 0.0013 = 0.3718`. **That
+recommendation is withdrawn.** An exhaustive history search (`r50_provenance.md`)
+confirmed the original script does not exist anywhere — not in any commit, any
+dangling object, or any untracked file — so quoting the unreproducible value plus
+a correction was the wrong call.
 
-With the bootstrap interval from the reimplementation (400 cluster resamples):
-**95% CI ≈ ±0.008**, so `R50 ≈ **0.372 [0.364, 0.380]**`.
-
-**Alternative, if the original script is recovered before submission**: rerun it
-on the certified `R` and quote that directly. That is the better outcome and
-should be attempted first.
+**Quote `R50 = 0.3682`, 95% CI [0.3603, 0.3730]**, from the committed
+`src/r50_fit.py`, whose definition is stated exactly in `r50_provenance.md`.
+Materiality `0.5·W = 0.0224`. The old 0.3705 lies **inside** the new interval.
 
 ## Downstream numbers that inherit `R50`
 

@@ -324,6 +324,31 @@ def main() -> None:
     chk("alpha max", float(ae.alpha.max()), 1.3411, 1e-3)
     chk("alpha median over onset region", float(ae.alpha.median()), 1.2797, 1e-3)
 
+    print("PROVENANCE: every verified artifact has a producing script")
+    import pathlib as _pl
+    import re as _re
+    _here = _pl.Path(__file__).resolve()
+    _self = _here.read_text()
+    # artifacts this verifier reads, as literal "name.ext" after `R / `
+    _arts = sorted({a for a in _re.findall(r'R / "([A-Za-z0-9_.]+\.(?:csv|txt))"', _self)})
+    _scripts = {p.name: p.read_text() for p in _here.parent.glob("*.py")
+                if p.name != _here.name}
+    _scripts.update({p.name: p.read_text()
+                     for p in (_here.parents[1] / "paper").glob("*.py")})
+    _orphans = []
+    for _a in _arts:
+        if _a == "ledger_verification.txt":
+            continue                      # written by this module itself
+        _stem = _a.rsplit(".", 1)[0]
+        # a producer references either the full name or the stem (artifact_lock
+        # pattern: RESULTS / "stem" then .with_suffix(".csv"))
+        if not any((_a in t) or (f'"{_stem}"' in t) for t in _scripts.values()):
+            _orphans.append(_a)
+    chk("artifacts with no producing script", float(len(_orphans)), 0.0, 0)
+    for _o in _orphans:
+        F.append(f"PROVENANCE: {_o} is read by the verifier but no committed "
+                 f"script writes it")
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 

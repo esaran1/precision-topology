@@ -1,5 +1,8 @@
 # Registration: which switch point do measured crossings track?
 
+> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
+
+
 **Status by `a`.** For `a = 1.30` this is **POST HOC** — the measured crossing
 (0.2332) and the coarse conditional switch (`R in (0.172, 0.215)`) were both in
 hand before this was written. For **every other `a` it is prospective**: no
@@ -43,7 +46,7 @@ it predicts the **under-estimate already observed at `a = 1.30`** (measured
 0.2332 against `R_glob = 0.2037`, +12.6%).
 
 **Also registered**: measured solve thresholds track **`R_solve(a)`**, same 15%
-tolerance. The existing measured value to beat is `R50 = 0.3705`.
+tolerance. The existing measured value to beat is `R50 = 0.3682` [0.3603, 0.3730] *(was 0.3682)*.
 
 **Also registered**: `R_spin`, `R_glob` and `R_solve` are each roughly constant
 in `a` when expressed in `R` (CV <= 0.15 across the six values), and each

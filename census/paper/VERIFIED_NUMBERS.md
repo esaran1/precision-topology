@@ -1,5 +1,8 @@
 # Every number the paper needs, recomputed from raw artifacts
 
+> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
+
+
 **Method**: each value below was recomputed in this pass from the raw CSV or by
 re-deriving the quantity, **not** read from a ledger row or results document.
 Where the record holds more than one value, all are named and the one to print
@@ -305,7 +308,7 @@ correction applied to one-sided values. Either way the arm fails.
 | unreached | 3.00 | 1.000 | 0.000 / 0.000 | 0.1027 | 0.02477 | 5.517 | 0.332924 |
 | found | 1.45 | 5.467 | 0.000 / 0.000 | 0.6473 | 0.003549 | 17.691 | 0.103498 |
 | found | 1.50 | 4.394 | 0.000 / 0.000 | 0.4880 | 0.002800 | 14.199 | 0.077061 |
-| found | 2.00 | 4.237 | 0.000 / 0.000 | 0.3705 | 0.001473 | 13.440 | 0.898190 |
+| found | 2.00 | 4.237 | 0.000 / 0.000 | 0.3682 | 0.001473 | 13.440 | 0.898190 |
 | found | 3.00 | 3.472 | 0.000 / 0.000 | 0.3722 | 0.000517 | 10.232 | 1.643642 |
 
 - **MEP barriers are exactly 0.000, median and max, at every `a`, both
@@ -461,7 +464,7 @@ transition band).
 | (1.2, 2.0] | 138 | 138 | 1.000 |
 | > 2.0 | 43 | 43 | 1.000 |
 
-**`R50` = 0.3705**, `R25 = 0.3472`, `R75 = 0.3954`, **transition width
+**`R50` = 0.3682**, `R25 = 0.3472`, `R75 = 0.3954`, **transition width
 W = 0.0481**. Registered materiality threshold **0.5W = 0.0241**.
 
 **AUC** (1,200-resample bootstrap 95% CI; transition-band n = runs where the

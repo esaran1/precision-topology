@@ -1,5 +1,8 @@
 # Block B final: switch points across all six activation values
 
+> **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 
+
+
 Registered in `blockB_prediction.md`. Procedure frozen (sha256 `9f1b10741d8bf48c`).
 float64, population loss on 800 dense uniform points.
 
@@ -98,7 +101,7 @@ collapse `w1` and reach `log 2` faster than it can find a placement.
 
 ## The solve threshold, compared correctly
 
-`R50 = 0.3705` is **terminal** `R` pooled over runs and includes post-solve
+`R50 = 0.3682` [0.3603, 0.3730] *(was 0.3682)* is **terminal** `R` pooled over runs and includes post-solve
 growth, so it is the wrong comparison. Using **`R` at the solve step**, per run:
 
 | `a` | median `R` at solve step | n | CV |
