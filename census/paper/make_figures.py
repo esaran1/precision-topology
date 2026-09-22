@@ -410,12 +410,13 @@ def fig3_r_collapse() -> None:
     spanning 5x (alpha 1.2627 / 0.9802 / 0.7188).  AdamW is included because
     its decoupled weight decay OPPOSES the mechanism.
     Panel (c) AUC: R against its two factors, per family, with bootstrap CIs.
-    Provenance: r_pooled.csv, r_adamw.csv, r_families.csv, ghat_certified_all.csv.
+    Provenance: r_pooled.csv, r_adamw.csv, r_families_certified.csv, ghat_certified_all.csv.
     """
 
     d = pd.read_csv(RESULTS / "r_pooled.csv")
     aw = pd.read_csv(RESULTS / "r_adamw.csv").rename(columns={"optimizer": "opt"})
-    fam = pd.read_csv(RESULTS / "r_families.csv")
+    fam = pd.read_csv(RESULTS / "r_families_certified.csv").rename(
+        columns={"ghat_certified": "gstar"})                 # certified family Ghat (T52 restated)
 
     # Recompute R with the CERTIFIED Ghat (T65).  The committed R columns used
     # the restricted maximum_gap() search, which under-estimates the supremum by
@@ -523,7 +524,7 @@ def fig3_r_collapse() -> None:
     axa.grid(alpha=0.25, lw=0.3, axis="y")
 
     save(fig, "fig3_r_collapse")
-    record("Fig 3", ["r_pooled.csv", "r_adamw.csv", "r_families.csv", "ghat_certified_all.csv"],
+    record("Fig 3", ["r_pooled.csv", "r_adamw.csv", "r_families_certified.csv", "ghat_certified_all.csv"],
            f"(a) {len(pooled):,}  (b) Adam 180 / AdamW 240 / SGD 180  "
            "(c) A 2,910 / q2 360 / q1 360 / B 1,000",
            "Clopper-Pearson on rates; 1,500-resample bootstrap on AUC; "

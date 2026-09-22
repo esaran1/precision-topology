@@ -66,5 +66,18 @@ def main() -> None:
     pd.DataFrame(rows).to_csv(RESULTS / "family_ghat_certified.csv", index=False)
 
 
+def write_families_certified() -> pd.DataFrame:
+    """r_families_certified.csv: the primary columns of r_families.csv (w2, solved;
+    regenerated bit-identically by provenance_rebuild.r_families_primary) with R
+    recomputed from the certified Ghat.  The superseded `gstar` column is dropped."""
+    d = pd.read_csv(RESULTS / "r_families.csv")[["q", "a", "budget", "seed", "w2", "solved"]]
+    c = pd.read_csv(RESULTS / "family_ghat_certified.csv")[["q", "a", "ghat_cert_lo"]]
+    d = d.merge(c, on=["q", "a"]).rename(columns={"ghat_cert_lo": "ghat_certified"})
+    d["R"] = d.w2 * d.ghat_certified / 2
+    d.to_csv(RESULTS / "r_families_certified.csv", index=False)
+    return d
+
+
 if __name__ == "__main__":
     main()
+    write_families_certified()

@@ -1,3 +1,5 @@
+> **RESTATED 2026-09-22 (T71, see CLAIMS.md): condition 4 fails for q2 only.** The q-family `gstar` column had no producing code in the repository and under-estimated the supremum by 1.3–89% (`family_ghat_certified.csv`, exact extrema + Lipschitz certificate). With the certified Ĝ and one estimator throughout (MLE logistic on runs): family A **0.3723** [0.3663, 0.3785], q1 **0.3585** [0.3230, 0.3677] — shift −0.0139, **0.6× materiality, not material**; q2 **0.3032** [0.2673, 0.3233] — shift −0.0692, **3.1× materiality, material**. The q1 failure was an artifact of its under-estimated G*. 
+
 # Is R the controlling variable? Results
 
 > **0.3705 superseded 2026-09-22**: the script producing it is not in the repository (`results/r50_provenance.md`); replaced by the committed reimplementation **`R50 = 0.3682` [0.3603, 0.3730]** (`src/r50_fit.py`), materiality `0.5W` **0.0224**. The old value lies inside the new interval, so no verdict changes. 

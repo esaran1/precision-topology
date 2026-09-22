@@ -348,7 +348,7 @@ def main() -> None:
     chk("tubes disjoint (2rho < sep)", float(bool(ol.tubes_disjoint)), 1.0, 0)
     chk("tube embedded (rho < reach)", float(bool(ol.tube_embedded)), 1.0, 0)
 
-    print("T69 S2uS2 budget sweep")
+    print("T69 S2uS2 budget sweep (WITHDRAWN -- overlapping regions; numbers checked only as the record)")
     s2 = pd.read_csv(R / "blockS2_budget.csv")
     gaps = {int(B): float(g[g.activation == "gelu"].accuracy.mean()
                           - g[g.activation == "relu"].accuracy.mean())
@@ -447,9 +447,10 @@ PRODUCERS = {
     "phase1_decomposition.csv": ("phase1_decompose", "main", "full", ""),
     "r50_fit.csv": ("r50_fit", "main", "full", ""),
     "r_adamw.csv": ("provenance_rebuild", "write", "full", ""),
-    "r_families.csv": ("provenance_rebuild", "r_families_primary", "partial",
-                       "w2 and solved regenerate exactly; the gstar column came from a "
-                       "search that is not in the repository and is not reproduced"),
+    "r_families.csv": ("provenance_rebuild", "r_families_primary", "full",
+                       "w2 and solved regenerate exactly; the gstar column had no producing "
+                       "code, is superseded by the certified Ghat, and backs no number"),
+    "r_families_certified.csv": ("family_certify", "write_families_certified", "full", ""),
     "r_pooled.csv": ("provenance_rebuild", "write", "full", ""),
     "r_pooled_union.csv": ("pool_union", "main", "full", ""),
     "saturation.parquet": ("census", "run_sweep", "full", ""),
