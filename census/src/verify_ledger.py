@@ -125,6 +125,24 @@ def main() -> None:
     chk("R_solve dev all negative (S-3 falsified)", float((dv < 0).all()), 1.0, 0)
     chk("R_solve mean dev (%)", dv.mean() * 100, -0.29, 0.02)
 
+    print("T59 Block E intervention")
+    d = pd.read_csv(R / "blockE_intervene.csv")
+    k = d[d.kept.notna()]
+    hl = k[k.arm == "hold_low"]; hh = k[k.arm == "hold_high"]; nf = k[k.arm == "noise_floor"]
+    chk("hold_low kept", float(hl.kept.sum()), 0.0, 0)
+    chk("hold_low n", float(len(hl)), 37.0, 0)
+    chk("hold_high kept", float(hh.kept.sum()), 33.0, 0)
+    chk("hold_high n", float(len(hh)), 37.0, 0)
+    chk("noise_floor kept", float(nf.kept.sum()), 37.0, 0)
+    chk("hold_high placed /40", float(d[d.arm == "hold_high"].placed_final.sum()), 33.0, 0)
+    chk("hold_high solved /40", float(d[d.arm == "hold_high"].solved_final.sum()), 0.0, 0)
+    chk("control placed /40", float(d[d.arm == "control"].placed_final.sum()), 37.0, 0)
+    chk("jump placed /40", float(d[d.arm == "jump"].placed_final.sum()), 9.0, 0)
+    chk("cold_high placed /40", float(d[d.arm == "cold_high"].placed_final.sum()), 2.0, 0)
+    chk("cold_low placed /40", float(d[d.arm == "cold_low"].placed_final.sum()), 0.0, 0)
+    lost = (hl.lost_at - hl.intervened_at)
+    chk("hold_low max steps to lose", float(lost.max()), 50.0, 0)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 

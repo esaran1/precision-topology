@@ -166,3 +166,46 @@ mean. Caught before the result was written up; both grids are reported in
 Running. Registered threshold: a freeze-mid arm is added only if the refined
 `R_spin - R_fold` window is **at least five grid steps of 0.01 in `|w2|`** wide.
 Reversibility remains the primary Block E result either way.
+
+## 2026-09-21 — Block E: the causal test passes, and two registered arms fail
+
+**Primary result (prospective).** Runs trained to placement, held 200 steps, then
+pinned to one side of `R_glob = 0.21446` and held there:
+
+| arm | held at | kept placement | CP95 |
+|---|---|---|---|
+| `hold_low` | 0.85 R_glob | **0 / 37** | [0.0000, 0.0949] |
+| `hold_high` | 1.15 R_glob | **33 / 37** | [0.7458, 0.9697] |
+| `noise_floor` | x(1+1e-6) | 37 / 37 | [0.9051, 1.0000] |
+
+**Fisher exact p = 1.2e-16.** Placement is lost within **50 steps** (the first
+checkpoint) in all 37 `hold_low` runs -- median = min = max = 50.
+
+**`hold_high` separates the two thresholds without being designed to**: places
+33/40, solves **0/40**, sitting 15% above `R_glob` and 19.6% **below**
+`R_solve = 0.3067`. That is the placed-but-unsolved regime T57 predicts.
+
+**Two registered arms FAILED.**
+- `cold_high` (registered "placement achieved"): **2 of 40**; a pilot at
+  1.50 R_glob over 20,000 steps gives **0 of 9**.
+- `jump` (registered "places well before control"): **falsified in the opposite
+  direction**, 9/40 vs control 37/40, Fisher **p = 1.3e-10**. Pre-supplying
+  `|w2|` STALLS the run: `R` moves 0.225 -> 0.236 in 19,500 steps while control
+  passes the same `R` near step 4,000 and reaches 1.80. Dose-response over 5
+  seeds: control 4/5, `w2` alone 2/5 (~5x later), `w2`+`b2` 0/5.
+
+**Net**: `R > R_glob` is **necessary for placement to persist, not sufficient for
+it to be found**. Growth and placement are coupled and ordered -- `|w2|` must
+grow *while* `(w1,b1)` are shaped. The paper must not claim `R` predicts when
+gradient descent succeeds; it predicts when success is stable.
+
+**Instrument note**: the arm named `null` round-tripped through CSV as NaN
+(`pandas` default NA). Renamed **`noise_floor`** in code and in the committed
+artifact; no data changed, verified by re-reading with `keep_default_na=False`.
+
+## 2026-09-21 — the a >= 1.35 window audit at step 0.01
+
+Running. `a = 1.60` already refuted its own window (0.0279 at step 0.05 -> 0.00111
+at 0.01, with `R_glob = R_spin` exactly). If 1.35-1.50 follow, every `R_spin`
+above `a = 1.30` in `blockB_switches.csv` is a grid-limited upper bound and D-1's
+two models coincide identically.
