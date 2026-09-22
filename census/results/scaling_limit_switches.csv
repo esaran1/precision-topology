@@ -1,0 +1,2 @@
+K,w2_glob,R_glob,w2_spin,R_spin,w2_solve,R_solve,grid_step_w2,note
+0.579454926,0.69,0.19991194947,0.69,0.19991194947,1.06,0.30711111078000003,0.005,refined from the 0.05 coarse grid; coarse values were R_glob 0.2025 R_spin 0.2170 R_solve 0.3183
