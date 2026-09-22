@@ -82,3 +82,53 @@ that cold starts never place. `hold_low` / `hold_high` are the **prospective**
 pair — they are the registered reversibility arms, unchanged in content, and
 their predictions are as originally registered. Only the prospective pair is
 scored as a registered test.
+
+---
+
+## Addendum: the `jump` arm is falsified in the opposite direction, and it is a result
+
+Registered prediction (`blockF_lag_prediction.md`): *"jump (scale to just above
+`R_spin`) -> placement well before control."* The revised note above weakened this
+to "no earlier than control". **Both are wrong: pre-supplying `|w2|` makes
+placement strictly worse.**
+
+Seed 0, `a = 1.30`, 20,000 steps, scaling to `1.05 R_glob` at step 0 and then
+releasing `|w2|` (no hold):
+
+| | step 0 | 3,000 | 8,000 | 12,000 | 19,500 | placed at |
+|---|---:|---:|---:|---:|---:|---:|
+| control `R` | 0.0349 | 0.1183 | 0.6107 | 1.0224 | 1.8010 | **4,500** |
+| control gap | -0.104 | -0.161 | +0.083 | +0.081 | +0.081 | |
+| jump `R` | 0.2248 | 0.2079 | 0.2110 | 0.2210 | 0.2362 | **never** |
+| jump gap | -0.104 | -0.033 | -0.032 | -0.031 | -0.029 | |
+
+The jumped run **stalls**: `R` moves 0.225 -> 0.236 in 19,500 steps, while the
+control passes through that same `R` around step 4,000 and keeps growing to 1.80.
+
+**Decomposed over 5 seeds** (placement within 20,000 steps):
+
+| variant | placed | steps to placement |
+|---|---:|---|
+| control | **4/5** | 4,250 / 2,750 / 2,000 / 3,250 / — |
+| `w2` only (b2 untouched) | 2/5 | 19,000 / — / — / 19,250 / — |
+| `w2` and `b2` scaled together | **0/5** | — |
+
+A clean dose-response in the wrong direction. Scaling `|w2|` alone already costs
+2 of 4 placements and delays the survivors by ~5x; carrying `b2` along costs all
+of them.
+
+**Why this matters for the paper's claim.** It is the sharpest evidence yet that
+`R` is **not** a sufficient condition dressed up as a threshold. The landscape
+account says a *stable* sign-correct configuration exists above `R_glob`, and the
+`hold_low`/`hold_high` pair confirms that. It says nothing about whether gradient
+descent finds that configuration, and here it does not: a run handed the necessary
+`|w2|` at initialisation sits in a flat region and never places, whereas a run that
+grows into it does. **Placement and `|w2|` growth are coupled, and the coupling
+has an order** — `|w2|` must grow *while* `(w1,b1)` are being shaped, not before.
+
+This is consistent with Block C (runs relax onto the branch and are carried along
+it) and with the rejection of the reverse mechanism (no post-crossing
+acceleration): the growth is not a consequence of placement, and placement is not
+a consequence of pre-existing growth. Neither direction alone is the mechanism.
+
+Logged as a **failed registered prediction**, direction opposite to registered.

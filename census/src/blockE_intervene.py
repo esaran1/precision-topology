@@ -1,28 +1,21 @@
 """Block E: intervene on |w2| and see whether placement follows.
 
-Registered in results/blockF_lag_prediction.md, section "Block E, reduced arm
-set -- reversibility registered".  The reduced arm set is used because the
-no-hysteresis falsifier was triggered: R_fold ~ R_glob ~ R_spin to within a grid
-step at a = 1.30 and (after refinement to step 0.01) at a = 1.60 as well, so
-there is no window in which a freeze-mid arm is defined.
+Registered in results/blockF_lag_prediction.md (reversibility pair) and revised
+in results/blockE_redesign.md after a pilot, which is reported there in full.
 
-Every arm trains the SAME run -- same seed, same data, same optimiser state
-schedule -- and differs only in what is done to (w2, b2) at the intervention
-step.  |w2| is rescaled and then HELD by projecting it back after every step;
-(w1, b1) and the sign of w2 are never touched.  b2 is scaled with w2 so the
-decision threshold is carried along rather than destroyed, which would confound
-a placement test with a bias failure.
+Key pilot finding, which sets the design: held at fixed |w2| from a COLD start,
+placement is never achieved at any R -- 0 of 9 at R/R_glob = 0.85, 1.15, 1.50
+over 20,000 steps.  Started from a placed configuration and held, placement is
+RETAINED above R_glob and LOST below it (0/10 at 0.90 R_glob, 10/10 at 1.15).
+So the switch governs STABILITY, not attainability, and the primary test is the
+reversibility pair hold_low / hold_high.
 
-Arms:
-  control        nothing done
-  null           (w2,b2) scaled by 1+1e-6 and held -- the noise floor
-  freeze_low     |w2| set so R = 0.85 * R_glob, held        -> placement never achieved
-  freeze_high    |w2| set so R = 1.15 * R_glob, held        -> placement achieved
-  jump           |w2| set so R = 1.05 * R_glob at step 0    -> placement early
-  down_hold_low  run until placed, then R = 0.85 * R_glob   -> placement LOST
-  down_hold_high run until placed, then R = 1.15 * R_glob   -> placement KEPT
-
-The last two are the reversibility pair and the primary result.
+Mechanics common to every arm: same initialisation per seed (drawn in one dtype
+and cast, matching phase1_relog and Block A, so these are the same networks whose
+crossings Block A measured); |w2| projected back to its held value after every
+step; (w1,b1) and sign(w2) never touched; b2 scaled with w2 so the decision
+threshold is carried along rather than destroyed, which would confound a
+placement test with a bias failure.
 """
 
 from __future__ import annotations
@@ -41,120 +34,124 @@ from .r_variable import oriented_gap
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 A = 1.30
-STEPS = 8_000
+STEPS = 12_000
 LR = 1e-2
 N_SEEDS = 40
-INTERVENE_AT = 400        # early: before any run has placed (crossings are >= 1860)
-PLACED_HOLD = 200         # for the down-hold arms: steps to wait after placement
+CHECK_EVERY = 50
+HOLD_AFTER_PLACED = 200   # steps to let the placed run settle before intervening
+LOW, HIGH = 0.85, 1.15    # multiples of R_glob for the two sides
+
+ARMS = ("control", "null", "hold_low", "hold_high",
+        "cold_low", "cold_high", "jump")
+PROSPECTIVE = ("hold_low", "hold_high")   # the only arms scored as registered
 
 
-def r_of(w2: float, gstar: float) -> float:
-    return abs(w2) * gstar / 2.0
-
-
-def w2_for_R(R: float, gstar: float, sign: float) -> float:
+def w2_for_R(R, gstar, sign):
     return sign * 2.0 * R / gstar
+
+
+def _scale_to(th, R, gstar):
+    """Set |w2| to the value giving margin capacity R; carry b2 with it."""
+
+    with torch.no_grad():
+        w2 = float(th[2])
+        s = np.sign(w2) if w2 != 0 else 1.0
+        new = w2_for_R(R, gstar, s)
+        if w2 != 0:
+            th[3] *= new / w2
+        th[2] = torch.tensor(new, dtype=torch.float64)
+        return abs(float(th[2]))
 
 
 def run(a, seed, arm, R_glob, gstar, steps=STEPS):
     f = activation("sin_family", a)
     x, y = make_data(200, seed)
     x, y = x.double(), y.double()
-    # Same initialisation as phase1_relog / Block A: draw in ONE dtype and cast,
-    # never per-dtype, so these seeds are the SAME networks as the runs whose
-    # crossings Block A measured.
     torch.manual_seed(seed)
-    init = torch.empty(4).uniform_(-1.0, 1.0)
-    th = init.double().clone().requires_grad_(True)
+    th = torch.empty(4).uniform_(-1.0, 1.0).double().clone().requires_grad_(True)
     opt = torch.optim.Adam([th], lr=LR)
 
-    hold = None                  # |w2| value to project back to, if any
+    hold = None
     applied = False
-    placed_at = None
-    rows = []
-    for i in range(steps):
-        # --- interventions ------------------------------------------------
-        if not applied and arm in ("null", "freeze_low", "freeze_high") and i == INTERVENE_AT:
-            with torch.no_grad():
-                w2 = float(th[2]); s = np.sign(w2) or 1.0
-                if arm == "null":
-                    scale = 1.0 + 1e-6
-                    th[2] *= scale; th[3] *= scale
-                else:
-                    tgt = 0.85 * R_glob if arm == "freeze_low" else 1.15 * R_glob
-                    new = w2_for_R(tgt, gstar, s)
-                    scale = new / w2 if w2 != 0 else 1.0
-                    th[2] = new; th[3] *= scale
-                hold = abs(float(th[2]))
-            applied = True
-        if not applied and arm == "jump" and i == 0:
-            with torch.no_grad():
-                w2 = float(th[2]); s = np.sign(w2) or 1.0
-                new = w2_for_R(1.05 * R_glob, gstar, s)
-                scale = new / w2 if w2 != 0 else 1.0
-                th[2] = new; th[3] *= scale
-            applied = True
-        if (not applied and arm in ("down_hold_low", "down_hold_high")
-                and placed_at is not None and i >= placed_at + PLACED_HOLD):
-            with torch.no_grad():
-                w2 = float(th[2]); s = np.sign(w2) or 1.0
-                tgt = 0.85 * R_glob if arm == "down_hold_low" else 1.15 * R_glob
-                new = w2_for_R(tgt, gstar, s)
-                scale = new / w2 if w2 != 0 else 1.0
-                th[2] = new; th[3] *= scale
-                hold = abs(float(th[2]))
-            applied = True
+    placed_at = None          # first step at which gap > 0
+    intervened_at = None
+    lost_at = None            # first step after the intervention at which gap <= 0
+    gap_at_intervention = None
 
+    if arm == "cold_low":
+        hold = _scale_to(th, LOW * R_glob, gstar); applied = True; intervened_at = 0
+    elif arm == "cold_high":
+        hold = _scale_to(th, HIGH * R_glob, gstar); applied = True; intervened_at = 0
+    elif arm == "jump":
+        _scale_to(th, 1.05 * R_glob, gstar); applied = True; intervened_at = 0
+
+    for i in range(steps):
         opt.zero_grad(set_to_none=True)
         out = th[2] * f(th[0] * x + th[1]) + th[3]
         F.binary_cross_entropy_with_logits(out, y).backward()
         opt.step()
-        if hold is not None:                        # project |w2| back
+        if hold is not None:
             with torch.no_grad():
-                w2 = float(th[2])
-                if w2 != 0:
-                    th[2] = torch.tensor(np.sign(w2) * hold, dtype=torch.float64)
+                v = float(th[2])
+                if v != 0:
+                    th[2] = torch.tensor(np.sign(v) * hold, dtype=torch.float64)
 
-        if i % 50 == 0 or i == steps - 1:
+        if i % CHECK_EVERY == 0 or i == steps - 1:
             with torch.no_grad():
                 w1, b1, w2, b2 = (float(v) for v in th)
             gp = oriented_gap(f, w1, b1)
             if placed_at is None and gp > 0:
                 placed_at = i
-            rows.append({"step": i, "w1": w1, "b1": b1, "w2": w2, "b2": b2,
-                         "gap": gp, "R": r_of(w2, gstar), "placed": gp > 0})
+            if intervened_at is not None and i > intervened_at and gp <= 0 and lost_at is None:
+                lost_at = i
+            # the hold/null arms intervene once the run has placed and settled
+            if (not applied and arm in ("hold_low", "hold_high", "null")
+                    and placed_at is not None and i >= placed_at + HOLD_AFTER_PLACED):
+                gap_at_intervention = gp
+                if arm == "null":
+                    with torch.no_grad():
+                        th[2] *= 1.0 + 1e-6
+                        th[3] *= 1.0 + 1e-6
+                else:
+                    hold = _scale_to(th, (LOW if arm == "hold_low" else HIGH) * R_glob,
+                                     gstar)
+                applied = True
+                intervened_at = i
+                lost_at = None
+
     with torch.no_grad():
         w1, b1, w2, b2 = (float(v) for v in th)
     gp = oriented_gap(f, w1, b1)
-    frame = pd.DataFrame(rows)
-    # placement at the END, and whether it was ever lost after the intervention
-    post = frame[frame.step >= INTERVENE_AT] if arm != "jump" else frame
     return {"a": a, "seed": seed, "arm": arm,
-            "placed_final": bool(gp > 0),
-            "solved_final": bool(solves(torch.tensor([w1, b1, w2, b2], dtype=torch.float64), f)),
-            "placed_ever": bool(frame.placed.any()),
-            "placed_at": placed_at,
-            "R_final": r_of(w2, gstar),
-            "frac_placed_after": float(post.placed.mean()) if len(post) else np.nan,
-            "gap_final": gp}
+            "placed_at": placed_at, "intervened_at": intervened_at,
+            "gap_at_intervention": gap_at_intervention,
+            "lost_at": lost_at,
+            "placed_final": bool(gp > 0), "gap_final": gp,
+            "kept": (None if arm in ("cold_low", "cold_high", "jump")
+                     else (bool(gp > 0) if intervened_at is not None else None)),
+            "solved_final": bool(solves(
+                torch.tensor([w1, b1, w2, b2], dtype=torch.float64), f)),
+            "R_final": abs(w2) * gstar / 2.0}
 
 
 def main():
     gstar = maximum_gap(A, resolution=600)
     sw = pd.read_csv(RESULTS / "blockB_switches.csv")
     R_glob = float(sw[sw.a == A].R_glob.iloc[0])
-    print(f"a={A}  Ghat={gstar:.6f}  R_glob={R_glob:.5f}", flush=True)
-    arms = ("control", "null", "freeze_low", "freeze_high", "jump",
-            "down_hold_low", "down_hold_high")
+    print(f"a={A}  Ghat={gstar:.6f}  R_glob={R_glob:.5f}  "
+          f"low={LOW * R_glob:.5f}  high={HIGH * R_glob:.5f}", flush=True)
     rows = []
-    for arm in arms:
+    for arm in ARMS:
         for s in range(N_SEEDS):
             rows.append(run(A, s, arm, R_glob, gstar))
         d = pd.DataFrame([r for r in rows if r["arm"] == arm])
-        print(f"  {arm:15s} placed_final {d.placed_final.mean():.3f}  "
-              f"solved {d.solved_final.mean():.3f}  "
-              f"ever_placed {d.placed_ever.mean():.3f}  "
-              f"R_final {d.R_final.median():.4f}", flush=True)
+        n_int = int(d.intervened_at.notna().sum())
+        kept = d[d.kept.notna()]
+        tag = " [PROSPECTIVE]" if arm in PROSPECTIVE else ""
+        print(f"  {arm:11s} placed {d.placed_final.mean():.3f}  solved "
+              f"{d.solved_final.mean():.3f}  intervened {n_int}/{len(d)}  "
+              f"kept {kept.kept.sum() if len(kept) else 0}/{len(kept)}  "
+              f"R_final {d.R_final.median():.4f}{tag}", flush=True)
     frame = pd.DataFrame(rows)
     stem = RESULTS / "blockE_intervene"
     with artifact_lock(stem, "blockE intervene"):
