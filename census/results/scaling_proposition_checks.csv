@@ -1,0 +1,40 @@
+check,quantity,value,bound_or_target,pass
+1,f_a(pi+s) - [claimed series to s^7],0,0,True
+1b,f_a(pi+s) - pi - (s - (1+eps) sin s),0,0,True
+2a,coefficient of eps^{3/2} minus h(sigma),0,0,True
+2b,coefficient of eps^{5/2} minus r(sigma),0,0,True
+2c,lowest power of sqrt(eps) present,3,3,True
+R(0.3),max|remainder| / explicit bound,0.0392,<= 1,True
+R(0.1),max|remainder| / explicit bound,0.0550,<= 1,True
+R(0.02),max|remainder| / explicit bound,0.0639,<= 1,True
+R(0.001),max|remainder| / explicit bound,0.0663,<= 1,True
+4(0.3),sup_C |G_a/eps^1.5 - G_h|  vs  2 eps M_eps,1.236e+00,<= 6.400e+01,True
+4(0.1),sup_C |G_a/eps^1.5 - G_h|  vs  2 eps M_eps,4.765e-01,<= 1.287e+01,True
+4(0.02),sup_C |G_a/eps^1.5 - G_h|  vs  2 eps M_eps,1.008e-01,<= 1.974e+00,True
+4(0.005),sup_C |G_a/eps^1.5 - G_h|  vs  2 eps M_eps,2.548e-02,<= 4.667e-01,True
+H1(1.02),"argmax (u, v)","(+1.594, -1.196)",inside C,True
+H1(1.05),"argmax (u, v)","(-1.577, -1.184)",inside C,True
+H1(1.1),"argmax (u, v)","(-1.547, -1.167)",inside C,True
+H1(1.25),"argmax (u, v)","(-1.476, -1.116)",inside C,True
+H1(1.3),"argmax (u, v)","(-1.454, -1.100)",inside C,True
+H1(1.35),"argmax (u, v)","(-1.433, -1.086)",inside C,True
+H1(1.4),"argmax (u, v)","(-1.413, -1.072)",inside C,True
+H1(1.45),"argmax (u, v)","(-1.394, -1.058)",inside C,True
+H1(1.5),"argmax (u, v)","(-1.376, -1.045)",inside C,True
+H1(1.6),"argmax (u, v)","(+1.341, +1.021)",inside C,True
+"5(0.1,R=0.2)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),1.728e-01,<= 5.818e+00,True
+"5(0.1,R=0.3)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),2.552e-01,<= 8.727e+00,True
+"5(0.02,R=0.2)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),3.043e-02,<= 9.454e-01,True
+"5(0.02,R=0.3)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),4.464e-02,<= 1.418e+00,True
+"5(0.005,R=0.2)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),7.396e-03,<= 2.265e-01,True
+"5(0.005,R=0.3)",sup_C |L_a - L_inf|  vs  (2R/K)(eps M'+|delta| H)/(1+delta),1.083e-02,<= 3.397e-01,True
+6a,d(gap of limit minimiser)/dW near W* = 0.690,1.6561,!= 0 (transversal crossing),True
+6b,"min Hessian eigenvalue of L_inf at the minimiser, W = 0.690",1.4705e-01,> 0 (nondegenerate),True
+6c,"max |Δ(u,v)| of the minimiser between adjacent W (step 0.005)",0.0036,"small (same branch, no switch)",True
+M1,"log-log slope of (kappa - kappa_0)/kappa_0 in eps, eps <= 0.1",0.9926,1 (O(eps)),True
+M2,log-log slope of R_glob(a)/R_glob^inf - 1 in eps (six a),0.9472,1 (O(eps)),True
+q=2/3,f/eps^(1+1/q) - [h_q + eps g_q],0,"0 (exact, no higher terms)",True
+q=1,f/eps^(1+1/q) - [h_q + eps g_q],0,"0 (exact, no higher terms)",True
+q=2,f/eps^(1+1/q) - [h_q + eps g_q],0,"0 (exact, no higher terms)",True
+q=4,f/eps^(1+1/q) - [h_q + eps g_q],0,"0 (exact, no higher terms)",True
+q=2 vs sin,h_2(tau/sqrt2) * sqrt2 - h(tau),0,0,True
