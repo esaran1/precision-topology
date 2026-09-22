@@ -68,6 +68,66 @@ If F-1 and F-3 both hold, the lag is a **result**: the same mechanism explains
 the offset's size across three optimisers and six activation values, and Block
 F's "three optimisers agree on `R`" becomes explained rather than observed.
 
+## D-1. The DISCRIMINATING test: `R_spin + lag` against `R_glob + lag`
+
+**Registered before any lag is fitted.** Added 2026-09-21 after the timestamp
+audit; this is a *new* registration, not an amendment to an existing one.
+
+**Why it is needed.** The registered "crossings track `R_spin`" test is **not
+discriminating**. `R_spin >= R_glob` by construction and every measured crossing
+exceeds `R_spin`, so "closer to `R_spin`" follows from the ordering alone and
+would hold equally if the true switch were `R_glob` and the run simply
+overshot it. Both accounts predict the same sign.
+
+They differ in **how much** of the offset the lag must carry:
+
+- **Spinodal account**: the run leaves when its branch vanishes, at `R_spin`.
+  Residual offset above `R_spin` is lag, and should be **small**.
+- **Global-switch-plus-lag account**: the landscape switches at `R_glob`; the
+  run overshoots by lag alone, which must therefore be **larger**, covering
+  `R_measured - R_glob`.
+
+**The test.** Predict lag from growth rate alone, with a single proportionality
+constant `c` fitted **once** across all `a`:
+
+    lag(a) = c * rate(a)
+
+where `rate(a)` is the local median `d|w2|/dstep` near the crossing, measured
+and fixed now:
+
+| `a` | 1.30 | 1.35 | 1.40 | 1.45 | 1.50 | 1.60 |
+|---|---:|---:|---:|---:|---:|---:|
+| rate (per step) | 0.00239 | 0.00241 | 0.00238 | 0.00241 | 0.00250 | 0.00260 |
+
+Then compare two one-parameter models against the six measured crossings:
+
+- **M-spin**: `R_pred(a) = R_spin(a) + c * rate(a)`
+- **M-glob**: `R_pred(a) = R_glob(a) + c * rate(a)`
+
+**Scored by RMS relative error across the six `a`, each fitting its own `c`.**
+
+**Registered tolerance and verdict rule**:
+
+> **M-spin wins** if its RMS relative error is **below M-glob's by at least a
+> factor of 1.5**. **M-glob wins** on the mirror. Otherwise **neither is
+> distinguished**, and the paper says the data do not separate the spinodal
+> from a global switch with lag.
+
+**Registered prediction: neither will be distinguished.** Grounds, stated now:
+the measured rates vary only **9%** across `a` (0.00239 to 0.00260) while the
+offsets vary more, so `c * rate(a)` is nearly a *constant* offset in this data
+and both models reduce to "predicted switch plus a constant". The data lack the
+leverage to separate them. **This is registered as the expected outcome so that
+a null result is not reported as a failure of the landscape account** — the
+landscape account survives either way; what is undecided is *which* switch
+point the run leaves at.
+
+**If this is right, the discriminating evidence must come from Block E**, where
+`freeze-mid` (hold `R_glob < R < R_spin`) directly separates them: placement
+should be **achieved** under the global-switch account and **never achieved**
+under the spinodal account. That is why the `a = 1.60` grid refinement below
+matters.
+
 ## Block B procedure, frozen before this comparison
 
 Committed and unchanged from here on:

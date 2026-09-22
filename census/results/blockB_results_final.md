@@ -16,15 +16,35 @@ float64, population loss on 800 dense uniform points.
 | 1.50 | 0.2181 | 0.2225 | 0.2399 | 0.3053 | **0.2489** | 1.038 | 1.119 |
 | 1.60 | 0.2229 | 0.2285 | 0.2508 | 0.3065 | **0.2563** | 1.022 | 1.122 |
 
-## Registered prediction: PASSES on the prospective set
+## Registered prediction: passes, but on THREE prospective `a`, not four —
+## and the test is not discriminating
 
-Registered: crossings track `R_spin` within 15%, and are **closer to `R_spin`
-than to `R_glob` at a majority of the four prospective `a`** (1.40, 1.45, 1.50,
-1.60 — `a` = 1.30 and 1.35 were post hoc).
+**Correction (timestamp audit).** The registration named `a` = 1.40, 1.45,
+1.50, 1.60 as prospective. **`a = 1.40` is not.** Its crossing median was read
+in the Block A interim at **18:41:03**, while the seeding fix that *creates*
+the `R_fold`/`R_spin` separation at `a >= 1.35`, and the frozen procedure
+sha `9f1b10741d8bf48c`, both landed at **18:56:15** — fifteen minutes later.
+Before that fix no window existed anywhere, so the `R_spin` values at
+`a >= 1.35` come from a procedure that postdates my having seen crossings at
+1.30, 1.35 and 1.40.
 
-- **within 15% of `R_spin`: 6 of 6**
-- **closer to `R_spin` than `R_glob`: 4 of 4 prospective** (5 of 6 overall;
-  `a = 1.30` ties because the two coincide there)
+| status | `a` |
+|---|---|
+| **genuinely prospective** | **1.45, 1.50, 1.60** (3 values) |
+| post hoc | 1.30, 1.35, 1.40 |
+
+On the corrected prospective set the result is **3 of 3** closer to `R_spin`
+than `R_glob`, all within 15%. Overall: within 15% of `R_spin` at 6 of 6;
+closer to `R_spin` at 5 of 6 (`a = 1.30` ties, the two coincide there).
+
+**And the test does not discriminate.** `R_spin >= R_glob` by construction, and
+**every** measured crossing exceeds `R_spin`. So "closer to `R_spin`" follows
+automatically from the ordering and would hold equally under a pure-lag account
+in which the true switch is `R_glob` and the run overshoots it. The registered
+outcome is recorded as it stands, but it is **not evidence for the spinodal
+over the global switch**. The discriminating version is registered in
+`blockF_lag_prediction.md` (§ D-1) and tests `R_spin + lag` against
+`R_glob + lag` with the lag predicted from growth rate alone.
 
 ## Drift: the predicted switch moves the way the measurement moves
 

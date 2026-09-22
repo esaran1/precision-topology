@@ -107,3 +107,20 @@ The `G > 0` branch is lost at `|w2| = 4.75`, `R = 0.2037` — **one 0.25 grid st
 **Why the scan was wrong**: its downward pass seeds by screening at the top of the range, and at `|w2| = 9.0` *every* non-degenerate screened candidate is absent — the log-2 constant predictor dominates there, so the seeding fell through to a lower `|w2|` and picked up an unrelated basin. Fixed by seeding the downward branch from `best_conditional` at a mid-range `|w2|` where the good placement is the actual minimiser.
 
 **The falsifier stands: there is no hysteresis window.** `R_fold ≈ R_glob ≈ R_spin ≈ 0.21` to within a grid step. Block E keeps the reduced arm set.
+
+## 2026-09-21 — TIMESTAMP AUDIT: the prospective set was 3 values, not 4
+
+The Block B registration named `a` = 1.40, 1.45, 1.50, 1.60 prospective. **`a = 1.40` is not.** Commit timeline:
+
+| time | commit | event |
+|---|---|---|
+| 18:38:04 | `9e30027` | Block B registered |
+| **18:41:03** | `f00ce39` | Block A interim — **read crossing medians for 1.30, 1.35, 1.40** |
+| 18:46:23 | `87ee918` | log-2 exclusion — procedure changed |
+| **18:56:15** | `3497f7f` | **seeding fix + frozen sha `9f1b10741d8bf48c`** |
+
+The seeding fix is what creates the `R_fold`/`R_spin` separation at `a >= 1.35`; before it no window existed anywhere. So the `R_spin` values at those `a` come from a procedure finalised **after** I had seen the 1.40 crossing.
+
+**Genuinely prospective: `a` = 1.45, 1.50, 1.60.** Result on that set is 3 of 3, all within 15%. Corrected in `blockB_results_final.md`.
+
+Also recorded there: **the 4/4 (now 3/3) test does not discriminate.** `R_spin >= R_glob` always and every measured crossing exceeds `R_spin`, so 'closer to `R_spin`' follows from the ordering alone and holds equally under a pure-lag account with `R_glob` as the true switch.
