@@ -299,6 +299,31 @@ def main() -> None:
         0.9918, 1e-3)
     chk("min at step 0 count", float((pw.min_at_step == 0).sum()), 0.0, 0)
 
+    print("T55 exceptions above 0.50")
+    exc = pd.read_csv(R / "exceptions_above_050.csv").sort_values("seed")
+    chk("n exceptions", float(len(exc)), 2.0, 0)
+    s13 = exc[exc.seed == 13].iloc[0]
+    s82 = exc[exc.seed == 82].iloc[0]
+    chk("seed13 placement G", float(s13.placement_G), 0.768428, 1e-5)
+    chk("seed13 placement ok", float(bool(s13.placement_ok)), 1.0, 0)
+    chk("seed13 bias miss", float(s13.bias_miss), 0.010958, 1e-6)
+    chk("seed13 outer violations", float(s13.dense_viol_outer), 11.0, 0)
+    chk("seed13 sample errors", float(s13.sample_errors), 1.0, 0)
+    chk("seed82 placement G", float(s82.placement_G), -0.216202, 1e-5)
+    chk("seed82 placement fails", float(not bool(s82.placement_ok)), 1.0, 0)
+    chk("seed82 w1 near zero", float(abs(s82.w1) < 0.05), 1.0, 0)
+    chk("seed82 total violations",
+        float(s82.dense_viol_inner + s82.dense_viol_outer), 3847.0, 0)
+    chk("seed82 sample errors", float(s82.sample_errors), 185.0, 0)
+    chk("seed82 new entrant (was below 0.50)", float(s82.R_restricted < 0.50), 1.0, 0)
+    chk("seed82 R certified", float(s82.R_certified), 0.500886, 1e-6)
+
+    print("T66 alpha(eps)")
+    ae = pd.read_csv(R / "alpha_of_eps.csv").sort_values("eps")
+    chk("alpha min", float(ae.alpha.min()), 1.1719, 1e-3)
+    chk("alpha max", float(ae.alpha.max()), 1.3411, 1e-3)
+    chk("alpha median over onset region", float(ae.alpha.median()), 1.2797, 1e-3)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 

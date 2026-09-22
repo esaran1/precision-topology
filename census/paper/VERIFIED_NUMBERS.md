@@ -374,7 +374,8 @@ correct; each is a different set of runs.
 
 | population | what it is | n | below R=0.30 | above R=0.50 |
 |---|---|---:|---|---|
-| **pooled, all runs** | `r_pooled.csv` + `r_adamw.csv`; 12 values of `a`, 8 budgets, three optimisers | **3,150** | **0 of 2,285** | **460 of 461** |
+| **pooled, all runs (CERTIFIED `Ĝ`)** | `r_pooled.csv` + `r_adamw.csv`; 12 values of `a`, 8 budgets, three optimisers | **3,150** | **0 of 2,281** | **461 of 463** |
+| *pooled, all runs (restricted `Ĝ`, superseded 2026-09-22)* | same data, pre-`Ĝ`-unification | *3,150* | *0 of 2,285* | *460 of 461* |
 | *pooled, pre-AdamW* | `r_pooled.csv` alone; 12 values of `a`, 6 budgets, Adam+SGD | *2,910* | *0 of 2,160* | *402 of 403* |
 | **three-optimiser comparison** | `a = 1.25` only, Adam/AdamW/SGD | **600** | **0 of 361** | **154 of 154** |
 
@@ -388,10 +389,30 @@ explicitly about the optimiser comparison** (§5.5, Figure 3b).
 union, computed at render time by `make_figures.py`. Any script quoting a
 pooled figure must read **both** files.
 
-**The single non-solving run above R = 0.50, identified.** Both `402 of 403`
-and `460 of 461` have exactly **one** exception, and it is the **same run** —
-AdamW contributed 58 runs above R = 0.50, all solving, so numerator and
-denominator each rose by 58.
+**The TWO non-solving runs above R = 0.50, identified (certified `Ĝ`, T65).**
+Both are `a = 3.0`, Adam, budget 2,000, and they are **different failure modes** —
+do **not** describe them as two near-misses.
+
+| | seed 13 | seed 82 |
+|---|---|---|
+| `\|w₂\|` | 1.099398 | 0.951985 |
+| `R` (certified) | 0.578447 | **0.500886** |
+| `R` (restricted) | 0.576580 | *0.499269 — below the cutoff* |
+| placement `G` | **+0.768428, OK** | **−0.216202, FAILS** |
+| `w₁` | −1.452066 | **+0.019358** |
+| failure | **bias**: `b₂` misses `(2.342373, 3.187182)` by **0.010958** | **placement**: degenerate `w₁ ≈ 0` constant-predictor region |
+| dense violations | **11 of 4,000 outer**, 0 inner, at `x ∈ [1.2000, 1.2040]` | **3,847**: 1,847 of 4,001 inner, 2,000 of 4,000 outer |
+| sample errors | **1** | **185** |
+
+**Seed 13** is a genuine near-miss, unchanged across all three pooled counts
+(`402 of 403`, `460 of 461`, `461 of 463`). AdamW contributed 58 runs above
+R = 0.50, all solving.
+
+**Seed 82 is a new entrant** under the certified `Ĝ`, clearing the cutoff by
+**0.0009**. It can reach `R > 0.5` with `\|w₂\| < 1` because `Ĝ(3.0) ≈ 1.05`, so
+the geometry factor alone nearly clears it — a known limitation of `R` as a single
+product at large `a`, already visible in T52's finding that `a = 2.0/3.0` fail the
+budget-homogeneity condition. Full diagnosis: `results/exceptions_above_050.md`.
 
 | | |
 |---|---|
@@ -410,7 +431,7 @@ the link setting (§3).
 **Ready answer for a reviewer**: R measures *capacity* at optimal placement,
 not achieved placement. This run has the capacity and did not use it; its
 `(w1, b1)` is slightly off, and the shortfall shows up only in a 4-thousandth
-of the outer window. One such run in 461 is consistent with R being necessary
+of the outer window. Two such runs in 463 — one a bias near-miss, one a large-`a` placement failure — are consistent with R being necessary
 and very nearly sufficient, which is what we claim.
 
 **AdamW adds no new `a` value** — all 240 of its runs are at `a = 1.25`, which

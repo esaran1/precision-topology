@@ -418,6 +418,18 @@ def fig3_r_collapse() -> None:
     fam = pd.read_csv(RESULTS / "r_families.csv")
     fb = pd.read_csv(RESULTS / "r_family_b.csv")
 
+    # Recompute R with the CERTIFIED Ghat (T65).  The committed R columns used
+    # the restricted maximum_gap() search, which under-estimates the supremum by
+    # 0.13-0.84%.  Both searches target the same quantity -- see
+    # results/ghat_unification.md -- so the certified value is the correct one.
+    _gc = pd.read_csv(RESULTS / "ghat_certified_all.csv").set_index("a")
+    def _R_cert(frame):
+        a = frame.a if "a" in frame else pd.Series(1.25, index=frame.index)
+        g = a.map(lambda v: float(_gc.loc[round(float(v), 2), "Ghat_certified"]))
+        return frame.w2.abs() * g / 2
+    d = d.assign(R=_R_cert(d))
+    aw = aw.assign(R=_R_cert(aw))
+
     pooled = pd.concat([d[["opt", "R", "solved"]], aw[["opt", "R", "solved"]]],
                        ignore_index=True)
     pooled["solved"] = pooled.solved.astype(bool)

@@ -118,9 +118,13 @@ differences at fixed `a`, where a common factor cancels exactly.
 
 ### Does not move beyond rounding
 
-**`R50`**: 0.3715 → **0.3728** under a reimplementation of the committed logistic
-fit that reproduces the committed 0.3705 to 0.001. The shift is **+0.0013**,
-inside the reported precision. `R25`/`R75`: 0.3482/0.3948 → 0.3495/0.3962.
+**`R50`**: shift **+0.0013**, inside the reported precision.
+
+*Corrected 2026-09-22*: the absolute values first quoted here (0.3715 → 0.3728)
+came from a **coarse fit grid**. Converged (900 × 1600) the reimplementation gives
+**0.3669 → 0.3682**. The **+0.0013 shift is identical at every grid resolution**
+and is the robust quantity; the absolute value is not, and the code producing the
+committed 0.3705 is **not in the repository**. See `r50_certified_results.md`.
 
 ## Nothing qualitative changes
 
