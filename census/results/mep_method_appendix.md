@@ -90,13 +90,38 @@ zero. The images are sliding along a descent direction that the arclength
 re-spacing keeps re-populating; the plateau is the residual tangential component
 the simplified method does not project out.
 
-**What may and may not be claimed.** The claim supported is: *a discretised path
-exists, at 41 images, along which the energy never rises above the higher
-endpoint, at every `a` and for both endpoint types.* That is enough to refute the
-Arrhenius premise, which requires a positive barrier. The claim **not** supported
-is that this path is the true MEP or that a converged saddle search was performed.
-`barrier_results.md` states the refutation, and the appendix should state the
-limitation in these terms.
+## Appendix wording — what to state, and what not to
+
+**State all of the following:**
+
+1. **Barrier definition.** `ΔE = max_path E − max(E_start, E_end)` — measured
+   relative to the **higher endpoint**, so `ΔE ≥ 0` and `ΔE = 0` means the path
+   is monotonically non-increasing from the higher endpoint. The convention is
+   symmetric under reversing the path.
+2. **Discretisation.** **41 images**, endpoints pinned. (The linear estimator
+   uses 101 points on the straight chord.)
+3. **Iterations.** A **fixed 400**, with **no convergence tolerance**.
+4. **Independence from that choice.** The barrier is **0.000000 at every
+   iteration count from 50 to 3,200**, so the reported value does not depend on
+   the fixed 400.
+5. **The path is not a converged MEP.** Interior gradient norms **plateau near
+   1.1 to 1.5** rather than approaching zero; the simplified string method does
+   not project out the tangential component, and the arclength re-spacing keeps
+   re-populating the images along a descent direction.
+
+**Claim only this:** *a path exists, at this discretisation, along which the
+training loss never exceeds the higher endpoint.* Equivalently, the measurement
+**rules out a positive static barrier along that path**.
+
+**Do not claim** that the path is the minimum-energy path, that a saddle search
+converged, or that no barrier exists anywhere between the endpoints — none of
+those follows from a non-converged string at 41 images.
+
+**Do not use the word "Arrhenius" in the paper.** State the result directly: no
+positive static barrier along the exhibited path, so a barrier-crossing account
+of findability has nothing to rest on here. The rate-theory framing adds no
+information and invites argument about whether that premise was ever the right
+one.
 
 ## Parameter summary for the appendix table
 
