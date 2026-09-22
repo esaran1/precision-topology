@@ -182,6 +182,32 @@ def main() -> None:
     chk("G-4 worst error (%)", float(sc.err_pct.abs().max()), 0.808, 0.01)
     chk("kappa_0 spread (x)", float(sc.kappa_0.max() / sc.kappa_0.min()), 8.077, 0.01)
 
+    print("T62 Block K family B")
+    bk = pd.read_csv(R / "blockK_auc.csv").sort_values("alpha")
+    chk("box/norm ratio at alpha=-0.5",
+        float(bk[bk.alpha == -0.50].gstar_box.iloc[0] / bk[bk.alpha == -0.50].gnorm.iloc[0]),
+        8.0, 1e-6)
+    chk("Ghat_norm exponent in |alpha|",
+        float(np.polyfit(np.log(bk.alpha.abs()), np.log(bk.gnorm), 1)[0]), 1.0, 0.01)
+    chk("cells with AUC(R_B)==AUC(prod)",
+        float((np.abs(bk.auc_R_B - bk.auc_prod) < 1e-12).sum()), 5.0, 0)
+    chk("cells at AUC 1.0", float((bk.auc_R_B >= 0.999999).sum()), 4.0, 0)
+    chk("band runs at alpha=-1.00", float(bk[bk.alpha == -1.00].band_runs.iloc[0]), 2.0, 0)
+    chk("alpha=-1 separation gap (unsolved max)",
+        float(bk[bk.alpha == -1.00].unsolved_max_prod.iloc[0]), 0.295219, 1e-5)
+    chk("alpha=-1 separation gap (solved min)",
+        float(bk[bk.alpha == -1.00].solved_min_prod.iloc[0]), 7.258799, 1e-5)
+    nb = pd.read_csv(R / "blockK_family_b_normalised.csv")
+    sv = nb.solved.values.astype(bool)
+    def _auc(v):
+        pos, neg = np.asarray(v)[sv], np.asarray(v)[~sv]
+        return float(sum(np.sum(p > neg) + 0.5 * np.sum(p == neg) for p in pos)
+                     / (len(pos) * len(neg)))
+    chk("pooled AUC(R_B)", _auc(nb.R_B), 0.9990, 1e-3)
+    chk("pooled AUC(|w2|)", _auc(nb.w2_abs), 0.9901, 1e-3)
+    chk("AUC margin under registered 0.10",
+        float((_auc(nb.R_B) - _auc(nb.w2_abs)) < 0.10), 1.0, 0)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 
