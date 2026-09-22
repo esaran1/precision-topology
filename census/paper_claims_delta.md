@@ -61,6 +61,10 @@ four-item follow-up of the same date. Append-only.
 | 27 | *(none — new)* | **The machinery transfers to four unseen task windows.** Across five windows at fixed `a`, `\|w₂\|` at crossing spans **2.34–13.65 (5.8×)** while `CV(R) < CV(\|w₂\|)/2` at both `a` (**3.36× and 3.01×**). Each window's `κ₀`, computed from `h(σ)` alone, matches its measured `κ(1.02)` within **0.81%, 5 of 5**, across κ₀ values spanning **8.1×**. Nothing was refitted per window. | T61 | §7 |
 | 28 | *(none — new)* | **The per-`a` lag is a property of `a`, not of the task.** Measured/predicted ratios have sd **0.014** at a = 1.30 and **0.016** at a = 1.50 across five windows; normalised by the base task's own offset at the same `a`, all ten land within **2.72%** of 1.0. | T61 | §7 |
 
+| 29 | the +8.7% offset is **relaxation lag**, a mechanism | **The offset is robust; the lag account is a LABEL, not a mechanism.** Block F: a **3.9× spread** in `|w₂|` growth rate across Adam/AdamW/SGD moves the median crossing `R` by **0.9%** (0.23094 / 0.22980 / 0.22888). F-1's ordering holds but **P(full ordering) = 0.290** vs 0.167 by chance, CIs overlapping. **F-2 FAILS**: SGD's predicted offset 2.46% against **8.65%** measured, a **6.19 pp** miss outside the registered ±4 pp. Per the registration's own falsifier, dropped. **What survives**: the offset is **one-signed and consistent — 8.6–9.6% across three optimisers, 8.6–14.4% across six `a`** — which is what makes the training-free prediction useful; and Block C's relaxation-then-tracking is unaffected. | T63 | §5 |
+| 30 | `κ ∈ [0.30544, 0.31543]`, constant to 3.2% (grid, resolution 600) | **Certified: `κ ∈ [0.307747, 0.317616]`, width 3.207%.** `Ĝ` is a supremum so a grid can only under-estimate it; the resolution-600 search was low at **every** `a` (0.13–0.68%). The **3.2% width — what the theorem chain consumes — survives at 3.207%**; the interval's **location moves up** by 0.69–0.76%. Certificate widths 0.022–0.086% via `Ĝ_grid ≤ Ĝ ≤ Ĝ_grid + Lh/2`, `L = (1+a)·max(1,max\|x\|)`. Boundary shell gap **non-positive**, so the compact-domain cut is sound. | T64 | §3 |
+| 31 | `κ₀` matches measured `κ(1.02)` to **0.061%** | **0.145% certified.** Certified `κ(1.02) ∈ [0.307747, 0.307844]` and `κ₀ ∈ [0.3073024, 0.3075655]` are **disjoint**; the 0.061% was a coincidence of two under-estimates of different size. S-1's 3% tolerance is unaffected (0.145% is 20× inside), but quote **0.15% certified**, not 0.061% sampled, and do not present the match as exact. `K = 0.579454926` and `κ₀ = 0.307302` sit at the certified **lower endpoints**. | T64 | §3 |
+
 ## Claims to REMOVE (second session)
 
 | # | claim to remove | reason |
@@ -85,19 +89,22 @@ four-item follow-up of the same date. Append-only.
 | Block E stall: registered expectation **trapping** | **saturation** — gradients 0.07% of control, and a 5× budget recovers 2/15 → 7/15 |
 | K-2's stated range "roughly 115–145×" | **arithmetically wrong in my own registration** — I omitted the 2,000-budget row at 11.8×; the correct range is **11.8×–145×**. The substantive predictions (exactly 8×, floor above 10×) both hold. |
 | K-3 (AUC margin ≥ 0.10 over `\|w₂\|`) | **0.0089** — and the claim is removed rather than reported, per the standing instruction |
+| F-2 (offsets scale with the rate ratio, ±4 pp) | **SGD misses by 6.19 pp** — predicted 2.46%, measured 8.65%. The offset is constant (0.98 pp spread) while rate varies 3.9×. |
+| F-1 (ordering, as evidence) | ordering holds but **P = 0.290** vs 0.167 by chance; no power to detect anything |
+| C-2 (certified κ contains T50's interval) | **containment fails** — certified lower bound 0.307747 exceeds T50's 0.30544. Magnitude criterion passes (< 1%); both endpoints moved **up**, the only possible direction |
 | Block H H-3 (validity gate) | **FAILED**, 42.5 pp, p = 4.3e-5 — a linear schedule is not a null because the natural `\|w₂\|` trajectory is non-monotone |
 
 ## Framings considered and NOT adopted
 
 - **Loss-landscape bifurcation with hysteresis** — dropped on its own registered falsifier at a = 1.30 and now excluded at all six `a` (claim 21).
 - **Output scale as an annealing parameter** — the registration made it conditional on the stall being **trapping**; it is **saturation**, and Block H's validity gate failed independently. Not adopted.
+- **Relaxation lag as the mechanism for the offset** — falsified by Block F (F-2 fails; a 3.9× rate change moves the offset 0.9%). The offset is reported as a robust empirical regularity with **no mechanism claimed**. This is the second failed rate-based account, after Block H.
 
 ## Open / pending
 
-- **Block F** (three-optimiser crossing `R`, F-1/F-2/F-3) — the remaining
-  registered test. D-1 is now **vacuous** (T60) and is not run.
-- **Block H, valid version**: a control-matched arm must replay each seed's own
-  `|w₂|(t)` time-warped by `m`, so `m = 1` is the natural trajectory exactly.
-  Not run; recorded as the correct design in `blockH_rate_results.md`.
-- **Family B** (`Ĝ`-derived claims) — still suspended pending Block K.
+- **Family B** — suspension lifted (T62): `β_B = 1` and the overshoot restored,
+  the AUC comparison removed permanently.
+- **D-1** — vacuous (T60), not run.
+- **Block H, valid version** — replay each seed's own `|w₂|(t)` time-warped by
+  `m`, so `m = 1` is the natural trajectory. Design recorded, not run.
 - Claim 26 (saturation/conditioning of the stall) has no ledger ID yet.

@@ -208,6 +208,48 @@ def main() -> None:
     chk("AUC margin under registered 0.10",
         float((_auc(nb.R_B) - _auc(nb.w2_abs)) < 0.10), 1.0, 0)
 
+    print("T63 Block F optimisers")
+    bf = pd.read_csv(R / "blockF_optimisers.csv")
+    cf = bf[bf.cross_R.notna()]
+    meds = {n: float(cf[cf.optimiser == n].cross_R.median()) for n in ("adam", "adamw", "sgd")}
+    chk("Adam cross R", meds["adam"], 0.23094, 1e-4)
+    chk("AdamW cross R", meds["adamw"], 0.22980, 1e-4)
+    chk("SGD cross R", meds["sgd"], 0.22888, 1e-4)
+    chk("F-1 ordering holds",
+        float(meds["adam"] > meds["adamw"] > meds["sgd"]), 1.0, 0)
+    rates = {n: float(cf[cf.optimiser == n].local_rate.median()) for n in meds}
+    chk("rate spread (Adam/SGD)", rates["adam"] / rates["sgd"], 3.917, 0.02)
+    R_glob_125 = 0.21066
+    offs = {n: (meds[n] / R_glob_125 - 1) * 100 for n in meds}
+    chk("SGD offset (%)", offs["sgd"], 8.645, 0.02)
+    chk("SGD predicted offset (%)", offs["adam"] * rates["sgd"] / rates["adam"], 2.458, 0.02)
+    chk("F-2 SGD error exceeds 4pp",
+        float(abs(offs["sgd"] - offs["adam"] * rates["sgd"] / rates["adam"]) > 4.0), 1.0, 0)
+    chk("offset spread (pp)", max(offs.values()) - min(offs.values()), 0.981, 0.02)
+    rng = np.random.default_rng(0)
+    def _bm(n, k=4000):
+        v = cf[cf.optimiser == n].cross_R.values
+        return np.array([np.median(rng.choice(v, len(v), replace=True)) for _ in range(k)])
+    ba, bw, bs = _bm("adam"), _bm("adamw"), _bm("sgd")
+    chk("P(full ordering) below 0.5", float(((ba > bw) & (bw > bs)).mean() < 0.5), 1.0, 0)
+
+    print("T64 kappa certified")
+    kc = pd.read_csv(R / "kappa_certified.csv")
+    sub = kc[kc.a <= 1.60]
+    chk("max certificate rel width (%)", float(sub.rel_width.max() * 100), 0.0855, 0.002)
+    chk("all widths under 0.2%", float((sub.rel_width < 0.002).all()), 1.0, 0)
+    chk("certified kappa lower", float(sub.kappa_lo.min()), 0.307747, 1e-5)
+    chk("certified kappa upper", float(sub.kappa_hi.max()), 0.317616, 1e-5)
+    chk("certified width (%)",
+        (float(sub.kappa_hi.max()) / float(sub.kappa_lo.min()) - 1) * 100, 3.207, 0.01)
+    chk("excludes T50 lower endpoint",
+        float(float(sub.kappa_lo.min()) > 0.30544), 1.0, 0)
+    kb = pd.read_csv(R / "kappa_boundary.csv")
+    chk("boundary below interior, all", float(kb.strictly_below.all()), 1.0, 0)
+    kk = pd.read_csv(R / "kappa_K_certified.csv").iloc[0]
+    chk("K certified lower", float(kk.K_lo), 0.579454977, 1e-8)
+    chk("K rel width (%)", (float(kk.K_hi) / float(kk.K_lo) - 1) * 100, 0.0856, 0.001)
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 
