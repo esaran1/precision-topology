@@ -258,3 +258,24 @@ below 6%.
 > permutation results are essentially unchanged (duplicates were unbiased
 > copies). Full analysis and mechanism: `reading_b_anomaly.md`;
 > authoritative counts: `CLAIMS.md`.
+
+
+---
+
+## Annotation appended 2026-09-22 (T68): what "their parametrization" means
+
+This note compares two readings of Appendix G.1. **Their released code implements
+neither** — it performs no thickening at all, and its curves self-intersect. See
+`notes/renlim_generator_private_note.md` (**private, not for the paper**) for the
+code and the proof.
+
+Consequences for how this study is described:
+
+1. The Reading A / Reading B comparison **remains valid** as a study of two ways
+   to corrugate a thickened tube, and its conclusion — that the ambiguity is
+   immaterial to every result here — is unaffected.
+2. **Neither reading is "their" parametrisation.** Any sentence implying we
+   replicate their published construction should be removed; §2 describes **our**
+   smooth linked tori, verified in `our_link_section2.md`.
+3. Nothing about their generator goes in our paper pending contact with the
+   authors.
