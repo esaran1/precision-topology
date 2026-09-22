@@ -106,6 +106,16 @@ scale, which is why their onsets differ by a constant factor (T44).
 
 ## Limits of the statement
 
+- **Cross-family test (post-registration finding, `crossfamily_results.md`).**
+  For the q-families the reduction holds only while `ε^{1/q}·max|σ| ≤ 1`, because
+  they are polynomial only for `|t| ≤ 1`. The registered cross-family test ran
+  at `ε ≥ 0.3`, where 25–34% of window points fall on the linear continuation.
+  There, q2 matched family A's `R_glob` at all six `a` but **not** its `R_solve`
+  (below A by 0.012–0.051). So at finite `ε` the reduction does **not** fix the
+  solve threshold across families whose folds agree only near the fold.
+  Statement 6 is claimed only inside the reduction's domain, where it is
+  untested for the q-families.
+
 - H1 and H2 are verified numerically, not proved.
 - Step 6 is conditional on H2 at each switch point used; H2 was checked at
   `R_glob^∞` only.
