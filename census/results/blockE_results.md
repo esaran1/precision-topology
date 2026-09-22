@@ -52,20 +52,37 @@ which side of a training-free threshold its output weight is pinned to.
 | `cold_high` | 2/40 | 0/40 | 0.2466 |
 | `jump` | 9/40 | 6/40 | 0.2205 |
 
-## `hold_high` separates the two thresholds, unprompted
+## `hold_high` is a causal confirmation of the SECOND threshold
 
-`hold_high` **places in 33 of 40 runs and solves in 0**. This was not what the
-arm was designed to test, and it is a direct confirmation of the placement/bias
-decomposition (T57):
+`hold_high` **places in 33 of 37 intervened runs and solves in 0 of 40**. This is
+not a shortfall. The held value sits **strictly between the two switch points**:
 
-- `R_glob = 0.2145` governs **placement** — `hold_high` sits 15% above it and
-  places.
-- `R_solve = 0.3067` governs **solving** — `hold_high` sits **19.6% below** it
-  and never solves.
+| | value | `hold_high` held `R` sits |
+|---|---:|---|
+| `R_glob` (placement switch) | 0.21446 | **+15.0% above** |
+| **`hold_high` held `R`** | **0.24663** | — |
+| `R_solve` (solve switch) | 0.30667 | **19.6% below** |
 
-Holding `R` between the two thresholds produces placed-but-unsolved networks in
-33 of 40 runs. The decomposition predicted exactly this regime; Block E exhibits
-it under intervention.
+`R_glob < 0.24663 < R_solve`. In that interval the conditional landscape predicts
+**placement achievable, solving not achievable**, and that is exactly what is
+observed.
+
+**Checked in the strongest available form.** Block B's conditional minimiser at
+precisely the held `|w2| = 5.750` — the *best achievable* network at that output
+scale, 24 restarts, 3,000 inner steps — has `gap = +0.022543` and **does not
+solve**. Solving is **impossible** at that `R`, not merely unattained. So 0/40 is
+the predicted value, and 33/37 placed is the landscape's placement prediction met
+under intervention.
+
+**This makes Block E a causal test of both thresholds, not one.** Pinning `R`
+below `R_glob` destroys placement (0/37); pinning it between `R_glob` and
+`R_solve` gives placement without solving (33/37 placed, 0/40 solved); leaving it
+free lets it grow past `R_solve` and the run solves (37/40). Three regimes, two
+thresholds, both computed with no training in them.
+
+*(The three `hold_high` rows with a held `R` of 0.029-0.042 are the seeds that
+never placed within 12,000 steps and so were never intervened on — the same three
+seeds control also fails. They are excluded from the 37.)*
 
 ## Two registered predictions FAILED, both informative
 

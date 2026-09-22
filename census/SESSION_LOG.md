@@ -181,9 +181,16 @@ pinned to one side of `R_glob = 0.21446` and held there:
 **Fisher exact p = 1.2e-16.** Placement is lost within **50 steps** (the first
 checkpoint) in all 37 `hold_low` runs -- median = min = max = 50.
 
-**`hold_high` separates the two thresholds without being designed to**: places
-33/40, solves **0/40**, sitting 15% above `R_glob` and 19.6% **below**
-`R_solve = 0.3067`. That is the placed-but-unsolved regime T57 predicts.
+**`hold_high` is a CAUSAL CONFIRMATION of the second threshold**: the held
+`R = 0.24663` sits **strictly between** `R_glob = 0.21446` (+15.0%) and
+`R_solve = 0.30667` (-19.6%), and in that interval the conditional landscape
+predicts placement achievable and solving NOT achievable. Observed: **33/37
+placed, 0/40 solved.** Checked against the conditional minimiser at exactly the
+held `|w2| = 5.750`: gap `+0.022543`, **does not solve** -- so solving is
+*impossible* at that `R`, not merely unattained. Block E therefore tests **both**
+switch points: below `R_glob` placement is destroyed (0/37), between the two it is
+stable but unsolvable (33/37, 0/40), free it grows past `R_solve` and solves
+(37/40).
 
 **Two registered arms FAILED.**
 - `cold_high` (registered "placement achieved"): **2 of 40**; a pilot at

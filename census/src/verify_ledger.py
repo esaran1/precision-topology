@@ -142,6 +142,13 @@ def main() -> None:
     chk("cold_low placed /40", float(d[d.arm == "cold_low"].placed_final.sum()), 0.0, 0)
     lost = (hl.lost_at - hl.intervened_at)
     chk("hold_low max steps to lose", float(lost.max()), 50.0, 0)
+    # hold_high's held R must lie strictly between the two switch points
+    sw = pd.read_csv(R / "blockB_switches.csv")
+    sw13 = sw[sw.a == 1.30].iloc[0]
+    held = float(d[(d.arm == "hold_high") & d.kept.notna()].R_final.median())
+    chk("hold_high held R", held, 0.24663, 1e-4)
+    chk("held R above R_glob", float(held > float(sw13.R_glob)), 1.0, 0)
+    chk("held R below R_solve", float(held < float(sw13.R_solve)), 1.0, 0)
 
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
