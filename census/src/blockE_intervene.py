@@ -41,7 +41,7 @@ CHECK_EVERY = 50
 HOLD_AFTER_PLACED = 200   # steps to let the placed run settle before intervening
 LOW, HIGH = 0.85, 1.15    # multiples of R_glob for the two sides
 
-ARMS = ("control", "null", "hold_low", "hold_high",
+ARMS = ("control", "noise_floor", "hold_low", "hold_high",
         "cold_low", "cold_high", "jump")
 PROSPECTIVE = ("hold_low", "hold_high")   # the only arms scored as registered
 
@@ -105,10 +105,10 @@ def run(a, seed, arm, R_glob, gstar, steps=STEPS):
             if intervened_at is not None and i > intervened_at and gp <= 0 and lost_at is None:
                 lost_at = i
             # the hold/null arms intervene once the run has placed and settled
-            if (not applied and arm in ("hold_low", "hold_high", "null")
+            if (not applied and arm in ("hold_low", "hold_high", "noise_floor")
                     and placed_at is not None and i >= placed_at + HOLD_AFTER_PLACED):
                 gap_at_intervention = gp
-                if arm == "null":
+                if arm == "noise_floor":
                     with torch.no_grad():
                         th[2] *= 1.0 + 1e-6
                         th[3] *= 1.0 + 1e-6
