@@ -14,6 +14,7 @@ Block 4 seeds (numpy default_rng(0)), and against 1d's certified seeds at a = 1.
     python -m src.own_threshold crossing      # a = 1.30 and 1.50, phase 2b seeds 0-39
     python -m src.own_threshold validate      # certified checks at both bracket ends, 20 Block 4 seeds
     python -m src.own_threshold score         # S1-S3 (needs the long-horizon replays)
+    python -m src.own_threshold block5_posthoc  # POST HOC: Block 5 retention midpoint vs median own/pop
 """
 
 from __future__ import annotations
@@ -156,7 +157,9 @@ def _run(jobs, out):
 
 
 def block4():
-    seeds = sorted(pd.read_csv(RESULTS / "fixed_scale_block4.csv").seed.unique())
+    """Seeds behind Block 4's checkpoints, plus Block 5's (for the post hoc Block 5 comparison)."""
+    seeds = sorted(set(pd.read_csv(RESULTS / "fixed_scale_block4.csv").seed.unique())
+                   | set(pd.read_csv(RESULTS / "fixed_scale_block5.csv").seed.unique()))
     _run([(1.30, int(s), _pop(1.30)[1]) for s in seeds], "own_threshold_block4.csv")
 
 
@@ -184,5 +187,76 @@ def validate():
     print(v.to_string(index=False)); print("agreement:", v.agrees.mean())
 
 
+def _spearman_perm(a, b, n_perm=100_000, seed=0):
+    """Spearman rho and one-sided (positive) permutation p-value."""
+    ra = pd.Series(a).rank().values; rb = pd.Series(b).rank().values
+    ra = (ra - ra.mean()) / ra.std(); rb = (rb - rb.mean()) / rb.std()
+    rho = float((ra * rb).mean())
+    rng = np.random.default_rng(seed)
+    perm = np.array([(ra * rng.permutation(rb)).mean() for _ in range(n_perm)])
+    return rho, float((1 + (perm >= rho - 1e-12).sum()) / (n_perm + 1))
+
+
+def score():
+    """Registered S1-S3 (own_threshold_prediction.md, 312829f)."""
+    own = pd.read_csv(RESULTS / "own_threshold_block4.csv")
+    hz = pd.read_csv(RESULTS / "fixed_scale_horizons.csv")
+    hz = hz[hz.variant == "preserved"].merge(own[["seed", "w2_own", "w2_pop"]], on="seed", how="left")
+    assert hz.w2_own.notna().all()
+    placed = hz["placed_64000"].astype(bool)
+    own_rule = hz.level * hz.w2_pop > hz.w2_own
+    pop_rule = hz.level > 1.0
+    ag_own, ag_pop = float((own_rule == placed).mean()), float((pop_rule == placed).mean())
+    rows = [{"test": "S1", "n": len(hz), "own_rule_agreement": ag_own, "pop_rule_agreement": ag_pop,
+             "pass": ag_own >= 0.95 and ag_own - ag_pop >= 0.05}]
+    tst = pd.read_csv(RESULTS / "fixed_scale_horizons_tests.csv").set_index("variant")
+    x50 = float(tst.loc["preserved", "x50_64k"])
+    med = float(own[own.seed.isin(hz.seed.unique())].own_over_pop.median())
+    rows.append({"test": "S2", "x50_64k": x50, "median_own_over_pop": med, "diff": x50 - med,
+                 "pass": abs(x50 - med) <= 0.02})
+    cr = pd.read_csv(RESULTS / "own_threshold_crossing.csv")
+    runs = pd.read_csv(RESULTS / "wi_crossing_runs.csv")
+    offsets = {1.30: 0.096, 1.50: 0.126}
+    for a, off in offsets.items():
+        o = cr[cr.a.round(2) == a]
+        R_pop = float(o.w2_pop.iloc[0] * o.Ghat_cert.iloc[0] / 2)
+        m = runs[(runs.a.round(2) == a) & (runs.budget == 32_000)].merge(o[["seed", "R_own"]], on="seed")
+        excess = float(o.own_over_pop.median() - 1)
+        rho, pval = _spearman_perm(m.R_cert.values, m.R_own.values)
+        off_own = abs(float(np.median(np.log(m.R_cert / m.R_own))))
+        off_pop = abs(float(np.median(np.log(m.R_cert / R_pop))))
+        rows.append({"test": f"S3 a={a:.2f}", "n_crossing_runs": len(m), "median_own_over_pop_minus_1": excess,
+                     "required_excess": off / 2, "S3a_pass": excess >= off / 2,
+                     "spearman_rho": rho, "spearman_p_one_sided": pval, "S3b_pass": rho > 0 and pval < 0.05,
+                     "offset_vs_own": off_own, "offset_vs_pop": off_pop, "S3c_pass": off_own < off_pop,
+                     "competing_centred_within_1pct": abs(excess) <= 0.01,
+                     "pass": excess >= off / 2 and rho > 0 and pval < 0.05 and off_own < off_pop})
+    d = pd.DataFrame(rows)
+    d.to_csv(RESULTS / "own_threshold_scores.csv", index=False)
+    print(d.T.to_string())
+
+
+def block5_posthoc():
+    """POST HOC (Block 5 was scored before this comparison was proposed): does Block 5's retention midpoint
+    (x50 = 1.067) match median(own w2_glob)/population over Block 5's seeds, as S2 predicts for Block 4?"""
+    own = pd.read_csv(RESULTS / "own_threshold_block4.csv")
+    b5 = pd.read_csv(RESULTS / "fixed_scale_block5.csv")
+    t5 = pd.read_csv(RESULTS / "fixed_scale_block5_tests.csv").set_index("variant")
+    m = own[own.seed.isin(b5.seed.unique())]
+    b5 = b5.merge(own[["seed", "w2_own", "w2_pop"]], on="seed")
+    b5["own_rule"] = b5.level * b5.w2_pop > b5.w2_own                 # retained iff held R above own threshold
+    b5["pop_rule"] = b5.level > 1.0
+    b5["retained"] = b5.first_hit.isna()
+    out = {"label": "post hoc", "n_seeds": m.seed.nunique(), "x50_preserved": float(t5.loc["preserved", "x50"]),
+           "median_own_over_pop": float(m.own_over_pop.median()),
+           "diff": float(t5.loc["preserved", "x50"] - m.own_over_pop.median()),
+           "within_S2_tolerance_0.02": abs(float(t5.loc["preserved", "x50"] - m.own_over_pop.median())) <= 0.02,
+           "own_rule_agreement": float((b5.own_rule == b5.retained).mean()),
+           "pop_rule_agreement": float((b5.pop_rule == b5.retained).mean())}
+    pd.DataFrame([out]).to_csv(RESULTS / "own_threshold_block5_posthoc.csv", index=False)
+    print(pd.Series(out).to_string())
+
+
 if __name__ == "__main__":
-    {"block4": block4, "crossing": crossing, "validate": validate}[sys.argv[1]]()
+    {"block4": block4, "crossing": crossing, "validate": validate, "score": score,
+     "block5_posthoc": block5_posthoc}[sys.argv[1]]()
