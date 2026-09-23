@@ -264,8 +264,127 @@ def q2_s1_breakdown():
     print(t.to_string(index=False))
 
 
+def _s1_rows():
+    from .own_threshold import _pop
+    w2p = _pop(1.30)[1]
+    hz = pd.read_csv(RESULTS / "fixed_scale_horizons.csv", float_precision="round_trip")
+    own = pd.read_csv(RESULTS / "own_threshold_block4.csv", float_precision="round_trip")
+    ck = pd.read_csv(RESULTS / "fixed_scale_checkpoints.csv", float_precision="round_trip").set_index(["seed", "step"])
+    p = hz[hz.variant == "preserved"].merge(own[["seed", "own_over_pop", "w2_own"]], on="seed")
+    p["held_s"] = p.level * w2p
+    p["placed"] = p.placed_64000.astype(bool)
+    p["own_rule"] = p.held_s > p.w2_own
+    p["dist"] = (p.held_s / p.w2_own - 1).abs()
+    p["branch_start"] = [_canon(ck.loc[(s_, c), "w1"], ck.loc[(s_, c), "w2"]) for s_, c in zip(p.seed, p.ck_step)]
+    p["branch_end"] = [_canon(w, g) for w, g in zip(p.w1_64000, p.w2_sign)]
+    return p
+
+
+def mirror_gap():
+    """Post hoc, item 1: |T+ - T-|/T_global per seed; for each S1 disagreement, whether the threshold of the branch the
+    replay started on classifies it correctly (and whether that gap exceeds the replay's distance from its own threshold)."""
+    T = pd.read_csv(RESULTS / "mirror_branch_thresholds.csv", float_precision="round_trip")
+    T = T[T.group == "B45"].set_index("seed")
+    own = pd.read_csv(RESULTS / "own_threshold_block4.csv", float_precision="round_trip").set_index("seed")
+    T["gap_rel"] = (T.T_plus - T.T_minus).abs() / own.w2_own.reindex(T.index)
+    p = _s1_rows()
+    d = p[p.own_rule != p.placed].copy()
+    d["T_start"] = [T.loc[s_, "T_plus"] if b > 0 else T.loc[s_, "T_minus"] for s_, b in zip(d.seed, d.branch_start)]
+    d["T_end"] = [T.loc[s_, "T_plus"] if b > 0 else T.loc[s_, "T_minus"] for s_, b in zip(d.seed, d.branch_end)]
+    d["start_rule_correct"] = (d.held_s > d.T_start) == d.placed
+    d["end_rule_correct"] = (d.held_s > d.T_end) == d.placed
+    d["seed_gap_rel"] = d.seed.map(T.gap_rel)
+    d["gap_exceeds_distance"] = d.seed_gap_rel > d.dist
+    d.to_csv(RESULTS / "mirror_gap_disagreements.csv", index=False)
+    summ = pd.DataFrame([{"n_seeds": int(T.gap_rel.notna().sum()), "gap_rel_median": float(T.gap_rel.median()),
+                          "gap_rel_min": float(T.gap_rel.min()), "gap_rel_max": float(T.gap_rel.max()),
+                          "gap_rel_q25": float(T.gap_rel.quantile(0.25)), "gap_rel_q75": float(T.gap_rel.quantile(0.75)),
+                          "n_disagreements": len(d), "gap_exceeds_distance": int(d.gap_exceeds_distance.sum()),
+                          "start_branch_rule_correct": int(d.start_rule_correct.sum()),
+                          "end_branch_rule_correct": int(d.end_rule_correct.sum())}])
+    summ.to_csv(RESULTS / "mirror_gap_summary.csv", index=False)
+    print(summ.T.to_string())
+
+
+def _census_job(args):
+    """One (seed, held scale): the two mirror-branch minima, and every disagreeing replay's endpoint basin."""
+    from .own_threshold import _bfgs
+    from .profiled_bnb import gap, profile
+    seed, s, ends = args
+    x, y = _data(seed)
+
+    def fg(p_, s_=s):
+        L, _, gw, gb, _ = profile([p_[0]], [p_[1]], s_, 1.30, x, y)
+        return float(L[0]), np.array([gw[0], gb[0]])
+
+    def hess(p_, h=1e-5):
+        H = np.array([(fg(p_ + h * e)[1] - fg(p_ - h * e)[1]) / (2 * h) for e in np.eye(2)])
+        return np.linalg.eigvalsh(0.5 * (H + H.T))
+    br = {sg: half_min(s, 1.30, x, y, sg) for sg in (+1, -1)}
+    L_glob = min(v[0] for v in br.values())
+
+    def dist(p_, q_):
+        db = abs(p_[1] - q_[1]) % (2 * math.pi)
+        return math.hypot(p_[0] - q_[0], min(db, 2 * math.pi - db))
+    out = []
+    for e in ends:
+        pe = np.array([e["w1c"], e["b1c"]])
+        L0, g0 = fg(pe)
+        qL, q = _bfgs(fg, pe.copy())
+        q[1] %= 2 * math.pi
+        which = next((sg for sg in (+1, -1) if dist(q, (br[sg][1], br[sg][2])) < 0.02), 0)
+        row = {**e, "grad_norm_end": float(np.linalg.norm(g0)), "hess_min_end": float(hess(pe)[0]),
+               "loc_min_L": qL, "loc_min_w1": float(q[0]), "loc_min_b1": float(q[1]),
+               "loc_min_G": float(gap([q[0]], [q[1]], 1.30)[0]), "loc_min_hess_min": float(hess(q)[0]),
+               "basin": {1: "mirror +", -1: "mirror -", 0: "other"}[which], "L_minus_global": qL - L_glob,
+               "branch_plus_L": br[1][0], "branch_minus_L": br[-1][0], "switch_s": np.nan}
+        if which == 0:                                  # follow the basin in s to its own switch (G sign change)
+            G0 = row["loc_min_G"]
+            for direction in (+1, -1):
+                qq, sprev, Gprev = q.copy(), s, G0
+                for k in range(1, 80):
+                    s_k = s + direction * 0.05 * k
+                    if s_k <= 0.3:
+                        break
+                    _, qn = _bfgs(lambda p_: fg(p_, s_k), qq.copy())
+                    if dist(qn, qq) > 0.2:              # basin lost
+                        break
+                    Gk = float(gap([qn[0]], [qn[1]], 1.30)[0])
+                    if np.sign(Gk) != np.sign(Gprev):
+                        row["switch_s"] = 0.5 * (s_k + sprev); break
+                    qq, sprev, Gprev = qn, s_k, Gk
+                if np.isfinite(row["switch_s"]):
+                    break
+        out.append(row)
+    return out
+
+
+def basin_census(workers=2):
+    """Post hoc, item 2: every disagreeing replay's 64k endpoint, classified as mirror + / mirror - / other basin on its
+    own objective at the held scale (canonical orientation, b1 mod 2π)."""
+    from .own_threshold import _pop
+    w2p = _pop(1.30)[1]
+    p = _s1_rows()
+    d = p[p.own_rule != p.placed].copy()
+    d["w1c"] = d.w1_64000 * d.w2_sign
+    d["b1c"] = (d.b1_64000 * d.w2_sign) % (2 * math.pi)
+    jobs = []
+    for (seed, s), g in d.groupby(["seed", "held_s"]):
+        jobs.append((int(seed), float(s), g[["seed", "ck_step", "level", "held_s", "placed", "own_rule", "dist", "w1c", "b1c"]]
+                     .to_dict("records")))
+    with Pool(workers) as pool:
+        rows = [r for part in pool.map(_census_job, jobs, chunksize=1) for r in part]
+    c = pd.DataFrame(rows)
+    c["switch_over_pop"] = c.switch_s / w2p
+    c.to_csv(RESULTS / "mirror_basin_census.csv", index=False)
+    print(c.basin.value_counts().to_string())
+    oth = c[c.basin == "other"]
+    if len(oth):
+        print(oth[["seed", "level", "placed", "loc_min_G", "L_minus_global", "loc_min_hess_min", "switch_over_pop"]].to_string(index=False))
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else int(os.environ.get("MB_WORKERS", "3"))
     {"thresholds": lambda: thresholds(w), "analyse": analyse, "global_branch": lambda: global_branch_levels(w),
-     "breakdown": q2_s1_breakdown}[cmd]()
+     "breakdown": q2_s1_breakdown, "gap": mirror_gap, "census": lambda: basin_census(w)}[cmd]()
