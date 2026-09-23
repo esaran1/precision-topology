@@ -267,6 +267,16 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - Per-replay prediction from own thresholds reaches **0.894**, against **0.760** for the population
     rule, short of the registered 0.95.
   - The explanation of that shortfall is left to the mirror-branch analysis (exploratory, pending).
+- **What the own-seed account does and does not predict (post hoc, `mirror_q2_s1_breakdown.csv` pending;
+  numbers from the scored horizon replays)**:
+  - It predicts **the fraction of replays placed at each scale** (S2).
+  - It does **not** predict **which individual replays place**. At 0.95×, 33 of the 51 placed replays
+    belong to seeds whose own threshold lies above that level. At 0.9×, all 8 do.
+  - Two-thirds of S1's 288 disagreements (195) lie more than 5% from the run's own threshold. So the
+    misses are not threshold-resolution effects near each run's switch.
+  - **Say**: "the training set's own threshold sets where the population of fixed-scale runs switches,
+    not the outcome of an individual run". The mirror-branch analysis and a basin census are examining
+    what determines individual outcomes; both are exploratory.
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
   point move toward 1.0 at 4× and 16× the horizon? **Q1 FAILED, Q2 FAILED; the registered competing
   outcome holds** (`fixed_scale_horizons_tests.csv`).
