@@ -35,14 +35,17 @@ LOG2 = bb.LOG2
 
 
 def make(fam, a):
-    """(f, centre c, scale s, amplitude power p) for 'A' (sin) or 'q2'."""
+    """(f, centre c, scale s, amplitude power p) for 'A' (sin) or a q-family 'q<q>'
+    ('q2', 'q1'): s = eps**(1/q), p = 1 + 1/q."""
     eps = a - 1.0
     if fam == "A":
         from .fold1d import activation
         return activation("sin_family", a), math.pi, math.sqrt(eps), 1.5
     from .depth_families import make_family
-    fq = make_family(2.0)[0]
-    return (lambda v: fq(v, a)), 0.0, math.sqrt(eps), 1.5
+    q = float(fam[1:])
+    fq = make_family(q)[0]
+    s = math.sqrt(eps) if q == 2.0 else eps ** (1.0 / q)      # q2: bit-identical to before
+    return (lambda v: fq(v, a)), 0.0, s, 1.0 + 1.0 / q
 
 
 def minimise(fam, a, w2, x, y, start=None, seed=0, steps=bb.STEPS):
