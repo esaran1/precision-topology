@@ -64,3 +64,20 @@ and every downstream number is recomputed.
 
 From now on, "training-free" is replaced by "computed independently of unconstrained
 training trajectories". The conditional search is itself an optimisation.
+
+## Addendum — 2026-09-23 12:41 EDT, before any 1d computation
+
+Scope restored and extended by decision, before any per-seed threshold was computed. 1d runs at
+**50 seeds per a** (seeds 0–49) at **a = 1.30, 1.45 and 1.60**. The third value, a = 1.60, extends
+the comparison between the quadrature and per-seed training objectives to the top of the range the
+paper uses.
+
+Procedure per seed: the full coarse scan (`conditional_certified.scan`, |w₂| from 1.5 to 11 in steps
+of 0.5, so a second sign change would be seen), then bisection of each switch to width 0.005.
+Reported: the per-seed threshold spread, and the quantile of the population threshold within it.
+No prediction is attached; 1d is a check on the choice of objective.
+
+Also added: a certified coarse scan across the full scale range at a = 1.30. At each grid scale it
+records the certified global minimiser, with an enclosure of the surviving cells, and a certified
+lower bound on the loss outside a ball around it. This certifies, at those scales, the single-branch
+picture the candidate plots show.
