@@ -1,0 +1,4 @@
+artifact,rows_new,rows_ref,max_abs_diff_a,max_abs_diff_budget,max_abs_diff_w2,max_abs_diff_gstar,max_abs_diff_R,equal_solved,equal_opt,equal_src
+r_pooled.csv,2910,2910,0.0,0.0,0.0,2.220446049250313e-16,4.440892098500626e-16,True,True,True
+r_adamw.csv,240,240,,,3.552713678800501e-15,1.3877787807814457e-17,2.220446049250313e-16,True,,
+"r_families.csv (w2, solved)",720,720,,,2.842170943040401e-14,,,True,,
