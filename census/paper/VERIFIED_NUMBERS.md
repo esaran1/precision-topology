@@ -959,29 +959,26 @@ question.
 
 ## 13. Registrations
 
-| outcome | count | share |
-|---|---:|---:|
-| PASS | 21 | 45% |
-| **FAIL** | **18** | **38%** |
-| PARTIAL | 1 | 2% |
-| UNRESOLVED | 7 | 15% |
-| **total** | **47** | |
+**Census 2026-09-23 (`registration_census.csv`, `src/registration_census.py`, T78): 164
+registered predictions.** The earlier headline "47 + 17 = 64" counted only the
+2026-09-12 P-* summary and the v2 blocks.
 
-**v2 additions (2026-09-22)**, counted separately so the table above is unchanged:
+| scope | PASS | FAIL | PARTIAL | UNRESOLVED | total |
+|---|---:|---:|---:|---:|---:|
+| **all registered predictions** | **69** | **53** | **12** | **30** | **164** |
+| the rows formerly counted as "64" | 27 | 24 | 1 | 12 | 64 |
+| the remaining 100 | 42 | 29 | 11 | 18 | 100 |
 
-| block | PASS | FAIL | UNRESOLVED |
-|---|---:|---:|---:|
-| A5d, k = 10 (A1–A5) | 1 (A1, uninformative) | 2 (A2, A4) | 2 (A3, A5) |
-| A5d, k = 1 (A1–A5) | 2 (A1, A4) | 1 (A2) | 2 (A3, A5) |
-| C, optimiser equivalence (3 pairs) | 1 | 2 (failed in the favourable direction) | 0 |
-| cross-family X1, X2 | 1 (X2) | 1 (X1) | 0 |
-| cross-family follow-up Y1 | 1 | 0 | 0 |
-| q1 negative control Z1 | 1 | 0 | 0 |
-| **v2 total (17)** | **7** | **6** | **4** |
+Corrections to previously scored rows (each recorded in the census with its source):
+- **E-2 → FAIL**: 33/37 = 0.892 kept against a registered ≥ 9/10 (`blockE_redesign.md:63, 72-74`).
+- **P-SGD → PARTIAL**: its own registered rule scores it DIRECTIONAL-ONLY (`sgd_law_results.md`).
+- **P-null → UNRESOLVED**: the test did not execute (`geometric_transfer.md`).
+- P-threshold's 2026-09-13 upgrade PARTIAL → PASS had never reached the totals.
 
-**Combined, 64 registered predictions: 28 PASS, 24 FAIL, 1 PARTIAL, 11 UNRESOLVED.**
-The v2 unresolved outcomes are all onset-dependent predictions made undecidable by a
-registered stop condition (no onset exists), not predictions left unscored.
+13 verdicts were first assigned in the census (post hoc, against the registered criterion) and are
+flagged per row; two rows are non-directional (outcome classes without a predicted class).
+
+*Superseded tallies, kept for the record: 21/18/1/7 of 47 (2026-09-12) and "64: 28/24/1/11" (v2).*
 
 Dates are **git-verified** from the commit that first added each registration
 document.

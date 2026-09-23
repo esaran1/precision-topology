@@ -63,7 +63,7 @@ SLUG = {"Fig 1": "fig1_setting", "Fig 2": "fig2_exclusions",
         "Fig 3": "fig3_r_collapse", "Fig 4": "fig4_metric_check",
         "Fig 5": "fig5_budget_law", "Fig 6": "fig6_four_family",
         "Fig 7": "fig7_family_b", "Fig 8": "fig8_link",
-        "Fig 9": "fig9_expressivity"}
+        "Fig 9": "fig9_expressivity", "Fig 10": "fig10_mechanism"}
 
 SMALLEST_PT = 6.0          # nothing may render below this at final size
 COL_IN, DBL_IN = 3.25, 6.75
@@ -534,28 +534,19 @@ def fig3_r_collapse() -> None:
 
 # ------------------------------------------------------------ Figure 4 ----
 def fig4_metric_check() -> None:
-    from src.fold1d_theorem import maximum_gap
-    s = pd.concat([pd.read_csv(RESULTS / "fold1d_sweep.csv"),
-                   pd.read_csv(RESULTS / "fold1d_refine.csv")])
-    s = s[(s.activation == "sin_family") & (s.parameter > 1.0)].copy()
-    gs_ = {a: maximum_gap(float(a), resolution=600) for a in sorted(s.parameter.unique())}
-    s["R"] = s.w2_abs * s.parameter.map(gs_) / 2
-    s["solved"] = s.solved.astype(bool)
-    edges = np.arange(0.0, 0.55, 0.025)
-    s["bin"] = pd.cut(s.R, edges)
-    g = s.groupby("bin", observed=True).agg(
-        n=("solved", "size"), rate=("solved", "mean"), err=("eval_errors", "mean"),
-        q25=("eval_errors", lambda v: v.quantile(.25)),
-        q75=("eval_errors", lambda v: v.quantile(.75))).reset_index()
-    g["mid"] = [b.mid for b in g["bin"]]
-    g = g[g.n >= 8]
+    """Certified Ĝ throughout; bands and the zero-rate share come from src/metric_check.py."""
+    from src.metric_check import analyse, binned, runs
+    s = runs("certified")
+    g = binned(s)
+    m = analyse("certified")
+    b10, b90, c10, c90 = m["binary_10"], m["binary_90"], m["continuous_10"], m["continuous_90"]
 
     fig, ax = plt.subplots(figsize=(COL * 1.55, 2.6))
-    ax.axvspan(0.055, 0.307, color="#d62728", alpha=0.09, zorder=0)
-    ax.axvspan(0.332, 0.452, color="#1f77b4", alpha=0.12, zorder=0)
+    ax.axvspan(c10, c90, color="#d62728", alpha=0.09, zorder=0)
+    ax.axvspan(b10, b90, color="#1f77b4", alpha=0.12, zorder=0)
     ax.plot(g["mid"], g.rate, "o-", color="#1f77b4", ms=3.5, label="binary solve rate")
     ax.set_ylabel("solve rate", color="#1f77b4")
-    ax.set_xlabel(r"$R = |w_2|\,G^*(a)/2$")
+    ax.set_xlabel(r"$R = |w_2|\,\hat G(a)/2$")
     ax.set_ylim(-0.04, 1.06)
     ax.tick_params(axis="y", labelcolor="#1f77b4")
 
@@ -565,17 +556,19 @@ def fig4_metric_check() -> None:
     tw.set_ylabel("eval errors (IQR band)", color="#d62728")
     tw.tick_params(axis="y", labelcolor="#d62728")
     tw.invert_yaxis()
-    ax.text(0.06, 0.62, "76% of the error swing\noccurs while 0 runs solve",
-            fontsize=6.5, color="#d62728")
-    ax.annotate("", xy=(0.055, -0.02), xytext=(0.307, -0.02),
+    ax.text(0.06, 0.62, f"{m['improvement_at_zero_rate_pct']:.0f}% of the error improvement\n"
+            f"occurs while 0 runs solve", fontsize=6.5, color="#d62728")
+    ax.annotate("", xy=(c10, -0.02), xytext=(c90, -0.02),
                 arrowprops=dict(arrowstyle="<->", lw=0.7, color="#d62728"))
-    ax.annotate("", xy=(0.332, 1.02), xytext=(0.452, 1.02),
+    ax.annotate("", xy=(b10, 1.02), xytext=(b90, 1.02),
                 arrowprops=dict(arrowstyle="<->", lw=0.7, color="#1f77b4"))
     ax.set_title("Metric check: continuous error falls before the binary rate moves",
                  fontsize=7.5)
     save(fig, "fig4_metric_check")
-    record("Fig 4", ["fold1d_sweep.csv", "fold1d_refine.csv"], "2,400",
-           "10-90% crossings: continuous [0.055,0.307], binary [0.332,0.452], disjoint")
+    record("Fig 4", ["fold1d_sweep.csv", "fold1d_refine.csv", "ghat_certified_all.csv",
+                     "metric_check.csv"], f"{m['runs']:,}",
+           f"certified Ĝ; 10-90% crossings (0.025 bins): continuous [{c10:.3f},{c90:.3f}], "
+           f"binary [{b10:.3f},{b90:.3f}]; binning sensitivity in metric_check_binning.csv")
 
 
 # ------------------------------------------------------------ Figure 5 ----
@@ -823,13 +816,78 @@ def fig9_expressivity() -> None:
            placement="full-width")
 
 
+def fig10_mechanism() -> None:
+    """Mechanism at a = 1.30 (certified Ĝ): (a) the conditional branch's class gap against R
+    with R_glob, R_solve and training trajectories; (b) retention of placement under the
+    |w2| interventions (Block E)."""
+    br = pd.read_csv(RESULTS / "mechanism_branch_a130.csv")
+    tr = pd.read_csv(RESULTS / "mechanism_trajectories_a130.csv")
+    cr = pd.read_csv(RESULTS / "wi_crossing_runs.csv")
+    cr = cr[cr.a.round(2) == 1.30]
+    pa = pd.read_csv(RESULTS / "wi_per_a_certified.csv")
+    pa = pa[pa.a.round(2) == 1.30].iloc[0]
+    rg, rs = float(pa.R_glob_cert), float(pa.R_solve_cert)
+
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(DBL, 2.6), gridspec_kw={"width_ratios": [1.6, 1]})
+    for i, (s, g) in enumerate(tr.groupby("seed")):
+        g = g.sort_values("step")
+        ax.plot(g.R_cert, g.gap, color="0.55", lw=0.5, alpha=0.8,
+                label="training trajectories (10 runs)" if i == 0 else None, zorder=1)
+    ax.plot(br.R_cert, br.gap, "o-", color="#1f77b4", ms=3, lw=1.2,
+            label="conditional branch (min. over $w_1,b_1,b_2$ at fixed $|w_2|$)", zorder=3)
+    sol = br[br.solves.astype(str).str.lower() == "true"]
+    ax.plot(sol.R_cert, sol.gap, "o", mfc="white", mec="#1f77b4", ms=3.5, zorder=4,
+            label="branch minimiser solves")
+    ax.axhline(0, color="k", lw=0.6)
+    ax.plot(cr.R_cert, np.zeros(len(cr)), "|", color="#d62728", ms=7, mew=0.6, zorder=2,
+            label=f"training crossings ({len(cr)} runs, all budgets)")
+    ax.axvline(rg, color="#2ca02c", ls="--", lw=0.9)
+    ax.axvline(rs, color="#9467bd", ls="-.", lw=0.9)
+    ax.text(rg, 0.105, f" $R_{{glob}}$ = {rg:.3f}", fontsize=6.5, color="#2ca02c", va="top")
+    ax.text(rs, 0.105, f" $R_{{solve}}$ = {rs:.3f}", fontsize=6.5, color="#9467bd", va="top")
+    ax.set_xlim(0.08, 0.45)
+    ax.set_ylim(-0.16, 0.11)
+    ax.set_xlabel(r"$R = |w_2|\,\hat G(a)/2$")
+    ax.set_ylabel("class gap of placement")
+    ax.set_title("(a) conditional branch and training, $a = 1.30$", fontsize=7.5)
+    ax.legend(loc="lower right", fontsize=6, frameon=False)
+    ax.grid(alpha=0.25, lw=0.3)
+
+    e = pd.read_csv(RESULTS / "blockE_intervene.csv")
+    arms = [("hold_low", "hold at\n0.85 $R_{glob}$"), ("hold_high", "hold at\n1.15 $R_{glob}$"),
+            ("noise_floor", "no rescale\n(noise floor)")]
+    for i, (arm, lab) in enumerate(arms):
+        k = e[(e.arm == arm) & e.kept.notna()]
+        kept = int((k.kept.astype(str).str.lower() == "true").sum())
+        n = len(k)
+        lo, hi = clopper_pearson(kept, n)
+        bx.errorbar(i, kept / n, yerr=[[kept / n - lo], [hi - kept / n]], marker="o",
+                    color=STYLE[i][2], ms=5, capsize=2.5, lw=1.0)
+        bx.text(i, min(hi + 0.04, 1.08), f"{kept}/{n}", ha="center", fontsize=6.5)
+    bx.axhline(0.9, color="0.4", ls=":", lw=0.8)
+    bx.text(-0.4, 0.86, "registered E-2 level (9/10)", fontsize=6, color="0.3", va="top")
+    bx.set_xticks(range(len(arms)))
+    bx.set_xticklabels([a[1] for a in arms], fontsize=6.5)
+    bx.set_xlim(-0.5, len(arms) - 0.5)
+    bx.set_ylim(-0.05, 1.15)
+    bx.set_ylabel("placement kept to 12k steps")
+    bx.set_title("(b) intervening on $|w_2|$ after placement", fontsize=7.5)
+    bx.grid(alpha=0.25, lw=0.3, axis="y")
+    save(fig, "fig10_mechanism")
+    record("Fig 10", ["mechanism_branch_a130.csv", "mechanism_trajectories_a130.csv",
+                      "wi_crossing_runs.csv", "wi_per_a_certified.csv", "blockE_intervene.csv"],
+           f"branch {len(br)} |w2| points; {len(cr)} crossings; E arms 37 intervened each",
+           "certified Ĝ; branch = frozen Block B minimisation; Clopper-Pearson 95% in (b)",
+           placement="full-width")
+
+
 def main() -> int:
     print("Regenerating paper figures from committed artifacts\n")
     audit_canonical()
     print("\nFigures:")
     for fn in (fig1_setting, fig2_exclusions, fig3_r_collapse, fig4_metric_check,
                fig5_budget_law, fig6_four_family, fig7_family_b, fig8_link,
-               fig9_expressivity):
+               fig9_expressivity, fig10_mechanism):
         try:
             fn()
         except Exception as exc:                       # noqa: BLE001

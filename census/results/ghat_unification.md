@@ -30,13 +30,22 @@ recovers the same maximum over its own slice:
 
 | `a` | restricted, one-sided | same slice, oriented | certified |
 |---|---:|---:|---:|
-| 1.02 | 0.0016156 | 0.0016156 | 0.0016156 |
-| 1.30 | 0.0857831 | 0.0857831 | 0.0857831 |
-| 1.60 | 0.2229064 | 0.2229064 | 0.2229064 |
+| 1.02 | 0.0016156 | 0.0016156 | 0.0016267 |
+| 1.30 | 0.0857831 | 0.0857831 | 0.0861018 |
+| 1.60 | 0.2229064 | 0.2229064 | 0.2243602 |
 
-Identical. **So the ~0.4% gap is pure grid resolution** — the restricted search is
-33 × 600 over a slice, the certified one refines to `h = 1.6e-05` with exact
-`x`-extrema. One quantity, two resolutions, and the certified value is the correct
+*Corrected 2026-09-23: the "certified" column previously repeated the restricted
+values; the certified values are from `ghat_certified_all.csv`. The two restricted
+columns are identical, which is the point of the table.* **So the ~0.4% gap is pure
+grid resolution** — the restricted search is 33 × 600 over a slice, the certified
+one refines (final `h` from 6.4e-07 to 8e-05 depending on `a`, *corrected from
+"1.6e-05"*) with exact `x`-extrema.
+
+*Added 2026-09-23 (T76):* the zoom certificate's upper end is not a global bound
+(it refines only a ±12h box and under-states the Lipschitz step). The global
+enclosure is now `ghat_bnb.csv` (branch and bound over the analytic domain
+`w₁ ∈ (0, a]`, `b₁ ∈ [0, 2π)`; relative width ≤ 0.099% at every `a`). The value
+used for `R` is within 0.0084% of the global lower end at every `a`. One quantity, two resolutions, and the certified value is the correct
 one (a grid can only under-estimate a supremum).
 
 **Decision: switch everything to the certified `Ĝ`.** No justification for keeping

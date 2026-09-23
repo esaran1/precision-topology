@@ -17,6 +17,14 @@ Date: 2026-09-12.
 | **UNRESOLVED** | 7 | 15% |
 | **total** | **47** | |
 
+> **Corrected 2026-09-23 (`registration_census.csv`, T78).** These totals were
+> never updated after P-threshold was upgraded PARTIAL → PASS on 2026-09-13 (its
+> row below): the rows give **22 / 18 / 0 / 7**. Two rows were mis-scored against
+> their own registrations: **P-SGD** is DIRECTIONAL-ONLY by its registered rule
+> (`sgd_law_results.md`), recorded as **PARTIAL**; **P-null** was never measured
+> (`geometric_transfer.md`), recorded as **UNRESOLVED**. Corrected: **20 / 18 / 1 / 8**. This table is also not
+> the full census: 164 registered predictions exist; see `registration_census.csv`.
+
 **18 of 47 registered predictions failed outright (38%), and a further 7**
 **(15%) could not be resolved.** Fewer than half passed.
 

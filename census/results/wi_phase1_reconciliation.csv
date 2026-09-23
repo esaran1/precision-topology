@@ -1,0 +1,4 @@
+precision,runs,solved,failed,placement,bias,disagreements
+float32,2400,430,1970,1664,306,0
+float64,2400,440,1960,1633,327,0
+both,4800,870,3930,3297,633,0

@@ -413,6 +413,84 @@ def main() -> None:
     chk("no perfect run at a <= 1.2",
         float(k1[k1.act.isin(["0.9", "1.0", "1.05", "1.1", "1.2"])].perfect.sum()), 0.0, 0)
 
+    print("T76 global Ĝ certificate")
+    bb = pd.read_csv(R / "ghat_bnb.csv")
+    chk("all a converged", float(bb.converged.astype(str).str.lower().eq("true").sum()), 13.0, 0)
+    chk("max relative enclosure width", float(bb.rel_width.max()), 0.00099, 0.00002)
+    chk("committed Ghat vs global lo, max rel diff",
+        float(((bb.Ghat_certified - bb.Ghat_lo) / bb.Ghat_lo).abs().max()), 0.000084, 0.000002)
+    chk("committed Ghat above global hi (count)", float((bb.Ghat_certified > bb.Ghat_hi).sum()), 0.0, 0)
+    chk("argmax w1 <= a/1.4 (count)", float((bb.w1 <= bb.a / 1.4).sum()), 13.0, 0)
+
+    print("T77 per-a table, certified Ĝ")
+    pa = pd.read_csv(R / "wi_per_a_certified.csv").set_index("a")
+    chk("R_glob(1.30)", float(pa.loc[1.3, "R_glob_cert"]), 0.2153, 1e-4)
+    chk("R_solve(1.30)", float(pa.loc[1.3, "R_solve_cert"]), 0.3078, 1e-4)
+    chk("crossing R median of cell medians (1.30)", float(pa.loc[1.3, "cross_R_median_of_cell_medians"]),
+        0.2338, 1e-4)
+    chk("crossing R (1.60)", float(pa.loc[1.6, "cross_R_median_of_cell_medians"]), 0.2580, 1e-4)
+    chk("crossings total", float(pa.n_crossings.sum()), 974.0, 0)
+    cvt = pd.read_csv(R / "wi_per_a_cv.csv").iloc[0]
+    chk("CV(R) certified, 6 a", float(cvt.cv_R_cert), 0.0324, 1e-4)
+    chk("CV(|w2|), 6 a", float(cvt.cv_w2), 0.2821, 1e-4)
+    cr_ = pd.read_csv(R / "wi_crossing_runs.csv")
+    bc = pd.read_csv(R / "blockA_crossings.csv")
+    m_ = bc.merge(cr_.groupby(["a", "budget"]).size().reset_index(name="n2"), on=["a", "budget"])
+    chk("crossing counts match blockA_crossings", float((m_.n == m_.n2).sum()), 30.0, 0)
+
+    print("T78 registration census")
+    rc = pd.read_csv(R / "registration_census.csv")
+    chk("registered predictions", float(len(rc)), 164.0, 0)
+    for v, n in (("PASS", 69), ("FAIL", 53), ("PARTIAL", 12), ("UNRESOLVED", 30)):
+        chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
+    r64 = rc[rc.counted_in_existing_64 == "yes"]
+    chk("existing 64 rows", float(len(r64)), 64.0, 0)
+    for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
+        chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
+    chk("E-2 as registered is FAIL", float(rc[rc.id == "E-2"].verdict.iloc[0] == "FAIL"), 1.0, 0)
+    e2 = pd.read_csv(R / "wi_e2_rescore.csv").set_index("arm")
+    chk("E-2 kept", float(e2.loc["hold_high", "kept"]), 33.0, 0)
+    chk("E-2 intervened", float(e2.loc["hold_high", "intervened"]), 37.0, 0)
+
+    print("T79 metric check, certified Ĝ")
+    mc = pd.read_csv(R / "metric_check.csv").set_index("ghat")
+    chk("restricted continuous 10% reproduces 0.055", float(mc.loc["restricted", "continuous_10"]), 0.055, 0.001)
+    chk("restricted continuous 90% reproduces 0.307", float(mc.loc["restricted", "continuous_90"]), 0.307, 0.001)
+    chk("zero-rate share, certified (%)", float(mc.loc["certified", "improvement_at_zero_rate_pct"]), 76.2, 0.05)
+    chk("certified binary 10%", float(mc.loc["certified", "binary_10"]), 0.330, 0.001)
+    chk("certified binary 90%", float(mc.loc["certified", "binary_90"]), 0.429, 0.001)
+    chk("certified continuous 90%", float(mc.loc["certified", "continuous_90"]), 0.342, 0.001)
+    chk("certified ratio", float(mc.loc["certified", "ratio"]), 2.90, 0.01)
+
+    print("T57 phase 1 reconciliation")
+    p1 = pd.read_csv(R / "wi_phase1_reconciliation.csv").set_index("precision")
+    chk("float32 placement", float(p1.loc["float32", "placement"]), 1664.0, 0)
+    chk("float32 bias", float(p1.loc["float32", "bias"]), 306.0, 0)
+    chk("float32 solved", float(p1.loc["float32", "solved"]), 430.0, 0)
+    chk("pooled solved", float(p1.loc["both", "solved"]), 870.0, 0)
+    chk("pooled runs", float(p1.loc["both", "runs"]), 4800.0, 0)
+
+    print("T80 branch tracking")
+    bt = pd.read_csv(R / "wi_branch_tracking.csv").set_index("split")
+    chk("median before crossing", float(bt.loc["before crossing", "median"]), 0.834, 0.001)
+    chk("median after crossing", float(bt.loc["after crossing", "median"]), 0.0017, 0.0001)
+    chk("median overall", float(bt.loc["all", "median"]), 0.0065, 0.0001)
+    chk("n before / after", float(bt.loc["before crossing", "n"] * 1000 + bt.loc["after crossing", "n"]),
+        197211.0, 0)
+
+    print("T41 exclusion configurations")
+    from . import barrier as _br
+    chk("string images", float(_br.STRING_IMAGES), 41.0, 0)
+    ex = pd.read_csv(R / "exclusion_table.csv")
+    chk("MEP barrier max over all rows", float(ex.barrier_mep_max.max()), 0.0, 0)
+    chk("found rows", float((ex.population == "found_adam").sum()), 4.0, 0)
+
+    print("T63 Block F definitions")
+    bf = pd.read_csv(R / "blockF_optimisers.csv")
+    med = bf[bf.local_rate.notna()].groupby("optimiser").local_rate.median()
+    chk("rate spread Adam/SGD (measured medians)", float(med.max() / med.min()), 3.92, 0.01)
+    chk("registered-rate ratio 0.00207/0.00075", 0.00207 / 0.00075, 2.76, 0.01)
+
     provenance_check()
 
     print(f"\n{len(F)} finding(s)")
@@ -535,6 +613,18 @@ PRODUCERS = {
     "crossfamily_q1control_validity.csv": ("crossfamily_q1control", "validity", "full", ""),
     "crossfamily_q1control_thresholds.csv": ("crossfamily_q1control", "run", "full", ""),
     "crossfamily_q1control_scores.csv": ("crossfamily_q1control", "score", "full", ""),
+    "ghat_bnb.csv": ("ghat_bnb", "main", "full", ""),
+    "wi_crossing_runs.csv": ("writer_inputs", "crossings", "full", ""),
+    "wi_per_a_certified.csv": ("writer_inputs", "per_a_table", "full", ""),
+    "wi_per_a_cv.csv": ("writer_inputs", "per_a_table", "full", ""),
+    "wi_phase1_reconciliation.csv": ("writer_inputs", "phase1", "full", ""),
+    "wi_e2_rescore.csv": ("writer_inputs", "e2_rescore", "full", ""),
+    "wi_branch_tracking.csv": ("writer_inputs", "branch_tracking", "full", ""),
+    "metric_check.csv": ("metric_check", "main", "full", ""),
+    "metric_check_binning.csv": ("metric_check", "main", "full", ""),
+    "mechanism_branch_a130.csv": ("mechanism_figure_data", "branch", "full", ""),
+    "mechanism_trajectories_a130.csv": ("mechanism_figure_data", "trajectories", "full", ""),
+    "registration_census.csv": ("registration_census", "build", "full", ""),
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
 }

@@ -10,7 +10,7 @@ the committed artifacts, all checked by `verify_ledger.py` (0 findings).
 | # | registered prediction | measured | verdict |
 |---|---|---|---|
 | **E-1** | `hold_low` (`R = 0.85 R_glob`): **placement LOST**, ≥ 9/10 | **0 of 37 kept** — lost within **50 steps** (first checkpoint) in all 37; CP95 [0.0000, 0.0949] | **PASS** |
-| **E-2** | `hold_high` (`R = 1.15 R_glob`): **placement KEPT**, ≥ 9/10 | **33 of 37 kept**; CP95 [0.7458, 0.9697]. Fisher vs `hold_low` **p = 1.2e-16** | **PASS** |
+| **E-2** | `hold_high` (`R = 1.15 R_glob`): **placement KEPT**, ≥ 9/10 | **33 of 37 kept** (0.892); CP95 [0.7458, 0.9697]. Fisher vs `hold_low` **p = 1.2e-16** | **FAIL as registered** (0.892 < 0.9; lost in 4/37 > 1 of 10). *Re-scored 2026-09-23; previously PASS on the Fisher contrast, which the registered rule does not use* |
 | **E-3** | `noise_floor` (×1+1e-6): indistinguishable from control | **37 of 37 kept**; Fisher vs `hold_high` p = 0.115 (null) | **PASS** |
 | **E-4** | `cold_high`: placement **achieved** within the relaxation time | **2 of 40** (pilot at 1.50 `R_glob`, 20,000 steps: **0 of 9**) | **FAIL** |
 | **E-5** | `jump`: places **well before** control | **9 of 40** vs control **37 of 40**, Fisher **p = 1.3e-10** — worse, not better | **FAIL (opposite direction)** |
@@ -162,14 +162,14 @@ requirement). The box was a *second* defect. Claim removed entirely.
 
 | block | passes | fails | notes |
 |---|---:|---:|---|
-| **E** | 3 | 2 | reversibility pair passes at **p = 1.2e-16**; both fails are informative — `R > R_glob` is necessary for placement to **persist**, not sufficient for it to be **found** |
+| **E** | 2 | 3 | *corrected 2026-09-23*: E-2 misses its registered ≥ 9/10 (33/37); the reversibility contrast is large (**p = 1.2e-16**) but the registered level was not met; E-4/E-5 fails are informative — `R > R_glob` is not sufficient for placement to be **found** |
 | **E-stall** | — | — | **saturation**, not the registered trapping |
 | **H** | 0 | 1 (gate) | dose-response observed but not a valid rate test |
 | **F** | 1 (confounded) | 1 | lag account dropped as a mechanism |
 | **G** | 3 | 2 | G-2 and G-4 are the strong results; G-1's misses are the documented per-`a` lag |
 | **K** | 3 | 2 | AUC claim removed; `β` and overshoot restored |
 
-**Nine registered predictions failed.** Every one is logged with its explanation,
+**Ten registered predictions failed** *(nine before the 2026-09-23 E-2 re-score)*. Every one is logged with its explanation,
 and two of them (E-5, K-3) changed what the paper claims.
 
 ---

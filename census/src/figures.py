@@ -157,35 +157,23 @@ def fig_metric_check() -> None:
     improvement happens in a region where the solve rate is identically zero,
     and the steepest error decline (R ~ 0.263) is NOT at the binary threshold
     (R ~ 0.37).  Provenance: results/metric_artifact_results.md; data rebuilt
-    from fold1d_sweep.csv + fold1d_refine.csv with G* from fold1d_theorem.
+    from fold1d_sweep.csv + fold1d_refine.csv with the certified Ĝ (src/metric_check.py).
     """
 
-    from .fold1d_theorem import maximum_gap
+    from .metric_check import analyse, binned, runs
 
-    d = pd.read_csv(R / "fold1d_sweep.csv")
-    e = pd.read_csv(R / "fold1d_refine.csv")
-    s = pd.concat([d, e])
-    s = s[(s.activation == "sin_family") & (s.parameter > 1.0)].copy()
-    gstar = {a: maximum_gap(float(a), resolution=600) for a in sorted(s.parameter.unique())}
-    s["Rv"] = s.w2_abs * s.parameter.map(gstar) / 2
-    s["solved"] = s.solved.astype(bool)
-
-    edges = np.arange(0.0, 0.55, 0.025)
-    s["bin"] = pd.cut(s.Rv, edges)
-    g = s.groupby("bin", observed=True).agg(
-        n=("solved", "size"), rate=("solved", "mean"),
-        err=("eval_errors", "mean")).reset_index()
-    g["Rmid"] = [b.mid for b in g["bin"]]
-    g = g[g.n >= 8]
+    s = runs("certified")                      # certified Ĝ (ghat_certified_all.csv)
+    g = binned(s).rename(columns={"mid": "Rmid"})
+    m = analyse("certified")
 
     fig, ax = plt.subplots(figsize=(6.2, 3.6))
     ax.plot(g.Rmid, g.rate, "o-", color="#1f77b4", label="binary solve rate")
-    ax.set_xlabel(r"$R = |w_2|\,G^*(a)/2$")
+    ax.set_xlabel(r"$R = |w_2|\,\hat G(a)/2$")
     ax.set_ylabel("solve rate", color="#1f77b4")
     ax.set_ylim(-0.03, 1.03)
     ax.tick_params(axis="y", labelcolor="#1f77b4")
-    ax.axvspan(0.055, 0.307, color="#d62728", alpha=0.07)
-    ax.axvspan(0.332, 0.452, color="#1f77b4", alpha=0.10)
+    ax.axvspan(m["continuous_10"], m["continuous_90"], color="#d62728", alpha=0.07)
+    ax.axvspan(m["binary_10"], m["binary_90"], color="#1f77b4", alpha=0.10)
 
     twin = ax.twinx()
     twin.plot(g.Rmid, g.err, "s--", color="#d62728",
@@ -196,7 +184,8 @@ def fig_metric_check() -> None:
 
     ax.set_title("Continuous error falls mostly before the binary rate moves",
                  fontsize=9)
-    ax.text(0.06, 0.52, "76% of the error swing\noccurs while 0 runs solve",
+    ax.text(0.06, 0.52, f"{m['improvement_at_zero_rate_pct']:.0f}% of the error improvement\n"
+            "occurs while 0 runs solve",
             fontsize=7, color="#d62728")
     fig.tight_layout()
     fig.savefig(FIG / "metric_check.png", dpi=150)

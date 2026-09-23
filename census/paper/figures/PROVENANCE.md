@@ -25,9 +25,9 @@ their artifacts on each run (see the audit block at the top of output).
 
 ## Fig 4 (`fig4_metric_check.pdf`, full-width)
 
-- **sources**: fold1d_sweep.csv, fold1d_refine.csv
+- **sources**: fold1d_sweep.csv, fold1d_refine.csv, ghat_certified_all.csv, metric_check.csv
 - **n**: 2,400
-- **uncertainty / notes**: 10-90% crossings: continuous [0.055,0.307], binary [0.332,0.452], disjoint
+- **uncertainty / notes**: certified Ĝ; 10-90% crossings (0.025 bins): continuous [0.055,0.342], binary [0.330,0.429]; binning sensitivity in metric_check_binning.csv
 
 ## Fig 5 (`fig5_budget_law.pdf`, full-width)
 
@@ -58,3 +58,9 @@ their artifacts on each run (see the audit block at the top of output).
 - **sources**: blockA5d_k1_perfect_fraction.csv, blockA5d_k1_controls.csv, blockA5d_k1_prediction.md
 - **n**: 20 seeds per cell (per a, budget)
 - **uncertainty / notes**: Clopper-Pearson 95%; perfect = zero errors on 20k uniform and 20k stratified held-out
+
+## Fig 10 (`fig10_mechanism.pdf`, full-width)
+
+- **sources**: mechanism_branch_a130.csv, mechanism_trajectories_a130.csv, wi_crossing_runs.csv, wi_per_a_certified.csv, blockE_intervene.csv
+- **n**: branch 33 |w2| points; 145 crossings; E arms 37 intervened each
+- **uncertainty / notes**: certified Ĝ; branch = frozen Block B minimisation; Clopper-Pearson 95% in (b)
