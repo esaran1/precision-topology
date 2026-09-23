@@ -169,8 +169,19 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
     theorem at a Krawczyk-certified switch point), and the gap-maximiser correction, −0.377.
   - The earlier "c₁ ≈ 0.49, a factor 2.4 too large" came from an incomplete calculation (K alone). Do
     not quote it.
-  - A **registered test at a = 1.01–1.04** (`first_order_prediction.md`) is **pending**. Until it is
-    scored, present c₁ as derived, with its prediction under test.
+  - **Chronology, state it in this order**:
+    1. The original 0.49 came from an incomplete argument that used only the K correction.
+    2. The certified refit showed it was inconsistent with the data: two-term laws allow only
+       [0.243, 0.321].
+    3. The full first-order calculation was then done and gives c₁ ∈ [0.2852300, 0.2852303].
+    4. The registered small-ε test (`f92b1b5`, a = 1.01–1.04) is the independent check. It is
+       **pending**.
+  - **Until that test is scored**, the paper may say only: "the corrected first-order calculation is
+    consistent with the certified large-ε values". It may **not** say that the first-order coefficient
+    is confirmed.
+  - **The tied corner** behind k₁: the expansion is certified two-sided for |ε| ≤ 0.05 (active set
+    unchanged, strict maximum; `math_note_v2.md` §8). The corner's smallest multiplier is small (0.004),
+    so do not extend the claim beyond that range.
 
 MATH_NOTE_SECTION
 

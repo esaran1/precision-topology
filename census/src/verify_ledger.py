@@ -701,6 +701,8 @@ PRODUCERS = {
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
+    "first_order_corner.csv": ("first_order", "corner", "full", ""),
+    "first_order_corner_free.csv": ("first_order", "corner", "full", ""),
     "mn2_h2prime.csv": ("math_note_v2_checks", "h2", "full", ""),
     "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
     "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
@@ -782,6 +784,15 @@ def v4_checks() -> None:
     chk("k1", float(fo.k1_lo), -0.37692472, 1e-8)
     chk("A* (Krawczyk)", float(fo.A_star_lo), 0.68544523757565, 1e-12)
     chk("R_glob^inf sharp lo", float(fo.R_glob_inf_lo), 0.1985926, 1e-7)
+
+    co = pd.read_csv(R / "first_order_corner.csv")
+    chk("corner: pieces", float(len(co)), 400.0, 0)
+    chk("corner: eps range", float(co.eps_hi.max() - co.eps_lo.min()), 0.1, 1e-12)
+    chk("corner: all certified (Krawczyk, active set, strict max)", float(co.all_ok.all()), 1.0, 0)
+    chk("corner: min barycentric weight", float(co.strict_max_barycentric_min.min()), 0.00434, 0.00001)
+    cf = pd.read_csv(R / "first_order_corner_free.csv")
+    chk("corner free check: fixed value inside free enclosure, all", float(cf.fixed_in_free_enclosure.all()), 1.0, 0)
+    chk("corner free check: kept cells within 3e-6", float((cf.kept_cells_max_dist_to_argmax_or_mirror < 3e-6).all()), 1.0, 0)
 
     print("V4 Block 2 (math note checks)")
     mb = dict(pd.read_csv(R / "mn2_bounds.csv").values)

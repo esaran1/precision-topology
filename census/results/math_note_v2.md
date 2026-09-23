@@ -224,10 +224,67 @@ Both terms come from the sine series, including the (1 + ε) factor.
   (largest angular gap 3.080 < π). The other pieces are dominated.
 - The vertex equations persist under ε. Differentiating them gives K′(0) = ∂_ε(O − I) + ∇(O − I)·θ′, with
   J_Eθ′ = −∂_εE.
-- Result: **k₁ ∈ [−0.37692472, −0.37692472]**. Check against the exact φ_ε: (K(ε)/K − 1)/ε = −0.3746, −0.3767,
-  −0.3769 at ε = 10⁻², 10⁻³, 10⁻⁴.
+- Result: **k₁ ∈ [−0.37692472, −0.37692472]**.
+- **Check against the exact φ_ε**: (K(ε)/K − 1)/ε = −0.3746, −0.3767, −0.3769 at ε = 10⁻², 10⁻³, 10⁻⁴.
+  These were computed **with the active set fixed** (Newton on the two tie equations). They check the
+  ε-dependence of that corner, not that the corner remains the maximiser. The free check below supplies
+  that.
+
+**Justification of the expansion at the tied corner** (`first_order corner` → `first_order_corner.csv`,
+`first_order_corner_free.csv`).
+- **Active edges** (the orientation min_O φ − max_I φ, v > 0):
+  - the inner maximum is a tie between the two inner edges, x = −0.8 and x = +0.8;
+  - the outer minimum is a tie between both edges of the negative outer window, x = −2.0 and x = −1.2.
+  - The mirror maximiser (v < 0) uses the positive outer window, by x ↦ −x.
+- **Uniform in ε**: φ_ε(σ) = −σ + (1 + ε)Σ_{k≥1}(−1)^{k+1}ε^{k−1}σ^{2k+1}/(2k+1)! is entire in ε. It is
+  evaluated in interval arithmetic with a rigorous tail bound, for either sign of ε. On ε ∈ [−0.05, 0.05],
+  split into 400 pieces, the following are certified on every piece:
+  - **(i) Unique corner**: a parametric Krawczyk test gives a unique corner θ(ε) in a box of width ≤ 3e−4
+    that serves every ε in the piece.
+  - **(ii) Active set unchanged**:
+    - φ_ε″ = (1 + ε)sin(√εσ)/√ε (the sinh form for ε < 0), and √|ε|·max|σ| < π. So φ_ε is concave for
+      σ < 0 and convex for σ > 0.
+    - φ_ε′ < 0 is certified on the inner window's negative σ-part. So the inner maximum sits at an edge.
+    - The negative outer window lies at σ < 0, so its minimum sits at an edge.
+    - φ_ε′ > 0 is certified on the positive outer window. Its minimum, the left edge, strictly exceeds
+      the active outer value.
+    - The other orientation is negative.
+  - **(iii) Strict (sharp) local maximum**: 0 is strictly inside the convex hull of the four piece-gradient
+    differences. The certified barycentric weights are ≥ 0.00434 on every piece (0.0047 at ε = 0).
+- **Why the expansion is two-sided.**
+  - At a non-smooth maximum of a min–max, the value function is in general only directionally
+    differentiable (Danskin).
+  - Its left and right derivatives differ when the active set changes at ε = 0.
+  - Here the active set is the same on both sides, and the corner stays a sharp maximum. The tie
+    equations E(θ, ε) = 0 are analytic, with J_E invertible.
+  - So θ(ε) and the local maximum value K_loc(ε) = G_ε(θ(ε)) are analytic on the neighbourhood.
+  - Hence k₁ = K_loc′(0)/K is an ordinary two-sided derivative.
+- **Thin margin**: the smallest weight belongs to the O(x = −2.0) piece. The corner is sharp but close to
+  degenerate in that direction. At some larger ε that tie could release; this is not tested here.
+- **Global maximiser (object 1)**: K(ε) = Ĝ(a)/ε^{3/2} is the global supremum, so K = K_loc needs the global
+  maximiser to be this corner.
+  - At ε = 0 this is certified by branch and bound.
+  - At ε = 0.005, 10⁻³ and 10⁻⁴, a **free** branch and bound (exact φ_ε extrema, no active set assumed,
+    (u, v) ∈ [0, 8] × [−12, 12]) finds the maximiser at the corner or its mirror, with every surviving
+    cell within 3e−6.
+  - Its value encloses the fixed-active value at each of those ε. The free slopes (K/K₀ − 1)/ε are
+    [−0.37576, −0.37574], [−0.37669, −0.37662] and [−0.37690, −0.37624].
+  - ε = 10⁻² is omitted, because K(0.01) belongs to the registered test. That run records the global
+    Ĝ(a) argmax at each test a.
 
 **Result: c₁ ∈ [0.2852300, 0.2852303].**
+
+**Chronology.**
+1. **Before v4** (`scaling_limit_results.md`, T58): c₁ ≈ 0.49 was predicted from an incomplete argument.
+   It used K(ε) with only the σ³/6 part of r and omitted the switch shift. It was set against the
+   frozen-grid fit c₁ = 0.231 ("a factor 2.4 too large"), and that note already called the argument
+   incomplete.
+2. **Certified refit** (`a023380`, `6dc47f2`, §5): on certified intervals no one-term law fits. Two-term
+   laws give c₁ ∈ [0.243, 0.321], so 0.49 is inconsistent with the data.
+3. **Full first-order calculation** (`f92b1b5`, this section): c₁ ∈ [0.2852300, 0.2852303]. It was done
+   after the refit had been seen. It has no fitted input, but it was not blind to the large-ε range.
+4. **Independent check**: the registered small-ε test at a = 1.01–1.04 (`first_order_prediction.md`,
+   registered in `f92b1b5` before any finite-a computation there). Pending.
 
 **Why the earlier prediction (≈ 0.49, `scaling_limit_results.md`) was wrong.**
 - It used K(ε) alone, with only the σ³/6 part of r.

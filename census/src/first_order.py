@@ -18,6 +18,8 @@ R = sĜ(a)/2 = A_ε K(ε)/2 with A = sε^{3/2} and K(ε) = Ĝ(a)/ε^{3/2}, so c1
     python -m src.first_order                 # certified c1 (theory)
     python -m src.first_order finite [workers]   # registered test: certified Ĝ(a) and R_glob(a), a = 1.01-1.04
     python -m src.first_order score           # registered scoring (first_order_prediction.md)
+    python -m src.first_order corner          # the tied corner: active set and strict max certified for |ε| <= 0.05,
+                                              # plus a free (active-set-agnostic) check at ε = 0.005, 1e-3, 1e-4
 """
 
 from __future__ import annotations
@@ -242,6 +244,217 @@ def main():
     print(pd.Series(out).to_string())
 
 
+# ------------------------------------------------------------------ the tied corner, uniformly in ε
+E_MAX = 0.05
+E_PIECES = 400
+N_SERIES = 14
+
+
+def _tail(e1, S, deriv):
+    """Bound on (1+e1)·Σ_{k>N} e1^{k-1} S^{2k+1-deriv}/(2k+1-deriv)!."""
+    t = mp.mpf(0)
+    for k in range(N_SERIES + 1, N_SERIES + 60):
+        t += mp.mpf(e1) ** (k - 1) * mp.mpf(S) ** (2 * k + 1 - deriv) / mp.factorial(2 * k + 1 - deriv)
+    return (1 + mp.mpf(e1)) * t
+
+
+def phi_iv(sg, E, e1, S):
+    """φ_ε(σ) = −σ + (1+ε) Σ_{k>=1} (−1)^{k+1} ε^{k-1} σ^{2k+1}/(2k+1)!  (entire in ε; any sign of ε)."""
+    acc = iv.mpf(0)
+    Ek = iv.mpf(1)
+    for k in range(1, N_SERIES + 1):
+        acc += (-1) ** (k + 1) * Ek * sg ** (2 * k + 1) / mp.factorial(2 * k + 1)
+        Ek = Ek * E
+    T = _tail(e1, S, 0)
+    return -sg + (1 + E) * acc + iv.mpf([-T, T])
+
+
+def dphi_iv(sg, E, e1, S):
+    acc = iv.mpf(0)
+    Ek = iv.mpf(1)
+    for k in range(1, N_SERIES + 1):
+        acc += (-1) ** (k + 1) * Ek * sg ** (2 * k) / mp.factorial(2 * k)
+        Ek = Ek * E
+    T = _tail(e1, S, 1)
+    return -1 + (1 + E) * acc + iv.mpf([-T, T])
+
+
+def _phi_f(sg, e):
+    """Float φ_ε from the same series (stable for small |ε|, any sign)."""
+    acc, Ek = 0.0, 1.0
+    for k in range(1, 30):
+        acc += (-1) ** (k + 1) * Ek * sg ** (2 * k + 1) / math.factorial(2 * k + 1)
+        Ek *= e
+    return -sg + (1 + e) * acc
+
+
+def _dphi_f(sg, e):
+    acc, Ek = 0.0, 1.0
+    for k in range(1, 30):
+        acc += (-1) ** (k + 1) * Ek * sg ** (2 * k) / math.factorial(2 * k)
+        Ek *= e
+    return -1 + (1 + e) * acc
+
+
+def _vertex_float(e, t0):
+    t = np.array(t0, float)
+    for _ in range(50):
+        u, v = t
+        sg = {k: v + k * u for k in (-0.8, 0.8, -2.0, -1.2)}
+        F = np.array([_phi_f(sg[-0.8], e) - _phi_f(sg[0.8], e), _phi_f(sg[-2.0], e) - _phi_f(sg[-1.2], e)])
+        d = {k: _dphi_f(sg[k], e) for k in sg}
+        J = np.array([[-0.8 * d[-0.8] - 0.8 * d[0.8], d[-0.8] - d[0.8]],
+                      [-2.0 * d[-2.0] + 1.2 * d[-1.2], d[-2.0] - d[-1.2]]])
+        t = t - np.linalg.solve(J, F)
+    return t
+
+
+def corner_piece(E_lo, E_hi, t0, rad=1e-3):
+    E = iv.mpf([E_lo, E_hi])
+    e1 = max(abs(E_lo), abs(E_hi))
+    em = 0.5 * (E_lo + E_hi)
+    tt = _vertex_float(em, t0)
+    S = 2.0 * (abs(tt[0]) + rad) + abs(tt[1]) + rad
+    P = lambda sg: phi_iv(sg, E, e1, S)
+    D = lambda sg: dphi_iv(sg, E, e1, S)
+
+    def fun(X, want_J=True):
+        u, v = X
+        sg = {k: v + k * u for k in (-0.8, 0.8, -2.0, -1.2)}
+        F = [P(sg[-0.8]) - P(sg[0.8]), P(sg[-2.0]) - P(sg[-1.2])]
+        if not want_J:
+            return F
+        d = {k: D(sg[k]) for k in sg}
+        J = [[-0.8 * d[-0.8] - 0.8 * d[0.8], d[-0.8] - d[0.8]],
+             [-2.0 * d[-2.0] + 1.2 * d[-1.2], d[-2.0] - d[-1.2]]]
+        return F, J
+    ok, Kb, _, _ = krawczyk(fun, tt, [rad, rad])
+    X = Kb                      # contracted box: contains the unique zero for every ε in E (if ok)
+    u, v = X
+    sI_lo, sI_hi = v - 0.8 * u, v + 0.8 * u
+    sOm_lo, sOm_hi = v - 2.0 * u, v - 1.2 * u
+    sOp_lo, sOp_hi = v + 1.2 * u, v + 2.0 * u
+    # concave for σ < 0, convex for σ > 0: φ'' = (1+ε) sin(√ε σ)/√ε (ε > 0; sinh form for ε < 0), and √ε|σ| <= √e1·S < π
+    shape_ok = math.sqrt(e1) * S < math.pi
+    neg_part = iv.mpf([min(float(mp.mpf(sI_lo.a)), 0.0), 0.0])
+    inner_decreasing_neg = (sI_lo.a >= 0) or (D(neg_part).b < 0)
+    om_negative = sOm_hi.b < 0
+    op_increasing = (sOp_lo.a > 0) and (D(iv.mpf([sOp_lo.a, sOp_hi.b])).a > 0)
+    op_dominated = P(sOp_lo).a > P(sOm_hi).b
+    other_orient_neg = (P(sI_lo) - P(sOp_hi)).b < 0 or (P(sI_hi) - P(sOp_hi)).b < 0
+    # strict (sharp) max: positive barycentric weights for three of the four c_ij = ∇O_i − ∇I_j
+    sg = {k: v + k * u for k in (-0.8, 0.8, -2.0, -1.2)}
+    g = {k: (k * D(sg[k]), D(sg[k])) for k in sg}
+    c = {(o, i): (g[o][0] - g[i][0], g[o][1] - g[i][1]) for o in (-2.0, -1.2) for i in (-0.8, 0.8)}
+    keys = list(c)
+    strict, lam_min = False, -np.inf
+    for drop in keys:
+        tri = [k for k in keys if k != drop]
+        M = [[c[tri[0]][0], c[tri[1]][0], c[tri[2]][0]], [c[tri[0]][1], c[tri[1]][1], c[tri[2]][1]],
+             [iv.mpf(1), iv.mpf(1), iv.mpf(1)]]
+        try:
+            lt, le = lin_enclose(M, [iv.mpf(0), iv.mpf(0), iv.mpf(-1)])
+        except (AssertionError, np.linalg.LinAlgError):
+            continue
+        lm = float(min(lt)) - le
+        if lm > lam_min:
+            lam_min = lm
+        if lm > 0:
+            strict = True
+    return {"eps_lo": E_lo, "eps_hi": E_hi, "krawczyk_ok": ok, "u_mid": tt[0], "v_mid": tt[1],
+            "box_width_u": _hi(Kb[0]) - _lo(Kb[0]), "box_width_v": _hi(Kb[1]) - _lo(Kb[1]),
+            "shape_ok": shape_ok, "inner_decreasing_on_negative_part": inner_decreasing_neg,
+            "outer_minus_window_negative_sigma": om_negative, "outer_plus_increasing": op_increasing,
+            "outer_plus_dominated": op_dominated, "other_orientation_negative": other_orient_neg,
+            "strict_max_barycentric_min": lam_min, "strict_max": strict,
+            "all_ok": all([ok, shape_ok, inner_decreasing_neg, om_negative, op_increasing, op_dominated,
+                           other_orient_neg, strict])}
+
+
+def _phi_exact(sg, a, eps):
+    se = math.sqrt(eps) * sg
+    return (se - a * np.sin(se)) / eps ** 1.5
+
+
+def _phi_extrema(lo, hi, a, eps):
+    """Exact min/max of φ_ε over [lo, hi] (vectorised): endpoints and critical points s = ±arccos(1/a) + 2πk."""
+    vals = [_phi_exact(lo, a, eps), _phi_exact(hi, a, eps)]
+    mn, mx = np.minimum(*vals), np.maximum(*vals)
+    base = math.acos(1 / a)
+    for k in (-1, 0, 1):
+        for sgn in (-1, 1):
+            c = (sgn * base + 2 * math.pi * k) / math.sqrt(eps)
+            inside = (lo <= c) & (c <= hi)
+            val = _phi_exact(c, a, eps)
+            mn = np.where(inside, np.minimum(mn, val), mn)
+            mx = np.where(inside, np.maximum(mx, val), mx)
+    return mn, mx
+
+
+def K_free(eps, U=8.0, V=12.0, h0=0.05, rel=1e-7):
+    """Branch and bound for sup G[φ_ε∘σ] over (u, v) ∈ [0, U] × [−V, V], both orientations, exact extrema; no
+    active set assumed.  Step: |φ_ε'| <= 1 + aσ²/2."""
+    a = 1 + eps
+    nu, nv = int(U / h0), int(2 * V / h0)
+    hu, hv = U / nu / 2, V / nv
+    cu, cv = np.meshgrid((np.arange(nu) + 0.5) * 2 * hu, -V + (np.arange(nv) + 0.5) * 2 * hv, indexing="ij")
+    cu, cv = cu.ravel(), cv.ravel()
+    best, arg = -np.inf, None
+    for _ in range(60):
+        def ext(lo, hi):
+            a1, a2 = cu * lo + cv, cu * hi + cv
+            return _phi_extrema(np.minimum(a1, a2), np.maximum(a1, a2), a, eps)
+        imn, imx = ext(-0.8, 0.8)
+        p_mn, p_mx = ext(1.2, 2.0)
+        n_mn, n_mx = ext(-2.0, -1.2)
+        omn, omx = np.minimum(p_mn, n_mn), np.maximum(p_mx, n_mx)
+        G = np.maximum(omn - imx, imn - omx)
+        smax = 2.0 * (np.abs(cu) + hu) + np.abs(cv) + hv
+        ub = G + (1 + a * smax ** 2 / 2) * (2.8 * hu + 2 * hv)
+        j = int(np.argmax(G))
+        if G[j] > best:
+            best, arg = float(G[j]), (float(cu[j]), float(cv[j]))
+        keep = ub > best
+        hi = float(ub[keep].max()) if keep.any() else best
+        if hi - best <= rel * best:
+            spread = float(np.max(np.minimum(np.hypot(cu[keep] - arg[0], cv[keep] - arg[1]),
+                                              np.hypot(cu[keep] - arg[0], cv[keep] + arg[1]))))
+            return best, hi, arg, spread
+        cu, cv = cu[keep], cv[keep]
+        hu, hv = hu / 2, hv / 2
+        cu = np.concatenate([cu - hu, cu - hu, cu + hu, cu + hu])
+        cv = np.concatenate([cv - hv, cv + hv, cv - hv, cv + hv])
+    raise RuntimeError("K_free not converged")
+
+
+def corner():
+    c = pd.read_csv(RESULTS / "first_order_c1.csv").iloc[0]
+    t0 = (float(c.vertex_u), float(c.vertex_v))
+    edges = np.linspace(-E_MAX, E_MAX, E_PIECES + 1)
+    rows = [corner_piece(float(edges[i]), float(edges[i + 1]), t0) for i in range(E_PIECES)]
+    d = pd.DataFrame(rows)
+    d.to_csv(RESULTS / "first_order_corner.csv", index=False)
+    print(d[["eps_lo", "eps_hi", "krawczyk_ok", "box_width_u", "strict_max_barycentric_min", "all_ok"]]
+          .iloc[::40].to_string(index=False))
+    print("pieces:", len(d), "all ok:", bool(d.all_ok.all()), "min barycentric weight:", d.strict_max_barycentric_min.min())
+    K0 = 0.5 * (float(c.K_vertex_lo) + float(c.K_vertex_hi))
+    free = []
+    for e in (0.005, 1e-3, 1e-4):
+        lo, hi, arg, spread = K_free(e)
+        tt = _vertex_float(e, t0)
+        u, v = tt
+        K_fixed = _phi_exact(v - 1.2 * u, 1 + e, e) - _phi_exact(v + 0.8 * u, 1 + e, e)
+        free.append({"eps": e, "K_free_lo": lo, "K_free_hi": hi, "free_argmax_u": arg[0], "free_argmax_v": arg[1],
+                     "kept_cells_max_dist_to_argmax_or_mirror": spread,
+                     "fixed_active_vertex_u": u, "fixed_active_vertex_v": v, "K_fixed_active": K_fixed,
+                     "fixed_in_free_enclosure": lo - 1e-12 <= K_fixed <= hi + 1e-12,
+                     "slope_free_lo": (lo / K0 - 1) / e, "slope_free_hi": (hi / K0 - 1) / e,
+                     "slope_fixed": (K_fixed / K0 - 1) / e})
+    f = pd.DataFrame(free)
+    f.to_csv(RESULTS / "first_order_corner_free.csv", index=False)
+    print(f.to_string(index=False))
+
+
 # ------------------------------------------------------------------ registered finite-a test
 A_TEST = (1.01, 1.02, 1.03, 1.04)
 REL_WIDTH = 2e-4
@@ -361,5 +574,7 @@ if __name__ == "__main__":
         finite(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
     elif cmd == "score":
         score()
+    elif cmd == "corner":
+        corner()
     else:
         main()
