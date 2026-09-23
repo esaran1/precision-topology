@@ -392,6 +392,8 @@ def _crossing(levels, frac, target=0.5):
 
 
 def score(block):
+    """Writes fixed_scale_block4_curve.csv / fixed_scale_block4_tests.csv (block 4) or
+    fixed_scale_block5_curve.csv / fixed_scale_block5_tests.csv (block 5)."""
     d = pd.read_csv(RESULTS / f"fixed_scale_block{block}.csv")
     if block == 4:
         d["success"] = d.placed_end.astype(bool)

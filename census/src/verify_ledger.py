@@ -550,6 +550,8 @@ def main() -> None:
     chk("rate spread Adam/SGD (measured medians)", float(med.max() / med.min()), 3.92, 0.01)
     chk("registered-rate ratio 0.00207/0.00075", 0.00207 / 0.00075, 2.76, 0.01)
 
+    v4_checks()
+
     provenance_check()
 
     print(f"\n{len(F)} finding(s)")
@@ -697,6 +699,26 @@ PRODUCERS = {
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
+    "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
+    "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
+    "cond_certified_brackets.csv": ("conditional_certified", "brackets", "full", ""),
+    "cond_certified_bracket_evaluations.csv": ("conditional_certified", "brackets", "full", ""),
+    "mn2_bounds.csv": ("math_note_v2_checks", "bounds", "full", ""),
+    "mn2_uniformity_summary.csv": ("math_note_v2_checks", "uniform_summary", "full", ""),
+    "mn2_neighbourhood.csv": ("math_note_v2_checks", "neighbourhood", "full", ""),
+    "mn2_rounding.csv": ("math_note_v2_checks", "rounding", "full", ""),
+    "limit_switch.csv": ("limit_bnb", "switch", "full", ""),
+    "prospective_comparisons.csv": ("prospective", "score", "full", ""),
+    "prospective_scores.csv": ("prospective", "score", "full", ""),
+    "prospective_calibration.csv": ("prospective", "calibrate", "full", ""),
+    "prospective_secondary_analyses.csv": ("prospective_secondary", "main", "full", ""),
+    "fixed_scale_block4.csv": ("fixed_scale", "run_replays", "full", ""),
+    "fixed_scale_block5.csv": ("fixed_scale", "run_replays", "full", ""),
+    "fixed_scale_block4_curve.csv": ("fixed_scale", "score", "full", ""),
+    "fixed_scale_block4_tests.csv": ("fixed_scale", "score", "full", ""),
+    "fixed_scale_block5_curve.csv": ("fixed_scale", "score", "full", ""),
+    "fixed_scale_block5_tests.csv": ("fixed_scale", "score", "full", ""),
+    "critical_slowing_posthoc.csv": ("critical_slowing", "main", "full", ""),
     "rglob_convergence_points.csv": ("rglob_refit", "main", "full", ""),
     "limit_K_base.csv": ("limit_windows", "K_base", "full", ""),
     "limit_windows.csv": ("limit_windows", "main", "full", ""),
@@ -705,6 +727,122 @@ PRODUCERS = {
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
                "_write(", "_write_frame(", "artifact_lock(")
+
+
+def v4_checks() -> None:
+    """Numbers in paper/WRITER_INPUTS_v4.md (Blocks 1-5)."""
+    print("V4 Block 1 (conditional audit)")
+    ca = pd.read_csv(R / "cond_audit_candidates.csv")
+    chk("1a candidates", float(len(ca)), 16468.0, 0)
+    chk("1a scales", float(ca.groupby(["a", "kind", "s"]).ngroups), 358.0, 0)
+    chk("1a frozen reproduced at all scales", float(ca.frozen_reproduced.all()), 1.0, 0)
+    ret = ca[ca.status == "RETAINED"].set_index(["a", "kind", "s"]).loss
+    oth = ca[ca.status != "RETAINED"].join(ret.rename("ret"), on=["a", "kind", "s"])
+    chk("1a discarded candidates below the retained loss", float((oth.loss < oth.ret - 1e-12).sum()), 0.0, 0)
+    chk("1a max retained gradient norm <= 2.3e-6",
+        float(ca[ca.status == "RETAINED"].grad_norm.max() <= 2.3e-6), 1.0, 0)
+    st = pd.read_csv(R / "cond_audit_strict.csv").join(ret.rename("ret"), on=["a", "kind", "s"])
+    chk("1e strict vs frozen, max |loss diff| <= 2e-16", float((st.loss - st.ret).abs().max() <= 2.2e-16), 1.0, 0)
+    br = pd.read_csv(R / "cond_certified_brackets.csv")
+    g13 = br[(br.a.round(2) == 1.3) & (br.kind == "glob")].iloc[0]
+    s13 = br[(br.a.round(2) == 1.3) & (br.kind == "solve")].iloc[0]
+    chk("1c R_glob(1.30) lower", float(g13.R_lo), 0.21310, 1e-5)
+    chk("1c R_glob(1.30) upper", float(g13.R_hi), 0.21364, 1e-5)
+    chk("1c R_solve(1.30) lower", float(s13.R_lo), 0.30566, 1e-5)
+    chk("1c R_solve(1.30) upper", float(s13.R_hi), 0.30620, 1e-5)
+    chk("1c frozen within one step, all 12", float(br.frozen_within_one_step.all()), 1.0, 0)
+    chk("1c all converged, none unresolved", float(br.all_converged.all() and (br.unresolved == 0).all()), 1.0, 0)
+    ev = pd.read_csv(R / "cond_certified_bracket_evaluations.csv")
+    sep = np.maximum(ev.m_plus_lo - ev.m_minus_hi, ev.m_minus_lo - ev.m_plus_hi)
+    chk("1c min separation of certified intervals >= 1.3e-8", float(sep.min() >= 1.3e-8), 1.0, 0)
+    gl = br[br.kind == "glob"]
+    asep = pd.concat([gl.argmin_separation_lo, gl.argmin_separation_hi])
+    chk("1c argmin separation min", float(asep.min()), 0.00015, 0.00005)
+    chk("1c argmin separation max", float(asep.max()), 0.0011, 0.00005)
+
+    print("V4 Block 2 (math note checks)")
+    mb = dict(pd.read_csv(R / "mn2_bounds.csv").values)
+    chk("B(24)", float(mb["B(24) (exact PAVA, 50 digits)"]), 0.38797358, 1e-8)
+    chk("B_full", float(mb["B_full (exact PAVA, 50 digits)"]), 0.47738563, 1e-8)
+    us = pd.read_csv(R / "mn2_uniformity_summary.csv").iloc[0]
+    chk("uniform branch loss sup on [0.66, 0.72]", float(us.sup_branch_loss), 0.3768942, 1e-7)
+    chk("uniform margin vs B(24)", float(us.margin_B24), 0.0111, 0.0001)
+    chk("uniform margin vs B_full", float(us.margin_Bfull), 0.1005, 0.0001)
+    chk("wider range [0.60, 0.76] not certified", float(us.wider_certified), 0.0, 0)
+    chk("wider range overshoot", float(us.wider_margin_B24), -0.0032, 0.0001)
+    nb = pd.read_csv(R / "mn2_neighbourhood.csv").iloc[0]
+    chk("U: Hessian PD on all sub-boxes", float(bool(nb.hess_pd_all_boxes) and bool(nb.b2_validated_all)), 1.0, 0)
+    chk("U: lambda_min lower bound", float(nb.hess_lambda_min_lower_bound), 0.0473, 0.0001)
+    chk("U: S_U", float(nb.S_U), 4.857, 0.001)
+    for k_, v_ in (("M0", 5.217), ("M1", 13.507), ("M2", 16.375), ("M3", 13.384)):
+        chk(f"Taylor constant {k_}", float(nb[k_]), v_, 0.001)
+    lsw = pd.read_csv(R / "limit_switch.csv").iloc[0]
+    chk("A* bracket lower", float(lsw.A_lo), 0.68125, 1e-9)
+    chk("A* bracket upper", float(lsw.A_hi), 0.6875, 1e-9)
+    rd = pd.read_csv(R / "mn2_rounding.csv")
+    chk("rounding: max |float - interval| <= 1.2e-16", float(rd["diff"].abs().max() <= 1.2e-16), 1.0, 0)
+
+    print("V4 Block 3 (prospective)")
+    cmp_ = pd.read_csv(R / "prospective_comparisons.csv").set_index("comparison")
+    for c_, m_, lo_, hi_ in (("C - B1", -0.257, -0.370, -0.131), ("C - B2", -0.055, -0.103, -0.010),
+                             ("C - U", -0.086, -0.111, -0.063),
+                             ("secondary: C - B3 (MAE of placed fraction)", -0.044, -0.068, -0.018)):
+        chk(f"{c_} mean", float(cmp_.loc[c_, "mean_diff"]), m_, 0.0006)
+        chk(f"{c_} ci lo", float(cmp_.loc[c_, "ci95_lo"]), lo_, 0.0006)
+        chk(f"{c_} ci hi", float(cmp_.loc[c_, "ci95_hi"]), hi_, 0.0006)
+    sc = pd.read_csv(R / "prospective_scores.csv")
+    chk("C max abs log error", float(sc.abslogerr_C.max()), 0.037, 0.0005)
+    chk("crossed min", float(sc.n_crossed.min()), 86.0, 0)
+    chk("crossed max", float(sc.n_crossed.max()), 88.0, 0)
+    chk("U inside registered range", float(sc.U_in_expected_range.sum()), 7.0, 0)
+    chk("U under-predicts everywhere", float((sc.U < sc.obs_median_cross_R).all()), 1.0, 0)
+    chk("U log(obs/U) min", float(sc.abslogerr_U.min()), 0.077, 0.0005)
+    chk("U log(obs/U) max", float(sc.abslogerr_U.max()), 0.151, 0.0005)
+    chk("C over-predicts everywhere", float((sc.C > sc.obs_median_cross_R).all()), 1.0, 0)
+    cal = pd.read_csv(R / "prospective_calibration.csv").set_index("a")
+    chk("lambda(1.30)", float(cal.loc[1.3, "lambda_fitted"]), 1.115, 0.0005)
+    chk("lambda(1.50)", float(cal.loc[1.5, "lambda_fitted"]), 1.164, 0.0005)
+    sg = np.log(sc.C / sc.obs_median_cross_R)
+    chk("C mean signed log error", float(sg.mean()), 0.022, 0.0005)
+    sa = pd.read_csv(R / "prospective_secondary_analyses.csv").set_index("analysis")
+    chk("window bootstrap C - B1 lo", float(sa.loc["window-clustered bootstrap: C - B1", "lo"]), -0.414, 0.0005)
+    chk("window bootstrap C - B1 hi", float(sa.loc["window-clustered bootstrap: C - B1", "hi"]), -0.069, 0.0005)
+    chk("window bootstrap C - B2 lo", float(sa.loc["window-clustered bootstrap: C - B2", "lo"]), -0.098, 0.0005)
+    chk("window bootstrap C - B2 hi", float(sa.loc["window-clustered bootstrap: C - B2", "hi"]), -0.012, 0.0005)
+    chk("signed error setting-level lo", float(sa.loc["C signed log error log(C/obs)", "lo"]), 0.0145, 0.0005)
+    chk("signed error setting-level hi", float(sa.loc["C signed log error log(C/obs)", "hi"]), 0.0295, 0.0005)
+
+    for blk, n_ck, n_rep, fr_, x50_ in ((4, 543, 8688, (0.0, 0.0, 0.013, 0.309, 0.700, 0.967, 0.989, 0.989), 1.049),
+                                        (5, 177, 2832, (0.0, 0.0, 0.017, 0.203, 0.644, 0.966, 1.0, 1.0), 1.067)):
+        print(f"V4 Block {blk} (fixed scale)")
+        rp_ = pd.read_csv(R / f"fixed_scale_block{blk}.csv")
+        chk("replays", float(len(rp_)), float(n_rep), 0)
+        chk("decisions preserved, all", float(rp_.decisions_preserved.all()), 1.0, 0)
+        chk("k = 1 check max diff", float(rp_.k1_check_max_diff.max()), 0.0, 1e-10)
+        cv_ = pd.read_csv(R / f"fixed_scale_block{blk}_curve.csv")
+        pr_ = cv_[cv_.variant == "preserved"].sort_values("level")
+        chk("checkpoints", float(pr_.n.max()), float(n_ck), 0)
+        for l_, f_ in zip(pr_.level, fr_):
+            chk(f"fraction at {l_}", float(pr_[pr_.level == l_].frac.iloc[0]), f_, 0.0006)
+        ts_ = pd.read_csv(R / f"fixed_scale_block{blk}_tests.csv").set_index("variant")
+        chk("x50 preserved", float(ts_.loc["preserved", "x50"]), x50_, 0.0006)
+        chk("monotone violations, both variants", float(ts_.monotonic_violations.sum()), 0.0, 0)
+        if blk == 4:
+            chk("D1 pass, both", float(ts_.D1_pass.all()), 1.0, 0)
+            chk("D2 pass, any", float(ts_.D2_pass.any()), 0.0, 0)
+        else:
+            chk("x50 reset", float(ts_.loc["reset", "x50"]), 1.068, 0.0006)
+            chk("location in [0.9, 1.1], both", float(ts_.location_in_band.all()), 1.0, 0)
+            chk("width 10-90", float(ts_.loc["preserved", "width_10_90"]), 0.27, 0.006)
+            sp_ = pd.read_csv(R / "fixed_scale_block5_splits.csv")
+            chk("split widths min", float(sp_.width_10_90.min()), 0.26, 0.006)
+            chk("split widths max", float(sp_.width_10_90.max()), 0.28, 0.006)
+            chk("split x50 range", float(sp_.x50.max() - sp_.x50.min()), 0.03, 0.001)
+
+    print("V4 exploratory: critical slowing (post hoc)")
+    cs = pd.read_csv(R / "critical_slowing_posthoc.csv").set_index("a")
+    chk("predicted offset at 1.30 (%)", float(cs.loc[1.3, "pred_offset_pct"]), 1.08, 0.01)
+    chk("observed offset at 1.30 (%)", float(cs.loc[1.3, "obs_offset_pct"]), 9.59, 0.01)
 
 
 def provenance_check() -> None:
