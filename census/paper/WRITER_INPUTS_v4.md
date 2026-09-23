@@ -252,6 +252,21 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   Do not generalise beyond this setting, optimiser or horizon.
 - **The two variants**: they differ early (first-step ΔG by up to 0.14; time to first G > 0 in 25% of
   replays) but end with the same placement outcome in every pair.
+- **Fixed-scale verdicts, stated plainly**:
+  - **Q1 FAILED.**
+  - **Q2 FAILED.**
+  - **S1 FAILED.**
+  - **S2 PASSED.**
+- **Interpretation**:
+  - Q1 and Q2 registered that fixed-scale placement would switch at the **population** threshold, and
+    they failed.
+  - S2 registered that it would switch at the **median of each training set's own** threshold, and it
+    passed.
+  - So at fixed scale, placement is governed by the training set's own conditional threshold, about 3–6%
+    above the population value.
+  - Per-replay prediction from own thresholds reaches **0.894**, against **0.760** for the population
+    rule, short of the registered 0.95.
+  - The explanation of that shortfall is left to the mirror-branch analysis (exploratory, pending).
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
   point move toward 1.0 at 4× and 16× the horizon? **Q1 FAILED, Q2 FAILED; the registered competing
   outcome holds** (`fixed_scale_horizons_tests.csv`).
