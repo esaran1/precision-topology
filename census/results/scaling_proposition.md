@@ -113,8 +113,15 @@ scale, which is why their onsets differ by a constant factor (T44).
   There, q2 matched family A's `R_glob` at all six `a` but **not** its `R_solve`
   (below A by 0.012–0.051). So at finite `ε` the reduction does **not** fix the
   solve threshold across families whose folds agree only near the fold.
-  Statement 6 is claimed only inside the reduction's domain, where it is
-  untested for the q-families.
+  Statement 6 is claimed only inside the reduction's domain.
+
+- **Cross-family follow-up, inside the domain (`crossfamily_followup_results.md`;
+  registered after X1 failed).** At `a` = 1.01–1.04, with 0% of window points on
+  q2's linear continuation, q2 matches family A on **both** `R_glob` and
+  `R_solve` at all four `a` (Y1 passes). Inside its domain, the reduction therefore
+  predicts both thresholds across equivalent families. The agreement is at grid
+  resolution (`ΔR = 0.00215`), with both families within one step of the limit.
+  The follow-up has no negative-control family. X1 stays failed as registered.
 
 - H1 and H2 are verified numerically, not proved.
 - Step 6 is conditional on H2 at each switch point used; H2 was checked at

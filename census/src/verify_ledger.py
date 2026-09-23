@@ -371,6 +371,21 @@ def main() -> None:
         float(all(relu[i] <= relu[i + 1] + 1e-9 for i in range(3))
               and all(gelu[i] <= gelu[i + 1] + 1e-9 for i in range(3))), 1.0, 0)
 
+    print("T73 optimiser equivalence (Block C in-band population, a = 1.25)")
+    v = pd.read_csv(R / "blockC_verdicts.csv").set_index("pair")
+    chk("pairs equivalent", float((v.verdict == "equivalent").sum()), 3.0, 0)
+    chk("adam - adamw diff", float(v.loc["adam - adamw", "diff"]), -0.0008, 1e-4)
+    chk("adam - sgd diff", float(v.loc["adam - sgd", "diff"]), 0.0029, 1e-4)
+    chk("adamw - sgd diff", float(v.loc["adamw - sgd", "diff"]), 0.0037, 1e-4)
+
+    print("T74 cross-family follow-up (Y1)")
+    y = pd.read_csv(R / "crossfamily_followup_scores.csv")
+    chk("comparisons within tol", float(y.within.sum()), 8.0, 0)
+    chk("max |q2 - A|", float(y["diff"].abs().max()), 0.00215, 1e-4)
+    chk("q2 share outside domain", float(y.q2_frac_outside.max()), 0.0, 0)
+    dom = pd.read_csv(R / "crossfamily_followup_domain.csv")
+    chk("domain condition at all a", float(dom.condition_holds.sum()), 4.0, 0)
+
     provenance_check()
 
     print(f"\n{len(F)} finding(s)")

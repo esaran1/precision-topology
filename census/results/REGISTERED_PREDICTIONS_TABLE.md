@@ -201,3 +201,9 @@ and two of them (E-5, K-3) changed what the paper claims.
 | X1 | q2 = A on `R_glob` and `R_solve`, a = 1.30–1.60 | `R_glob` 6/6, `R_solve` 0/6 | **FAIL** (stays failed) |
 | X2 | q1 ≠ A at ≥ 4 of 6 | `R_glob` 6/6 outside | PASS |
 
+### Cross-family follow-up inside the q2 domain (`crossfamily_followup_results.md`; registered after X1 failed)
+
+| # | prediction | measured | verdict |
+|---|---|---|---|
+| Y1 | q2 = A within tol on `R_glob` and `R_solve`, a = 1.01–1.04 (0% of points outside the q2 domain) | `R_glob` 4/4, `R_solve` 4/4; agreement at grid resolution 0.00215 | **PASS** (X1 unchanged) |
+
