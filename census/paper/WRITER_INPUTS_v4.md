@@ -279,3 +279,18 @@ Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea
 - The same caveat as Block 4 applies to the width: it reflects heterogeneity across runs (S1–S3 test
   whether own-seed thresholds account for it).
 
+
+## Figure manifest (v4)
+
+These are **not in `paper/figures` yet.** They are held until S1–S3 and the c₁ test are scored, since
+those can change what the panels should show.
+- Producer: `src/figures_v4.py` (`PYTHONPATH=. python -m src.figures_v4`).
+- Output: `results/figures/v4/*.pdf` (vector) and `.png` previews.
+- All figures are single column, 3.25 in wide, with nothing below 6 pt.
+- Every panel states n and shows uncertainty.
+
+| file | content | n | uncertainty shown | source artifacts | pending changes |
+|---|---|---|---|---|---|
+| `v4_prospective.pdf` | Block 3: predicted against observed median crossing R, 8 held-out settings × 4 models. C is filled, U open and joined to C by a segment (the fitted λ). λ(1.30) = 1.115 and λ(1.50) = 1.164 are labelled as fitted on the base window. Identity line. | 86–88 crossings of 90 per setting | observed medians: bootstrap 95% (10,000 resamples, seed 0) | `prospective_runs.csv`, `prospective_scores.csv`, `prospective_calibration.csv` | none expected |
+| `v4_fixed_scale.pdf` | (a) Block 4: placed at 4,000 steps against held R/R_glob, both optimiser-state variants, x₅₀ in the legend, registered band [0.9, 1.25] shaded. (b) Block 5: retained through 12,000 steps, band [0.9, 1.1], with **E-2's criterion** (kept ≥ 0.9 at 1.15 × Block E's R_glob = 1.156 certified units) and Block E's observed 33/37 marked FAIL. | 543 checkpoints per level (a); 177 (b); Block E 37 | Clopper–Pearson 95% | `fixed_scale_block{4,5}_curve.csv`, `_tests.csv`; `blockE_results.md` | **Room kept** for the 16k and 64k curves from the registered horizon extension (Q1). Hook: `fig_fixed_scale(horizons=True)`, added once Q1/Q2 are scored. S1/S2 may add the own-seed prediction. |
+| `v4_thresholds.pdf` | Certified R_glob and R_solve intervals at a = 1.30–1.60 and in the limit ε → 0, with free-training crossing-R distributions (budget 32k) on the same axes. | 38 runs per a | certified interval widths; crossing medians bootstrap 95% | `cond_certified_brackets.csv`, `limit_K_base.csv`, `mn2_solve_limit.csv`, `wi_crossing_runs.csv` | S3 may add the own-seed thresholds. The c₁ test may add the small-ε points (a = 1.01–1.04) and the first-order line. The limit R_solve is for the branch only until competitor exclusion is certified. |
