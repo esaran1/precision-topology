@@ -1,0 +1,14 @@
+analysis,result,detail,lo,hi
+"U range, per setting (registered rule)",7 of 8 inside,H10/1.30: 0.0767 OUTSIDE; H10/1.50: 0.1156; H35/1.30: 0.0804; H35/1.50: 0.1238; H65/1.30: 0.0875; H65/1.50: 0.1418; H90/1.30: 0.0882; H90/1.50: 0.1509,0.0801090156193558,0.1824332611910125
+"U range, read as a joint prediction (all settings in range)",FAIL (narrowly),U under-predicts in all 8 settings by 7.4% to 14.0%,0.0801090156193558,0.1824332611910125
+window-clustered bootstrap: C - B1,"mean -0.2573, 95% [-0.4138, -0.0693]","C better, interval excludes 0",-0.41376248789219905,-0.06933984059197601
+"leave-one-window-out: C - B1, without H10",mean -0.2383,C better,,
+"leave-one-window-out: C - B1, without H35",mean -0.3472,C better,,
+"leave-one-window-out: C - B1, without H65",mean -0.2553,C better,,
+"leave-one-window-out: C - B1, without H90",mean -0.1884,C better,,
+window-clustered bootstrap: C - B2,"mean -0.0550, 95% [-0.0984, -0.0116]","C better, interval excludes 0",-0.09835771897320006,-0.011609445939702197
+"leave-one-window-out: C - B2, without H10",mean -0.0710,C better,,
+"leave-one-window-out: C - B2, without H35",mean -0.0679,C better,,
+"leave-one-window-out: C - B2, without H65",mean -0.0422,C better,,
+"leave-one-window-out: C - B2, without H90",mean -0.0389,C better,,
+C signed log error log(C/obs),"mean 0.0223; setting-level 95% [0.0145, 0.0295]; window-level 95% [0.0134, 0.0313]",H10/1.30: +0.0320; H10/1.50: +0.0366; H35/1.30: +0.0284; H35/1.50: +0.0284; H65/1.30: +0.0212; H65/1.50: +0.0104; H90/1.30: +0.0205; H90/1.50: +0.0013,0.01454823956421826,0.029454792210435867

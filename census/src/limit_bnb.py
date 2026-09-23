@@ -182,7 +182,11 @@ def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=Tru
         lower = float(lb[keep].min()) if keep.any() else upper
         conv = upper - lower <= tol or not keep.any()
         if conv or (region == "+" and lower > math.log(2)) or 4 * keep.sum() > max_cells:
-            return {"region": region, "A": A, "lower": min(lower, upper), "upper": upper,
+            encl = None
+            if keep.any():
+                kp, kq = cp[keep], cq[keep]
+                encl = (float(kp.min() - hpp), float(kp.max() + hpp), float(kq.min() - hq), float(kq.max() + hq))
+            return {"encl": encl, "region": region, "A": A, "lower": min(lower, upper), "upper": upper,
                     "arg_p": arg[0] if arg else np.nan, "arg_q": arg[1] if arg else np.nan,
                     "cells": int(keep.sum()), "rounds": rounds, "hp": hpp, "hq": hq,
                     "P": P, "Q": Q, "converged": bool(conv or lower > math.log(2))}

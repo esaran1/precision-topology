@@ -1,0 +1,5 @@
+quantity,value
+B_full (closed form: ln3/4 + ln(3/2)/2),0.47738562622110961384
+"B_full (exact PAVA, 50 digits)",0.47738562622110961384
+"B(24) (exact PAVA, 50 digits)",0.38797358308678997649
+|B_full closed - PAVA|,6.6819e-52
