@@ -306,6 +306,15 @@ def score():
                 sec.append({"window": w, "a": a, "budget": B, "model": model, "pred": pv, "obs": o,
                             "abs_err": abs(pv - o)})
     sec = pd.DataFrame(sec)
+    per = sec.pivot_table(index=["window", "a"], columns="model", values="abs_err", aggfunc="mean")
+    d2, lo2, hi2 = _boot_diff(per["C"].values, per["B3"].values)
+    comp = pd.concat([comp, pd.DataFrame([{"comparison": "secondary: C - B3 (MAE of placed fraction)",
+                                           "mean_diff": d2, "ci95_lo": lo2, "ci95_hi": hi2,
+                                           "C_better_interval_excludes_zero": hi2 < 0}])])
+    cal = pd.read_csv(RESULTS / "prospective_calibration.csv").iloc[0]
+    m["U_logerr"] = np.log(m["U"] / m.obs_median_cross_R)
+    m["U_in_expected_range"] = ((-m.U_logerr) >= cal.U_expected_log_error_min - 1e-12) & \
+                               ((-m.U_logerr) <= cal.U_expected_log_error_max + 1e-12)
     m.to_csv(RESULTS / "prospective_scores.csv", index=False)
     comp.to_csv(RESULTS / "prospective_comparisons.csv", index=False)
     sec.to_csv(RESULTS / "prospective_secondary.csv", index=False)
