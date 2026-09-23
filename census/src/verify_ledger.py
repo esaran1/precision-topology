@@ -385,6 +385,13 @@ def main() -> None:
     chk("q2 share outside domain", float(y.q2_frac_outside.max()), 0.0, 0)
     dom = pd.read_csv(R / "crossfamily_followup_domain.csv")
     chk("domain condition at all a", float(dom.condition_holds.sum()), 4.0, 0)
+    z = pd.read_csv(R / "crossfamily_q1control_scores.csv")
+    chk("Z1: q1 beyond two steps (8 comparisons)", float(z.beyond_two_steps.sum()), 8.0, 0)
+    chk("Z1: min q1-A steps, R_glob", float(z[z.threshold == "glob"].steps.min()), 35.0, 0.01)
+    chk("Z1: min q1-A steps, R_solve", float(z[z.threshold == "solve"].steps.min()), 5.0, 0.01)
+    chk("Z1: q1 share outside domain", float(z.q1_frac_outside.max()), 0.0, 0)
+    zg = pd.read_csv(R / "crossfamily_q1control_validity.csv")
+    chk("Z1 gate passes at a = 1.30", float(zg["pass"].sum()), 2.0, 0)
 
     print("T75 Block A5d at k = 1")
     k1 = pd.read_csv(R / "blockA5d_k1_runs.csv", dtype={"act": str})
@@ -398,6 +405,11 @@ def main() -> None:
     fa = k1[~k1.act.isin(["relu", "gelu"])]
     chk("max perfect fraction (no onset)",
         float(fa.groupby(["act", "budget"]).perfect.mean().max()), 0.35, 1e-9)
+    tr = pd.read_csv(R / "blockA5d_k1_first_perfect.csv").set_index("budget")
+    chk("post hoc: smallest a with any perfect at 1k", float(tr.loc[1000, "smallest_a_any_perfect"]), 3.0, 0)
+    chk("post hoc: smallest a with any perfect at 4k-64k",
+        float(tr.loc[[4000, 16000, 64000], "smallest_a_any_perfect"].max()), 1.35, 0)
+    chk("post hoc: 50% onset reached at any budget", float(tr.onset_half_reached.sum()), 0.0, 0)
     chk("no perfect run at a <= 1.2",
         float(k1[k1.act.isin(["0.9", "1.0", "1.05", "1.1", "1.2"])].perfect.sum()), 0.0, 0)
 
@@ -517,6 +529,12 @@ PRODUCERS = {
     "crossfamily_followup_thresholds.csv": ("crossfamily_followup", "run", "full", ""),
     "crossfamily_followup_scores.csv": ("crossfamily_followup", "score", "full", ""),
     "blockB_scaled_validity.csv": ("crossfamily_followup", "validity", "full", ""),
+    "blockA5d_k1_budget_trend.csv": ("blockA5d_k1_trend", "main", "full", ""),
+    "blockA5d_k1_first_perfect.csv": ("blockA5d_k1_trend", "main", "full", ""),
+    "crossfamily_q1control_domain.csv": ("crossfamily_q1control", "verify", "full", ""),
+    "crossfamily_q1control_validity.csv": ("crossfamily_q1control", "validity", "full", ""),
+    "crossfamily_q1control_thresholds.csv": ("crossfamily_q1control", "run", "full", ""),
+    "crossfamily_q1control_scores.csv": ("crossfamily_q1control", "score", "full", ""),
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
 }

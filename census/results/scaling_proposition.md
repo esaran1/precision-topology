@@ -121,7 +121,10 @@ scale, which is why their onsets differ by a constant factor (T44).
   `R_solve` at all four `a` (Y1 passes). Inside its domain, the reduction therefore
   predicts both thresholds across equivalent families. The agreement is at grid
   resolution (`ΔR = 0.00215`), with both families within one step of the limit.
-  The follow-up has no negative-control family. X1 stays failed as registered.
+  A registered negative control (Z1, made after Y1) shows that this resolution is
+  enough to discriminate: q1, whose limit is not a rescaling of `h`, sits 35–36 grid
+  steps from A on `R_glob` and 5 on `R_solve` at the same `a`. So Y1's agreement
+  reflects the reduction, not the grid. X1 stays failed as registered.
 
 - H1 and H2 are verified numerically, not proved.
 - Step 6 is conditional on H2 at each switch point used; H2 was checked at

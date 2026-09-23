@@ -976,9 +976,10 @@ question.
 | C, optimiser equivalence (3 pairs) | 1 | 2 (failed in the favourable direction) | 0 |
 | cross-family X1, X2 | 1 (X2) | 1 (X1) | 0 |
 | cross-family follow-up Y1 | 1 | 0 | 0 |
-| **v2 total (16)** | **6** | **6** | **4** |
+| q1 negative control Z1 | 1 | 0 | 0 |
+| **v2 total (17)** | **7** | **6** | **4** |
 
-**Combined, 63 registered predictions: 27 PASS, 24 FAIL, 1 PARTIAL, 11 UNRESOLVED.**
+**Combined, 64 registered predictions: 28 PASS, 24 FAIL, 1 PARTIAL, 11 UNRESOLVED.**
 The v2 unresolved outcomes are all onset-dependent predictions made undecidable by a
 registered stop condition (no onset exists), not predictions left unscored.
 

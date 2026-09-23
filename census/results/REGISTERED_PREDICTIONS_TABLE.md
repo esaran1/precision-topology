@@ -218,4 +218,5 @@ Perfect = zero errors on 20k uniform **and** 20k stratified (linking-region) hel
 | # | prediction | measured | verdict |
 |---|---|---|---|
 | Y1 | q2 = A within tol on `R_glob` and `R_solve`, a = 1.01–1.04 (0% of points outside the q2 domain) | `R_glob` 4/4, `R_solve` 4/4; agreement at grid resolution 0.00215 | **PASS** (X1 unchanged) |
+| Z1 | negative control (registered after Y1): q1 differs from A by > 2 grid steps on both thresholds at a = 1.01–1.04 | `R_glob` +35–36 steps 4/4, `R_solve` +5 steps 4/4 | **PASS**: Y1 is discriminating |
 

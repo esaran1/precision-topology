@@ -44,10 +44,37 @@ thresholds across equivalent families**, and X1's `R_solve` failure at
   the eight comparisons are identical on the grid. Differences smaller than about
   0.002 are not resolved. The test shows that **one limit governs both
   families**. It does not measure a finite-`ε` difference between them.
-- **No negative control in this follow-up.** q1, which separated from A in the
-  original test (X2), was not rerun at these `a`. So this test's power to
-  distinguish families with a *different* limit is shown only by X2, at larger
-  `ε`.
+- **Negative control added afterwards (Z1, below).** At registration Y1 had no
+  negative control. The q1 control, registered after Y1 passed, shows that the
+  procedure separates a family with a different limit at these `ε`.
 - The "domain violation explains X1" reading is the registration's fixed reading.
   The mechanism (why `R_solve` but not `R_glob` was affected outside the domain)
   remains untested (`crossfamily_results.md`).
+
+## Negative control (Z1): q1 at the same a — added after Y1
+
+Registered in `crossfamily_q1control_prediction.md` (`eb66cb4`, after Y1 passed,
+before any q1 threshold at these `a`). The q1 domain was verified first
+(`ε·max|σ| ≤ 0.72` over the whole scan box; 0% of the window outside at every
+argmax and every minimiser). The q1 scaled procedure passed its gate at
+`a = 1.30` (frozen vs scaled: `R_glob` 0.27817 vs 0.27817, `R_solve` 0.31907 vs
+0.31907, differences 2e-8). Artifacts: `crossfamily_q1control_*.csv`, producer
+`src/crossfamily_q1control.py`.
+
+| `a` | `R_glob` A | `R_glob` q1 | steps | `R_solve` A | `R_solve` q1 | steps |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1.01 | 0.2007 | 0.2782 | +36 | 0.3083 | 0.3191 | +5 |
+| 1.02 | 0.2007 | 0.2782 | +36 | 0.3083 | 0.3191 | +5 |
+| 1.03 | 0.2007 | 0.2782 | +36 | 0.3083 | 0.3191 | +5 |
+| 1.04 | 0.2028 | 0.2782 | +35 | 0.3083 | 0.3191 | +5 |
+
+**Z1 PASS for both thresholds** (beyond two steps at 4 of 4 `a`; within one step
+at 0 of 4). As registered, **Y1's agreement is discriminating for both
+thresholds**. The procedure resolves a family with a different limit at these
+`ε`, so q2's agreement with A reflects the reduction, not the grid.
+
+- The `R_solve` separation is 5 grid steps (0.0108), a clear but modest margin.
+  The `R_glob` separation is 35–36 steps.
+- Identical `R` across `a` is grid quantisation: every threshold is reported at a
+  fixed `R`-grid point, and q1's thresholds at 1.01–1.04 fall in the same cell as
+  at `a = 1.30`.
