@@ -325,12 +325,29 @@
 
 % ---------------- Sources already in the paper ----------------
 
-% verified: https://arxiv.org/abs/2606.31856 (2026-09-23). PARTIAL: arXiv journal-ref says ICML 2026, PMLR 306, and
-% https://icml.cc/virtual/2026/poster/60602 lists it as an ICML 2026 poster, but no PMLR page exists yet
-% (https://proceedings.mlr.press/v306/ returns 404; the PMLR index has no volume 306). Kept as the arXiv version.
-@misc{ren2026low,
+% verified: https://proceedings.neurips.cc/paper_files/paper/2023/hash/adc98a266f45005c403b8311ca7e8bd7-Abstract-Conference.html (2026-09-23);
+% pages and DOI from the proceedings' own BibTeX (...-Bibtex.bib, same hash); https://arxiv.org/abs/2304.15004 (2026-09-23)
+@inproceedings{schaeffer2023are,
+  author        = {Rylan Schaeffer and Brando Miranda and Sanmi Koyejo},
+  title         = {Are Emergent Abilities of Large Language Models a Mirage?},
+  booktitle     = {Advances in Neural Information Processing Systems},
+  volume        = {36},
+  pages         = {55565--55581},
+  doi           = {10.52202/075280-2425},
+  year          = {2023},
+  eprint        = {2304.15004},
+  archivePrefix = {arXiv}
+}
+
+
+% verified: https://arxiv.org/abs/2606.31856 (2026-09-23); venue from the arXiv PDF itself (v1, page 1:
+% "Proceedings of the 43rd International Conference on Machine Learning, Seoul, South Korea. PMLR 306, 2026").
+% https://icml.cc/virtual/2026/poster/60602 lists it as an ICML 2026 poster. PMLR has not yet posted volume 306,
+% so no volume or pages are given.
+@inproceedings{ren2026low,
   author        = {Junyu Ren and Lek-Heng Lim},
   title         = {Low-dimensional topology of deep neural networks},
+  booktitle     = {Proceedings of the 43rd International Conference on Machine Learning},
   year          = {2026},
   eprint        = {2606.31856},
   archivePrefix = {arXiv}

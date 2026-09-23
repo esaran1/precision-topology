@@ -10,11 +10,8 @@ number in the draft that conflicts with it.
 
 ### Still unresolved
 
-1. **Ren & Lim's venue** (the only open item). `ren2026low` is cited in its arXiv version (2606.31856). The ICML 2026 /
-   PMLR 306 listing could not be confirmed on PMLR: volume 306 does not exist there yet. Switch to
-   the PMLR entry once it appears (§14).
-Nothing else is open. Every item in §15 is resolved: either a committed script now produces the
-number, or the claim has been removed from every paper-facing file.
+**Nothing.** Ren & Lim is now cited at its ICML 2026 venue, taken from the arXiv PDF's own first
+page (§14).
 
 ### Decisions applied, and what the draft must change
 
@@ -36,7 +33,7 @@ number, or the claim has been removed from every paper-facing file.
 8. **Phase 1 population (§7).** Use one population throughout.
 9. **Ĝ enclosure (§2).** The enclosure is now globally certified; R is unchanged.
 10. **Optimiser in T1 (§1).** Every link run used Adam, not SGD.
-11. **Bibliography (§14).** 32 entries: 31 verified, 1 in its arXiv version, none failed.
+11. **Bibliography (§14).** 33 entries, all verified.
 
 ---
 
@@ -558,7 +555,7 @@ both are regenerated. The binning sensitivity of Fig 4's bands (T79):
 
 ## 14. Bibliography
 
-**`paper/references.bib`**: 32 entries. Every entry was checked on 2026-09-23 against a fetched
+**`paper/references.bib`**: 33 entries. Every entry was checked on 2026-09-23 against a fetched
 page, and that page's URL is in a `% verified:` comment above the entry. The verification log is
 `paper/references_verification.csv`, one row per key with every discrepancy noted.
 
@@ -580,7 +577,14 @@ page, and that page's URL is in a `% verified:` comment above the entry. The ver
 - **arXiv only** (no venue version): Hanin & Sellke 2017, Hendrycks & Gimpel 2016, Ramachandran et
   al. 2017, Guss & Salakhutdinov 2018, Jacot et al. 2021, Kaplan et al. 2020.
 - **Failed verification: none.**
-- **Partial: `ren2026low`.** It is cited as arXiv 2606.31856; PMLR volume 306 does not exist yet.
+- **`ren2026low`** is cited at ICML 2026 ("Proceedings of the 43rd International Conference on Machine
+  Learning"), keeping arXiv 2606.31856. The venue comes from the arXiv PDF's page 1, which states
+  "Proceedings of the 43rd International Conference on Machine Learning, Seoul, South Korea. PMLR 306,
+  2026". PMLR has not posted volume 306, so no volume or pages are given.
+- **`schaeffer2023are`** (added 2026-09-23): Schaeffer, Miranda & Koyejo, "Are Emergent Abilities of
+  Large Language Models a Mirage?", NeurIPS 2023 (Advances in Neural Information Processing Systems 36,
+  pp. 55565–55581, DOI 10.52202/075280-2425), arXiv 2304.15004. Verified on the NeurIPS proceedings
+  page, with pages and DOI from the proceedings' BibTeX.
 - **Corrections to the candidate list**:
   - **Jacot et al.**: the full title is "Saddle-to-Saddle Dynamics in Deep Linear Networks: Small
     Initialization Training, Symmetry, and Sparsity".
