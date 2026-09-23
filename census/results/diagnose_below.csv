@@ -1,0 +1,4 @@
+a,glob_sign_changes_on_coarse_grid,w2_glob_lo,w2_glob_hi,solve_sign_changes_on_coarse_grid,w2_solve_lo,w2_solve_hi,unresolved_evaluations,all_converged,seed,own_w2_glob_mid,own_over_pop,own_threshold_below_0p9
+1.3,1,5.863281,5.867188,1,8.105469,8.109375,0,True,200082,5.8652345,1.183401664564943,False
+1.3,1,6.113281,6.117188,1,8.570312,8.574218,0,True,200087,6.1152345,1.2338430264817148,False
+1.3,1,6.0625,6.066406,0,,,1,True,200127,6.064453,1.2235970744010087,False
