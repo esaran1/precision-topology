@@ -702,6 +702,8 @@ PRODUCERS = {
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
+    "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
+    "diagnose_below.csv": ("diagnose_below", "main", "full", ""),
     "fixed_scale_horizons_tests.csv": ("fixed_scale", "score_horizons", "full", ""),
     "fixed_scale_horizons_curve.csv": ("fixed_scale", "score_horizons", "full", ""),
     "fixed_scale_horizons_check.csv": ("fixed_scale", "check_horizons", "full", ""),
@@ -863,6 +865,14 @@ def v4_checks() -> None:
     chk("frac 0.95 at 64k", float(ht_.loc["preserved", "frac095_64k"]), 0.0939, 0.0001)
     hc_ = pd.read_csv(R / "fixed_scale_horizons_check.csv").iloc[0]
     chk("amended reproduction check", float(hc_.reproduced and hc_.rows_compared == 3258), 1.0, 0)
+    en_ = pd.read_csv(R / "diagnose_below_endpoints.csv")
+    chk("0.9x endpoints: seven, all placed at 64k", float(len(en_) == 7 and en_.placed_64000.all()), 1.0, 0)
+    chk("0.9x endpoints: strict local minima", float((en_.loc_min_hess_min_64000 > 1.5).all()), 1.0, 0)
+    chk("0.9x endpoints: global minimum in G<=0", float((en_.global_region == "-").all()), 1.0, 0)
+    chk("0.9x endpoints: loss gap min", float(en_.loss_gap_to_global_64000.min()), 0.008, 0.0005)
+    chk("0.9x endpoints: loss gap max", float(en_.loss_gap_to_global_64000.max()), 0.064, 0.0005)
+    chk("0.9x endpoints: mirror (opposite w1 sign)", float((en_.loc_min_w1_64000 * en_.global_w1 < 0).all()), 1.0, 0)
+    chk("0.9x endpoints: barrier = log 2", float(en_.barrier_level.max()), 0.693147, 0.00001)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

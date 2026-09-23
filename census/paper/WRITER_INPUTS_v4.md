@@ -268,6 +268,17 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     this is an equilibrium, not a finite-horizon effect."
   - **Q2**: placement below the threshold does not vanish at long horizons: 8/543 at 0.9× and 9.4% at
     0.95× at 64k. The 7 runs placed at 0.9× at 4k all persist, and one more places by 64k.
+  - **Why some runs stay placed below the threshold (exploratory, `diagnose_below.md`)**:
+    - The seven 0.9× placements sit in **metastable correct-placement basins**: strict local minima of
+      their own training loss with G > 0, 0.008–0.064 above that run's global minimum.
+    - Each basin is the **mirror image (x → −x) of the global branch**. The population objective is
+      symmetric, so the two are equivalent there. A finite sample breaks the symmetry, and at this scale
+      the placed mirror is the higher-loss one.
+    - They are separated from the global branch by a barrier of exactly log 2, since the path must pass
+      through the constant predictor.
+    - The runs' own thresholds (1.18–1.23×) do not explain them.
+    - The single-branch certificate at a = 1.30 is for the population objective, modulo the mirror
+      symmetry. Say so if citing it.
   - **A validity check fired and was amended before scoring.** The registered check requires the
     4,000-step outcome to reproduce Block 4 exactly, and it returned False.
   - **Cause**: Block 4's stored values were read with a CSV parser that is off by up to 1e−16, then
