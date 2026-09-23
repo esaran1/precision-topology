@@ -189,6 +189,43 @@ def score():
     pd.DataFrame(cells).to_csv(RESULTS / "sample_size_cells.csv", index=False)
     pd.DataFrame(tests).to_csv(RESULTS / "sample_size_tests.csv", index=False)
     print(pd.DataFrame(cells).to_string(index=False)); print(pd.DataFrame(tests).T.to_string())
+    detail(o, fr)
+
+
+def _boot_median(u, B=10_000, seed=0):
+    rng = np.random.default_rng(seed)
+    return np.percentile(np.median(rng.choice(u, (B, len(u))), axis=1), [2.5, 97.5])
+
+
+def detail(o, fr):
+    """Reported beside the registered verdicts (it changes none of them): every cell's value with its bootstrap
+    95% interval, every pairwise difference with its interval, and for each strict-ordering step that fails, whether
+    both values are consistent with zero ("indistinguishable at those sizes") -- a different outcome from an
+    offset that does not shrink."""
+    rows, pairs = [], []
+    for a in A_VALUES:
+        _, w2p, Rp = _pop(a)
+        for q, get in (("own_excess", lambda n: o[(o.a.round(2) == a) & (o.n == n)].w2_own.values / w2p),
+                       ("free_offset", lambda n: fr[(fr.a.round(2) == a) & (fr.n == n)].R_cross.dropna().values / Rp)):
+            v = {n: get(n) for n in N_VALUES}
+            est = {n: float(np.median(v[n]) - 1) for n in N_VALUES}
+            ci = {n: _boot_median(v[n]) - 1 for n in N_VALUES}
+            for n in N_VALUES:
+                rows.append({"a": a, "quantity": q, "n": n, "value": est[n], "ci_lo": ci[n][0], "ci_hi": ci[n][1],
+                             "consistent_with_zero": ci[n][0] <= 0 <= ci[n][1]})
+            for n1, n2 in ((400, 1600), (400, 6400), (1600, 6400)):
+                d = _boot_median_diff(v[n1], v[n2])
+                strict = est[n1] > est[n2]
+                pairs.append({"a": a, "quantity": q, "n_small": n1, "n_large": n2, "difference": est[n1] - est[n2],
+                              "ci_lo": d[0], "ci_hi": d[1], "strictly_decreasing": strict,
+                              "note": "" if strict or (n1, n2) == (400, 6400) else
+                              ("registered ordering fails; both values consistent with zero: indistinguishable at "
+                               "these sizes (not the same as an offset that does not shrink)"
+                               if (ci[n1][0] <= 0 <= ci[n1][1]) and (ci[n2][0] <= 0 <= ci[n2][1])
+                               else "registered ordering fails")})
+    pd.DataFrame(rows).to_csv(RESULTS / "sample_size_detail_cells.csv", index=False)
+    pd.DataFrame(pairs).to_csv(RESULTS / "sample_size_detail_pairs.csv", index=False)
+    print(pd.DataFrame(rows).to_string(index=False)); print(pd.DataFrame(pairs).to_string(index=False))
 
 
 if __name__ == "__main__":
