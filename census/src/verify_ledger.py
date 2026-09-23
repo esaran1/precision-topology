@@ -701,6 +701,9 @@ PRODUCERS = {
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
+    "corner_tracking.csv": ("corner_tracking", "main", "full", ""),
+    "corner_tracking_decomposition.csv": ("corner_tracking", "decompose", "full", ""),
+    "corner_tracking_switch_active.csv": ("corner_tracking", "switch_active", "full", ""),
     "cond_certified_seeds_summary.csv": ("conditional_certified", "seeds_summary", "full", ""),
     "first_order_corner.csv": ("first_order", "corner", "full", ""),
     "first_order_corner_free.csv": ("first_order", "corner", "full", ""),
@@ -807,6 +810,20 @@ def v4_checks() -> None:
     cf = pd.read_csv(R / "first_order_corner_free.csv")
     chk("corner free check: fixed value inside free enclosure, all", float(cf.fixed_in_free_enclosure.all()), 1.0, 0)
     chk("corner free check: kept cells within 3e-6", float((cf.kept_cells_max_dist_to_argmax_or_mirror < 3e-6).all()), 1.0, 0)
+
+    ct_ = pd.read_csv(R / "corner_tracking.csv")
+    chk("corner tracking: eps values", float(ct_.eps.nunique()), 79.0, 0)
+    chk("corner tracking: one active set throughout", float(ct_.active_set.nunique()), 1.0, 0)
+    chk("corner tracking: min outer inactive margin", float(ct_.margin_outer_inactive.min()), 0.97, 0.01)
+    dc_ = pd.read_csv(R / "corner_tracking_decomposition.csv")
+    chk("corner vertex = B&B sup at all checked eps", float(dc_[dc_.part == "vertex_check"].vertex_in_bnb.all()), 1.0, 0)
+    d6_ = dc_[(dc_.part == "decomposition") & (dc_.eps.round(2) == 0.6)].iloc[0]
+    chk("decomposition a=1.60: excess", float(d6_.excess_over_first_order), -0.038, 0.0006)
+    chk("decomposition a=1.60: product term", float(d6_.product_term), -0.060, 0.0006)
+    chk("decomposition a=1.60: A higher order", float(d6_.A_higher_order), -0.037, 0.0006)
+    chk("decomposition a=1.60: K higher order", float(d6_.K_higher_order), 0.059, 0.0006)
+    sw_ = pd.read_csv(R / "corner_tracking_switch_active.csv")
+    chk("switch active pair unchanged", float((sw_.inner_active == "I:x=+0.8").all() and (sw_.outer_active == "O-:x=-1.2").all()), 1.0, 0)
 
     print("V4 Block 2 (math note checks)")
     mb = dict(pd.read_csv(R / "mn2_bounds.csv").values)

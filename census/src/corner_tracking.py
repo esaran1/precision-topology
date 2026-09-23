@@ -135,8 +135,49 @@ def switch_active():
     print(t.to_string(index=False))
 
 
+
+
+def decompose():
+    """EXPLORATORY.  (i) At ε = 0.05, 0.3, 0.6, 1.0, 1.5, 2.0: the corner solved from its two tie equations with the
+    exact f_a against the branch-and-bound supremum.  (ii) At the six certified a: R/R_inf - 1 = α + κ + ακ with
+    α = A/A* - 1 (A = s ε^{3/2}, certified bracket midpoint) and κ = K(ε)/K0 - 1 (certified Ĝ), against the
+    first-order terms A'/A*·ε and k1·ε."""
+    from .first_order import _phi_exact
+    d = pd.read_csv(RESULTS / "corner_tracking.csv").set_index("eps")
+    fo = pd.read_csv(RESULTS / "first_order_c1.csv").iloc[0]
+    K0 = 0.5 * (fo.K_vertex_lo + fo.K_vertex_hi)
+    rows, t = [], np.array([1.6056, 1.2042])
+    for e in (0.05, 0.3, 0.6, 1.0, 1.5, 2.0):
+        a = 1 + e
+        E = lambda tt: np.array([_phi_exact(tt[1] - 0.8 * tt[0], a, e) - _phi_exact(tt[1] + 0.8 * tt[0], a, e),
+                                 _phi_exact(tt[1] - 2.0 * tt[0], a, e) - _phi_exact(tt[1] - 1.2 * tt[0], a, e)])
+        for _ in range(60):
+            J = np.array([(E(t + 1e-8 * np.eye(2)[i]) - E(t)) / 1e-8 for i in range(2)]).T
+            t = t - np.linalg.solve(J, E(t))
+        Kv = _phi_exact(t[1] - 1.2 * t[0], a, e) - _phi_exact(t[1] + 0.8 * t[0], a, e)
+        r = d.loc[round(e, 6)]
+        rows.append({"part": "vertex_check", "eps": e, "K_vertex": Kv, "K_bnb_lo": r.Ghat_lo / e ** 1.5,
+                     "K_bnb_hi": r.Ghat_hi / e ** 1.5,
+                     "vertex_in_bnb": r.Ghat_lo / e ** 1.5 - 1e-9 <= Kv <= r.Ghat_hi / e ** 1.5 + 1e-9})
+    br = pd.read_csv(RESULTS / "cond_certified_brackets.csv")
+    for r in br[br.kind == "glob"].sort_values("a").itertuples():
+        e = r.a - 1
+        al = 0.5 * (r.w2_lo + r.w2_hi) * e ** 1.5 / fo.A_star_lo - 1
+        ka = r.Ghat_cert / e ** 1.5 / K0 - 1
+        rows.append({"part": "decomposition", "eps": e, "alpha": al, "alpha_first_order": fo.A1_over_A_lo * e,
+                     "kappa": ka, "kappa_first_order": fo.k1_lo * e, "dev": al + ka + al * ka,
+                     "dev_first_order": fo.c1_lo * e, "excess_over_first_order": al + ka + al * ka - fo.c1_lo * e,
+                     "A_higher_order": al - fo.A1_over_A_lo * e, "K_higher_order": ka - fo.k1_lo * e,
+                     "product_term": al * ka})
+    t_ = pd.DataFrame(rows)
+    t_.to_csv(RESULTS / "corner_tracking_decomposition.csv", index=False)
+    print(t_.to_string(index=False))
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "switch":
         switch_active()
+    elif len(sys.argv) > 1 and sys.argv[1] == "decompose":
+        decompose()
     else:
         main(int(sys.argv[1]) if len(sys.argv) > 1 else 2)

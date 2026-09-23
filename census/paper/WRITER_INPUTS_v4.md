@@ -198,8 +198,12 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
     - **Do not quote first-order statements** (c₁, k₁, A′(0), or "R_glob(a) ≈ R_glob^∞(1 + c₁ε)") as
       applying at the larger a the paper also uses (1.30–1.60, ε = 0.3–0.6). There the certified values
       show a visible ε² term.
-    - The corner's smallest multiplier is small (0.004). Where the corner structure actually breaks is
-      being tracked up to ε = 2.0 (exploratory, `corner_tracking.py`). Pending.
+    - The corner's smallest multiplier is small (0.004). **Exploratory tracking up to ε = 2.0** found no
+      change in the gap maximiser's active set at any of 79 ε (math note §9). The conditional minimiser's
+      active pair is also unchanged at a = 1.30–1.60.
+    - **So the concavity at ε = 0.3–0.6 is genuine higher order, not a structural change.** Its largest
+      part is the product of the two first-order effects (a₁k₁ = −0.250). Say it this way if needed; do
+      not call it a regime change.
 
 MATH_NOTE_SECTION
 

@@ -307,3 +307,35 @@ Both terms come from the sine series, including the (1 + ε) factor.
 - This identifies the global switch only with (c)'s competitor exclusion (annulus, pending). Until that is
   certified, the unconditional statement remains the branch-and-bound bracket [0.19738, 0.19920], which
   contains it.
+
+## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
+
+- **Method**: the global certified Ĝ(a) branch and bound (full placement domain, relative target 1e−8), with
+  no active set assumed. The maximiser's active edges and interior critical points are classified at every
+  ε from 0.05 to 2.0 in steps of 0.025 (79 values), and each change is bisected.
+- **Result: the active set never changes.** At every one of the 79 ε, the maximiser is the same four-piece
+  corner:
+  - an inner tie at x = ±0.8;
+  - an outer tie at x = −2.0 and −1.2.
+  - Every inactive candidate is separated by a relative margin ≥ 0.97 (`corner_tracking_changes.csv` is
+    empty).
+- **Confirmed directly**: the corner solved from its two tie equations with the exact f_a equals the
+  branch-and-bound supremum, within 1e−9, at ε = 0.05, 0.3, 0.6, 1.0, 1.5 and 2.0.
+- **Resolution caveat**: a change that reverses within 0.025 in ε would be missed.
+- **Conditional minimiser**: its active pair (inner x = +0.8, outer x = −1.2) is also unchanged at all six
+  certified switches, a = 1.30–1.60 (`corner_tracking_switch_active.csv`). The small multiplier on the
+  O(−2.0) piece (0.004 at ε = 0) does not release anywhere up to ε = 2.0.
+- **So the concave approach seen in the certified refit (§5) is not an active-set change.** It occurs where
+  the corner persists, and it reflects genuine higher-order terms.
+- **Decomposition** (`corner_tracking_decomposition.csv`): with α = A_ε/A* − 1 and κ = K(ε)/K − 1,
+  R/R∞ − 1 = α + κ + ακ. At a = 1.60 the excess over the first-order line c₁ε is −0.038. It is the sum of
+  three terms:
+
+  | term | size at a = 1.60 |
+  |---|---:|
+  | product term ακ (its leading part a₁k₁ε² has certified coefficient 0.662 × (−0.377) = −0.250) | −0.060 |
+  | the switch position's own curvature (α − a₁ε) | −0.037 |
+  | the gap maximiser's own curvature (κ − k₁ε, positive) | +0.059 |
+
+  The same signs hold at all six a. These use the conditional sharp A* (annulus pending) and are
+  exploratory.
