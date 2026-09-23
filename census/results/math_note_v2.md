@@ -46,6 +46,9 @@ only through the unit R = |w₂|Ĝ/2.
   **R_glob^∞ = KA*/2 ∈ [0.19738, 0.19920]** (`limit_K_base.csv`). The solve switch is certified in the
   same way at A_solve ∈ (1.05875, 1.06], giving **R_solve^∞ ∈ [0.30675, 0.30712]** (transversal, nondegenerate;
   `mn2_solve_limit.csv`).
+  - **Stated for the branch only, for now.** At the two bracket ends the branch minimiser is certified to be the
+    global minimiser on K(24). There is not yet a certified margin excluding other basins uniformly over
+    the bracket (`mn2_solve_competitor.csv`, pending).
 - (c) **Single branch**:
   - for A ∈ [0.66, 0.71], the global minimiser lies in the box U = [p₀ ± 0.05] × [q₀ ± 0.05], with
     (p₀, q₀) = (1.66858, 1.36972);
@@ -152,7 +155,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | No competitor outside U, uniform in A | PENDING (annulus) | `mn2_annulus.csv` | — |
 | Transversal crossing (H2′) at A* | **Certified**: dG₀/dA ∈ [1.666, 1.705] over the bracket | `mn2_h2prime.csv` | — |
 | Local branch or global minimiser? | **Global** in the limit on K(24) (localisation, B&B, annulus); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
-| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **Finite a**: PENDING | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
+| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **For the branch only**: global optimality is certified at the two bracket ends; competitor exclusion uniform over the bracket is PENDING (`mn2_solve_competitor.csv`). **Finite a**: PENDING | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
 | Other window geometries | **Not done**: A* is certified for the base window only | — | rerun `limit_bnb switch` per window |
 
 ## 5. Finite-a certificates (Block 1c)
@@ -183,7 +186,8 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | (d) transversality | H2′ | `math_note_v2_checks h2` → `mn2_h2prime.csv` | interval arithmetic (mpmath.iv), argmin enclosure at tolerance 1e−11 |
 | C² convergence | derivative control | `taylor_constants` → `mn2_neighbourhood.csv` (M₀–M₃) | closed-form bounds, float max over 200,001 points of polynomials |
 | finite-a global preference | Block 1c | `conditional_certified brackets` → `cond_certified_brackets.csv` | `mn2_rounding.csv`, a = 1.30 rows: ≤ 1.1e−16 against certified gaps ≥ 1.8e−8 |
-| solve threshold (limit) | nondegeneracy, transversality | `math_note_v2_checks solve_limit` → `mn2_solve_limit.csv` | interval arithmetic over tolerance-1e−11 enclosures; b validated |
+| solve threshold (limit), branch | nondegeneracy, transversality | `math_note_v2_checks solve_limit` → `mn2_solve_limit.csv` | interval arithmetic over tolerance-1e−11 enclosures; b validated |
+| solve threshold (limit), competitors | exclusion on K(24) minus the ρ-box, uniform over (1.05875, 1.06]; Hessian PD on the ρ-box | `math_note_v2_checks solve_competitor` → `mn2_solve_competitor.csv` | PENDING |
 | solve threshold (finite a) | same | `math_note_v2_checks solve_finite` → `mn2_solve_finite.csv` | PENDING |
 
 ## 7. Limits

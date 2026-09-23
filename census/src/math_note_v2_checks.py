@@ -732,3 +732,37 @@ def uniform_summary(A_lo=0.66, A_hi=0.72):
 
 if __name__ == "__main__" and sys.argv[1] == "uniform_summary":
     uniform_summary()
+
+
+# ----------------------------------------------------------------------------- competitor exclusion at the solve bracket
+def solve_competitor(workers=1):
+    """Uniformly for A in the limit solve bracket (1.05875, 1.06]: (i) a certified lower bound on L0* over K(24)
+    minus the ρ-box around the branch argmin (annulus_job, convexity in A), against the certified branch upper bound
+    on the same interval; (ii) the (p, q, b) Hessian PD on every sub-box of the ρ-box × bracket (_box_hessian_pd), so
+    the branch minimiser is the unique critical point there."""
+    import ast
+    from multiprocessing import Pool
+    sl = pd.read_csv(RESULTS / "mn2_solve_limit.csv").sort_values("A")
+    A_lo, A_hi = float(sl.A_solve_lo.iloc[0]), float(sl.A_solve_hi.iloc[0])
+    e = ast.literal_eval(sl.encl.iloc[-1])
+    p0, q0 = 0.5 * (e[0] + e[1]), 0.5 * (e[2] + e[3])
+    ann = annulus_job((A_lo, A_hi, 24.0, p0, q0, RHO, 1e-7, 0.25))
+    pe = np.linspace(p0 - RHO, p0 + RHO, SPLIT[0] + 1)
+    qe = np.linspace(q0 - RHO, q0 + RHO, SPLIT[1] + 1)
+    boxes = [(pe[i], pe[i + 1], qe[j], qe[j + 1], A_lo, A_hi) for i in range(SPLIT[0]) for j in range(SPLIT[1])]
+    with Pool(workers) as pool:
+        res = pool.map(_box_hessian_pd, boxes)
+    out = {"A_lo": A_lo, "A_hi": A_hi, "p0": p0, "q0": q0, "rho": RHO, **{f"annulus_{k}": v for k, v in ann.items()
+                                                                          if k not in ("A_lo", "A_hi")},
+           "sub_boxes": len(boxes), "b2_validated_all": all(r["b2_ok"] for r in res),
+           "hess_pd_all_boxes": all(r["pd"] for r in res),
+           "hess_lambda_min_lower_bound": float(np.nanmin([r["lam_lo"] for r in res])),
+           "branch_argmin_shift_across_bracket": float(math.hypot(
+               0.5 * sum(ast.literal_eval(sl.encl.iloc[0])[:2]) - p0, 0.5 * sum(ast.literal_eval(sl.encl.iloc[0])[2:]) - q0))}
+    out["certified"] = bool(out["annulus_certified"] and out["hess_pd_all_boxes"] and out["b2_validated_all"])
+    pd.DataFrame([out]).to_csv(RESULTS / "mn2_solve_competitor.csv", index=False)
+    print(pd.Series(out).to_string())
+
+
+if __name__ == "__main__" and sys.argv[1] == "solve_competitor":
+    solve_competitor(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
