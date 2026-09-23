@@ -68,5 +68,9 @@ Infrastructure: `src/fixed_scale.py`. E-2 stays failed whatever these show.
 ## Stop and report if
 
 - the rescaling changes any decision at the moment of intervention (checked on every replay);
-- any replay at k = 1 in the "preserved" variant does not reproduce the uninterrupted training
-  trajectory for its first 25 steps (to 1e-10).
+- ~~any replay at k = 1 in the "preserved" variant does not reproduce the uninterrupted training
+  trajectory for its first 25 steps (to 1e-10).~~ **Amended 2026-09-23 12:14 EDT, before any run:**
+  that check was ill-posed, because the replay freezes `w₂` and uninterrupted training does not. The
+  replacement: the "preserved" replay at k = 1 must reproduce, to 1e-10 over its first 25 steps, an
+  independent continuation from the same saved state. That continuation restores the full 4-parameter
+  Adam optimiser and zeroes `w₂`'s gradient before each step.
