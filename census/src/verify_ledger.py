@@ -701,6 +701,11 @@ PRODUCERS = {
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
+    "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
+    "own_threshold_crossing.csv": ("own_threshold", "_run", "full", ""),
+    "own_threshold_block4.csv": ("own_threshold", "_run", "full", ""),
+    "own_threshold_validation.csv": ("own_threshold", "validate", "full", ""),
+    "own_threshold_validation_tight.csv": ("own_threshold", "validate_tight", "full", ""),
     "corner_tracking.csv": ("corner_tracking", "main", "full", ""),
     "corner_tracking_decomposition.csv": ("corner_tracking", "decompose", "full", ""),
     "corner_tracking_switch_active.csv": ("corner_tracking", "switch_active", "full", ""),
@@ -824,6 +829,22 @@ def v4_checks() -> None:
     chk("decomposition a=1.60: K higher order", float(d6_.K_higher_order), 0.059, 0.0006)
     sw_ = pd.read_csv(R / "corner_tracking_switch_active.csv")
     chk("switch active pair unchanged", float((sw_.inner_active == "I:x=+0.8").all() and (sw_.outer_active == "O-:x=-1.2").all()), 1.0, 0)
+
+    print("V4 own-seed thresholds (S3)")
+    sc3 = pd.read_csv(R / "own_threshold_scores.csv").set_index("test")
+    for a_, ex_, pass_, a_pass_, rho_, oo_, op_ in (("1.30", 0.0574, True, True, 0.877, 0.0308, 0.0916),
+                                                    ("1.50", 0.0556, False, False, 0.881, 0.0640, 0.1189)):
+        r_ = sc3.loc[f"S3 a={a_}"]
+        chk(f"S3 a={a_}: excess", float(r_.median_own_over_pop_minus_1), ex_, 0.0001)
+        chk(f"S3 a={a_}: S3a", float(r_.S3a_pass), float(a_pass_), 0)
+        chk(f"S3 a={a_}: rho", float(r_.spearman_rho), rho_, 0.001)
+        chk(f"S3 a={a_}: offset vs own", float(r_.offset_vs_own), oo_, 0.0001)
+        chk(f"S3 a={a_}: offset vs pop", float(r_.offset_vs_pop), op_, 0.0001)
+        chk(f"S3 a={a_}: verdict", float(r_["pass"]), float(pass_), 0)
+    va_ = pd.read_csv(R / "own_threshold_validation.csv")
+    chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
+    vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")
+    chk("own validation at 1e-11: consistent", float(vt_.consistent.sum()), 6.0, 0)
 
     print("V4 Block 2 (math note checks)")
     mb = dict(pd.read_csv(R / "mn2_bounds.csv").values)

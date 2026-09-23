@@ -200,6 +200,16 @@ def _spearman_perm(a, b, n_perm=100_000, seed=0):
 def score():
     """Registered S1-S3 (own_threshold_prediction.md, 312829f)."""
     own = pd.read_csv(RESULTS / "own_threshold_block4.csv")
+    rows = []
+    if (RESULTS / "fixed_scale_horizons_tests.csv").exists():
+        rows = _score_s12(own)
+    rows += _score_s3()
+    d = pd.DataFrame(rows)
+    d.to_csv(RESULTS / "own_threshold_scores.csv", index=False)
+    print(d.T.to_string())
+
+
+def _score_s12(own):
     hz = pd.read_csv(RESULTS / "fixed_scale_horizons.csv")
     hz = hz[hz.variant == "preserved"].merge(own[["seed", "w2_own", "w2_pop"]], on="seed", how="left")
     assert hz.w2_own.notna().all()
@@ -214,6 +224,11 @@ def score():
     med = float(own[own.seed.isin(hz.seed.unique())].own_over_pop.median())
     rows.append({"test": "S2", "x50_64k": x50, "median_own_over_pop": med, "diff": x50 - med,
                  "pass": abs(x50 - med) <= 0.02})
+    return rows
+
+
+def _score_s3():
+    rows = []
     cr = pd.read_csv(RESULTS / "own_threshold_crossing.csv")
     runs = pd.read_csv(RESULTS / "wi_crossing_runs.csv")
     offsets = {1.30: 0.096, 1.50: 0.126}
@@ -231,9 +246,7 @@ def score():
                      "offset_vs_own": off_own, "offset_vs_pop": off_pop, "S3c_pass": off_own < off_pop,
                      "competing_centred_within_1pct": abs(excess) <= 0.01,
                      "pass": excess >= off / 2 and rho > 0 and pval < 0.05 and off_own < off_pop})
-    d = pd.DataFrame(rows)
-    d.to_csv(RESULTS / "own_threshold_scores.csv", index=False)
-    print(d.T.to_string())
+    return rows
 
 
 def block5_posthoc():

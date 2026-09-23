@@ -265,7 +265,25 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   threshold reflects heterogeneity across replays, not a relaxation timescale.
 - **Sample-specific thresholds, registered** (`own_threshold_prediction.md`, `312829f`): each run
   trains on its own 400 points. S1–S3 test whether the run's own conditional threshold explains the
-  replay-level placements, the 50% point and the free-training offset. **Pending.**
+  replay-level placements, the 50% point and the free-training offset (`own_threshold_scores.csv`).
+  - **S3 (free-training offset): PASS at a = 1.30, FAIL at a = 1.50.**
+    - The own-seed threshold sits above the population threshold by 5.7% (1.30) and 5.6% (1.50). The
+      registered requirement was at least half the free-training offset: ≥ 4.8% at 1.30 (met) and
+      ≥ 6.3% at 1.50 (**missed**).
+    - Crossing R tracks each run's own threshold (Spearman ρ = 0.88 at both a, p ≈ 1e−5).
+    - Measured against the own threshold, the offset shrinks from 9.2% to 3.1% (1.30) and from 11.9% to
+      6.4% (1.50).
+    - The competing account (own thresholds centred on the population value) is rejected at both a.
+  - **Say**: "about 6% of the 9.6–12.6% free-training offset reflects each run's own finite training set;
+    this accounts for the registered half at a = 1.30 but not at a = 1.50".
+  - **Validation**:
+    - The fast search agrees seed by seed with 1d's certified search on seeds 0–39: 40/40 brackets
+      overlap, the mean difference is −0.012%, and the range is −0.09% to +0.06%.
+    - Registered certified check on 20 Block 4 seeds: 13/20 certified at both ends, 7 with one end
+      unresolved at 1e−9, and 0 contradicted. At 1e−11, 19/20.
+    - The 1.033 (Block 4/5 seeds) against 1.063 (1d seeds) medians differ by sampling variation: the
+      difference is 0.029, 95% interval [−0.017, 0.067].
+  - **S1, S2: pending** (the long-horizon replays).
 
 ## Block 5 — retention just after placement: both registered predictions PASSED
 
