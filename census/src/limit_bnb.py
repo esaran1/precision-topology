@@ -143,10 +143,15 @@ def monotone_bound(x, y, window):
     return best
 
 
-def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=True):
-    """half=True searches p >= 0 only: valid when the data are x-symmetric, since then
-    L0*(p, q) = L0*(-p, q) and G0(p, q) = G0(-p, q) (substitute x -> -x)."""
-    Q = 2 * math.sqrt(2) + 2 * P
+def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=True,
+            inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+    """half=True searches p >= 0 only: valid when the data and windows are x-symmetric, since then
+    L0*(p, q) = L0*(-p, q) and G0(p, q) = G0(-p, q) (substitute x -> -x).
+    Window-general: X = max|x| over I ∪ O sets the q-range 2√2 + X·P and the σ bound; the gap step uses
+    max|x| over I plus max|x| over O (0.8 + 2.0 = 2.8 for the base window)."""
+    X = max(abs(inner[0]), abs(inner[1]), outer[1])
+    cG = max(abs(inner[0]), abs(inner[1])) + outer[1]
+    Q = 2 * math.sqrt(2) + X * P
     p0 = 0.0 if half else -P
     npn = int(math.ceil((P - p0) / h0)); nq = int(math.ceil(2 * Q / h0))
     hpp, hq = (P - p0) / npn / 2, Q / nq
@@ -165,12 +170,12 @@ def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=Tru
         for i in range(0, n, 2000):
             sl = slice(i, i + 2000)
             L[sl], _, gp[sl], gq[sl] = profile(cp[sl], cq[sl], A, x, y)
-            G[sl] = gap0(cp[sl], cq[sl])
+            G[sl] = gap0(cp[sl], cq[sl], inner, outer)
             d = ax[None, :] * hpp + hq
             smax = np.abs(cp[sl, None] * x[None, :] + cq[sl, None]) + d
             curv[sl] = 0.5 * A * (smax * d ** 2).mean(axis=1)
-            sm = 2 * np.abs(cp[sl]) + np.abs(cq[sl]) + 2 * hpp + hq
-            stepG[sl] = (1 + sm ** 2 / 2) * (2.8 * hpp + 2 * hq)
+            sm = X * np.abs(cp[sl]) + np.abs(cq[sl]) + X * hpp + hq
+            stepG[sl] = (1 + sm ** 2 / 2) * (cG * hpp + 2 * hq)
         lb = L - np.abs(gp) * hpp - np.abs(gq) * hq - curv
         inreg = (G <= 0) if region == "-" else (G > 0)
         if inreg.any():
@@ -214,9 +219,9 @@ if __name__ == "__main__" and sys.argv[1] == "localisation":
 
 
 # ------------------------------------------------------------------------- switch and H2'
-def _status(A, x, y, P, half=True, tol=1e-7):
-    rm = certify(A, x, y, "-", P, tol=tol, half=half)
-    rp = certify(A, x, y, "+", P, tol=tol, half=half)
+def _status(A, x, y, P, half=True, tol=1e-7, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+    rm = certify(A, x, y, "-", P, tol=tol, half=half, inner=inner, outer=outer)
+    rp = certify(A, x, y, "+", P, tol=tol, half=half, inner=inner, outer=outer)
     if rp["lower"] > rm["upper"]:
         st = "minus"
     elif rm["lower"] > rp["upper"]:

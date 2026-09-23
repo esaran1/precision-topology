@@ -439,6 +439,31 @@ if __name__ == "__main__" and sys.argv[1] in ("score4", "score5"):
     score(4 if sys.argv[1] == "score4" else 5)
 
 
+def score5_splits():
+    """Block 5, reported without prediction: 10-90% width by starting state (median splits of the
+    first-placement step and of G at placement), per variant."""
+    d = pd.read_csv(RESULTS / "fixed_scale_block5.csv")
+    d["success"] = d.first_hit.isna()
+    rows = []
+    for split, col in (("first-placement step", "ck_step"), ("G at placement", "ck_G")):
+        med = d.drop_duplicates("seed")[col].median()
+        for half, g in (("below median", d[d[col] <= med]), ("above median", d[d[col] > med])):
+            for var, gv in g.groupby("variant"):
+                lv = sorted(gv.level.unique())
+                frac = [float(gv[gv.level == l].success.mean()) for l in lv]
+                x10, x50, x90 = (_crossing(lv, frac, t) for t in (0.1, 0.5, 0.9))
+                rows.append({"split": split, "median": med, "half": half, "variant": var,
+                             "n_checkpoints": gv.seed.nunique(), "x10": x10, "x50": x50, "x90": x90,
+                             "width_10_90": x90 - x10})
+    t = pd.DataFrame(rows)
+    t.to_csv(RESULTS / "fixed_scale_block5_splits.csv", index=False)
+    print(t.to_string(index=False))
+
+
+if __name__ == "__main__" and sys.argv[1] == "score5_splits":
+    score5_splits()
+
+
 # ------------------------------------------------------------------ horizon extension (registered cdfbf9d)
 HORIZONS = (4_000, 16_000, 64_000)
 H_LEVELS = (0.9, 0.95, 1.0, 1.05, 1.1)

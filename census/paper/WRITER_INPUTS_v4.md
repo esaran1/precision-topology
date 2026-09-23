@@ -219,4 +219,31 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   trains on its own 400 points. S1–S3 test whether the run's own conditional threshold explains the
   replay-level placements, the 50% point and the free-training offset. **Pending.**
 
-BLOCKS45_SECTION
+## Block 5 — retention just after placement: both registered predictions PASSED
+
+Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea5`); producer
+`src/fixed_scale.py` (`run_replays(5)`, `score(5)`, `score5_splits`); artifacts
+`fixed_scale_block5.csv`, `_curve.csv`, `_tests.csv`, `_splits.csv`.
+
+- **Design**: the first-placement checkpoint of each of 177 runs (180 seeds; the registered minimum was
+  150), rescaled to each level and trained 12,000 steps with |w₂| held. **Retained** = G > 0 at every
+  25-step check (Block E's "kept").
+- **Validity**: decisions preserved in 2,832 of 2,832 replays; k = 1 check difference 0.0.
+
+| R/R_glob | 0.6 | 0.8 | 0.9 | 1.0 | 1.1 | 1.25 | 1.5 | 2.0 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| retained, preserved (n = 177) | 0.000 | 0.000 | 0.017 | 0.203 | 0.644 | 0.966 | 1.000 | 1.000 |
+
+- **Monotone: PASS** (no paired McNemar violation, both variants).
+- **Location: PASS**: the 50% point is **1.067** (reset 1.068), inside the registered [0.9, 1.1].
+- **Reported without prediction**: the 10–90% width is 0.27 (0.94 to 1.22). By starting state
+  (median splits of first-placement step and of G at placement) the width stays 0.26–0.28 and the 50%
+  point moves by at most 0.03 (1.054 vs 1.083).
+- **E-2 stays failed as registered.** Block 5 is a new registered test at fixed scale, not a rescoring
+  of E-2.
+- **Scope, same as Block 4**: a = 1.30, base window, Adam, moments preserved or reset, 12,000-step
+  horizon. Say: "Just after placement, whether a correct configuration is kept at a fixed output scale
+  switches around R/R_glob ≈ 1.07; below 0.9 it is almost always lost, above 1.25 almost always kept."
+- The same caveat as Block 4 applies to the width: it reflects heterogeneity across runs (S1–S3 test
+  whether own-seed thresholds account for it).
+
