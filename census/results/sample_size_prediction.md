@@ -55,3 +55,14 @@ crossing exactly (step 4,016, R = 0.211725). The own-seed bracket [4.7375, 4.743
 
 This test runs after the registered c₁ test (`first_order_prediction.md`). The sequence is: `validate400`,
 `own`, `free`, `certify`, then `score`.
+
+## Reporting addendum (2026-09-23 15:32 EDT; before any run; no verdict changes)
+
+Alongside the registered verdicts, the scorer reports:
+- the value in every cell with its bootstrap 95% interval;
+- every pairwise difference (400 − 1,600, 400 − 6,400, 1,600 − 6,400) with its interval.
+  (`sample_size_detail_cells.csv`, `sample_size_detail_pairs.csv`)
+
+If a strict-ordering step fails while both values' intervals contain 0, the registered failure is recorded
+as a failure. Separately, the offsets are stated to be **indistinguishable at those sizes**. That outcome
+differs from an offset that does not shrink (the competing outcome).
