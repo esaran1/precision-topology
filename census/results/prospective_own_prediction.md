@@ -139,3 +139,15 @@ that run becomes correct**. It covers both a = 1.30 and a = 1.50, with results r
 
 It runs after the currently queued items, using free slots as they open. The sequence is `predict`
 (hash committed), `validate`, `train`, then `score`.
+
+## Amendment 1 — 2026-09-23 17:59 EDT (implementation only; before any computation on the new settings)
+
+- **Stop condition, now enforced** (`gate_validation`): a certified contradiction of a bracket end halts
+  `validate`, `train` and `score`.
+- **Hash**: `predict` now records the SHA-256 in `prospective_own_predictions.sha256`. `validate`,
+  `train` and `score` halt if the predictions file no longer matches it (`gate_hash`). The file and its
+  hash are committed before training, as registered.
+- **Parsing**: stored values are read with exact round-trip float parsing.
+- **Tests**: pass and fail cases for both gates and for the comparison verdicts (P1, P2a, P2b, P3, P4)
+  (`tests/test_registered_checks.py`).
+- **No prediction, criterion, setting or seed changes.**

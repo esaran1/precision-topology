@@ -328,7 +328,7 @@ def _replay_job(args):
     return r
 
 
-def run_replays(block):
+def run_replays(block, out_name=None):
     G_hat, w2_glob, R_glob = _ghat_and_glob()
     states = _load()
     cks = select4(states, G_hat, w2_glob) if block == 4 else select5(states)
@@ -345,12 +345,33 @@ def run_replays(block):
         out = p.map(_replay_job, jobs, chunksize=4)
     d = pd.DataFrame(out)
     d["k1_check_max_diff"] = max(k1)
-    d.to_csv(RESULTS / f"fixed_scale_block{block}.csv", index=False)
+    d.to_csv(RESULTS / (out_name or f"fixed_scale_block{block}.csv"), index=False)
     print(f"decisions preserved in {int(d.decisions_preserved.sum())} of {len(d)}", flush=True)
 
 
 if __name__ == "__main__" and sys.argv[1] in ("replay4", "replay5"):
     run_replays(4 if sys.argv[1] == "replay4" else 5)
+
+
+def check_rerun(results=None):
+    """The distance-column rerun must reproduce Block 4's scored outcomes exactly (exact parsing, zero tolerance):
+    placed_end, G_end, first_hit, decisions_preserved, on every row.  Only dist_branch_end may differ."""
+    R = results or RESULTS
+    a = pd.read_csv(R / "fixed_scale_block4.csv", float_precision="round_trip")
+    b = pd.read_csv(R / "fixed_scale_block4_rerun.csv", float_precision="round_trip")
+    m = a.merge(b, on=["seed", "ck_step", "level", "variant"], suffixes=("", "_re"))
+    same = (len(m) == len(a) == len(b)) and all(
+        np.array_equal(m[c].values, m[c + "_re"].values, equal_nan=(m[c].dtype.kind == "f"))
+        for c in ("placed_end", "G_end", "first_hit", "decisions_preserved"))
+    pd.DataFrame([{"rows": len(m), "reproduced": bool(same)}]).to_csv(R / "fixed_scale_block4_rerun_check.csv", index=False)
+    if not same:
+        raise SystemExit("STOP: the distance-column rerun does not reproduce Block 4's scored outcomes")
+    return True
+
+
+if __name__ == "__main__" and sys.argv[1] == "replay4_rerun":
+    run_replays(4, out_name="fixed_scale_block4_rerun.csv")
+    check_rerun()
 
 
 # ------------------------------------------------------------------ scoring (as registered)

@@ -198,7 +198,28 @@ def predict(workers=WORKERS):
     own["C_own"] = own.U_own * own.a.round(2).map(RHO_RES)
     f = RESULTS / "prospective_own_predictions.csv"
     own.to_csv(f, index=False)
-    print("SHA-256", hashlib.sha256(f.read_bytes()).hexdigest())
+    h = hashlib.sha256(f.read_bytes()).hexdigest()
+    (RESULTS / "prospective_own_predictions.sha256").write_text(h + "\n")
+    print("SHA-256", h, "(commit the file and its hash before training)")
+
+
+def gate_hash(results=None):
+    """Registered: the predictions file must be unchanged from its recorded (committed) SHA-256."""
+    R = results or RESULTS
+    rec = (R / "prospective_own_predictions.sha256").read_text().strip()
+    now = hashlib.sha256((R / "prospective_own_predictions.csv").read_bytes()).hexdigest()
+    if rec != now:
+        raise SystemExit("STOP (registered): the predictions file changed after its hash was recorded")
+    return now
+
+
+def gate_validation(results=None):
+    """Registered stop: any certified status contradicting a bracket end."""
+    v = pd.read_csv((results or RESULTS) / "prospective_own_validation.csv")
+    bad = v[(v.cert_lo == "plus") | (v.cert_hi == "minus")]
+    if len(bad):
+        raise SystemExit(f"STOP (registered): {len(bad)} certified statuses contradict a bracket end")
+    return len(v)
 
 
 def _val_job(args):
@@ -220,14 +241,16 @@ def _val_job(args):
 
 
 def validate(workers=WORKERS):
+    gate_hash()
     wins = {w.tag: w for w in windows()}
-    own = pd.read_csv(RESULTS / "prospective_own_predictions.csv")
+    own = pd.read_csv(RESULTS / "prospective_own_predictions.csv", float_precision="round_trip")
     sub = own[own.seed.isin([SEED0, SEED0 + 1, SEED0 + 2])]
     with Pool(workers) as p:
         v = pd.DataFrame(p.map(_val_job, [(wins[r.window], r.a, r.seed, r.w2_own_lo, r.w2_own_hi)
                                           for r in sub.itertuples()], chunksize=1))
     v.to_csv(RESULTS / "prospective_own_validation.csv", index=False)
     print(v.to_string(index=False)); print("contradictions:", int(v.contradiction.sum()))
+    gate_validation()
 
 
 # ------------------------------------------------------------------------------------------ training and scoring
@@ -242,14 +265,18 @@ def _train_job(args):
 
 
 def train(workers=WORKERS):
+    gate_hash()
+    gate_validation()
     jobs = [(w, a, SEED0 + i) for w in windows() for a in A_VALUES for i in range(N_SEEDS)]
     with Pool(workers) as p:
         pd.DataFrame(p.map(_train_job, jobs, chunksize=1)).to_csv(RESULTS / "prospective_own_runs.csv", index=False)
 
 
 def score():
-    pr = pd.read_csv(RESULTS / "prospective_own_predictions.csv")
-    rn = pd.read_csv(RESULTS / "prospective_own_runs.csv")
+    gate_hash()
+    gate_validation()
+    pr = pd.read_csv(RESULTS / "prospective_own_predictions.csv", float_precision="round_trip")
+    rn = pd.read_csv(RESULTS / "prospective_own_runs.csv", float_precision="round_trip")
     d = rn.merge(pr, on=["window", "a", "seed"])
     d["R_cross"] = d.cross_w2 * d.Ghat_lo / 2
     d["R_final"] = d.final_w2 * d.Ghat_lo / 2

@@ -66,3 +66,19 @@ Alongside the registered verdicts, the scorer reports:
 If a strict-ordering step fails while both values' intervals contain 0, the registered failure is recorded
 as a failure. Separately, the offsets are stated to be **indistinguishable at those sizes**. That outcome
 differs from an offset that does not shrink (the competing outcome).
+
+## Amendment 1 — 2026-09-23 17:59 EDT (implementation only; before any certify, free-training or score output exists)
+
+- **The problem**: the registered stop conditions were stated but not enforced. `validate400` only
+  printed the overlap count, and nothing read the certified validation before scoring.
+- **Now enforced as gates** (`gate_validate400`, `gate_certify`):
+  - `own`, `free` and `score` halt if fewer than 45 of 50 brackets overlap 1d's;
+  - `score` halts on any certified status that contradicts a bracket end.
+- The validate400 condition had already been met (50 of 50 overlap) before the gate existed, and before
+  the `own` stage began.
+- **Parsing**: stored values are read with exact round-trip float parsing.
+- **Refactor**: the seed-extension rule is factored out (`extend_seeds`) so that it can be tested. Its
+  behaviour is unchanged: 20 seeds at a time, up to 110.
+- **Tests**: pass and fail cases for every gate, for the extension rule, and for the scorer's verdicts
+  and "indistinguishable" flag (`tests/test_registered_checks.py`).
+- **No prediction, criterion, cell, seed or budget changes.**

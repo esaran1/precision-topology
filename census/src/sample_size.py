@@ -120,14 +120,43 @@ def validate400(workers=3):
           "  max |midpoint diff|:", float(m.mid_diff.abs().max()))
 
 
+def _read(name, results=None):
+    return pd.read_csv((results or RESULTS) / name, float_precision="round_trip")
+
+
+def gate_validate400(results=None):
+    """Registered stop: fewer than 45 of 50 brackets overlapping 1d's certified brackets."""
+    m = _read("sample_size_validate400.csv", results)
+    n = int(m.overlap.sum())
+    if n < 45:
+        raise SystemExit(f"STOP (registered): only {n} of {len(m)} brackets overlap 1d's certified brackets")
+    return n
+
+
+def gate_certify(results=None):
+    """Registered stop: any certified status contradicting a bracket end."""
+    c = _read("sample_size_certify.csv", results)
+    bad = c[(c.cert_lo == "plus") | (c.cert_hi == "minus")]
+    if len(bad):
+        raise SystemExit(f"STOP (registered): {len(bad)} certified statuses contradict a bracket end")
+    return len(c)
+
+
 def own(workers=3):
+    gate_validate400()
     jobs = [(a, n, SEED0 + i) for n in N_VALUES for a in A_VALUES for i in range(N_SEEDS)]
     pd.DataFrame(_pool(own_one, jobs, workers)).to_csv(RESULTS / "sample_size_own.csv", index=False)
 
 
 def free(workers=3):
+    gate_validate400()
     rows = _pool(free_one, [(a, n, SEED0 + i) for n in N_VALUES for a in A_VALUES for i in range(N_SEEDS)], workers)
-    d = pd.DataFrame(rows)
+    d = extend_seeds(pd.DataFrame(rows), lambda more: _pool(free_one, more, workers))
+    d.to_csv(RESULTS / "sample_size_free.csv", index=False)
+
+
+def extend_seeds(d, run):
+    """Registered: if fewer than 40 of a cell's runs cross, add 20 seeds at a time (free-training arm), up to 110."""
     while True:
         more = []
         for (a, n), g in d.groupby(["a", "n"]):
@@ -136,8 +165,8 @@ def free(workers=3):
                 more += [(a, n, s) for s in range(start, start + 20)]
         if not more:
             break
-        d = pd.concat([d, pd.DataFrame(_pool(free_one, more, workers))])
-    d.to_csv(RESULTS / "sample_size_free.csv", index=False)
+        d = pd.concat([d, pd.DataFrame(run(more))], ignore_index=True)
+    return d
 
 
 def _cert_job(args):
@@ -150,7 +179,7 @@ def _cert_job(args):
 
 
 def certify(workers=3):
-    o = pd.read_csv(RESULTS / "sample_size_own.csv")
+    o = _read("sample_size_own.csv")
     sub = o[o.seed.isin([SEED0, SEED0 + 1])]
     rows = _pool(_cert_job, [(r.a, r.n, r.seed, r.w2_lo, r.w2_hi) for r in sub.itertuples()], workers)
     pd.DataFrame(rows).to_csv(RESULTS / "sample_size_certify.csv", index=False)
@@ -163,9 +192,14 @@ def _boot_median_diff(u, v, B=10_000, seed=0):
     return np.percentile(bu - bv, [2.5, 97.5])
 
 
-def score():
-    o = pd.read_csv(RESULTS / "sample_size_own.csv")
-    fr = pd.read_csv(RESULTS / "sample_size_free.csv")
+def score(results=None):
+    global RESULTS
+    if results is not None:
+        RESULTS = results
+    gate_validate400()
+    gate_certify()
+    o = _read("sample_size_own.csv")
+    fr = _read("sample_size_free.csv")
     cells, tests = [], []
     for a in A_VALUES:
         _, w2p, Rp = _pop(a)
