@@ -53,3 +53,22 @@ Q1 and Q2 are scored independently.
 
   This is post hoc, since the free-training crossings have been seen. If it works, a prospective
   design is written and **not run** before review.
+
+## Stop report — 2026-09-23 17:49 EDT (validity check fired; nothing scored)
+
+- **The registered 4,000-step reproduction check returned False** (`run_horizons`: "Block 4 reproduced at
+  4,000 steps: False on 3258 rows").
+- **Diagnosis**: the check compares in-memory G at 4,000 steps **exactly** (rtol = atol = 0) against Block
+  4's G_end as read from `fixed_scale_block4.csv` with pandas' default CSV float parser. That parser is
+  not round-trip exact: it differs from exact parsing on 7,959 of 8,688 stored values, by at most
+  9.95e−17.
+- **Re-check with exact (round-trip) parsing on both sides**, labelled as a diagnosis, not an amendment:
+  on all 3,258 matched rows, placement at 4,000 steps equals Block 4's and **G at 4,000 steps is
+  bit-identical** to Block 4's G_end. The replays reproduce Block 4 exactly; the check's
+  implementation did not read the stored values exactly.
+- **Status**: per the registration, Q1, Q2, S1 and S2 are not scored. The 0.9× endpoint characterisation
+  is not run either, since it reads the same long-horizon outputs. Awaiting a decision on amending the
+  check's implementation to exact parsing.
+- If amended, this is the third implementation error in this registration family's validity checks,
+  after amendments 1 and 2 of `fixed_scale_prediction.md`. None of the three concerned an outcome
+  criterion.
