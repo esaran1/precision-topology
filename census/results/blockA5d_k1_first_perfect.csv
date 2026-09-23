@@ -1,0 +1,5 @@
+budget,smallest_a_any_perfect,max_frac_any_a,onset_half_reached
+1000,3.0,0.05,False
+4000,1.35,0.25,False
+16000,1.35,0.3,False
+64000,1.35,0.35,False

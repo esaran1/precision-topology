@@ -316,6 +316,11 @@ per cell. **Perfect = 0 errors on 20,000 uniform and 20,000 linking-region held-
 - **A4 PASS**: 7 of 20 at `a = 3.0`.
 - **Stop condition**: no `a` reaches half perfect at any budget (max 0.35), so **no onset
   is measured** (A2 fails; A3, A5 undecidable). The k = 10 run (T72) found no perfect run anywhere.
+- **Post hoc, descriptive** (`src/blockA5d_k1_trend.py`): smallest grid `a` with any perfect run
+  is 3.0 at 1k and **1.35 at 4k, 16k and 64k**; largest fraction at any `a` is 0.05 / 0.25 / 0.30 / 0.35.
+  At `a = 3.0` the fraction is 0.05 [0.001, 0.25] → 0.25 [0.09, 0.49] → 0.30 [0.12, 0.54] → 0.35 [0.15, 0.59]
+  (exact 95%); GELU 0 → 0.05 → 0.25 → 0.30. The budgets are checkpoints of the same 20 runs. **The
+  registered 50% onset was never reached at any budget.**
 
 ## 4. Exclusion table
 

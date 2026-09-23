@@ -38,6 +38,38 @@ no stage-2 seeds are added.
 | ReLU | 0 | 0 | 0 | 0 | 0 |
 | GELU | 0 | 0.05 | 0.25 | 0.30 | 3 of 20 |
 
+## Budget trend — POST HOC, descriptive, not a registered test
+
+**The registered onset (≥ half perfect at some grid `a`) was never reached, at
+any budget.** The table below describes how the perfect fraction changes with
+budget. It is not a substitute for the onset. `src/blockA5d_k1_trend.py` →
+`blockA5d_k1_budget_trend.csv`, `blockA5d_k1_first_perfect.csv`. Fraction perfect
+(registered criterion), exact 95% Clopper–Pearson intervals, n = 20 per cell:
+
+| | 1k | 4k | 16k | 64k |
+|---|---|---|---|---|
+| `a = 1.35` | 0 [0, 0.17] | 0.05 [0.001, 0.25] | 0.10 [0.01, 0.32] | 0.10 [0.01, 0.32] |
+| `a = 1.5` | 0 [0, 0.17] | 0.05 [0.001, 0.25] | 0.05 [0.001, 0.25] | 0.05 [0.001, 0.25] |
+| `a = 2.0` | 0 [0, 0.17] | 0.10 [0.01, 0.32] | 0.15 [0.03, 0.38] | 0.15 [0.03, 0.38] |
+| `a = 3.0` | 0.05 [0.001, 0.25] | 0.25 [0.09, 0.49] | 0.30 [0.12, 0.54] | 0.35 [0.15, 0.59] |
+| GELU | 0 [0, 0.17] | 0.05 [0.001, 0.25] | 0.25 [0.09, 0.49] | 0.30 [0.12, 0.54] |
+
+| budget | smallest grid `a` with any perfect run | largest fraction at any `a` |
+|---:|---:|---:|
+| 1,000 | 3.0 | 0.05 |
+| 4,000 | 1.35 | 0.25 |
+| 16,000 | 1.35 | 0.30 |
+| 64,000 | 1.35 | 0.35 |
+
+- The fraction perfect is non-decreasing in budget in every cell, and the
+  smallest `a` with any perfect run drops from 3.0 at 1k to 1.35 from 4k on. It
+  never goes below 1.35, so no run at `a ≤ 1.2` is perfect at any budget.
+- The budgets are checkpoints of **the same 20 runs**, so the columns are not
+  independent samples. Every interval overlaps its neighbour's. This is a
+  direction, not a measured trend.
+- The 1.35 floor is a count of **any** perfect run (1–2 of 20). It is not an
+  onset and should not be read as one.
+
 ## What this does and does not show
 
 - **The onset, as registered, is not observable at this capacity.** The "≥ half
