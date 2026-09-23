@@ -19,7 +19,7 @@ their artifacts on each run (see the audit block at the top of output).
 
 ## Fig 3 (`fig3_r_collapse.pdf`, full-width)
 
-- **sources**: r_pooled.csv, r_adamw.csv, r_families.csv, r_family_b.csv
+- **sources**: r_pooled.csv, r_adamw.csv, r_families_certified.csv, ghat_certified_all.csv
 - **n**: (a) 3,150  (b) Adam 180 / AdamW 240 / SGD 180  (c) A 2,910 / q2 360 / q1 360 / B 1,000
 - **uncertainty / notes**: Clopper-Pearson on rates; 1,500-resample bootstrap on AUC; Fisher exact two-sided on (b)
 
@@ -43,12 +43,18 @@ their artifacts on each run (see the audit block at the top of output).
 
 ## Fig 7 (`fig7_family_b.pdf`, full-width)
 
-- **sources**: onset_law_extended.csv, onset_family_b.csv, r_family_b.csv
+- **sources**: onset_law_extended.csv, onset_family_b.csv, blockK_family_b_normalised.csv
 - **n**: (a) A 6 cells / B 2 bracketed of 3  (b) 5 alpha values, 200 runs each
-- **uncertainty / notes**: compensation exponent -0.475; product range 4.9x vs G* 19x
+- **uncertainty / notes**: compensation exponent -0.471; product range 5.1x vs G* 20x
 
 ## Fig 8 (`fig8_link.pdf`, single-column)
 
 - **sources**: gelu_scale_*.csv, monotonic_zero.md
 - **n**: 200 per arm; floor n=5,580
 - **uncertainty / notes**: Clopper-Pearson 95%; up-vs-down Fisher one-sided p=1.5e-6
+
+## Fig 9 (`fig9_expressivity.pdf`, full-width)
+
+- **sources**: blockA5d_k1_perfect_fraction.csv, blockA5d_k1_controls.csv, blockA5d_k1_prediction.md
+- **n**: 20 seeds per cell (per a, budget)
+- **uncertainty / notes**: Clopper-Pearson 95%; perfect = zero errors on 20k uniform and 20k stratified held-out
