@@ -39,6 +39,10 @@ Registered `conditional_audit_prediction.md` (`6b17508`, before any audit comput
   - The per-seed median is **1.06×** the quadrature value. The IQR is 0.99–1.12× and the range
     0.87–1.22×.
   - The quadrature value sits at the 30th–32nd percentile. Every seed has one switch.
+  - **Bias of the procedure, stated beside the 6%**: evaluations that could not be resolved at tolerance
+    1e−9 were treated as unplaced. That biases the affected thresholds **upward** by at most one bisection
+    step: ≤ 0.08% / 0.14% / 0.19% of R at a = 1.30 / 1.45 / 1.60, in 20 / 18 / 6 of 50 seeds. This is far
+    too small to produce the +6% median excess.
   - **Say**: "the quadrature threshold is the population-level object; individual training sets have
     thresholds spread ±12% (IQR) around a median 6% above it". Whether that spread and offset explain
     the fixed-scale curve width and the free-training offset is tested in S1–S3 (pending).

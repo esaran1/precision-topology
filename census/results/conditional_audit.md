@@ -101,3 +101,8 @@ prediction was attached. Summary: `cond_certified_seeds_summary.csv`.
   - On a continuous crossing, that happens only where the two regional minima coincide, i.e. at the
   switch. The affected brackets are therefore accurate to about one bisection step, but not certified
   at their lower end.
+  - **Direction and size**: treating them as unplaced can only move a bracket **up**, so it biases those
+    seeds' thresholds upward, by at most one bisection step. The final width is 0.0039 in |w₂|, which is
+    **≤ 0.08%, 0.14% and 0.19% of R** at a = 1.30, 1.45 and 1.60. It affects 20, 18 and 6 of the 50
+    seeds.
+  - Even ten times that bound is below 2%, so it cannot account for the **+6%** median excess.
