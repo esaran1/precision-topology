@@ -701,6 +701,7 @@ PRODUCERS = {
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
+    "mn2_h2prime.csv": ("math_note_v2_checks", "h2", "full", ""),
     "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
     "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
     "cond_certified_brackets.csv": ("conditional_certified", "brackets", "full", ""),
@@ -803,6 +804,13 @@ def v4_checks() -> None:
     chk("A* bracket upper", float(lsw.A_hi), 0.6875, 1e-9)
     rd = pd.read_csv(R / "mn2_rounding.csv")
     chk("rounding: max |float - interval| <= 1.2e-16", float(rd["diff"].abs().max() <= 1.2e-16), 1.0, 0)
+
+    h2_ = pd.read_csv(R / "mn2_h2prime.csv")
+    chk("H2': all validated (b, PD, unique active set)",
+        float(h2_.b2_validated.all() and h2_.hessian_pd.all() and h2_.active_set_unique.all()), 1.0, 0)
+    chk("H2': dG/dA min", float(h2_.dG_dA_lo.min()), 1.666, 0.0005)
+    chk("H2': dG/dA max", float(h2_.dG_dA_hi.max()), 1.705, 0.0005)
+    chk("H2': lambda_min lower", float(h2_.hess_lambda_min_lo.min()), 0.1470, 0.0001)
 
     print("V4 Block 3 (prospective)")
     cmp_ = pd.read_csv(R / "prospective_comparisons.csv").set_index("comparison")

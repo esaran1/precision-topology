@@ -50,8 +50,9 @@ only through the unit R = |w₂|Ĝ/2.
   - the (p, q, b) Hessian is positive definite on U × [0.66, 0.71], with λ_min ≥ 0.0473;
   - so the global minimiser is the unique critical point there, and it is C^∞ in A.
   - *Competitor bound outside U, uniform in A: PENDING (annulus).*
-- (d) **Transversality (H2′)**: dG_0/dA along the branch at A* ≠ 0. *Interval: PENDING (h2).* The
-  float value is 1.304.
+- (d) **Transversality (H2′)**: dG_0/dA along the branch lies in **[1.666, 1.705]** at A = 0.68125, 0.684375
+  and 0.6875 (certified intervals, `mn2_h2prime.csv`). It is positive, so the crossing is transversal. The
+  earlier float 1.304 was a finite difference of coarse branch-and-bound argmins; it is superseded.
 
 **Corollary (finite a, local).** For all sufficiently small ε, L*_ε has a unique critical point in U for
 each A ∈ [0.66, 0.71]. It is a strict local minimum, and its gap changes sign transversally at
@@ -110,8 +111,15 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
   and one of O.
 - dG_0/dA = ∇G_0 · dθ/dA, with dθ/dA = −H⁻¹∂_A∇L_0 (implicit-function theorem on the full
   (p, q, b) gradient system).
-- Evaluated in interval arithmetic over the certified argmin enclosure (`ift_limit`, `h2`).
-  *PENDING.*
+- Evaluated in interval arithmetic over the certified argmin enclosure (`ift_limit`, `h2`, tolerance 1e−11).
+  At all six (A, region) evaluations:
+  - b is enclosed;
+  - the Hessian is PD (λ_min ≥ 0.1470);
+  - the active pair (outer −1.2, inner 0.8) is unique;
+  - dG_0/dA ∈ [1.666, 1.705].
+- The global minimiser's certified gap is [−0.00715, −0.00703] at A = 0.68125 and [0.00339, 0.00350] at
+  0.6875. That agrees with the Krawczyk switch A* = 0.685445 (§8): the slope ≈ 1.68 predicts −0.00707 and
+  +0.00346.
 
 **Corollary: C² convergence.** On U, |σ| ≤ S_U = 2(|p₀| + ρ) + |q₀| + ρ = 4.857 (since |x| ≤ 2). For
 ε ≤ 0.05 (`taylor_constants`, remainders derived in the docstring):
@@ -140,7 +148,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | Uniform C² derivative control | **Proved**, with explicit constants M₀–M₃ | `taylor_constants` | — |
 | Hessian PD on the neighbourhood (IFT) | **Certified**: λ_min ≥ 0.0473 on 500 sub-boxes | `mn2_neighbourhood.csv` | — |
 | No competitor outside U, uniform in A | PENDING (annulus) | `mn2_annulus.csv` | — |
-| Transversal crossing (H2′) at A* | PENDING (interval); float 1.304 | `mn2_h2prime.csv` | — |
+| Transversal crossing (H2′) at A* | **Certified**: dG₀/dA ∈ [1.666, 1.705] over the bracket | `mn2_h2prime.csv` | — |
 | Local branch or global minimiser? | **Global** in the limit on K(24) (localisation, B&B, annulus); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
 | Solve threshold: nondegeneracy and transversality | PENDING (limit, `mn2_solve_limit.csv`; finite a, `mn2_solve_finite.csv`) | — | — |
 | Other window geometries | **Not done**: A* is certified for the base window only | — | rerun `limit_bnb switch` per window |
@@ -170,7 +178,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | (b) switch at A* | global order at A = 0.68125, 0.6875 | `limit_bnb switch` → `limit_switch.csv` | certified interval gaps vs interval re-evaluation: \|float − interval\| ≤ 1.1e−16 (`mn2_rounding.csv`) |
 | (c) uniqueness in U | Hessian PD | `math_note_v2_checks neighbourhood` → `mn2_neighbourhood.csv` | interval arithmetic throughout (mpmath.iv, 30 digits) |
 | (c) competitors outside U | annulus | `math_note_v2_checks annulus` → `mn2_annulus.csv` | PENDING |
-| (d) transversality | H2′ | `math_note_v2_checks h2` → `mn2_h2prime.csv` | interval arithmetic (PENDING) |
+| (d) transversality | H2′ | `math_note_v2_checks h2` → `mn2_h2prime.csv` | interval arithmetic (mpmath.iv), argmin enclosure at tolerance 1e−11 |
 | C² convergence | derivative control | `taylor_constants` → `mn2_neighbourhood.csv` (M₀–M₃) | closed-form bounds, float max over 200,001 points of polynomials |
 | finite-a global preference | Block 1c | `conditional_certified brackets` → `cond_certified_brackets.csv` | `mn2_rounding.csv`, a = 1.30 rows: ≤ 1.1e−16 against certified gaps ≥ 1.8e−8 |
 | solve threshold | nondegeneracy, transversality | `math_note_v2_checks solve_limit`, `solve_finite` | PENDING |
