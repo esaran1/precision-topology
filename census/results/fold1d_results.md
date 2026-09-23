@@ -4,6 +4,13 @@ Predictions registered in `fold1d_prediction.md`. Data: `fold1d_sweep.csv`,
 `fold1d_refine.csv`, `fold1d_geometry.csv`, `estimator_validation.csv`,
 `estimator_anisotropy.csv`, `fold_settings.csv`.
 
+**Protocol deviation from the registration, recorded 2026-09-23.** `fold1d_prediction.md`
+registered "Dense verification: 10,000 fresh points". The code does not use a 10,000-point
+sample (`DENSE_N = 10_000` in `src/fold1d.py` is unused). The verification actually run is a
+fresh 400-point sample (seed 500,000 + s) **plus** `solves()`: sign correctness on dense
+`linspace` grids of 4,001 inner and 2 × 2,000 outer points spanning both windows. No reported
+number depends on the 10,000 figure; the paper should describe the verification that was run.
+
 ## Part 1: the minimal fold task
 
 `sign(|x| − 1)`, width-1 network, four parameters. Monotone `f` ⇒ monotone

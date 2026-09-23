@@ -169,7 +169,7 @@ requirement). The box was a *second* defect. Claim removed entirely.
 | **G** | 3 | 2 | G-2 and G-4 are the strong results; G-1's misses are the documented per-`a` lag |
 | **K** | 3 | 2 | AUC claim removed; `β` and overshoot restored |
 
-**Ten registered predictions failed** *(nine before the 2026-09-23 E-2 re-score)*. Every one is logged with its explanation,
+**Ten registered predictions failed** *(nine before the 2026-09-23 E-2 re-score)*. **Block E's primary result is negative per its registration**: the registered falsifier (hold_high loses placement in more than 1 of 10 seeds) fired, with 4 of 37 lost. Every one is logged with its explanation,
 and two of them (E-5, K-3) changed what the paper claims.
 
 ---

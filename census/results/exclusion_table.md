@@ -3,7 +3,7 @@
 Data: `exclusion_table.csv`. Every column is a direct measurement on the same
 objects, and every one could have come out the other way. Rows marked
 **zero-basin** are solutions that exist, solve the task exactly, and are never
-reached (0/200 SGD runs at a <= 1.30; exact basin fraction 0 through a = 1.25).
+reached (0/200 Adam runs at a <= 1.30; exact basin fraction 0 through a = 1.25).
 
 | a | population | \|w2\| | MEP barrier | lambda_max*eta | distance from init | margin |
 |---|---|---|---|---|---|---|
@@ -53,15 +53,17 @@ reachable ones.
 
 *Adversarial check*: Euclidean norm in raw parameter coordinates is not the
 metric Adam moves in, so the reversal could be a coordinate artifact.
-Recomputed under Adam's own preconditioner (bias-corrected sqrt of the
+*[Withdrawn 2026-09-23: the preconditioned recomputation below has no committed
+producer and is not used in any paper-facing file.]* Recomputed under Adam's own preconditioner (bias-corrected sqrt of the
 accumulated second moment, measured from real trajectories), found/constructed
 distance ratios are **3.79, 3.04, 2.30, 1.72** at a = 1.45, 1.50, 2.00, 3.00
 against Euclidean **3.50, 2.80, 2.56, 1.85**. **The reversal survives in the
 optimizer's own metric at every value.**
 
 **Margin — excluded by measurement, with population overlap.** At a = 1.5 the
-zero-basin solution's margin is 0.0384, and **5 of 20 found solutions have a
-smaller margin than that** (min 0.0038). So margin does not separate the
+zero-basin solution's margin is 0.0384, and **17 of 81 found solutions have a
+smaller margin than that** (min 0.0017; `discrepancy_margin.csv`, recomputed
+2026-09-23 — the earlier "5 of 20, min 0.0038" had no producer). So margin does not separate the
 populations even as an ordering. *This is a measurement.* (The theorem in
 `fold1d_theorem.md` does predict these solutions must have small margin,
 m = |w2|*G/2 -- that part is derivation; the overlap with found solutions is

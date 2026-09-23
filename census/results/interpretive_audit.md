@@ -122,7 +122,7 @@ link in the budget law and should be stated as such.**
 For each: what would make the measurement right and the exclusion wrong?
 
 **(a) Barrier (MEP exactly 0).** *Measures:* the maximum loss along a string-
-method path minus max(endpoint losses), converged to 41 images x 400 steps.
+method path minus max(endpoint losses), 41 images x 400 steps (not a converged MEP; see `mep_method_appendix.md`. A path with zero barrier at every image bounds the barrier at those images regardless of convergence).
 *Adversarial failure:* the string method finds **a** path, not **the** minimum-
 energy path; if it converges to a low-barrier path that SGD would never
 follow, "no barrier" is true of the landscape and irrelevant to the dynamics.
@@ -147,7 +147,7 @@ initializations. *Adversarial failure:* Euclidean distance in unnormalized
 parameter coordinates is not the metric SGD moves in -- Adam's per-coordinate
 normalization means the effective metric is closer to L-infinity in
 gradient-scaled units. Under a different metric the ordering could reverse.
-*Status:* **RESOLVED 2026-09-08 -- attack answered.** Recomputed under Adam's
+*Status:* ***WITHDRAWN 2026-09-23: the recomputation below has no committed producer; the distance finding is stated in Euclidean norm only.*** Recomputed under Adam's
 own preconditioner (bias-corrected sqrt of accumulated second moment, measured
 from trajectories): found/constructed ratios **3.79 / 3.04 / 2.30 / 1.72** at
 a = 1.45 / 1.50 / 2.00 / 3.00, against Euclidean 3.50 / 2.80 / 2.56 / 1.85.

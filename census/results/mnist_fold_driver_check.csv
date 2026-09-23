@@ -1,0 +1,4 @@
+table,rows_ref,rows_new,matched,max_abs_diff_test,max_abs_diff_train
+mnist_fold_pilot,90,90,90,1.1102230246251565e-16,1.1102230246251565e-16
+mnist_fold_pilot_narrow,75,75,75,1.1102230246251565e-16,1.1102230246251565e-16
+mnist_fold_pilot_longbudget,45,45,45,1.1102230246251565e-16,1.1102230246251565e-16

@@ -7,7 +7,9 @@ already used in basin_profiles.csv.
 Linear: straight line from initialization to solution, 101 points.
 MEP: string method — discretize the path, repeatedly take a gradient step
 on each interior image and re-space the images by arclength.  Reports the
-converged path's barrier, which lower-bounds the linear estimate.
+barrier of the path found (not a certified-converged MEP; see
+results/mep_method_appendix.md).  Any path's barrier upper-bounds the MEP
+barrier at its images, and is at most the linear estimate.
 """
 
 from __future__ import annotations

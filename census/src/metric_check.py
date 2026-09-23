@@ -75,7 +75,14 @@ def analyse(ghat: str) -> dict:
     zero = t[t.rate == 0]
     last_zero = float(zero.err.iloc[-1])
     n_zero = int(s[s.R <= float(zero.bin.iloc[-1].right)].shape[0])
-    return {"ghat": ghat, "runs": len(s), "binary_10": b10, "binary_90": b90, "W_binary": b90 - b10,
+    slope = np.diff(g.err.values) / np.diff(x)             # d(errors)/dR between consecutive bins
+    at = x[1:]                                             # assigned to the later bin's midpoint
+    k = int(np.argmin(slope))
+    b50 = crossing(x, rate.values, 0.5)
+    j = int(np.argmin(np.abs(at - b50)))
+    return {"ghat": ghat, "runs": len(s), "binary_10": b10,
+            "steepest_slope": float(slope[k]), "steepest_slope_at_R": float(at[k]),
+            "binary_50": b50, "slope_near_binary_50": float(slope[j]), "slope_near_binary_50_at_R": float(at[j]), "binary_90": b90, "W_binary": b90 - b10,
             "continuous_10": c10, "continuous_90": c90, "W_continuous": c90 - c10,
             "ratio": (c90 - c10) / (b90 - b10),
             "err_first_bin": first, "err_last_zero_rate_bin": last_zero,

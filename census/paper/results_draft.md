@@ -131,16 +131,11 @@ points, and these points are not stationary.
 
 **Distance.** These solutions sit 4.7 to 5.5 from typical initialization in
 parameter norm, while found solutions sit 10.2 to 17.7 away -- **the unreached
-solutions are the nearer ones**. Because Euclidean distance in raw coordinates
-is not the metric Adam moves in, we recomputed under Adam's own preconditioner,
-the bias-corrected square root of the accumulated second moment measured from
-real trajectories: found-to-unreached distance ratios are **1.72 to 3.79**
-against Euclidean 1.85 to 3.50. The reversal survives in the optimizer's own
-metric. **We had registered the opposite prediction**, that unreached
-solutions would be the more distant ones.
+solutions are the nearer ones** in Euclidean parameter norm. **We had registered
+the opposite prediction**, that unreached solutions would be the more distant ones.
 
 **Margin.** At `a = 1.5` the unreached solution has logit margin 0.0384, and
-**5 of 20 found solutions have a smaller margin than that** (minimum 0.0038).
+**17 of 81 found solutions (21%) have a smaller margin than that** (minimum 0.0017).
 Destination margin does not separate the populations. Margin along the
 approach is a different quantity and is untested.
 

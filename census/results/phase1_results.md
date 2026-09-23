@@ -1,6 +1,6 @@
 # Phase 1: what determines sign correctness
 
-Registered in `results/phase1_prediction.md` (commit `7db80cf`) before the
+Registered in `results/phase1_prediction.md` (commit `ab7556d`; *corrected 2026-09-23 from `7db80cf`, which is the decomposition commit*) before the
 decomposition was computed. Data: `phase1_runs.csv`, `phase1_decomposition.csv`
 — 12 values of `a` × 200 seeds × both precisions, Adam, lr 1e-2, 2,000 steps.
 

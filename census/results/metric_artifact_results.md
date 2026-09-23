@@ -21,7 +21,7 @@ and the substantive finding is in the *locations* rather than the widths:
 > does not leave zero until R = 0.30, by which point most of the underlying
 > improvement has already happened.
 
-The 10%-to-90% crossings do not even overlap: the continuous metric moves over
+*[2026-09-23, T79: recomputed under the certified Ĝ by `src/metric_check.py`; the overlap statement below is binning-dependent and is not used in paper-facing files. Certified, 0.025 bins: continuous [0.055, 0.342], binary [0.330, 0.429].]* The 10%-to-90% crossings do not even overlap: the continuous metric moves over
 `R in [0.055, 0.307]`, the binary rate over `R in [0.332, 0.452]`.
 
 **Consequence, applied immediately**: the claim "R identifies a sharp

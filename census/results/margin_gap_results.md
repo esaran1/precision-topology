@@ -15,6 +15,10 @@ grid can only remove solutions, never establish a floor.
 **Confirmed empirically -- no floor exists.** Margins of solutions the
 experiments count as solved:
 
+*Note 2026-09-23: this table has no committed producer and is superseded by
+`discrepancy_margin.csv` (`src/discrepancies.py margins`: float32 phase-1 solvers;
+at a = 1.5, n = 81, min 0.0017). Its numbers are not used in any paper-facing file.*
+
 | a | n | min margin | p05 | median |
 |---|---|---|---|---|
 | 1.35 | **1** | 0.083 | -- | 0.083 |

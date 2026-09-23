@@ -14,11 +14,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 SRC = RESULTS / "registration_census_enumeration.csv"
 OUT = RESULTS / "registration_census.csv"
+TALLY = RESULTS / "registration_tally.csv"
 VERDICTS = ("PASS", "FAIL", "PARTIAL", "UNRESOLVED")
 
 # (id, corrected verdict, previously scored verdict, reason)
@@ -54,9 +56,17 @@ def build() -> pd.DataFrame:
         d.loc[m, "verdict_status"] = ("SCORED IN CENSUS 2026-09-23 (post hoc scoring against the "
                                       "registered criterion; judgement call, see note)")
     d["non_directional"] = d.note.fillna("").str.startswith("NON-DIRECTIONAL")
+    d["scoring"] = np.where(d.id.isin(POST_HOC), "post hoc (census)", "registered rule")
     assert not d.id.duplicated().any()
     assert d.verdict.isin(VERDICTS).all()
     d.to_csv(OUT, index=False)
+    rows = []
+    for scope, g in (("scored by registered rules", d[d.scoring == "registered rule"]),
+                     ("assigned post hoc in the census", d[d.scoring != "registered rule"]),
+                     ("all", d)):
+        c = g.verdict.value_counts().reindex(VERDICTS).fillna(0).astype(int)
+        rows.append({"scope": scope, "n": len(g), **c.to_dict()})
+    pd.DataFrame(rows).to_csv(TALLY, index=False)
     return d
 
 

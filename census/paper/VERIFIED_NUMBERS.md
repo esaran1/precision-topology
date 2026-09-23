@@ -182,6 +182,13 @@ the weight.
 
 Corrugation is 1,890 rows minus 270 bit-identical Reading-B duplicates.
 
+**Training protocol, stated for the paper (2026-09-23).** Six strata train with
+full-batch Adam, lr 1e-2, 2,000 steps. The **protocol stratum (360 runs)** uses
+minibatch Adam, lr 1e-3, batch 128, up to 800 epochs, patience 150, and
+**early-stops on evaluation accuracy — the same set it is scored on**
+(`src/author_protocol.py`). That selection can only raise its count of
+separations; the count is 0. Every stratum uses Adam, not SGD.
+
 **Link types — "five link families" was withdrawn and is defined nowhere.**
 The artifact-derived enumeration:
 
@@ -351,15 +358,18 @@ per cell. **Perfect = 0 errors on 20,000 uniform and 20,000 linking-region held-
   falsified**.
 - **Distance from initialisation** (Euclidean): unreached **4.67–5.52**, found
   **10.23–17.69**. **Unreached points are NEARER, not further** — opposite to
-  the registered prediction. Under **Adam-preconditioned** distance the
-  reversal does not survive; the finding is metric-dependent and must be
-  reported as "nearer **in parameter norm**".
+  the registered prediction. This is Euclidean distance in parameter space; report it as
+  "nearer **in parameter norm**". *(2026-09-23: no committed script computes a
+  preconditioned distance, so no statement about other metrics is made.)*
 - **Margin.** In the table's representative runs, found margin at `a = 1.5` is
   **0.0771** against the construction's **0.0384** — i.e. *larger*. The claim
   that found solutions can have *smaller* margins is a **population**
-  statement, verified separately: at `a = 1.5`, **6 of 24 found solvers
-  (25%) have margin below 0.0384**, minimum **0.0054**. Print the population
-  form with its n; do not attach "smaller" to the single tabulated run.
+  statement (`src/discrepancies.py margins` → `discrepancy_margin.csv`; the float32
+  phase-1 solvers, Adam lr 1e-2, 2,000 steps): at `a = 1.5`, **17 of 81 solvers
+  (21%) have margin below 0.0384**, minimum **0.0017**; at `a = 1.45`, **18 of 50**
+  below the construction's 0.0325. Print the population form with its n; do not
+  attach "smaller" to the single tabulated run. *(The earlier "6 of 24 … 0.0054" and
+  "5 of 20 … 0.0038" had no producing script and are withdrawn.)*
 - **Gradient norms** (`criticality.csv`): unreached **0.0192–0.2724**, found
   **0.0057–0.0137**; training's own terminal gradient norm is
   **0.00033–0.0211**. Unreached points sit at **20–227x** training's terminal
@@ -626,12 +636,16 @@ consistent across them.
 | mean errors at R ≤ 0.05 | **153.6** (n = 995) |
 | mean errors at R in (0.25, 0.30] | **36.3** (n = 128), **0 solved** |
 | mean errors at R > 0.6 | **0.0** |
-| error improvement occurring at **zero** solve rate | **76%** (117.3 of 153.6) |
-| 10–90% crossing, continuous | **R in [0.055, 0.307]** |
-| 10–90% crossing, binary | **R in [0.332, 0.452]** |
-| the two intervals | **disjoint** |
-| steepest continuous slope | **−1,649 at R ≈ 0.263** |
-| slope at the binary threshold (R ≈ 0.362) | **−136**, a fifth of peak |
+| error improvement occurring at **zero** solve rate | **76%** (117.1 of 153.6; 1,815 runs, certified Ĝ) |
+| 10–90% crossing, continuous (0.025 bins) | **R in [0.055, 0.342]** |
+| 10–90% crossing, binary (0.025 bins) | **R in [0.330, 0.429]** |
+| the two intervals | **binning-dependent**: overlap by 0.012 at 0.025 bins, disjoint at 0.02/0.03/0.04/0.05 (`metric_check_binning.csv`) — do not print "disjoint" |
+| steepest continuous slope | **−1,760 at R ≈ 0.263** |
+| slope at the binary 50% point (R ≈ 0.372; nearest bin 0.3625) | **−142**, about a twelfth of peak |
+
+*Recomputed 2026-09-23 under the certified Ĝ by `src/metric_check.py` (T79); the
+original computation had no committed producer. Under the restricted Ĝ the script
+reproduces 0.055, 0.307, 76%, −1,649 and −136 exactly.*
 | registered width ratio `W_cont / W_binary` | **2.09** |
 | registered bands | ≤ 2 genuine, ≥ 5 artifact, between = intermediate |
 | **verdict** | **intermediate**, marginally outside "genuine" |
@@ -963,11 +977,18 @@ question.
 registered predictions.** The earlier headline "47 + 17 = 64" counted only the
 2026-09-12 P-* summary and the v2 blocks.
 
+**Headline (print this):** of the **151** registered predictions scored by their registered
+rules, **66 passed, 47 failed, 8 partially passed and 30 were not resolved**. Listed
+separately: **13** further verdicts were assigned post hoc in the census (3 PASS, 6 FAIL,
+4 PARTIAL); they are not in the headline (`registration_tally.csv`; the 13 rows are in
+`WRITER_INPUTS.md` §9). **E-2 is recorded as failed, and Block E's primary result is negative
+per its registration** (T59).
+
 | scope | PASS | FAIL | PARTIAL | UNRESOLVED | total |
 |---|---:|---:|---:|---:|---:|
-| **all registered predictions** | **69** | **53** | **12** | **30** | **164** |
-| the rows formerly counted as "64" | 27 | 24 | 1 | 12 | 64 |
-| the remaining 100 | 42 | 29 | 11 | 18 | 100 |
+| **scored by registered rules (headline)** | **66** | **47** | **8** | **30** | **151** |
+| assigned post hoc in the census (listed separately) | 3 | 6 | 4 | 0 | 13 |
+| all | 69 | 53 | 12 | 30 | 164 |
 
 Corrections to previously scored rows (each recorded in the census with its source):
 - **E-2 → FAIL**: 33/37 = 0.892 kept against a registered ≥ 9/10 (`blockE_redesign.md:63, 72-74`).
@@ -1024,9 +1045,10 @@ theorem in `D(a)` and label the asymptotic — still stands.
 ### 14.2 "Found solutions have smaller margins" — right claim, wrong support
 
 The exclusion table's `a = 1.5` row shows found margin **0.0771** *above* the
-construction's **0.0384**. The real claim is a **population** statement: **6 of
-24 found solvers (25%) at `a = 1.5` have margin below 0.0384**, minimum
-**0.0054**. Attach it to the population with its n, not to the tabulated run.
+construction's **0.0384**. The real claim is a **population** statement: **17 of
+81 solvers (21%) at `a = 1.5` have margin below 0.0384**, minimum **0.0017**
+(`discrepancy_margin.csv`). Attach it to the population with its n, not to the
+tabulated run.
 
 ### 14.3 "24 of 25 runs plateaued" — arithmetically impossible
 
@@ -1106,9 +1128,10 @@ stated as such.
 
 ### 14.12 Things listed in the brief that do not exist
 
-- **"Adam-preconditioned distance"** exists as a check but **does not reverse
-  the Euclidean finding**; it shows the reversal is metric-dependent. There is
-  no separate preconditioned column in `exclusion_table.csv`.
+- **"Adam-preconditioned distance"**: no committed script computes it and there is
+  no preconditioned column in `exclusion_table.csv`. **Withdrawn from every
+  paper-facing file (2026-09-23)**; the distance finding is stated in Euclidean
+  parameter norm only.
 - **q0.667 under SGD**: no exponent exists — **unbracketed at all four
   budgets**. Any SGD value for it in the draft is fabricated.
 - **Family B's "four onsets"**: only **three budgets** were run (2k, 16k, 64k)

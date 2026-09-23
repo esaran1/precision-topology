@@ -142,7 +142,15 @@ def branch_tracking():
     pd.DataFrame(rows).to_csv(RESULTS / "wi_branch_tracking.csv", index=False)
 
 
+def crossing_steps():
+    """Crossing step range per (a, budget): claim 13's 1,860-6,839 is a = 1.30 at budget 8,000."""
+    c = pd.read_csv(CROSS_RUNS)
+    t = c.groupby([c.a.round(2), "budget"]).cross_step.agg(["size", "min", "median", "max"]).reset_index()
+    t.to_csv(RESULTS / "wi_crossing_steps.csv", index=False)
+
+
 def tables():
+    crossing_steps()
     per_a_table()
     phase1()
     e2_rescore()

@@ -313,7 +313,15 @@ def main() -> None:
     chk("median min-along-path", float(pw.min_distance.median()), 4.8773, 1e-3)
     chk("median ratio min/init", float((pw.min_distance / pw.init_distance).median()),
         0.9918, 1e-3)
-    chk("min at step 0 count", float((pw.min_at_step == 0).sum()), 0.0, 0)
+    # corrected 2026-09-23: step 0 is never logged; the true initialisation is regenerated
+    pi = pd.read_csv(R / "discrepancy_pathwise_init.csv")
+    chk("step 1 reproduced from regenerated init", float(pi.step1_reproduced.sum()), 400.0, 0)
+    chk("median distance at true init", float(pi.init_distance_step0.median()), 5.2259, 1e-3)
+    chk("median min incl. step 0", float(pi.min_including_step0.median()), 4.8755, 1e-3)
+    chk("minimum at initialisation (runs)", float(pi.min_at_step0.sum()), 114.0, 0)
+    appr = 1 - pi.min_including_step0 / pi.init_distance_step0
+    chk("runs > 5% closer", float((appr > 0.05).sum()), 112.0, 0)
+    chk("largest approach (%)", float(appr.max() * 100), 23.43, 0.01)
 
     print("T55 exceptions above 0.50")
     exc = pd.read_csv(R / "exceptions_above_050.csv").sort_values("seed")
@@ -447,6 +455,13 @@ def main() -> None:
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
+    tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
+    for scope, want in (("scored by registered rules", (151, 66, 47, 8, 30)),
+                        ("assigned post hoc in the census", (13, 3, 6, 4, 0))):
+        got = tl.loc[scope]
+        chk(f"{scope}: n/PASS/FAIL/PARTIAL/UNRES",
+            float(sum(int(got[k]) * 10 ** (3 * i) for i, k in enumerate(["n", "PASS", "FAIL", "PARTIAL", "UNRESOLVED"]))),
+            float(sum(v * 10 ** (3 * i) for i, v in enumerate(want))), 0)
     chk("E-2 as registered is FAIL", float(rc[rc.id == "E-2"].verdict.iloc[0] == "FAIL"), 1.0, 0)
     e2 = pd.read_csv(R / "wi_e2_rescore.csv").set_index("arm")
     chk("E-2 kept", float(e2.loc["hold_high", "kept"]), 33.0, 0)
@@ -477,6 +492,27 @@ def main() -> None:
     chk("median overall", float(bt.loc["all", "median"]), 0.0065, 0.0001)
     chk("n before / after", float(bt.loc["before crossing", "n"] * 1000 + bt.loc["after crossing", "n"]),
         197211.0, 0)
+
+    print("T48 MNIST pilots (driver)")
+    md = pd.read_csv(R / "mnist_fold_driver_check.csv").set_index("table")
+    chk("pilot rows regenerated", float(md.matched.sum()), 210.0, 0)
+    chk("max |test acc diff|", float(md.max_abs_diff_test.max()), 0.0, 1e-12)
+    chk("narrow pilot rows (no a = 0.5)", float(md.loc["mnist_fold_pilot_narrow", "rows_ref"]), 75.0, 0)
+
+    print("T41 margins and MEP (produced 2026-09-23)")
+    mg = pd.read_csv(R / "discrepancy_margin.csv").set_index("a")
+    chk("a=1.5 solvers", float(mg.loc[1.5, "n_solved"]), 81.0, 0)
+    chk("a=1.5 below constructed margin", float(mg.loc[1.5, "n_below_constructed"]), 17.0, 0)
+    chk("a=1.5 min margin", float(mg.loc[1.5, "min_margin"]), 0.0017, 0.0001)
+    chk("a=1.45 below constructed margin", float(mg.loc[1.45, "n_below_constructed"]), 18.0, 0)
+    mp = pd.read_csv(R / "discrepancy_mep.csv").iloc[0]
+    chk("exclusion-table MEP paths", float(mp.paths), 60.0, 0)
+    chk("barrier.csv distinct a", float(mp.barrier_csv_distinct_a), 13.0, 0)
+
+    print("AdamW default weight decay (Block F) equals Block C's explicit 0.01")
+    import inspect as _insp, torch as _t
+    chk("torch AdamW default weight_decay",
+        float(_insp.signature(_t.optim.AdamW).parameters["weight_decay"].default), 0.01, 0)
 
     print("T41 exclusion configurations")
     from . import barrier as _br
@@ -625,6 +661,16 @@ PRODUCERS = {
     "mechanism_branch_a130.csv": ("mechanism_figure_data", "branch", "full", ""),
     "mechanism_trajectories_a130.csv": ("mechanism_figure_data", "trajectories", "full", ""),
     "registration_census.csv": ("registration_census", "build", "full", ""),
+    "registration_tally.csv": ("registration_census", "build", "full", ""),
+    "discrepancy_margin.csv": ("discrepancies", "margins", "full", ""),
+    "discrepancy_margin_runs.csv": ("discrepancies", "margins", "full", ""),
+    "discrepancy_pathwise_init.csv": ("discrepancies", "pathwise", "full", ""),
+    "discrepancy_mep.csv": ("discrepancies", "mep", "full", ""),
+    "mnist_fold_driver_check.csv": ("mnist_fold_driver", "check", "full", ""),
+    "mnist_fold_pilot.csv": ("mnist_fold_driver", "write", "full", ""),
+    "mnist_fold_pilot_narrow.csv": ("mnist_fold_driver", "write", "full", ""),
+    "mnist_fold_pilot_longbudget.csv": ("mnist_fold_driver", "write", "full", ""),
+    "wi_crossing_steps.csv": ("writer_inputs", "crossing_steps", "full", ""),
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
 }

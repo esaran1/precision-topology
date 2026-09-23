@@ -1,7 +1,7 @@
 """Part 1: are the zero-basin points critical points at all?
 
 Reports ||grad L||, full Hessian spectrum (including lambda_min), and loss,
-for zero-basin constructed solutions and for SGD-found solutions, plus
+for zero-basin constructed solutions and for Adam-found solutions, plus
 typical gradient norms along a training trajectory for scale.
 """
 

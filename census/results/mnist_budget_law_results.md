@@ -42,8 +42,10 @@ the wide comparison would have been `w = 32`, above `2 x ID ~ 28`.
 ## The pilot, and why no capability threshold exists
 
 `results/mnist_fold_pilot.csv` (widths 4/6/8) and
-`mnist_fold_pilot_narrow.csv` (widths 1/2/3), `a` in {0, 0.5, 1, 1.5, 2.5, 4},
-5 seeds per cell, 2,000 steps.
+`mnist_fold_pilot_narrow.csv` (widths 1/2/3), `a` in {0, 0.5, 1, 1.5, 2.5, 4}
+(the narrow pilot has no `a = 0.5`: 75 runs, not 90), 5 seeds per cell, 2,000
+steps. *Driver committed 2026-09-23 (`src/mnist_fold_driver.py`); it regenerates
+all three pilot tables exactly.*
 
 Best mean test accuracy by width, monotonic against non-monotonic:
 

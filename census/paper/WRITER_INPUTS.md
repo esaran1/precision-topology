@@ -5,17 +5,38 @@ the artifact that holds the number and the script that produces it. Every number
 stated here is checked by `src/verify_ledger.py` (0 findings as of 2026-09-23). "Certified Ĝ"
 means the value in `results/ghat_certified_all.csv`, column `Ghat_certified` (§2).
 
-**Changes the draft must absorb** (details in the sections named):
+**This is the single final handoff (2026-09-23).** It supersedes earlier versions and any
+number in the draft that conflicts with it.
 
-1. **E-2 fails as registered, and the registered falsifier for Block E's primary pair fires** (§8).
-   The paper cannot present the hold_high / hold_low contrast as a passed causal test.
-2. **The registration census has 164 predictions, not 64**, and the tally changes (§9).
-3. **The Phase 1 sentence mixes two populations** (§7).
-4. **"The 10–90% crossings do not even overlap" depends on the binning** under the certified Ĝ.
-   "76% of the improvement happens while no run solves" does not (§13, Fig 4).
-5. **Ĝ's upper certificate was not global.** It is now, and R is unchanged (§2).
-6. **Per-a crossing numbers in the draft (e.g. 0.2332) are on the old Ĝ.** Use §4.
-7. **T1 said "under SGD". Every link run used Adam** (§1).
+### Still unresolved
+
+1. **Ren & Lim's venue** (the only open item). `ren2026low` is cited in its arXiv version (2606.31856). The ICML 2026 /
+   PMLR 306 listing could not be confirmed on PMLR: volume 306 does not exist there yet. Switch to
+   the PMLR entry once it appears (§14).
+Nothing else is open. Every item in §15 is resolved: either a committed script now produces the
+number, or the claim has been removed from every paper-facing file.
+
+### Decisions applied, and what the draft must change
+
+1. **Registration tally (§9).** The headline is **151 predictions scored by their registered rules:
+   66 PASS, 47 FAIL, 8 PARTIAL, 30 UNRESOLVED.** The **13 verdicts assigned post hoc** in the census
+   are listed separately (3 PASS, 6 FAIL, 4 PARTIAL), each with its row.
+2. **E-2 failed and Block E is negative per its registration (§8).** Report the 0/37 against 33/37
+   contrast as a measurement, not as a passed causal test.
+3. **Numbers at a = 1.30 (§4).** **R_glob = 0.2153; the certified median crossing is 0.2338.**
+   The draft's 0.2332 used the old Ĝ.
+4. **Distance to constructed solutions (§5).** "At most 0.8% closer" and "no point comes meaningfully
+   closer" are withdrawn. The minimum is at initialisation in 114 of 400 runs, and the largest
+   approach is 23.4%.
+5. **Margin (§11).** The population statement is **17 of 81 found solutions (21%) at a = 1.5 have
+   margin below the construction's 0.0384 (minimum 0.0017).** "6 of 24" and "5 of 20" are withdrawn.
+6. **Preconditioned distance.** Withdrawn everywhere. The distance finding is Euclidean only.
+7. **Metric check (§13).** Print "76% of the error improvement occurs where no run solves". Do not
+   print "the crossings do not even overlap".
+8. **Phase 1 population (§7).** Use one population throughout.
+9. **Ĝ enclosure (§2).** The enclosure is now globally certified; R is unchanged.
+10. **Optimiser in T1 (§1).** Every link run used Adam, not SGD.
+11. **Bibliography (§14).** 32 entries: 31 verified, 1 in its arXiv version, none failed.
 
 ---
 
@@ -220,11 +241,14 @@ means the value in `results/ghat_certified_all.csv`, column `Ghat_certified` (§
 
 - **Spread across the six a**: **CV(R) = 0.0324**, CV(|w₂|) = 0.2821. The draft's 0.0152 / 0.1508
   used only three values of a and the old Ĝ.
-- **The draft's "0.2332" is on the old Ĝ.** The certified value at a = 1.30 is **0.2338**.
+- **At a = 1.30: R_glob = 0.2153 and the certified median crossing is 0.2338.** The draft's
+  "0.2332" used the old Ĝ.
+- **Claim 13's "crossing step 1,860 to 6,839"** is a = 1.30 at budget 8,000 (36 runs). Across all
+  five budgets the range is 1,860 to 27,778 (`wi_crossing_steps.csv`).
 - **Interval**: 4,000-sample bootstrap of the pooled per-run median. The table's headline
   statistic is the median of the five per-budget medians, which is the registered unit.
-- **Caveat**: the a = 1.60 row of `blockB_fine_windows.csv` holds rounded values that its producer
-  would not output. The table therefore uses the coarse `blockB_switches.csv` for `R_glob` (§15).
+- `R_glob` in this table comes from the coarse `blockB_switches.csv` (0.05 grid). The 0.01-grid
+  refinement is in `blockB_fine_windows.csv` and is regenerated exactly by its producer (§15).
 
 ---
 
@@ -244,10 +268,20 @@ means the value in `results/ghat_certified_all.csv`, column `Ghat_certified` (§
 
 - The registered criterion (median < 0.2) is met overall (0.0065) and after crossing, **not
   before**. Training follows the branch once placement exists.
-- **Distance to constructed solutions (T67)** is a different quantity: the Euclidean distance in
-  raw `(w₁, b₁, w₂, b₂)` to the nearest member of the constructed `|w₂| = 1` family.
-  - Medians: 5.22 at the first logged step, 4.88 minimum, 49.7 final (400 runs).
-  - The first logged checkpoint is **after one Adam step**, not at initialisation (§15).
+- **Distance to constructed solutions (T67, corrected)** is a different quantity: the Euclidean distance
+  in raw `(w₁, b₁, w₂, b₂)` to the nearest of 2,034–2,768 verified constructed `|w₂| = 1` solutions.
+  - The logged checkpoints start **after one Adam step**. The true initialisation is regenerated with
+    `torch.manual_seed(seed)` and `U(−1,1)⁴`, and reproduces step 1 exactly in 400 of 400 runs
+    (`src/discrepancies.py pathwise` → `discrepancy_pathwise_init.csv`).
+  - Median distance at initialisation **5.2259**; minimum along the path (step 0 included) **4.8755**;
+    at the end **49.7**.
+  - **The minimum is at initialisation in 114 of 400 runs.** The median approach is 0.84%. 112 runs
+    get more than 5% closer, 41 more than 10%, and the largest approach is **23.4%**.
+  - **Print**: "trajectories end about ten times further from the constructed solutions than they
+    start (median 49.7 against 5.2); the closest approach is a median 0.8% nearer than the start and
+    at most 23% nearer."
+  - Withdrawn: "at most 0.8% closer", "no point comes meaningfully closer", and "minimum at step 0
+    in 0 of 400", which was a vacuous check because step 0 was never logged.
 
 ---
 
@@ -322,76 +356,49 @@ steps.
 ## 9. Registration census (T78)
 
 `results/registration_census.csv` has one row per registered prediction. It is built by
-`src/registration_census.py` from the curated enumeration `registration_census_enumeration.csv`.
-Each row records the registration file and its commit, the verdict, where the verdict was scored,
-and the verdict's status.
+`src/registration_census.py`; the tally is in `registration_tally.csv`.
 
-**164 registered predictions.** The "47 + 17 = 64" counted only the 2026-09-12 P-* summary and the
-v2 blocks.
+**Headline — print this:** of the **151 registered predictions scored by their registered rules,
+66 passed, 47 failed, 8 partially passed and 30 were not resolved.**
+
+**Listed separately — 13 verdicts assigned post hoc in the census.** These predictions were
+registered but never scored against their rule, or the rule leaves room for judgement. The census
+scored them against the registered criterion after the fact. They are **3 PASS, 6 FAIL,
+4 PARTIAL** and are not in the headline:
+
+| row | block | registration | verdict | why it is a judgement call |
+|---|---|---|---|---|
+| E-cold_low | E | `blockF_lag_prediction.md` | PASS | freeze-low arm registered before the pilot; blockE_redesign scores only the prospective pair |
+| loc-2 | localization 08-22 | `localization_prediction.md` | FAIL | fails as registered; borne out only in the corrected \|lk\| form (arguably PARTIAL) |
+| thr-P5 | threshold 08-22 | `threshold_prediction.md` | PASS | families agree on a common derivative value, which the registration said would count against (arguably FAIL) |
+| amp-2a-match | early census 08-23 | `amplification_prediction.md` | FAIL | stated reason retracted in T28; never re-scored |
+| gelu-up | early census 08-23 | `gelu_scale_prediction.md` | FAIL | 17.0% sits on the edge of the stated 3–17% band |
+| collapse-link | collapse 09-12 | `collapse_prediction.md` | FAIL | registered biconditional violated once the corrected Item 2 passes; never re-scored |
+| metric-1a | metric artifact 09-12 | `metric_artifact_prediction.md` | PARTIAL | non-directional: outcome classes without a predicted class; intermediate mapped to PARTIAL |
+| metric-2 | metric artifact 09-12 | `metric_artifact_prediction.md` | PARTIAL | non-directional criterion; family B qualifies and fails |
+| rc-1d | R-collapse 09-12 | `r_collapse_prediction.md` | PARTIAL | only the parametric criterion was registered (strictly FAIL); superseded by the third-optimizer test |
+| B-spin | B | `blockB_prediction.md` | FAIL | scored pass later withdrawn; the registered falsifier fired (alternative: UNRESOLVED) |
+| B-solve | B | `blockB_prediction.md` | FAIL | scored in the census against the registered 15% tolerance; every a lies outside |
+| B-CV | B | `blockB_prediction.md` | PASS | scored in the census against the registered CV ≤ 0.15 |
+| S-3 | scaling limit | `scaling_limit_prediction.md` | PARTIAL | passes for R_glob, fails for R_solve (strictly FAIL for R_solve) |
 
 | scope | PASS | FAIL | PARTIAL | UNRESOLVED | total |
 |---|---:|---:|---:|---:|---:|
-| **all** | **69** | **53** | **12** | **30** | **164** |
-| rows formerly counted as "64" | 27 | 24 | 1 | 12 | 64 |
-| — the 47 P-* rows | 20 | 18 | 1 | 8 | 47 |
-| — the 17 v2 rows | 7 | 6 | 0 | 4 | 17 |
-| the other 100 | 42 | 29 | 11 | 18 | 100 |
+| **scored by registered rules (headline)** | **66** | **47** | **8** | **30** | **151** |
+| assigned post hoc (listed separately) | 3 | 6 | 4 | 0 | 13 |
+| all | 69 | 53 | 12 | 30 | 164 |
 
-**Corrections, each sourced**:
+**Corrections within the 151**, each scored against its own registration:
 
-- **E-2**: PASS → FAIL (§8).
+- **E-2**: PASS → **FAIL** (33/37 < 9/10). **Block E is negative per its registration**
+  (the falsifier fired; §8).
 - **P-SGD**: PASS → PARTIAL. Its registered rule scores it DIRECTIONAL-ONLY (outside the band by
-  0.0356; `sgd_law_results.md:21-37`). The summary row had recorded only that the arm ran.
-- **P-null**: PASS → UNRESOLVED. "The test did not execute", and no ratio was measured
-  (`geometric_transfer.md`).
-- **P-threshold**: its 2026-09-13 upgrade PARTIAL → PASS had never reached the totals
-  (the 47 read 21/18/1/7 against rows giving 22/18/0/7).
+  0.0356).
+- **P-null**: PASS → UNRESOLVED. The test did not execute.
+- **P-threshold**: its 2026-09-13 upgrade to PASS had never reached the totals.
 
-**By block** (all 164; the `block` column of the CSV):
-
-| block | PASS | FAIL | PARTIAL | UNRESOLVED | total |
-|---|---:|---:|---:|---:|---:|
-| A5d k=1 | 2 | 1 | 0 | 2 | 5 |
-| A5d k=10 | 1 | 2 | 0 | 2 | 5 |
-| Arrhenius 08-27 | 15 | 11 | 1 | 15 | 42 |
-| B | 1 | 2 | 0 | 0 | 3 |
-| C | 1 | 2 | 0 | 0 | 3 |
-| E | 3 | 3 | 0 | 0 | 6 |
-| E-stall | 0 | 2 | 0 | 0 | 2 |
-| F | 1 | 1 | 0 | 2 | 4 |
-| G | 3 | 2 | 0 | 0 | 5 |
-| H | 0 | 1 | 0 | 2 | 3 |
-| K | 3 | 2 | 0 | 0 | 5 |
-| MNIST budget law 09-11 | 0 | 1 | 0 | 2 | 3 |
-| R-collapse 09-12 | 0 | 1 | 2 | 0 | 3 |
-| S2 (withdrawn) | 1 | 1 | 0 | 0 | 2 |
-| collapse 09-12 | 1 | 3 | 0 | 0 | 4 |
-| corrugation 08-06 | 0 | 2 | 0 | 0 | 2 |
-| corrugation readings 08-22 | 2 | 0 | 0 | 0 | 2 |
-| cross-family | 3 | 1 | 0 | 0 | 4 |
-| early census 08-23 | 7 | 3 | 2 | 1 | 13 |
-| early census 08-23 (basin) | 1 | 4 | 0 | 0 | 5 |
-| early census 08-23 (width) | 3 | 1 | 0 | 0 | 4 |
-| interleaved 08-05 | 0 | 0 | 0 | 2 | 2 |
-| kappa | 3 | 1 | 0 | 0 | 4 |
-| localization 08-22 | 1 | 1 | 1 | 0 | 3 |
-| metric artifact 09-12 | 0 | 0 | 2 | 0 | 2 |
-| nu | 0 | 1 | 0 | 0 | 1 |
-| phase1 | 1 | 1 | 0 | 0 | 2 |
-| phase2b | 0 | 1 | 0 | 0 | 1 |
-| phase2b across a | 2 | 1 | 0 | 1 | 4 |
-| precision | 0 | 0 | 0 | 1 | 1 |
-| scaling limit | 3 | 0 | 1 | 0 | 4 |
-| search 08-22 | 2 | 0 | 2 | 0 | 4 |
-| third optimizer 09-14 | 2 | 0 | 0 | 0 | 2 |
-| threshold 08-22 | 3 | 1 | 1 | 0 | 5 |
-| winding 08-22 | 4 | 0 | 0 | 0 | 4 |
-
-- 13 verdicts were first assigned in the census: post hoc scoring against the registered
-  criterion. Each is flagged in `verdict_status`, and each is a judgement call.
-- Two rows (metric-1a, metric-2) register outcome classes without predicting one.
-- **Suggested wording**: "Of 164 registered predictions, 69 passed, 53 failed, 12 partially
-  passed and 30 were not resolved; every registration and verdict is listed in the supplement."
+The earlier "47 + 17 = 64" covered only the 2026-09-12 summary plus the v2 blocks. The per-block
+breakdown of all 164 is in the CSV's `block` column.
 
 ---
 
@@ -432,8 +439,27 @@ v2 blocks.
   barrier.
   - Settings: 400 steps, lr 5e-3, endpoints pinned (`src/barrier.py:25-28`).
   - 5 initialisations per row × 12 rows = 60 paths.
-  - **The barrier is 0.000 on every path.**
+  - **The barrier is 0.000 on every path.** Whether the string converged doesn't matter: a path with
+    zero barrier at every image bounds the barrier at those images.
   - It is not a CIFAR or MNIST count. Now in the ledger (T41) and checked by the verifier.
+  - `barrier.csv` is a different experiment (paths from initialisation to a solution; maximum MEP
+    barrier 0.0957). It covers **13** values of a: the script tries 15, and a = 1.20 and 1.60 have
+    no solving endpoint (`discrepancy_mep.csv`).
+- **Margin (population statement)**: float32 phase-1 solvers (the same training as "found"; margin =
+  the exclusion table's `margin_of`) against the construction's margin (`src/discrepancies.py margins`
+  → `discrepancy_margin.csv`):
+
+| a | solvers | min margin | median | constructed margin | solvers below it |
+|---:|---:|---:|---:|---:|---:|
+| 1.45 | 50 | 0.0033 | 0.0479 | 0.0325 | 18 |
+| 1.50 | 81 | 0.0017 | 0.1118 | 0.0384 | 17 |
+| 2.00 | 143 | 0.1502 | 0.7738 | 0.1149 | 0 |
+| 3.00 | 139 | 0.1209 | 1.6120 | 0.3329 | 1 |
+
+  - **Print**: "at a = 1.5, 17 of 81 found solutions (21%) have a smaller margin than the constructed
+    solution (0.0384; minimum 0.0017)".
+  - The table's single "found" row at a = 1.5 has margin 0.0771, which is larger. Attach "smaller" to
+    the population only.
 
 ---
 
@@ -459,6 +485,10 @@ v2 blocks.
   steps/epoch); the long-budget pilot used **8,000 steps** (about 17.1 epochs).
 - **Data**: train 60,000 (normalised (x − 0.1307)/0.3081); test 10,000. Training accuracy is
   measured on the first 10,000.
+- **Pilot counts**: 90 (widths 4/6/8 × 6 a × 5 seeds) + 75 (widths 1/2/3 × 5 a × 5 seeds; no
+  a = 0.5) + 45 long-budget = 210 runs. **All 210 are regenerated exactly** by the committed driver
+  `src/mnist_fold_driver.py` (maximum difference 1e-16; `mnist_fold_driver_check.csv`). T48's
+  "6 widths × 6 a × 5 seeds" is corrected.
 - **Other MNIST configurations**:
   - T34 bottleneck sweep: 784 → 128 → w → 128 → 10, 3 epochs, batch 256, lr 1e-3.
   - T35 control search: width 256, depths 4/8/12, 15 epochs, batch 256, lr 1e-3.
@@ -528,45 +558,65 @@ both are regenerated. The binning sensitivity of Fig 4's bands (T79):
 
 ## 14. Bibliography
 
-**Not done.** The writer's candidate list was not attached to the request, and there is none in the
-repository. No `references.bib` has been written, so no entry is unverified.
-`paper/related_work.md` holds the 8 sources already read from their PDFs, which are in
-`paper/sources/`. Send the list and each entry will be checked against its arXiv, DBLP or
-proceedings page.
+**`paper/references.bib`**: 32 entries. Every entry was checked on 2026-09-23 against a fetched
+page, and that page's URL is in a `% verified:` comment above the entry. The verification log is
+`paper/references_verification.csv`, one row per key with every discrepancy noted.
+
+- The list is the writer's candidates plus the 8 sources already read from PDFs in
+  `related_work.md`. Duplicates are merged: Hanin–Sellke, Guss–Salakhutdinov, Ahn–Zhang–Sra and
+  Soudry et al.
+- **Venue versions are used where verifiable**:
+  - JMLR: Soudry et al. 2018, JMLR 19(70):1–57; Naitzat et al. 2020, JMLR 21(184):1–40.
+  - ICLR: Johnson 2019; Lyu & Li 2020; Park et al. 2021; Cohen et al. 2021; Cai 2023;
+    Kim et al. 2024.
+  - NeurIPS: Montúfar et al. 2014; Chen et al. 2018; Garipov et al. 2018; Chizat et al. 2019;
+    Dupont et al. 2019; Sitzmann et al. 2020 (pp. 7462–7473); Ziyin et al. 2020 (pp. 1583–1594).
+  - COLT: Telgarsky 2016 (PMLR 49:1517–1539); Eldan & Shamir 2016 (PMLR 49:907–940); Kidger &
+    Lyons 2020 (PMLR 125:2306–2327).
+  - ICML: Raghu et al. 2017 (PMLR 70:2847–2854); Shalev-Shwartz et al. 2017 (PMLR 70:3067–3075);
+    Draxler et al. 2018 (PMLR 80:1309–1318); Ahn et al. 2022 (PMLR 162:247–257); Li et al. 2023
+    (PMLR 202:19460–19470); Jin et al. 2023 (PMLR 202:15200–15238).
+  - BMVC: Misra 2020, via the BMVA archive.
+- **arXiv only** (no venue version): Hanin & Sellke 2017, Hendrycks & Gimpel 2016, Ramachandran et
+  al. 2017, Guss & Salakhutdinov 2018, Jacot et al. 2021, Kaplan et al. 2020.
+- **Failed verification: none.**
+- **Partial: `ren2026low`.** It is cited as arXiv 2606.31856; PMLR volume 306 does not exist yet.
+- **Corrections to the candidate list**:
+  - **Jacot et al.**: the full title is "Saddle-to-Saddle Dynamics in Deep Linear Networks: Small
+    Initialization Training, Symmetry, and Sparsity".
+  - **Draxler et al.**: pages are 1309–1318 per PMLR; the arXiv journal-ref's 1308–1317 is wrong.
+  - **Years change with the venue version**: Soudry 2017 → 2018, Lyu & Li 2019 → 2020, Chizat 2018 →
+    2019, Eldan & Shamir 2015 → 2016, Misra 2019 → 2020.
+  - **Author forms as printed by the venue**: "Li'Ang Li"; "Simon Shaolei Du"; "David K. Duvenaud";
+    "Andrew G. Wilson"; "Lénaïc Chizat".
+  - **Kaplan et al.**: ten authors (Kaplan, McCandlish, Henighan, Brown, Chess, Child, Gray, Radford,
+    Wu, Amodei).
+- **Verification route**: openreview.net and dblp.org served bot challenges to automated fetches,
+  so the ICLR entries were verified on iclr.cc / proceedings.iclr.cc. I re-checked three entries by
+  hand: Draxler, Jin and Jacot.
+- **Anonymity**: `references.bib` names the Ren–Lim authors, as any citation does. It is not part of
+  the supplementary.
 
 ---
 
-## 15. Other inconsistencies found while assembling this (not fixed unless stated)
+## 15. Discrepancies found while assembling this — all resolved
 
-- **T67 initialisation**: "distance at initialisation" is the first **logged** checkpoint, which
-  comes after one Adam step. The verifier check "minimum at step 0 in 0 of 400" is vacuous because
-  step 0 is never logged. 114 runs have their minimum at step 1.
-- **Margin population**: `VERIFIED_NUMBERS.md` says "6 of 24 … minimum 0.0054"; T41,
-  `exclusion_table.md` and `results_draft.md` say "5 of 20 … minimum 0.0038". Neither has a
-  producing script. **Do not print either until one is committed.**
-- **Preconditioned distance**: `VERIFIED_NUMBERS.md:354-356` says the reversal "does not survive"
-  under Adam's metric; `exclusion_table.md:59-60` says it "survives … at every value".
-- **MEP convergence**: `barrier.py` and `interpretive_audit.md` say the path converged;
-  `mep_method_appendix.md:87, 107` says it did not. The appendix also says "13 values of a", while
-  the script lists 15.
-- **Wrong optimiser in text**: the `criticality.py` docstring and `exclusion_table.md:6` say
-  "SGD"; the code uses Adam. T1 has been corrected; these two have not.
-- **fold1d registration**: it registered "Dense verification: 10,000 fresh points", but
-  `DENSE_N = 10_000` is unused. The actual check is a fresh 400-point sample plus the dense grid in
-  `solves()`.
-- **AdamW weight decay**: set explicitly to 0.01 in Block C and left at the PyTorch default in
-  Block F. The default is also 0.01, so the value is the same; state it explicitly in the text.
-- **MNIST pilot counts**: T48 says "6 widths × 6 a × 5 seeds" = 180, but the committed pilots have
-  90 + 75 = 165 rows (the narrow pilot lacks a = 0.5). No driver script calling
-  `mnist_fold.train_one` is committed.
-- **Protocol stratum (T1)**: 360 of the 5,580 runs early-stop on the evaluation set they are
-  scored on. That can only raise their separation count, and the count is still 0.
-- **Block B fine windows**: the a = 1.60 row of `blockB_fine_windows.csv` has rounded values the
-  producer would not emit, so it looks hand-entered. §4 uses the coarse switches.
-- **Phase 1 registration commit**: `phase1_results.md:3` cites `7db80cf` (the decomposition
-  commit). The registration is `ab7556d`.
-- **Unrecorded binning**: the original metric-artifact computation had no committed producer, and
-  its binary 90% crossing (0.452) cannot be reproduced exactly (§13).
+| discrepancy | resolution | producer / where |
+|---|---|---|
+| T67 "distance at initialisation" was step 1; "minimum at step 0 in 0 of 400" was vacuous; "at most 0.8% closer" | **Recomputed**: true initialisation regenerated and checked; minimum at initialisation in 114/400; largest approach 23.4%. T67 and claim 34 restated; verifier check replaced | `src/discrepancies.py pathwise`, `discrepancy_pathwise_init.csv` |
+| Margin: "6 of 24, min 0.0054" versus "5 of 20, min 0.0038"; neither had a producer | **Recomputed**: 17 of 81 at a = 1.5 (min 0.0017); 18 of 50 at a = 1.45. Replaced in VERIFIED_NUMBERS, results_draft, exclusion_table.md and T37; `margin_gap_results.md` marked superseded | `src/discrepancies.py margins`, `discrepancy_margin.csv` |
+| Preconditioned distance: "survives" versus "does not survive"; no producer | **Removed** from VERIFIED_NUMBERS and results_draft; marked withdrawn in exclusion_table.md and interpretive_audit.md | — |
+| MEP "converged" versus "not converged"; "13 values of a" versus 15 | **Resolved**: not converged, and the zero-barrier result doesn't need convergence; `barrier.csv` has 13 values of a (the script tries 15; 1.20 and 1.60 have no endpoint). barrier.py docstring and interpretive_audit.md corrected | `src/discrepancies.py mep`, `discrepancy_mep.csv` |
+| "SGD" in the criticality.py docstring and exclusion_table.md | **Corrected** to Adam (T1 was corrected earlier) | — |
+| fold1d registered "10,000 fresh points"; code uses a 400-point sample plus dense grids | **Recorded as a protocol deviation** in fold1d_results.md and T30; no number depends on it | — |
+| AdamW weight decay: explicit 0.01 (Block C) versus default (Block F) | **Same value**: the verifier checks that PyTorch's AdamW default is 0.01 | `verify_ledger.py` |
+| MNIST pilots: "6 widths × 6 a × 5 seeds" = 180 versus 165 rows; no driver committed | **Driver committed**; it regenerates all 210 pilot runs exactly; T48 counts corrected | `src/mnist_fold_driver.py`, `mnist_fold_driver_check.csv` |
+| Protocol stratum early-stops on the evaluation set it is scored on | **Disclosed** in VERIFIED_NUMBERS §3 (the separation count is 0 regardless) | — |
+| a = 1.60 row of `blockB_fine_windows.csv` looks hand-entered | **Regenerated** by its producer: \|w₂\| values match the committed row to 3e-14; only the R columns had been rounded to five decimals (< 1e-6). The file is replaced with the exact producer output | `session_artifacts.blockB_fine_windows` |
+| Phase 1 registration cited as `7db80cf` | **Corrected** to `ab7556d` | — |
+| Metric check: no producer; binary 90% crossing 0.452 not reproducible; slopes −1,649 / −136 | **Script committed**: reproduces 0.055, 0.307, 76%, −1,649 and −136 exactly under the old Ĝ; certified values in VERIFIED_NUMBERS and T53; "disjoint" withdrawn | `src/metric_check.py`, `metric_check.csv` |
+| Claim 13: "crossing step 1,860 to 6,839" with no stated population; claim 14 on three values of a | **Corrected**: that range is a = 1.30 at budget 8,000 (1,860–27,778 across all budgets); claim 14 restated on six values of a with the certified Ĝ | `writer_inputs.py`, `wi_crossing_steps.csv` |
+| `ghat_unification.md` "certified" column held restricted values | **Corrected** | — |
 
 ---
 

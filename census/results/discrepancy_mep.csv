@@ -1,0 +1,2 @@
+string_images,string_steps,string_lr,inits_per_row,rows,distinct_a,a_values,paths,barrier_mep_max,barrier_csv_rows,barrier_csv_distinct_a,barrier_csv_a_values,barrier_csv_mep_max,script_a_values_attempted
+41,400,0.005,5,12,8,1.02 1.1 1.25 1.35 1.45 1.5 2 3,60,0.0,340,13,1.02 1.05 1.1 1.25 1.3 1.35 1.4 1.45 1.5 1.75 2 2.5 3,0.095660411559369,15
