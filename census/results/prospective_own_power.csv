@@ -1,0 +1,17 @@
+scenario,a,comparison,power_or_prob_pass,n_sim,window_sd,n_base_runs
+as observed,1.3,P1,1.0,1000,0.005597953028926868,37
+as observed,1.3,P2a,1.0,1000,0.005597953028926868,37
+as observed,1.3,P3,1.0,1000,0.005597953028926868,37
+as observed,1.3,P4,1.0,1000,0.005597953028926868,37
+as observed,1.5,P1,1.0,1000,0.016167807083896833,37
+as observed,1.5,P2b,0.999,1000,0.016167807083896833,37
+as observed,1.5,P3,1.0,1000,0.016167807083896833,37
+as observed,1.5,P4,1.0,1000,0.016167807083896833,37
+"stress: window sd x3, independent shifts",1.3,P1,1.0,1000,0.016793859086780605,37
+"stress: window sd x3, independent shifts",1.3,P2a,0.998,1000,0.016793859086780605,37
+"stress: window sd x3, independent shifts",1.3,P3,1.0,1000,0.016793859086780605,37
+"stress: window sd x3, independent shifts",1.3,P4,1.0,1000,0.016793859086780605,37
+"stress: window sd x3, independent shifts",1.5,P1,0.705,1000,0.0485034212516905,37
+"stress: window sd x3, independent shifts",1.5,P2b,0.976,1000,0.0485034212516905,37
+"stress: window sd x3, independent shifts",1.5,P3,0.608,1000,0.0485034212516905,37
+"stress: window sd x3, independent shifts",1.5,P4,0.879,1000,0.0485034212516905,37

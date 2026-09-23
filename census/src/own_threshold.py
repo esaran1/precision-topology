@@ -81,9 +81,9 @@ def _bfgs(fg, x0, gtol=1e-10, maxit=500):
     return float(f), xk
 
 
-def global_min(s, a, x, y, step=STEP, n_refine=N_REFINE):
-    """Refined global minimiser of L*(.,.; s): (L, w1, b1, G)."""
-    W = w_bound(s, a, x, y)
+def global_min(s, a, x, y, step=STEP, n_refine=N_REFINE, win=(-0.8, 0.8, 1.2, 2.0)):
+    """Refined global minimiser of L*(.,.; s): (L, w1, b1, G); win = (i_lo, i_hi, o_lo, o_hi) for w_bound and G."""
+    W = w_bound(s, a, x, y, win)
     w1g = np.arange(-W, W + step / 2, step)
     b1g = np.arange(0.0, 2 * math.pi, step)
     Wm, Bm = np.meshgrid(w1g, b1g, indexing="ij")
@@ -109,7 +109,7 @@ def global_min(s, a, x, y, step=STEP, n_refine=N_REFINE):
         if best is None or f < best[0]:
             best = (f, float(xk[0]), float(xk[1]))
     Lb, w1, b1 = best
-    return Lb, w1, b1, float(gap([w1], [b1], a)[0]), float(L[order[0]])
+    return Lb, w1, b1, float(gap([w1], [b1], a, win[:2], win[2:])[0]), float(L[order[0]])
 
 
 def own_threshold(a, seed, w2_start):
