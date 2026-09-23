@@ -105,37 +105,82 @@ def _rglob_job(args):
             return False, rm, rp
         if rm["lower"] > rp["upper"]:
             return True, rm, rp
-        rm = certify(s, a, x, y, "-", tol=1e-9, win=win)
-        rp = certify(s, a, x, y, "+", tol=1e-9, win=win)
+        rm = certify(s, a, x, y, "-", tol=1e-9, win=win, max_cells=16_000_000)
+        rp = certify(s, a, x, y, "+", tol=1e-9, win=win, max_cells=16_000_000)
         if rm["lower"] > rp["upper"]:
             return True, rm, rp
         if rp["lower"] > rm["upper"]:
             return False, rm, rp
-        raise RuntimeError(f"sign unresolved at s={s} ({w.tag}, a={a})")
+        return None, rm, rp          # m+ and m- equal to within tolerance: s is the switch
     from .prospective import ghat_window as _gw
     G = _gw((w, a))["Ghat_lo"]
     # bracket in R starting from [0.20, 0.24], stepping 0.04 outward until the sign changes,
     # then bisection in |w2| until the width is below one grid step (0.05)
-    Rlo, Rhi, evals = 0.20, 0.24, 0
+    Rlo, Rhi, evals, ties = 0.20, 0.24, 0, 0
     flo, fhi = plus(2 * Rlo / G)[0], plus(2 * Rhi / G)[0]
     evals += 2
+    if flo is None or fhi is None:            # a tie at an endpoint: that endpoint is the switch
+        s_t = 2 * (Rlo if flo is None else Rhi) / G
+        return {"window": w.tag, "a": a, "w2_glob_lo": s_t, "w2_glob_hi": s_t, "evaluations": evals,
+                "ties": 1}
     while flo and Rlo > 0.02:
         Rhi, fhi = Rlo, flo
         Rlo = round(Rlo - 0.04, 6); flo = plus(2 * Rlo / G)[0]; evals += 1
+        if flo is None:
+            s_t = 2 * Rlo / G
+            return {"window": w.tag, "a": a, "w2_glob_lo": s_t, "w2_glob_hi": s_t, "evaluations": evals, "ties": 1}
     while not fhi and Rhi < 1.0:
         Rlo, flo = Rhi, fhi
         Rhi = round(Rhi + 0.04, 6); fhi = plus(2 * Rhi / G)[0]; evals += 1
+        if fhi is None:
+            s_t = 2 * Rhi / G
+            return {"window": w.tag, "a": a, "w2_glob_lo": s_t, "w2_glob_hi": s_t, "evaluations": evals, "ties": 1}
     if flo or not fhi:
-        return {"window": w.tag, "a": a, "w2_glob_lo": np.nan, "w2_glob_hi": np.nan, "evaluations": evals}
+        return {"window": w.tag, "a": a, "w2_glob_lo": np.nan, "w2_glob_hi": np.nan, "evaluations": evals,
+                "ties": 0}
     lo, hi = 2 * Rlo / G, 2 * Rhi / G
+    tie_at = np.nan
     while hi - lo >= 0.05:
         mid = 0.5 * (lo + hi)
         evals += 1
-        if plus(mid)[0]:
+        f_mid = plus(mid)[0]
+        if f_mid is None:                     # tie at mid: m+ = m- to within 1e-9 (the switch is in the
+            ties += 1                         # resolved bracket [lo, hi], near mid); keep the bracket
+            tie_at = mid
+            break
+        if f_mid:
             hi = mid
         else:
             lo = mid
-    return {"window": w.tag, "a": a, "w2_glob_lo": lo, "w2_glob_hi": hi, "evaluations": evals}
+    return {"window": w.tag, "a": a, "w2_glob_lo": lo, "w2_glob_hi": hi, "evaluations": evals, "ties": ties,
+            "tie_at_w2": tie_at}
+
+
+def _rglob_safe(args):
+    try:
+        return _rglob_job(args)
+    except Exception as e:                   # never lose the other settings
+        return {"window": args[0].tag, "a": args[1], "w2_glob_lo": np.nan, "w2_glob_hi": np.nan,
+                "error": repr(e)}
+
+
+def rglob_fix_ties():
+    """Recompute the settings whose bisection stopped at a tie, keeping the resolved bracket."""
+    d = pd.read_csv(RESULTS / "prospective_rglob_all.csv")
+    existing, held = windows()
+    byname = {w.tag: w for w in existing + held}
+    tied = d[d.ties > 0]
+    with Pool(WORKERS) as p:
+        out = p.map(_rglob_safe, [(byname[r.window], float(r.a)) for r in tied.itertuples()])
+    new = pd.DataFrame(out)
+    g = pd.read_csv(RESULTS / "prospective_ghat.csv")
+    new = new.merge(g[["window", "a", "Ghat_lo"]], on=["window", "a"], how="left")
+    new["R_glob"] = 0.5 * (new.w2_glob_lo + new.w2_glob_hi) * new.Ghat_lo / 2
+    new["R_glob_lo"], new["R_glob_hi"] = new.w2_glob_lo * new.Ghat_lo / 2, new.w2_glob_hi * new.Ghat_lo / 2
+    keep = d[d.ties == 0]
+    d = pd.concat([keep, new], ignore_index=True).sort_values(["window", "a"])
+    d.to_csv(RESULTS / "prospective_rglob_all.csv", index=False)
+    print(new.to_string(index=False))
 
 
 def rglob(which="all"):
@@ -143,7 +188,7 @@ def rglob(which="all"):
     ws = {"all": existing + held, "held": held, "existing": existing}[which]
     jobs = [(w, a) for w in ws for a in A_VALUES]
     with Pool(WORKERS) as p:
-        out = p.map(_rglob_job, jobs)
+        out = p.map(_rglob_safe, jobs)
     d = pd.DataFrame(out)
     g = pd.read_csv(RESULTS / "prospective_ghat.csv")
     d = d.merge(g[["window", "a", "Ghat_lo"]], on=["window", "a"], how="left")
@@ -159,7 +204,10 @@ if __name__ == "__main__" and sys.argv[1] in ("ghat", "rglob"):
     if cmd == "ghat":
         ghat()
     elif cmd == "rglob":
-        rglob(sys.argv[2] if len(sys.argv) > 2 else "all")
+        if len(sys.argv) > 2 and sys.argv[2] == "fixties":
+            rglob_fix_ties()
+        else:
+            rglob(sys.argv[2] if len(sys.argv) > 2 else "all")
 
 
 # ------------------------------------------------------------------ calibration and predictions

@@ -47,9 +47,9 @@ WORKERS = int(os.environ.get("FS_WORKERS", "4"))
 def _ghat_and_glob():
     g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
     G = float(g[g.a.round(2) == A].Ghat_certified.iloc[0])
-    t = pd.read_csv(RESULTS / "cond_certified_thresholds.csv")
-    r = t[t.a.round(2) == A].iloc[0]
-    w2_glob = 0.5 * (r.w2_glob_lo + r.w2_glob_hi)
+    t = pd.read_csv(RESULTS / "cond_certified_brackets.csv")
+    r = t[(t.a.round(2) == A) & (t.kind == "glob")].iloc[0]
+    w2_glob = 0.5 * (r.w2_lo + r.w2_hi)
     return G, w2_glob, w2_glob * G / 2
 
 
@@ -161,3 +161,222 @@ def replay(ck, level, variant, horizon, stop_on, G_hat, w2_glob, branch=None, x=
             "placed_end": Gend > 0, "grad_start": g_start, "grad_end": float(p.grad.norm()),
             "sat_start": sat0, "dist_branch_end": dist,
             "traj_G": ";".join(f"{t}:{g:.6g}" for t, g in traj)}
+
+
+if __name__ == "__main__" and sys.argv[1] == "train":
+    train(sys.argv[2])
+
+
+# ------------------------------------------------------------------ checkpoint selection and replays
+STRATA = ((0.2, 0.5), (0.5, 0.8), (0.8, 1.0), (1.0, 1.3))
+H4, H5 = 4_000, 12_000
+
+
+def _load():
+    with open(STATE_DIR / "checkpoints.pkl", "rb") as fh:
+        return pickle.load(fh)
+
+
+def _branch_argmins(G_hat, w2_glob):
+    """Certified global conditional minimiser (w1, b1) at each held scale s = level * w2_glob."""
+    from . import blockB_landscape as bb
+    from .profiled_bnb import certify
+    x, y = bb.population_data()
+    x, y = x.numpy(), y.numpy()
+    out = {}
+    for lv in LEVELS:
+        s = lv * w2_glob
+        rm = certify(s, A, x, y, "-")
+        rp = certify(s, A, x, y, "+")
+        g = rp if rp["upper"] < rm["upper"] else rm
+        out[lv] = (abs(g["arg_w1"]), g["arg_b1"])            # w1 folded: the data are x-symmetric
+    return out
+
+
+def select4(states, G_hat, w2_glob):
+    """Block 4: before placement (G < 0), latest checkpoint per run per R/R_glob stratum."""
+    R_glob = w2_glob * G_hat / 2
+    by_seed = {}
+    for s in states:
+        by_seed.setdefault(s["seed"], []).append(s)
+    chosen = []
+    for seed, ss in by_seed.items():
+        placed = [s["step"] for s in ss if s["first_placement"]]
+        t_place = placed[0] if placed else math.inf
+        pre = [s for s in ss if s["step"] < t_place and s["G"] < 0]
+        for lo, hi in STRATA:
+            cand = [s for s in pre if lo <= abs(s["theta"][2]) * G_hat / 2 / R_glob < hi]
+            if cand:
+                c = max(cand, key=lambda s: s["step"])
+                chosen.append({**c, "stratum": f"[{lo},{hi})"})
+    return chosen
+
+
+def select5(states):
+    return [s for s in states if s["first_placement"]]
+
+
+def _decisions_preserved(ck, k):
+    import torch
+    from .fold1d import activation, make_data
+    f = activation("sin_family", A)
+    x, _ = make_data(200, ck["seed"])
+    x = x.double()
+    w1, b1, w2, b2 = (float(v) for v in ck["theta"])
+    z = w2 * f(w1 * x + b1) + b2
+    return bool(torch.equal(torch.sign(z), torch.sign(k * z)))
+
+
+def _k1_check(ck, steps=25):
+    """Registered check: 'preserved' replay at k = 1 vs an independent frozen-w2 continuation."""
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import activation, make_data
+    f = activation("sin_family", A)
+    x, y = make_data(200, ck["seed"])
+    x, y = x.double(), y.double()
+    th = torch.tensor(ck["theta"], dtype=torch.float64, requires_grad=True)
+    opt = torch.optim.Adam([th], lr=LR)
+    opt.state[th] = {"step": torch.tensor(float(ck["adam_step"])),
+                     "exp_avg": torch.tensor(ck["exp_avg"], dtype=torch.float64),
+                     "exp_avg_sq": torch.tensor(ck["exp_avg_sq"], dtype=torch.float64)}
+    for _ in range(steps):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y).backward()
+        th.grad[2] = 0.0
+        opt.step()
+    ind = th.detach().numpy()[[0, 1, 3]]
+    # replay implementation, same checkpoint, k = 1, 'preserved'
+    w1, b1, w2, b2 = (float(v) for v in ck["theta"])
+    p = torch.tensor([w1, b1, b2], dtype=torch.float64, requires_grad=True)
+    o2 = torch.optim.Adam([p], lr=LR)
+    o2.state[p] = {"step": torch.tensor(float(ck["adam_step"])),
+                   "exp_avg": torch.tensor(ck["exp_avg"][[0, 1, 3]], dtype=torch.float64),
+                   "exp_avg_sq": torch.tensor(ck["exp_avg_sq"][[0, 1, 3]], dtype=torch.float64)}
+    w2t = torch.tensor(w2, dtype=torch.float64)
+    for _ in range(steps):
+        o2.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(w2t * f(p[0] * x + p[1]) + p[2], y).backward()
+        o2.step()
+    return float(np.abs(ind - p.detach().numpy()).max())
+
+
+def _replay_job(args):
+    ck, level, variant, horizon, stop_on, G_hat, w2_glob, branch = args
+    import torch
+    torch.set_num_threads(1)
+    r = replay(ck, level, variant, horizon, stop_on, G_hat, w2_glob, branch=branch)
+    r["decisions_preserved"] = _decisions_preserved(ck, r["k"])
+    r["stratum"] = ck.get("stratum", "")
+    r["ck_G"] = ck["G"]
+    r["ck_R_over_glob"] = abs(ck["theta"][2]) * G_hat / 2 / (w2_glob * G_hat / 2)
+    return r
+
+
+def run_replays(block):
+    G_hat, w2_glob, R_glob = _ghat_and_glob()
+    states = _load()
+    cks = select4(states, G_hat, w2_glob) if block == 4 else select5(states)
+    horizon, stop_on = (H4, "place") if block == 4 else (H5, "lose")
+    br = _branch_argmins(G_hat, w2_glob)
+    jobs = [(ck, lv, var, horizon, stop_on, G_hat, w2_glob, br[lv])
+            for ck in cks for lv in LEVELS for var in ("preserved", "reset")]
+    k1 = [_k1_check(ck) for ck in cks[:20]]
+    print(f"block {block}: {len(cks)} checkpoints, {len(jobs)} replays; k=1 check max diff {max(k1):.2e}",
+          flush=True)
+    with Pool(WORKERS) as p:
+        out = p.map(_replay_job, jobs, chunksize=4)
+    d = pd.DataFrame(out)
+    d["k1_check_max_diff"] = max(k1)
+    d.to_csv(RESULTS / f"fixed_scale_block{block}.csv", index=False)
+    print(f"decisions preserved in {int(d.decisions_preserved.sum())} of {len(d)}", flush=True)
+
+
+if __name__ == "__main__" and sys.argv[1] in ("replay4", "replay5"):
+    run_replays(4 if sys.argv[1] == "replay4" else 5)
+
+
+# ------------------------------------------------------------------ scoring (as registered)
+def _mcnemar_one_sided(b, c):
+    """Exact one-sided McNemar: P(X >= b) with X ~ Bin(b + c, 1/2); b = discordant pairs in the tested direction."""
+    n = b + c
+    if n == 0:
+        return 1.0
+    return sum(math.comb(n, i) for i in range(b, n + 1)) / 2 ** n
+
+
+def _clopper(k, n, alpha=0.05):
+    def tail_ge(p):
+        return sum(math.comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(k, n + 1))
+
+    def tail_le(p):
+        return sum(math.comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(0, k + 1))
+    lo, hi = 0.0, 1.0
+    if k > 0:
+        a, b = 0.0, 1.0
+        for _ in range(60):
+            m = (a + b) / 2
+            a, b = (m, b) if tail_ge(m) < alpha / 2 else (a, m)
+        lo = a
+    if k < n:
+        a, b = 0.0, 1.0
+        for _ in range(60):
+            m = (a + b) / 2
+            a, b = (m, b) if tail_le(m) > alpha / 2 else (a, m)
+        hi = a
+    return lo, hi
+
+
+def _crossing(levels, frac, target=0.5):
+    for i in range(1, len(levels)):
+        if (frac[i - 1] - target) * (frac[i] - target) <= 0 and frac[i] != frac[i - 1]:
+            return levels[i - 1] + (target - frac[i - 1]) * (levels[i] - levels[i - 1]) / (frac[i] - frac[i - 1])
+    return float("nan")
+
+
+def score(block):
+    d = pd.read_csv(RESULTS / f"fixed_scale_block{block}.csv")
+    if block == 4:
+        d["success"] = d.placed_end.astype(bool)
+    else:
+        d["success"] = d.first_hit.isna()                       # retained: never lost
+    rows, tests = [], []
+    for var, g in d.groupby("variant"):
+        piv = g.pivot_table(index=["seed", "ck_step"], columns="level", values="success", aggfunc="first")
+        lv = sorted(piv.columns)
+        frac = [float(piv[l].mean()) for l in lv]
+        for l, f_ in zip(lv, frac):
+            k, n = int(piv[l].sum()), int(piv[l].notna().sum())
+            lo, hi = _clopper(k, n)
+            rows.append({"variant": var, "level": l, "k": k, "n": n, "frac": f_, "ci95_lo": lo, "ci95_hi": hi})
+        # monotonicity: any higher level significantly BELOW a lower level (paired, one-sided)
+        viol = []
+        for i, li in enumerate(lv):
+            for lj in lv[i + 1:]:
+                b = int(((piv[li] == True) & (piv[lj] == False)).sum())   # lower level success, higher fail
+                c = int(((piv[li] == False) & (piv[lj] == True)).sum())
+                p = _mcnemar_one_sided(b, c)
+                if p < 0.05:
+                    viol.append((li, lj, b, c, p))
+        x50 = _crossing(lv, frac)
+        x10, x90 = _crossing(lv, frac, 0.1), _crossing(lv, frac, 0.9)
+        rec = {"variant": var, "x50": x50, "x10": x10, "x90": x90, "width_10_90": x90 - x10,
+               "monotonic_violations": len(viol), "violations": str(viol)}
+        if block == 4:
+            imax = int(np.argmax(frac))
+            b = int(((piv[lv[imax]] == True) & (piv[2.0] == False)).sum())
+            c = int(((piv[lv[imax]] == False) & (piv[2.0] == True)).sum())
+            rec.update({"D1_x50_in_band": 0.9 <= x50 <= 1.25, "D1_pass": (0.9 <= x50 <= 1.25) and not viol
+                        and frac[-1] >= frac[0],
+                        "D2_level_of_max": lv[imax], "D2_p": _mcnemar_one_sided(b, c),
+                        "D2_pass": _mcnemar_one_sided(b, c) < 0.05 and lv[imax] != 2.0})
+        else:
+            rec.update({"location_in_band": 0.9 <= x50 <= 1.1, "monotone_pass": not viol})
+        tests.append(rec)
+    pd.DataFrame(rows).to_csv(RESULTS / f"fixed_scale_block{block}_curve.csv", index=False)
+    pd.DataFrame(tests).to_csv(RESULTS / f"fixed_scale_block{block}_tests.csv", index=False)
+    print(pd.DataFrame(rows).to_string(index=False)); print(pd.DataFrame(tests).T.to_string())
+
+
+if __name__ == "__main__" and sys.argv[1] in ("score4", "score5"):
+    score(4 if sys.argv[1] == "score4" else 5)
