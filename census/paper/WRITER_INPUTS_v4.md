@@ -165,4 +165,41 @@ MATH_NOTE_SECTION
   implementation check, not an outcome.
 - **E-2 stays failed** whatever these blocks show.
 
+### Block 4 — fixed-scale dynamics: D1 passed, D2 failed
+
+Registered `fixed_scale_prediction.md` (`888344d`; validity check amended at `10c1ea5`, before any outcome).
+Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer `src/fixed_scale.py`.
+
+**Design.**
+- **Checkpoints**: 543 before-placement checkpoints (G < 0) from 180 fresh runs.
+- **Rescaling**: (w₂, b₂) jointly rescaled so that R/R_glob lands on a fixed grid. This preserves
+  every decision; verified in 8,688 of 8,688 replays.
+- **Replay**: |w₂| held fixed while (w₁, b₁, b₂) train for 4,000 steps, with Adam moments either
+  preserved or reset.
+
+| R/R_glob | 0.6 | 0.8 | 0.9 | 1.0 | 1.1 | 1.25 | 1.5 | 2.0 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| placed at 4,000 steps (n = 543) | 0.000 | 0.000 | 0.013 | 0.309 | 0.700 | 0.967 | 0.989 | 0.989 |
+
+- **D1 (equilibrium) passed**, in both optimiser-state variants. The 50% point is **1.049**, inside
+  the registered [0.9, 1.25], with no significant monotonicity violation.
+- **D2 (saturation) failed**: placement does not fall at 2× the threshold.
+- **Scope of the claim — state it exactly this way**:
+
+  > At a = 1.30 in the base window, under Adam, with moments preserved or reset, where training ends
+  > up at a fixed output scale is set by the conditional threshold: the placed fraction switches
+  > around R/R_glob ≈ 1.05 at a 4,000-step horizon.
+
+  Do not generalise beyond this setting, optimiser or horizon.
+- **The two variants**: they differ early (first-step ΔG by up to 0.14; time to first G > 0 in 25% of
+  replays) but end with the same placement outcome in every pair.
+- **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
+  point move toward 1.0 at 4× and 16× the horizon? **Pending.**
+- **Exploratory, post hoc — critical slowing.** The recorded 25-step first-placement times cannot
+  support a relaxation fit: placement above the threshold happens within 25–50 steps at every level.
+  Integrating that along free training predicts an offset of about 1–2%, far below the observed 9.6%.
+  Fixed-scale relaxation therefore does not appear to explain the free-training offset. Per-step
+  settling times are being recorded in the long-horizon replays. No prospective design has been
+  written.
+
 BLOCKS45_SECTION
