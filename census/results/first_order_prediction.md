@@ -1,0 +1,63 @@
+# Registration: the first-order coefficient c₁ at small ε
+
+**Written before any certified Ĝ(a) or R_glob(a) at a = 1.01, 1.02, 1.03 or 1.04 is computed for this test.**
+Date: 2026-09-23 13:55 EDT. Producer: `src/first_order.py` (`finite`, `score`), committed with this file.
+
+## Prediction (computed independently of unconstrained training trajectories)
+
+`first_order_c1.csv` and `math_note_v2.md` §8 give the complete first-order calculation: the switch shift by
+the implicit-function theorem plus the correction to K.
+
+  R_glob(ε) = R_glob^∞ (1 + c₁ε + O(ε²)),   **c₁ ∈ [0.2852300, 0.2852303]**,
+  with A′(0)/A* ∈ [0.6621547, 0.6621550] and k₁ ∈ [−0.37692472, −0.37692472].
+
+R_glob^∞ ∈ [0.1985926, 0.1985927] (Krawczyk A* × the K enclosure). This is conditional on the annulus
+certificate (math_note_v2 (c)).
+
+## Procedure (a = 1.01, 1.02, 1.03, 1.04; ε = a − 1; 800-point quadrature objective, as in Block 1c)
+
+- **Ĝ(a)**: `ghat_bnb.certify(a, target_rel = 1e−6)`, a global branch and bound.
+- **R_glob(a)**: the Block 1c bracket procedure (`conditional_certified.evaluate`: certified m₋ against m₊,
+  tolerance 1e−7, tightened to 1e−9).
+  - Start at s₀ = A*/ε^{3/2}, the limit value, not the prediction.
+  - Step outward by 1% until the certified status flips.
+  - Bisect until the relative width in s is ≤ 2e−4.
+  - If a midpoint is unresolved, stop and use the last resolved bracket. Its width is reported, and the
+    tolerance below adapts to it.
+- **R interval**: [s_lo·Ĝ_lo/2, s_hi·Ĝ_hi/2].
+
+## Registered test (primary)
+
+- **Feasible set** C: the set of c₁ for which some R∞ in its interval and some c₂ ∈ ℝ make
+  R∞(1 + c₁ε + c₂ε²) pass through all four certified R_glob intervals.
+  - Each interval is widened by ±ε³·R∞, which allows an O(ε³) term with |c₃| ≤ 1.
+  - C is computed exactly (a 2D linear program per R∞).
+  - The tolerance is therefore set by the bracket widths actually attained.
+- **PASS** iff the predicted c₁ interval meets C.
+- **FAIL** iff it does not, or if C is empty (no law of that form fits). Either way, the perturbation
+  calculation or its hypotheses contain an error, and it is reported.
+- **INCONCLUSIVE** iff C is wider than 0.1 (brackets too coarse to test). It is reported as such, not as
+  a pass.
+- **Competing values**, each reported as excluded or not by C:
+  - 0.49, the earlier incomplete prediction;
+  - −0.377, the K correction alone;
+  - 0.662, the switch shift alone;
+  - 0, no first-order term.
+- **If PASS**: the large-ε mismatch (the one-term law fails, §5) is higher order, and the note says so.
+- **Not discriminated by design**: the large-ε two-term range [0.243, 0.321] contains 0.285. This test
+  checks the derivation; it does not separate it from that fit.
+
+## Registered component tests (secondary)
+
+The same feasible-set construction is applied to each component separately:
+- **k₁**: on K(ε) = Ĝ(a)/ε^{3/2}, against K ∈ the branch-and-bound enclosure.
+- **A′(0)/A***: on A_ε = s·ε^{3/2}, against the Krawczyk A*.
+
+## Disclosed prior exposure
+
+- **Y1 grid R_glob at a = 1.01–1.04** (`crossfamily_followup_results.md`) was seen, at resolution
+  ΔR = 0.00215. That is about 1% of R, the same size as the whole first-order effect at ε = 0.04 (0.23%
+  of R∞ per 0.01 in ε), so it cannot resolve c₁.
+- **Certified Ĝ(1.02)** (`ghat_certified_all.csv`, relative width 6e−4) was seen. The new run recomputes
+  it at 1e−6.
+- No other quantity at these a was computed.

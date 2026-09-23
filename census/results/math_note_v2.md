@@ -182,3 +182,56 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 - Global preference at finite a rests on Block 1c at the six reported a, not on the limit.
 - Everything is exact for the stated finite objective. For another sample (for example a run's own 400
   training points) the threshold differs; see `own_threshold_prediction.md`.
+
+## 8. The first-order coefficient c₁ (`src/first_order.py` → `first_order_c1.csv`)
+
+**Exact bookkeeping.** With A = sε^{3/2} and K(ε) := Ĝ(a)/ε^{3/2}, R = sĜ(a)/2 = A·K(ε)/2 exactly. So if the
+switch sits at A_ε = A* + A′(0)ε + O(ε²) and K(ε) = K(1 + k₁ε + O(ε²)), then
+
+  R_glob(ε) = R_glob^∞ (1 + c₁ε + O(ε²)),   **c₁ = A′(0)/A* + k₁**.
+
+**Expansion.** φ_ε(σ) = [f_a(π + √εσ) − π]/ε^{3/2} = h(σ) + ε r(σ) + O(ε²), with r(σ) = σ³/6 − σ⁵/120.
+Both terms come from the sine series, including the (1 + ε) factor.
+
+**Switch shift, A′(0).**
+- At the switch the gap's active pair is inner x = 0.8 and outer x = −1.2. On the box below, every other
+  candidate is strictly dominated (margins 0.625 inner and 0.108 outer), so near the switch G₀ = h(q − 1.2p) − h(q + 0.8p)
+  is smooth.
+- The switch is a zero of Φ(p, q, b, A; ε) = (∇_{p,q,b} L_ε, G_ε).
+- **At ε = 0**: a Krawczyk test on a box of radius 1e−9 certifies a unique zero, at
+  (p, q, b, A*) = (1.6680839, 1.3692319, −0.6141196, **0.68544523757565**). This is 800-point quadrature
+  objective, interval arithmetic at 30 digits. The Jacobian J = ∂_{(p,q,b,A)}Φ is invertible over the box.
+- **Implicit-function theorem**: d(p, q, b, A)/dε = −J⁻¹∂_εΦ, where
+  - ∂_ε∇_θL = mean[σ(z)(1 − σ(z))·A r(σ)·∂_θz + (σ(z) − y)·∂_θ(A r(σ))];
+  - ∂_εG = r(σ_O) − r(σ_I).
+  - The linear system is enclosed rigorously.
+- Result: **A′(0)/A* ∈ [0.6621547, 0.6621550]**.
+
+**Gap-maximiser correction, k₁.**
+- K = sup G₀ is attained at a vertex of the max–min: I(−0.8) = I(0.8) and O(−2.0) = O(−1.2). The mirror
+  vertex is v ↦ −v.
+- Krawczyk in 2D gives (u, v) = (1.6055757, 1.2041818) and K = 0.57945588342 (±2e−11). This lies inside the
+  branch-and-bound enclosure [0.5794558833, 0.5794559217].
+- It is a strict local maximum: 0 is interior to the convex hull of the four piece-gradient differences
+  (largest angular gap 3.080 < π). The other pieces are dominated.
+- The vertex equations persist under ε. Differentiating them gives K′(0) = ∂_ε(O − I) + ∇(O − I)·θ′, with
+  J_Eθ′ = −∂_εE.
+- Result: **k₁ ∈ [−0.37692472, −0.37692472]**. Check against the exact φ_ε: (K(ε)/K − 1)/ε = −0.3746, −0.3767,
+  −0.3769 at ε = 10⁻², 10⁻³, 10⁻⁴.
+
+**Result: c₁ ∈ [0.2852300, 0.2852303].**
+
+**Why the earlier prediction (≈ 0.49, `scaling_limit_results.md`) was wrong.**
+- It used K(ε) alone, with only the σ³/6 part of r.
+- It omitted the switch shift, which is the larger term and has the opposite sign: the conditional
+  minimiser trades gap against loss, as that note itself suspected.
+- The complete first-order value, 0.285, lies inside the range [0.243, 0.321] allowed by the certified
+  large-ε values (§5). So the "factor 2.4" discrepancy came from an incomplete calculation.
+- Whether 0.285 is the actual first-order slope is tested prospectively at a = 1.01–1.04
+  (`first_order_prediction.md`).
+
+**Sharp limit threshold (conditional).**
+- The Krawczyk A* combined with the K enclosure gives **R_glob^∞ ∈ [0.1985926, 0.1985927]**.
+- This identifies the global switch only with (c)'s competitor exclusion (annulus, pending). Until that is
+  certified, the unconditional statement remains the branch-and-bound bracket [0.19738, 0.19920], which
+  contains it.
