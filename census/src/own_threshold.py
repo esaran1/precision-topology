@@ -257,6 +257,30 @@ def block5_posthoc():
     print(pd.Series(out).to_string())
 
 
+
+
+
+def validate_tight():
+    """Supplementary to the registered validation: re-certify every unresolved bracket end at tolerance 1e-11
+    (profiled_bnb.certify on both regions)."""
+    from .profiled_bnb import certify
+    v = pd.read_csv(RESULTS / "own_threshold_validation.csv")
+    rows = []
+    for r in v.itertuples():
+        x, y = _data(int(r.seed))
+        for end, s_, st in (("lo", r.w2_lo, r.cert_status_lo), ("hi", r.w2_hi, r.cert_status_hi)):
+            if st != "unresolved":
+                continue
+            rm = certify(s_, 1.30, x, y, "-", tol=1e-11, max_cells=16_000_000)
+            rp = certify(s_, 1.30, x, y, "+", tol=1e-11, max_cells=16_000_000)
+            new = "minus" if rp["lower"] > rm["upper"] else "plus" if rm["lower"] > rp["upper"] else "unresolved"
+            rows.append({"seed": r.seed, "end": end, "s": s_, "status_1e-11": new,
+                         "consistent": new == ("minus" if end == "lo" else "plus"),
+                         "m_minus": rm["upper"], "m_plus": rp["upper"], "gap": rp["upper"] - rm["upper"]})
+            print(rows[-1], flush=True)
+    pd.DataFrame(rows).to_csv(RESULTS / "own_threshold_validation_tight.csv", index=False)
+
+
 if __name__ == "__main__":
     {"block4": block4, "crossing": crossing, "validate": validate, "score": score,
-     "block5_posthoc": block5_posthoc}[sys.argv[1]]()
+     "block5_posthoc": block5_posthoc, "validate_tight": validate_tight}[sys.argv[1]]()
