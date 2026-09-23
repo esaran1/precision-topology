@@ -34,6 +34,10 @@ Registered `conditional_audit_prediction.md` (`6b17508`, before any audit comput
   - Retained minimisers are stationary: gradient norm at most 2.3e-6.
   - The candidate-loss plots (`results/figures/cond_audit_candidates.pdf`) show one continuous branch
     at every a.
+- **Certified full-range scan at a = 1.30** (`cond_scan_certified_a130.csv`): at every |w₂| from 1.5 to
+  11 (step 0.5) the certified global conditional minimiser lies on one continuous branch.
+  - Its gap changes sign once, between 4.5 and 5.0.
+  - No other basin comes within +0.0031 to +0.0126 of it (certified competitor margins, radius 0.1).
 - **Stricter optimisation (1e)**: 10× steps and a gradient-norm stop at 1e-8. It agrees with the
   frozen search at all 12 thresholds, and losses agree to 2e-16.
 - **Certified thresholds (1c).**
@@ -153,9 +157,20 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
   - log-log slope 0.83 (exact range 0.71–0.96 over the certified intervals);
   - a single O(ε) term does **not** fit the certified values; a leading term plus a negative ε² term
     does, with c₁ between 0.24 and 0.32.
+  - **The one-term law is withdrawn.** The O(ε) rate rests on the theorem, not on the fit.
+  - **Warning sentence for the paper**: "A straight line through the finite-a thresholds (ε = 0.3–0.6)
+    extrapolates to 0.2002–0.2035 at ε → 0, outside the certified limit, so moderate-ε values should
+    not be extrapolated to the limit."
   - **Say**: "The O(ε) rate is proved (under the stated hypotheses); at the a we measure (ε = 0.3–0.6)
     the approach is concave and the ε² term is visible."
   - **Do not say**: "R_glob(a) is fitted by R_glob^∞(1 + c₁ε)", or quote 0.947 or 0.231.
+- **The first-order coefficient is now computed, not fitted** (`math_note_v2.md` §8, `first_order_c1.csv`):
+  - c₁ ∈ [0.2852300, 0.2852303], certified. It combines the switch shift, +0.662 (implicit-function
+    theorem at a Krawczyk-certified switch point), and the gap-maximiser correction, −0.377.
+  - The earlier "c₁ ≈ 0.49, a factor 2.4 too large" came from an incomplete calculation (K alone). Do
+    not quote it.
+  - A **registered test at a = 1.01–1.04** (`first_order_prediction.md`) is **pending**. Until it is
+    scored, present c₁ as derived, with its prediction under test.
 
 MATH_NOTE_SECTION
 

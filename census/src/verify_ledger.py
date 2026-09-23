@@ -699,6 +699,8 @@ PRODUCERS = {
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
+    "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
+    "first_order_c1.csv": ("first_order", "main", "full", ""),
     "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
     "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
     "cond_certified_brackets.csv": ("conditional_certified", "brackets", "full", ""),
@@ -759,6 +761,26 @@ def v4_checks() -> None:
     asep = pd.concat([gl.argmin_separation_lo, gl.argmin_separation_hi])
     chk("1c argmin separation min", float(asep.min()), 0.00015, 0.00005)
     chk("1c argmin separation max", float(asep.max()), 0.0011, 0.00005)
+
+    sc_ = pd.read_csv(R / "cond_scan_certified_a130.csv").sort_values("s")
+    chk("1c scan: one sign change", float(((sc_.global_region == "+").astype(int).diff().abs() == 1).sum()), 1.0, 0)
+    chk("1c scan: sign change between 4.5 and 5.0",
+        float(sc_[sc_.global_region == "+"].s.min() == 5.0 and sc_[sc_.global_region == "-"].s.max() == 4.5), 1.0, 0)
+    chk("1c scan: competitor margin min", float(sc_.competitor_margin.min()), 0.0031, 0.00005)
+    chk("1c scan: competitor margin max", float(sc_.competitor_margin.max()), 0.0126, 0.00005)
+    chk("1c scan: all competitor bounds converged", float(sc_.competitor_converged.all()), 1.0, 0)
+
+    print("V4 first-order coefficient (math_note_v2 s8)")
+    fo = pd.read_csv(R / "first_order_c1.csv").iloc[0]
+    for k_ in ("switch_krawczyk_ok", "active_set_unique", "vertex_krawczyk_ok", "other_pieces_dominated",
+               "strict_local_max", "vertex_in_bnb_enclosure"):
+        chk(k_, float(bool(fo[k_])), 1.0, 0)
+    chk("c1 lo", float(fo.c1_lo), 0.2852300, 1e-7)
+    chk("c1 hi", float(fo.c1_hi), 0.2852303, 1e-7)
+    chk("A'/A* lo", float(fo.A1_over_A_lo), 0.6621547, 1e-7)
+    chk("k1", float(fo.k1_lo), -0.37692472, 1e-8)
+    chk("A* (Krawczyk)", float(fo.A_star_lo), 0.68544523757565, 1e-12)
+    chk("R_glob^inf sharp lo", float(fo.R_glob_inf_lo), 0.1985926, 1e-7)
 
     print("V4 Block 2 (math note checks)")
     mb = dict(pd.read_csv(R / "mn2_bounds.csv").values)
