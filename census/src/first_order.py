@@ -701,7 +701,10 @@ def score_supplementary():
     out = pd.DataFrame([{"all_certified": bool(sp.certified.all()), "feasible_lo": f_lo, "feasible_hi": f_hi,
                          "feasible_width": f_hi - f_lo, "pred_lo": c.c1_lo, "pred_hi": c.c1_hi,
                          "pred_inside": bool(f_lo <= c.c1_hi and c.c1_lo <= f_hi),
-                         "max_rel_bracket_width": float(np.max((sp.s_hi - sp.s_lo) / sp.s_lo))}])
+                         "max_rel_bracket_width": float(np.max((sp.s_hi - sp.s_lo) / sp.s_lo)),
+                         **{f"competing_{name}": ("inside" if f_lo <= v <= f_hi else "below" if v < f_lo else "above")
+                            for name, v in (("0.49_earlier", 0.49), ("-0.377_K_only", -0.377),
+                                            ("0.662_switch_only", 0.662), ("0_no_first_order", 0.0))}}])
     pts = sp.assign(R_lo=R_lo, R_hi=R_hi)
     pts.to_csv(RESULTS / "first_order_supplementary.csv", index=False)
     out.to_csv(RESULTS / "first_order_supplementary_scores.csv", index=False)
