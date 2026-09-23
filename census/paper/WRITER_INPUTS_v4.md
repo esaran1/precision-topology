@@ -179,9 +179,15 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
   - **Until that test is scored**, the paper may say only: "the corrected first-order calculation is
     consistent with the certified large-ε values". It may **not** say that the first-order coefficient
     is confirmed.
-  - **The tied corner** behind k₁: the expansion is certified two-sided for |ε| ≤ 0.05 (active set
-    unchanged, strict maximum; `math_note_v2.md` §8). The corner's smallest multiplier is small (0.004),
-    so do not extend the claim beyond that range.
+  - **Range of validity**: the first-order expansion of K is certified for |ε| ≤ 0.05, i.e.
+    a ∈ [0.95, 1.05] (active set unchanged, strict maximum, two-sided; `math_note_v2.md` §8).
+    - The registered c₁ test (a = 1.01–1.04) lies inside that range, so its premises hold where it is
+      evaluated.
+    - **Do not quote first-order statements** (c₁, k₁, A′(0), or "R_glob(a) ≈ R_glob^∞(1 + c₁ε)") as
+      applying at the larger a the paper also uses (1.30–1.60, ε = 0.3–0.6). There the certified values
+      show a visible ε² term.
+    - The corner's smallest multiplier is small (0.004). Where the corner structure actually breaks is
+      being tracked up to ε = 2.0 (exploratory, `corner_tracking.py`). Pending.
 
 MATH_NOTE_SECTION
 
