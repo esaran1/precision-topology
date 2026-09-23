@@ -15,7 +15,7 @@ stage-1 run). Artifacts: `blockA5d_k1_runs.csv` (220 runs × 4 budgets, seeds
 |---|---|
 | **A1**: zero perfect runs at `a ≤ 1`, every budget | **PASS**: 0 of 160 run-budgets. No `a ≤ 1` run reached zero uniform errors, so the violation check was never triggered. Minimum uniform errors 22 (`a = 1.0`) and 30 (`a = 0.9`) at 64k |
 | **A2**: a bracketed onset `a_on(B) > 1` at every budget | **FAIL**: no grid `a` reaches ≥ half perfect at any budget (maximum 0.35, `a = 3.0` at 64k) |
-| **A3**: `a_on` non-increasing, strictly lower at 64k than 1k | **FAIL** (undefined: no bracketed onset) |
+| **A3**: `a_on` non-increasing, strictly lower at 64k than 1k | **undecidable** (no onset exists at any budget; recorded as at k = 10) |
 | **A4**: ≥ 1 perfect run at `a = 3.0`, 64k | **PASS**: 7 of 20 |
 | **A5** (exploratory): `γ`, `α_L/β` both positive | **not evaluable**: `γ` undefined with no bracketed onset (`α_L = 0.404`) |
 
@@ -42,9 +42,9 @@ no stage-2 seeds are added.
 
 - **The onset, as registered, is not observable at this capacity.** The "≥ half
   perfect" criterion is never met, even by the positive controls (GELU 0.30,
-  `a = 3.0` 0.35). A2, A3 and A5 are therefore uninformative rather than
-  contradicted. The capacity pilot fixed depth by *any* perfect seed, which
-  guaranteed A4 but not a ≥ half rate. That was a weakness of the pilot rule.
+  `a = 3.0` 0.35). A2 fails as registered; A3 and A5 are undecidable. The capacity
+  pilot selected depth on *any* perfect seed, which made A4 likely but said
+  nothing about reaching a ≥ half rate. That was a weakness of the pilot rule.
 - **Descriptive, not a registered test:** perfect runs occur only for `a ≥ 1.35`,
   and in none of the 100 runs per budget at `a ≤ 1.2`, including the three
   grid values just above the threshold. The pattern respects the barrier and

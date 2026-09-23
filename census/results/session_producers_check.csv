@@ -1,0 +1,7 @@
+artifact,rows_new,rows_ref,max_abs_diff_numeric,non_numeric_equal
+ghat_certified_all.csv,13,13,2.220446049250313e-16,True
+kappa_certified_exact.csv,10,10,9.898765834792655e-17,True
+kappa_certified_full_range.csv,12,12,5.551115123125783e-17,True
+kappa_certified_smalleps.csv,9,9,9.367506770274758e-17,True
+exact_vs_grid.csv,4800,4800,4.440892098500626e-16,True
+exact_all_solved.csv,870,870,4.440892098500626e-16,True

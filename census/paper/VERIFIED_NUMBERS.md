@@ -315,7 +315,7 @@ per cell. **Perfect = 0 errors on 20,000 uniform and 20,000 linking-region held-
 - **A1 PASS**: 0 of 160 run-budgets perfect at `a ≤ 1`; minimum 22 uniform errors.
 - **A4 PASS**: 7 of 20 at `a = 3.0`.
 - **Stop condition**: no `a` reaches half perfect at any budget (max 0.35), so **no onset
-  is measured** (A2, A3 fail; A5 not evaluable). The k = 10 run (T72) found no perfect run anywhere.
+  is measured** (A2 fails; A3, A5 undecidable). The k = 10 run (T72) found no perfect run anywhere.
 
 ## 4. Exclusion table
 
@@ -961,6 +961,21 @@ question.
 | PARTIAL | 1 | 2% |
 | UNRESOLVED | 7 | 15% |
 | **total** | **47** | |
+
+**v2 additions (2026-09-22)**, counted separately so the table above is unchanged:
+
+| block | PASS | FAIL | UNRESOLVED |
+|---|---:|---:|---:|
+| A5d, k = 10 (A1–A5) | 1 (A1, uninformative) | 2 (A2, A4) | 2 (A3, A5) |
+| A5d, k = 1 (A1–A5) | 2 (A1, A4) | 1 (A2) | 2 (A3, A5) |
+| C, optimiser equivalence (3 pairs) | 1 | 2 (failed in the favourable direction) | 0 |
+| cross-family X1, X2 | 1 (X2) | 1 (X1) | 0 |
+| cross-family follow-up Y1 | 1 | 0 | 0 |
+| **v2 total (16)** | **6** | **6** | **4** |
+
+**Combined, 63 registered predictions: 27 PASS, 24 FAIL, 1 PARTIAL, 11 UNRESOLVED.**
+The v2 unresolved outcomes are all onset-dependent predictions made undecidable by a
+registered stop condition (no onset exists), not predictions left unscored.
 
 Dates are **git-verified** from the commit that first added each registration
 document.

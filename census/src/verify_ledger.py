@@ -517,6 +517,8 @@ PRODUCERS = {
     "crossfamily_followup_thresholds.csv": ("crossfamily_followup", "run", "full", ""),
     "crossfamily_followup_scores.csv": ("crossfamily_followup", "score", "full", ""),
     "blockB_scaled_validity.csv": ("crossfamily_followup", "validity", "full", ""),
+    "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
+    "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
