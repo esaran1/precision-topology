@@ -209,7 +209,63 @@ def analyse():
     print(sp.groupby(["group", "a"]).split.describe().to_string())
 
 
+
+def _gb_job(args):
+    from .own_threshold import global_min
+    seed, level, s = args
+    x, y = _data(seed)
+    L, w1, b1, G, _ = global_min(s, 1.30, x, y)
+    return {"seed": seed, "level": level, "held_s": s, "global_branch": int(np.sign(w1)), "global_G": G, "global_L": L}
+
+
+def global_branch_levels(workers=1):
+    """The globally preferred mirror branch of each run's own loss at each held scale of the horizon replays."""
+    from .own_threshold import _pop
+    w2p = _pop(1.30)[1]
+    hz = pd.read_csv(RESULTS / "fixed_scale_horizons.csv", float_precision="round_trip")
+    pairs = hz[hz.variant == "preserved"][["seed", "level"]].drop_duplicates()
+    with Pool(workers) as p:
+        d = pd.DataFrame(p.map(_gb_job, [(int(r.seed), float(r.level), float(r.level) * w2p) for r in pairs.itertuples()],
+                               chunksize=4))
+    d.to_csv(RESULTS / "mirror_global_branch.csv", index=False)
+    print(d.describe().to_string())
+
+
+def q2_s1_breakdown():
+    """Post hoc: Q2 against own thresholds, and S1's disagreements by distance to the own threshold and by mirror
+    occupancy (64k endpoint on the globally preferred branch at the held scale, or on its mirror)."""
+    hz = pd.read_csv(RESULTS / "fixed_scale_horizons.csv", float_precision="round_trip")
+    own = pd.read_csv(RESULTS / "own_threshold_block4.csv", float_precision="round_trip")
+    gb = pd.read_csv(RESULTS / "mirror_global_branch.csv", float_precision="round_trip")
+    p = hz[hz.variant == "preserved"].merge(own[["seed", "own_over_pop"]], on="seed")
+    p = p.merge(gb[["seed", "level", "global_branch", "global_G"]], on=["seed", "level"])
+    p["placed"] = p.placed_64000.astype(bool)
+    p["own_rule"] = p.level > p.own_over_pop
+    p["branch_end"] = [_canon(w, s) for w, s in zip(p.w1_64000, p.w2_sign)]
+    p["on_mirror"] = p.branch_end != p.global_branch
+    p["dist"] = (p.level / p.own_over_pop - 1).abs()
+    p["dist_bin"] = pd.cut(p.dist, [0, 0.01, 0.03, 0.05, np.inf], labels=["<1%", "1-3%", "3-5%", ">5%"], right=False)
+    seeds = own[own.seed.isin(p.seed.unique())]
+    rows = [{"part": "Q2 vs own", "level": lv, "frac_seeds_own_below_level": float((seeds.own_over_pop < lv).mean()),
+             "placed_frac_64k": float(p[p.level.round(2) == lv].placed.mean()),
+             "placed_n": int(p[p.level.round(2) == lv].placed.sum()),
+             "placed_above_own": int((p[p.level.round(2) == lv].placed & p[p.level.round(2) == lv].own_rule).sum()),
+             "placed_below_own": int((p[p.level.round(2) == lv].placed & ~p[p.level.round(2) == lv].own_rule).sum()),
+             "placed_below_own_on_mirror": int((p[p.level.round(2) == lv].placed & ~p[p.level.round(2) == lv].own_rule
+                                                & p[p.level.round(2) == lv].on_mirror).sum())} for lv in (0.9, 0.95)]
+    for key in ("dist_bin", "on_mirror"):
+        for k, g in p.groupby(key, observed=False):
+            rows.append({"part": f"S1 by {key}", "group": str(k), "n": len(g), "agreement": float((g.own_rule == g.placed).mean()),
+                         "disagreements": int((g.own_rule != g.placed).sum()),
+                         "placed_but_below_own": int((~g.own_rule & g.placed).sum()),
+                         "unplaced_but_above_own": int((g.own_rule & ~g.placed).sum())})
+    t = pd.DataFrame(rows)
+    t.to_csv(RESULTS / "mirror_q2_s1_breakdown.csv", index=False)
+    print(t.to_string(index=False))
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else int(os.environ.get("MB_WORKERS", "3"))
-    {"thresholds": lambda: thresholds(w), "analyse": analyse}[cmd]()
+    {"thresholds": lambda: thresholds(w), "analyse": analyse, "global_branch": lambda: global_branch_levels(w),
+     "breakdown": q2_s1_breakdown}[cmd]()
