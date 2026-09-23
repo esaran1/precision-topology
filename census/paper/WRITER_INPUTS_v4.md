@@ -253,7 +253,21 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
 - **The two variants**: they differ early (first-step ΔG by up to 0.14; time to first G > 0 in 25% of
   replays) but end with the same placement outcome in every pair.
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
-  point move toward 1.0 at 4× and 16× the horizon? **Pending.**
+  point move toward 1.0 at 4× and 16× the horizon? **Q1 FAILED, Q2 FAILED; the registered competing
+  outcome holds** (`fixed_scale_horizons_tests.csv`).
+
+  | horizon | 4,000 | 16,000 | 64,000 |
+  |---|---:|---:|---:|
+  | x₅₀ (preserved) | 1.0458 | 1.0450 | 1.0454 |
+  | placed at 0.9× | 0.0129 | 0.0129 | 0.0147 |
+  | placed at 0.95× | 0.094 | 0.092 | 0.094 |
+
+  - **The 50% point does not move with horizon.** It stays at 1.045 from 4k to 64k, the same under reset
+    moments, inside the competing band [1.03, 1.07].
+  - **Say**: "at a fixed output scale the switch sits about 4.5% above the conditional threshold, and
+    this is an equilibrium, not a finite-horizon effect."
+  - **Q2**: placement below the threshold does not vanish at long horizons: 8/543 at 0.9× and 9.4% at
+    0.95× at 64k. The 7 runs placed at 0.9× at 4k all persist, and one more places by 64k.
   - **A validity check fired and was amended before scoring.** The registered check requires the
     4,000-step outcome to reproduce Block 4 exactly, and it returned False.
   - **Cause**: Block 4's stored values were read with a CSV parser that is off by up to 1e−16, then
@@ -305,7 +319,14 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
       unresolved at 1e−9, and 0 contradicted. At 1e−11, 19/20.
     - The 1.033 (Block 4/5 seeds) against 1.063 (1d seeds) medians differ by sampling variation: the
       difference is 0.029, 95% interval [−0.017, 0.067].
-  - **S1, S2: pending** (the long-horizon replays).
+  - **S1 (per replay): FAIL.** The own-seed rule (placed iff held R > the run's own R_glob) agrees
+    with 89.4% of the 2,715 replays at 64k, below the registered 95%. It does beat the population rule
+    (76.0%) by 13.4 points, above the registered 5.
+  - **S2 (50% point): PASS.** x₅₀(64k) = 1.0454 against the median own/pop = 1.0359 over the replays'
+    seeds, a difference of 0.0095 (tolerance ±0.02). So the fixed-scale switch's position above the
+    population threshold is accounted for by the runs' own thresholds.
+  - Scored with the scorer committed before the data (`a015ace`), unchanged; the current refactored
+    scorer gives identical output.
 
 ## Block 5 — retention just after placement: both registered predictions PASSED
 

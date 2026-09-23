@@ -1,3 +1,5 @@
-test,n_crossing_runs,median_own_over_pop_minus_1,required_excess,S3a_pass,spearman_rho,spearman_p_one_sided,S3b_pass,offset_vs_own,offset_vs_pop,S3c_pass,competing_centred_within_1pct,pass
-S3 a=1.30,38,0.05737704918032782,0.048,True,0.8768262772042666,9.99990000099999e-06,True,0.03082026015087811,0.091609195448931,True,False,True
-S3 a=1.50,38,0.05555555555555558,0.063,False,0.8805823592093852,9.99990000099999e-06,True,0.06396980434132524,0.11893987443497078,True,False,False
+test,n,own_rule_agreement,pop_rule_agreement,pass,x50_64k,median_own_over_pop,diff,n_crossing_runs,median_own_over_pop_minus_1,required_excess,S3a_pass,spearman_rho,spearman_p_one_sided,S3b_pass,offset_vs_own,offset_vs_pop,S3c_pass,competing_centred_within_1pct
+S1,2715.0,0.8939226519337017,0.7602209944751381,False,,,,,,,,,,,,,,
+S2,,,,True,1.0453947368421053,1.0359394703656997,0.0094552664764056,,,,,,,,,,,
+S3 a=1.30,,,,True,,,,38.0,0.05737704918032782,0.048,True,0.8768262772042666,9.99990000099999e-06,True,0.03082026015087811,0.091609195448931,True,False
+S3 a=1.50,,,,False,,,,38.0,0.05555555555555558,0.063,False,0.8805823592093852,9.99990000099999e-06,True,0.06396980434132524,0.11893987443497078,True,False

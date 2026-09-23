@@ -702,6 +702,9 @@ PRODUCERS = {
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
+    "fixed_scale_horizons_tests.csv": ("fixed_scale", "score_horizons", "full", ""),
+    "fixed_scale_horizons_curve.csv": ("fixed_scale", "score_horizons", "full", ""),
+    "fixed_scale_horizons_check.csv": ("fixed_scale", "check_horizons", "full", ""),
     "own_threshold_crossing.csv": ("own_threshold", "_run", "full", ""),
     "own_threshold_block4.csv": ("own_threshold", "_run", "full", ""),
     "own_threshold_validation.csv": ("own_threshold", "validate", "full", ""),
@@ -841,6 +844,25 @@ def v4_checks() -> None:
         chk(f"S3 a={a_}: offset vs own", float(r_.offset_vs_own), oo_, 0.0001)
         chk(f"S3 a={a_}: offset vs pop", float(r_.offset_vs_pop), op_, 0.0001)
         chk(f"S3 a={a_}: verdict", float(r_["pass"]), float(pass_), 0)
+    s1_ = sc3.loc["S1"]
+    chk("S1 own-rule agreement", float(s1_.own_rule_agreement), 0.8939, 0.0001)
+    chk("S1 pop-rule agreement", float(s1_.pop_rule_agreement), 0.7602, 0.0001)
+    chk("S1 n replays", float(s1_.n), 2715.0, 0)
+    chk("S1 verdict", float(s1_["pass"]), 0.0, 0)
+    s2_ = sc3.loc["S2"]
+    chk("S2 x50 64k", float(s2_.x50_64k), 1.0454, 0.0001)
+    chk("S2 median own/pop", float(s2_.median_own_over_pop), 1.0359, 0.0001)
+    chk("S2 verdict", float(s2_["pass"]), 1.0, 0)
+    ht_ = pd.read_csv(R / "fixed_scale_horizons_tests.csv").set_index("variant")
+    chk("Q1 preserved", float(ht_.loc["preserved", "Q1_pass"]), 0.0, 0)
+    chk("Q2 preserved", float(ht_.loc["preserved", "Q2_pass"]), 0.0, 0)
+    chk("competing outcome preserved", float(ht_.loc["preserved", "competing_outcome"]), 1.0, 0)
+    for h_, v_ in (("x50_4k", 1.0458), ("x50_16k", 1.0450), ("x50_64k", 1.0454)):
+        chk(f"horizon {h_}", float(ht_.loc["preserved", h_]), v_, 0.0001)
+    chk("frac 0.9 at 64k", float(ht_.loc["preserved", "frac09_64k"]), 0.0147, 0.0001)
+    chk("frac 0.95 at 64k", float(ht_.loc["preserved", "frac095_64k"]), 0.0939, 0.0001)
+    hc_ = pd.read_csv(R / "fixed_scale_horizons_check.csv").iloc[0]
+    chk("amended reproduction check", float(hc_.reproduced and hc_.rows_compared == 3258), 1.0, 0)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")
