@@ -437,3 +437,120 @@ def score(block):
 
 if __name__ == "__main__" and sys.argv[1] in ("score4", "score5"):
     score(4 if sys.argv[1] == "score4" else 5)
+
+
+# ------------------------------------------------------------------ horizon extension (registered cdfbf9d)
+HORIZONS = (4_000, 16_000, 64_000)
+H_LEVELS = (0.9, 0.95, 1.0, 1.05, 1.1)
+
+
+def replay_multi(ck, level, variant, w2_glob, branch):
+    """Same dynamics as `replay` (identical update sequence), recording the outcome at each horizon."""
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import activation, make_data
+    torch.set_num_threads(1)
+    f = activation("sin_family", A)
+    x, y = make_data(200, ck["seed"])
+    x, y = x.double(), y.double()
+    w1, b1, w2, b2 = (float(v) for v in ck["theta"])
+    k = level * w2_glob / abs(w2)
+    w2n, b2n = w2 * k, b2 * k
+    p = torch.tensor([w1, b1, b2n], dtype=torch.float64, requires_grad=True)
+    opt = torch.optim.Adam([p], lr=LR)
+    if variant == "preserved":
+        opt.state[p] = {"step": torch.tensor(float(ck["adam_step"])),
+                        "exp_avg": torch.tensor(ck["exp_avg"][[0, 1, 3]], dtype=torch.float64),
+                        "exp_avg_sq": torch.tensor(ck["exp_avg_sq"][[0, 1, 3]], dtype=torch.float64)}
+    w2t = torch.tensor(w2n, dtype=torch.float64)
+    out = {"seed": ck["seed"], "ck_step": ck["step"], "level": level, "variant": variant, "k": k}
+    first_hit, last_nonpos = None, 0
+    for t in range(1, HORIZONS[-1] + 1):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(w2t * f(p[0] * x + p[1]) + p[2], y).backward()
+        opt.step()
+        # exploratory settling time: every step up to 1,000, then every 25 (checks do not alter dynamics)
+        if t <= 1000 or t % 25 == 0 or t in HORIZONS:
+            G = _gap(f, float(p[0]), float(p[1]), w2n)
+            if first_hit is None and G > 0:
+                first_hit = t
+            if G <= 0:
+                last_nonpos = t
+            if t in HORIZONS:
+                ew1, eb1 = float(p[0]), float(p[1])
+                out[f"G_{t}"] = G
+                out[f"placed_{t}"] = G > 0
+                out[f"dist_{t}"] = _branch_distance(ew1, eb1, w2n, branch)
+                out[f"w1_{t}"], out[f"b1_{t}"] = ew1, eb1
+    out["first_hit"] = first_hit
+    out["settle_step"] = (last_nonpos + 1) if out[f"placed_{HORIZONS[-1]}"] else None   # exploratory
+    out["w2_sign"] = float(np.sign(w2n))
+    return out
+
+
+def _multi_job(args):
+    return replay_multi(*args)
+
+
+def run_horizons():
+    G_hat, w2_glob, R_glob = _ghat_and_glob()
+    cks = select4(_load(), G_hat, w2_glob)
+    br = _branch_argmins_levels(H_LEVELS, w2_glob)
+    jobs = [(ck, lv, var, w2_glob, br[lv]) for ck in cks for lv in H_LEVELS for var in ("preserved", "reset")]
+    print(f"{len(jobs)} long replays", flush=True)
+    with Pool(WORKERS) as p:
+        out = p.map(_multi_job, jobs, chunksize=2)
+    d = pd.DataFrame(out)
+    # validity check: the 4,000-step outcome must reproduce Block 4 exactly
+    b4 = pd.read_csv(RESULTS / "fixed_scale_block4.csv")
+    m = d.merge(b4[["seed", "ck_step", "level", "variant", "placed_end", "G_end"]],
+                on=["seed", "ck_step", "level", "variant"], how="inner")
+    d["block4_reproduced_rows"] = len(m)
+    d["block4_reproduced_all"] = bool((m.placed_4000 == m.placed_end).all() and
+                                      np.allclose(m.G_4000, m.G_end, atol=0, rtol=0))
+    d.to_csv(RESULTS / "fixed_scale_horizons.csv", index=False)
+    print("Block 4 reproduced at 4,000 steps:", d.block4_reproduced_all.iloc[0], "on", len(m), "rows", flush=True)
+
+
+def _branch_argmins_levels(levels, w2_glob):
+    from . import blockB_landscape as bb
+    from .profiled_bnb import certify
+    x, y = bb.population_data()
+    x, y = x.numpy(), y.numpy()
+    out = {}
+    for lv in levels:
+        s = lv * w2_glob
+        rm = certify(s, A, x, y, "-"); rp = certify(s, A, x, y, "+")
+        g = rp if rp["upper"] < rm["upper"] else rm
+        out[lv] = (abs(g["arg_w1"]), g["arg_b1"] % (2 * math.pi))
+    return out
+
+
+def score_horizons():
+    d = pd.read_csv(RESULTS / "fixed_scale_horizons.csv")
+    rows = []
+    for var, g in d.groupby("variant"):
+        for H in HORIZONS:
+            fr = g.groupby("level")[f"placed_{H}"].mean()
+            lv = list(fr.index)
+            rows.append({"variant": var, "horizon": H, **{f"frac_{l}": fr[l] for l in lv},
+                         "x50": _crossing(lv, list(fr.values))})
+    t = pd.DataFrame(rows)
+    res = []
+    for var, g in t.groupby("variant"):
+        x = dict(zip(g.horizon, g.x50))
+        f09 = dict(zip(g.horizon, g["frac_0.9"])); f095 = dict(zip(g.horizon, g["frac_0.95"]))
+        q1 = (x[4000] >= x[16000] >= x[64000]) and abs(x[64000] - 1) < abs(x[4000] - 1) and 0.98 <= x[64000] <= 1.02
+        q2 = (f09[4000] >= f09[16000] >= f09[64000]) and (f095[4000] >= f095[16000] >= f095[64000]) \
+            and f09[64000] == 0 and f095[64000] <= 0.01
+        comp = 1.03 <= x[64000] <= 1.07
+        res.append({"variant": var, "x50_4k": x[4000], "x50_16k": x[16000], "x50_64k": x[64000],
+                    "Q1_pass": q1, "Q2_pass": q2, "competing_outcome": comp,
+                    "frac09_64k": f09[64000], "frac095_64k": f095[64000]})
+    t.to_csv(RESULTS / "fixed_scale_horizons_curve.csv", index=False)
+    pd.DataFrame(res).to_csv(RESULTS / "fixed_scale_horizons_tests.csv", index=False)
+    print(t.to_string(index=False)); print(pd.DataFrame(res).to_string(index=False))
+
+
+if __name__ == "__main__" and sys.argv[1] in ("horizons", "score_horizons"):
+    run_horizons() if sys.argv[1] == "horizons" else score_horizons()
