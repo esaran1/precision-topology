@@ -287,6 +287,8 @@ def _finite_job(a):
     G_lo, G_hi = float(g["Ghat_lo"]), float(g["Ghat_hi"])
     return ({"a": a, "eps": eps, "s_lo": lo, "s_hi": hi, "s_rel_width": (hi - lo) / lo,
              "stopped_unresolved": unresolved, "Ghat_lo": G_lo, "Ghat_hi": G_hi, "Ghat_rel_width": (G_hi - G_lo) / G_lo,
+             "Ghat_converged": bool(g["converged"]),
+             "Ghat_argmax_u": g["w1"] / math.sqrt(eps), "Ghat_argmax_v": (g["b1"] - math.pi) / math.sqrt(eps),
              "R_lo": lo * G_lo / 2, "R_hi": hi * G_hi / 2,
              "A_lo": lo * eps ** 1.5, "A_hi": hi * eps ** 1.5,
              "K_lo": G_lo / eps ** 1.5, "K_hi": G_hi / eps ** 1.5,
