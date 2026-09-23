@@ -79,5 +79,25 @@ fired.**
 
 ## 1d. Objective used (training sets against quadrature)
 
-Reduced and deprioritised by decision on 2026-09-23 (compute reallocated to Block 3): 20 seeds per a,
-run after Block 3's training. Results will be added here when run; nothing is claimed about it yet.
+Scope as restored by the addendum (`7d94ebf`): 50 seeds (0–49) at a = 1.30, 1.45 and 1.60. Each seed's own
+400 training points, with the full certified coarse scan (|w₂| 1.5–11) and then bisection to 0.005. No
+prediction was attached. Summary: `cond_certified_seeds_summary.csv`.
+
+| a | own/population R_glob: median | IQR | range | population's quantile | own/population R_solve: median |
+|---|---:|---|---|---:|---:|
+| 1.30 | 1.063 | [0.988, 1.121] | 0.877–1.222 | 0.32 | 1.069 |
+| 1.45 | 1.063 | [0.990, 1.119] | 0.877–1.222 | 0.30 | 1.071 |
+| 1.60 | 1.059 | [0.989, 1.115] | 0.873–1.220 | 0.32 | 1.070 |
+
+- **One switch per seed**: every seed has exactly one R_glob sign change on the coarse grid, and every
+  search converged.
+- **The objective matters at the level of individual runs.** The quadrature threshold sits at the
+  30th–32nd percentile of the per-seed thresholds. The per-seed median is about 6% above it, and the
+  spread is ±12% (IQR), stable across a.
+  - This is the input to the registered sample-specific-threshold test (`own_threshold_prediction.md`,
+    S1–S3). That test was registered before these outputs were read.
+- **Unresolved evaluations** (20, 18 and 6): the m₋ and m₊ intervals overlapped at tolerance 1e−9, and the
+  bisection treated those evaluations as not placed.
+  - On a continuous crossing, that happens only where the two regional minima coincide, i.e. at the
+  switch. The affected brackets are therefore accurate to about one bisection step, but not certified
+  at their lower end.

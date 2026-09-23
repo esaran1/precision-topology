@@ -232,3 +232,30 @@ def brackets():
 
 if __name__ == "__main__" and sys.argv[1] == "brackets":
     brackets()
+
+
+def seeds_summary():
+    """1d summary: per-seed thresholds relative to the population's certified bracket midpoint (a = 1.30, 1.45, 1.60).
+    Unresolved evaluations (m- and m+ intervals overlapping at tolerance 1e-9) were treated as not placed by the
+    bisection; they occur only where the two regional minima coincide, i.e. at the switch itself."""
+    br = pd.read_csv(RESULTS / "cond_certified_brackets.csv")
+    rows = []
+    for a in (1.30, 1.45, 1.60):
+        d = pd.read_csv(RESULTS / f"cond_certified_seeds_a{a:.2f}.csv")
+        for kind in ("glob", "solve"):
+            pop = br[(br.a.round(2) == a) & (br.kind == kind)].iloc[0]
+            wp = 0.5 * (pop.w2_lo + pop.w2_hi)
+            r = 0.5 * (d[f"w2_{kind}_lo"] + d[f"w2_{kind}_hi"]) / wp
+            rows.append({"a": a, "kind": kind, "n_seeds": len(d), "median_own_over_pop": r.median(),
+                         "q25": r.quantile(0.25), "q75": r.quantile(0.75), "min": r.min(), "max": r.max(),
+                         "pop_quantile_in_seeds": float((r < 1).mean()),
+                         "seeds_with_more_than_one_sign_change": int((d[f"{kind}_sign_changes_on_coarse_grid"] > 1).sum()),
+                         "unresolved_evaluations": int(d.unresolved_evaluations.sum()),
+                         "all_converged": bool(d.all_converged.all())})
+    t = pd.DataFrame(rows)
+    t.to_csv(RESULTS / "cond_certified_seeds_summary.csv", index=False)
+    print(t.to_string(index=False))
+
+
+if __name__ == "__main__" and sys.argv[1] == "seeds_summary":
+    seeds_summary()

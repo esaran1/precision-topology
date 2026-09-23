@@ -7,7 +7,7 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 
 | block | status | for the 25 September submission? |
 |---|---|---|
-| 1. Audit of the conditional threshold | **complete**; registered decision rule met; 1d (objective choice) running | yes (1d: added when done) |
+| 1. Audit of the conditional threshold | **complete**; registered decision rule met; 1d done (below) | yes |
 | 2. Proposition 2 made precise | certified localisation, rounding and bounds done; H2′, neighbourhood and solve checks running | yes, once the checks close |
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
 | 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
@@ -34,6 +34,14 @@ Registered `conditional_audit_prediction.md` (`6b17508`, before any audit comput
   - Retained minimisers are stationary: gradient norm at most 2.3e-6.
   - The candidate-loss plots (`results/figures/cond_audit_candidates.pdf`) show one continuous branch
     at every a.
+- **Objective check (1d)**: each of 50 seeds' own 400-point training sets gives its own certified
+  threshold, at a = 1.30, 1.45 and 1.60 (`cond_certified_seeds_summary.csv`).
+  - The per-seed median is **1.06×** the quadrature value. The IQR is 0.99–1.12× and the range
+    0.87–1.22×.
+  - The quadrature value sits at the 30th–32nd percentile. Every seed has one switch.
+  - **Say**: "the quadrature threshold is the population-level object; individual training sets have
+    thresholds spread ±12% (IQR) around a median 6% above it". Whether that spread and offset explain
+    the fixed-scale curve width and the free-training offset is tested in S1–S3 (pending).
 - **Certified full-range scan at a = 1.30** (`cond_scan_certified_a130.csv`): at every |w₂| from 1.5 to
   11 (step 0.5) the certified global conditional minimiser lies on one continuous branch.
   - Its gap changes sign once, between 4.5 and 5.0.

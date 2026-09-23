@@ -701,6 +701,7 @@ PRODUCERS = {
     "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
     "cond_scan_certified_a130.csv": ("cond_scan_certified", "main", "full", ""),
     "first_order_c1.csv": ("first_order", "main", "full", ""),
+    "cond_certified_seeds_summary.csv": ("conditional_certified", "seeds_summary", "full", ""),
     "first_order_corner.csv": ("first_order", "corner", "full", ""),
     "first_order_corner_free.csv": ("first_order", "corner", "full", ""),
     "mn2_h2prime.csv": ("math_note_v2_checks", "h2", "full", ""),
@@ -773,6 +774,18 @@ def v4_checks() -> None:
     chk("1c scan: competitor margin min", float(sc_.competitor_margin.min()), 0.0031, 0.00005)
     chk("1c scan: competitor margin max", float(sc_.competitor_margin.max()), 0.0126, 0.00005)
     chk("1c scan: all competitor bounds converged", float(sc_.competitor_converged.all()), 1.0, 0)
+
+    ss_ = pd.read_csv(R / "cond_certified_seeds_summary.csv")
+    g_ = ss_[ss_.kind == "glob"].set_index("a")
+    for a_, med_, pq_ in ((1.3, 1.063, 0.32), (1.45, 1.063, 0.30), (1.6, 1.059, 0.32)):
+        chk(f"1d a={a_}: median own/pop", float(g_.loc[a_, "median_own_over_pop"]), med_, 0.0006)
+        chk(f"1d a={a_}: population quantile", float(g_.loc[a_, "pop_quantile_in_seeds"]), pq_, 0)
+    chk("1d: IQR low min", float(g_.q25.min()), 0.988, 0.0006)
+    chk("1d: IQR high max", float(g_.q75.max()), 1.121, 0.0006)
+    chk("1d: range min", float(g_["min"].min()), 0.873, 0.0006)
+    chk("1d: range max", float(g_["max"].max()), 1.222, 0.0006)
+    chk("1d: seeds with >1 sign change", float(ss_.seeds_with_more_than_one_sign_change.sum()), 0.0, 0)
+    chk("1d: 50 seeds per a", float(ss_.n_seeds.min()), 50.0, 0)
 
     print("V4 first-order coefficient (math_note_v2 s8)")
     fo = pd.read_csv(R / "first_order_c1.csv").iloc[0]
