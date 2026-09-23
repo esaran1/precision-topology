@@ -711,3 +711,24 @@ def annulus(workers=1, P=24.0):
 
 if __name__ == "__main__" and sys.argv[1] == "annulus":
     annulus(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
+
+
+def uniform_summary(A_lo=0.66, A_hi=0.72):
+    """Restrict the uniformity bound to [A_lo, A_hi] (grid points and bridges inside it)."""
+    d = pd.read_csv(RESULTS / "mn2_uniformity.csv")
+    inside = d[(d.A >= A_lo - 1e-9) & (d.A <= A_hi + 1e-9)].reset_index(drop=True)
+    bridges = inside.sup_bridge_to_next.iloc[:-1]          # bridges between consecutive grid points inside
+    sup_ = float(max(inside.U.max(), bridges.max()))
+    b24 = float(mp.mpf("0.38797358308678997649"))
+    bfull = float(mp.log(3) / 4 + mp.log(mp.mpf(3) / 2) / 2)
+    full_sup = float(d.sup_over_neighbourhood.iloc[0])
+    out = pd.DataFrame([{"A_lo": A_lo, "A_hi": A_hi, "sup_branch_loss": sup_, "margin_B24": b24 - sup_,
+                         "margin_Bfull": bfull - sup_, "certified": sup_ < b24,
+                         "wider_range": "0.60-0.76", "wider_sup": full_sup, "wider_margin_B24": b24 - full_sup,
+                         "wider_certified": full_sup < b24}])
+    out.to_csv(RESULTS / "mn2_uniformity_summary.csv", index=False)
+    print(out.T.to_string())
+
+
+if __name__ == "__main__" and sys.argv[1] == "uniform_summary":
+    uniform_summary()

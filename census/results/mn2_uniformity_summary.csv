@@ -1,0 +1,2 @@
+A_lo,A_hi,sup_branch_loss,margin_B24,margin_Bfull,certified,wider_range,wider_sup,wider_margin_B24,wider_certified
+0.66,0.72,0.3768942002519616,0.0110793828348284,0.10049142596914806,True,0.60-0.76,0.3912214991571797,-0.0032479160703897114,False
