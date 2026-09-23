@@ -254,6 +254,15 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   replays) but end with the same placement outcome in every pair.
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
   point move toward 1.0 at 4× and 16× the horizon? **Pending.**
+  - **A validity check fired and was amended before scoring.** The registered check requires the
+    4,000-step outcome to reproduce Block 4 exactly, and it returned False.
+  - **Cause**: Block 4's stored values were read with a CSV parser that is off by up to 1e−16, then
+    compared exactly.
+  - **With exact parsing on both sides**, all 3,258 rows reproduce bit for bit.
+  - **The amendment** changed only how stored values are read. Tolerance stayed at zero, and no
+    prediction or criterion changed. It was made before any Q1, Q2, S1 or S2 outcome was scored.
+  - This is the third implementation error in this registration family's validity checks; none
+    concerned an outcome criterion.
 - **Exploratory, post hoc — critical slowing.** The recorded 25-step first-placement times cannot
   support a relaxation fit: placement above the threshold happens within 25–50 steps at every level.
   Integrating that along free training predicts an offset of about 1–2%, far below the observed 9.6%.

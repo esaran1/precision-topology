@@ -72,3 +72,26 @@ Q1 and Q2 are scored independently.
 - If amended, this is the third implementation error in this registration family's validity checks,
   after amendments 1 and 2 of `fixed_scale_prediction.md`. None of the three concerned an outcome
   criterion.
+
+## Amendment 1 — 2026-09-23 17:55 EDT (after the stop report above; before any Q1, Q2, S1 or S2 outcome is scored)
+
+- **Fired check**: the registered 4,000-step reproduction check (stop report above, commit `856327b`).
+- **Diagnosis**: it compared exact in-memory values with Block 4's stored values parsed by pandas'
+  default CSV float parser. That parser is not round-trip exact: 7,959 of 8,688 stored values are off by
+  at most 9.95e−17.
+- **What changes, and only this**: how stored values are read. Both sides of the comparison are now read
+  from their files with exact round-trip float parsing (`fixed_scale.check_horizons`).
+- **What does not change**:
+  - the tolerance stays at **zero**, for both placement and G;
+  - it still compares **all 3,258 overlapping rows**;
+  - **no prediction, level, horizon or criterion changes**: Q1, Q2 and the competing outcome, and S1 and
+    S2 in `own_threshold_prediction.md`, are untouched.
+- **Result of the amended check**: 3,258 rows compared, 0 placement mismatches, 0 values of G that are not
+  bit-identical. The check passes (`fixed_scale_horizons_check.csv`).
+- **Tests of the amended check** (`tests/test_registered_checks.py`):
+  - it passes on identical awkward floats written and read back;
+  - it fails on a one-ulp change in G;
+  - it fails on a flipped placement;
+  - the default parser demonstrably does not round-trip.
+- **Scoring**: Q1 and Q2 use `fixed_scale.score_horizons`, and S1 and S2 use the scorer committed
+  before the data (`a015ace`), unchanged.

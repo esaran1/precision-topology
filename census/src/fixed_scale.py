@@ -528,15 +528,25 @@ def run_horizons():
     with Pool(WORKERS) as p:
         out = p.map(_multi_job, jobs, chunksize=2)
     d = pd.DataFrame(out)
-    # validity check: the 4,000-step outcome must reproduce Block 4 exactly
-    b4 = pd.read_csv(RESULTS / "fixed_scale_block4.csv")
+    d.to_csv(RESULTS / "fixed_scale_horizons.csv", index=False)
+    check_horizons()
+
+
+def check_horizons(results=None):
+    """Registered validity check, as amended (fixed_scale_horizon_prediction.md, amendment 1): the 4,000-step
+    outcome must reproduce Block 4 exactly.  Both stored files are read with exact round-trip float parsing;
+    tolerance zero; all overlapping (seed, ck_step, level, variant) rows."""
+    R = results or RESULTS
+    d = pd.read_csv(R / "fixed_scale_horizons.csv", float_precision="round_trip")
+    b4 = pd.read_csv(R / "fixed_scale_block4.csv", float_precision="round_trip")
     m = d.merge(b4[["seed", "ck_step", "level", "variant", "placed_end", "G_end"]],
                 on=["seed", "ck_step", "level", "variant"], how="inner")
-    d["block4_reproduced_rows"] = len(m)
-    d["block4_reproduced_all"] = bool((m.placed_4000 == m.placed_end).all() and
-                                      np.allclose(m.G_4000, m.G_end, atol=0, rtol=0))
-    d.to_csv(RESULTS / "fixed_scale_horizons.csv", index=False)
-    print("Block 4 reproduced at 4,000 steps:", d.block4_reproduced_all.iloc[0], "on", len(m), "rows", flush=True)
+    ok = bool((m.placed_4000 == m.placed_end).all() and np.array_equal(m.G_4000.values, m.G_end.values))
+    out = pd.DataFrame([{"rows_compared": len(m), "placement_mismatches": int((m.placed_4000 != m.placed_end).sum()),
+                         "G_not_bit_identical": int((m.G_4000.values != m.G_end.values).sum()), "reproduced": ok}])
+    out.to_csv(R / "fixed_scale_horizons_check.csv", index=False)
+    print("Block 4 reproduced at 4,000 steps (exact parsing):", ok, "on", len(m), "rows", flush=True)
+    return ok
 
 
 def _branch_argmins_levels(levels, w2_glob):
@@ -579,5 +589,5 @@ def score_horizons():
     print(t.to_string(index=False)); print(pd.DataFrame(res).to_string(index=False))
 
 
-if __name__ == "__main__" and sys.argv[1] in ("horizons", "score_horizons"):
-    run_horizons() if sys.argv[1] == "horizons" else score_horizons()
+if __name__ == "__main__" and sys.argv[1] in ("horizons", "score_horizons", "check_horizons"):
+    {"horizons": run_horizons, "score_horizons": score_horizons, "check_horizons": check_horizons}[sys.argv[1]]()
