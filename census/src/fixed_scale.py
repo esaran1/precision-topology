@@ -107,6 +107,17 @@ def train(n):
     print(meta.groupby("seed").first_placement.any().value_counts().to_string())
 
 
+def _branch_distance(w1, b1, w2, branch):
+    """Distance in (w1, b1) to the certified branch argmin (|w1*|, b1* in [0, 2π)), modulo the problem's
+    symmetries: orientation (w1, b1, w2) -> (-w1, -b1, -w2) maps w2 < 0 to w2 > 0; the population is
+    x-symmetric, so (w1, b1) -> (-w1, b1); and b1 is 2π-periodic."""
+    if w2 < 0:
+        w1, b1 = -w1, -b1
+    db = (b1 - branch[1]) % (2 * math.pi)
+    db = min(db, 2 * math.pi - db)
+    return math.hypot(abs(w1) - branch[0], db)
+
+
 def replay(ck, level, variant, horizon, stop_on, G_hat, w2_glob, branch=None, x=None, y=None):
     """Rescale to R/R_glob = level, hold |w2|, train (w1, b1, b2) for `horizon` steps."""
     import torch
@@ -154,12 +165,12 @@ def replay(ck, level, variant, horizon, stop_on, G_hat, w2_glob, branch=None, x=
     L, _ = lossf()
     L.backward()
     Gend = traj[-1][1]
-    dist = (math.hypot(float(p[0]) - branch[0], float(p[1]) - branch[1])
-            if branch is not None else np.nan)
+    ew1, eb1 = float(p[0]), float(p[1])
+    dist = _branch_distance(ew1, eb1, w2n, branch) if branch is not None else np.nan
     return {"seed": ck["seed"], "ck_step": ck["step"], "level": level, "variant": variant,
             "k": k, "G_start": G0, "dG_first": dG1, "G_end": Gend, "first_hit": first_hit,
             "placed_end": Gend > 0, "grad_start": g_start, "grad_end": float(p.grad.norm()),
-            "sat_start": sat0, "dist_branch_end": dist,
+            "sat_start": sat0, "dist_branch_end": dist, "end_w1": ew1, "end_b1": eb1, "w2_sign": float(np.sign(w2n)),
             "traj_G": ";".join(f"{t}:{g:.6g}" for t, g in traj)}
 
 
