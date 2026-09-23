@@ -61,3 +61,26 @@ The same feasible-set construction is applied to each component separately:
 - **Certified Ĝ(1.02)** (`ghat_certified_all.csv`, relative width 6e−4) was seen. The new run recomputes
   it at 1e−6.
 - No other quantity at these a was computed.
+
+## Supplementary analysis — 2026-09-23 19:19 EDT (written and committed before the registered result exists or is scored)
+
+- **Reported beside the registered verdict, which stands whatever this shows.**
+- **Why**: the registered bracket rule compares the certified regional minima on either side of G = 0. At
+  a continuous crossing those minima converge at the switch, so the comparison loses resolution where
+  it is needed, and the rule stops at "unresolved".
+- **Supplementary measurement** (`first_order.supplementary`, `score_supplementary`): the same
+  quadrature objective, the same branch and the same quantity, measured along the branch minimiser.
+  - **Switch point**: a Krawczyk test certifies a unique zero of Φ(w₁, b₁, b₂, s) = (∇_{w₁,b₁,b₂} L, G)
+    in a small box, with G on the active pair (outer x = −1.2, inner x = 0.8), in interval arithmetic
+    at 30 digits. That gives a bracket for the switch scale s.
+  - **Branch**: the (w₁, b₁, b₂) Hessian is positive definite over the box, so the zero is the branch
+    minimiser and locally unique.
+  - **Active pair**: it is unique over the box; the other edges and the interior critical points of f_a
+    are strictly dominated.
+  - **Global minimiser**: a certified competitor bound (`profiled_bnb.competitor_gap`, balls of
+    radius 0.25√ε around the branch and its mirror) shows it is the global minimiser at the switch.
+- **R brackets**: [s_lo·Ĝ_lo/2, s_hi·Ĝ_hi/2], with Ĝ(a) from the registered run.
+- **Feasible c₁ set**: the registered construction (`_feasible_c1`: same limit interval, same O(ε³)
+  allowance), reported with the prediction's position relative to it. **No verdict attaches to it.**
+- **Tried beforehand only at a = 1.05**, outside the registered set: certified, with a bracket width of
+  1e−9 in s and a competitor margin of +0.0135.

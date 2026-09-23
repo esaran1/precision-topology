@@ -576,5 +576,133 @@ if __name__ == "__main__":
         score()
     elif cmd == "corner":
         corner()
+    elif cmd == "supplementary":
+        supplementary(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
+    elif cmd == "score_supplementary":
+        score_supplementary()
     else:
         main()
+
+
+# ------------------------------------------------------------------ SUPPLEMENTARY: switch located along the branch
+def _fa(t, a): return t + a * iv.sin(t) if isinstance(t, type(iv.mpf(0))) else t + a * math.sin(t)
+def _fa1(t, a): return 1 + a * iv.cos(t) if isinstance(t, type(iv.mpf(0))) else 1 + a * math.cos(t)
+def _fa2(t, a): return -a * iv.sin(t) if isinstance(t, type(iv.mpf(0))) else -a * math.sin(t)
+
+
+def branch_system(X, a, x, y, want_J=True):
+    """Φ(w1, b1, b2, s) = (∇_{w1,b1,b2} L, G) on the quadrature objective at finite a, G on the active pair
+    (outer x = −1.2, inner x = 0.8; w2 > 0 orientation).  Returns Φ, J = ∂Φ/∂(w1, b1, b2, s)."""
+    w1, b1, b2, s = X
+    n = len(x)
+    F = [iv.mpf(0)] * 3
+    J = [[iv.mpf(0)] * 4 for _ in range(3)]
+    for xi, yi in zip(x, y):
+        xi = float(xi)
+        t = w1 * xi + b1
+        f0, f1, f2 = _fa(t, a), _fa1(t, a), _fa2(t, a)
+        z = s * f0 + b2
+        S = _sig(z); res = S - int(yi)
+        dz = [s * f1 * xi, s * f1, iv.mpf(1)]
+        for i in range(3):
+            F[i] += res * dz[i]
+        if not want_J:
+            continue
+        w = _dsig(S)
+        d2 = [[s * f2 * xi * xi, s * f2 * xi, 0], [s * f2 * xi, s * f2, 0], [0, 0, 0]]
+        ds = [f1 * xi, f1, iv.mpf(0)]
+        for i in range(3):
+            for j in range(3):
+                J[i][j] += w * dz[i] * dz[j] + res * d2[i][j]
+            J[i][3] += w * f0 * dz[i] + res * ds[i]
+    F = [f / n for f in F]
+    tO, tI = w1 * -1.2 + b1, w1 * 0.8 + b1
+    F.append(_fa(tO, a) - _fa(tI, a))
+    if not want_J:
+        return F
+    J = [[J[i][j] / n for j in range(4)] for i in range(3)]
+    J.append([-1.2 * _fa1(tO, a) - 0.8 * _fa1(tI, a), _fa1(tO, a) - _fa1(tI, a), iv.mpf(0), iv.mpf(0)])
+    return F, J
+
+
+def _active_ok(W1, B1, a):
+    """Over the box: max over I of f_a is at x = 0.8 and min over O at x = −1.2, every other candidate (edges and
+    interior critical points t = π ± arccos(1/a) + 2πk) strictly dominated."""
+    d = math.acos(1 / a)
+    inner = [(-0.8, 0.8)]; outer = [(-2.0, -1.2), (1.2, 2.0)]
+    I_act, O_act = _fa(W1 * 0.8 + B1, a), _fa(W1 * -1.2 + B1, a)
+    others_I, others_O = [_fa(W1 * -0.8 + B1, a)], [_fa(W1 * -2.0 + B1, a), _fa(W1 * 1.2 + B1, a), _fa(W1 * 2.0 + B1, a)]
+    for (lo, hi), acc, base in ((inner[0], others_I, math.pi - d), (outer[0], others_O, math.pi + d),
+                                (outer[1], others_O, math.pi + d)):
+        t1, t2 = W1 * lo + B1, W1 * hi + B1
+        tlo, thi = float(mp.mpf(min(t1.a, t2.a))), float(mp.mpf(max(t1.b, t2.b)))
+        for k in range(math.floor((tlo - base) / (2 * math.pi)) - 1, math.ceil((thi - base) / (2 * math.pi)) + 2):
+            c = base + 2 * math.pi * k
+            if tlo - 1e-9 <= c <= thi + 1e-9:
+                acc.append(iv.mpf(_fa(c, a)))
+    return all(I_act.a > o.b for o in others_I) and all(O_act.b < o.a for o in others_O)
+
+
+def supplementary_one(a, rad=(1e-9, 1e-9, 1e-7, 1e-6)):
+    from .conditional_certified import _population
+    from .own_threshold import global_min
+    from .profiled_bnb import competitor_gap, profile
+    eps = a - 1
+    x, y = _population()
+    c = pd.read_csv(RESULTS / "first_order_c1.csv").iloc[0]
+    s0 = float(c.A_star_lo) * (1 + float(c.A1_over_A_lo) * eps) / eps ** 1.5     # starting guess only
+    _, w1, b1, _, _ = global_min(s0, a, x, y)
+    if w1 < 0:
+        w1 = -w1                                     # population is x-symmetric: use the w1 > 0 member of the pair
+    _, b2, *_ = profile([w1], [b1], s0, a, x, y)
+    fun = lambda X, J=True: branch_system(X, a, x, y, J) if J else branch_system(X, a, x, y, False)
+    v = _newton_float(fun, np.array([w1, b1, float(b2[0]), s0]))
+    ok, Kb, _, _ = krawczyk(fun, v, list(rad))
+    X = [iv.mpf([mp.mpf(v[i]) - rad[i], mp.mpf(v[i]) + rad[i]]) for i in range(4)]
+    _, J = branch_system(X, a, x, y, True)
+    Hm = np.array([[_mid(J[i][j]) for j in range(3)] for i in range(3)])
+    Hr = math.sqrt(sum(float(mp.mpf((J[i][j].b - J[i][j].a) / 2)) ** 2 for i in range(3) for j in range(3)))
+    lam_lo = float(np.linalg.eigvalsh(Hm)[0]) - Hr
+    act = _active_ok(X[0], X[1], a)
+    s_star = float(v[3])
+    L_branch = float(profile([v[0]], [v[1]], s_star, a, x, y)[0][0])
+    rad_ball = 0.25 * math.sqrt(eps)
+    cg = competitor_gap(s_star, a, x, y, [(v[0], v[1]), (-v[0], v[1])], rad_ball, tol=1e-8)
+    return {"a": a, "eps": eps, "krawczyk_ok": ok, "s_lo": _lo(Kb[3]), "s_hi": _hi(Kb[3]), "w1": v[0], "b1": v[1],
+            "hess_lambda_min_lo": lam_lo, "active_set_unique": act, "competitor_ball_radius": rad_ball,
+            "competitor_lower": cg["lower"], "branch_loss": L_branch, "competitor_margin": cg["lower"] - L_branch,
+            "competitor_converged": cg["converged"],
+            "certified": bool(ok and lam_lo > 0 and act and cg["lower"] > L_branch)}
+
+
+def _supp_job(a):
+    return supplementary_one(a)
+
+
+def supplementary(workers=2):
+    """SUPPLEMENTARY to first_order_prediction.md (written before the registered result was scored): the switch located
+    along the branch minimiser by a Krawczyk test on (∇L, G) = 0 in (w1, b1, b2, s), same objective and branch."""
+    from multiprocessing import Pool
+    with Pool(workers) as p:
+        d = pd.DataFrame(p.map(_supp_job, A_TEST, chunksize=1))
+    d.to_csv(RESULTS / "first_order_supplementary.csv", index=False)
+    print(d.to_string(index=False))
+
+
+def score_supplementary():
+    """The c1 feasible set implied by the supplementary brackets, with the registered construction (Ĝ from the
+    registered run; the same limit interval and O(ε³) allowance)."""
+    sp = pd.read_csv(RESULTS / "first_order_supplementary.csv", float_precision="round_trip").sort_values("a")
+    fin = pd.read_csv(RESULTS / "first_order_finite.csv", float_precision="round_trip").set_index("a")
+    c = pd.read_csv(RESULTS / "first_order_c1.csv", float_precision="round_trip").iloc[0]
+    G_lo = sp.a.map(fin.Ghat_lo).values; G_hi = sp.a.map(fin.Ghat_hi).values
+    R_lo, R_hi = sp.s_lo.values * G_lo / 2, sp.s_hi.values * G_hi / 2
+    f_lo, f_hi = _feasible_c1(sp.eps.values, R_lo, R_hi, c.R_glob_inf_lo, c.R_glob_inf_hi)
+    out = pd.DataFrame([{"all_certified": bool(sp.certified.all()), "feasible_lo": f_lo, "feasible_hi": f_hi,
+                         "feasible_width": f_hi - f_lo, "pred_lo": c.c1_lo, "pred_hi": c.c1_hi,
+                         "pred_inside": bool(f_lo <= c.c1_hi and c.c1_lo <= f_hi),
+                         "max_rel_bracket_width": float(np.max((sp.s_hi - sp.s_lo) / sp.s_lo))}])
+    pts = sp.assign(R_lo=R_lo, R_hi=R_hi)
+    pts.to_csv(RESULTS / "first_order_supplementary.csv", index=False)
+    out.to_csv(RESULTS / "first_order_supplementary_scores.csv", index=False)
+    print(pts.to_string(index=False)); print(out.T.to_string())
