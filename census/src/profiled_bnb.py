@@ -183,7 +183,13 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
         keep = may & (lb < upper)
         lower = float(lb[keep].min()) if keep.any() else upper
         if upper - lower <= tol or not keep.any():
-            return {"region": region, "s": s, "a": a, "lower": min(lower, upper), "upper": upper,
+            kw, kb = cw[keep], cb[keep]
+            encl = {}
+            for tag, m in (("pos", kw >= 0), ("neg", kw < 0)):
+                if m.any():
+                    encl[f"encl_{tag}"] = (float(kw[m].min() - hw), float(kw[m].max() + hw),
+                                           float(kb[m].min() - hb), float(kb[m].max() + hb))
+            return {**encl, "region": region, "s": s, "a": a, "lower": min(lower, upper), "upper": upper,
                     "arg_w1": arg[0] if arg else np.nan, "arg_b1": arg[1] if arg else np.nan,
                     "cells": int(keep.sum()), "rounds": rounds, "hw": hw, "hb": hb, "W": W,
                     "above_log2": lower > math.log(2), "converged": True}
@@ -198,6 +204,50 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
                     "arg_w1": arg[0] if arg else np.nan, "arg_b1": arg[1] if arg else np.nan,
                     "cells": int(len(cw)), "rounds": rounds, "hw": hw, "hb": hb, "W": W,
                     "above_log2": lower > math.log(2), "converged": False}
+        hw, hb = hw / 2, hb / 2
+        cw = np.concatenate([cw - hw, cw - hw, cw + hw, cw + hw])
+        cb = np.concatenate([cb - hb, cb + hb, cb - hb, cb + hb])
+
+
+def competitor_gap(s, a, x, y, centres, radius, tol=1e-6, h0=0.05, win=(-0.8, 0.8, 1.2, 2.0)):
+    """Certified min of L* over the whole domain minus balls of `radius` (Euclidean in (w1, b1),
+    b1 taken modulo 2π) around each centre.  Cells lying entirely inside a ball are discarded."""
+    W = w_bound(s, a, x, y, win)
+    nw = int(math.ceil(2 * W / h0)); nb = int(math.ceil(TWO_PI / h0))
+    hw, hb = W / nw, TWO_PI / nb / 2
+    wc = -W + (np.arange(nw) + 0.5) * 2 * hw
+    bc = (np.arange(nb) + 0.5) * 2 * hb
+    cw, cb = np.meshgrid(wc, bc, indexing="ij"); cw, cb = cw.ravel(), cb.ravel()
+    ax = np.abs(x)
+
+    def db(b, c):
+        d = np.abs(b - c) % TWO_PI
+        return np.minimum(d, TWO_PI - d)
+    upper, rounds = math.inf, 0
+    while True:
+        rounds += 1
+        inside = np.zeros(len(cw), bool)
+        for (c0, c1) in centres:
+            far = np.hypot(np.abs(cw - c0) + hw, db(cb, c1) + hb)
+            inside |= far < radius
+        cw, cb = cw[~inside], cb[~inside]
+        n = len(cw)
+        L = np.empty(n); gw = np.empty(n); gb = np.empty(n)
+        for i in range(0, n, CHUNK):
+            sl = slice(i, i + CHUNK)
+            L[sl], _, gw[sl], gb[sl], _ = profile(cw[sl], cb[sl], s, a, x, y)
+        curv = 0.5 * s * a * np.mean((ax * hw + hb) ** 2)
+        lb = L - np.abs(gw) * hw - np.abs(gb) * hb - curv
+        outside = np.ones(n, bool)
+        for (c0, c1) in centres:
+            outside &= np.hypot(cw - c0, db(cb, c1)) >= radius
+        if outside.any():
+            upper = min(upper, float(L[outside].min()))
+        keep = lb < upper
+        lower = float(lb[keep].min()) if keep.any() else upper
+        if upper - lower <= tol or not keep.any() or rounds > 30:
+            return {"lower": lower, "upper": upper, "rounds": rounds, "converged": upper - lower <= tol}
+        cw, cb = cw[keep], cb[keep]
         hw, hb = hw / 2, hb / 2
         cw = np.concatenate([cw - hw, cw - hw, cw + hw, cw + hw])
         cb = np.concatenate([cb - hb, cb + hb, cb - hb, cb + hb])
