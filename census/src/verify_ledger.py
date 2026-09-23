@@ -120,12 +120,25 @@ def main() -> None:
     chk("R_glob dev monotone", float(np.all(np.diff(dev) > 0)), 1.0, 0)
     chk("R_glob dev at a=1.60 (%)", dev[-1] * 100, 14.29, 0.05)
     chk("R_glob corr(eps,dev)", float(np.corrcoef(e, dev)[0, 1]), 0.9866, 0.001)
-    chk("R_glob log-log slope", float(np.polyfit(np.log(e), np.log(dev), 1)[0]), 0.947, 0.01)
+    chk("R_glob log-log slope (frozen grid, superseded)", float(np.polyfit(np.log(e), np.log(dev), 1)[0]), 0.947, 0.01)
     c1 = float(np.linalg.lstsq(np.vstack([e]).T, dev, rcond=None)[0][0])
     chk("c1", c1, 0.23099, 1e-4)
     chk("c1 fit max residual",
         float(np.abs(b["R_glob"].values - float(d["R_glob"]) * (1 + c1 * e)).max()),
         0.00133, 1e-4)
+    print("T58 refit on certified intervals (rglob_refit)")
+    rf = dict(pd.read_csv(R / "rglob_convergence_refit.csv").values)
+    for q_, v_, t_ in (("log-log slope, midpoints", 0.829, 0.001), ("log-log slope, min over certified box", 0.714, 0.001),
+                       ("log-log slope, max over certified box", 0.954, 0.001), ("slope range inside registered band [0.5, 2]", 1.0, 0),
+                       ("one-term law R_inf(1 + c1 eps) feasible within all certified intervals", 0.0, 0),
+                       ("two-term law (eps and eps^2) feasible within all certified intervals", 1.0, 0),
+                       ("two-term law: c1 = m/R_inf min over feasible", 0.243, 0.001),
+                       ("two-term law: c1 max over feasible", 0.321, 0.001),
+                       ("two-term law: q max over feasible", -0.0070, 0.0001),
+                       ("limit-free intercept min over box", 0.2002, 0.0001),
+                       ("limit-free intercept range overlaps certified limit", 0.0, 0),
+                       ("dev all positive (worst corner)", 1.0, 0), ("dev monotone in a, midpoints", 1.0, 0)):
+        chk(q_, float(rf[q_]), v_, t_)
     dv = (b["R_solve"] / float(d["R_solve"]) - 1).values
     chk("R_solve dev all negative (S-3 falsified)", float((dv < 0).all()), 1.0, 0)
     chk("R_solve mean dev (%)", dv.mean() * 100, -0.29, 0.02)

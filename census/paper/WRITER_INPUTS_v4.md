@@ -146,6 +146,17 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
 
 ## Block 2 — Proposition 2 made precise
 
+- **The limit threshold is an interval**: R_glob^∞ ∈ [0.1974, 0.1992], certified. Never quote 0.19991;
+  that is the old grid's first point above the interval.
+- **Convergence, on certified values** (replaces "slope 0.947" and "R_glob(a) = 0.19991(1 + 0.231ε)"):
+  - finite-a thresholds exceed the limit by 7.6–13.5%, increasing in a;
+  - log-log slope 0.83 (exact range 0.71–0.95 over the certified intervals);
+  - a single O(ε) term does **not** fit the certified values; a leading term plus a negative ε² term
+    does, with c₁ between 0.24 and 0.32.
+  - **Say**: "The O(ε) rate is proved (under the stated hypotheses); at the a we measure (ε = 0.3–0.6)
+    the approach is concave and the ε² term is visible."
+  - **Do not say**: "R_glob(a) is fitted by R_glob^∞(1 + c₁ε)", or quote 0.947 or 0.231.
+
 MATH_NOTE_SECTION
 
 ## Blocks 4 and 5 — fixed-scale dynamics and retention

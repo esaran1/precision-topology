@@ -148,8 +148,17 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 - Certified brackets for s = |w₂|, width 0.0125, at a = 1.30 … 1.60 (`cond_certified_brackets.csv`).
   For example, R_glob(1.30) ∈ (0.21310, 0.21364] and R_solve(1.30) ∈ (0.30566, 0.30620].
 - The frozen Block B grid value is the first grid point above the bracket in every case.
-- The finite-a values exceed R_glob^∞ by 7–14%, consistent with the O(ε) correction. The rate is
-  measured (log-log slope 0.947, frozen-grid values), not certified.
+- **Convergence, refitted on certified intervals** (`rglob_refit.py` → `rglob_convergence_refit.csv`,
+  `rglob_convergence_points.csv`):
+  - finite-a values exceed R_glob^∞ by +7.6 to +13.5% (midpoints), positive at the worst corner, monotone in a;
+  - log-log slope 0.829 at midpoints, exact range [0.714, 0.954] over the certified box (the frozen-grid
+    fit gave 0.947);
+  - **no one-term law R_glob^∞(1 + c₁ε) passes through all certified intervals**; a two-term law does,
+    with c₁ ∈ [0.243, 0.321] and a strictly negative ε² coefficient;
+  - a straight line through the six finite a alone extrapolates to [0.2002, 0.2035], outside the
+    certified limit.
+- So the O(ε) rate is the corollary's, not the fit's. At ε = 0.30–0.60 the ε² term is not negligible,
+  and the measured points do not isolate the leading coefficient better than [0.243, 0.321].
 
 ## 6. Chain table
 
