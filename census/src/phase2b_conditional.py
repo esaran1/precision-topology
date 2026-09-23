@@ -1,4 +1,5 @@
-"""Training-free prediction of both thresholds from the slow-variable hypothesis.
+"""Prediction of both thresholds, computed independently of unconstrained training trajectories,
+from the slow-variable hypothesis.
 
 Registered in results/phase2b_across_a_prediction.md BEFORE any crossing value
 outside a = 1.30 was read.

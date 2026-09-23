@@ -1,4 +1,4 @@
-"""Block G: does the training-free machinery transfer to task windows it was
+"""Block G: does the machinery computed independently of unconstrained training trajectories transfer to task windows it was
 never calibrated on?
 
 Registered in results/blockG_prediction.md.  float64 throughout.
@@ -220,7 +220,7 @@ def train(win, a, seed, gs, budget=BUDGET):
 
 
 def main():
-    print("=== Ghat on each window (training-free) ===", flush=True)
+    print("=== Ghat on each window (computed independently of unconstrained training trajectories) ===", flush=True)
     gh = {}
     for win in WINDOWS:
         for a in (1.30, 1.50):
@@ -229,7 +229,7 @@ def main():
             print(f"  {win.tag:15s} a={a}: Ghat={g:.6f} at w1={arg[0]:.4f} b1={arg[1]:.4f}",
                   flush=True)
 
-    print("\n=== switch points on each window (training-free, grid 0.01) ===", flush=True)
+    print("\n=== switch points on each window (computed independently of unconstrained training trajectories, grid 0.01) ===", flush=True)
     srows = []
     for win in WINDOWS:
         for a in (1.30, 1.50):

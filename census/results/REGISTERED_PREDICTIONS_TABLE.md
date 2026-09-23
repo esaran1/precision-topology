@@ -99,7 +99,7 @@ registration's own falsifier, **the relaxation-lag account is a label, not a
 mechanism**. What survives: the offset is **robust and one-signed**, 8.6–9.6%
 across three optimisers and 8.6–14.4% across six `a`.
 
-## Block G — out-of-distribution windows against training-free predictions
+## Block G — out-of-distribution windows against predictions computed independently of unconstrained training trajectories
 
 | # | registered prediction | measured | verdict |
 |---|---|---|---|
