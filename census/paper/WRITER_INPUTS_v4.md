@@ -150,7 +150,7 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
   that is the old grid's first point above the interval.
 - **Convergence, on certified values** (replaces "slope 0.947" and "R_glob(a) = 0.19991(1 + 0.231ε)"):
   - finite-a thresholds exceed the limit by 7.6–13.5%, increasing in a;
-  - log-log slope 0.83 (exact range 0.71–0.95 over the certified intervals);
+  - log-log slope 0.83 (exact range 0.71–0.96 over the certified intervals);
   - a single O(ε) term does **not** fit the certified values; a leading term plus a negative ε² term
     does, with c₁ between 0.24 and 0.32.
   - **Say**: "The O(ε) rate is proved (under the stated hypotheses); at the a we measure (ε = 0.3–0.6)

@@ -89,7 +89,7 @@ crossing is transversal. ∎
 
 - `(κ(a) − κ₀)/κ₀` against `ε` for `ε ≤ 0.1`: log-log slope **0.9926** [M1].
 - `R_glob(a)/R_glob^∞ − 1` over the six measured `a`: log-log slope **0.9472** [M2] (frozen grid; superseded by the
-  certified-interval refit in `math_note_v2.md` §5: 0.829, range [0.714, 0.954]).
+  certified-interval refit in `math_note_v2.md` §5: 0.829, range [0.714, 0.955]).
 
 Both are the `O(ε)` rate of 4 and 6.
 

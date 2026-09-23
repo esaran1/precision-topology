@@ -32,7 +32,9 @@ only through the unit R = |w₂|Ĝ/2.
 - **Limit problem**: φ_0 = h, h(σ) = −σ + σ³/6, giving L*_0(p, q; A). It does not depend on a.
 - **Limit gap**: G_0(p, q) = min_O h(σ) − max_I h(σ) in the A > 0 orientation. The finite gap is
   ε^{3/2}(G_0 + O(ε)).
-- **Units**: R = sĜ(a)/2 = KA(1 + δ_ε)/2 with |δ_ε| = O(ε), and K = 0.579454926 (T64).
+- **Units**: R = sĜ(a)/2 = KA(1 + δ_ε)/2 with |δ_ε| = O(ε). K ∈ [0.5794558, 0.5794951] (exact-extrema
+  branch and bound, `limit_K_base.csv`; T58's 0.579454926 is a refinement estimate just below the
+  supremum). Certified R intervals use K_lo·A_lo/2 and K_hi·A_hi/2.
 
 ## 2. Statement
 
@@ -41,7 +43,7 @@ only through the unit R = |w₂|Ĝ/2.
 - (a) **Localisation**, proved given computed bounds: for every A ∈ [0.66, 0.72], every global
   minimiser of L*_0(·, ·; A) lies in K(24) = {|p| ≤ 24, |q| ≤ 2√2 + 48}.
 - (b) **Switch**: the global minimiser's gap changes sign at a unique A* ∈ (0.68125, 0.6875]. Hence
-  **R_glob^∞ = KA*/2 ∈ [0.1974, 0.1992]**.
+  **R_glob^∞ = KA*/2 ∈ [0.19738, 0.19920]** (`limit_K_base.csv`).
 - (c) **Single branch**:
   - for A ∈ [0.66, 0.71], the global minimiser lies in the box U = [p₀ ± 0.05] × [q₀ ± 0.05], with
     (p₀, q₀) = (1.66858, 1.36972);
@@ -151,7 +153,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 - **Convergence, refitted on certified intervals** (`rglob_refit.py` → `rglob_convergence_refit.csv`,
   `rglob_convergence_points.csv`):
   - finite-a values exceed R_glob^∞ by +7.6 to +13.5% (midpoints), positive at the worst corner, monotone in a;
-  - log-log slope 0.829 at midpoints, exact range [0.714, 0.954] over the certified box (the frozen-grid
+  - log-log slope 0.829 at midpoints, exact range [0.714, 0.955] over the certified box (the frozen-grid
     fit gave 0.947);
   - **no one-term law R_glob^∞(1 + c₁ε) passes through all certified intervals**; a two-term law does,
     with c₁ ∈ [0.243, 0.321] and a strictly negative ε² coefficient;

@@ -1,28 +1,28 @@
 quantity,value
-R_glob_inf certified lo,0.19737683416875
-R_glob_inf certified hi,0.1991876308125
+R_glob_inf certified lo,0.1973771259484547
+R_glob_inf certified hi,0.1992014548677744
 finite-a certified R width max,0.0014022512632846929
-"dev min (%), midpoints",7.609746608768875
-"dev max (%), midpoints",13.505544561510519
+"dev min (%), midpoints",7.6059163428424
+"dev max (%), midpoints",13.50150444029936
 dev all positive (worst corner),1.0
 "dev monotone in a, midpoints",1.0
-"corr(eps, dev), midpoints",0.9986721472154834
-"log-log slope, midpoints",0.8291835056358163
-"log-log slope, min over certified box",0.71448692713364
-"log-log slope, max over certified box",0.9542085134319627
+"corr(eps, dev), midpoints",0.9986721472154833
+"log-log slope, midpoints",0.8294780062456384
+"log-log slope, min over certified box",0.7144969634848524
+"log-log slope, max over certified box",0.9549048947046379
 "slope range inside registered band [0.5, 2]",1.0
-"c1, midpoints",0.23626007065579377
-c1 min over box,0.21984927315940206
-c1 max over box,0.2528214259273818
-"c1 fit max residual, midpoints",0.0013286092882348888
+"c1, midpoints",0.2361735645707355
+c1 min over box,0.21968175194805312
+c1 max over box,0.25281780869000064
+"c1 fit max residual, midpoints",0.001326375770042021
 one-term law R_inf(1 + c1 eps) feasible within all certified intervals,0.0
 two-term law (eps and eps^2) feasible within all certified intervals,1.0
-two-term law: m (= R_inf c1) min over feasible,0.048487499999999996
+two-term law: m (= R_inf c1) min over feasible,0.0484125
 two-term law: m max over feasible,0.0634125
-two-term law: c1 = m/R_inf min over feasible,0.24342625996512013
-two-term law: c1 max over feasible,0.3212763051300368
-two-term law: q (eps^2 coefficient) min over feasible,-0.030703006223930074
-two-term law: q max over feasible,-0.007007557338387969
+two-term law: c1 = m/R_inf min over feasible,0.24303286355079667
+two-term law: c1 max over feasible,0.3212758301919963
+two-term law: q (eps^2 coefficient) min over feasible,-0.030705032471879397
+two-term law: q max over feasible,-0.00691605772223812
 "limit-free linear fit: intercept alpha, midpoints",0.20184647451926635
 limit-free intercept min over box,0.20015458035460323
 limit-free intercept max over box,0.2035383686839294

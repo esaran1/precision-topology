@@ -1,7 +1,7 @@
 """Convergence of R_glob(a) to R_glob^inf, refitted on certified intervals (replaces the frozen-grid fit).
 
 Inputs: certified finite-a brackets (cond_certified_brackets.csv, kind glob, R = s Ĝ_cert/2) and the certified
-limit interval (limit_switch.csv).  dev(a) = R_glob(a)/R_glob^inf − 1, ε = a − 1.
+limit interval (limit_K_base.csv: certified K interval × the A* bracket of limit_switch.csv).  dev(a) = R_glob(a)/R_glob^inf − 1, ε = a − 1.
 
 1. Midpoint fit: log-log slope of dev on ε, c1 = Σε·dev/Σε² (R = R_inf(1 + c1 ε)), max residual, corr.
 2. Exact ranges over the certified box.  For fixed R_inf, the OLS slope is linear in y_i = log dev_i and each
@@ -44,7 +44,7 @@ def main():
     e = (b.a - 1).values
     Rlo, Rhi = b.R_lo.values, b.R_hi.values
     Rmid = 0.5 * (Rlo + Rhi)
-    ls = pd.read_csv(RESULTS / "limit_switch.csv").iloc[0]
+    ls = pd.read_csv(RESULTS / "limit_K_base.csv").iloc[0]         # certified K interval × certified A* bracket
     Llo, Lhi = float(ls.R_glob_inf_lo), float(ls.R_glob_inf_hi)
     Lmid = 0.5 * (Llo + Lhi)
     le = np.log(e)

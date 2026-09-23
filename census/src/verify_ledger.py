@@ -108,6 +108,11 @@ def main() -> None:
     ls_ = pd.read_csv(R / "limit_switch.csv").iloc[0]
     chk("R_glob^inf certified lower", float(ls_["R_glob_inf_lo"]), 0.1974, 5e-5)
     chk("R_glob^inf certified upper", float(ls_["R_glob_inf_hi"]), 0.1992, 5e-5)
+    kb_ = pd.read_csv(R / "limit_K_base.csv").iloc[0]
+    chk("K certified (exact extrema) lower", float(kb_.K_lo), 0.5794558, 1e-7)
+    chk("K certified (exact extrema) upper", float(kb_.K_hi), 0.5794951, 1e-7)
+    chk("R_glob^inf certified with K interval, lower", float(kb_.R_glob_inf_lo), 0.19738, 1e-5)
+    chk("R_glob^inf certified with K interval, upper", float(kb_.R_glob_inf_hi), 0.19920, 1e-5)
     chk("frozen grid value lies above the certified interval",
         float(float(d["R_glob"]) > float(ls_["R_glob_inf_hi"])), 1.0, 0)
     chk("R_spin^inf == R_glob^inf (no window)",
@@ -129,12 +134,12 @@ def main() -> None:
     print("T58 refit on certified intervals (rglob_refit)")
     rf = dict(pd.read_csv(R / "rglob_convergence_refit.csv").values)
     for q_, v_, t_ in (("log-log slope, midpoints", 0.829, 0.001), ("log-log slope, min over certified box", 0.714, 0.001),
-                       ("log-log slope, max over certified box", 0.954, 0.001), ("slope range inside registered band [0.5, 2]", 1.0, 0),
+                       ("log-log slope, max over certified box", 0.955, 0.001), ("slope range inside registered band [0.5, 2]", 1.0, 0),
                        ("one-term law R_inf(1 + c1 eps) feasible within all certified intervals", 0.0, 0),
                        ("two-term law (eps and eps^2) feasible within all certified intervals", 1.0, 0),
                        ("two-term law: c1 = m/R_inf min over feasible", 0.243, 0.001),
                        ("two-term law: c1 max over feasible", 0.321, 0.001),
-                       ("two-term law: q max over feasible", -0.0070, 0.0001),
+                       ("two-term law: q max over feasible", -0.0069, 0.0001),
                        ("limit-free intercept min over box", 0.2002, 0.0001),
                        ("limit-free intercept range overlaps certified limit", 0.0, 0),
                        ("dev all positive (worst corner)", 1.0, 0), ("dev monotone in a, midpoints", 1.0, 0)):
@@ -691,6 +696,11 @@ PRODUCERS = {
     "wi_crossing_steps.csv": ("writer_inputs", "crossing_steps", "full", ""),
     "provenance_rebuild_check.csv": ("provenance_rebuild", "check", "full", ""),
     "session_producers_check.csv": ("session_artifacts", "check_session_producers", "full", ""),
+    "rglob_convergence_refit.csv": ("rglob_refit", "main", "full", ""),
+    "rglob_convergence_points.csv": ("rglob_refit", "main", "full", ""),
+    "limit_K_base.csv": ("limit_windows", "K_base", "full", ""),
+    "limit_windows.csv": ("limit_windows", "main", "full", ""),
+    "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
