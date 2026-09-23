@@ -704,6 +704,7 @@ PRODUCERS = {
     "first_order_corner.csv": ("first_order", "corner", "full", ""),
     "first_order_corner_free.csv": ("first_order", "corner", "full", ""),
     "mn2_h2prime.csv": ("math_note_v2_checks", "h2", "full", ""),
+    "mn2_solve_limit.csv": ("math_note_v2_checks", "solve_limit", "full", ""),
     "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
     "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
     "cond_certified_brackets.csv": ("conditional_certified", "brackets", "full", ""),
@@ -822,6 +823,15 @@ def v4_checks() -> None:
     chk("H2': dG/dA min", float(h2_.dG_dA_lo.min()), 1.666, 0.0005)
     chk("H2': dG/dA max", float(h2_.dG_dA_hi.max()), 1.705, 0.0005)
     chk("H2': lambda_min lower", float(h2_.hess_lambda_min_lo.min()), 0.1470, 0.0001)
+
+    sl_ = pd.read_csv(R / "mn2_solve_limit.csv").sort_values("A")
+    chk("solve limit: sign fails then solves",
+        float(list(sl_.certified_sign) == ["fails", "solves"] and sl_.b2_validated.all()), 1.0, 0)
+    chk("solve limit: A_solve lo", float(sl_.A_solve_lo.iloc[0]), 1.05875, 1e-9)
+    chk("solve limit: A_solve hi", float(sl_.A_solve_hi.iloc[0]), 1.06, 1e-9)
+    chk("solve limit: dmargin/dA min", float(sl_.dmargin_dA_lo.min()), 0.532, 0.0005)
+    chk("solve limit: dmargin/dA max", float(sl_.dmargin_dA_hi.max()), 0.536, 0.0005)
+    chk("solve limit: lambda_min", float(sl_.hess_lambda_min_lo.min()), 0.1369, 0.0001)
 
     print("V4 Block 3 (prospective)")
     cmp_ = pd.read_csv(R / "prospective_comparisons.csv").set_index("comparison")
