@@ -128,6 +128,14 @@ iv = mp.iv
 iv.dps = 30
 
 
+def _mid(v):
+    return float((mp.mpf(v.a) + mp.mpf(v.b)) / 2)
+
+
+def _rad(v):
+    return float((mp.mpf(v.b) - mp.mpf(v.a)) / 2)
+
+
 def _ivx(v, r=0.0):
     return iv.mpf([mp.mpf(v) - r, mp.mpf(v) + r])
 
@@ -264,12 +272,12 @@ def ift_limit(A, x, y, encl, b_c):
             c[i] += ds * _h(sg) * dz[i] + r_ * dAdz[i]
     H = [[H[i][j] / n for j in range(3)] for i in range(3)]
     c = [c[i] / n for i in range(3)]
-    Hm = np.array([[float(mp.mpf((H[i][j].a + H[i][j].b) / 2)) for j in range(3)] for i in range(3)])
-    cm = np.array([float(mp.mpf((c[i].a + c[i].b) / 2)) for i in range(3)])
+    Hm = np.array([[_mid(H[i][j]) for j in range(3)] for i in range(3)])
+    cm = np.array([_mid(c[i]) for i in range(3)])
     x0 = -np.linalg.solve(Hm, cm)
     Rv = [sum(H[i][j] * float(x0[j]) for j in range(3)) + c[i] for i in range(3)]
-    Rn = math.sqrt(sum(float(max(abs(v.a), abs(v.b))) ** 2 for v in Rv))
-    rad = math.sqrt(sum(float((H[i][j].b - H[i][j].a) / 2) ** 2 for i in range(3) for j in range(3)))
+    Rn = math.sqrt(sum(max(abs(float(mp.mpf(v.a))), abs(float(mp.mpf(v.b)))) ** 2 for v in Rv))
+    rad = math.sqrt(sum(_rad(H[i][j]) ** 2 for i in range(3) for j in range(3)))
     lam_mid = float(np.linalg.eigvalsh(Hm)[0])
     lam_lo = lam_mid - rad
     if lam_lo <= 0:
@@ -320,9 +328,9 @@ def ift_limit(A, x, y, encl, b_c):
     dG = gp * dtheta[0] + gq * dtheta[1]
     _IFT_CACHE["last"] = {"dtheta": dtheta, "om": om, "im": im}
     return {"b2_validated": True, "hessian_pd": True, "active_set_unique": True,
-            "hess_lambda_min_lo": lam_lo, "dG_dA_lo": float(dG.a), "dG_dA_hi": float(dG.b),
+            "hess_lambda_min_lo": lam_lo, "dG_dA_lo": float(mp.mpf(dG.a)), "dG_dA_hi": float(mp.mpf(dG.b)),
             "outer_active": f"{om[0]} {om[1]}", "inner_active": f"{im[0]} {im[1]}",
-            "G_lo": float((om[2] - im[2]).a), "G_hi": float((om[2] - im[2]).b)}
+            "G_lo": float(mp.mpf((om[2] - im[2]).a)), "G_hi": float(mp.mpf((om[2] - im[2]).b))}
 
 
 def h2(P=24.0):
@@ -428,7 +436,8 @@ def solve_finite():
             sign = "solves" if margin.a > 0 else ("fails" if margin.b < 0 else "undetermined")
             rows.append({"a": a, "s": s, "global_region": g["region"], "b2_validated": ok,
                          "encl_w1_width": enc[1] - enc[0], "encl_b1_width": enc[3] - enc[2],
-                         "margin_lo": float(margin.a), "margin_hi": float(margin.b), "certified_sign": sign})
+                         "margin_lo": float(mp.mpf(margin.a)), "margin_hi": float(mp.mpf(margin.b)),
+                         "certified_sign": sign})
             print(rows[-1], flush=True)
     d = pd.DataFrame(rows)
     d.to_csv(RESULTS / "mn2_solve_finite.csv", index=False)
@@ -515,8 +524,8 @@ def solve_limit(P=24.0):
                 d_ = None
             if d_ is not None:
                 dM = (float(d_.a), float(d_.b))
-        rows.append({"A": A, "region": g["region"], "b2_validated": ok, "margin_lo": float(M.a),
-                     "margin_hi": float(M.b), "certified_sign": sign,
+        rows.append({"A": A, "region": g["region"], "b2_validated": ok, "margin_lo": float(mp.mpf(M.a)),
+                     "margin_hi": float(mp.mpf(M.b)), "certified_sign": sign,
                      "hess_lambda_min_lo": ift.get("hess_lambda_min_lo"),
                      "dmargin_dA_lo": dM[0], "dmargin_dA_hi": dM[1], "encl": str(enc)})
         print(rows[-1], flush=True)
@@ -530,3 +539,175 @@ def solve_limit(P=24.0):
 
 if __name__ == "__main__" and sys.argv[1] == "solve_limit":
     solve_limit()
+
+
+# ----------------------------------------------------------------------------- neighbourhood U and constants
+RHO = 0.05
+SPLIT = (10, 10, 5)          # sub-boxes in p, q, A for the certified PD check
+A_RANGE = (0.66, 0.71)
+EPS_MAX = 0.05
+
+
+def taylor_constants(S, eps):
+    """Exact remainder bounds for φ_ε(σ) = [f_a(π+√εσ) − π]/ε^{3/2} against h on |σ| <= S (derivation in the note).
+
+    φ_ε    = h + ε r + ε² e0,  r = σ³/6 − σ⁵/120,   |e0| <= S⁵/120 + (1+ε) S⁷/5040
+    φ_ε'   = h' + ε r' + ε² e1, r' = σ²/2 − σ⁴/24,  |e1| <= S⁴/24 + (1+ε) S⁶/720
+    φ_ε''  = h'' + ε r'' + ε² e2, r'' = σ − σ³/6,   |e2| <= S³/6 + (1+ε) S⁵/120
+    φ_ε''' − h''' = (1+ε) cos(√εσ) − 1,              |·| <= ε + (1+ε) ε S²/2
+    Returns M0..M3 with |φ_ε^{(k)} − h^{(k)}| <= ε M_k.
+    """
+    sig = np.linspace(-S, S, 200001)
+    r = sig ** 3 / 6 - sig ** 5 / 120
+    r1 = sig ** 2 / 2 - sig ** 4 / 24
+    r2 = sig - sig ** 3 / 6
+    M0 = np.abs(r).max() + eps * (S ** 5 / 120 + (1 + eps) * S ** 7 / 5040)
+    M1 = np.abs(r1).max() + eps * (S ** 4 / 24 + (1 + eps) * S ** 6 / 720)
+    M2 = np.abs(r2).max() + eps * (S ** 3 / 6 + (1 + eps) * S ** 5 / 120)
+    M3 = 1 + (1 + eps) * S ** 2 / 2
+    return {"S": S, "eps_max": eps, "M0": M0, "M1": M1, "M2": M2, "M3": M3}
+
+
+def _box_hessian_pd(args):
+    """Certified PD of the (p, q, b) Hessian over one sub-box, with b enclosed by interval Newton."""
+    pl, ph, ql, qh, al, ah = args
+    from .limit_bnb import population, profile
+    x, y = population()
+    iv.dps = 30
+    P, Q, Aiv = iv.mpf([pl, ph]), iv.mpf([ql, qh]), iv.mpf([al, ah])
+    _, b2c, *_ = profile([0.5 * (pl + ph)], [0.5 * (ql + qh)], 0.5 * (al + ah), x, y)
+    ybar = mp.mpf(int(y.sum())) / len(y)
+    ok, r, N = False, 0.01, None
+    while not ok and r < 2:
+        B = iv.mpf([float(b2c[0]) - r, float(b2c[0]) + r])
+        gc = iv.mpf(0); gb = iv.mpf(0)
+        for xi in x:
+            sg = P * float(xi) + Q
+            gc += _sig_iv(Aiv * _h(sg) + float(b2c[0]))
+            gb += _dsig_iv(_sig_iv(Aiv * _h(sg) + B))
+        N = float(b2c[0]) - (gc / len(x) - ybar) / (gb / len(x))
+        ok = (mp.mpf(N.a) >= mp.mpf(B.a)) and (mp.mpf(N.b) <= mp.mpf(B.b))
+        r *= 2
+    if not ok:
+        return {"box": args, "b2_ok": False, "pd": False, "lam_lo": np.nan}
+    H = [[iv.mpf(0)] * 3 for _ in range(3)]
+    for xi, yi in zip(x, y):
+        xi = float(xi)
+        sg = P * xi + Q
+        hp_ = -1 + sg ** 2 / 2
+        z = Aiv * _h(sg) + N
+        s_ = _sig_iv(z); ds = _dsig_iv(s_)
+        r_ = s_ - int(yi)
+        dz = [Aiv * hp_ * xi, Aiv * hp_, iv.mpf(1)]
+        d2 = {(0, 0): Aiv * sg * xi * xi, (0, 1): Aiv * sg * xi, (1, 1): Aiv * sg}
+        for i in range(3):
+            for j in range(3):
+                H[i][j] += ds * dz[i] * dz[j] + r_ * d2.get((min(i, j), max(i, j)), 0)
+    H = [[H[i][j] / len(x) for j in range(3)] for i in range(3)]
+    Hm = np.array([[_mid(H[i][j]) for j in range(3)] for i in range(3)])
+    rad = math.sqrt(sum(_rad(H[i][j]) ** 2 for i in range(3) for j in range(3)))
+    lam = float(np.linalg.eigvalsh(Hm)[0])
+    return {"box": args, "b2_ok": True, "pd": lam - rad > 0, "lam_lo": lam - rad}
+
+
+def neighbourhood(workers=1):
+    from multiprocessing import Pool
+    ls = pd.read_csv(RESULTS / "limit_switch.csv").iloc[0]
+    p0, q0 = float(ls.argmin_p), float(ls.argmin_q)
+    S_U = 2 * (abs(p0) + RHO) + abs(q0) + RHO
+    pe = np.linspace(p0 - RHO, p0 + RHO, SPLIT[0] + 1)
+    qe = np.linspace(q0 - RHO, q0 + RHO, SPLIT[1] + 1)
+    ae = np.linspace(A_RANGE[0], A_RANGE[1], SPLIT[2] + 1)
+    boxes = [(pe[i], pe[i + 1], qe[j], qe[j + 1], ae[k], ae[k + 1])
+             for i in range(SPLIT[0]) for j in range(SPLIT[1]) for k in range(SPLIT[2])]
+    with Pool(workers) as pool:
+        res = pool.map(_box_hessian_pd, boxes)
+    lam_lo = [r["lam_lo"] for r in res]
+    out = {"p0": p0, "q0": q0, "rho": RHO, "A_lo": A_RANGE[0], "A_hi": A_RANGE[1], "S_U": S_U,
+           "sub_boxes": len(boxes), "b2_validated_all": all(r["b2_ok"] for r in res),
+           "hess_pd_all_boxes": all(r["pd"] for r in res),
+           "hess_lambda_min_lower_bound": float(np.nanmin(lam_lo)), **taylor_constants(S_U, EPS_MAX)}
+    pd.DataFrame([out]).to_csv(RESULTS / "mn2_neighbourhood.csv", index=False)
+    print(pd.Series(out).to_string())
+
+
+if __name__ == "__main__" and sys.argv[1] == "neighbourhood":
+    neighbourhood(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
+
+
+# ----------------------------------------------------------------------------- annulus / uniqueness over A
+A_SUBINTERVALS = 8
+
+
+def annulus_job(args):
+    """Certified lower bound of L0*(p, q; A) over K(P) minus the ρ-box around the branch argmin, uniformly for
+    A in [A_lo, A_hi], and a certified upper bound of the branch loss over the same A-interval.
+
+    Uniformity in A: for fixed θ, L0*(θ; A) = min_b mean ℓ(A h(σ) + b) is convex in A (ℓ is convex and the
+    logit is jointly linear in (A, b)), so L0*(θ; A) >= L0*(θ; A_c) - h_A |∂_A L0*(θ; A_c)| on the interval,
+    and |∂_A L0*| = |mean((σ(z) - y) h(σ))| <= mean |h(σ)|, bounded per cell by |h| at the cell's max |σ|.
+    Branch upper bound: m(A) <= L0*(θ_c; A_c) + h_A mean|h(σ_c)| (the loss is 1-Lipschitz in the logit and the
+    profiled bias can only lower it).
+    """
+    A_lo, A_hi, P, p0, q0, rho, tol, h0 = args
+    from .limit_bnb import population, profile
+    x, y = population()
+    Ac, hA = 0.5 * (A_lo + A_hi), 0.5 * (A_hi - A_lo)
+    Q = 2 * math.sqrt(2) + 2 * P
+    npn = int(math.ceil(P / h0)); nq = int(math.ceil(2 * Q / h0))
+    hp, hq = P / npn / 2, Q / nq
+    cp, cq = np.meshgrid((np.arange(npn) + 0.5) * 2 * hp, -Q + (np.arange(nq) + 0.5) * 2 * hq, indexing="ij")
+    cp, cq = cp.ravel(), cq.ravel()
+    ax = np.abs(x)
+    # branch upper bound over the A-interval, from the argmin at A_c
+    Lc, _, _, _ = profile([p0], [q0], Ac, x, y)
+    sig0 = p0 * x + q0
+    branch_upper = float(Lc[0]) + hA * float(np.mean(np.abs(-sig0 + sig0 ** 3 / 6)))
+    upper, rounds = math.inf, 0
+    while True:
+        rounds += 1
+        inbox = (np.abs(cp - p0) + hp <= rho) & (np.abs(cq - q0) + hq <= rho)     # cell entirely in the box
+        cp, cq = cp[~inbox], cq[~inbox]
+        n = len(cp)
+        lb = np.empty(n); Lv = np.empty(n)
+        for i in range(0, n, 2000):
+            sl = slice(i, i + 2000)
+            L, _, gp, gq = profile(cp[sl], cq[sl], Ac, x, y)
+            d = ax[None, :] * hp + hq
+            smax = np.abs(cp[sl, None] * x[None, :] + cq[sl, None]) + d
+            curv = 0.5 * Ac * (smax * d ** 2).mean(axis=1)
+            habs = (smax + smax ** 3 / 6).mean(axis=1)                         # >= mean |h(σ)| over the cell
+            lb[sl] = L - np.abs(gp) * hp - np.abs(gq) * hq - curv - hA * habs
+            Lv[sl] = L
+        outside = ~((np.abs(cp - p0) < rho) & (np.abs(cq - q0) < rho))
+        if outside.any():
+            upper = min(upper, float(Lv[outside].min()))
+        keep = lb < min(upper, branch_upper + 1.0)
+        lower = float(lb[keep].min()) if keep.any() else upper
+        done = (lower > branch_upper) or (upper - lower <= tol) or not keep.any() or rounds > 30
+        if done:
+            return {"A_lo": A_lo, "A_hi": A_hi, "branch_upper": branch_upper, "competitor_lower": lower,
+                    "competitor_attained": upper, "margin": lower - branch_upper, "rounds": rounds,
+                    "certified": lower > branch_upper}
+        cp, cq = cp[keep], cq[keep]
+        hp, hq = hp / 2, hq / 2
+        cp = np.concatenate([cp - hp, cp - hp, cp + hp, cp + hp])
+        cq = np.concatenate([cq - hq, cq + hq, cq - hq, cq + hq])
+
+
+def annulus(workers=1, P=24.0):
+    from multiprocessing import Pool
+    ls = pd.read_csv(RESULTS / "limit_switch.csv").iloc[0]
+    p0, q0 = float(ls.argmin_p), float(ls.argmin_q)
+    edges = np.linspace(A_RANGE[0], A_RANGE[1], A_SUBINTERVALS + 1)
+    jobs = [(edges[i], edges[i + 1], P, p0, q0, RHO, 1e-7, 0.25) for i in range(A_SUBINTERVALS)]
+    with Pool(workers) as pool:
+        rows = pool.map(annulus_job, jobs)
+    d = pd.DataFrame(rows)
+    d.to_csv(RESULTS / "mn2_annulus.csv", index=False)
+    print(d.to_string(index=False))
+    print("all A-subintervals certified:", bool(d.certified.all()), " min margin:", d.margin.min())
+
+
+if __name__ == "__main__" and sys.argv[1] == "annulus":
+    annulus(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
