@@ -227,38 +227,82 @@ def _decisions_preserved(ck, k):
     return bool(torch.equal(torch.sign(z), torch.sign(k * z)))
 
 
-def _k1_check(ck, steps=25):
-    """Registered check: 'preserved' replay at k = 1 vs an independent frozen-w2 continuation."""
+def reference_freeze(ck, variant, steps, x=None, y=None):
+    """Independent reference for the replay at k = 1 (amended check, 2026-09-23).
+
+    Restores the full 4-parameter Adam optimiser from the checkpoint ('preserved') or starts it fresh
+    ('reset'), zeroes w2's gradient AND resets w2 to its saved value after every step, so w2 is truly
+    frozen.  (Zeroing the gradient alone does not freeze w2 under Adam: the stored first moment keeps
+    moving it — the reason the original check fired.)  Returns (w1, b1, b2) and the w2 trajectory.
+    """
     import torch
     from torch.nn import functional as F
     from .fold1d import activation, make_data
     f = activation("sin_family", A)
-    x, y = make_data(200, ck["seed"])
-    x, y = x.double(), y.double()
+    if x is None:
+        x, y = make_data(200, ck["seed"])
+        x, y = x.double(), y.double()
     th = torch.tensor(ck["theta"], dtype=torch.float64, requires_grad=True)
+    w2_0 = th.detach()[2].clone()
     opt = torch.optim.Adam([th], lr=LR)
-    opt.state[th] = {"step": torch.tensor(float(ck["adam_step"])),
-                     "exp_avg": torch.tensor(ck["exp_avg"], dtype=torch.float64),
-                     "exp_avg_sq": torch.tensor(ck["exp_avg_sq"], dtype=torch.float64)}
+    if variant == "preserved":
+        opt.state[th] = {"step": torch.tensor(float(ck["adam_step"])),
+                         "exp_avg": torch.tensor(ck["exp_avg"], dtype=torch.float64),
+                         "exp_avg_sq": torch.tensor(ck["exp_avg_sq"], dtype=torch.float64)}
+    w2_traj = []
     for _ in range(steps):
         opt.zero_grad(set_to_none=True)
         F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y).backward()
         th.grad[2] = 0.0
         opt.step()
-    ind = th.detach().numpy()[[0, 1, 3]]
-    # replay implementation, same checkpoint, k = 1, 'preserved'
+        with torch.no_grad():
+            th[2] = w2_0
+        w2_traj.append(float(th.detach()[2]))
+    return th.detach().numpy()[[0, 1, 3]], w2_traj
+
+
+def replay_params(ck, variant, steps, k=1.0, x=None, y=None):
+    """The replay's own implementation (w2 excluded from the optimiser), returning (w1, b1, b2)."""
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import activation, make_data
+    f = activation("sin_family", A)
+    if x is None:
+        x, y = make_data(200, ck["seed"])
+        x, y = x.double(), y.double()
     w1, b1, w2, b2 = (float(v) for v in ck["theta"])
-    p = torch.tensor([w1, b1, b2], dtype=torch.float64, requires_grad=True)
-    o2 = torch.optim.Adam([p], lr=LR)
-    o2.state[p] = {"step": torch.tensor(float(ck["adam_step"])),
-                   "exp_avg": torch.tensor(ck["exp_avg"][[0, 1, 3]], dtype=torch.float64),
-                   "exp_avg_sq": torch.tensor(ck["exp_avg_sq"][[0, 1, 3]], dtype=torch.float64)}
-    w2t = torch.tensor(w2, dtype=torch.float64)
+    p = torch.tensor([w1, b1, b2 * k], dtype=torch.float64, requires_grad=True)
+    o = torch.optim.Adam([p], lr=LR)
+    if variant == "preserved":
+        o.state[p] = {"step": torch.tensor(float(ck["adam_step"])),
+                      "exp_avg": torch.tensor(ck["exp_avg"][[0, 1, 3]], dtype=torch.float64),
+                      "exp_avg_sq": torch.tensor(ck["exp_avg_sq"][[0, 1, 3]], dtype=torch.float64)}
+    w2t = torch.tensor(w2 * k, dtype=torch.float64)
     for _ in range(steps):
-        o2.zero_grad(set_to_none=True)
+        o.zero_grad(set_to_none=True)
         F.binary_cross_entropy_with_logits(w2t * f(p[0] * x + p[1]) + p[2], y).backward()
-        o2.step()
-    return float(np.abs(ind - p.detach().numpy()).max())
+        o.step()
+    return p.detach().numpy()
+
+
+def k1_check(ck, variant="preserved", steps=25):
+    """Amended registered check: max |replay - reference_freeze| over the first `steps` steps."""
+    ref, _ = reference_freeze(ck, variant, steps)
+    return float(np.abs(replay_params(ck, variant, steps) - ref).max())
+
+
+K1_TOL = 1e-10
+
+
+def stop_conditions(ck, k, variant="preserved"):
+    """Both registered stop conditions for one replay: returns (fires, reasons)."""
+    reasons = []
+    if not _decisions_preserved(ck, k):
+        reasons.append("rescaling changed a decision")
+    d = k1_check(ck, variant)
+    if not d <= K1_TOL:
+        reasons.append(f"k=1 check failed ({d:.3e})")
+    return bool(reasons), reasons
 
 
 def _replay_job(args):
@@ -281,7 +325,9 @@ def run_replays(block):
     br = _branch_argmins(G_hat, w2_glob)
     jobs = [(ck, lv, var, horizon, stop_on, G_hat, w2_glob, br[lv])
             for ck in cks for lv in LEVELS for var in ("preserved", "reset")]
-    k1 = [_k1_check(ck) for ck in cks[:20]]
+    k1 = [k1_check(ck) for ck in cks[:20]]
+    if max(k1) > K1_TOL:
+        raise SystemExit(f"STOP: amended k=1 check failed, max diff {max(k1):.3e}")
     print(f"block {block}: {len(cks)} checkpoints, {len(jobs)} replays; k=1 check max diff {max(k1):.2e}",
           flush=True)
     with Pool(WORKERS) as p:

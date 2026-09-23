@@ -74,3 +74,38 @@ Infrastructure: `src/fixed_scale.py`. E-2 stays failed whatever these show.
   replacement: the "preserved" replay at k = 1 must reproduce, to 1e-10 over its first 25 steps, an
   independent continuation from the same saved state. That continuation restores the full 4-parameter
   Adam optimiser and zeroes `w₂`'s gradient before each step.
+
+## Amendment 2 — 2026-09-23 12:39 EDT, after the check fired and before any outcome was computed
+
+**What happened.**
+- **The check fired.** When Block 4's replays were launched, the registered k = 1 check (amendment 1)
+  gave a maximum difference of **0.105**, against a limit of 1e-10, on the first 20 checkpoints.
+- **Replays stopped before any outcome.** They were halted at once, before any replay result was
+  written. No Block 4 or Block 5 outcome has been computed.
+
+**Diagnosis: the check was invalid; the replay was not.**
+- **The reference didn't freeze w₂.** It restored the full 4-parameter Adam optimiser and zeroed
+  w₂'s gradient. Under Adam that does not freeze w₂: the stored first moment keeps moving it, by up to
+  0.033 in 25 steps on these checkpoints.
+- **The replay is correct.** A reference that truly freezes w₂, by resetting it to its saved value
+  after every step, reproduces the replay exactly: difference 0.0 on the same 20 checkpoints.
+
+**The amendment.**
+- **What changes:** only the validity check's reference. It now truly freezes w₂, resetting it
+  after every step (`fixed_scale.reference_freeze`, used by `fixed_scale.k1_check`, tolerance
+  1e-10).
+- **What does not change:** the outcome predictions (D1, D2, D3, the retention monotonicity and the
+  [0.9, 1.1] location band), the horizons (4,000 and 12,000), the level grid, the strata, the sample
+  size rule (≥ 150), the success criteria and the other stop condition.
+
+**Tests before any replay** (`tests/test_fixed_scale.py`, 11 of 11 pass):
+- The reference freeze keeps w₂ bit-identical over 200 steps, under both optimiser-state variants.
+- The k = 1 replay equals the reference exactly (`array_equal`), under both variants.
+- The original check was invalid: zeroing the gradient alone moves w₂.
+- **Stop condition 1** (decisions changed): does not fire for k ∈ (0.3, 1.0, 2.5); fires for k = −1.
+- **Stop condition 2** (amended k = 1 check): does not fire on the correct replay; fires on a replay
+  drifted by 1e-6, and on a preserved/reset variant mismatch.
+- **Combined stop check**: fires on a sign flip.
+
+This is the second error found in this registration's stop conditions (amendment 1 was the first).
+Both concerned the implementation-validity check, not any outcome criterion.
