@@ -81,11 +81,11 @@ def _bfgs(fg, x0, gtol=1e-10, maxit=500):
     return float(f), xk
 
 
-def global_min(s, a, x, y):
+def global_min(s, a, x, y, step=STEP, n_refine=N_REFINE):
     """Refined global minimiser of L*(.,.; s): (L, w1, b1, G)."""
     W = w_bound(s, a, x, y)
-    w1g = np.arange(-W, W + STEP / 2, STEP)
-    b1g = np.arange(0.0, 2 * math.pi, STEP)
+    w1g = np.arange(-W, W + step / 2, step)
+    b1g = np.arange(0.0, 2 * math.pi, step)
     Wm, Bm = np.meshgrid(w1g, b1g, indexing="ij")
     wf, bf = Wm.ravel(), Bm.ravel()
     L = np.empty(wf.size)
@@ -97,7 +97,7 @@ def global_min(s, a, x, y):
         if all(abs(wf[j] - w) > 0.1 or min(abs(bf[j] - b), 2 * math.pi - abs(bf[j] - b)) > 0.1
                for w, b in starts):
             starts.append((wf[j], bf[j]))
-        if len(starts) == N_REFINE:
+        if len(starts) == n_refine:
             break
 
     def fg(p):
