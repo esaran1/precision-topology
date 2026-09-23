@@ -201,5 +201,11 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   Fixed-scale relaxation therefore does not appear to explain the free-training offset. Per-step
   settling times are being recorded in the long-horizon replays. No prospective design has been
   written.
+- **Caveat for any reading of the placement curve as dynamics**: first-placement times come only from
+  replays that place (at 1.1×, 30% never place within the horizon). The curve's width around the
+  threshold reflects heterogeneity across replays, not a relaxation timescale.
+- **Sample-specific thresholds, registered** (`own_threshold_prediction.md`, `312829f`): each run
+  trains on its own 400 points. S1–S3 test whether the run's own conditional threshold explains the
+  replay-level placements, the 50% point and the free-training offset. **Pending.**
 
 BLOCKS45_SECTION
