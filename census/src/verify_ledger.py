@@ -104,7 +104,12 @@ def main() -> None:
     chk("kappa_0", K / D_inf, 0.307302, 1e-5)
     chk("kappa(1.02) vs kappa_0 (%)",
         (_mg(1.02, resolution=800) / _dd(1.02) / (K / D_inf) - 1) * 100, -0.38, 0.05)
-    chk("R_glob^inf", float(d["R_glob"]), 0.19991, 1e-4)
+    chk("R_glob^inf (frozen 0.005 grid)", float(d["R_glob"]), 0.19991, 1e-4)
+    ls_ = pd.read_csv(R / "limit_switch.csv").iloc[0]
+    chk("R_glob^inf certified lower", float(ls_["R_glob_inf_lo"]), 0.1974, 5e-5)
+    chk("R_glob^inf certified upper", float(ls_["R_glob_inf_hi"]), 0.1992, 5e-5)
+    chk("frozen grid value lies above the certified interval",
+        float(float(d["R_glob"]) > float(ls_["R_glob_inf_hi"])), 1.0, 0)
     chk("R_spin^inf == R_glob^inf (no window)",
         float(d["R_spin"]) - float(d["R_glob"]), 0.0, 0)
     chk("R_solve^inf", float(d["R_solve"]), 0.30711, 1e-4)

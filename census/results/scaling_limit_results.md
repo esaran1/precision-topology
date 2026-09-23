@@ -71,7 +71,7 @@ above every finite-`a` value and would have read as a clean S-3 failure.
 
 | | coarse (0.05) | **refined (0.005)** |
 |---|---:|---:|
-| `R_glob^inf` | 0.2025 | **0.19991** (`W = 0.690`) |
+| `R_glob^inf` | 0.2025 | **0.19991** (`W = 0.690`; frozen grid. Certified interval [0.1974, 0.1992], `limit_switch.csv`) |
 | `R_spin^inf` | 0.2170 | **0.19991** (`W = 0.690`) |
 | `R_solve^inf` | 0.3183 | **0.30711** (`W = 1.060`) |
 
