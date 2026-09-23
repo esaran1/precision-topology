@@ -274,8 +274,21 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     - Measured against the own threshold, the offset shrinks from 9.2% to 3.1% (1.30) and from 11.9% to
       6.4% (1.50).
     - The competing account (own thresholds centred on the population value) is rejected at both a.
+  - **Decomposition of the free-training offset, state it this way**:
+
+    | | a = 1.30 | a = 1.50 |
+    |---|---:|---:|
+    | free-training offset against the population threshold | 9.6% | 12.6% |
+    | finite-sample shift (median own-seed threshold over population) | 5.7% | 5.6% |
+    | share of the offset it accounts for | ≈ 60% | ≈ 44% |
+    | residual against each run's own threshold (median, log) | 3.1% | 6.4% |
+
+    - The finite-sample shift is about 6% at both a.
+    - The residual grows with a and is **unexplained**.
+    - Crossing R tracks each run's own threshold with Spearman ρ ≈ 0.88 at both a.
   - **Say**: "about 6% of the 9.6–12.6% free-training offset reflects each run's own finite training set;
-    this accounts for the registered half at a = 1.30 but not at a = 1.50".
+    this accounts for the registered half at a = 1.30 but not at a = 1.50, and leaves a residual of 3.1%
+    and 6.4% that grows with a and is not explained".
   - **Validation**:
     - The fast search agrees seed by seed with 1d's certified search on seeds 0–39: 40/40 brackets
       overlap, the mean difference is −0.012%, and the range is −0.09% to +0.06%.
