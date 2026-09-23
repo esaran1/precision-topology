@@ -301,6 +301,22 @@ correction applied to one-sided values. Either way the arm fails.
 
 ---
 
+### 3b. Five-dimensional expressivity threshold (Block A5d, k = 1; T75, Fig 9)
+
+Registered `blockA5d_k1_prediction.md`; recomputed by `src/blockA5d_analyze.py score k1`
+from `blockA5d_k1_runs.csv`. Linked `S² ⊔ S² ⊂ ℝ⁵` (Ren–Lim generator, targeted
+thickening ρ = 0.5, one copy), width 5, depth 5 (chosen by capacity pilot), 20 seeds
+per cell. **Perfect = 0 errors on 20,000 uniform and 20,000 linking-region held-out points.**
+
+| `a` | 0.9 | 1.0 | 1.05 | 1.1 | 1.2 | 1.35 | 1.5 | 2.0 | 3.0 | ReLU | GELU |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| perfect at 64k | 0/20 | 0/20 | 0/20 | 0/20 | 0/20 | 2/20 | 1/20 | 3/20 | 7/20 | 0/20 | 6/20 |
+
+- **A1 PASS**: 0 of 160 run-budgets perfect at `a ≤ 1`; minimum 22 uniform errors.
+- **A4 PASS**: 7 of 20 at `a = 3.0`.
+- **Stop condition**: no `a` reaches half perfect at any budget (max 0.35), so **no onset
+  is measured** (A2, A3 fail; A5 not evaluable). The k = 10 run (T72) found no perfect run anywhere.
+
 ## 4. Exclusion table
 
 `exclusion_table.csv`: **8 unreached** (constructed, `|w2| = 1`) and **4 found**

@@ -803,6 +803,9 @@ def fig9_expressivity() -> None:
     ax.text(thr + 0.08, 1.03, "expressivity threshold $a = 1$\n(Ren–Lim Thm 4.7 bars $a \\leq 1$)",
             fontsize=6, va="bottom")
     ax.axvline(len(a_vals) - 0.2, color="0.6", lw=0.5)
+    ax.axhline(0.5, color="0.35", ls=":", lw=0.8)
+    ax.text(len(a_vals) - 0.3, 0.52, "registered onset level (half perfect)", fontsize=6,
+            ha="right", va="bottom", color="0.25")
     ax.set_xticks([xpos[k] for k in list(a_vals) + ctrl])
     ax.set_xticklabels([f"{a:g}" for a in a_vals] + ["ReLU", "GELU"])
     ax.set_xlabel("activation $f_a(t) = t + a\\sin t$, parameter $a$ (controls at right)")

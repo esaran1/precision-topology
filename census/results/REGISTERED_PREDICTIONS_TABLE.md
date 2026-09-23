@@ -186,6 +186,18 @@ and two of them (E-5, K-3) changed what the paper claims.
 | A4 | a = 3.0, 64k: ≥ 1 perfect | 0 of 20 | **FAIL** |
 | A5 | γ, α_L/β positive | γ undefined | undecidable |
 
+### Block A5d at k = 1 (`blockA5d_k1_results.md`; fresh registration after k = 10, depth 5 chosen by a capacity pilot)
+
+Perfect = zero errors on 20k uniform **and** 20k stratified (linking-region) held-out points.
+
+| # | prediction | measured | verdict |
+|---|---|---|---|
+| A1 | zero perfect runs for a ≤ 1 | 0 of 160; min uniform errors 22 | **PASS**, informative (perfect runs exist at a ≥ 1.35) |
+| A2 | bracketed onset > 1 at every budget | no a reaches ≥ half perfect (max 0.35 at a = 3.0) | **FAIL** — stop condition |
+| A3 | onset non-increasing in B | — | **FAIL** (undefined) |
+| A4 | a = 3.0, 64k: ≥ 1 perfect | 7 of 20 | **PASS** |
+| A5 | γ, α_L/β positive | γ undefined | not evaluable |
+
 ### Block C — optimizer equivalence (`blockC_equivalence_prediction.md`), δ = 0.024
 
 | pair | 90% interval | verdict | registered expectation |

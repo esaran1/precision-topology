@@ -386,6 +386,21 @@ def main() -> None:
     dom = pd.read_csv(R / "crossfamily_followup_domain.csv")
     chk("domain condition at all a", float(dom.condition_holds.sum()), 4.0, 0)
 
+    print("T75 Block A5d at k = 1")
+    k1 = pd.read_csv(R / "blockA5d_k1_runs.csv", dtype={"act": str})
+    k1["perfect"] = k1.perfect.astype(str).str.lower() == "true"
+    chk("runs", float(len(k1)), 880.0, 0)
+    low = k1[k1.act.isin(["0.9", "1.0"])]
+    chk("A1: perfect at a <= 1", float(low.perfect.sum()), 0.0, 0)
+    chk("A1: min uniform errors at a <= 1", float(low.heldout_errors.min()), 22.0, 0)
+    top = k1[(k1.act == "3.0") & (k1.budget == 64_000)]
+    chk("A4: perfect at a = 3.0, 64k", float(top.perfect.sum()), 7.0, 0)
+    fa = k1[~k1.act.isin(["relu", "gelu"])]
+    chk("max perfect fraction (no onset)",
+        float(fa.groupby(["act", "budget"]).perfect.mean().max()), 0.35, 1e-9)
+    chk("no perfect run at a <= 1.2",
+        float(k1[k1.act.isin(["0.9", "1.0", "1.05", "1.1", "1.2"])].perfect.sum()), 0.0, 0)
+
     provenance_check()
 
     print(f"\n{len(F)} finding(s)")

@@ -1,0 +1,6 @@
+id,prediction,measured,pass
+A1,"zero perfect runs for a <= 1, every budget","0 zero-uniform, 0 zero on uniform+stratified, 0 also zero on 200k, of 160 run-budgets; min uniform errors 22, min stratified 0",True
+A2,a bracketed onset a_on(B) > 1 at every budget,B=1000: a_on=None bracketed=False; B=4000: a_on=None bracketed=False; B=16000: a_on=None bracketed=False; B=64000: a_on=None bracketed=False,False
+A3,"a_on non-increasing in B, strictly lower at 64k than 1k",bracketed onsets ,False
+A4,"at a = 3.0, B = 64k, at least one perfect run",7 of 20,True
+A5,gamma and alpha_L/beta (beta = 3/2) both positive (direction only),"gamma = nan from 0 bracketed budgets; alpha_L = 0.4043, alpha_L/beta = 0.2695",False
