@@ -825,6 +825,7 @@ PRODUCERS = {
     "crossing_audit_full_runs.csv": ("cadence_sensitivity", "runs", "full", ""),
     "cadence_sensitivity.csv": ("cadence_sensitivity", "main", "full", ""),
     "width2_unplaced.csv": ("width2_unplaced", "save", "full", ""),
+    "width2_unplaced_localmin.csv": ("width2_unplaced", "save", "full", ""),
     "ghat_rigorous.csv": ("ghat_rigorous", "build", "full", ""),
     "ghat_digit_stability.csv": ("verify_ledger", "digit_stability", "full", ""),
     "ghat_digit_stability_machine_precision.csv": ("verify_ledger", "digit_stability", "full", ""),

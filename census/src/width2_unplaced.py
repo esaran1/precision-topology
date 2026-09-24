@@ -121,6 +121,65 @@ def best_unplaced(act_name, R2, restarts=400, n_random=24, gens=600, seed=11):
             "alphas": json.dumps([float(th[0]), float(th[2])]), "linear_c": c_lin}
 
 
+def local_minima_check(act_name, R2, restarts=400, seed=11):
+    """Does the unplaced region contain a local minimum of L*?  From EVERY unplaced candidate (exact G₊ <= 0) of an
+    unconstrained restart search at this scale, an unconstrained local CMA-ES (σ₀ = 0.01, 400 generations): a candidate
+    is a local-minimum candidate only if the loss cannot fall by more than DESCENT_TOL.  Returns the counts."""
+    from .cmaes import cma_es
+    from .width2_conditional import population, search_batch
+    from .width2_w0 import ACTS, _read
+    act = ACTS[act_name]
+    gh = float(_read(f"gamma_{act_name}.csv").query("search == 'nm'").gamma_lo.iloc[0])
+    x, y = population()
+    s = 2 * R2 / gh
+    f = lambda q: loss(q, s, x, y, act)
+    _, cands = search_batch(s, x, y, act, restarts=restarts, seed=seed, maxit=2000)
+    n_un = to_placed = still_unplaced = no_descent = 0
+    detail = []
+    worst = None
+    for k, c in enumerate(cands[:-1]):
+        if c["p"] is None or not np.isfinite(c["loss"]):
+            continue
+        t = float(np.clip(c["p"][4], -1, 1))
+        q = np.r_[c["p"][:4], t, c["sigma"] * (1 - abs(t))]
+        if g_exact(q, act)[1] > 0:
+            continue
+        n_un += 1
+        L0 = f(q)
+        r = cma_es(f, q, 0.01, max_generations=400, seed=k + 1)
+        drop = L0 - r.best_f
+        worst = drop if worst is None else min(worst, drop)
+        if drop <= DESCENT_TOL:
+            no_descent += 1
+            th, v = _split(q)
+            ge = g_exact(q, act)
+            detail.append({"act": act_name, "R2": R2, "k": k, "loss": L0, "G_hi": ge[1], "w1": abs(v[0]), "w2": abs(v[1]),
+                           "alpha1": th[0], "beta1": th[1], "alpha2": th[2], "beta2": th[3],
+                           "loss_minus_unplaced_best": np.nan, "drop": drop})
+        elif g_exact(r.best_x, act)[0] > 0:
+            to_placed += 1
+        else:
+            still_unplaced += 1
+    return {"act": act_name, "R2": R2, "unplaced_candidates": n_un, "descended_to_placed": to_placed,
+            "descended_still_unplaced": still_unplaced, "no_descent_local_min_candidates": no_descent,
+            "smallest_drop": worst}, detail
+
+
+def run_local_minima(act_name):
+    from .width2_w0 import SMALL_R2
+    out = PARTS / f"unplaced_localmin_{act_name}.csv"
+    done = set() if not out.exists() else set(np.round(pd.read_csv(out).R2, 10))
+    for R2 in SMALL_R2:
+        if round(R2, 10) in done:
+            continue
+        row, det = local_minima_check(act_name, R2)
+        pd.DataFrame([row]).to_csv(out, mode="a", header=not out.exists(), index=False)
+        dout = PARTS / f"unplaced_localmin_detail_{act_name}.csv"
+        if det:
+            pd.DataFrame(det).to_csv(dout, mode="a", header=not dout.exists(), index=False)
+        print(json.dumps(row), flush=True)
+
+
 def run(act_name):
     from .width2_w0 import SMALL_R2
     out = PARTS / f"unplaced_{act_name}.csv"
@@ -153,11 +212,34 @@ def save():
     """Committed copy of the per-scale best-unplaced results (the parts directory is not committed)."""
     d = pd.concat([pd.read_csv(p, float_precision="round_trip") for p in sorted(PARTS.glob("unplaced_*.csv"))])
     d.to_csv(RESULTS / "width2_unplaced.csv", index=False)
+    # local minima inside the unplaced region, and the lowest one against the boundary infimum and the placed pair
+    from .width2_conditional import population
+    x, _ = population()
+    rows = []
+    for act in sorted({p.stem.split("_")[-1] for p in PARTS.glob("unplaced_localmin_f*.csv")}):
+        c = pd.read_csv(PARTS / f"unplaced_localmin_{act}.csv")
+        det = pd.read_csv(PARTS / f"unplaced_localmin_detail_{act}.csv", float_precision="round_trip")
+        for r in c.itertuples():
+            g = det[det.R2 == r.R2]
+            u = d[(d.act == act) & (d.R2 == r.R2)].iloc[0]
+            low = g.loc[g.loss.idxmin()]
+            rows.append({"act": act, "R2": r.R2, "unplaced_candidates": r.unplaced_candidates,
+                         "no_descent": r.no_descent_local_min_candidates, "descended_to_placed": r.descended_to_placed,
+                         "descended_still_unplaced": r.descended_still_unplaced,
+                         "no_descent_single_unit": int((g[["w1", "w2"]].min(axis=1) < 1e-6).sum()),
+                         "lowest_local_min_minus_placed": float(low.loss - u.local_descent_loss),
+                         "lowest_local_min_G": float(low.G_hi), "lowest_local_min_single_unit": bool(min(low.w1, low.w2) < 1e-6),
+                         "boundary_inf_minus_placed": float(u.best_unplaced_loss - u.local_descent_loss),
+                         "predicted_single_unit_gap": float(u.s ** 2 / 8 * 1.7913244 ** 2 * np.var(x)),
+                         "predicted_boundary_gap": float(u.s ** 2 / 8 * u.linear_c ** 2 * np.var(x))})
+    pd.DataFrame(rows).to_csv(RESULTS / "width2_unplaced_localmin.csv", index=False)
     return d
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "save":
+    if sys.argv[1] == "localmin":
+        run_local_minima(sys.argv[2])
+    elif sys.argv[1] == "save":
         print(save().to_string(index=False))
     else:
         run(sys.argv[1])
