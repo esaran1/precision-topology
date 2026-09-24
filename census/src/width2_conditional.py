@@ -270,3 +270,111 @@ def first_sign_change(R, gplus):
     first = int(np.flatnonzero(pos)[0])
     return {"status": "defined", "bracket": (float(R[first - 1]), float(R[first])) if first > 0 else None,
             "sign_changes": int(len(changes))}
+
+
+# ------------------------------------------------------------------------------------------ batched (vectorised) search
+def profile_b_batch(Z0, y, iters=200):
+    """Row-wise profiled bias for Z0 of shape (m, n): safeguarded Newton, as profile_b, vectorised over rows."""
+    ybar = y.mean()
+    L0 = math.log(ybar / (1 - ybar))
+    lo = L0 - Z0.max(axis=1); hi = L0 - Z0.min(axis=1)
+    b = 0.5 * (lo + hi)
+    done = np.zeros(len(b), bool)
+    for _ in range(iters):
+        s = _sig(Z0 + b[:, None]); g = s.mean(axis=1) - ybar
+        lo = np.where(g < 0, b, lo); hi = np.where(g > 0, b, hi)
+        h = (s * (1 - s)).mean(axis=1)
+        bn = b - g / np.maximum(h, 1e-300)
+        bad = (bn <= lo) | (bn >= hi) | ~np.isfinite(bn)
+        bn = np.where(bad, 0.5 * (lo + hi), bn)
+        done = done | (np.abs(g) <= 1e-15) | (hi - lo <= 1e-15 * np.maximum(1, np.abs(b)))
+        b = np.where(done, b, bn)
+        if done.all():
+            break
+    return b
+
+
+def loss_grad_batch(P, sigma, s, x, y, act):
+    """L* and its gradient for a batch of points P (m, 5) with signs sigma (m,)."""
+    a1, b1, a2, b2, t = (P[:, i:i + 1] for i in range(5))
+    t = np.clip(t, -1, 1); sg = sigma[:, None]
+    v0, v1 = t, sg * (1 - np.abs(t))
+    T1, T2 = a1 * x[None, :] + b1, a2 * x[None, :] + b2
+    U1, U2 = act.u(T1), act.u(T2)
+    Z0 = s * (v0 * U1 + v1 * U2)
+    b = profile_b_batch(Z0, y)
+    Z = Z0 + b[:, None]
+    L = (_softplus(Z) - y[None, :] * Z).mean(axis=1)
+    R = _sig(Z) - y[None, :]
+    D1, D2 = act.du(T1), act.du(T2)
+    G = np.stack([(R * s * v0 * D1 * x).mean(axis=1), (R * s * v0 * D1).mean(axis=1),
+                  (R * s * v1 * D2 * x).mean(axis=1), (R * s * v1 * D2).mean(axis=1),
+                  np.where(np.abs(t[:, 0]) < 1, (R * s * (U1 - sg * np.sign(t) * U2)).mean(axis=1), 0.0)], axis=1)
+    return L, G
+
+
+def bfgs_batch(fg, X0, gtol=1e-8, maxit=2000):
+    """BFGS with Armijo backtracking, independently per row.  fg(Xsub, rows) returns (f, g) for those rows.
+    Converged or stuck rows are frozen."""
+    X = np.array(X0, float); m, n = X.shape
+    allrows = np.arange(m)
+    f, g = fg(X, allrows)
+    H = np.repeat(np.eye(n)[None] * 0.1, m, axis=0)
+    active = np.abs(g).max(axis=1) > gtol
+    it = np.zeros(m, int)
+    I = np.eye(n)
+    for _ in range(maxit):
+        if not active.any():
+            break
+        idx = np.flatnonzero(active)
+        d = -np.einsum("kij,kj->ki", H[idx], g[idx])
+        up = (d * g[idx]).sum(axis=1) >= 0
+        if up.any():
+            H[idx[up]] = I * 0.1; d[up] = -0.1 * g[idx[up]]
+        dg = (d * g[idx]).sum(axis=1)
+        t = np.ones(len(idx)); acc = np.zeros(len(idx), bool)
+        fn = np.empty(len(idx)); gn = np.empty((len(idx), n))
+        for _bt in range(47):                                   # t down to ~1e-14, as the scalar version
+            j = np.flatnonzero(~acc)
+            if not len(j):
+                break
+            ft, gt = fg(X[idx[j]] + t[j, None] * d[j], idx[j])
+            ok = ft <= f[idx[j]] + 1e-4 * t[j] * dg[j]
+            fn[j[ok]], gn[j[ok]] = ft[ok], gt[ok]
+            acc[j[ok]] = True
+            t[j[~ok]] *= 0.5
+        acc_idx = idx[acc]
+        sv = t[acc, None] * d[acc]; yv = gn[acc] - g[acc_idx]
+        X[acc_idx] += sv; f[acc_idx] = fn[acc]; g[acc_idx] = gn[acc]
+        sy = (sv * yv).sum(axis=1)
+        okc = sy > 1e-300
+        if okc.any():
+            ai = acc_idx[okc]; rr = (1.0 / sy[okc])[:, None, None]
+            S, Yv = sv[okc], yv[okc]
+            A = I[None] - rr * np.einsum("ki,kj->kij", S, Yv)
+            H[ai] = np.einsum("kij,kjl,kml->kim", A, H[ai], A) + rr * np.einsum("ki,kj->kij", S, S)
+        it[idx] += 1
+        active[idx[~acc]] = False                               # line search failed: stuck, as the scalar version
+        active[acc_idx] = np.abs(g[acc_idx]).max(axis=1) > gtol
+    return X, f, g, it
+
+
+def search_batch(s, x, y, act, restarts=2000, seed=0, gtol=1e-8, maxit=2000, box=BOX_ALPHA, batch=250):
+    """The validated search, vectorised over restarts (same starts as `search` for the same seed).  Every restart is
+    retained, plus the constant predictor."""
+    rng = np.random.default_rng(seed)
+    starts = [_start(rng, act, box) for _ in range(restarts)]
+    cands = []
+    for i in range(0, restarts, batch):
+        chunk = starts[i:i + batch]
+        P0 = np.array([c[0] for c in chunk]); sg = np.array([c[1] for c in chunk], float)
+        P, L, G, it = bfgs_batch(lambda Q, rows, sg=sg: loss_grad_batch(Q, sg[rows], s, x, y, act), P0,
+                                 gtol=gtol, maxit=maxit)
+        P[:, 4] = np.clip(P[:, 4], -1, 1)
+        for k in range(len(chunk)):
+            gn = float(np.abs(G[k]).max())
+            cands.append({"k": i + k, "p": P[k], "sigma": int(sg[k]), "loss": float(L[k]), "gnorm": gn,
+                          "iters": int(it[k]), "flags": degenerate(P[k], gn, gtol, box)})
+    cands.append({"k": -1, "p": None, "sigma": 0, "loss": constant_predictor_loss(y), "gnorm": 0.0, "iters": 0,
+                  "flags": ["constant_predictor"]})
+    return retain(cands), cands
