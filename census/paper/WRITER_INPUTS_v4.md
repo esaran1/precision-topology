@@ -771,15 +771,46 @@ are the 13 in `WRITER_INPUTS.md` §9, plus one new row:
 
 ## Figure manifest (v4)
 
-These are **not in `paper/figures` yet.** They are held until S1–S3 and the c₁ test are scored, since
-those can change what the panels should show.
-- Producer: `src/figures_v4.py` (`PYTHONPATH=. python -m src.figures_v4`).
-- Output: `results/figures/v4/*.pdf` (vector) and `.png` previews.
-- All figures are single column, 3.25 in wide, with nothing below 6 pt.
+Built 2026-09-24 after S1–S3 and the c₁ test were scored.
+- **Producer**: `src/figures_v4.py` (`PYTHONPATH=. python -m src.figures_v4`).
+- **Output**: `results/figures/v4/*.pdf` (vector, tight bounding box) and `.png` previews at 300 dpi.
+- **Checks run on every build** (`audit()`, `provenance()`):
+  - every PDF is at most 3.25 in wide (single column);
+  - **every glyph is ≥ 8 pt at that size**, including sub- and superscripts, read from the PDF;
+  - no text lies outside the page box;
+  - no legend or text touches data or another text;
+  - every source artifact is committed.
+- Builds are deterministic: two runs give byte-identical files.
+- **Style**: one table (`STYLE`) fixes the colour, marker, line style and fill of each quantity across all
+  figures.
+  - Calibrated or fitted predictors are filled; unfitted ones are open.
+  - No two series are distinguished by colour alone.
 - Every panel states n and shows uncertainty.
 
-| file | content | n | uncertainty shown | source artifacts | pending changes |
-|---|---|---|---|---|---|
-| `v4_prospective.pdf` | Block 3: predicted against observed median crossing R, 8 held-out settings × 4 models. C is filled, U open and joined to C by a segment (the fitted λ). λ(1.30) = 1.115 and λ(1.50) = 1.164 are labelled as fitted on the base window. Identity line. | 86–88 crossings of 90 per setting | observed medians: bootstrap 95% (10,000 resamples, seed 0) | `prospective_runs.csv`, `prospective_scores.csv`, `prospective_calibration.csv` | none expected |
-| `v4_fixed_scale.pdf` | (a) Block 4: placed at 4,000 steps against held R/R_glob, both optimiser-state variants, x₅₀ in the legend, registered band [0.9, 1.25] shaded. (b) Block 5: retained through 12,000 steps, band [0.9, 1.1], with **E-2's criterion** (kept ≥ 0.9 at 1.15 × Block E's R_glob = 1.156 certified units) and Block E's observed 33/37 marked FAIL. | 543 checkpoints per level (a); 177 (b); Block E 37 | Clopper–Pearson 95% | `fixed_scale_block{4,5}_curve.csv`, `_tests.csv`; `blockE_results.md` | **Room kept** for the 16k and 64k curves from the registered horizon extension (Q1). Hook: `fig_fixed_scale(horizons=True)`, added once Q1/Q2 are scored. S1/S2 may add the own-seed prediction. |
-| `v4_thresholds.pdf` | Certified R_glob and R_solve intervals at a = 1.30–1.60 and in the limit ε → 0, with free-training crossing-R distributions (budget 32k) on the same axes. | 38 runs per a | certified interval widths; crossing medians bootstrap 95% | `cond_certified_brackets.csv`, `limit_K_base.csv`, `mn2_solve_limit.csv`, `wi_crossing_runs.csv` | S3 may add the own-seed thresholds. The c₁ test may add the small-ε points (a = 1.01–1.04) and the first-order line. The limit R_solve is now global (competitor exclusion certified, `certv2_solve_summary.csv`). |
+| file | content | n | uncertainty shown | source artifacts |
+|---|---|---|---|---|
+| `v4_decomposition.pdf` | The decomposition: fraction of runs solved, failed on placement (G ≤ 0) or failed on bias (G > 0, b₂ outside its interval), against ε = a − 1. | 400 runs per a (4,800 total: 870 / 3,297 / 633); 0 disagreements | Clopper–Pearson 95% | `phase1_decomposition.csv` (totals checked against `wi_phase1_reconciliation.csv`) |
+| `v4_thresholds.pdf` | (a) Certified R_glob and R_solve at a = 1.30–1.60 against free-training crossing-R violins, with the ε → 0 limits (B&B bracket, sharp R_glob^∞, global R_solve^∞). (b) Small ε: the limit, the certified brackets at a = 1.01–1.04, and the first-order line over \|ε\| ≤ 0.05; the c₁ test's INCONCLUSIVE verdict is stated. | 38 runs per a; 4 certified brackets | certified intervals to scale; bootstrap 95% of the medians | `cond_certified_brackets.csv`, `limit_K_base.csv`, `first_order_c1.csv`, `first_order_finite.csv`, `first_order_scores.csv`, `mn2_solve_limit.csv`, `certv2_solve_summary.csv`, `wi_crossing_runs.csv` |
+| `v4_cond_candidates.pdf` | The conditional-loss candidates at a = 1.30. (a) Every candidate of the frozen search (degenerate, screening, not lowest) above the single retained branch, with log 2 and the certified global minimum. (b) The branch's gap crossing G = 0 once and continuously, with the certified R_glob and R_solve brackets. | 2,701 candidates at 59 evaluations; 20 certified scales | certified enclosures; certified brackets | `cond_audit_candidates.csv`, `cond_audit_strict.csv`, `cond_scan_certified_a130.csv`, `cond_certified_brackets.csv` |
+| `v4_fixed_scale.pdf` | (a) Block 4 placement at 4,000 steps and (b) Block 5 retention through 12,000 steps, against held R/R_glob, both optimiser-state variants, with the registered 50% bands and **E-2's criterion** with Block E's 33/37 marked FAIL. (c) Horizon extension at 4k / 16k / 64k, with Q1 and Q2 FAIL. | 543 per level (a, c); 177 per level (b); Block E 37 | Clopper–Pearson 95% | `fixed_scale_block{4,5}_curve.csv`, `_tests.csv`, `fixed_scale_horizons*.csv`, `wi_e2_rescore.csv`, `blockE_results.md` |
+| `v4_mirror_branches.pdf` | **Post hoc.** Crossing R against the own threshold of the mirror branch occupied at the crossing, marked by branch (+ / −), with the initialisation-selected branch for contrast. **Spearman ρ = 0.997 (a = 1.30) and 0.995 (a = 1.50).** | 38 runs per a | Spearman ρ with bootstrap 95% | `mirror_occupancy.csv`, `mirror_branch_thresholds.csv`, `mirror_s3.csv`, `ghat_certified_all.csv` |
+| `v4_prospective.pdf` | Block 3: predicted against observed median crossing R, 8 held-out settings. C (λ fitted) is filled and U (nothing fitted) open, joined by the fitted λ; baselines B1 and B2; identity line. | 86–88 crossings of 90 per setting | bootstrap 95% of the observed medians | `prospective_runs.csv`, `prospective_scores.csv`, `prospective_calibration.csv`, `prospective_ghat.csv` |
+| `v4_prospective_own.pdf` | The own-seed test. (a) Per run: observed crossing R against the frozen own threshold (U_own, open), with the fitted C_own lines. (b) Mean per-run \|log error\| of U, C, U_own and C_own at each a, with the registered verdicts. | 460 crossers of 480 per a (16 settings × 60) | frozen R_own brackets; window-level bootstrap 95% | `prospective_own_predictions.csv`, `prospective_own_runs.csv`, `prospective_own_scores.csv`, `prospective_own_settings_scored.csv` |
+
+- **ρ for the mirror-branch relation**: quote "Spearman ρ = 0.997 (a = 1.30) and 0.995 (a = 1.50)".
+  - The "≈ 0.996" in `prospective_own_prediction.md` Amendment 2 is an approximation written into a frozen
+    registration. It is not a committed value.
+- **Heights at 3.25 in width**:
+
+  | figure | height |
+  |---|---|
+  | decomposition | 3.1 in |
+  | prospective | 4.1 in |
+  | prospective_own | 7.8 in |
+  | mirror_branches | 7.9 in |
+  | thresholds | 8.0 in |
+  | fixed_scale | 8.7 in |
+  | cond_candidates | 8.9 in |
+
+  The 8 pt minimum and the legends above the axes make the multi-panel figures tall. Splitting or
+  rearranging them would change the panel structure and needs the author's approval.
