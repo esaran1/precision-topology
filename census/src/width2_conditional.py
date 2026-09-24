@@ -214,7 +214,7 @@ def audit(cands, retained, tol=1e-9):
 
 def convergence_ladder(s, x, y, act, ladder=(500, 1000, 2000, 4000), seed=0, tol=1e-9, **kw):
     """Retained minimum at increasing restart counts (nested: the first n restarts of one seeded stream)."""
-    r, cands = search(s, x, y, act, restarts=max(ladder), seed=seed, **kw)
+    r, cands = search_batch(s, x, y, act, restarts=max(ladder), seed=seed, **kw)
     const = cands[-1]
     vals = []
     for n in ladder:
