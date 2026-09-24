@@ -10,3 +10,5 @@ pyarrow==25.0.0
 pypdf==6.14.2
 # Required by src/scaling_proposition.py (symbolic checks); also a torch dependency.
 sympy==1.14.0
+# Required by src/verify_certificates.py, the independent certificate checker (Arb ball arithmetic).
+python-flint==0.9.0

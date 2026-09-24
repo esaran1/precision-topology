@@ -1,0 +1,39 @@
+{
+ "kind": "finite_a_status",
+ "name": "finite_a1.30_glob_lo",
+ "a": 1.3,
+ "s": 4.95,
+ "tol": 1e-09,
+ "status": "minus",
+ "winning_region": "-",
+ "losing_region": "+",
+ "U_search": 0.3495050145375298,
+ "U_point": [
+  0.8336719223629646,
+  3.831999665419958,
+  -16.153278456912005
+ ],
+ "W": 2.9077100071895274,
+ "nw": 117,
+ "nb": 126,
+ "hw0": 0.024852222283671174,
+ "hb0": 0.024933275028490423,
+ "h0": 0.05,
+ "domain": "w1 in [-W, W], b1 in [0, 2pi)",
+ "objective": "L*(w1, b1; s) = min_b2 mean softplus(z) - y z, z = s f_a(w1 x + b1) + b2, f_a(t) = t + a sin t",
+ "gap": "G = min_O f_a(w1 x + b1) - max_I f_a(w1 x + b1), I = [-0.8, 0.8], O = +-[1.2, 2.0]",
+ "lower_bound_search": "L*(c) - |dL/dw| hw - |dL/db| hb - 0.5 s a mean((|x| hw + hb)^2)",
+ "gap_step_search": "(1 + a)(2.8 hw + 2 hb)",
+ "search_result": {
+  "minus": {
+   "lower": 0.3495050139250294,
+   "upper": 0.3495050145375298,
+   "rounds": 13
+  },
+  "plus": {
+   "lower": 0.34950507316935947,
+   "upper": 0.3495050736809272,
+   "rounds": 19
+  }
+ }
+}

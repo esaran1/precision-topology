@@ -143,7 +143,7 @@ def w_bound(s, a, x, y, win=(-0.8, 0.8, 1.2, 2.0)):
 
 
 def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
-            win=(-0.8, 0.8, 1.2, 2.0)):
+            win=(-0.8, 0.8, 1.2, 2.0), record=None):
     """Certified min of L* over {G <= 0} (region='-') or {G > 0} (region='+').
 
     Returns dict with lower/upper bounds, argmin, and whether the bound is above log 2.
@@ -160,6 +160,10 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
     bc = (np.arange(nb) + 0.5) * 2 * hb
     cw, cb = np.meshgrid(wc, bc, indexing="ij")
     cw, cb = cw.ravel(), cb.ravel()
+    if record is not None:        # certificate export (Block 2): integer quadtree indices, leaves and claims
+        iw, ib = (v.ravel() for v in np.meshgrid(np.arange(nw), np.arange(nb), indexing="ij"))
+        lev = 0
+        record.update(W=W, nw=nw, nb=nb, h0=h0, hw0=hw, hb0=hb, s=s, a=a, region=region, tol=tol, leaves=[])
     upper = math.log(2) if region == "-" else math.inf   # constant predictor: G = 0, loss log 2
     arg = (0.0, 0.0) if region == "-" else None
     ax = np.abs(x)
@@ -182,7 +186,17 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
         may = (G - stepG <= 0) if region == "-" else (G + stepG > 0)
         keep = may & (lb < upper)
         lower = float(lb[keep].min()) if keep.any() else upper
+        if record is not None:
+            d = ~keep
+            record["leaves"].append(np.rec.fromarrays(
+                [np.full(d.sum(), lev), iw[d], ib[d], cw[d], cb[d], lb[d], G[d], np.where(may[d], 1, 2)],
+                names="level,iw,ib,cw,cb,lb,G,reason"))          # reason 1: lb >= running upper; 2: outside region
         if upper - lower <= tol or not keep.any():
+            if record is not None:
+                record["leaves"].append(np.rec.fromarrays(
+                    [np.full(keep.sum(), lev), iw[keep], ib[keep], cw[keep], cb[keep], lb[keep], G[keep],
+                     np.zeros(keep.sum(), int)], names="level,iw,ib,cw,cb,lb,G,reason"))   # reason 0: final kept
+                record.update(upper=upper, arg=arg, lower=min(lower, upper))
             kw, kb = cw[keep], cb[keep]
             encl = {}
             for tag, m in (("pos", kw >= 0), ("neg", kw < 0)):
@@ -194,12 +208,21 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
                     "cells": int(keep.sum()), "rounds": rounds, "hw": hw, "hb": hb, "W": W,
                     "above_log2": lower > math.log(2), "converged": True}
         if lower > math.log(2) and region == "+":
+            if record is not None:
+                record["leaves"].append(np.rec.fromarrays(
+                    [np.full(keep.sum(), lev), iw[keep], ib[keep], cw[keep], cb[keep], lb[keep], G[keep],
+                     np.zeros(keep.sum(), int)], names="level,iw,ib,cw,cb,lb,G,reason"))
+                record.update(upper=upper, arg=arg, lower=lower)
             return {"region": region, "s": s, "a": a, "lower": lower, "upper": upper,
                     "arg_w1": arg[0] if arg else np.nan, "arg_b1": arg[1] if arg else np.nan,
                     "cells": int(keep.sum()), "rounds": rounds, "hw": hw, "hb": hb, "W": W,
                     "above_log2": True, "converged": True}
         cw, cb = cw[keep], cb[keep]
+        if record is not None:
+            iw, ib = iw[keep], ib[keep]
         if 4 * len(cw) > max_cells:
+            if record is not None:
+                record["incomplete"] = True
             return {"region": region, "s": s, "a": a, "lower": lower, "upper": upper,
                     "arg_w1": arg[0] if arg else np.nan, "arg_b1": arg[1] if arg else np.nan,
                     "cells": int(len(cw)), "rounds": rounds, "hw": hw, "hb": hb, "W": W,
@@ -207,6 +230,10 @@ def certify(s, a, x, y, region, tol=1e-7, h0=0.05, max_cells=4_000_000, W=None,
         hw, hb = hw / 2, hb / 2
         cw = np.concatenate([cw - hw, cw - hw, cw + hw, cw + hw])
         cb = np.concatenate([cb - hb, cb + hb, cb - hb, cb + hb])
+        if record is not None:
+            iw = np.concatenate([2 * iw, 2 * iw, 2 * iw + 1, 2 * iw + 1])
+            ib = np.concatenate([2 * ib, 2 * ib + 1, 2 * ib, 2 * ib + 1])
+            lev += 1
 
 
 def competitor_gap(s, a, x, y, centres, radius, tol=1e-6, h0=0.05, win=(-0.8, 0.8, 1.2, 2.0)):
