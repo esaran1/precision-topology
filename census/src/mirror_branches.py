@@ -44,11 +44,11 @@ def init_sign(seed):
     return int(np.sign(float(t[0])) * np.sign(float(t[2])))
 
 
-def half_min(s, a, x, y, sign, step=0.02, n_refine=8):
-    """Conditional minimiser of L*(.,.; s) restricted to sign·w1 > 0: (L, w1, b1, G)."""
+def half_min(s, a, x, y, sign, step=0.02, n_refine=8, win=(-0.8, 0.8, 1.2, 2.0)):
+    """Conditional minimiser of L*(.,.; s) restricted to sign·w1 > 0: (L, w1, b1, G); win = (i_lo, i_hi, o_lo, o_hi)."""
     from .own_threshold import _bfgs
     from .profiled_bnb import gap, profile, w_bound
-    W = w_bound(s, a, x, y)
+    W = w_bound(s, a, x, y, win)
     w1g = sign * np.arange(step / 2, W + step / 2, step)
     b1g = np.arange(0.0, 2 * math.pi, step)
     Wm, Bm = np.meshgrid(w1g, b1g, indexing="ij")
@@ -77,12 +77,12 @@ def half_min(s, a, x, y, sign, step=0.02, n_refine=8):
     if best is None:
         j = order[0]
         best = (float(L[j]), float(wf[j]), float(bf[j]))
-    return best[0], best[1], best[2], float(gap([best[1]], [best[2]], a)[0])
+    return best[0], best[1], best[2], float(gap([best[1]], [best[2]], a, win[:2], win[2:])[0])
 
 
-def branch_threshold(a, seed, sign, w2_start, data=None, step=0.02, n_refine=8):
+def branch_threshold(a, seed, sign, w2_start, data=None, step=0.02, n_refine=8, win=(-0.8, 0.8, 1.2, 2.0)):
     x, y = data if data is not None else _data(seed)
-    placed = lambda s: half_min(s, a, x, y, sign, step=step, n_refine=n_refine)[3] > 0
+    placed = lambda s: half_min(s, a, x, y, sign, step=step, n_refine=n_refine, win=win)[3] > 0
     lo = hi = round(w2_start, 6)
     p = placed(lo)
     if p:

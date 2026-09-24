@@ -151,3 +151,80 @@ It runs after the currently queued items, using free slots as they open. The seq
 - **Tests**: pass and fail cases for both gates and for the comparison verdicts (P1, P2a, P2b, P3, P4)
   (`tests/test_registered_checks.py`).
 - **No prediction, criterion, setting or seed changes.**
+
+## Amendment 2 — 2026-09-23 22:16 EDT (before any computation on the new settings): two secondary predictors
+
+**Status at this commit**: nothing on the new settings has been computed.
+`prospective_own_settings.csv`, `prospective_own_predictions.csv`, `prospective_own_validation.csv` and
+`prospective_own_runs.csv` do not exist. **U_own, on the global own threshold, stays primary, and P1–P4 are
+unchanged.**
+
+### Why
+
+The mirror-branch analysis (post hoc) found:
+- initialisation selects the mirror branch at chance (51.4%);
+- by the crossing, runs are mostly on the globally preferred branch: 77% for Block 4/5 and 89.5% for
+  phase 2b, and 89.2% in the Block G base-window runs under this protocol;
+- with the branch occupied at the crossing, crossing R tracks that branch's own threshold with ρ ≈ 0.996.
+
+### Additional pre-training computation (frozen in the hashed predictions file)
+
+For every run, in addition to R_own:
+- the global minimiser's branch at the placed end of the own bracket;
+- the **other** branch's own threshold, R_other: the same method restricted to the other half-plane, on
+  the window's own w-bound and gap.
+
+### Secondary predictor S-mix: setting-level, weighted mixture (fitted, labelled)
+
+- **Prediction**: the per-setting median crossing R is predicted as the weighted median of the pooled
+  set {R_own of every run in the setting, with weight w} ∪ {R_other of every run, with weight 1 − w}.
+  - **w = 0.8919**, frozen: the global-branch share of crossings in the Block G base-window runs under
+    this protocol (seeds 0–39; 33 of 37 at each a).
+  - A second variant multiplies by 1 + r(a), with **r(1.30) = 0.030 and r(1.50) = 0.063**, frozen from the
+    crossing-branch residual of the base-window crossing runs of the same seeds (phase 2b, which differs
+    only in check schedule and budget).
+  - Both are **fitted**.
+- **Target**: |log(observed median crossing R / prediction)| per setting. Reported with the window-level
+  bootstrap (mean over the a's 8 windows, 10,000 resamples), alone and minus U, C and the per-setting
+  median of U_own. **No pass criterion.**
+- **Expected, base window**: log(observed/prediction) is +0.063 (1.30) and +0.106 (1.50) unweighted by r,
+  and +0.033 and +0.045 with ×(1 + r).
+- The equal-weight version is **not** registered. It fails on the base window (post hoc; see the writer
+  inputs).
+
+### Secondary predictor S-early: per run, prospective in time
+
+- **Rule**: take the first logged check (every 50 steps) at which the run has **left the
+  constant-predictor plateau**, having been on it. A run never on the plateau takes its first logged
+  check. **Plateau: |w₁| < 0.05 or |w₂| < 0.05.**
+  - **Structural justification**: in canonical orientation the branch is sign(w₁)·sign(w₂). It can
+    therefore change through either weight passing zero, and the network is a constant predictor when
+    either weight is near zero.
+  - **Disclosed**: the base-window match rates (0.81 for |w₁| alone; 0.86 and 0.89 for the combined
+    definition) also informed the choice.
+- **Prediction**: that check's branch in canonical orientation. The predicted crossing R is that branch's
+  own threshold (R_own if it is the global minimiser's branch, else R_other), **unfitted**; and that value
+  × (1 + r(a)), **fitted**.
+- **Registered expectations** (Block G base-window runs, this protocol and rule), per a:
+  - **Match rate** between the early branch and the branch at the crossing: expected **0.865 (1.30)** and
+    **0.892 (1.50)**; "consistent" iff within ±0.10. Runs that switch branch later count as misses. Runs
+    for which the rule is undefined (still on the plateau at every check) count as misses and are not
+    excluded; their number is reported. There were none in the base-window data.
+  - **Lead time**, reported in steps and in R (median and minimum), so the prediction visibly precedes
+    the outcome. Base window: median 2,450 steps (1.30) and 1,200 (1.50), minimum 900 and 250.
+  - **Per-run |log error|**: its median should lie within the base-window 10th–90th percentile range.
+    - unfitted: [0.029, 0.053] at 1.30 and [0.065, 0.124] at 1.50;
+    - fitted: [0.004, 0.023] at 1.30 and [0.005, 0.063] at 1.50. The fitted ranges are in-sample for r.
+
+### Training loop
+
+- `train` now uses `train_logged`. That is `blockG_windows.train` unchanged in every operation, plus a
+  read-only log of (w₁, w₂, loss) at each 50-step check.
+- It reproduces Block G's stored base-window crossings exactly: 80 of 80, bit-identical, including after
+  the loss logging was added.
+
+### Tests
+
+The rule has pass and fail cases: never on the plateau, leaves it, never leaves (undefined), and a flip
+through w₂ = 0. The weighted median and the early-prediction selection are also tested
+(`tests/test_registered_checks.py`).

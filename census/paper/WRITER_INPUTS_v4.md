@@ -294,6 +294,17 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     - **Say**: "among replays that end on the globally preferred branch of their own loss, the own
       threshold matches the outcome in 99% of cases; the disagreements are runs that end in the mirror
       basin".
+    - **Dynamics steer runs toward the global branch** (post hoc):
+      - an equal-weight mixture of both branches' thresholds predicts the base window's median crossing R
+        **11–16% too low** (−0.115 at 1.30, −0.159 at 1.50);
+      - by the crossing, 77–90% of runs sit on the globally preferred branch, although initialisation
+        chooses it at chance;
+      - a run commits to its branch early: from 10% of its time to crossing, the branch at every check
+        matches the branch at the crossing;
+      - every observed branch switch happens while the training loss is at log 2 (switch loss median
+        0.6931, range 0.685–0.729), and none after the loss falls clearly below it. That is consistent
+        with the log 2 barrier trapping each run in the mirror it reaches first below the plateau
+        (exploratory, `prospective_own_switch_losses.csv`).
     - **Summary, all post hoc**:
       - initialisation selects the mirror branch at chance (51.4%);
       - every replay ends on the branch it started on;

@@ -339,3 +339,13 @@ def test_early_branch_rule():
     via_w2 = [(0, 0.4, 0.3), (50, 0.5, 0.02), (100, 0.6, -0.4)]
     assert early_branch(via_w2, "w1") == (0, 0, 1, 0.3)                # |w1| rule ignores the w2 = 0 plateau
     assert early_branch(via_w2, "w1w2") == (2, 100, -1, 0.4)           # combined rule catches the flip through w2 = 0
+
+
+def test_secondary_predictor_pieces():
+    from src.prospective_own import early_prediction, weighted_median
+    assert weighted_median([1.0, 2.0], [0.8919, 0.1081]) == 1.0          # the global branch dominates
+    assert weighted_median([1.0, 2.0, 3.0, 4.0], [1, 1, 1, 1]) == 2.0
+    row = {"early_defined": True, "early_branch": 1, "global_branch": 1, "U_own": 0.21, "R_other": 0.23}
+    assert early_prediction(row) == 0.21
+    assert early_prediction({**row, "early_branch": -1}) == 0.23
+    assert early_prediction({**row, "early_defined": False}) is None     # undefined: a miss

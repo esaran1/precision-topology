@@ -178,7 +178,12 @@ def _own_job(args):
             hi = mid
         else:
             lo = mid
-    return {"window": w.tag, "a": a, "seed": seed, "w2_own_lo": lo, "w2_own_hi": hi, "w2_own": 0.5 * (lo + hi)}
+    # amendment 2: the global minimiser's branch at the placed end, and the other branch's own threshold
+    from .mirror_branches import branch_threshold
+    gbr = int(np.sign(global_min(hi, a, x, y, win=_win_tuple(w))[1]))
+    w2_other = branch_threshold(a, seed, -gbr, 0.5 * (lo + hi), data=(x, y), win=_win_tuple(w))
+    return {"window": w.tag, "a": a, "seed": seed, "w2_own_lo": lo, "w2_own_hi": hi, "w2_own": 0.5 * (lo + hi),
+            "global_branch": gbr, "w2_other": w2_other}
 
 
 def predict(workers=WORKERS):
@@ -196,6 +201,7 @@ def predict(workers=WORKERS):
     own = own.merge(st[["window", "a", "Ghat_lo", "U", "C"]], on=["window", "a"])
     own["U_own"] = own.w2_own * own.Ghat_lo / 2
     own["C_own"] = own.U_own * own.a.round(2).map(RHO_RES)
+    own["R_other"] = own.w2_other * own.Ghat_lo / 2
     f = RESULTS / "prospective_own_predictions.csv"
     own.to_csv(f, index=False)
     h = hashlib.sha256(f.read_bytes()).hexdigest()
@@ -256,12 +262,15 @@ def validate(workers=WORKERS):
 # ------------------------------------------------------------------------------------------ training and scoring
 def _train_job(args):
     import torch
-    from .blockG_windows import train
     torch.set_num_threads(1)
     w, a, seed = args
-    r = train(w, a, seed, gs=1.0, budget=BUDGET)
-    return {k: r[k] for k in ("window", "a", "seed", "cross_step", "cross_w2", "final_placed", "final_solved")} | \
-        {"final_w2": 2 * r["R_final"]}
+    cs, cw2, fw2, log = train_logged(w, a, seed, BUDGET)
+    out = {"window": w.tag, "a": a, "seed": seed, "cross_step": cs, "cross_w2": cw2, "final_w2": fw2}
+    e = early_branch(log, "w1w2")
+    out.update({"early_defined": e is not None, "early_step": e[1] if e else np.nan,
+                "early_branch": e[2] if e else np.nan, "early_w2": e[3] if e else np.nan,
+                "branch_cross": int(np.sign(log[-1][1]) * np.sign(log[-1][2])) if cs is not None else np.nan})
+    return out
 
 
 def train(workers=WORKERS):
@@ -328,12 +337,13 @@ def train_logged(win, a, seed, budget=BUDGET):
     log = []
     for i in range(budget):
         opt.zero_grad(set_to_none=True)
-        F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y).backward()
+        loss = F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y)
+        loss.backward()
         opt.step()
         if i % CHECK_EVERY == 0 and cross_step is None:
             with torch.no_grad():
                 w1, b1, w2, b2 = (float(v) for v in th)
-            log.append((i, w1, w2))
+            log.append((i, w1, w2, float(loss.detach())))
             if oriented_gap(win, a, w1, b1) > 0:
                 cross_step, cross_w2 = i, abs(w2)
     with torch.no_grad():
@@ -346,7 +356,7 @@ def early_branch(log, plateau="w1"):
     a run never on the plateau takes its first logged check.  plateau="w1": |w1| < 0.05; "w1w2": |w1| < 0.05 or
     |w2| < 0.05.  Returns (index, step, branch in canonical orientation, |w2|) or None if the run is still on the
     plateau at every check."""
-    on = [(abs(w1) < PLATEAU) or (plateau == "w1w2" and abs(w2) < PLATEAU) for _, w1, w2 in log]
+    on = [(abs(e[1]) < PLATEAU) or (plateau == "w1w2" and abs(e[2]) < PLATEAU) for e in log]
     if not any(on):
         i = 0
     else:
@@ -355,7 +365,7 @@ def early_branch(log, plateau="w1"):
         if not rest:
             return None
         i = rest[0]
-    step, w1, w2 = log[i]
+    step, w1, w2 = log[i][:3]
     return i, step, int(np.sign(w1) * np.sign(w2)), abs(w2)
 
 
@@ -371,8 +381,9 @@ def _calib_job(args):
         e = early_branch(log, pl)
         out.update({f"early_{pl}_defined": e is not None, f"early_{pl}_step": e[1] if e else np.nan,
                     f"early_{pl}_branch": e[2] if e else np.nan, f"early_{pl}_w2": e[3] if e else np.nan})
-    out["ever_on_plateau_w1"] = any(abs(w1) < PLATEAU for _, w1, _ in log)
-    out["ever_on_plateau_w1w2"] = any(abs(w1) < PLATEAU or abs(w2) < PLATEAU for _, w1, w2 in log)
+    out["ever_on_plateau_w1"] = any(abs(e[1]) < PLATEAU for e in log)
+    out["ever_on_plateau_w1w2"] = any(abs(e[1]) < PLATEAU or abs(e[2]) < PLATEAU for e in log)
+    out["log"] = log
     return out
 
 
@@ -414,6 +425,10 @@ def calibrate_early(workers=3):
                          "abs_err_fitted_median": float(np.nanmedian(np.abs(e_fit))),
                          "abs_err_fitted_p10": float(np.nanpercentile(np.abs(e_fit), 10)),
                          "abs_err_fitted_p90": float(np.nanpercentile(np.abs(e_fit), 90))})
+    logs = [(r.a, r.seed, e) for r in d.itertuples() for e in r.log]
+    pd.DataFrame([{"a": a, "seed": sd, "step": e[0], "w1": e[1], "w2": e[2], "loss": e[3]} for a, sd, e in logs]).to_csv(
+        RESULTS / "prospective_own_early_calibration_logs.csv", index=False)
+    d = d.drop(columns="log")
     d.to_csv(RESULTS / "prospective_own_early_calibration_runs.csv", index=False)
     t = pd.DataFrame(rows)
     t.to_csv(RESULTS / "prospective_own_early_calibration.csv", index=False)
@@ -424,8 +439,120 @@ def calibrate_early(workers=3):
 RESID = {1.30: 0.030, 1.50: 0.063}               # r(a), frozen from base-window crossing runs (S3 crossing-branch residual)
 
 
+
+# ------------------------------------------------------------------ amendment 2: secondary predictors
+W_GLOBAL = 0.8919                                      # global-branch crossing share, Block G base-window runs (both a)
+EXPECT_MATCH = {1.30: 0.865, 1.50: 0.892}              # early branch vs crossing branch, base-window runs
+MATCH_TOL = 0.10
+EXPECT_ERR = {("unfitted", 1.30): (0.029, 0.053), ("unfitted", 1.50): (0.065, 0.124),
+              ("fitted", 1.30): (0.004, 0.023), ("fitted", 1.50): (0.005, 0.063)}   # 10th-90th pct, base window
+
+
+def weighted_median(vals, wts):
+    vals, wts = np.asarray(vals, float), np.asarray(wts, float)
+    o = np.argsort(vals)
+    c = np.cumsum(wts[o]) / wts.sum()
+    return float(vals[o][np.searchsorted(c, 0.5)])
+
+
+def early_prediction(row):
+    """Early-branch predictor: the threshold of the branch recorded at the early checkpoint (global if it is the global
+    minimiser's branch, else the other); undefined -> None (a miss)."""
+    if not row["early_defined"]:
+        return None
+    return row["U_own"] if row["early_branch"] == row["global_branch"] else row["R_other"]
+
+
+def score_secondary(results=None):
+    R = results or RESULTS
+    gate_hash(R); gate_validation(R)
+    pr = pd.read_csv(R / "prospective_own_predictions.csv", float_precision="round_trip")
+    rn = pd.read_csv(R / "prospective_own_runs.csv", float_precision="round_trip")
+    st = pd.read_csv(R / "prospective_own_settings.csv", float_precision="round_trip")
+    d = rn.merge(pr, on=["window", "a", "seed"])
+    d["R_cross"] = d.cross_w2 * d.Ghat_lo / 2
+    d["early_R"] = d.early_w2 * d.Ghat_lo / 2
+    rows, sett = [], []
+    for a in A_VALUES:
+        g = d[d.a.round(2) == a]
+        x = g[g.R_cross.notna()].copy()
+        match = (x.early_branch == x.branch_cross) & x.early_defined
+        pred = np.array([early_prediction(r) if early_prediction(r) is not None else np.nan for r in x.to_dict("records")])
+        e_un = np.abs(np.log(x.R_cross.values / pred))
+        e_fit = np.abs(np.log(x.R_cross.values / (pred * (1 + RESID[a]))))
+        lead = x.cross_step - x.early_step
+        rows.append({"a": a, "n_crossed": len(x), "n_undefined": int((~x.early_defined).sum()),
+                     "match_rate": float(match.mean()), "match_expected": EXPECT_MATCH[a],
+                     "match_consistent": abs(float(match.mean()) - EXPECT_MATCH[a]) <= MATCH_TOL,
+                     "lead_steps_median": float(lead.median()), "lead_steps_min": float(lead.min()),
+                     "lead_R_median": float((x.R_cross - x.early_R).median()), "lead_R_min": float((x.R_cross - x.early_R).min()),
+                     **{f"err_{k}_median": float(np.nanmedian(v)) for k, v in (("unfitted", e_un), ("fitted", e_fit))},
+                     **{f"err_{k}_in_expected_range": EXPECT_ERR[(k, a)][0] <= float(np.nanmedian(v)) <= EXPECT_ERR[(k, a)][1]
+                        for k, v in (("unfitted", e_un), ("fitted", e_fit))}})
+        for wname, gw in g.groupby("window"):
+            xw = gw[gw.R_cross.notna()]
+            obs = float(xw.R_cross.median())
+            mix = weighted_median(np.r_[gw.U_own.values, gw.R_other.values],
+                                  np.r_[np.full(len(gw), W_GLOBAL), np.full(len(gw), 1 - W_GLOBAL)])
+            s0 = st[(st.window == wname) & (st.a.round(2) == a)].iloc[0]
+            sett.append({"a": a, "window": wname, "obs_median_R": obs,
+                         "err_mix": abs(np.log(obs / mix)), "err_mix_fitted": abs(np.log(obs / (mix * (1 + RESID[a])))),
+                         "err_U": abs(np.log(obs / s0.U)), "err_C": abs(np.log(obs / s0.C)),
+                         "err_U_own_setting": abs(np.log(obs / gw.U_own.median()))})
+    t = pd.DataFrame(rows)
+    se = pd.DataFrame(sett)
+    comp = []
+    for a in A_VALUES:
+        s_a = se[se.a.round(2) == a]
+        for m in ("err_mix", "err_mix_fitted"):
+            m0, lo, hi = _win_boot(s_a[m].values, B_WIN)
+            comp.append({"a": a, "statistic": f"mean per-setting {m}", "value": m0, "lo": lo, "hi": hi})
+            for other in ("err_U", "err_C", "err_U_own_setting"):
+                dd, lo, hi = _win_boot((s_a[m] - s_a[other]).values, B_WIN)
+                comp.append({"a": a, "statistic": f"{m} - {other}", "value": dd, "lo": lo, "hi": hi})
+    t.to_csv(R / "prospective_own_early_scores.csv", index=False)
+    se.to_csv(R / "prospective_own_mixture_settings.csv", index=False)
+    pd.DataFrame(comp).to_csv(R / "prospective_own_mixture_scores.csv", index=False)
+    print(t.T.to_string()); print(pd.DataFrame(comp).to_string(index=False))
+
+
+def descriptive():
+    """EXPLORATORY, base-window runs (prospective protocol): (i) when the branch commits -- match rate between the branch
+    at each check and at the crossing, by time and by R; (ii) branch switches between initialisation and crossing and
+    the training loss at each switch, and each run's loss at its last switch."""
+    from .own_threshold import _pop
+    lg = pd.read_csv(RESULTS / "prospective_own_early_calibration_logs.csv", float_precision="round_trip")
+    runs = pd.read_csv(RESULTS / "prospective_own_early_calibration_runs.csv")
+    runs = runs[runs.cross_step.notna()]
+    lg = lg.merge(runs[["a", "seed", "cross_step", "branch_cross"]], on=["a", "seed"])
+    lg["branch"] = np.sign(lg.w1) * np.sign(lg.w2)
+    lg["G"] = lg.a.round(2).map({a: _pop(a)[0] for a in A_VALUES})
+    lg["R"] = lg.w2.abs() * lg.G / 2
+    lg["frac_time"] = lg.step / lg.cross_step
+    lg["match"] = lg.branch == lg.branch_cross
+    by_t = lg.groupby([lg.a.round(2), pd.cut(lg.frac_time, [0, .01, .05, .1, .25, .5, .75, .9, 1.0001], include_lowest=True)],
+                      observed=True).match.agg(["mean", "size"]).reset_index()
+    by_R = lg.groupby([lg.a.round(2), pd.cut(lg.R, [0, .02, .05, .1, .15, .2, .25, 1])], observed=True).match.agg(["mean", "size"]).reset_index()
+    sw = []
+    for (a, sd), g in lg.sort_values("step").groupby([lg.a.round(2), "seed"]):
+        b = g.branch.values
+        idx = np.where(np.diff(b) != 0)[0] + 1
+        for k in idx:
+            sw.append({"a": a, "seed": sd, "step": int(g.step.values[k]), "loss": float(g.loss.values[k]),
+                       "loss_before": float(g.loss.values[k - 1]), "last": k == idx[-1]})
+    sw = pd.DataFrame(sw)
+    by_t.to_csv(RESULTS / "prospective_own_commit_by_time.csv", index=False)
+    by_R.to_csv(RESULTS / "prospective_own_commit_by_R.csv", index=False)
+    sw.to_csv(RESULTS / "prospective_own_switch_losses.csv", index=False)
+    print(by_t.to_string(index=False)); print(by_R.to_string(index=False))
+    if len(sw):
+        print("switches:", len(sw), " loss at switch: median %.4f, min %.4f, max %.4f;  log 2 = %.4f" %
+              (sw.loss.median(), sw.loss.min(), sw.loss.max(), np.log(2)))
+        print("loss at each run's last switch:", sw[sw["last"]].loss.describe().to_string())
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else WORKERS
     {"select": select, "power": power, "predict": lambda: predict(w), "validate": lambda: validate(w),
-     "train": lambda: train(w), "score": score, "calibrate_early": lambda: calibrate_early(w)}[cmd]()
+     "train": lambda: train(w), "score": score, "calibrate_early": lambda: calibrate_early(w),
+     "score_secondary": score_secondary, "descriptive": descriptive}[cmd]()
