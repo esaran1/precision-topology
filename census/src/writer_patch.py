@@ -352,9 +352,52 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
 {t5}"""
     text += wp6()
     text += wp7()
+    text += wp8()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
+
+
+def wp8():
+    """WP-8: the small-scale selection resolved against the unplaced region (wording approved by the author 2026-09-24)."""
+    lm = pd.read_csv(RESULTS / "width2_unplaced_localmin.csv")
+    un = pd.read_csv(RESULTS / "width2_unplaced.csv")
+    sm = []
+    for act in ("f1.30", "f1.50"):
+        f = RESULTS / "width2_w0_parts" / f"smallscale_{act}.csv"
+        if f.exists():
+            sm.append(pd.read_csv(f, float_precision="round_trip"))
+    sm = pd.concat(sm) if sm else pd.DataFrame(columns=["act", "R2", "retained_loss", "placed", "is_cancelling_pair"])
+    rows = ""
+    for r in lm.merge(un, on=["act", "R2"]).itertuples():
+        d = sm[(sm.act == r.act) & (np.isclose(sm.R2, r.R2))]
+        if len(d):
+            q = d.iloc[0]
+            placed_l = q.retained_loss
+            chk = (f"{placed_l:.13f} ({'placed' if q.placed else 'UNPLACED'}, "
+                   f"{'cancelling pair' if q.is_cancelling_pair else 'not the pair'})")
+            diff = r.best_unplaced_loss - placed_l
+            dd = f"{diff:.2e} ({diff / 1e-9:,.0f}× 1e−9)"
+        else:
+            chk, dd = "pending", "pending"
+        rows += (f"| a = {float(r.act[1:]):.2f}, R₂ = {r.R2:g} | {chk} | {r.best_unplaced_loss:.13f} (boundary, G₊ = {r.G_hi:.1e}) "
+                 f"| {dd} | {r.lowest_local_min_minus_placed:.2e} (single unit, G₊ = {r.lowest_local_min_G:.2f}) |\n")
+    return f"""
+## WP-8. The small-scale selection, resolved against the unplaced region (direct check; rebuttal revision)
+
+Sources: `width2_unplaced.csv`, `width2_unplaced_localmin.csv` (producer `src/width2_unplaced.py`), the direct check
+`width2_w0 smallscale` (validated W0 search, 4,000 restarts per scale).
+
+At these scales the unplaced region contains local minima: single units at α* with an idle second unit (G₊ ≈ −3.3 to
+−3.7), whose loss exceeds the placed cancelling pair's by the predicted single-unit second-order gap (s²/8)·α*²·Var(x)
+to within 0.1–2%. The infimum over the unplaced region is lower: it lies on the placement boundary G₊ = 0, at a
+partially cancelling pair (|c| ≈ 0.43–0.51). Descent from there reaches the placed cancelling pair, and the loss drop
+matches the second-order prediction (s²/8)·c²·Var(x) to within 0.2–3%. In every search the placed minimiser lies below
+every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× the 1e−9 tie tolerance).
+
+| scale | best placed: the direct check's retained minimiser | best unplaced (infimum over G₊ ≤ 0) | difference (× tie tolerance) | lowest unplaced local minimum, above the placed pair |
+|---|---|---|---|---|
+{rows}"""
 
 
 def wp7():

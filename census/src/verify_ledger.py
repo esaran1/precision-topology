@@ -1268,6 +1268,21 @@ def v4_checks() -> None:
     chk("G* best lower - Ghat_cert, max absolute", float(ab_.max()), 7.09e-6, 0.006e-6)
     chk("G* best lower - Ghat_cert, max absolute at a = 1.60", float(gr_.a[ab_.idxmax()]), 1.60, 1e-9)
     chk("G* best lower - Ghat_cert, relative at a = 1.60", float(rel_[ab_.idxmax()]), 3.16e-5, 0.006e-5)
+    print("WP-8: unplaced region at small scale")
+    lm_ = pd.read_csv(R / "width2_unplaced_localmin.csv")
+    un_ = pd.read_csv(R / "width2_unplaced.csv")
+    r1_ = lm_.lowest_local_min_minus_placed / lm_.predicted_single_unit_gap - 1
+    chk("single-unit gap within 0.1-2% of prediction", float(r1_.abs().min() >= 0.0005 and r1_.abs().max() <= 0.02), 1.0, 0)
+    chk("lowest unplaced local minimum is a single unit at every scale", float(lm_.lowest_local_min_single_unit.all()), 1.0, 0)
+    chk("its G+ range lo", float(lm_.lowest_local_min_G.min()), -3.65, 0.01)
+    chk("its G+ range hi", float(lm_.lowest_local_min_G.max()), -3.34, 0.01)
+    mm_ = lm_.merge(un_, on=["act", "R2"])
+    r2_ = (mm_.best_unplaced_loss - mm_.local_descent_loss) / mm_.predicted_boundary_gap - 1
+    chk("boundary drop within 0.2-3% of prediction", float(r2_.min() >= 0.0015 and r2_.max() <= 0.032), 1.0, 0)
+    chk("all best-unplaced on the boundary", float((un_.classification == "boundary").all()), 1.0, 0)
+    chk("|c| min", float(un_.linear_c.abs().min()), 0.43, 0.006)
+    chk("|c| max", float(un_.linear_c.abs().max()), 0.51, 0.006)
+    chk("min margin at R2 = 0.001", float((mm_[mm_.R2 == 0.001].best_unplaced_loss - mm_[mm_.R2 == 0.001].local_descent_loss).min()), 9.9e-8, 0.06e-8)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

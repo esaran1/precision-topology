@@ -210,7 +210,7 @@ def report(act_name):
 
 def save():
     """Committed copy of the per-scale best-unplaced results (the parts directory is not committed)."""
-    d = pd.concat([pd.read_csv(p, float_precision="round_trip") for p in sorted(PARTS.glob("unplaced_*.csv"))])
+    d = pd.concat([pd.read_csv(p, float_precision="round_trip") for p in sorted(PARTS.glob("unplaced_f*.csv"))])
     d.to_csv(RESULTS / "width2_unplaced.csv", index=False)
     # local minima inside the unplaced region, and the lowest one against the boundary infimum and the placed pair
     from .width2_conditional import population

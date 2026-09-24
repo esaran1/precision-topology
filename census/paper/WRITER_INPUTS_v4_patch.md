@@ -420,10 +420,10 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 379 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 386 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
-scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 1 are unstable
-(`ghat_digit_stability.csv`). A further 10 checks compare two artifacts to 1e−12; they are
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
+(`ghat_digit_stability.csv`). A further 11 checks compare two artifacts to 1e−12; they are
 not printed numbers. 5 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
 P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict
@@ -434,3 +434,26 @@ the check above covers. Every code path that computes R now reads `ghat_rigorous
 
 R keeps Ĝ_cert (table (i)); the best certified lower bound in table (ii) is a valid bound on G* but a different number
 from the one R has always used (author's decision 2026-09-24).
+
+## WP-8. The small-scale selection, resolved against the unplaced region (direct check; rebuttal revision)
+
+Sources: `width2_unplaced.csv`, `width2_unplaced_localmin.csv` (producer `src/width2_unplaced.py`), the direct check
+`width2_w0 smallscale` (validated W0 search, 4,000 restarts per scale).
+
+At these scales the unplaced region contains local minima: single units at α* with an idle second unit (G₊ ≈ −3.3 to
+−3.7), whose loss exceeds the placed cancelling pair's by the predicted single-unit second-order gap (s²/8)·α*²·Var(x)
+to within 0.1–2%. The infimum over the unplaced region is lower: it lies on the placement boundary G₊ = 0, at a
+partially cancelling pair (|c| ≈ 0.43–0.51). Descent from there reaches the placed cancelling pair, and the loss drop
+matches the second-order prediction (s²/8)·c²·Var(x) to within 0.2–3%. In every search the placed minimiser lies below
+every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× the 1e−9 tie tolerance).
+
+| scale | best placed: the direct check's retained minimiser | best unplaced (infimum over G₊ ≤ 0) | difference (× tie tolerance) | lowest unplaced local minimum, above the placed pair |
+|---|---|---|---|---|
+| a = 1.30, R₂ = 0.001 | pending | 0.6922872690039 (boundary, G₊ = -2.0e-10) | pending | 1.61e-06 (single unit, G₊ = -3.65) |
+| a = 1.30, R₂ = 0.003 | pending | 0.6905704168112 (boundary, G₊ = -1.2e-11) | pending | 1.45e-05 (single unit, G₊ = -3.64) |
+| a = 1.30, R₂ = 0.01 | pending | 0.6845925670975 (boundary, G₊ = -2.0e-12) | pending | 1.60e-04 (single unit, G₊ = -3.59) |
+| a = 1.30, R₂ = 0.02 | pending | 0.6761364675950 (boundary, G₊ = -1.6e-13) | pending | 6.33e-04 (single unit, G₊ = -3.52) |
+| a = 1.50, R₂ = 0.001 | pending | 0.6922872667961 (boundary, G₊ = -1.7e-10) | pending | 1.21e-06 (single unit, G₊ = -3.45) |
+| a = 1.50, R₂ = 0.003 | pending | 0.6905704102030 (boundary, G₊ = -1.9e-12) | pending | 1.09e-05 (single unit, G₊ = -3.44) |
+| a = 1.50, R₂ = 0.01 | pending | 0.6845925452478 (boundary, G₊ = -4.4e-13) | pending | 1.20e-04 (single unit, G₊ = -3.40) |
+| a = 1.50, R₂ = 0.02 | pending | 0.6761364244002 (boundary, G₊ = -2.9e-13) | pending | 4.77e-04 (single unit, G₊ = -3.34) |
