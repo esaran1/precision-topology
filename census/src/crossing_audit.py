@@ -94,7 +94,9 @@ def phase2b_stored():
         c = g[g.crossing == "True"]
         s = int(c.step.iloc[0])
         pre = g[g.step == s - 1]
-        ok = len(c) == 1 and s == int(r.cross_step) and len(pre) == 1 and float(abs(c.w2.iloc[0])) == float(r.w2_abs)
+        # wi_crossing_runs.csv stores |w₂| to 15 significant digits, the checkpoint rows at full precision: relative 1e-13
+        ok = (len(c) == 1 and s == int(r.cross_step) and len(pre) == 1
+              and abs(float(abs(c.w2.iloc[0])) - float(r.w2_abs)) <= 1e-13 * float(r.w2_abs))
         R_ref = float(own.loc[(a, int(r.seed))]) if (a, int(r.seed)) in own.index else np.nan
         G = [float(pre.gap.iloc[0]), float(c.gap.iloc[0])] if ok else [np.nan, np.nan]
         R = [abs(float(pre.w2.iloc[0])) * gc[a] / 2, abs(float(c.w2.iloc[0])) * gc[a] / 2] if ok else [np.nan] * 2

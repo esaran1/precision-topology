@@ -815,6 +815,8 @@ PRODUCERS = {
     "writer_patch_census_by_block.csv": ("writer_patch", "census_by_block", "full", ""),
     "writer_patch_figure_sizes.csv": ("writer_patch", "figure_sizes", "full", ""),
     "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
+    "crossing_audit_runs.csv": ("crossing_audit", "main", "full", ""),
+    "crossing_audit_summary.csv": ("crossing_audit", "main", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
@@ -1165,6 +1167,36 @@ def v4_checks() -> None:
     chk("4b a=1.3 control residual", float(rms[(rms.a == 1.3) & (rms.arm == "control")].median_residual.iloc[0]), 0.031053, 1e-6)
     chk("4b a=1.3 teleport residual", float(rms[(rms.a == 1.3) & (rms.arm == "teleport")].median_residual.iloc[0]), 0.030787, 1e-6)
     chk("4b a=1.5 reset residual", float(rms[(rms.a == 1.5) & (rms.arm == "reset")].median_residual.iloc[0]), 0.067219, 1e-6)
+    rtr_ = rms[rms.arm == "teleport_reset"].set_index("a").median_residual
+    chk("4b a=1.3 teleport+reset residual", float(rtr_.loc[1.3]), 0.031222, 1e-6)
+    chk("4b a=1.5 teleport+reset residual", float(rtr_.loc[1.5]), 0.066012, 1e-6)
+    print("Crossing-detection audit (POST HOC: crossing_audit.md)")
+    car_ = pd.read_csv(R / "crossing_audit_runs.csv")
+    chk("audit: every rerun reproduced bit for bit (160)",
+        float(car_[car_.source == "rerun"].reproduced.all() and (car_.source == "rerun").sum() == 160), 1.0, 0)
+    chk("audit: phase 2b stored runs located (228)",
+        float(car_[car_.source == "stored"].reproduced.sum()), 228.0, 0)
+    cas_ = pd.read_csv(R / "crossing_audit_summary.csv").set_index(["family", "a"])
+    def _ca(fam, a, col):
+        return float(cas_[cas_.index.get_level_values(0).str.startswith(fam)].xs(a, level=1)[col].iloc[0])
+    for fam_, a_, col_, want_ in (("phase 2b", 1.3, "median_residual_check", 0.0313), ("phase 2b", 1.3, "median_residual_interp_check", 0.0311),
+                                  ("phase 2b", 1.5, "median_residual_check", 0.0661), ("phase 2b", 1.5, "median_residual_interp_check", 0.0658),
+                                  ("phase 2b", 1.6, "growth_over_interval_rel_max", 0.0044),
+                                  ("size test", 1.3, "median_residual_check", 0.0316), ("size test", 1.3, "median_residual_interp_check", 0.0311),
+                                  ("size test", 1.5, "median_residual_check", 0.0668), ("size test", 1.5, "median_residual_interp_check", 0.0659),
+                                  ("size test", 1.3, "growth_one_step_rel_median", 0.00058), ("size test", 1.5, "growth_one_step_rel_median", 0.00149),
+                                  ("Block G base", 1.3, "growth_over_interval_rel_median", 0.0240), ("Block G base", 1.5, "growth_over_interval_rel_median", 0.0491),
+                                  ("Block G base", 1.3, "median_shift_check_minus_interp_check", 0.0138), ("Block G base", 1.5, "median_shift_check_minus_interp_check", 0.0191),
+                                  ("Block 3", 1.3, "median_residual_check", 0.0858), ("Block 3", 1.3, "median_residual_interp_check", 0.0746),
+                                  ("Block 3", 1.5, "median_residual_check", 0.1304), ("Block 3", 1.5, "median_residual_interp_check", 0.1169),
+                                  ("Block 3", 1.5, "growth_over_interval_rel_max", 0.2111), ("Block 3", 1.5, "max_shift_check_minus_interp_check", 0.1628),
+                                  ("prospective own-seed", 1.3, "median_residual_check", 0.0430), ("prospective own-seed", 1.3, "median_residual_interp_check", 0.0297),
+                                  ("prospective own-seed", 1.5, "median_residual_check", 0.0801), ("prospective own-seed", 1.5, "median_residual_interp_check", 0.0618)):
+        chk(f"audit {fam_} a={a_} {col_}", _ca(fam_, a_, col_), want_, 0.00006)
+    print("Block 2: finite-a certificates, independent checker")
+    vcf_ = (R / "verify_certificates_finite.log").read_text()
+    chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12
+                                                         and "12 certificate(s) checked; failures: none" in vcf_), 1.0, 0)
     print("Scale limits (registered: scale_limits_prediction.md)")
     sd_ = pd.read_csv(R / "scale_limits_D.csv").iloc[0]
     chk("alpha*", float(sd_.alpha_star), 1.7913244, 1e-6)
