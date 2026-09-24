@@ -155,7 +155,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | No competitor outside U, uniform in A | PENDING (annulus) | `mn2_annulus.csv` | — |
 | Transversal crossing (H2′) at A* | **Certified**: dG₀/dA ∈ [1.666, 1.705] over the bracket | `mn2_h2prime.csv` | — |
 | Local branch or global minimiser? | **Global** in the limit on K(24) (localisation, B&B, annulus); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
-| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **For the branch only**: global optimality is certified at the two bracket ends; competitor exclusion uniform over the bracket is PENDING (`mn2_solve_competitor.csv`). **Finite a**: PENDING | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
+| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **For the branch only**: global optimality is certified at the two bracket ends; competitor exclusion uniform over the bracket is PENDING (`mn2_solve_competitor.csv`). **Finite a: certified.** At a = 1.30–1.60, the global minimiser's solve margin over its certified enclosure (width ≤ 9e−6), with b validated, is certified negative at every lower bracket end and positive at every upper end. The smallest margin is [4.1e−6, 3.1e−4] at a = 1.45. | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
 | Other window geometries | **Not done**: A* is certified for the base window only | — | rerun `limit_bnb switch` per window |
 
 ## 5. Finite-a certificates (Block 1c)
@@ -188,7 +188,7 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | finite-a global preference | Block 1c | `conditional_certified brackets` → `cond_certified_brackets.csv` | `mn2_rounding.csv`, a = 1.30 rows: ≤ 1.1e−16 against certified gaps ≥ 1.8e−8 |
 | solve threshold (limit), branch | nondegeneracy, transversality | `math_note_v2_checks solve_limit` → `mn2_solve_limit.csv` | interval arithmetic over tolerance-1e−11 enclosures; b validated |
 | solve threshold (limit), competitors | exclusion on K(24) minus the ρ-box, uniform over (1.05875, 1.06]; Hessian PD on the ρ-box | `math_note_v2_checks solve_competitor` → `mn2_solve_competitor.csv` | PENDING |
-| solve threshold (finite a) | same | `math_note_v2_checks solve_finite` → `mn2_solve_finite.csv` | PENDING |
+| solve threshold (finite a) | sign of the solve margin at both bracket ends | `math_note_v2_checks solve_finite` → `mn2_solve_finite.csv` | interval arithmetic over the argmin enclosure (tolerance 1e−11); b validated by interval Newton |
 
 ## 7. Limits
 

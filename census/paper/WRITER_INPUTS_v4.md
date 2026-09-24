@@ -74,8 +74,9 @@ at or above each certified switch, so they overstate it by less than one grid st
 | 1.50 | 0.175126 | (0.22110, 0.22219] | 0.22329 | (0.30428, 0.30538] | 0.30647 | (2.5250, 2.5375] / (3.4750, 3.4875] |
 | 1.60 | 0.224360 | (0.22436, 0.22576] | 0.22997 | (0.30289, 0.30429] | 0.30850 | (2.0000, 2.0125] / (2.7000, 2.7125] |
 
-(R_solve is the global minimiser's solve margin changing sign, evaluated at the certified minimiser.
-Its certification over the minimiser's enclosure is in Block 2 below.)
+(R_solve is the global minimiser's solve margin changing sign. **Certified**: over the minimiser's certified
+enclosure, the margin is certified negative at every lower bracket end and positive at every upper end, at
+all six a (`mn2_solve_finite.csv`).)
 
 ## Block 3 — prospective prediction on held-out geometries: primary criterion PASSED
 

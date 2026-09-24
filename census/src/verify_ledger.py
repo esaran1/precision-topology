@@ -734,6 +734,7 @@ PRODUCERS = {
     "first_order_corner_free.csv": ("first_order", "corner", "full", ""),
     "mn2_h2prime.csv": ("math_note_v2_checks", "h2", "full", ""),
     "mn2_solve_limit.csv": ("math_note_v2_checks", "solve_limit", "full", ""),
+    "mn2_solve_finite.csv": ("math_note_v2_checks", "solve_finite", "full", ""),
     "cond_audit_candidates.csv": ("conditional_audit", "candidates", "full", ""),
     "cond_audit_strict.csv": ("conditional_audit", "strict", "full", ""),
     "cond_certified_brackets.csv": ("conditional_certified", "brackets", "full", ""),
@@ -976,6 +977,12 @@ def v4_checks() -> None:
     chk("solve limit: dmargin/dA min", float(sl_.dmargin_dA_lo.min()), 0.532, 0.0005)
     chk("solve limit: dmargin/dA max", float(sl_.dmargin_dA_hi.max()), 0.536, 0.0005)
     chk("solve limit: lambda_min", float(sl_.hess_lambda_min_lo.min()), 0.1369, 0.0001)
+
+    sf_ = pd.read_csv(R / "mn2_solve_finite.csv")
+    chk("solve finite: 12 bracket ends", float(len(sf_)), 12.0, 0)
+    chk("solve finite: fails at lower ends", float((sf_.groupby("a").certified_sign.first() == "fails").all()), 1.0, 0)
+    chk("solve finite: solves at upper ends", float((sf_.groupby("a").certified_sign.last() == "solves").all()), 1.0, 0)
+    chk("solve finite: b validated", float(sf_.b2_validated.all()), 1.0, 0)
 
     print("V4 Block 3 (prospective)")
     cmp_ = pd.read_csv(R / "prospective_comparisons.csv").set_index("comparison")
