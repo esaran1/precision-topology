@@ -8,7 +8,7 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 | block | status | for the 25 September submission? |
 |---|---|---|
 | 1. Audit of the conditional threshold | **complete**; registered decision rule met; 1d done (below) | yes |
-| 2. Proposition 2 made precise | certified localisation, rounding and bounds done; H2′, neighbourhood and solve checks running | yes, once the checks close |
+| 2. Proposition 2 made precise | **certified**: localisation, switch, H2′, neighbourhood, solve threshold, and global uniqueness (annulus and solve bracket, four-link chain); the registered c₁ test is running | yes |
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
 | 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
 | 5. Retention curve | queued after Block 4 | if scored and verified in time; otherwise rebuttal |
@@ -165,6 +165,22 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
 
 - **The limit threshold is an interval**: R_glob^∞ ∈ [0.1974, 0.1992], certified. Never quote 0.19991;
   that is the old grid's first point above the interval.
+- **Single branch, certified globally** (`math_note_v2.md` §2(c), §3(c); `certificates_v2.py`,
+  `certv2_annulus_summary.csv`, `certv2_solve_summary.csv`):
+  - For every A ∈ [0.66, 0.71], and for every A over the solve bracket [1.05875, 1.06], the limit problem has
+    a **unique global minimiser** (up to the mirror p → −p), and it is the branch minimiser.
+  - The proof is a four-link chain, with A carried as an interval and never sampled:
+    1. localisation to K(24);
+    2. every point outside a 0.15 box loses to the branch by a certified margin (≥ 1.0e−4);
+    3. no critical point in the ring between the 0.05 and 0.15 boxes (interval gradient bounds);
+    4. a positive-definite Hessian on the 0.05 box.
+  - **Consequences**:
+    - The sharp value **R_glob^∞ ∈ [0.1985926, 0.1985927]** is now certified. It is no longer
+      conditional, and it lies inside [0.1974, 0.1992].
+    - The limit **R_solve^∞ ∈ [0.30675, 0.30712]** is global, not branch-only.
+  - **Say**: "certified: for every A in the neighbourhood of the switch, the limit problem has a unique global
+    minimiser, which is the branch followed by the implicit-function argument."
+  - **Do not say** this for finite a. Global preference at finite a rests on Block 1c at a = 1.30–1.60 only.
 - **Convergence, on certified values** (replaces "slope 0.947" and "R_glob(a) = 0.19991(1 + 0.231ε)"):
   - finite-a thresholds exceed the limit by 7.6–13.5%, increasing in a;
   - log-log slope 0.83 (exact range 0.71–0.96 over the certified intervals);
@@ -585,4 +601,4 @@ those can change what the panels should show.
 |---|---|---|---|---|---|
 | `v4_prospective.pdf` | Block 3: predicted against observed median crossing R, 8 held-out settings × 4 models. C is filled, U open and joined to C by a segment (the fitted λ). λ(1.30) = 1.115 and λ(1.50) = 1.164 are labelled as fitted on the base window. Identity line. | 86–88 crossings of 90 per setting | observed medians: bootstrap 95% (10,000 resamples, seed 0) | `prospective_runs.csv`, `prospective_scores.csv`, `prospective_calibration.csv` | none expected |
 | `v4_fixed_scale.pdf` | (a) Block 4: placed at 4,000 steps against held R/R_glob, both optimiser-state variants, x₅₀ in the legend, registered band [0.9, 1.25] shaded. (b) Block 5: retained through 12,000 steps, band [0.9, 1.1], with **E-2's criterion** (kept ≥ 0.9 at 1.15 × Block E's R_glob = 1.156 certified units) and Block E's observed 33/37 marked FAIL. | 543 checkpoints per level (a); 177 (b); Block E 37 | Clopper–Pearson 95% | `fixed_scale_block{4,5}_curve.csv`, `_tests.csv`; `blockE_results.md` | **Room kept** for the 16k and 64k curves from the registered horizon extension (Q1). Hook: `fig_fixed_scale(horizons=True)`, added once Q1/Q2 are scored. S1/S2 may add the own-seed prediction. |
-| `v4_thresholds.pdf` | Certified R_glob and R_solve intervals at a = 1.30–1.60 and in the limit ε → 0, with free-training crossing-R distributions (budget 32k) on the same axes. | 38 runs per a | certified interval widths; crossing medians bootstrap 95% | `cond_certified_brackets.csv`, `limit_K_base.csv`, `mn2_solve_limit.csv`, `wi_crossing_runs.csv` | S3 may add the own-seed thresholds. The c₁ test may add the small-ε points (a = 1.01–1.04) and the first-order line. The limit R_solve is for the branch only until competitor exclusion is certified. |
+| `v4_thresholds.pdf` | Certified R_glob and R_solve intervals at a = 1.30–1.60 and in the limit ε → 0, with free-training crossing-R distributions (budget 32k) on the same axes. | 38 runs per a | certified interval widths; crossing medians bootstrap 95% | `cond_certified_brackets.csv`, `limit_K_base.csv`, `mn2_solve_limit.csv`, `wi_crossing_runs.csv` | S3 may add the own-seed thresholds. The c₁ test may add the small-ε points (a = 1.01–1.04) and the first-order line. The limit R_solve is now global (competitor exclusion certified, `certv2_solve_summary.csv`). |

@@ -1,0 +1,2 @@
+range,covered,sub_intervals_evaluated,sub_intervals_certified,min_outer_margin,min_ring_grad_lower,max_branch_upper,B24,max_outer_peak_cells,max_ring_boxes,pd_source,pd_boxes,pd_all,pd_b2_all,pd_lambda_min_lower,pd_p_lo,pd_p_hi,pd_q_lo,pd_q_hi
+"[1.05875, 1.06]",True,1,1,0.00014759317699114538,0.008466617960377114,0.28116603417969155,0.38797358308679,39072,540,certv2_solve_pd.csv,100,True,True,0.020851704282571257,1.5275651931762695,1.6275651931762696,1.2252930806298712,1.3252930806298713

@@ -1,0 +1,2 @@
+range,covered,sub_intervals_evaluated,sub_intervals_certified,min_outer_margin,min_ring_grad_lower,max_branch_upper,B24,max_outer_peak_cells,max_ring_boxes,pd_source,pd_all,pd_b2_all,pd_lambda_min_lower
+"[0.66, 0.71]",True,40,40,0.00010023664423419731,0.0032786344759717072,0.3580445932238794,0.38797358308679,39072,540,mn2_neighbourhood.csv,True,True,0.04734591045290669

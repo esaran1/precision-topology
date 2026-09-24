@@ -1,0 +1,2 @@
+tag,A_lo,A_hi,centre_p,centre_q,ring_certified,ring_boxes,ring_depth,ring_final_side,ring_grad_lower,ring_left,outer_certified,outer_margin,branch_upper,localised,outer_P,outer_lower,outer_attained,outer_rounds,outer_peak_cells,outer_final_h,certified
+solve,1.05875,1.06,1.5775651931762695,1.2752930806298712,True,540,0,0.0125,0.008466617960377114,0,True,0.00014759317699114538,0.28116603417969155,True,24.0,0.2813136273566827,0.2882433952761201,7,39072,0.001953125,True

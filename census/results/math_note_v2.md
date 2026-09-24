@@ -46,15 +46,14 @@ only through the unit R = |w₂|Ĝ/2.
   **R_glob^∞ = KA*/2 ∈ [0.19738, 0.19920]** (`limit_K_base.csv`). The solve switch is certified in the
   same way at A_solve ∈ (1.05875, 1.06], giving **R_solve^∞ ∈ [0.30675, 0.30712]** (transversal, nondegenerate;
   `mn2_solve_limit.csv`).
-  - **Stated for the branch only, for now.** At the two bracket ends the branch minimiser is certified to be the
-    global minimiser on K(24). There is not yet a certified margin excluding other basins uniformly over
-    the bracket (`mn2_solve_competitor.csv`, pending).
-- (c) **Single branch**:
-  - for A ∈ [0.66, 0.71], the global minimiser lies in the box U = [p₀ ± 0.05] × [q₀ ± 0.05], with
-    (p₀, q₀) = (1.66858, 1.36972);
+  - **Global over the whole bracket** (§3(c), same four-link chain as (c)): for every A ∈ [1.05875, 1.06]
+    the global minimiser of L*_0(·; A) is unique (up to p → −p) and is the branch minimiser
+    (`certv2_solve_summary.csv`).
+- (c) **Single branch, global** (certified by a four-link chain, §3(c)):
+  - for every A ∈ [0.66, 0.71], L*_0(·; A) has a unique global minimiser (up to the reflection p → −p). It lies
+    in the box U = [p₀ ± 0.05] × [q₀ ± 0.05], with (p₀, q₀) = (1.66858, 1.36972);
   - the (p, q, b) Hessian is positive definite on U × [0.66, 0.71], with λ_min ≥ 0.0473;
-  - so the global minimiser is the unique critical point there, and it is C^∞ in A.
-  - *Competitor bound outside U, uniform in A: PENDING (annulus).*
+  - so the global minimiser is the unique critical point in U, and it is C^∞ in A.
 - (d) **Transversality (H2′)**: dG_0/dA along the branch lies in **[1.666, 1.705]** at A = 0.68125, 0.684375
   and 0.6875 (certified intervals, `mn2_h2prime.csv`). It is positive, so the crossing is transversal. The
   earlier float 1.304 was a finite difference of coarse branch-and-bound argmins; it is superseded.
@@ -107,9 +106,67 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
   - the interval (p, q, b) Hessian has eigenvalues ≥ λ_mid − ‖radius‖_F > 0;
   - the minimum lower bound over all boxes is 0.0473.
 - A C² function with a PD Hessian on a convex box has at most one critical point there.
-- **Competitor exclusion**: `annulus_job` bounds L*_0 from below on K(24) \ U, uniformly over eight
-  A-subintervals, via convexity in A. It is compared with the certified branch upper bound on the
-  same subinterval. *PENDING.*
+- **Global uniqueness: the four-link chain** (`certificates_v2.py` → `certv2_annulus_parts.csv`,
+  `certv2_annulus_summary.csv`; solve bracket → `certv2_solve_parts.csv`, `certv2_solve_pd.csv`,
+  `certv2_solve_summary.csv`).
+  - A is carried as an interval, never sampled. The chain holds on each A-sub-interval: 40 sub-intervals of
+    width 0.00125 covering [0.66, 0.71], and the solve bracket [1.05875, 1.06] as one interval.
+  - θ_c is U's centre (p₀, q₀). For the solve bracket it is the centre of the certified argmin enclosure at
+    A = 1.06, with its own 0.05 box.
+  - **Link 1, localisation**: every global minimiser lies in K(24) (by (a)).
+    - For the solve bracket, the branch upper bound max(L*_0(θ_c; 1.05875), L*_0(θ_c; 1.06)) = 0.28117 is
+      below B(24) = 0.38797.
+  - **Link 2, outer exclusion**: for every θ ∈ K(24) outside the 0.15 box around θ_c, and every A in the
+    sub-interval, L*_0(θ; A) > L*_0(θ_c; A). The margin is certified at ≥ 1.00e−4 on every annulus
+    sub-interval and ≥ 1.48e−4 on the solve bracket.
+    - **Branch side**: L*_0(θ_c; ·) is convex, so over the sub-interval it is at most the larger of its two
+      endpoint values.
+    - **Competitor side**: the §3(b) cell bound at the midpoint A_c, with curvature taken at A_hi, minus
+      h_A·|∂_A L*_0| (convexity in A). By the envelope theorem, ∂_A L*_0 = mean((σ(z_i) − y_i)h(σ_i)).
+    - The profiled bias gives mean(σ(z_i) − y_i) = 0. So for any constant c,
+      |∂_A L*_0| ≤ mean|h(σ_i) − c| ≤ mean(|h(σ_i(θ_cell)) − c| + (1 + σmax_i²/2)(|x_i|h_p + h_q)),
+      taking c as the median over points at the cell centre.
+    - The cruder bound mean|h(σ)| reaches about 10⁴ near p = 0, |q| ≈ 36. There h(σ) is nearly constant
+      across points and b absorbs it, and with the crude bound the search does not close.
+    - A 1e−9 allowance covers float rounding in the profiled evaluations.
+    - The search stops at 7 refinement rounds with ≤ 39,072 live cells, against a cap of 1.5M.
+  - **Link 3, ring**: ∇_{(p,q)} L*_0(·; A) ≠ 0 on the ring 0.05 ≤ |θ − θ_c|_∞ ≤ 0.15, for every A in the
+    sub-interval.
+    - **Method**: vectorised interval arithmetic with outward rounding after every operation. exp and pow
+      are widened by ≥ 4 ulps, and the mean carries a summation error bound. The profiled b is enclosed by
+      certified sign changes of the monotone bounds mean σ(z_lo + b) − ȳ ≤ F(b) ≤ mean σ(z_hi + b) − ȳ.
+    - The gradient ∂_p L*_0 = mean((σ(z) − y)Ah′(σ)x), ∂_q L*_0 = mean((σ(z) − y)Ah′(σ)) is enclosed on
+      540 boxes of side 0.0125 covering the ring (padded by 1e−12). On every box, 0 is excluded from ∂_p
+      or from ∂_q, with no subdivision needed.
+    - The smallest certified |gradient component| is 3.28e−3 (annulus) and 8.47e−3 (solve bracket).
+  - **Link 4, PD**: the (p, q, b) Hessian is PD on the 0.05 box × the A range. For the annulus this is
+    `mn2_neighbourhood.csv` (λ_min ≥ 0.0473, 500 sub-boxes). For the solve bracket it is `certv2_solve_pd.csv`:
+    100 sub-boxes over the whole bracket, b validated by interval Newton, λ_min ≥ 0.0209.
+  - **Hence**:
+    - A global minimiser exists in K(24) (Link 1, continuity).
+    - It lies in the 0.15 box (Link 2).
+    - It is an unconstrained minimiser, so it is a critical point, and therefore it is not in the ring
+      (Link 3).
+    - So it lies in the 0.05 box, where the critical point is unique (Link 4).
+    - The global minimiser is therefore unique up to the reflection p → −p, and it is the branch minimiser.
+      The data and windows are x-symmetric, and the search covers p ≥ 0, as in `limit_bnb.certify`.
+  - **Tests**: `tests/test_certificates_v2.py`, 12 tests.
+    - The interval primitives are checked against 50-digit values, and the b and gradient enclosures
+      against float profiles at random interior points.
+    - **Constructed fail cases**, each correctly not certified:
+      - a centre shifted by 0.1, so the critical point is in the ring;
+      - the inner box removed;
+      - a centre shifted by 0.3, so the minimiser is outside the box;
+      - a box too small for the A-interval;
+      - the cell cap reached.
+    - The halving-tree coverage bookkeeping and the three-link conjunction are also tested.
+  - **Superseded first design** (`math_note_v2_checks.annulus`, `solve_competitor`; never produced an
+    artifact). It compared the competitor bound directly against the rise at the edge of the 0.05 box,
+    with a branch upper bound carrying h_A·mean|h|.
+    - Its slack (7.2e−3 annulus, 1.2e−3 solve) exceeded that rise (3.3e−4 and 6.8e−4), so it could not
+      close at any resolution.
+    - The redesign widens the exclusion to the 0.15 box and closes the gap between 0.05 and 0.15 with the
+      ring certificate instead.
 
 **(d) Transversality.**
 - Along the branch, G_0 is differentiable wherever its active set is unique: one extremal point of I
@@ -152,10 +209,10 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | Branch interior to where the expansion holds | **Certified**: U with S_U = 4.857, ε ≤ 0.05 | `mn2_neighbourhood.csv` | — |
 | Uniform C² derivative control | **Proved**, with explicit constants M₀–M₃ | `taylor_constants` | — |
 | Hessian PD on the neighbourhood (IFT) | **Certified**: λ_min ≥ 0.0473 on 500 sub-boxes | `mn2_neighbourhood.csv` | — |
-| No competitor outside U, uniform in A | PENDING (annulus) | `mn2_annulus.csv` | — |
+| No competitor outside U, uniform in A | **Certified** for every A ∈ [0.66, 0.71] (40 A-sub-intervals, A as an interval): outer exclusion outside the 0.15 box (margin ≥ 1.00e−4), no critical point in the ring 0.05–0.15 (\|gradient component\| ≥ 3.28e−3), PD on U | `certv2_annulus_parts.csv`, `certv2_annulus_summary.csv` | — |
 | Transversal crossing (H2′) at A* | **Certified**: dG₀/dA ∈ [1.666, 1.705] over the bracket | `mn2_h2prime.csv` | — |
-| Local branch or global minimiser? | **Global** in the limit on K(24) (localisation, B&B, annulus); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
-| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **For the branch only**: global optimality is certified at the two bracket ends; competitor exclusion uniform over the bracket is PENDING (`mn2_solve_competitor.csv`). **Finite a: certified.** At a = 1.30–1.60, the global minimiser's solve margin over its certified enclosure (width ≤ 9e−6), with b validated, is certified negative at every lower bracket end and positive at every upper end. The smallest margin is [4.1e−6, 3.1e−4] at a = 1.45. | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
+| Local branch or global minimiser? | **Global and unique** (up to p → −p) in the limit for A ∈ [0.66, 0.71] and over the solve bracket (localisation, four-link chain §3(c)); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
+| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **Global over the whole bracket**: the four-link chain certifies a unique global minimiser for every A ∈ [1.05875, 1.06] (outer margin ≥ 1.48e−4; ring \|gradient component\| ≥ 8.47e−3; PD λ_min ≥ 0.0209; branch loss ≤ 0.28117 < B(24)) (`certv2_solve_summary.csv`). **Finite a: certified.** At a = 1.30–1.60, the global minimiser's solve margin over its certified enclosure (width ≤ 9e−6), with b validated, is certified negative at every lower bracket end and positive at every upper end. The smallest margin is [4.1e−6, 3.1e−4] at a = 1.45. | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
 | Other window geometries | **Not done**: A* is certified for the base window only | — | rerun `limit_bnb switch` per window |
 
 ## 5. Finite-a certificates (Block 1c)
@@ -182,12 +239,12 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 | (a) localisation | H1′ (limit) | `math_note_v2_checks bounds`, `uniform` → `mn2_bounds.csv`, `mn2_uniformity*.csv` | B(24): exact rational/50-digit. Branch bound: margin 0.0111 ≫ float error ≤ 1.1e−16 (`mn2_rounding.csv`) |
 | (b) switch at A* | global order at A = 0.68125, 0.6875 | `limit_bnb switch` → `limit_switch.csv` | certified interval gaps vs interval re-evaluation: \|float − interval\| ≤ 1.1e−16 (`mn2_rounding.csv`) |
 | (c) uniqueness in U | Hessian PD | `math_note_v2_checks neighbourhood` → `mn2_neighbourhood.csv` | interval arithmetic throughout (mpmath.iv, 30 digits) |
-| (c) competitors outside U | annulus | `math_note_v2_checks annulus` → `mn2_annulus.csv` | PENDING |
+| (c) competitors outside U | outer exclusion (0.15 box) + ring (no critical point, 0.05–0.15), uniform over 40 A-sub-intervals | `certificates_v2 annulus` → `certv2_annulus_parts.csv`, `certv2_annulus_summary.csv` | outer: float B&B with a 1e−9 rounding allowance against a certified margin ≥ 1.00e−4; ring: outward-rounded interval arithmetic |
 | (d) transversality | H2′ | `math_note_v2_checks h2` → `mn2_h2prime.csv` | interval arithmetic (mpmath.iv), argmin enclosure at tolerance 1e−11 |
 | C² convergence | derivative control | `taylor_constants` → `mn2_neighbourhood.csv` (M₀–M₃) | closed-form bounds, float max over 200,001 points of polynomials |
 | finite-a global preference | Block 1c | `conditional_certified brackets` → `cond_certified_brackets.csv` | `mn2_rounding.csv`, a = 1.30 rows: ≤ 1.1e−16 against certified gaps ≥ 1.8e−8 |
 | solve threshold (limit), branch | nondegeneracy, transversality | `math_note_v2_checks solve_limit` → `mn2_solve_limit.csv` | interval arithmetic over tolerance-1e−11 enclosures; b validated |
-| solve threshold (limit), competitors | exclusion on K(24) minus the ρ-box, uniform over (1.05875, 1.06]; Hessian PD on the ρ-box | `math_note_v2_checks solve_competitor` → `mn2_solve_competitor.csv` | PENDING |
+| solve threshold (limit), competitors | the same chain over [1.05875, 1.06]; Hessian PD on the 0.05 box × bracket | `certificates_v2 solve` → `certv2_solve_parts.csv`, `certv2_solve_pd.csv`, `certv2_solve_summary.csv` | as (c); PD in mpmath.iv (30 digits) |
 | solve threshold (finite a) | sign of the solve margin at both bracket ends | `math_note_v2_checks solve_finite` → `mn2_solve_finite.csv` | interval arithmetic over the argmin enclosure (tolerance 1e−11); b validated by interval Newton |
 
 ## 7. Limits
@@ -302,11 +359,13 @@ Both terms come from the sine series, including the (1 + ε) factor.
 - Whether 0.285 is the actual first-order slope is tested prospectively at a = 1.01–1.04
   (`first_order_prediction.md`).
 
-**Sharp limit threshold (conditional).**
+**Sharp limit threshold.**
 - The Krawczyk A* combined with the K enclosure gives **R_glob^∞ ∈ [0.1985926, 0.1985927]**.
-- This identifies the global switch only with (c)'s competitor exclusion (annulus, pending). Until that is
-  certified, the unconditional statement remains the branch-and-bound bracket [0.19738, 0.19920], which
-  contains it.
+- This identifies the global switch given (c)'s competitor exclusion, which is now certified (§3(c)):
+  - for every A ∈ [0.66, 0.71] the global minimiser is the unique critical point in U;
+  - the Krawczyk switch point (p*, q*) = (1.66808, 1.36923) at A* = 0.685445 lies in U (5e−4 from its
+    centre).
+  - It lies inside the branch-and-bound bracket [0.19738, 0.19920].
 
 ## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
 
@@ -337,5 +396,5 @@ Both terms come from the sine series, including the (1 + ε) factor.
   | the switch position's own curvature (α − a₁ε) | −0.037 |
   | the gap maximiser's own curvature (κ − k₁ε, positive) | +0.059 |
 
-  The same signs hold at all six a. These use the conditional sharp A* (annulus pending) and are
+  The same signs hold at all six a. These use the sharp A* (certified once (c)'s chain closed) and are
   exploratory.

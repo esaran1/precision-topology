@@ -748,6 +748,12 @@ PRODUCERS = {
     "mn2_neighbourhood.csv": ("math_note_v2_checks", "neighbourhood", "full", ""),
     "mn2_rounding.csv": ("math_note_v2_checks", "rounding", "full", ""),
     "limit_switch.csv": ("limit_bnb", "switch", "full", ""),
+    "certv2_annulus_parts.csv": ("certificates_v2", "_run", "full", ""),
+    "first_order_supplementary.csv": ("first_order", "supplementary", "full", ""),
+    "certv2_annulus_summary.csv": ("certificates_v2", "_summary", "full", ""),
+    "certv2_solve_parts.csv": ("certificates_v2", "_run", "full", ""),
+    "certv2_solve_pd.csv": ("certificates_v2", "pd_boxes_solve", "full", ""),
+    "certv2_solve_summary.csv": ("certificates_v2", "_summary", "full", ""),
     "prospective_comparisons.csv": ("prospective", "score", "full", ""),
     "prospective_scores.csv": ("prospective", "score", "full", ""),
     "prospective_calibration.csv": ("prospective", "calibrate", "full", ""),
@@ -994,6 +1000,20 @@ def v4_checks() -> None:
     chk("solve limit: dmargin/dA min", float(sl_.dmargin_dA_lo.min()), 0.532, 0.0005)
     chk("solve limit: dmargin/dA max", float(sl_.dmargin_dA_hi.max()), 0.536, 0.0005)
     chk("solve limit: lambda_min", float(sl_.hess_lambda_min_lo.min()), 0.1369, 0.0001)
+
+    for nm_, mg_, gr_, bu_ in (("annulus", 1.00e-4, 3.28e-3, 0.358045), ("solve", 1.48e-4, 8.47e-3, 0.281166)):
+        cs_ = pd.read_csv(R / f"certv2_{nm_}_summary.csv").iloc[0]
+        cp_ = pd.read_csv(R / f"certv2_{nm_}_parts.csv")
+        chk(f"certv2 {nm_}: covered, all certified, PD and b validated",
+            float(bool(cs_.covered) and bool(cp_.certified.all()) and bool(cp_.localised.all())
+                  and bool(cs_.pd_all) and bool(cs_.pd_b2_all)), 1.0, 0)
+        chk(f"certv2 {nm_}: min outer margin", float(cp_.outer_margin.min()), mg_, 0.005e-4)
+        chk(f"certv2 {nm_}: min ring gradient bound", float(cp_.ring_grad_lower.min()), gr_, 0.005e-3)
+        chk(f"certv2 {nm_}: max branch upper < B(24)", float(cp_.branch_upper.max()), bu_, 1e-6)
+    chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
+        float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
+    chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),
+        0.0209, 0.0001)
 
     sf_ = pd.read_csv(R / "mn2_solve_finite.csv")
     chk("solve finite: 12 bracket ends", float(len(sf_)), 12.0, 0)
