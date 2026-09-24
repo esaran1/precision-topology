@@ -459,3 +459,24 @@ compute priority.
 
 **Everything else in Revision 2 is approved as written**: the k(a) rule, the W4 horizon rule, the cap-raising
 rule, the DE budget (20 × 200 × 2,000) with 1e−6 agreement, and the per-unit breakdown.
+
+## Amendment — cap rule and refinement (2026-09-24 15:13 EDT; approved by the author; before any W1 run)
+
+**Cap rule (replaces "raise it until none hit").**
+- A restart counts as a **cap hit** only if it is **still improving**: its loss fell by more than 1e−12 over its
+  last 10% of iterations.
+- Otherwise it is a **stall**, reported separately:
+  - its count;
+  - its loss against the retained minimum;
+  - **its location**: the kink at t = 0 (|t| < 1e−6) or the clip at |t| = 1 (|t| ≥ 1 − 1e−9). Any other location
+    is reported as "other".
+- **From every stall, a local search is run in the alternative parametrisation of the stricter validation
+  search**: v unconstrained, normalised afterwards; CMA-ES, σ₀ = 0.05, started at the stall.
+  - **If any reaches below the retained minimum by more than 1e−9, the audit's stop fires.**
+- The cap-raising rule (2,000 → 5,000 → 20,000 → 100,000) then applies to still-improving restarts only.
+- **Why**: near the threshold, 10–18% of restarts reached the cap with loss and parameters unchanged to the last
+  digit after 10× more iterations, at a higher loss than the retained minimum. They are stalls at non-smooth points
+  of the (θ, t, σ) parametrisation.
+
+**Refinement (clarification of "bisection to one grid step")**: after the registered 0.01 grid brackets the sign
+change, the bracket is bisected in s to a relative width of **2×10⁻⁴**.
