@@ -170,3 +170,53 @@ def test_ghat_rejects_a_missing_leaf(ghat_cert, monkeypatch):
 def test_ghat_rejects_an_overstated_cert_value(ghat_cert, monkeypatch):
     r = _check(ghat_cert, monkeypatch, lambda m, d: m.update(ghat_cert=m["ghat_cert"] + 1e-9))
     assert not r["checks"]["ghat_cert_attained"]
+
+
+@pytest.fixture(scope="module")
+def ghat_stream_cert(tmp_path_factory):
+    import shutil
+    import src.cert_export as ce
+    root = tmp_path_factory.mktemp("results_s")
+    certs = root / "certificates"
+    for f in ("ghat_bnb.csv", "ghat_certified_all.csv"):
+        shutil.copy(ce.CERTS.parent / f, root / f)
+    old = ce.CERTS
+    ce.CERTS = certs
+    try:
+        ce.ghat_stream(3.0, "s3")
+        ce.ghat(3.0, "g3")
+    finally:
+        ce.CERTS = old
+    return certs
+
+
+def test_streamed_format_gives_the_same_verdicts(ghat_stream_cert, monkeypatch):
+    monkeypatch.setattr(vc, "CERTS", ghat_stream_cert)
+    a = vc.check_ghat("s3", verbose=False, workers=1)
+    b = vc.check_ghat("g3", verbose=False, workers=1)
+    assert a["checks"] == b["checks"] and a["leaves"] == b["leaves"] and a["worst_leaf_upper"] == b["worst_leaf_upper"]
+    assert a["checks"]["coverage"]
+
+
+def test_per_round_tiling_rejects_constructed_faults(ghat_stream_cert):
+    import json as _json
+    d = np.load(ghat_stream_cert / "s3.npz")
+    m = _json.loads((ghat_stream_cert / "s3.json").read_text())
+    R = len(m["rounds"])
+    base = {k: d[k] for k in d.files}
+
+    class Z(dict):
+        @property
+        def files(self):
+            return list(self.keys())
+    assert vc.coverage_per_round(Z(base), m["nw"], m["nb"], R)[0]
+    k = [k for k in base if len(base[k]) > 3][0]
+    drop = dict(base); drop[k] = base[k][1:]
+    assert not vc.coverage_per_round(Z(drop), m["nw"], m["nb"], R)[0]                     # a gap
+    dup = dict(base); dup[k] = np.r_[base[k], base[k][:1]]
+    assert not vc.coverage_per_round(Z(dup), m["nw"], m["nb"], R)[0]                      # a duplicate
+    lvl = int(k[1:3])
+    if lvl + 1 < R:                                                                        # a child of a level-l leaf
+        nk = f"r{lvl + 1:02d}_pruned"
+        anc = dict(base); anc[nk] = np.r_[base.get(nk, np.empty((0, 2), np.int32)), 2 * base[k][:1]]
+        assert not vc.coverage_per_round(Z(anc), m["nw"], m["nb"], R)[0]

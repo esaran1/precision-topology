@@ -311,7 +311,11 @@ def files_match_manifest(name):
     want = {r["file"]: r["sha256"] for r in csv.DictReader(man.open())}
     for ext in ("json", "npz"):
         key = f"results/certificates/{name}.{ext}"
-        if want.get(key) != hashlib.sha256((CERTS / f"{name}.{ext}").read_bytes()).hexdigest():
+        h = hashlib.sha256()
+        with (CERTS / f"{name}.{ext}").open("rb") as fh:                 # streamed (large certificates)
+            for blk in iter(lambda: fh.read(1 << 24), b""):
+                h.update(blk)
+        if want.get(key) != h.hexdigest():
             return False
     return True
 
@@ -458,7 +462,49 @@ def _ghat_chunk(args):
             bad.append((l, i, j))
         worst = ub if worst is None else max(worst, ub)                  # exact points
     worst = None if worst is None else float(worst.mid())
-    return bad, worst
+    return bad, worst, len(lv)
+
+
+def coverage_per_round(zf_npz, nw, nb, rounds):
+    """Exact tiling for leaves stored per level (streamed certificates), with memory linear in one level: the open set
+    at level 0 is the whole nw x nb grid; at each level the leaves must be distinct members of the open set, and the
+    open set at the next level is the four children of every open cell that is not a leaf; after the last level no
+    open cell may remain.  Every point is then covered by exactly one leaf."""
+    names = set(zf_npz.files)
+    bj = max(1, int(nb * 2 ** rounds - 1).bit_length())
+    op = (np.arange(nw, dtype=np.int64)[:, None] << bj | np.arange(nb, dtype=np.int64)[None, :]).ravel()
+    for r in range(rounds):
+        parts = [zf_npz[k].astype(np.int64) for k in (f"r{r:02d}_pruned", f"r{r:02d}_kept") if k in names]
+        leaf = np.concatenate(parts) if parts else np.empty((0, 2), np.int64)
+        lk = np.sort((leaf[:, 0] << bj) | leaf[:, 1])
+        if len(np.unique(lk)) != len(lk):
+            return False, f"duplicate leaf at level {r}"
+        op = np.sort(op)
+        pos = np.searchsorted(op, lk)
+        if not ((pos < len(op)).all() and (op[np.minimum(pos, len(op) - 1)] == lk).all()):
+            return False, f"a level-{r} leaf is not an open cell (outside the grid or under an ancestor leaf)"
+        rest = np.setdiff1d(op, lk, assume_unique=True)
+        del op, lk, leaf
+        if r == rounds - 1:
+            return (len(rest) == 0), ("exact tiling" if len(rest) == 0 else f"{len(rest)} cells uncovered")
+        i, j = rest >> bj, rest & ((1 << bj) - 1)
+        op = np.concatenate([((2 * i + di) << bj) | (2 * j + dj) for di in (0, 1) for dj in (0, 1)])
+    return False, "no levels"
+
+
+def _ghat_leaf_iter(dat, meta):
+    """(level, iw, ib) chunks of at most 2,000 leaves, from either storage format."""
+    if meta.get("format") == "per_round":
+        for k in sorted(dat.files):
+            arr = dat[k]
+            lv = int(k[1:3])
+            for s in range(0, len(arr), 2000):
+                c = arr[s:s + 2000].astype(np.int64)
+                yield np.full(len(c), lv, np.int64), c[:, 0], c[:, 1]
+    else:
+        lv, iw, ib = dat["level"].astype(np.int64), dat["iw"].astype(np.int64), dat["ib"].astype(np.int64)
+        for s in range(0, len(lv), 2000):
+            yield lv[s:s + 2000], iw[s:s + 2000], ib[s:s + 2000]
 
 
 def check_ghat(name, verbose=True, workers=WORKERS):
@@ -476,14 +522,20 @@ def check_ghat(name, verbose=True, workers=WORKERS):
     fa = FA(a)
     res = {"name": name, "checks": {"files_match_committed_hashes": files_match_manifest(name)}}
     t0 = time.time()
-    lv, iw, ib = dat["level"].astype(np.int64), dat["iw"].astype(np.int64), dat["ib"].astype(np.int64)
-    ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
+    if meta.get("format") == "per_round":
+        ok, why = coverage_per_round(dat, meta["nw"], meta["nb"], len(meta["rounds"]))
+    else:
+        lv, iw, ib = dat["level"].astype(np.int64), dat["iw"].astype(np.int64), dat["ib"].astype(np.int64)
+        ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
+        del lv, iw, ib
     res["checks"]["coverage"] = ok
     res["checks"]["domain_contains_reduction"] = a / 1.4 <= a
-    n = len(lv)
-    parts = [(lv[i:i + 2000], iw[i:i + 2000], ib[i:i + 2000]) for i in range(0, n, 2000)]
+    n = 0
+    out = []
     with Pool(workers, initializer=_ghat_init, initargs=(a, meta["nw"], meta["nb"], meta["claim_hi"])) as p:
-        out = p.map(_ghat_chunk, parts)
+        for o in p.imap_unordered(_ghat_chunk, _ghat_leaf_iter(dat, meta), chunksize=8):
+            out.append(o)
+    n = sum(o[2] for o in out)
     bad = [b for o in out for b in o[0]]
     res["checks"]["every_leaf_below_claim_hi"] = not bad
     res["worst_leaf_upper"] = max(o[1] for o in out)

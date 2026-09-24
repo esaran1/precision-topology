@@ -113,3 +113,65 @@ if __name__ == "__main__":
         print(certify(float(sys.argv[1])))
     else:
         main()
+
+
+def certify_stream(a, out_npz, target_rel=TARGET_REL, h0=H0, max_rounds=40, chunk=1_000_000, rss_limit=2.9e9):
+    """certify(a, record=...) with bounded memory, for the largest certificate (a = 1.02).  The same operations in the
+    same order (G evaluated chunk by chunk into a preallocated array; identical values), so the result equals
+    certify(a) exactly.  Leaves are streamed round by round into out_npz (an .npz written member by member):
+    'r{round:02d}_pruned' and, at convergence, 'r{round:02d}_kept', each an int32 array of (iw, ib) at level = round.
+    Stops (RuntimeError) if the resident set size exceeds rss_limit."""
+    import resource
+    import zipfile
+    from .exact_extrema import exact_gap
+
+    def rss():
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss       # bytes on macOS
+
+    def put(zf, name, arr):
+        with zf.open(name + ".npy", "w", force_zip64=True) as fh:
+            np.lib.format.write_array(fh, np.ascontiguousarray(arr), allow_pickle=False)
+
+    nw = max(1, math.ceil(a / h0))
+    nb = math.ceil(2 * math.pi / h0)
+    hw, hb = a / nw / 2, 2 * math.pi / nb / 2
+    wc = (np.arange(nw) + 0.5) * 2 * hw
+    bc = (np.arange(nb) + 0.5) * 2 * hb
+    cells = np.array([(w, b) for w in wc for b in bc])
+    idx = np.array([(i, j) for i in range(nw) for j in range(nb)], dtype=np.int32)
+    meta = {"nw": nw, "nb": nb, "hw0": hw, "hb0": hb, "rounds": [], "peak_rss": 0}
+    lo, arg, evaluated = -np.inf, None, 0
+    ch = np.array([(0, 0), (0, 1), (1, 0), (1, 1)], dtype=np.int32)
+    with zipfile.ZipFile(out_npz, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
+        for rnd in range(max_rounds):
+            n = len(cells)
+            g = np.empty(n)
+            for s in range(0, n, chunk):
+                g[s:s + chunk] = [exact_gap(a, float(w), float(b))[0] for w, b in cells[s:s + chunk]]
+            evaluated += n
+            i = int(np.argmax(g))
+            if g[i] > lo:
+                lo, arg = float(g[i]), (float(cells[i, 0]), float(cells[i, 1]))
+            ub = g + step(a, hw, hb)
+            del g
+            keep = ub > lo
+            hi = float(max(ub[keep].max(), lo))
+            del ub
+            put(zf, f"r{rnd:02d}_pruned", idx[~keep])
+            meta["rounds"].append({"round": rnd, "cells": n, "kept": int(keep.sum())})
+            meta["peak_rss"] = max(meta["peak_rss"], rss())
+            if meta["peak_rss"] > rss_limit:
+                raise RuntimeError(f"STOP: resident set {meta['peak_rss'] / 1e9:.2f} GB > {rss_limit / 1e9:.2f} GB")
+            if hi - lo <= target_rel * lo:
+                put(zf, f"r{rnd:02d}_kept", idx[keep])
+                return {"a": a, "Ghat_lo": lo, "Ghat_hi": hi, "rel_width": (hi - lo) / lo,
+                        "w1": arg[0], "b1": arg[1], "rounds": rnd + 1, "cells_evaluated": evaluated,
+                        "final_hw": hw, "final_hb": hb, "surviving": int(keep.sum()), "converged": True}, meta
+            cells = cells[keep]
+            idx = idx[keep]
+            del keep
+            hw, hb = hw / 2, hb / 2
+            offs = np.array([(-hw, -hb), (-hw, hb), (hw, -hb), (hw, hb)])
+            cells = (cells[:, None, :] + offs[None, :, :]).reshape(-1, 2)
+            idx = (2 * idx[:, None, :] + ch[None, :, :]).reshape(-1, 2)
+    raise RuntimeError("not converged")

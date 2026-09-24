@@ -94,6 +94,32 @@ def ghat(a, name):
     return meta
 
 
+def ghat_stream(a, name):
+    """ghat() with bounded memory (ghat_bnb.certify_stream): leaves streamed to <name>.npz, one int32 (iw, ib) array per
+    round ('r{round:02d}_pruned' / 'r{round:02d}_kept', level = round).  The same assertions as ghat()."""
+    import pandas as pd
+    from .ghat_bnb import certify_stream
+    from .kappa_certify import certify_exact
+    CERTS.mkdir(parents=True, exist_ok=True)
+    r, rec = certify_stream(a, CERTS / f"{name}.npz")
+    ref = pd.read_csv(CERTS.parent / "ghat_bnb.csv", float_precision="round_trip")
+    ref = ref[ref.a.round(2) == round(a, 2)].iloc[0]
+    assert r["Ghat_lo"] == ref.Ghat_lo and r["Ghat_hi"] == ref.Ghat_hi, "search result differs from ghat_bnb.csv"
+    z = certify_exact(a)
+    gc = pd.read_csv(CERTS.parent / "ghat_certified_all.csv", float_precision="round_trip")
+    gc = gc[gc.a.round(2) == round(a, 2)].iloc[0]
+    assert z["Ghat_lo"] == gc.Ghat_certified, "zoom result differs from ghat_certified_all.csv"
+    meta = {"kind": "ghat_enclosure", "format": "per_round", "name": name, "a": a, "nw": rec["nw"], "nb": rec["nb"],
+            "hw0": rec["hw0"], "hb0": rec["hb0"], "rounds": rec["rounds"], "peak_rss_search": rec["peak_rss"],
+            "domain": "w1 in [0, a], b1 in [0, 2pi] (contains (0, a/1.4] x [0, 2pi))",
+            "gap": "G = max(min_O phi - max_I phi, min_I phi - max_O phi), phi = f_a(w1 x + b1), I = [-0.8, 0.8], O = +-[1.2, 2.0]",
+            "step": "(1 + a)(2.8 hw + 2 hb)", "claim_hi": r["Ghat_hi"], "bnb_lo": r["Ghat_lo"],
+            "bnb_arg": [r["w1"], r["b1"]], "ghat_cert": float(gc.Ghat_certified), "ghat_cert_witness": [z["w1"], z["b1"]],
+            "regenerate": f"python -m src.cert_export ghat_stream {a} {name}"}
+    (CERTS / f"{name}.json").write_text(json.dumps(meta, indent=1, default=float))
+    return meta
+
+
 def manifest():
     """results/certificates_manifest.csv: every exported file's SHA-256 and size, and the command that regenerates
     it bit-identically.  The data files themselves are not committed."""
@@ -104,7 +130,11 @@ def manifest():
         meta = json.loads(p.read_text())
         for f in (p, p.with_suffix(".npz")):
             if f.exists():
-                rows.append({"file": f"results/certificates/{f.name}", "sha256": hashlib.sha256(f.read_bytes()).hexdigest(),
+                h = hashlib.sha256()
+                with f.open("rb") as fh:                                  # streamed (large certificates)
+                    for blk in iter(lambda: fh.read(1 << 24), b""):
+                        h.update(blk)
+                rows.append({"file": f"results/certificates/{f.name}", "sha256": h.hexdigest(),
                              "bytes": f.stat().st_size, "regenerate": meta.get("regenerate", "")})
     out = CERTS.parent / "certificates_manifest.csv"
     with out.open("w", newline="") as fh:
@@ -116,6 +146,8 @@ def manifest():
 if __name__ == "__main__":
     if sys.argv[1] == "manifest":
         print(manifest())
+    elif sys.argv[1] == "ghat_stream":
+        print(json.dumps(ghat_stream(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "ghat":
         print(json.dumps(ghat(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "finite":

@@ -249,5 +249,90 @@ def main(workers=1):
         print("NOT REPRODUCED:", bad[["family", "a", "seed", "window"]].to_string(index=False))
 
 
+
+
+# ------------------------------------------------------------------------------------------ full 50-step rerun (approved)
+FULL_PARTS = RESULTS / "crossing_audit_full_parts.csv"
+
+
+def _full_job(args):
+    """One 50-step run replayed to its stored crossing, logging G and |w₂| at every check (i ≡ 0 mod 50): the stored
+    crossing is reproduced bit for bit, and the crossing |w₂| is interpolated linearly in G between the last negative
+    and the first positive check."""
+    import torch
+    from torch.nn import functional as F
+    from .blockG_windows import CHECK_EVERY, LR, f_a, oriented_gap
+    family, win, a, seed, stored_step, stored_w2 = args
+    torch.set_num_threads(1)
+    f = f_a(a)
+    x, y = win.data(200, seed)
+    torch.manual_seed(seed)
+    th = torch.empty(4).uniform_(-1.0, 1.0).double().clone().requires_grad_(True)
+    opt = torch.optim.Adam([th], lr=LR)
+    prev = None
+    row = {"family": family, "window": win.tag, "a": a, "seed": seed, "stored_cross_step": stored_step,
+           "stored_cross_w2": stored_w2}
+    for i in range(stored_step + 1):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y).backward()
+        opt.step()
+        if i % CHECK_EVERY == 0:
+            with torch.no_grad():
+                w1, b1, w2, b2 = (float(v) for v in th)
+            g = oriented_gap(win, a, w1, b1)
+            if g > 0:
+                row.update(cross_step=i, cross_w2=abs(w2), G_cross=g,
+                           reproduced=(i == stored_step and abs(w2) == stored_w2))
+                if prev is None:
+                    row.update(prev_step=np.nan, G_prev=np.nan, w2_prev=np.nan, cross_w2_interp=abs(w2))
+                else:
+                    fr = prev[1] / (prev[1] - g)
+                    row.update(prev_step=prev[0], G_prev=prev[1], w2_prev=prev[2],
+                               cross_w2_interp=prev[2] + fr * (abs(w2) - prev[2]))
+                return row
+            prev = (i, g, abs(w2))
+    row.update(reproduced=False)
+    return row
+
+
+def full_jobs():
+    from .prospective import windows as pwins
+    from .prospective_own import windows as owins
+    old, held = pwins()
+    base = {w.tag: w for w in old}["base"]
+    held = {w.tag: w for w in held}
+    own = {w.tag: w for w in owins()}
+    jobs = []
+    bg = pd.read_csv(RESULTS / "blockG_crossings.csv", float_precision="round_trip")
+    bg = bg[(bg.window == "base") & bg.a.round(2).isin(A_VALUES) & bg.cross_step.notna()]
+    jobs += [("Block G base (lambda)", base, round(float(r.a), 2), int(r.seed), int(r.cross_step), float(r.cross_w2))
+             for r in bg.itertuples()]
+    pr = pd.read_csv(RESULTS / "prospective_runs.csv", float_precision="round_trip")
+    jobs += [("Block 3", held[r.window], round(float(r.a), 2), int(r.seed), int(r.cross_step), float(r.cross_w2))
+             for r in pr[pr.cross_step.notna()].itertuples()]
+    po = pd.read_csv(RESULTS / "prospective_own_runs.csv", float_precision="round_trip")
+    jobs += [("own-seed", own[r.window], round(float(r.a), 2), int(r.seed), int(r.cross_step), float(r.cross_w2))
+             for r in po[po.cross_step.notna()].itertuples()]
+    return jobs
+
+
+def full(workers=1):
+    jobs = full_jobs()
+    done = set()
+    if FULL_PARTS.exists():
+        d0 = pd.read_csv(FULL_PARTS)
+        done = set(zip(d0.family, d0.window, d0.a.round(2), d0.seed))
+    todo = [j for j in jobs if (j[0], j[1].tag, j[2], j[3]) not in done]
+    print(len(jobs), "crossing runs;", len(todo), "to do", flush=True)
+    with Pool(workers) as p:
+        for row in p.imap_unordered(_full_job, todo, chunksize=4):
+            pd.DataFrame([row]).to_csv(FULL_PARTS, mode="a", header=not FULL_PARTS.exists(), index=False)
+            if not row["reproduced"]:
+                print("NOT REPRODUCED", row, flush=True)
+
+
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 1)
+    if len(sys.argv) > 1 and sys.argv[1] == "full":
+        full(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
+    else:
+        main(int(sys.argv[1]) if len(sys.argv) > 1 else 1)
