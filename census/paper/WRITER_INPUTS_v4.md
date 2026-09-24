@@ -396,6 +396,42 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - Scored with the scorer committed before the data (`a015ace`), unchanged; the current refactored
     scorer gives identical output.
 
+## Sample-size test (registered `sample_size_prediction.md`, `04e7668`; scored)
+
+- **Design**: a ∈ {1.30, 1.50} × n ∈ {400, 1,600, 6,400}, with 50 fresh seeds per cell for both arms.
+- **Validity**:
+  - 50/50 brackets overlap 1d's at n = 400;
+  - the certified check agrees on 10/12, with 2 unresolved ends and **0 contradictions**;
+  - 48–49 of 50 runs cross in every cell.
+- **Verdicts**:
+  - **N1 PASS at both a.**
+  - **N2 FAIL at 1.30, PASS at 1.50.**
+  - **N3 FAIL at both a.**
+  - The competing outcome ("the offset is not a finite-sample effect") **holds at 1.30** and does not
+    hold at 1.50.
+
+| a | n | own excess (95%) | free offset (95%) |
+|---|---:|---|---|
+| 1.30 | 400 | 4.2% [1.8, 7.4] | 7.1% [3.7, 9.8] |
+| 1.30 | 1,600 | 3.9% [1.5, 5.1] | 5.6% [3.2, 7.3] |
+| 1.30 | 6,400 | 1.2% [0.5, 2.2] | 4.2% [3.1, 5.2] |
+| 1.50 | 400 | 4.4% [1.4, 7.3] | 10.6% [8.3, 13.7] |
+| 1.50 | 1,600 | 3.6% [1.2, 5.1] | 8.5% [6.9, 11.0] |
+| 1.50 | 6,400 | 1.1% [0.2, 2.1] | 7.5% [6.4, 8.3] |
+
+- Every pairwise difference and its interval is in `sample_size_detail_pairs.csv`. No ordering step
+  failed, so the "indistinguishable" flag does not apply.
+- **N2 at 1.30 fails** only on its interval condition: the offset decreases 7.1 → 5.6 → 4.2%, but the
+  400 − 6,400 difference interval [−0.005, 0.056] includes 0.
+- **Reading, and the connection to S3's residual**:
+  - As n grows, the own-seed excess shrinks toward zero: to about 1% at 6,400.
+  - The free-training offset shrinks less, to 4.2% (1.30) and 7.5% (1.50). Those are close to S3's
+    residual against the own threshold (3.1% and 6.4% at n = 400).
+  - So the free-training offset tends to the residual, not to zero. The finite-sample part disappears
+    with n; the residual does not, and it grows with a.
+  - **Say**: "the finite-sample shift of the threshold vanishes as the training set grows; a residual
+    lag of about 4% (a = 1.30) and 7.5% (a = 1.50) remains and is not a finite-sample effect".
+
 ## Block 5 — retention just after placement: both registered predictions PASSED
 
 Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea5`); producer

@@ -704,6 +704,11 @@ PRODUCERS = {
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
     "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
     "mirror_q2_s1_breakdown.csv": ("mirror_branches", "q2_s1_breakdown", "full", ""),
+    "sample_size_tests.csv": ("sample_size", "score", "full", ""),
+    "sample_size_cells.csv": ("sample_size", "score", "full", ""),
+    "sample_size_certify.csv": ("sample_size", "certify", "full", ""),
+    "sample_size_detail_pairs.csv": ("sample_size", "detail", "full", ""),
+    "sample_size_detail_cells.csv": ("sample_size", "detail", "full", ""),
     "mirror_basin_census_preferred.csv": ("mirror_branches", "basin_census", "full", ""),
     "mirror_global_branch.csv": ("mirror_branches", "global_branch_levels", "full", ""),
     "diagnose_below.csv": ("diagnose_below", "main", "full", ""),
@@ -891,6 +896,19 @@ def v4_checks() -> None:
     chk("census preferred: plateau cases", float(cp_.kind.str.startswith("degenerate").sum()), 8.0, 0)
     chk("census preferred: non-plateau within 0.35% of own threshold",
         float((cp_[~cp_.kind.str.startswith("degenerate")].dist < 0.0035).all()), 1.0, 0)
+    stt_ = pd.read_csv(R / "sample_size_tests.csv").set_index("a")
+    for a_, n1_, n2_, n3_, cp_x in ((1.3, 1, 0, 0, 1), (1.5, 1, 1, 0, 0)):
+        chk(f"size test a={a_}: N1", float(stt_.loc[a_, "N1_pass"]), float(n1_), 0)
+        chk(f"size test a={a_}: N2", float(stt_.loc[a_, "N2_pass"]), float(n2_), 0)
+        chk(f"size test a={a_}: N3", float(stt_.loc[a_, "N3_pass"]), float(n3_), 0)
+        chk(f"size test a={a_}: competing", float(stt_.loc[a_, "competing_offset_not_finite_sample"]), float(cp_x), 0)
+    sc_ = pd.read_csv(R / "sample_size_cells.csv").set_index(["a", "n"])
+    for (a_, n_), ex_, off_ in (((1.3, 400), 0.0422, 0.0706), ((1.3, 6400), 0.0120, 0.0421),
+                                ((1.5, 400), 0.0444, 0.1062), ((1.5, 6400), 0.0111, 0.0748)):
+        chk(f"size test {a_}/{n_}: own excess", float(sc_.loc[(a_, n_), "own_excess"]), ex_, 0.0001)
+        chk(f"size test {a_}/{n_}: free offset", float(sc_.loc[(a_, n_), "free_offset"]), off_, 0.0001)
+    scc_ = pd.read_csv(R / "sample_size_certify.csv")
+    chk("size test: certified contradictions", float(((scc_.cert_lo == "plus") | (scc_.cert_hi == "minus")).sum()), 0.0, 0)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")
