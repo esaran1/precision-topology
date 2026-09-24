@@ -104,3 +104,38 @@ so observing it would mean the search or the argument is wrong (see the stop con
   The test run also caught a bug in `analytic`, which passed a (p, σ) tuple as p. It was fixed before this commit.
   The search, its validation, the Var selection over the retained maximisers and the verdict have **not** been
   computed.
+
+## Result — computed 2026-09-24 with the committed producer (`python -m src.scale_limits_tanh`, 807 s, 0.2 GB)
+
+**Registered outcome: "neither".** One of T1's conditions failed at the last rung. No stop condition fired: all
+validation passed, the Var-selected member is placed at every A, and T2 is not indicated.
+
+| A | box maximum | 1 − max | ladder / independent / analytic tie | maximisers on the boundary (min max\|αᵢ\|/A) | single-unit G₊ | selected member | selected G₊ | selected Var |
+|---|---|---|---|---|---|---|---|---|
+| 5 | 0.9677930 | 3.22e−2 | pass / pass / pass | yes (1.0000) | −0.2381 | symmetric pair (t = ½) | +0.7616 | 0.2349 |
+| 10 | 0.9976487 | 2.35e−3 | pass / pass / pass | yes (1.0000) | −0.0359 | symmetric pair | +0.9640 | 0.2488 |
+| 20 | 0.9999774 | 2.26e−5 | pass / pass / pass | yes (1.0000) | −6.70e−4 | symmetric pair | +0.99933 | 0.249989 |
+| 40 | 0.999999996 | 4.10e−9 | pass / pass / pass | **no (0.9908)** | −2.9e−7 to −2.1e−7 | symmetric pair | +0.9999998 | 0.250000 |
+
+- **T1 conditions.**
+  - Box maximum < 1 and rising by more than 1e−9 at every rung: **yes**. The increments are 3.0e−2, 2.3e−3 and
+    2.26e−5.
+  - Var-selected member G₊ > 0 at every A: **yes**.
+  - All retained maximisers on the boundary (max|αᵢ| ≥ 0.999·A): **yes at A = 5, 10, 20; no at A = 40**.
+- **The first-order tie, as predicted.** At every A, the analytic single step and the analytic symmetric pair both
+  attain the box maximum to 1e−9. The retained maximisers are single units (1,057 / 948 / 806 / 741) and pairs
+  (509 / 452 / 432 / 366). The single units are unplaced at every A. The Var selection picks the symmetric pair,
+  whose Var → 0.25 and G₊ → 1, the limits derived above.
+- **Why A = 40 failed the boundary condition** (post hoc, labelled).
+  - At A = 40, 1 − max = 4.1e−9, the same order as the registered tie tolerance of 1e−9.
+  - 9 of the 1,107 retained near-maximisers have max|αᵢ| between 0.9908·A and 0.999·A. All are within 8.0e−10 of
+    the maximum: Δμ is flat to within the tolerance that close to saturation.
+  - The best candidate itself is on the boundary (max|αᵢ| = A) at every rung.
+  - I did not foresee this interaction when I chose A = 40 (only the double-precision floor at A = 80). It is a flaw
+    in the registered criterion, not in the search.
+- **Post hoc reading (not a registered verdict).** Every number is what T1 predicted. With the boundary condition
+  applied to the best candidate instead of to every member of the tie set, T1 would hold at all four rungs. That
+  reading was formed after seeing the outcome, so it is not scored. The registered outcome stays "neither".
+- **Analytic status, independent of this computation.** The bound Δμ < 1 = sup Δμ (above) proves non-attainment.
+  The limit analysis gives the Var-selected configurations G₊ → 1. The computation confirms both numerically at
+  every rung but did not meet its own registered boundary criterion at A = 40.

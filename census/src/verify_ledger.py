@@ -816,6 +816,9 @@ PRODUCERS = {
     "writer_patch_figure_sizes.csv": ("writer_patch", "figure_sizes", "full", ""),
     "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
     "crossing_audit_runs.csv": ("crossing_audit", "main", "full", ""),
+    "scale_limits_tanh.csv": ("scale_limits_tanh", "main", "full", ""),
+    "scale_limits_tanh_maximisers.csv": ("scale_limits_tanh", "main", "full", ""),
+    "scale_limits_tanh_summary.csv": ("scale_limits_tanh", "main", "full", ""),
     "crossing_audit_summary.csv": ("crossing_audit", "main", "full", ""),
 }
 
@@ -1193,6 +1196,23 @@ def v4_checks() -> None:
                                   ("prospective own-seed", 1.3, "median_residual_check", 0.0430), ("prospective own-seed", 1.3, "median_residual_interp_check", 0.0297),
                                   ("prospective own-seed", 1.5, "median_residual_check", 0.0801), ("prospective own-seed", 1.5, "median_residual_interp_check", 0.0618)):
         chk(f"audit {fam_} a={a_} {col_}", _ca(fam_, a_, col_), want_, 0.00006)
+    print("Scale limits, tanh (registered: scale_limits_tanh_prediction.md)")
+    tl_ = pd.read_csv(R / "scale_limits_tanh.csv").set_index("A")
+    chk("tanh: registered outcome 'neither'", float(pd.read_csv(R / "scale_limits_tanh_summary.csv").verdict.iloc[0] == "neither"), 1.0, 0)
+    chk("tanh: validation passed at every A", float(tl_.ladder_ok.all() and tl_.independent_ok.all() and tl_.analytic_attain.all()), 1.0, 0)
+    chk("tanh: box maxima < 1 and rising", float((tl_.top < 1).all() and (np.diff(tl_.top.values) > 1e-9).all()), 1.0, 0)
+    chk("tanh: boundary condition fails only at A = 40", float(list(tl_.maximisers_on_boundary) == [True, True, True, False]), 1.0, 0)
+    chk("tanh: min max|alpha|/A at A = 40", float(tl_.loc[40.0, "min_max_abs_alpha_over_A"]), 0.9908, 0.0001)
+    chk("tanh: 1 - max at A = 40", float(tl_.loc[40.0, "one_minus_max"]), 4.10e-9, 0.01e-9)
+    for A_, g_ in ((5.0, 0.7616), (10.0, 0.9640), (20.0, 0.99933), (40.0, 0.9999998)):
+        chk(f"tanh: selected (pair) G+ at A = {A_}", float(tl_.loc[A_, "selected_G_lo"]), g_, 0.00005 if A_ < 20 else 0.000005)
+    chk("tanh: selected member is the symmetric pair at every A",
+        float((tl_.selected_type == "pair").all() and (tl_.selected_t == 0.5).all()), 1.0, 0)
+    tm_ = pd.read_csv(R / "scale_limits_tanh_maximisers.csv")
+    chk("tanh: single units unplaced at every A", float((tm_[tm_.type == "single_unit"].G_hi < 0).all()), 1.0, 0)
+    t40_ = tm_[tm_.A == 40.0]
+    chk("tanh: A = 40 near-maximisers off the boundary", float((t40_.max_abs_alpha_over_A < 0.999).sum()), 9.0, 0)
+    chk("tanh: A = 40 tie-set size", float(len(t40_)), 1107.0, 0)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12
