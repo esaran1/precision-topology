@@ -508,14 +508,27 @@ def _finite_job(a):
              "all_converged": all(r_["converged"] for r_ in rows), "evaluations": len(rows)}, rows)
 
 
-def finite(workers=2):
+PARTS = RESULTS / "first_order_finite_parts"
+
+
+def finite(workers=1, subset=None):
+    """The registered procedure, one a at a time.  Each a's result is written to disk as soon as it finishes
+    (first_order_finite_parts/) and a restart skips the finished ones; the combined file is written once all four exist.
+    (Crash resilience only: the per-a computation is unchanged.)"""
     from multiprocessing import Pool
+    PARTS.mkdir(exist_ok=True)
+    todo = [a for a in (subset or A_TEST) if not (PARTS / f"a{a:.2f}.csv").exists()]
     with Pool(workers) as pool:
-        out = pool.map(_finite_job, A_TEST, chunksize=1)
-    t = pd.DataFrame([r_ for r_, _ in out])
-    t.to_csv(RESULTS / "first_order_finite.csv", index=False)
-    pd.DataFrame([e for _, ev in out for e in ev]).to_csv(RESULTS / "first_order_finite_evaluations.csv", index=False)
-    print(t.to_string(index=False))
+        for r_, ev in pool.imap_unordered(_finite_job, todo, chunksize=1):
+            pd.DataFrame([r_]).to_csv(PARTS / f"a{r_['a']:.2f}.csv", index=False)
+            pd.DataFrame(ev).to_csv(PARTS / f"a{r_['a']:.2f}_evaluations.csv", index=False)
+            print("finished a =", r_["a"], flush=True)
+    if all((PARTS / f"a{a:.2f}.csv").exists() for a in A_TEST):
+        t = pd.concat([pd.read_csv(PARTS / f"a{a:.2f}.csv", float_precision="round_trip") for a in A_TEST])
+        t.to_csv(RESULTS / "first_order_finite.csv", index=False)
+        pd.concat([pd.read_csv(PARTS / f"a{a:.2f}_evaluations.csv", float_precision="round_trip") for a in A_TEST]).to_csv(
+            RESULTS / "first_order_finite_evaluations.csv", index=False)
+        print(t.to_string(index=False))
 
 
 def _feasible_c1(eps, lo, hi, base_lo, base_hi, c3=C3_MAX, grid=11):
@@ -751,7 +764,8 @@ if __name__ == "__main__":
     import sys
     cmd = sys.argv[1] if len(sys.argv) > 1 else "c1"
     if cmd == "finite":
-        finite(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
+        finite(int(sys.argv[2]) if len(sys.argv) > 2 else 1,
+               [float(v) for v in sys.argv[3].split(",")] if len(sys.argv) > 3 else None)
     elif cmd == "score":
         score()
     elif cmd == "corner":

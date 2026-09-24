@@ -15,3 +15,7 @@ dist/
 
 # deterministic lag-test-2 checkpoints (regenerate: python -m src.lag_test2 checkpoints)
 results/lag_test2_states/
+results/prospective_own_parts/
+results/first_order_finite_parts/
+results/lag_test2_parts/
+.sched/

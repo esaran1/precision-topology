@@ -186,18 +186,41 @@ def _own_job(args):
             "global_branch": gbr, "w2_other": w2_other}
 
 
+PO_PARTS = RESULTS / "prospective_own_parts"
+
+
+def _append(path, row):
+    pd.DataFrame([row]).to_csv(path, mode="a", header=not path.exists(), index=False)
+
+
 def predict(workers=WORKERS):
+    """Every setting and every run's prediction is appended to prospective_own_parts/ as it finishes, and a restart
+    skips finished ones (crash resilience only).  The predictions file is assembled, sorted, once every run is done,
+    and only then hashed."""
+    PO_PARTS.mkdir(exist_ok=True)
     wins = windows()
+    sf = PO_PARTS / "settings.csv"
+    done = set() if not sf.exists() else set(zip(*[pd.read_csv(sf)[c] for c in ("window", "a")]))
+    todo = [(w, a) for w in wins for a in A_VALUES if (w.tag, a) not in {(d0, round(d1, 2)) for d0, d1 in done}]
     with Pool(workers) as p:
-        st = pd.DataFrame(p.map(_setting_job, [(w, a) for w in wins for a in A_VALUES], chunksize=1))
+        for r in p.imap_unordered(_setting_job, todo, chunksize=1):
+            _append(sf, r)
+    st = pd.read_csv(sf, float_precision="round_trip").sort_values(["window", "a"]).reset_index(drop=True)
     st["w2_pop"] = 0.5 * (st.w2_glob_lo + st.w2_glob_hi)
     st["U"] = st.w2_pop * st.Ghat_lo / 2
     st["C"] = st.U * st.a.round(2).map(LAMBDA)
     st.to_csv(RESULTS / "prospective_own_settings.csv", index=False)
     start = {(r.window, round(r.a, 2)): r.w2_pop for r in st.itertuples()}
-    jobs = [(w, a, SEED0 + i, start[(w.tag, a)]) for w in wins for a in A_VALUES for i in range(N_SEEDS)]
+    of = PO_PARTS / "own.csv"
+    done = set() if not of.exists() else {(w_, round(a_, 2), int(s_)) for w_, a_, s_ in
+                                          zip(*[pd.read_csv(of)[c] for c in ("window", "a", "seed")])}
+    jobs = [(w, a, SEED0 + i, start[(w.tag, a)]) for w in wins for a in A_VALUES for i in range(N_SEEDS)
+            if (w.tag, a, SEED0 + i) not in done]
     with Pool(workers) as p:
-        own = pd.DataFrame(p.map(_own_job, jobs, chunksize=1))
+        for r in p.imap_unordered(_own_job, jobs, chunksize=1):
+            _append(of, r)
+    own = pd.read_csv(of, float_precision="round_trip").sort_values(["window", "a", "seed"]).reset_index(drop=True)
+    assert len(own) == len(wins) * len(A_VALUES) * N_SEEDS and not own.duplicated(["window", "a", "seed"]).any()
     own = own.merge(st[["window", "a", "Ghat_lo", "U", "C"]], on=["window", "a"])
     own["U_own"] = own.w2_own * own.Ghat_lo / 2
     own["C_own"] = own.U_own * own.a.round(2).map(RHO_RES)

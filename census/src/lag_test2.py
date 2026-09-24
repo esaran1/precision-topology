@@ -189,11 +189,25 @@ def _own():
     return o.set_index(["a", "seed"]).R_own
 
 
+PARTS = RESULTS / "lag_test2_parts"
+
+
+def _append(path, row):
+    pd.DataFrame([row]).to_csv(path, mode="a", header=not path.exists(), index=False)
+
+
 def checkpoints(workers=3):
+    """Rows are appended as each run finishes; a restart skips finished runs (crash resilience only)."""
+    PARTS.mkdir(exist_ok=True)
+    pf = PARTS / "checkpoints.csv"
+    done = set() if not pf.exists() else {(round(a, 2), int(s)) for a, s in zip(*[pd.read_csv(pf)[c] for c in ("a", "seed")])}
     own = _own()
-    jobs = [(a, s, float(own.loc[(a, s)])) for a in A_VALUES for s in range(SEED0, SEED0 + N_SEEDS)]
+    jobs = [(a, s, float(own.loc[(a, s)])) for a in A_VALUES for s in range(SEED0, SEED0 + N_SEEDS) if (a, s) not in done]
     with Pool(workers) as p:
-        d = pd.DataFrame(p.map(checkpoint_one, jobs, chunksize=1))
+        for r in p.imap_unordered(checkpoint_one, jobs, chunksize=1):
+            _append(pf, r)
+    d = pd.read_csv(pf).sort_values(["a", "seed"]).reset_index(drop=True)
+    assert len(d) == len(A_VALUES) * N_SEEDS
     d.to_csv(RESULTS / "lag_test2_checkpoints.csv", index=False)
     print(d.status_primary.value_counts().to_string()); print(d.status_tstar.value_counts().to_string())
     print("runs using the commitment level instead of 0.7 R_own:", int(d.used_commit_level.fillna(False).sum()))
@@ -201,10 +215,16 @@ def checkpoints(workers=3):
 
 def cont(workers=3):
     ck = pd.read_csv(RESULTS / "lag_test2_checkpoints.csv")
+    PARTS.mkdir(exist_ok=True)
+    pf = PARTS / "runs.csv"
+    done = set() if not pf.exists() else {(r_, round(a, 2), int(sd), f_) for r_, a, sd, f_ in
+                                          zip(*[pd.read_csv(pf)[c] for c in ("rule", "a", "seed", "factor")])}
     jobs = [(r.a, int(r.seed), fct, rule) for rule in RULES for fct in FACTORS
-            for r in ck[ck[f"status_{rule}"] == "ok"].itertuples()]
+            for r in ck[ck[f"status_{rule}"] == "ok"].itertuples() if (rule, round(r.a, 2), int(r.seed), fct) not in done]
     with Pool(workers) as p:
-        d = pd.DataFrame(p.map(continue_one, jobs, chunksize=1))
+        for r in p.imap_unordered(continue_one, jobs, chunksize=1):
+            _append(pf, r)
+    d = pd.read_csv(pf, float_precision="round_trip").sort_values(["rule", "a", "factor", "seed"]).reset_index(drop=True)
     d.to_csv(RESULTS / "lag_test2_runs.csv", index=False)
     print("phi = 1 continuations reproduced exactly:", check_continuation())
 
