@@ -288,8 +288,13 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     | on the mirror branch | 618 (23%) | 0.558 | 273 |
 
     - All 41 replays placed below their own threshold at 0.9× and 0.95× are on the mirror.
-    - **Say**: "where a run sits on the globally preferred branch of its own loss, its own threshold
-      predicts its fixed-scale outcome in 99% of replays; the misses are runs held in the mirror basin".
+    - **The 99.3% is conditional on the branch where the replay ends, which is known only after the
+      run.** It explains the disagreements; it does not predict them.
+    - **Say**: "among replays that end on the globally preferred branch of their own loss, the own
+      threshold matches the outcome in 99% of cases; the disagreements are runs that end in the mirror
+      basin".
+    - Whether a branch known before the run (the starting branch, or the one the initialisation selects)
+      predicts outcomes is the separate, pending question.
     - Whether the mirror branch's own threshold then predicts those runs is pending (branch thresholds
       computing).
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
