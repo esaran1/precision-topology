@@ -139,3 +139,17 @@ validation passed, the Var-selected member is placed at every A, and T2 is not i
 - **Analytic status, independent of this computation.** The bound Δμ < 1 = sup Δμ (above) proves non-attainment.
   The limit analysis gives the Var-selected configurations G₊ → 1. The computation confirms both numerically at
   every rung but did not meet its own registered boundary criterion at A = 40.
+
+## Author's decision (2026-09-24): recorded as "neither", no re-registration
+
+- **Recorded outcome: "neither".**
+- **Reason.** The boundary criterion as written (every member of the 1e−9 tie set within 0.999·A of the box edge)
+  fails at A = 40 because of the tie tolerance: there 1 − max = 4.1e−9, the same order as the tolerance. Every
+  other registered expectation held:
+  - validation passed at every A;
+  - the maxima are < 1 and rising;
+  - the first-order tie is present;
+  - the Var-selected symmetric pair is placed at every A;
+  - the single units are unplaced.
+- **Non-attainment is proved analytically** (Δμ < 1 = sup Δμ, above) and does not rest on this computation.
+- **No re-registration.** The post hoc reading above stays labelled post hoc and unscored.
