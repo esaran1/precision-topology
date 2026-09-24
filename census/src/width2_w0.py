@@ -196,7 +196,107 @@ def summary():
     print(out.to_string(index=False))
 
 
+# ------------------------------------------------------------------------------------------ direct small-scale check
+SMALL_R2 = (0.001, 0.003, 0.01, 0.02)
+
+
+def _classify_caps(cands, cap):
+    """Cap-rule amendment: a cap hit counts only if still improving (loss fell > 1e−12 over the last 10% of iterations);
+    otherwise it is a stall, located at the kink t = 0, the clip |t| = 1, or 'other'."""
+    improving, stalls = [], []
+    for c in cands[:-1]:
+        if c["iters"] < cap:
+            continue
+        if np.isfinite(c.get("loss_at_90pct", np.nan)) and c["loss_at_90pct"] - c["loss"] > 1e-12:
+            improving.append(c)
+        else:
+            t = abs(float(c["p"][4]))
+            c["stall_at"] = "kink t=0" if t < 1e-6 else ("clip |t|=1" if t >= 1 - 1e-9 else "other")
+            stalls.append(c)
+    return improving, stalls
+
+
+def _continue(c, s, x, y, act, extra):
+    P, L, G, it = wc.bfgs_batch(lambda Q, rows: wc.loss_grad_batch(Q, np.array([float(c["sigma"])])[rows * 0], s, x, y, act),
+                                np.array([c["p"]]), gtol=1e-8, maxit=extra)
+    c["p"] = P[0]; c["loss"] = float(L[0]); c["gnorm"] = float(np.abs(G[0]).max()); c["iters"] += int(it[0])
+    c["loss_at_90pct"] = float(wc.bfgs_batch.last_f90[0])
+    c["flags"] = wc.degenerate(c["p"], c["gnorm"], 1e-8)
+
+
+def _local_from_stall(c, s, x, y, act):
+    """Local CMA-ES in the alternative parametrisation (v unconstrained, normalised), σ₀ = 0.05, from the stall."""
+    from .cmaes import cma_es
+    t = float(np.clip(c["p"][4], -1, 1)); v = np.array([t, c["sigma"] * (1 - abs(t))])
+    q0 = np.r_[c["p"][:4], v]
+
+    def f(q):
+        vv = q[4:6]; n1 = abs(vv[0]) + abs(vv[1])
+        if n1 < 1e-12:
+            return 1e9
+        vv = vv / n1
+        z0 = s * (vv[0] * act.u(q[0] * x + q[1]) + vv[1] * act.u(q[2] * x + q[3]))
+        b = wc.profile_b(z0, y); z = z0 + b
+        return float((wc._softplus(z) - y * z).mean())
+    return cma_es(f, q0, 0.05, max_generations=100, seed=int(c["k"]) + 1).best_f
+
+
+def _is_pair(p, sigma):
+    t = float(np.clip(p[4], -1, 1)); v = np.array([t, sigma * (1 - abs(t))])
+    c = v[0] * p[0] + v[1] * p[2]
+    return (abs(abs(t) - 0.5) < 1e-3 and abs(abs(p[0]) - abs(p[2])) < 1e-3 * max(abs(p[0]), 1e-9)
+            and abs(c) < 1e-3 * (abs(v[0] * p[0]) + abs(v[1] * p[2]) + 1e-12)), float(c)
+
+
+def smallscale(act_name):
+    act = ACTS[act_name]
+    gh = float(_read(f"gamma_{act_name}.csv").query("search == 'nm'").gamma_lo.iloc[0])
+    x, y = wc.population()
+    done = _read(f"smallscale_{act_name}.csv")
+    have = set() if done.empty else set(np.round(done.R2, 10))
+    for R2 in SMALL_R2:
+        if round(R2, 10) in have:
+            continue
+        s = 2 * R2 / gh
+        r, cands = wc.search_batch(s, x, y, act, restarts=4000, seed=7000, maxit=CAPS[0])
+        cap = CAPS[0]
+        for nxt in CAPS[1:]:                                   # cap raising for still-improving restarts only
+            improving, _ = _classify_caps(cands, cap)
+            if not improving:
+                break
+            for c in improving:
+                _continue(c, s, x, y, act, nxt - cap)
+            cap = nxt
+        improving, stalls = _classify_caps(cands, cap)
+        r = wc.retain(cands)
+        aud = wc.audit(cands, r)
+        stall_mins = [_local_from_stall(c, s, x, y, act) for c in stalls]
+        stall_ok = all(m >= r["loss"] - 1e-9 for m in stall_mins)
+        ladder = wc.retain(cands[:500] + [cands[-1]])["loss"]
+        strict, _ = wc.search_batch(s, x, y, act, restarts=RESTARTS, seed=7100, gtol=1e-10, maxit=CAPS[0] * 10)
+        ind = wc.independent_search(s, x, y, act)
+        gp = wc.directional_gplus(r["p"], r["sigma"], act) if r["p"] is not None else (np.nan, np.nan)
+        pair, c_lin = _is_pair(r["p"], r["sigma"]) if r["p"] is not None else (False, np.nan)
+        locs = pd.Series([c["stall_at"] for c in stalls]).value_counts().to_dict() if stalls else {}
+        row = {"act": act_name, "R2": R2, "s": s, "retained_loss": r["loss"], "Gplus_lo": gp[0], "Gplus_hi": gp[1],
+               "placed": bool(gp[0] > 0), "is_cancelling_pair": pair, "linear_c": c_lin,
+               **({f"p{i}": float(v) for i, v in enumerate(r["p"])} if r["p"] is not None else {}), "sigma": r["sigma"],
+               "final_cap": cap, "still_improving_at_final_cap": len(improving), "stalls": len(stalls),
+               "stall_locations": json.dumps(locs), "stall_local_min": min(stall_mins) if stall_mins else np.nan,
+               "stall_local_ok": stall_ok, "audit_ok": aud["ok"], "ladder_500": ladder,
+               "ladder_ok": abs(ladder - r["loss"]) <= 1e-9, "stricter_loss": strict["loss"],
+               "stricter_ok": wc.stricter_check(r["loss"], strict["loss"]), "independent_loss": ind["loss"],
+               "independent_ok": wc.stricter_check(r["loss"], ind["loss"])}
+        _append(f"smallscale_{act_name}.csv", row)
+        print(json.dumps({k: row[k] for k in ("act", "R2", "placed", "is_cancelling_pair", "Gplus_lo", "audit_ok",
+                                              "stall_local_ok", "ladder_ok", "stricter_ok", "independent_ok", "stalls",
+                                              "stall_locations", "still_improving_at_final_cap")}, default=str), flush=True)
+        if not row["placed"]:
+            print(f"UNPLACED at R2 = {R2}: the verdict would be wrong -- report immediately", flush=True)
+    return _read(f"smallscale_{act_name}.csv")
+
+
 if __name__ == "__main__":
     cmd, act = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else None)
     {"gamma": lambda: gamma(act), "scan": lambda: scan(act), "refine": lambda: refine(act),
-     "validate": lambda: validate(act), "summary": summary}[cmd]()
+     "validate": lambda: validate(act), "summary": summary, "smallscale": lambda: smallscale(act)}[cmd]()

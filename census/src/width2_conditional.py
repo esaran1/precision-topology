@@ -319,6 +319,8 @@ def bfgs_batch(fg, X0, gtol=1e-8, maxit=2000):
     X = np.array(X0, float); m, n = X.shape
     allrows = np.arange(m)
     f, g = fg(X, allrows)
+    f90 = np.full(m, np.nan)                                   # loss at 90% of maxit (cap-rule amendment: stall test)
+    k90 = int(0.9 * maxit)
     H = np.repeat(np.eye(n)[None] * 0.1, m, axis=0)
     active = np.abs(g).max(axis=1) > gtol
     it = np.zeros(m, int)
@@ -354,8 +356,11 @@ def bfgs_batch(fg, X0, gtol=1e-8, maxit=2000):
             A = I[None] - rr * np.einsum("ki,kj->kij", S, Yv)
             H[ai] = np.einsum("kij,kjl,kml->kim", A, H[ai], A) + rr * np.einsum("ki,kj->kij", S, S)
         it[idx] += 1
+        at90 = idx[it[idx] == k90]
+        f90[at90] = f[at90]
         active[idx[~acc]] = False                               # line search failed: stuck, as the scalar version
         active[acc_idx] = np.abs(g[acc_idx]).max(axis=1) > gtol
+    bfgs_batch.last_f90 = f90
     return X, f, g, it
 
 
@@ -370,11 +375,12 @@ def search_batch(s, x, y, act, restarts=2000, seed=0, gtol=1e-8, maxit=2000, box
         P0 = np.array([c[0] for c in chunk]); sg = np.array([c[1] for c in chunk], float)
         P, L, G, it = bfgs_batch(lambda Q, rows, sg=sg: loss_grad_batch(Q, sg[rows], s, x, y, act), P0,
                                  gtol=gtol, maxit=maxit)
+        f90 = bfgs_batch.last_f90
         P[:, 4] = np.clip(P[:, 4], -1, 1)
         for k in range(len(chunk)):
             gn = float(np.abs(G[k]).max())
             cands.append({"k": i + k, "p": P[k], "sigma": int(sg[k]), "loss": float(L[k]), "gnorm": gn,
-                          "iters": int(it[k]), "flags": degenerate(P[k], gn, gtol, box)})
+                          "iters": int(it[k]), "loss_at_90pct": float(f90[k]), "flags": degenerate(P[k], gn, gtol, box)})
     cands.append({"k": -1, "p": None, "sigma": 0, "loss": constant_predictor_loss(y), "gnorm": 0.0, "iters": 0,
                   "flags": ["constant_predictor"]})
     return retain(cands), cands
