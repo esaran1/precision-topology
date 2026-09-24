@@ -334,6 +334,7 @@ def _census_job(args):
         q[1] %= 2 * math.pi
         which = next((sg for sg in (+1, -1) if dist(q, (br[sg][1], br[sg][2])) < 0.02), 0)
         row = {**e, "grad_norm_end": float(np.linalg.norm(g0)), "hess_min_end": float(hess(pe)[0]),
+               "G_end": float(gap([pe[0]], [pe[1]], 1.30)[0]), "dist_end_to_loc_min": dist(pe, q),
                "loc_min_L": qL, "loc_min_w1": float(q[0]), "loc_min_b1": float(q[1]),
                "loc_min_G": float(gap([q[0]], [q[1]], 1.30)[0]), "loc_min_hess_min": float(hess(q)[0]),
                "basin": {1: "mirror +", -1: "mirror -", 0: "other"}[which], "L_minus_global": qL - L_glob,
@@ -359,13 +360,19 @@ def _census_job(args):
     return out
 
 
-def basin_census(workers=2):
-    """Post hoc, item 2: every disagreeing replay's 64k endpoint, classified as mirror + / mirror - / other basin on its
-    own objective at the held scale (canonical orientation, b1 mod 2π)."""
+def basin_census(workers=2, subset="all"):
+    """Post hoc: disagreeing replays' 64k endpoints, classified as mirror + / mirror - / other basin on their own
+    objective at the held scale (canonical orientation, b1 mod 2π).  subset="preferred": only the disagreements whose
+    endpoint lies on the globally preferred branch at the held scale; each is further classified as a third basin,
+    slow relaxation (endpoint not yet at its local minimum) or at the branch minimiser."""
     from .own_threshold import _pop
     w2p = _pop(1.30)[1]
     p = _s1_rows()
     d = p[p.own_rule != p.placed].copy()
+    if subset == "preferred":
+        gb = pd.read_csv(RESULTS / "mirror_global_branch.csv", float_precision="round_trip")
+        d = d.merge(gb[["seed", "level", "global_branch"]], on=["seed", "level"])
+        d = d[d.branch_end == d.global_branch].copy()
     d["w1c"] = d.w1_64000 * d.w2_sign
     d["b1c"] = (d.b1_64000 * d.w2_sign) % (2 * math.pi)
     jobs = []
@@ -376,7 +383,12 @@ def basin_census(workers=2):
         rows = [r for part in pool.map(_census_job, jobs, chunksize=1) for r in part]
     c = pd.DataFrame(rows)
     c["switch_over_pop"] = c.switch_s / w2p
-    c.to_csv(RESULTS / "mirror_basin_census.csv", index=False)
+    c["kind"] = np.where(c.basin == "other", "third basin",
+                         np.where((c.grad_norm_end > 1e-4) | (c.dist_end_to_loc_min > 1e-3), "slow relaxation",
+                                  "at the branch minimiser"))
+    c.to_csv(RESULTS / ("mirror_basin_census.csv" if subset == "all" else "mirror_basin_census_preferred.csv"), index=False)
+    print(c[["seed", "level", "placed", "dist", "G_end", "loc_min_G", "grad_norm_end", "dist_end_to_loc_min",
+             "loc_min_hess_min", "basin", "kind"]].to_string(index=False))
     print(c.basin.value_counts().to_string())
     oth = c[c.basin == "other"]
     if len(oth):
@@ -387,4 +399,5 @@ if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else int(os.environ.get("MB_WORKERS", "3"))
     {"thresholds": lambda: thresholds(w), "analyse": analyse, "global_branch": lambda: global_branch_levels(w),
-     "breakdown": q2_s1_breakdown, "gap": mirror_gap, "census": lambda: basin_census(w)}[cmd]()
+     "breakdown": q2_s1_breakdown, "gap": mirror_gap, "census": lambda: basin_census(w),
+     "census_preferred": lambda: basin_census(w, "preferred")}[cmd]()
