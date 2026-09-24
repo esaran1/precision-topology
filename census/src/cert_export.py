@@ -62,6 +62,38 @@ def finite(a, s, name, x=None, y=None):
     return meta
 
 
+def ghat(a, name):
+    """One Ĝ(a) enclosure certificate: the global branch and bound (ghat_bnb.certify, recorded; its result asserted
+    equal to results/ghat_bnb.csv) and the witness of the paper's Ĝ_cert (kappa_certify.certify_exact's attained
+    point; its value asserted equal to results/ghat_certified_all.csv)."""
+    import pandas as pd
+    from .ghat_bnb import certify
+    from .kappa_certify import certify_exact
+    rec = {}
+    r = certify(a, record=rec)
+    ref = pd.read_csv(CERTS.parent / "ghat_bnb.csv", float_precision="round_trip")
+    ref = ref[ref.a.round(2) == round(a, 2)].iloc[0]
+    assert r["Ghat_lo"] == ref.Ghat_lo and r["Ghat_hi"] == ref.Ghat_hi, "search result differs from ghat_bnb.csv"
+    z = certify_exact(a)
+    gc = pd.read_csv(CERTS.parent / "ghat_certified_all.csv", float_precision="round_trip")
+    gc = gc[gc.a.round(2) == round(a, 2)].iloc[0]
+    assert z["Ghat_lo"] == gc.Ghat_certified, "zoom result differs from ghat_certified_all.csv"
+    lv = np.concatenate([np.full(len(ix), rnd, dtype=np.int8) for rnd, ix, _ in rec["leaves"]])
+    ij = np.concatenate([ix for _, ix, _ in rec["leaves"]])
+    reason = np.concatenate([np.full(len(ix), rs, dtype=np.int8) for _, ix, rs in rec["leaves"]])
+    arrays = {"level": lv, "iw": ij[:, 0].astype(np.int64), "ib": ij[:, 1].astype(np.int64), "reason": reason}
+    meta = {"kind": "ghat_enclosure", "name": name, "a": a, "nw": rec["nw"], "nb": rec["nb"],
+            "hw0": rec["hw0"], "hb0": rec["hb0"], "domain": "w1 in [0, a], b1 in [0, 2pi] (contains (0, a/1.4] x [0, 2pi))",
+            "gap": "G = max(min_O phi - max_I phi, min_I phi - max_O phi), phi = f_a(w1 x + b1), I = [-0.8, 0.8], O = +-[1.2, 2.0]",
+            "step": "(1 + a)(2.8 hw + 2 hb)", "claim_hi": r["Ghat_hi"], "bnb_lo": r["Ghat_lo"],
+            "bnb_arg": [r["w1"], r["b1"]], "ghat_cert": float(gc.Ghat_certified), "ghat_cert_witness": [z["w1"], z["b1"]],
+            "regenerate": f"python -m src.cert_export ghat {a} {name}"}
+    CERTS.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(CERTS / f"{name}.npz", **arrays)
+    (CERTS / f"{name}.json").write_text(json.dumps(meta, indent=1, default=float))
+    return meta
+
+
 def manifest():
     """results/certificates_manifest.csv: every exported file's SHA-256 and size, and the command that regenerates
     it bit-identically.  The data files themselves are not committed."""
@@ -84,5 +116,7 @@ def manifest():
 if __name__ == "__main__":
     if sys.argv[1] == "manifest":
         print(manifest())
+    elif sys.argv[1] == "ghat":
+        print(json.dumps(ghat(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "finite":
         print(json.dumps(finite(float(sys.argv[2]), float(sys.argv[3]), sys.argv[4]), indent=1, default=float)[:1500])

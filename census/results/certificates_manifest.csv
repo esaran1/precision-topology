@@ -23,3 +23,25 @@ results/certificates/finite_a1.60_glob_hi.json,48ebfaf15e6854c374dec11f673cab499
 results/certificates/finite_a1.60_glob_hi.npz,e0aa120ef01ce6b934d0700308c21735b8860a8a7bb074fecd307f4f3563df7f,699310,python -m src.cert_export finite 1.6 2.0125 finite_a1.60_glob_hi
 results/certificates/finite_a1.60_glob_lo.json,230f23f106944034df2f9778624ff1654909aff41ac8de4a88c8893031d61963,1089,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
 results/certificates/finite_a1.60_glob_lo.npz,1d42ab3da52f25a9cef2e4f78e2ad28dcb0ab3757e51354305612b388efb2eb9,729650,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
+results/certificates/ghat_a1.10.json,a57335bb0d1eb2a2eb2effcdfe0a436a83a899c7b4ce7171f144541dd469ed27,660,python -m src.cert_export ghat 1.1 ghat_a1.10
+results/certificates/ghat_a1.10.npz,891d10ec278b2e8bfd801c609956e44544d61ae3a45366b9325df7ccf8ed587d,1146055,python -m src.cert_export ghat 1.1 ghat_a1.10
+results/certificates/ghat_a1.15.json,307b957773ea83eac9f8de0620e39b10cc27ffc9fe291b34f4be3c858fadbd02,680,python -m src.cert_export ghat 1.15 ghat_a1.15
+results/certificates/ghat_a1.15.npz,6882c16e1d60b25a19cc8cddcd75b370d16802c8ddf8e761e69cbe537ae35168,544538,python -m src.cert_export ghat 1.15 ghat_a1.15
+results/certificates/ghat_a1.25.json,59503464761cff667ad6b88efb2b49055db86cd4246bd68da65a6b491a366e93,661,python -m src.cert_export ghat 1.25 ghat_a1.25
+results/certificates/ghat_a1.25.npz,05b3504fdb3aa6097f430679d63dee0cd640232a25beb6de2ebf4d0a13a29138,236734,python -m src.cert_export ghat 1.25 ghat_a1.25
+results/certificates/ghat_a1.30.json,1df725f96f50251e90da1a755ff8766188957ec6a6169f2d1e8e28b02f972cdd,660,python -m src.cert_export ghat 1.3 ghat_a1.30
+results/certificates/ghat_a1.30.npz,a307fddcbfb5bdf8dda60ad72eccfd709b464b43b8be5b973887c51f05ad8f02,197377,python -m src.cert_export ghat 1.3 ghat_a1.30
+results/certificates/ghat_a1.35.json,9957263ba4cb6fd2fa89f167248329dc37245595d69b9272b5b91d85a09a853d,663,python -m src.cert_export ghat 1.35 ghat_a1.35
+results/certificates/ghat_a1.35.npz,5d5d97bdeb2b6c7b1ef12fab043664f22bf80731372944717b0517dd2cd55fc3,171441,python -m src.cert_export ghat 1.35 ghat_a1.35
+results/certificates/ghat_a1.40.json,14d64c962849d2ba6d8e018041fb13500ff903623cb7aa5dce6e2d1cd241ca48,675,python -m src.cert_export ghat 1.4 ghat_a1.40
+results/certificates/ghat_a1.40.npz,f9da3b5e75b969aeac4d63b116522df0c2907e80d777a729a2d38a8ff6131ca9,151232,python -m src.cert_export ghat 1.4 ghat_a1.40
+results/certificates/ghat_a1.45.json,a9e25ee41eb33697f6b390fb016c066519cd7a8552a1d11025114033f23d7677,675,python -m src.cert_export ghat 1.45 ghat_a1.45
+results/certificates/ghat_a1.45.npz,4eba4d278f60191d4d04536b55d62dc1d032f5a74f1cf0dae72b40803f40062a,103029,python -m src.cert_export ghat 1.45 ghat_a1.45
+results/certificates/ghat_a1.50.json,9abfb873b7a3f9f375b6ed35f7a8131dd1caae52cbe609cd534416968a612f6e,659,python -m src.cert_export ghat 1.5 ghat_a1.50
+results/certificates/ghat_a1.50.npz,2792b0ba92078d89718ab0b25a778b22eff0ea260568746571d4bd35ac13ea62,95088,python -m src.cert_export ghat 1.5 ghat_a1.50
+results/certificates/ghat_a1.60.json,d7b5584b09ceb0930828a5285852df114a7446ccf39b8a32c3cfa0da9e4b68b0,658,python -m src.cert_export ghat 1.6 ghat_a1.60
+results/certificates/ghat_a1.60.npz,a05fd3f0cbf8ef25393766612117f0e20139c4c0d313eaaa984d11aa49e400d6,81788,python -m src.cert_export ghat 1.6 ghat_a1.60
+results/certificates/ghat_a2.00.json,a90fa04400c197a5e5b757a5e848019ec34d36b882d1d0fb5da477eedbb7c448,657,python -m src.cert_export ghat 2.0 ghat_a2.00
+results/certificates/ghat_a2.00.npz,e34f117c5d53640bec5e43b5a2fda6544737ceb28182637bea72df3805ecd11a,42328,python -m src.cert_export ghat 2.0 ghat_a2.00
+results/certificates/ghat_a3.00.json,cb0bcdffbe937c5294c3809e5cc4d61a2837ae49a0134d9dd6cf8ce127b24417,658,python -m src.cert_export ghat 3.0 ghat_a3.00
+results/certificates/ghat_a3.00.npz,0e38aaa3a3785092594591ed83d032c1006af712d546ee83c5576196c86fb073,19939,python -m src.cert_export ghat 3.0 ghat_a3.00

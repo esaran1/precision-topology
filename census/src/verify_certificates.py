@@ -107,6 +107,23 @@ class FA:
         return mn, mx
 
 
+def range_inner(fa, tlo, thi):
+    """(an upper bound of min, a lower bound of max) of f_a over the exact interval [tlo, thi] (tlo, thi arb balls
+    enclosing the exact endpoints): only values ATTAINED in the interval are used -- the endpoints, and the critical
+    points whose ball lies strictly inside -- so min over them >= the true min and max over them <= the true max."""
+    cand = [fa.f(tlo), fa.f(thi)]
+    if fa.c is not None:
+        for sgn in (1, -1):
+            cc = sgn * fa.c
+            k0 = int(math.floor((float(tlo.mid()) - float(cc.mid())) / (2 * math.pi))) - 1
+            k1 = int(math.ceil((float(thi.mid()) - float(cc.mid())) / (2 * math.pi))) + 1
+            for k in range(k0, k1 + 1):
+                tk = cc + k * fa.twopi
+                if lo_(tk) > hi_(tlo) and hi_(tk) < lo_(thi):
+                    cand.append(fa.f(tk))
+    return min(hi_(c) for c in cand), max(lo_(c) for c in cand)
+
+
 def t_interval(wl, wh, bl, bh, xl, xh):
     """Range of w·x + b over w ∈ [wl, wh], x ∈ [xl, xh], b ∈ [bl, bh] (arb endpoints, exact products)."""
     prods = [wl * xl, wl * xh, wh * xl, wh * xh]
@@ -377,8 +394,110 @@ def check_finite(name, verbose=True, workers=WORKERS):
     return res
 
 
+# ------------------------------------------------------------------------------------------ Ĝ enclosure certificates
+def _oriented_gap_upper(fa, w, b, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+    """Rigorous upper bound of G(w, b) = max(min_O φ − max_I φ, min_I φ − max_O φ) at the exact point enclosed by the
+    balls w, b (attained values only; see range_inner)."""
+    ti = (w * arb(inner[0]) + b, w * arb(inner[1]) + b)
+    o1 = (w * arb(outer[0]) + b, w * arb(outer[1]) + b)
+    o2 = (w * arb(-outer[1]) + b, w * arb(-outer[0]) + b)
+    imn_u, imx_l = range_inner(fa, *ti)
+    a_u, a_l = range_inner(fa, *o1)
+    b_u, b_l = range_inner(fa, *o2)
+    # every operand is an exact point (a ball endpoint), so min/max are exact; each difference is a ball whose
+    # UPPER endpoint is taken, and the maximum of two exact points is exact
+    return max(hi_(min(a_u, b_u) - imx_l), hi_(imn_u - max(a_l, b_l)))
+
+
+def _oriented_gap_lower(fa, w, b, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+    """Rigorous lower bound of G at the exact point (every possibly-contained critical point: FA.range)."""
+    w, b = arb(w), arb(b)
+    imn, imx = fa.range(w * arb(inner[0]) + b, w * arb(inner[1]) + b)
+    amn, amx = fa.range(w * arb(outer[0]) + b, w * arb(outer[1]) + b)
+    bmn, bmx = fa.range(w * arb(-outer[1]) + b, w * arb(-outer[0]) + b)
+    return max(lo_(min(amn, bmn) - imx), lo_(imn - max(amx, bmx)))           # exact points throughout (as above)
+
+
+_G = {}
+
+
+def _ghat_init(a, nw, nb, hi):
+    ctx.prec = PREC
+    fa = FA(a)
+    A = arb(a)
+    _G.update(fa=fa, a=A, cw0=A / nw, cb0=2 * arb.pi() / nb, hi=arb(hi))
+
+
+def _ghat_chunk(args):
+    lv, iw, ib = args
+    fa, A, cw0, cb0, hi = _G["fa"], _G["a"], _G["cw0"], _G["cb0"], _G["hi"]
+    bad, worst = [], None
+    for l, i, j in zip(lv.tolist(), iw.tolist(), ib.tolist()):
+        dw, db = cw0 / 2 ** l, cb0 / 2 ** l                      # cell widths (exact reals, as balls)
+        wc, bc = (i + arb(1) / 2) * dw, (j + arb(1) / 2) * db
+        ub = hi_(_oriented_gap_upper(fa, wc, bc) + (1 + A) * (arb("2.8") * dw / 2 + 2 * db / 2))
+        if not (ub <= hi):
+            bad.append((l, i, j))
+        worst = ub if worst is None else max(worst, ub)                  # exact points
+    worst = None if worst is None else float(worst.mid())
+    return bad, worst
+
+
+def check_ghat(name, verbose=True, workers=WORKERS):
+    """Ĝ(a) enclosure.  Checks: (1) files match the committed hashes; (2) the leaves tile [0, a] x [0, 2π] exactly;
+    (3) on every leaf, sup G <= claim_hi: a rigorous upper bound of G at the leaf's exact centre plus the Lipschitz
+    step (1 + a)(2.8 hw + 2 hb) (|f_a′| <= 1 + a; derivation in src/ghat_bnb.py), all in Arb; (4) the search's
+    attained lower end: G(bnb_arg) >= bnb_lo; (5) the paper's Ĝ_cert is attained: G(witness) >= Ĝ_cert, rigorously;
+    (6) Ĝ_cert <= claim_hi.  The reduction of the domain to w₁ ∈ (0, a/1.4], b₁ ∈ [0, 2π) is analytic (symmetries and
+    f_a(u) − f_a(t) >= (u − t) − 2a); a/1.4 <= a is checked."""
+    from multiprocessing import Pool
+    ctx.prec = PREC
+    meta = json.loads((CERTS / f"{name}.json").read_text())
+    dat = np.load(CERTS / f"{name}.npz")
+    a = meta["a"]
+    fa = FA(a)
+    res = {"name": name, "checks": {"files_match_committed_hashes": files_match_manifest(name)}}
+    t0 = time.time()
+    lv, iw, ib = dat["level"].astype(np.int64), dat["iw"], dat["ib"]
+    ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
+    res["checks"]["coverage"] = ok
+    res["checks"]["domain_contains_reduction"] = a / 1.4 <= a
+    n = len(lv)
+    parts = [(lv[i:i + 2000], iw[i:i + 2000], ib[i:i + 2000]) for i in range(0, n, 2000)]
+    with Pool(workers, initializer=_ghat_init, initargs=(a, meta["nw"], meta["nb"], meta["claim_hi"])) as p:
+        out = p.map(_ghat_chunk, parts)
+    bad = [b for o in out for b in o[0]]
+    res["checks"]["every_leaf_below_claim_hi"] = not bad
+    res["worst_leaf_upper"] = max(o[1] for o in out)
+    g_arg = _oriented_gap_lower(fa, *meta["bnb_arg"])
+    g_wit = _oriented_gap_lower(fa, *meta["ghat_cert_witness"])
+    res["checks"]["bnb_lo_attained"] = bool(g_arg >= arb(meta["bnb_lo"]))
+    res["checks"]["ghat_cert_attained"] = bool(g_wit >= arb(meta["ghat_cert"]))
+    res["checks"]["ghat_cert_below_hi"] = bool(arb(meta["ghat_cert"]) <= arb(meta["claim_hi"]))
+    res["G_at_bnb_arg_lower"] = str(lo_(g_arg)); res["G_at_witness_lower"] = str(lo_(g_wit))
+    # the rigorous enclosure this certificate proves, and how far each published float endpoint is from it
+    # (reported, never used to pass a check)
+    L_rig = max(lo_(g_arg), lo_(g_wit))
+    res["rigorous_lower"] = float(L_rig.mid()); res["rigorous_upper"] = res["worst_leaf_upper"]
+    res["claim_hi_excess_over_published"] = res["worst_leaf_upper"] - meta["claim_hi"]
+    res["ghat_cert_deficit"] = float((arb(meta["ghat_cert"]) - lo_(g_wit)).mid())
+    res["bnb_lo_deficit"] = float((arb(meta["bnb_lo"]) - lo_(g_arg)).mid())
+    res["ghat_cert"] = meta["ghat_cert"]; res["claim_hi"] = meta["claim_hi"]
+    res["leaves"] = n; res["failed_leaves"] = bad[:20]
+    res["seconds"] = time.time() - t0
+    res["pass"] = all(res["checks"].values())
+    if verbose:
+        print(json.dumps(res, indent=1))
+    return res
+
+
+def check(name):
+    kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
+    return check_ghat(name) if kind == "ghat_enclosure" else check_finite(name)
+
+
 def main(names):
-    out = [check_finite(n) for n in names]
+    out = [check(n) for n in names]
     bad = [r["name"] for r in out if not r["pass"]]
     print(f"{len(out)} certificate(s) checked; failures: {bad or 'none'}")
     return 0 if not bad else 1

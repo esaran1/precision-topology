@@ -83,3 +83,76 @@ def test_lemma_matches_the_search_bound():
     x, y = _population()
     for a, s in ((1.30, 4.95), (1.50, 2.525), (1.60, 2.0)):
         assert abs(vc.lemma_W(x, y, s, a) - w_bound(s, a, x, y)) <= 1e-12
+
+
+# ------------------------------------------------------------------------------------------ Ĝ enclosure certificates
+def test_gap_bounds_bracket_an_independent_float_evaluation():
+    from src.exact_extrema import exact_gap
+    fa = vc.FA(1.30)
+    rng = np.random.default_rng(3)
+    for _ in range(300):
+        w, b = float(rng.uniform(0, 1.3)), float(rng.uniform(0, 2 * math.pi))
+        g = exact_gap(1.30, w, b)[0]
+        up = vc._oriented_gap_upper(fa, arb(w), arb(b))
+        lo = vc._oriented_gap_lower(fa, w, b)
+        assert float(lo.mid()) <= g + 1e-13 and float(up.mid()) >= g - 1e-13
+        assert float(up.mid()) - float(lo.mid()) < 1e-9                    # tight at a point
+
+
+@pytest.fixture(scope="module")
+def ghat_cert(tmp_path_factory):
+    import shutil
+    import src.cert_export as ce
+    root = tmp_path_factory.mktemp("results")
+    certs = root / "certificates"
+    for f in ("ghat_bnb.csv", "ghat_certified_all.csv"):
+        shutil.copy(ce.CERTS.parent / f, root / f)
+    old = ce.CERTS
+    ce.CERTS = certs
+    try:
+        ce.ghat(3.0, "g3")
+    finally:
+        ce.CERTS = old
+    return certs
+
+
+def _check(certs, monkeypatch, edit=None):
+    import json as _json
+    if edit:
+        m = _json.loads((certs / "g3.json").read_text())
+        d = dict(np.load(certs / "g3.npz"))
+        edit(m, d)
+        (certs / "t.json").write_text(_json.dumps(m)); np.savez_compressed(certs / "t.npz", **d)
+        name = "t"
+    else:
+        name = "g3"
+    monkeypatch.setattr(vc, "CERTS", certs)
+    return vc.check_ghat(name, verbose=False, workers=1)
+
+
+def test_ghat_certificate_structure_and_rounding_level_discrepancies(ghat_cert, monkeypatch):
+    """The real a = 3.0 certificate: exact tiling, and the float search's published endpoints miss the rigorous
+    enclosure only at rounding level (the strict endpoint checks report that; they are not relaxed)."""
+    r = _check(ghat_cert, monkeypatch)
+    c = r["checks"]
+    assert c["coverage"] and c["domain_contains_reduction"] and c["ghat_cert_below_hi"]
+    assert abs(r["claim_hi_excess_over_published"]) < 1e-14 and abs(r["ghat_cert_deficit"]) < 1e-14
+    assert r["rigorous_lower"] <= r["rigorous_upper"]
+    assert not c["files_match_committed_hashes"]                    # no manifest in the temporary directory
+
+
+def test_ghat_rejects_a_lowered_upper_claim(ghat_cert, monkeypatch):
+    r = _check(ghat_cert, monkeypatch, lambda m, d: m.update(claim_hi=m["bnb_lo"]))
+    assert not r["checks"]["every_leaf_below_claim_hi"]
+
+
+def test_ghat_rejects_a_missing_leaf(ghat_cert, monkeypatch):
+    def drop(m, d):
+        for k in ("level", "iw", "ib", "reason"):
+            d[k] = d[k][1:]
+    assert not _check(ghat_cert, monkeypatch, drop)["checks"]["coverage"]
+
+
+def test_ghat_rejects_an_overstated_cert_value(ghat_cert, monkeypatch):
+    r = _check(ghat_cert, monkeypatch, lambda m, d: m.update(ghat_cert=m["ghat_cert"] + 1e-9))
+    assert not r["checks"]["ghat_cert_attained"]

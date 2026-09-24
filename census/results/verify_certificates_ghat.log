@@ -1,0 +1,350 @@
+/Users/Evan/precision-topology/census/results/certificates_manifest.csv
+{
+ "name": "ghat_a1.10",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.017688791466699536,
+ "G_at_bnb_arg_lower": "[0.017673427712114575356450 +/- 1.87e-25]",
+ "G_at_witness_lower": "[0.017671950853019389084257 +/- 3.84e-25]",
+ "rigorous_lower": 0.017673427712114574,
+ "rigorous_upper": 0.017688791466699536,
+ "claim_hi_excess_over_published": -2.914335439641036e-16,
+ "ghat_cert_deficit": 3.561443001831557e-17,
+ "bnb_lo_deficit": 3.1103337682031077e-16,
+ "ghat_cert": 0.017671950853019425,
+ "claim_hi": 0.017688791466699827,
+ "leaves": 4086270,
+ "failed_leaves": [],
+ "seconds": 90.02477169036865,
+ "pass": false
+}
+{
+ "name": "ghat_a1.15",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.031951889476332464,
+ "G_at_bnb_arg_lower": "[0.031920435132815563745821 +/- 1.53e-25]",
+ "G_at_witness_lower": "[0.031918407628363589101154 +/- 4.13e-25]",
+ "rigorous_lower": 0.03192043513281556,
+ "rigorous_upper": 0.031951889476332464,
+ "claim_hi_excess_over_published": -1.249000902703301e-16,
+ "ghat_cert_deficit": 4.758751138125153e-16,
+ "bnb_lo_deficit": -5.814913939253029e-17,
+ "ghat_cert": 0.031918407628364065,
+ "claim_hi": 0.03195188947633259,
+ "leaves": 1814754,
+ "failed_leaves": [],
+ "seconds": 38.2754180431366,
+ "pass": false
+}
+{
+ "name": "ghat_a1.25",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.06657312199977874,
+ "G_at_bnb_arg_lower": "[0.066507277337271930704656 +/- 2.40e-25]",
+ "G_at_witness_lower": "[0.066505622211057423938837 +/- 2.67e-25]",
+ "rigorous_lower": 0.06650727733727194,
+ "rigorous_upper": 0.06657312199977874,
+ "claim_hi_excess_over_published": -5.551115123125783e-17,
+ "ghat_cert_deficit": 1.783610511923181e-16,
+ "bnb_lo_deficit": -2.2325121659328486e-17,
+ "ghat_cert": 0.0665056222110576,
+ "claim_hi": 0.0665731219997788,
+ "leaves": 722136,
+ "failed_leaves": [],
+ "seconds": 15.316925048828125,
+ "pass": false
+}
+{
+ "name": "ghat_a1.30",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": false,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": true,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.08617034394079373,
+ "G_at_bnb_arg_lower": "[0.086103036063564050443684 +/- 3.93e-25]",
+ "G_at_witness_lower": "[0.086101793877779714907205 +/- 2.80e-25]",
+ "rigorous_lower": 0.08610303606356405,
+ "rigorous_upper": 0.08617034394079373,
+ "claim_hi_excess_over_published": 2.914335439641036e-16,
+ "ghat_cert_deficit": -4.391750952670076e-16,
+ "bnb_lo_deficit": 1.2516250504785643e-16,
+ "ghat_cert": 0.08610179387777928,
+ "claim_hi": 0.08617034394079344,
+ "leaves": 580392,
+ "failed_leaves": [
+  [
+   12,
+   65269,
+   208555
+  ],
+  [
+   12,
+   65269,
+   307540
+  ]
+ ],
+ "seconds": 12.254697322845459,
+ "pass": false
+}
+{
+ "name": "ghat_a1.35",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": false,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.10698283537921904,
+ "G_at_bnb_arg_lower": "[0.10691406428726740637942 +/- 3.02e-24]",
+ "G_at_witness_lower": "[0.10691355066123346726446 +/- 1.54e-24]",
+ "rigorous_lower": 0.10691406428726741,
+ "rigorous_upper": 0.10698283537921904,
+ "claim_hi_excess_over_published": 1.6653345369377348e-16,
+ "ghat_cert_deficit": 6.896751698675612e-17,
+ "bnb_lo_deficit": -1.6550800781455884e-16,
+ "ghat_cert": 0.10691355066123354,
+ "claim_hi": 0.10698283537921888,
+ "leaves": 484512,
+ "failed_leaves": [
+  [
+   12,
+   69481,
+   205299
+  ],
+  [
+   12,
+   69481,
+   310796
+  ]
+ ],
+ "seconds": 10.168272972106934,
+ "pass": false
+}
+{
+ "name": "ghat_a1.40",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": true,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.12884274034696003,
+ "G_at_bnb_arg_lower": "[0.12877250604028610515077 +/- 4.85e-24]",
+ "G_at_witness_lower": "[0.12877189555569060650904 +/- 3.38e-24]",
+ "rigorous_lower": 0.12877250604028612,
+ "rigorous_upper": 0.12884274034696003,
+ "claim_hi_excess_over_published": -2.220446049250313e-16,
+ "ghat_cert_deficit": -1.43311436639866e-16,
+ "bnb_lo_deficit": 1.2245134448959753e-16,
+ "ghat_cert": 0.12877189555569046,
+ "claim_hi": 0.12884274034696025,
+ "leaves": 415350,
+ "failed_leaves": [],
+ "seconds": 8.690681219100952,
+ "pass": false
+}
+{
+ "name": "ghat_a1.45",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.15168901707968227,
+ "G_at_bnb_arg_lower": "[0.15154562203688943744226 +/- 7.20e-25]",
+ "G_at_witness_lower": "[0.15154531873731976647508 +/- 1.60e-24]",
+ "rigorous_lower": 0.15154562203688943,
+ "rigorous_upper": 0.15168901707968227,
+ "claim_hi_excess_over_published": -1.1102230246251565e-16,
+ "ghat_cert_deficit": 3.673310974047677e-16,
+ "bnb_lo_deficit": 1.5598913758009872e-16,
+ "ghat_cert": 0.15154531873732013,
+ "claim_hi": 0.15168901707968238,
+ "leaves": 272292,
+ "failed_leaves": [],
+ "seconds": 5.690428733825684,
+ "pass": false
+}
+{
+ "name": "ghat_a1.50",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.1752720433368614,
+ "G_at_bnb_arg_lower": "[0.17512572186462384455055 +/- 2.83e-24]",
+ "G_at_witness_lower": "[0.17512620048883921724745 +/- 3.33e-24]",
+ "rigorous_lower": 0.17512620048883923,
+ "rigorous_upper": 0.1752720433368614,
+ "claim_hi_excess_over_published": -1.942890293094024e-16,
+ "ghat_cert_deficit": 1.0939616066944297e-15,
+ "bnb_lo_deficit": 2.0644350542497083e-16,
+ "ghat_cert": 0.1751262004888403,
+ "claim_hi": 0.17527204333686158,
+ "leaves": 243594,
+ "failed_leaves": [],
+ "seconds": 5.068569183349609,
+ "pass": false
+}
+{
+ "name": "ghat_a1.60",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": false,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.22451946571494927,
+ "G_at_bnb_arg_lower": "[0.22436729138382213322336 +/- 3.06e-24]",
+ "G_at_witness_lower": "[0.22436020212556185085062 +/- 4.52e-24]",
+ "rigorous_lower": 0.22436729138382214,
+ "rigorous_upper": 0.22451946571494927,
+ "claim_hi_excess_over_published": 3.0531133177191805e-16,
+ "ghat_cert_deficit": 1.0744671500308169e-16,
+ "bnb_lo_deficit": -1.9029391900433868e-16,
+ "ghat_cert": 0.22436020212556196,
+ "claim_hi": 0.22451946571494896,
+ "leaves": 200394,
+ "failed_leaves": [
+  [
+   11,
+   42563,
+   96544
+  ],
+  [
+   11,
+   42563,
+   161503
+  ]
+ ],
+ "seconds": 4.177062273025513,
+ "pass": false
+}
+{
+ "name": "ghat_a2.00",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": true,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.44138475580203645,
+ "G_at_bnb_arg_lower": "[0.44103358426866664340967 +/- 4.61e-24]",
+ "G_at_witness_lower": "[0.44103392406330583241784 +/- 4.91e-24]",
+ "rigorous_lower": 0.4410339240633058,
+ "rigorous_upper": 0.44138475580203645,
+ "claim_hi_excess_over_published": -3.885780586188048e-16,
+ "ghat_cert_deficit": -8.384390171459072e-16,
+ "bnb_lo_deficit": 1.4613103726770815e-16,
+ "ghat_cert": 0.441033924063305,
+ "claim_hi": 0.44138475580203684,
+ "leaves": 91668,
+ "failed_leaves": [],
+ "seconds": 1.946230173110962,
+ "pass": false
+}
+{
+ "name": "ghat_a3.00",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": false,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 1.0532331487299569,
+ "G_at_bnb_arg_lower": "[1.0522966913076369461167 +/- 1.24e-23]",
+ "G_at_witness_lower": "[1.0522977578507089304705 +/- 4.31e-23]",
+ "rigorous_lower": 1.052297757850709,
+ "rigorous_upper": 1.0532331487299569,
+ "claim_hi_excess_over_published": 2.220446049250313e-16,
+ "ghat_cert_deficit": 6.281541147347422e-16,
+ "bnb_lo_deficit": -3.5698671746259193e-16,
+ "ghat_cert": 1.0522977578507096,
+ "claim_hi": 1.0532331487299567,
+ "leaves": 41988,
+ "failed_leaves": [
+  [
+   9,
+   14992,
+   20621
+  ],
+  [
+   9,
+   14992,
+   43890
+  ]
+ ],
+ "seconds": 0.9444301128387451,
+ "pass": false
+}
+11 certificate(s) checked; failures: ['ghat_a1.10', 'ghat_a1.15', 'ghat_a1.25', 'ghat_a1.30', 'ghat_a1.35', 'ghat_a1.40', 'ghat_a1.45', 'ghat_a1.50', 'ghat_a1.60', 'ghat_a2.00', 'ghat_a3.00']
+      192.69 real       190.17 user         1.47 sys
+          1028734976  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              275803  page reclaims
+                1969  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                6467  voluntary context switches
+              106025  involuntary context switches
+        184901306887  instructions retired
+         47753087616  cycles elapsed
+          1018365032  peak memory footprint

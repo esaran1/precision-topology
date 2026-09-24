@@ -52,7 +52,10 @@ def step(a, hw, hb):
     return (1.0 + a) * (2.8 * hw + 2.0 * hb)
 
 
-def certify(a, target_rel=TARGET_REL, h0=H0, max_rounds=40):
+def certify(a, target_rel=TARGET_REL, h0=H0, max_rounds=40, record=None):
+    """record (certificate export, Block 2): if a dict, it receives nw, nb, hw0, hb0 and the leaves as integer
+    quadtree indices (level, iw, ib) with reason 1 (pruned: G(centre) + step <= running lo) or 0 (surviving at
+    convergence).  The leaves tile [0, a] x [0, 2π] exactly.  Results are identical with and without it."""
     from .exact_extrema import exact_gap
     nw = max(1, math.ceil(a / h0))
     nb = math.ceil(2 * math.pi / h0)
@@ -60,6 +63,9 @@ def certify(a, target_rel=TARGET_REL, h0=H0, max_rounds=40):
     wc = (np.arange(nw) + 0.5) * 2 * hw
     bc = (np.arange(nb) + 0.5) * 2 * hb
     cells = np.array([(w, b) for w in wc for b in bc])
+    if record is not None:
+        idx = np.array([(i, j) for i in range(nw) for j in range(nb)], dtype=np.int64)
+        record.update(nw=nw, nb=nb, hw0=hw, hb0=hb, leaves=[])
     lo, arg, evaluated = -np.inf, None, 0
     for rnd in range(max_rounds):
         g = np.array([exact_gap(a, float(w), float(b))[0] for w, b in cells])
@@ -70,7 +76,11 @@ def certify(a, target_rel=TARGET_REL, h0=H0, max_rounds=40):
         ub = g + step(a, hw, hb)
         keep = ub > lo
         hi = float(max(ub[keep].max(), lo))
+        if record is not None:
+            record["leaves"].append((rnd, idx[~keep], 1))
         if hi - lo <= target_rel * lo:
+            if record is not None:
+                record["leaves"].append((rnd, idx[keep], 0))
             return {"a": a, "Ghat_lo": lo, "Ghat_hi": hi, "rel_width": (hi - lo) / lo,
                     "w1": arg[0], "b1": arg[1], "rounds": rnd + 1, "cells_evaluated": evaluated,
                     "final_hw": hw, "final_hb": hb, "surviving": int(keep.sum()), "converged": True}
@@ -78,6 +88,10 @@ def certify(a, target_rel=TARGET_REL, h0=H0, max_rounds=40):
         hw, hb = hw / 2, hb / 2
         offs = np.array([(-hw, -hb), (-hw, hb), (hw, -hb), (hw, hb)])
         cells = (cells[:, None, :] + offs[None, :, :]).reshape(-1, 2)
+        if record is not None:
+            k = idx[keep]
+            ch = np.array([(0, 0), (0, 1), (1, 0), (1, 1)], dtype=np.int64)
+            idx = (2 * k[:, None, :] + ch[None, :, :]).reshape(-1, 2)
     return {"a": a, "Ghat_lo": lo, "Ghat_hi": hi, "rel_width": (hi - lo) / lo, "w1": arg[0],
             "b1": arg[1], "rounds": max_rounds, "cells_evaluated": evaluated, "final_hw": hw,
             "final_hb": hb, "surviving": int(keep.sum()), "converged": False}
