@@ -11,7 +11,11 @@ R = Path(__file__).resolve().parents[1] / "results"
 F: list[str] = []
 
 
+REC: list[tuple] = []
+
+
 def chk(label, got, want, tol=0.01):
+    REC.append((label, got, want, tol))
     ok = (got is not None) and abs(got - want) <= tol
     print(f"  {'ok ' if ok else 'MISMATCH'} {label}: artifact={got} ledger={want}")
     if not ok:
@@ -566,6 +570,8 @@ def main() -> None:
 
     provenance_check()
 
+    digit_stability()
+
     print(f"\n{len(F)} finding(s)")
     (R / "ledger_verification.txt").write_text("\n".join(F) if F else "no findings\n")
 
@@ -818,6 +824,9 @@ PRODUCERS = {
     "crossing_audit_runs.csv": ("crossing_audit", "main", "full", ""),
     "crossing_audit_full_runs.csv": ("cadence_sensitivity", "runs", "full", ""),
     "cadence_sensitivity.csv": ("cadence_sensitivity", "main", "full", ""),
+    "ghat_rigorous.csv": ("ghat_rigorous", "build", "full", ""),
+    "ghat_digit_stability.csv": ("verify_ledger", "digit_stability", "full", ""),
+    "ghat_digit_stability_machine_precision.csv": ("verify_ledger", "digit_stability", "full", ""),
     "cadence_sensitivity_block3.csv": ("cadence_sensitivity", "main", "full", ""),
     "cadence_sensitivity_own_seed.csv": ("cadence_sensitivity", "main", "full", ""),
     "scale_limits_tanh.csv": ("scale_limits_tanh", "main", "full", ""),
@@ -1255,11 +1264,11 @@ def v4_checks() -> None:
     go_ = {}
     for m_ in _re.findall(r"^\{\n.*?^\}", gl_, flags=_re.S | _re.M):
         o_ = _json.loads(m_); go_[o_["name"]] = o_                      # the latest run of each certificate
-    chk("Ghat certificates checked (a = 1.05-3.0)", float(len(go_)), 12.0, 0)
+    chk("Ghat certificates checked (a = 1.02-3.0)", float(len(go_)), 13.0, 0)
     chk("Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi)",
         float(all(o_["checks"][k] for o_ in go_.values() for k in ("files_match_committed_hashes", "coverage",
                                                                     "domain_contains_reduction", "ghat_cert_below_hi"))), 1.0, 0)
-    chk("Ghat: max |published - rigorous| endpoint discrepancy <= 1.1e-15",
+    chk("Ghat: max |published - rigorous| endpoint discrepancy <= 1.1e-15 (a >= 1.05; a = 1.02 <= 1.4e-16)",
         float(max(max(abs(o_["claim_hi_excess_over_published"]), abs(o_["ghat_cert_deficit"]), abs(o_["bnb_lo_deficit"]))
                   for o_ in go_.values()) <= 1.1e-15), 1.0, 0)
     chk("Ghat(1.05) leaves", float(go_["ghat_a1.05"]["leaves"]), 18041202.0, 0)
@@ -1348,6 +1357,57 @@ def v4_checks() -> None:
     cs = pd.read_csv(R / "critical_slowing_posthoc.csv").set_index("a")
     chk("predicted offset at 1.30 (%)", float(cs.loc[1.3, "pred_offset_pct"]), 1.08, 0.01)
     chk("observed offset at 1.30 (%)", float(cs.loc[1.3, "obs_offset_pct"]), 9.59, 0.01)
+
+
+def _decimals(v) -> int:
+    t = repr(float(v))
+    if "e" in t or "E" in t:
+        m, e = t.lower().split("e")
+        return max(0, (len(m.split(".")[1]) if "." in m else 0) - int(e))
+    return len(t.split(".")[1]) if "." in t else 0
+
+
+def digit_stability() -> None:
+    """Ĝ was replaced by its rigorous enclosure (author's decision 2026-09-24).  Every R is linear in Ĝ, so a stored
+    value x computed with the old float Ĝ becomes x·r with |r − 1| <= δ, δ = the largest relative change of Ĝ over a
+    (results/ghat_rigorous.csv).  For EVERY numeric ledger check (conservatively, including numbers that do not depend
+    on Ĝ): the check must still hold at x·(1 ± δ), and x·(1 ± δ) must round to the same printed digits (the number of
+    decimals of the printed ledger value).  Any failure is a finding."""
+    p = R / "ghat_rigorous.csv"
+    print("Digit stability under the rigorous Ĝ")
+    if not p.exists():
+        F.append("digit stability: ghat_rigorous.csv missing"); print("  MISSING ghat_rigorous.csv"); return
+    g = pd.read_csv(p, float_precision="round_trip")
+    want_a = set(pd.read_csv(R / "ghat_certified_all.csv").a.round(2))
+    if set(g.a.round(2)) != want_a:
+        F.append("digit stability: ghat_rigorous.csv does not cover every a"); return
+    delta = float(max(g.rel_delta_cert.abs().max(), g.rel_delta_hi.abs().max()))
+    # Checks with tol < 1e-9 are machine-precision consistency checks between two artifacts (their "value" carries
+    # 14-18 decimals); they are not printed numbers.  They are recorded and listed by name, not counted as printed-digit
+    # findings (disclosed in WP-7; set after the first run flagged five, none of which depends on the replaced Ĝ(a)).
+    n_num = n_skip = 0
+    bad, mp = [], []
+    for label, got, want, tol in REC:
+        if got is None or tol == 0 or not np.isfinite(got) or not np.isfinite(want):
+            n_skip += 1
+            continue
+        d = _decimals(want)
+        moved = any(abs(x - want) > tol or round(x, d) != round(got, d) for x in (got * (1 - delta), got * (1 + delta)))
+        if tol < 1e-9:
+            mp.append({"label": label, "tol": tol, "moves_under_blanket_delta": moved})
+            continue
+        n_num += 1
+        if moved:
+            bad.append(label)
+    rows = [{"delta": delta, "printed_number_checks": n_num, "unstable": len(bad),
+             "machine_precision_checks": len(mp), "machine_precision_moved": int(sum(m["moves_under_blanket_delta"] for m in mp)),
+             "exact_or_non_numeric": n_skip}]
+    pd.DataFrame(rows).to_csv(R / "ghat_digit_stability.csv", index=False)
+    pd.DataFrame(mp).to_csv(R / "ghat_digit_stability_machine_precision.csv", index=False)
+    print(f"  delta = {delta:.3e}; {n_num} printed-number checks, {len(bad)} unstable; {len(mp)} machine-precision checks "
+          f"({rows[0]['machine_precision_moved']} move in their last digits); {n_skip} exact or non-numeric")
+    for b in bad:
+        F.append(f"digit stability under the rigorous Ĝ: {b}")
 
 
 def provenance_check() -> None:

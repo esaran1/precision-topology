@@ -1,0 +1,28 @@
+{
+ "name": "ghat_a1.45",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.15168901707968227,
+ "G_at_bnb_arg_lower": "[0.15154562203688943744226 +/- 7.20e-25]",
+ "G_at_witness_lower": "[0.15154531873731976647508 +/- 1.60e-24]",
+ "rigorous_lower": 0.15154562203688943,
+ "rigorous_upper": 0.15168901707968227,
+ "witness_lower": 0.15154531873731975,
+ "bnb_arg_lower": 0.15154562203688943,
+ "claim_hi_excess_over_published": -1.1102230246251565e-16,
+ "ghat_cert_deficit": 3.673310974047677e-16,
+ "bnb_lo_deficit": 1.5598913758009872e-16,
+ "ghat_cert": 0.15154531873732013,
+ "claim_hi": 0.15168901707968238,
+ "leaves": 272292,
+ "failed_leaves": [],
+ "seconds": 5.742546796798706,
+ "pass": false
+}

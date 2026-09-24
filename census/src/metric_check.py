@@ -36,8 +36,12 @@ def runs(ghat: str) -> pd.DataFrame:
     s = s[(s.activation == "sin_family") & (s.parameter > 1.0)].copy()
     g = pd.read_csv(RESULTS / "ghat_certified_all.csv").set_index(pd.read_csv(
         RESULTS / "ghat_certified_all.csv").a.round(2))
-    col = "Ghat_certified" if ghat == "certified" else "Ghat_restricted"
-    s["R"] = s.w2_abs * s.parameter.round(2).map(g[col]) / 2
+    if ghat == "certified":                         # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+        from .ghat_rigorous import ghat_R
+        gmap = pd.Series(ghat_R())
+    else:
+        gmap = g["Ghat_restricted"]
+    s["R"] = s.w2_abs * s.parameter.round(2).map(gmap) / 2
     s["solved"] = s.solved.astype(str).str.lower() == "true"
     return s
 

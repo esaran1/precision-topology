@@ -30,8 +30,8 @@ TRAJ = RESULTS / "mechanism_trajectories_a130.csv"
 
 
 def _ghat():
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    return float(g[g.a.round(2) == A].Ghat_certified.iloc[0])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    return ghat_R_of(A)
 
 
 def _point(w2):

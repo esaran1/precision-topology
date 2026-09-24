@@ -17,7 +17,7 @@
 | finite-a glob brackets (a = 1.30–1.60, lo and hi ends) | 12 | **all pass** (every leaf claim verified, exact tiling, lemma W, hashes) | 554–658 s each at one worker, ≈ 75 MB | `verify_certificates_finite.log` |
 | Ĝ(a) enclosures (a = 1.10–3.0) | 11 | **structure passes; the float endpoints miss by ≤ 1.1e−15** (see below) | 1–90 s check; export ≤ 0.6 GB | `verify_certificates_ghat.log` |
 | Ĝ(1.05) | 1 | as for a ≥ 1.10: structure passes (18.0M leaves, exact tiling, every leaf below hi); the endpoints miss by ≤ 4e−16 | export 119 s, 1.5 GB; check 394–397 s. **The first check peaked at 3.05 GB, over the 3 GB rule.** I had not extrapolated it: the set-based tiling check held 18M tuples. The vectorised tiling check (same verdicts on constructed and real cases) brought it to 2.85 GB | `verify_certificates_ghat.log` |
-| Ĝ(1.02) | — | **not exported: stopped under the 3 GB rule.** It has 147M search cells, 6× a = 1.05, which peaked at 1.5 GB, so ≈ 9 GB is extrapolated. It needs the recording to stream leaves to disk, or a tighter certifier | | |
+| Ĝ(1.02) | 1 | as for the others: structure passes (110.7M leaves, exact tiling by the per-level check); the endpoints miss by ≤ 1.4e−16 | streamed export 747 s, 2.08 GB (under the rule); check 2,307 s. **The check peaked at 3.74 GB, over the 3 GB rule**: I had not extrapolated the per-level tiling check's copies (`setdiff1d` and per-child temporaries on a 36M-key level). It is fixed (in-place marking, preallocated children; tests pass) but the fix is not yet re-measured at this size | `verify_certificates_ghat.log` |
 | solve brackets, limit switch, outer exclusion and ring, PD boxes, K, Krawczyk boxes, localisation | — | to do | | |
 
 ## Ĝ enclosure certificates: what passed and what did not
@@ -48,3 +48,16 @@
     verifying those.
 
   The finite-a certificates were not affected: their comparisons have margins far above rounding.
+
+## Author's decision (2026-09-24): option (a), implemented
+
+- **The published Ĝ values are replaced by the checker's rigorous enclosures** (`ghat_rigorous.csv`, from
+  `certificate_checks/ghat_a*.json`; producer `src/ghat_rigorous.py`).
+  - Ĝ_cert is now the Arb lower bound of G at the same witness as the old float value, rounded down.
+  - Ĝ_hi is the Arb bound over every leaf, rounded up.
+  - Every code path that computes R reads `ghat_rigorous.ghat_R` (17 modules switched).
+- **No printed digit changes.** The largest relative change is δ = 8.4e−14 (at a = 1.02). All 376 printed-number checks
+  in the ledger keep their printed digits with their values scaled by 1 ± δ (`ghat_digit_stability.csv`; WP-7).
+- **The strict checks on the old float endpoints keep reporting as they are.**
+- **The branch and bound's own attained point** gives a larger proven lower bound at nine a (by up to 8.4e−5
+  relative). It is reported in WP-7 and not adopted, because it is a different number, not a rounding correction.

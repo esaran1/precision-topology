@@ -73,6 +73,24 @@ def hi_(b):
     return b.upper()
 
 
+def float_down(x):
+    """The largest double <= the exact lower endpoint of the ball x (checked by exact Arb comparison)."""
+    e = lo_(x)
+    f = float(e.mid())
+    while arb(f) > e:
+        f = math.nextafter(f, -math.inf)
+    return f
+
+
+def float_up(x):
+    """The smallest double >= the exact upper endpoint of the ball x."""
+    e = hi_(x)
+    f = float(e.mid())
+    while arb(f) < e:
+        f = math.nextafter(f, math.inf)
+    return f
+
+
 # ------------------------------------------------------------------------------------------ f_a and its exact range
 class FA:
     def __init__(self, a):
@@ -461,7 +479,7 @@ def _ghat_chunk(args):
         if not (ub <= hi):
             bad.append((l, i, j))
         worst = ub if worst is None else max(worst, ub)                  # exact points
-    worst = None if worst is None else float(worst.mid())
+    worst = None if worst is None else float_up(worst)                    # rounded upward: still an upper bound
     return bad, worst, len(lv)
 
 
@@ -483,12 +501,19 @@ def coverage_per_round(zf_npz, nw, nb, rounds):
         pos = np.searchsorted(op, lk)
         if not ((pos < len(op)).all() and (op[np.minimum(pos, len(op) - 1)] == lk).all()):
             return False, f"a level-{r} leaf is not an open cell (outside the grid or under an ancestor leaf)"
-        rest = np.setdiff1d(op, lk, assume_unique=True)
-        del op, lk, leaf
+        hit = np.zeros(len(op), bool)                   # lk ⊂ op is established above: mark, then keep the rest
+        hit[pos] = True
+        del lk, leaf, pos
+        rest = op[~hit]
+        del op, hit
         if r == rounds - 1:
             return (len(rest) == 0), ("exact tiling" if len(rest) == 0 else f"{len(rest)} cells uncovered")
+        op = np.empty(4 * len(rest), np.int64)          # the children, written in place (no temporaries per child)
         i, j = rest >> bj, rest & ((1 << bj) - 1)
-        op = np.concatenate([((2 * i + di) << bj) | (2 * j + dj) for di in (0, 1) for dj in (0, 1)])
+        del rest
+        for k, (di, dj) in enumerate(((0, 0), (0, 1), (1, 0), (1, 1))):
+            op[k::4] = ((2 * i + di) << bj) | (2 * j + dj)
+        del i, j
     return False, "no levels"
 
 
@@ -548,7 +573,9 @@ def check_ghat(name, verbose=True, workers=WORKERS):
     # the rigorous enclosure this certificate proves, and how far each published float endpoint is from it
     # (reported, never used to pass a check)
     L_rig = max(lo_(g_arg), lo_(g_wit))
-    res["rigorous_lower"] = float(L_rig.mid()); res["rigorous_upper"] = res["worst_leaf_upper"]
+    res["rigorous_lower"] = float_down(L_rig); res["rigorous_upper"] = res["worst_leaf_upper"]
+    res["witness_lower"] = float_down(g_wit)          # the rigorous value of the paper's Ĝ_cert (same witness)
+    res["bnb_arg_lower"] = float_down(g_arg)
     res["claim_hi_excess_over_published"] = res["worst_leaf_upper"] - meta["claim_hi"]
     res["ghat_cert_deficit"] = float((arb(meta["ghat_cert"]) - lo_(g_wit)).mid())
     res["bnb_lo_deficit"] = float((arb(meta["bnb_lo"]) - lo_(g_arg)).mid())
@@ -556,6 +583,9 @@ def check_ghat(name, verbose=True, workers=WORKERS):
     res["leaves"] = n; res["failed_leaves"] = bad[:20]
     res["seconds"] = time.time() - t0
     res["pass"] = all(res["checks"].values())
+    out_dir = CERTS.parent / "certificate_checks"
+    out_dir.mkdir(exist_ok=True)
+    (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
     if verbose:
         print(json.dumps(res, indent=1))
     return res

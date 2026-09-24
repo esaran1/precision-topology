@@ -33,8 +33,8 @@ FIELDS = ["family", "q", "a", "threshold", "ghat", "w2", "R", "coarse", "fine"]
 
 
 def ghat_A(a):
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv").set_index("a")
-    return float(g.loc[round(a, 2), "Ghat_certified"])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    return ghat_R_of(a)
 
 
 def job(args):

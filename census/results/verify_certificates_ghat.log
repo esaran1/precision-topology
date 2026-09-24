@@ -394,3 +394,62 @@
         449913290121  instructions retired
         134984098001  cycles elapsed
           4295871896  peak memory footprint
+/Users/Evan/precision-topology/census/results/certificates_manifest.csv
+{
+ "name": "ghat_a1.02",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": false,
+  "bnb_lo_attained": true,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.001627653245274938,
+ "G_at_bnb_arg_lower": "[0.0016267450023583913036794 +/- 2.55e-26]",
+ "G_at_witness_lower": "[0.0016267447623457854368795 +/- 5.68e-27]",
+ "rigorous_lower": 0.0016267450023583912,
+ "rigorous_upper": 0.001627653245274938,
+ "witness_lower": 0.0016267447623457853,
+ "bnb_arg_lower": 0.0016267450023583912,
+ "claim_hi_excess_over_published": 1.5395670849294163e-17,
+ "ghat_cert_deficit": 1.364761586882096e-16,
+ "bnb_lo_deficit": -1.5035076350502697e-17,
+ "ghat_cert": 0.001626744762345922,
+ "claim_hi": 0.0016276532452749225,
+ "leaves": 110724630,
+ "failed_leaves": [
+  [
+   18,
+   1216548,
+   15625788
+  ],
+  [
+   18,
+   1216548,
+   17404355
+  ]
+ ],
+ "seconds": 2306.644841194153,
+ "pass": false
+}
+1 certificate(s) checked; failures: ['ghat_a1.02']
+     2306.85 real      2271.73 user        14.53 sys
+          3737288704  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1445240  page reclaims
+                 835  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               68082  voluntary context switches
+             2230530  involuntary context switches
+        298767256768  instructions retired
+        216937405051  cycles elapsed
+          6521869400  peak memory footprint

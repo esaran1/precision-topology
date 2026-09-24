@@ -40,8 +40,8 @@ def predicted_crossings(a, nu, c, R_glob):
     for ch in pd.read_csv(RESULTS / "phase2b_checkpoints.csv", usecols=cols, chunksize=2_000_000):
         parts.append(ch[(ch.a.round(2) == a) & (ch.budget == 32_000)])
     d = pd.concat(parts)
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    G = float(g[g.a.round(2) == a].Ghat_certified.iloc[0])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    G = ghat_R_of(a)
     out = []
     for seed, t in d.groupby("seed"):
         t = t.sort_values("step")

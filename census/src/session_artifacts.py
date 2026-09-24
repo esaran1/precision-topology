@@ -147,7 +147,8 @@ def exceptions_above_050() -> pd.DataFrame:
 
     gg = pd.read_csv(RESULTS / "ghat_certified_all.csv").set_index("a")
     a = 3.0
-    g_cert = float(gg.loc[a, "Ghat_certified"])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    g_cert = ghat_R_of(a)
     g_rest = float(gg.loc[a, "Ghat_restricted"])
     rows = []
     for seed in (13, 82):

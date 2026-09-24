@@ -400,8 +400,8 @@ def clopper(k, n, alpha=0.05):
 
 def _ghat(a):
     """Certified G_hat of the base window (the value R uses throughout; own_threshold._pop)."""
-    g = read("ghat_certified_all.csv", float_precision="round_trip")
-    return float(g[g.a.round(2) == round(a, 2)].Ghat_certified.iloc[0])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    return ghat_R_of(a)
 
 
 # ------------------------------------------------------------------------------------------ Phase 1

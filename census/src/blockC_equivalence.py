@@ -39,8 +39,8 @@ FIELDS = ["optimizer", "budget", "seed", "w2", "R", "solved"]
 
 
 def ghat():
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv").set_index("a")
-    return float(g.loc[A, "Ghat_certified"])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    return ghat_R_of(A)
 
 
 def train(args):

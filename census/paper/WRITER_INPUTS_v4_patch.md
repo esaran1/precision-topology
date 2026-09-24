@@ -364,3 +364,43 @@ Block 3, C against each baseline (upper end of the 95% interval of the |log erro
 With the registered predictions (built from 50-step data) and interpolated observations the detection is mismatched;
 with C, B1 and B2 rebuilt from interpolated Block G crossings (cadence-matched) every registered comparison keeps its
 sign and excludes 0.
+
+## WP-7. Ĝ(a) as rigorous enclosures (replaces the float values; Block 2)
+
+Source: `ghat_rigorous.csv` (producer `src/ghat_rigorous.py`, from the independent Arb checker's results in
+`certificate_checks/`). **Every R now uses the rigorous lower end** `Ĝ_cert` below: the checker's lower bound on G at
+the same witness point as the published float value, rounded down to a double. The upper end is the checker's bound
+over every leaf of the branch and bound, rounded up. The domain reduction to w₁ ∈ (0, a/1.4] is analytic.
+
+| a | Ĝ(a) ∈ [Ĝ_cert, Ĝ_hi] (rigorous) | old float Ĝ_cert | change of Ĝ_cert | change of Ĝ_hi | larger proven lower bound (not adopted) | leaves |
+|---|---|---|---|---|---|---|
+| 1.02 | [0.001626744762, 0.001627653245] | 0.001626744762 | -1.4e-16 | +1.5e-17 | 0.001626745002 | 110,724,630 |
+| 1.05 | [0.006360085994, 0.006363833420] | 0.006360085994 | -1.6e-16 | -7.7e-17 | 0.006360084013 | 18,041,202 |
+| 1.10 | [0.017671950853, 0.017688791467] | 0.017671950853 | -3.8e-17 | -2.9e-16 | 0.017673427712 | 4,086,270 |
+| 1.15 | [0.031918407628, 0.031951889476] | 0.031918407628 | -4.8e-16 | -1.2e-16 | 0.031920435133 | 1,814,754 |
+| 1.25 | [0.066505622211, 0.066573122000] | 0.066505622211 | -1.8e-16 | -5.6e-17 | 0.066507277337 | 722,136 |
+| 1.30 | [0.086101793878, 0.086170343941] | 0.086101793878 | +4.3e-16 | +3.1e-16 | 0.086103036064 | 580,392 |
+| 1.35 | [0.106913550661, 0.106982835379] | 0.106913550661 | -6.9e-17 | +1.8e-16 | 0.106914064287 | 484,512 |
+| 1.40 | [0.128771895556, 0.128842740347] | 0.128771895556 | +1.4e-16 | -1.9e-16 | 0.128772506040 | 415,350 |
+| 1.45 | [0.151545318737, 0.151689017080] | 0.151545318737 | -3.9e-16 | -1.1e-16 | 0.151545622037 | 272,292 |
+| 1.50 | [0.175126200489, 0.175272043337] | 0.175126200489 | -1.1e-15 | -1.7e-16 | 0.175125721865 | 243,594 |
+| 1.60 | [0.224360202126, 0.224519465715] | 0.224360202126 | -1.1e-16 | +3.3e-16 | 0.224367291384 | 200,394 |
+| 2.00 | [0.441033924063, 0.441384755802] | 0.441033924063 | +8.3e-16 | -3.3e-16 | 0.441033584269 | 91,668 |
+| 3.00 | [1.052297757851, 1.053233148730] | 1.052297757851 | -6.7e-16 | +4.4e-16 | 1.052296691308 | 41,988 |
+
+**No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
+All 376 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
+(`ghat_digit_stability.csv`). A further 10 checks compare two artifacts to 1e−12; they are
+not printed numbers. 5 of them move in their last digits under the blanket δ, and none of
+those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
+P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict
+checks on them keep reporting that they are not rigorous in the last one or two ulps.
+
+Artifacts computed before the switch (stored R columns) keep the old float Ĝ; they differ by at most δ relative, which
+the check above covers. Every code path that computes R now reads `ghat_rigorous.ghat_R`.
+
+The "larger proven lower bound" column is the rigorous value at the branch and bound's own attained point. At nine a it
+exceeds Ĝ_cert, by up to 8.4e-05 relative. It is a valid lower bound but a different number from the one R has
+always used, so it is not adopted.

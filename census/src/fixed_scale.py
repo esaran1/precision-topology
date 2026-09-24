@@ -45,8 +45,8 @@ WORKERS = int(os.environ.get("FS_WORKERS", "4"))
 
 
 def _ghat_and_glob():
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    G = float(g[g.a.round(2) == A].Ghat_certified.iloc[0])
+    from .ghat_rigorous import ghat_R_of            # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    G = ghat_R_of(A)
     t = pd.read_csv(RESULTS / "cond_certified_brackets.csv")
     r = t[(t.a.round(2) == A) & (t.kind == "glob")].iloc[0]
     w2_glob = 0.5 * (r.w2_lo + r.w2_hi)

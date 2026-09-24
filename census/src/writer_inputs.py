@@ -1,7 +1,7 @@
 """Producers for the numbers in WRITER_INPUTS.md that no earlier artifact holds.
 
-Every R here uses the certified Ĝ (results/ghat_certified_all.csv, column
-Ghat_certified = the attained lower end of the enclosure).  R is linear in Ĝ, so
+Every R here uses the certified Ĝ as a rigorous enclosure's lower end (results/ghat_rigorous.csv, column
+Ghat_cert_rigorous: Arb's lower bound at the witness of the old float Ghat_certified; author's decision 2026-09-24).  R is linear in Ĝ, so
 switch points found by bracketing in |w2| (Block B) and crossings recorded as
 |w2| (phase2b checkpoints) convert exactly: R = |w2|·Ĝ_cert/2.
 
@@ -22,8 +22,8 @@ CROSS_RUNS = RESULTS / "wi_crossing_runs.csv"
 
 
 def ghat_cert():
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    return dict(zip(g.a.round(2), g.Ghat_certified))
+    from .ghat_rigorous import ghat_R               # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    return ghat_R()
 
 
 def crossings():

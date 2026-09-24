@@ -50,7 +50,11 @@ def pooled(certified: bool = True) -> pd.DataFrame:
         t = pd.read_csv(RESULTS / fn)
         if "a" not in t:
             t = t.assign(a=1.25)
-        g = t.a.map(lambda v: float(gg.loc[round(float(v), 2), col]))
+        if certified:                               # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+            from .ghat_rigorous import ghat_R_of
+            g = t.a.map(ghat_R_of)
+        else:
+            g = t.a.map(lambda v: float(gg.loc[round(float(v), 2), col]))
         frames.append(pd.DataFrame({"R": t.w2.abs() * g / 2,
                                     "solved": t.solved.astype(bool)}))
     return pd.concat(frames, ignore_index=True)

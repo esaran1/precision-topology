@@ -23,6 +23,8 @@ results/certificates/finite_a1.60_glob_hi.json,48ebfaf15e6854c374dec11f673cab499
 results/certificates/finite_a1.60_glob_hi.npz,e0aa120ef01ce6b934d0700308c21735b8860a8a7bb074fecd307f4f3563df7f,699310,python -m src.cert_export finite 1.6 2.0125 finite_a1.60_glob_hi
 results/certificates/finite_a1.60_glob_lo.json,230f23f106944034df2f9778624ff1654909aff41ac8de4a88c8893031d61963,1089,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
 results/certificates/finite_a1.60_glob_lo.npz,1d42ab3da52f25a9cef2e4f78e2ad28dcb0ab3757e51354305612b388efb2eb9,729650,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
+results/certificates/ghat_a1.02.json,6e876b36ecf7c9f168685946697ee315ea566d616ac882b3a68d5f563baa1617,1957,python -m src.cert_export ghat_stream 1.02 ghat_a1.02
+results/certificates/ghat_a1.02.npz,7fbdbf6f4ada7a5fa7c178a4a85fcb7a2b40c50d0dbec0b161183905db97195f,214483221,python -m src.cert_export ghat_stream 1.02 ghat_a1.02
 results/certificates/ghat_a1.05.json,de8d36cf3e83415fd7503232674e5e0741d8d38b1c210492237e903cf53dd6e4,663,python -m src.cert_export ghat 1.05 ghat_a1.05
 results/certificates/ghat_a1.05.npz,4c17f2b5603c5086e8247de7c1e0921c078bba245dbde2f89a15b0e2b5f42a60,4668588,python -m src.cert_export ghat 1.05 ghat_a1.05
 results/certificates/ghat_a1.10.json,a57335bb0d1eb2a2eb2effcdfe0a436a83a899c7b4ce7171f144541dd469ed27,660,python -m src.cert_export ghat 1.1 ghat_a1.10

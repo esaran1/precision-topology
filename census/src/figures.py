@@ -162,7 +162,7 @@ def fig_metric_check() -> None:
 
     from .metric_check import analyse, binned, runs
 
-    s = runs("certified")                      # certified Ĝ (ghat_certified_all.csv)
+    s = runs("certified")                      # certified Ĝ (rigorous: ghat_rigorous.csv)
     g = binned(s).rename(columns={"mid": "Rmid"})
     m = analyse("certified")
 

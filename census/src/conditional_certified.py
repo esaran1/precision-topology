@@ -132,8 +132,8 @@ def population():
         out = p.map(_pop_job, A_VALUES)
     thr = pd.DataFrame([r for r, _ in out])
     evals = pd.DataFrame([row for _, rows in out for row in rows]).sort_values(["a", "s"])
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    gm = dict(zip(g.a.round(2), g.Ghat_certified))
+    from .ghat_rigorous import ghat_R               # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    gm = ghat_R()
     sw = pd.read_csv(RESULTS / "blockB_switches.csv")
     thr["w2_glob_frozen"] = thr.a.map(dict(zip(sw.a.round(2), sw.w2_glob)))
     thr["w2_solve_frozen"] = thr.a.map(dict(zip(sw.a.round(2), sw.w2_solve)))
@@ -219,9 +219,9 @@ def brackets():
         out = p.map(_bracket_job, jobs)
     t = pd.DataFrame([r for r, _ in out])
     ev = pd.DataFrame([row for _, rows in out for row in rows]).sort_values(["a", "s"])
-    g = pd.read_csv(RESULTS / "ghat_certified_all.csv")
-    gm = dict(zip(g.a.round(2), g.Ghat_certified))
-    t["Ghat_cert"] = t.a.map(gm)
+    from .ghat_rigorous import ghat_R               # the rigorous Ĝ_cert (Block 2, author's decision 2026-09-24)
+    gm = ghat_R()
+    t["Ghat_cert"] = t.a.round(2).map(gm)
     t["R_lo"], t["R_hi"] = t.w2_lo * t.Ghat_cert / 2, t.w2_hi * t.Ghat_cert / 2
     t["R_frozen"] = t.w2_frozen * t.Ghat_cert / 2
     t["frozen_within_one_step"] = (t.w2_frozen > t.w2_lo - 1e-9) & (t.w2_frozen - t.w2_hi <= 0.05 + 1e-9)

@@ -351,9 +351,48 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
 
 {t5}"""
     text += wp6()
+    text += wp7()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
+
+
+def wp7():
+    """WP-7: Ĝ(a) as rigorous enclosures (author's decision 2026-09-24, Block 2 option (a))."""
+    g = pd.read_csv(RESULTS / "ghat_rigorous.csv", float_precision="round_trip")
+    ds = pd.read_csv(RESULTS / "ghat_digit_stability.csv").iloc[0]
+    e = lambda v: f"{v:+.1e}"
+    rows = "".join(f"| {r.a:.2f} | [{r.Ghat_cert_rigorous:.12f}, {r.Ghat_hi_rigorous:.12f}] | {r.Ghat_cert_published:.12f} | "
+                   f"{e(r.delta_cert)} | {e(r.delta_hi)} | {r.bnb_arg_lower:.12f} | {int(r.leaves):,} |\n"
+                   for r in g.itertuples())
+    return f"""
+## WP-7. Ĝ(a) as rigorous enclosures (replaces the float values; Block 2)
+
+Source: `ghat_rigorous.csv` (producer `src/ghat_rigorous.py`, from the independent Arb checker's results in
+`certificate_checks/`). **Every R now uses the rigorous lower end** `Ĝ_cert` below: the checker's lower bound on G at
+the same witness point as the published float value, rounded down to a double. The upper end is the checker's bound
+over every leaf of the branch and bound, rounded up. The domain reduction to w₁ ∈ (0, a/1.4] is analytic.
+
+| a | Ĝ(a) ∈ [Ĝ_cert, Ĝ_hi] (rigorous) | old float Ĝ_cert | change of Ĝ_cert | change of Ĝ_hi | larger proven lower bound (not adopted) | leaves |
+|---|---|---|---|---|---|---|
+{rows}
+**No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = {ds.delta:.1e}. Every R is linear in Ĝ.
+All {int(ds.printed_number_checks)} printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); {int(ds.unstable)} are unstable
+(`ghat_digit_stability.csv`). A further {int(ds.machine_precision_checks)} checks compare two artifacts to 1e−12; they are
+not printed numbers. {int(ds.machine_precision_moved)} of them move in their last digits under the blanket δ, and none of
+those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
+P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict
+checks on them keep reporting that they are not rigorous in the last one or two ulps.
+
+Artifacts computed before the switch (stored R columns) keep the old float Ĝ; they differ by at most δ relative, which
+the check above covers. Every code path that computes R now reads `ghat_rigorous.ghat_R`.
+
+The "larger proven lower bound" column is the rigorous value at the branch and bound's own attained point. At nine a it
+exceeds Ĝ_cert, by up to {float(((g.bnb_arg_lower - g.Ghat_cert_rigorous) / g.Ghat_cert_rigorous).max()):.1e} relative. It is a valid lower bound but a different number from the one R has
+always used, so it is not adopted.
+"""
 
 
 def wp6():
