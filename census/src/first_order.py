@@ -567,10 +567,6 @@ def score():
     print(t.to_string(index=False)); print(d.to_string(index=False))
 
 
-    else:
-        main()
-
-
 # ------------------------------------------------------------------ SUPPLEMENTARY: switch located along the branch
 def _fa(t, a): return t + a * iv.sin(t) if isinstance(t, type(iv.mpf(0))) else t + a * math.sin(t)
 def _fa1(t, a): return 1 + a * iv.cos(t) if isinstance(t, type(iv.mpf(0))) else 1 + a * math.cos(t)
@@ -768,3 +764,5 @@ if __name__ == "__main__":
         d = pd.DataFrame([ghat_rescaled(a) for a in A_TEST])
         d.to_csv(RESULTS / "first_order_ghat_rescaled.csv", index=False)
         print(d.to_string(index=False))
+    else:
+        main()
