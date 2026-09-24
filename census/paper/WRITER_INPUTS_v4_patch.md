@@ -294,3 +294,73 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
 | results/figures/v4/v4_prospective.pdf | 5.288 | 2.699 | Block 3: predicted against observed median crossing R in 8 held-out settings; C (λ fitted) filled, U (nothing fitted) open, B1, B2; bootstrap 95%. |
 | results/figures/v4/v4_prospective_own.pdf | 5.379 | 3.096 | Prospective own-seed test: (a) per-run crossing R against the frozen own threshold, with the fitted C_own lines; (b) mean per-run |log error| of U, C, U_own, C_own at each a with the registered verdicts. |
 | results/figures/v4/v4_thresholds.pdf | 5.338 | 3.123 | (a) certified R_glob and R_solve at a = 1.30–1.60 against free-training crossing violins, with the certified ε → 0 limits; (b) small ε: certified brackets at a = 1.01–1.04, the sharp limit and the first-order line; the registered c₁ test INCONCLUSIVE. |
+
+## WP-6. Crossing detection and the residual (post hoc audit; no registered verdict changes)
+
+Sources: `crossing_audit.md`, `crossing_audit_summary.csv`, `cadence_sensitivity.csv` (producers `src/crossing_audit.py`,
+`src/cadence_sensitivity.py`). Every rerun reproduced its stored crossing step and |w₂| bit for bit.
+
+**Check interval, stated beside each number.** Phase 2b (S3), the size test, both lag tests (every φ arm; the interval
+did not scale with the budget, which was 32,000/φ) and Block 4b check placement **every step**. Block 3, the prospective
+own-seed test and the Block G runs behind λ, B1 and B2 check **every 50 steps**.
+
+**Every-step experiments: the residual is unaffected by detection.** The upward bias of the recorded crossing is at most
+one step's growth of R: median 0.05%–0.15%
+of the threshold, at most 0.44%. The residual against the run's own threshold
+moves by at most 0.09 points under interpolation: S3 3.1% → 3.1% (a = 1.30) and
+6.6% → 6.6% (a = 1.50); the size test (the lag tests' φ = 1 arms and 4b's control)
+3.2% → 3.1% and 6.7% → 6.6%. Detection spacing is ruled out as the
+cause of the every-step residual.
+
+**50-step experiments: detection overstates the residual; interpolated values as a labelled sensitivity analysis.**
+Crossing located by linear interpolation of G between the last negative and the first positive 50-step check (all
+crossing runs):
+
+| quantity (check interval 50 steps) | check-based | interpolated (post hoc) |
+|---|---|---|
+| own-seed: median R_cross/U_own − 1, a = 1.30 (n = 460) | 4.1% | 2.9% |
+| own-seed: median R_cross/U_own − 1, a = 1.50 (n = 460) | 8.8% | 6.2% |
+| Block 3: median over settings of (median R/U) − 1, a = 1.30 | 8.8% | 7.3% |
+| Block 3: median over settings of (median R/U) − 1, a = 1.50 | 14.2% | 11.5% |
+| λ(1.30) (Block G base) | 1.1149 | 1.0979 |
+| λ(1.50) (Block G base) | 1.1644 | 1.1298 |
+| B2 pooled median crossing R (five Block G windows) | 0.2280 | 0.2260 |
+
+**The residual statement (narrower form, finalised on the full rerun).** Against the run's own threshold, the residual
+is about 3% at a = 1.30 and about 6–6.5% at a = 1.50 whether placement is checked every step (S3 3.1% and
+6.6%) or every 50 steps with the crossing interpolated (own-seed 2.9% and 6.2%).
+Against a population threshold it stays larger after interpolation (Block 3 against U: 7.3% and
+11.5%), so that excess is not a detection effect. The check-spacing explanation is ruled out for the every-step residual; in the 50-step
+experiments detection adds about 1.2 (a = 1.30) and 2.6
+(a = 1.50) points on top of it.
+
+**Registered comparisons under interpolation (sensitivity; the registered verdicts stand as scored).** Own-seed
+criteria as registered (statistic [95% interval]; pass/fail check-based / interpolated):
+
+| criterion | check-based | interpolated | verdict check / interpolated |
+|---|---|---|---|
+| own-seed P1, a = 1.30 | -0.0696 [-0.0852, -0.0565] | -0.0712 [-0.0863, -0.0585] | pass / pass |
+| own-seed P2a, a = 1.30 | -0.0136 [-0.0256, -0.0016] | -0.0302 [-0.0372, -0.0226] | pass / pass |
+| own-seed P3, a = 1.30 | -0.0448 [-0.0553, -0.0334] | -0.0523 [-0.0593, -0.0447] | pass / pass |
+| own-seed P4, a = 1.30 | 0.0419 [0.0010, 0.0610] | 0.0293 [0.0010, 0.0610] | pass / pass |
+| own-seed P1, a = 1.50 | -0.0695 [-0.0864, -0.0562] | -0.0698 [-0.0861, -0.0568] | pass / pass |
+| own-seed P2b, a = 1.50 | 0.0226 [0.0091, 0.0363] | -0.0025 [-0.0131, 0.0084] | pass / pass |
+| own-seed P3, a = 1.50 | -0.0318 [-0.0436, -0.0196] | -0.0468 [-0.0530, -0.0397] | pass / pass |
+| own-seed P4, a = 1.50 | 0.0867 [0.0340, 0.0940] | 0.0615 [0.0340, 0.0940] | pass / pass |
+
+For P4 the bracket is the registered acceptance range, not an interval. At a = 1.50 the P2b reading "C better than U_own (interval above 0)" holds check-based but not interpolated.
+
+Block 3, C against each baseline (upper end of the 95% interval of the |log error| difference; C better if < 0):
+
+| comparison | check-based | interpolated | check / interpolated |
+|---|---|---|---|
+| Block 3 C - B1, registered predictions | upper -0.1312 | upper -0.1270 | excludes 0 / excludes 0 |
+| Block 3 C - B2, registered predictions | upper -0.0105 | upper 0.0053 | excludes 0 / includes 0 |
+| Block 3 C - U, registered predictions | upper -0.0630 | upper -0.0363 | excludes 0 / excludes 0 |
+| Block 3 C - B1, cadence-matched C, B1 and B2 | upper -0.1312 | upper -0.1349 | excludes 0 / excludes 0 |
+| Block 3 C - B2, cadence-matched C, B1 and B2 | upper -0.0105 | upper -0.0169 | excludes 0 / excludes 0 |
+| Block 3 C - U, cadence-matched C, B1 and B2 | upper -0.0630 | upper -0.0544 | excludes 0 / excludes 0 |
+
+With the registered predictions (built from 50-step data) and interpolated observations the detection is mismatched;
+with C, B1 and B2 rebuilt from interpolated Block G crossings (cadence-matched) every registered comparison keeps its
+sign and excludes 0.

@@ -350,9 +350,103 @@ All figures are built at ICLR's text width (5.5 in) and placed at their built si
 Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figure_sizes.csv`).
 
 {t5}"""
+    text += wp6()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
+
+
+def wp6():
+    """WP-6: crossing detection and the residual (post hoc audit, author's decision 2026-09-24)."""
+    sm = pd.read_csv(RESULTS / "crossing_audit_summary.csv")
+    cs = pd.read_csv(RESULTS / "cadence_sensitivity.csv")
+    pct = lambda v: f"{100 * v:.1f}%"
+    pp = lambda v: f"{100 * v:.2f}%"
+
+    def fam(prefix, a, col):
+        return float(sm[sm.family.str.startswith(prefix) & (sm.a.round(2) == a)][col].iloc[0])
+
+    def q(exp, a, quantity, col):
+        g = cs[(cs.experiment == exp) & (cs.quantity == quantity)]
+        if a is not None:
+            g = g[g.a.round(2) == a]
+        return float(g[col].iloc[0])
+    every = sm[sm.check_interval == 1]
+    own = {a: (q("own-seed", a, "median residual R_cross / U_own - 1", "check_based"),
+               q("own-seed", a, "median residual R_cross / U_own - 1", "interpolated")) for a in (1.3, 1.5)}
+    b3 = {a: (q("Block 3", a, "median over settings of (median R / U) - 1", "check_based"),
+              q("Block 3", a, "median over settings of (median R / U) - 1", "interpolated")) for a in (1.3, 1.5)}
+    lam = {a: (q("Block G base (lambda)", a, "lambda(a)", "check_based"),
+               q("Block G base (lambda)", a, "lambda(a)", "interpolated")) for a in (1.3, 1.5)}
+    b2 = (q("Block G all windows (B2)", None, "B2 pooled median crossing R", "check_based"),
+          q("Block G all windows (B2)", None, "B2 pooled median crossing R", "interpolated"))
+    s3 = {a: (fam("phase 2b", a, "median_residual_check"), fam("phase 2b", a, "median_residual_interp_check")) for a in (1.3, 1.5)}
+    sz = {a: (fam("size test", a, "median_residual_check"), fam("size test", a, "median_residual_interp_check")) for a in (1.3, 1.5)}
+    o = cs[(cs.experiment == "own-seed") & cs.quantity.str.endswith("[registered predictions]")]
+    b = cs[(cs.experiment == "Block 3") & cs.quantity.str.contains("ci95_hi")]
+    rows_o = "".join(f"| own-seed {r.quantity.split()[0]}, a = {r.a:.2f} | {r.check_based:.4f} [{r.check_lo:.4f}, {r.check_hi:.4f}] "
+                     f"| {r.interpolated:.4f} [{r.interp_lo:.4f}, {r.interp_hi:.4f}] | {'pass' if r.check_pass else 'FAIL'} / "
+                     f"{'pass' if r.interp_pass else 'FAIL'} |\n" for r in o.itertuples())
+    rows_b = "".join(f"| Block 3 {r.quantity.split(' ci95')[0]}, {r.quantity.split('[')[1].rstrip(']')} | upper {r.check_based:.4f} "
+                     f"| upper {r.interpolated:.4f} | {'excludes 0' if r.check_pass else 'includes 0'} / "
+                     f"{'excludes 0' if r.interp_pass else 'includes 0'} |\n" for r in b.itertuples())
+    return f"""
+## WP-6. Crossing detection and the residual (post hoc audit; no registered verdict changes)
+
+Sources: `crossing_audit.md`, `crossing_audit_summary.csv`, `cadence_sensitivity.csv` (producers `src/crossing_audit.py`,
+`src/cadence_sensitivity.py`). Every rerun reproduced its stored crossing step and |w₂| bit for bit.
+
+**Check interval, stated beside each number.** Phase 2b (S3), the size test, both lag tests (every φ arm; the interval
+did not scale with the budget, which was 32,000/φ) and Block 4b check placement **every step**. Block 3, the prospective
+own-seed test and the Block G runs behind λ, B1 and B2 check **every 50 steps**.
+
+**Every-step experiments: the residual is unaffected by detection.** The upward bias of the recorded crossing is at most
+one step's growth of R: median {pp(every.growth_over_interval_rel_median.min())}–{pp(every.growth_over_interval_rel_median.max())}
+of the threshold, at most {pp(every.growth_over_interval_rel_max.max())}. The residual against the run's own threshold
+moves by at most 0.09 points under interpolation: S3 {pct(s3[1.3][0])} → {pct(s3[1.3][1])} (a = 1.30) and
+{pct(s3[1.5][0])} → {pct(s3[1.5][1])} (a = 1.50); the size test (the lag tests' φ = 1 arms and 4b's control)
+{pct(sz[1.3][0])} → {pct(sz[1.3][1])} and {pct(sz[1.5][0])} → {pct(sz[1.5][1])}. Detection spacing is ruled out as the
+cause of the every-step residual.
+
+**50-step experiments: detection overstates the residual; interpolated values as a labelled sensitivity analysis.**
+Crossing located by linear interpolation of G between the last negative and the first positive 50-step check (all
+crossing runs):
+
+| quantity (check interval 50 steps) | check-based | interpolated (post hoc) |
+|---|---|---|
+| own-seed: median R_cross/U_own − 1, a = 1.30 (n = 460) | {pct(own[1.3][0])} | {pct(own[1.3][1])} |
+| own-seed: median R_cross/U_own − 1, a = 1.50 (n = 460) | {pct(own[1.5][0])} | {pct(own[1.5][1])} |
+| Block 3: median over settings of (median R/U) − 1, a = 1.30 | {pct(b3[1.3][0])} | {pct(b3[1.3][1])} |
+| Block 3: median over settings of (median R/U) − 1, a = 1.50 | {pct(b3[1.5][0])} | {pct(b3[1.5][1])} |
+| λ(1.30) (Block G base) | {lam[1.3][0]:.4f} | {lam[1.3][1]:.4f} |
+| λ(1.50) (Block G base) | {lam[1.5][0]:.4f} | {lam[1.5][1]:.4f} |
+| B2 pooled median crossing R (five Block G windows) | {b2[0]:.4f} | {b2[1]:.4f} |
+
+**The residual statement (narrower form, finalised on the full rerun).** Against the run's own threshold, the residual
+is about 3% at a = 1.30 and about 6–6.5% at a = 1.50 whether placement is checked every step (S3 {pct(s3[1.3][1])} and
+{pct(s3[1.5][1])}) or every 50 steps with the crossing interpolated (own-seed {pct(own[1.3][1])} and {pct(own[1.5][1])}).
+Against a population threshold it stays larger after interpolation (Block 3 against U: {pct(b3[1.3][1])} and
+{pct(b3[1.5][1])}), so that excess is not a detection effect. The check-spacing explanation is ruled out for the every-step residual; in the 50-step
+experiments detection adds about {100 * (own[1.3][0] - own[1.3][1]):.1f} (a = 1.30) and {100 * (own[1.5][0] - own[1.5][1]):.1f}
+(a = 1.50) points on top of it.
+
+**Registered comparisons under interpolation (sensitivity; the registered verdicts stand as scored).** Own-seed
+criteria as registered (statistic [95% interval]; pass/fail check-based / interpolated):
+
+| criterion | check-based | interpolated | verdict check / interpolated |
+|---|---|---|---|
+{rows_o}
+For P4 the bracket is the registered acceptance range, not an interval. At a = 1.50 the P2b reading "C better than U_own (interval above 0)" holds check-based but not interpolated.
+
+Block 3, C against each baseline (upper end of the 95% interval of the |log error| difference; C better if < 0):
+
+| comparison | check-based | interpolated | check / interpolated |
+|---|---|---|---|
+{rows_b}
+With the registered predictions (built from 50-step data) and interpolated observations the detection is mismatched;
+with C, B1 and B2 rebuilt from interpolated Block G crossings (cadence-matched) every registered comparison keeps its
+sign and excludes 0.
+"""
 
 
 

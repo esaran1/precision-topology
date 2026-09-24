@@ -816,6 +816,10 @@ PRODUCERS = {
     "writer_patch_figure_sizes.csv": ("writer_patch", "figure_sizes", "full", ""),
     "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
     "crossing_audit_runs.csv": ("crossing_audit", "main", "full", ""),
+    "crossing_audit_full_runs.csv": ("cadence_sensitivity", "runs", "full", ""),
+    "cadence_sensitivity.csv": ("cadence_sensitivity", "main", "full", ""),
+    "cadence_sensitivity_block3.csv": ("cadence_sensitivity", "main", "full", ""),
+    "cadence_sensitivity_own_seed.csv": ("cadence_sensitivity", "main", "full", ""),
     "scale_limits_tanh.csv": ("scale_limits_tanh", "main", "full", ""),
     "scale_limits_tanh_maximisers.csv": ("scale_limits_tanh", "main", "full", ""),
     "scale_limits_tanh_summary.csv": ("scale_limits_tanh", "main", "full", ""),
@@ -1213,6 +1217,34 @@ def v4_checks() -> None:
     t40_ = tm_[tm_.A == 40.0]
     chk("tanh: A = 40 near-maximisers off the boundary", float((t40_.max_abs_alpha_over_A < 0.999).sum()), 9.0, 0)
     chk("tanh: A = 40 tie-set size", float(len(t40_)), 1107.0, 0)
+    print("WP-6: 50-step rerun and cadence sensitivity (POST HOC)")
+    fr_ = pd.read_csv(R / "crossing_audit_full_runs.csv")
+    chk("full rerun: replays", float(len(fr_)), 1998.0, 0)
+    chk("full rerun: every replay reproduced", float(fr_.reproduced.all()), 1.0, 0)
+    cs_ = pd.read_csv(R / "cadence_sensitivity.csv")
+    def _cs(exp, a, qty, col):
+        g = cs_[(cs_.experiment == exp) & (cs_.quantity == qty)]
+        g = g if a is None else g[g.a.round(2) == a]
+        return float(g[col].iloc[0])
+    for a_, c_, i_ in ((1.3, 0.0412, 0.0291), (1.5, 0.0878, 0.0622)):
+        chk(f"own-seed residual a={a_} check", _cs("own-seed", a_, "median residual R_cross / U_own - 1", "check_based"), c_, 0.00006)
+        chk(f"own-seed residual a={a_} interp", _cs("own-seed", a_, "median residual R_cross / U_own - 1", "interpolated"), i_, 0.00006)
+    for a_, c_, i_ in ((1.3, 0.0876, 0.0732), (1.5, 0.1421, 0.1154)):
+        chk(f"Block 3 residual vs U a={a_} check", _cs("Block 3", a_, "median over settings of (median R / U) - 1", "check_based"), c_, 0.00006)
+        chk(f"Block 3 residual vs U a={a_} interp", _cs("Block 3", a_, "median over settings of (median R / U) - 1", "interpolated"), i_, 0.00006)
+    for a_, c_, i_ in ((1.3, 1.1149, 1.0979), (1.5, 1.1644, 1.1298)):
+        chk(f"lambda a={a_} check", _cs("Block G base (lambda)", a_, "lambda(a)", "check_based"), c_, 0.00006)
+        chk(f"lambda a={a_} interp", _cs("Block G base (lambda)", a_, "lambda(a)", "interpolated"), i_, 0.00006)
+    chk("B2 check", _cs("Block G all windows (B2)", None, "B2 pooled median crossing R", "check_based"), 0.2280, 0.00006)
+    chk("B2 interp", _cs("Block G all windows (B2)", None, "B2 pooled median crossing R", "interpolated"), 0.2260, 0.00006)
+    p2b_ = cs_[(cs_.experiment == "own-seed") & (cs_.quantity == "P2b stat [registered predictions]")].iloc[0]
+    chk("P2b a=1.50 check interval above 0", float(p2b_.check_lo > 0), 1.0, 0)
+    chk("P2b a=1.50 interp interval includes 0", float(p2b_.interp_lo < 0 < p2b_.interp_hi), 1.0, 0)
+    chk("every own-seed criterion passes both ways", float(cs_[cs_.experiment == "own-seed"].dropna(subset=["check_pass"])
+                                                           [["check_pass", "interp_pass"]].astype(bool).all().all()), 1.0, 0)
+    b3m_ = cs_[(cs_.experiment == "Block 3") & cs_.quantity.str.contains("ci95_hi") & cs_.quantity.str.contains("cadence-matched")]
+    chk("Block 3 cadence-matched: every comparison excludes 0", float(b3m_.interp_pass.astype(bool).all() and len(b3m_) == 3), 1.0, 0)
+    chk("Block 3 registered preds: C - B2 upper interp", float(cs_[cs_.quantity == "C - B2 ci95_hi [registered predictions]"].interpolated.iloc[0]), 0.0053, 0.00006)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

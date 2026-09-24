@@ -307,6 +307,12 @@ def full_jobs():
     bg = bg[(bg.window == "base") & bg.a.round(2).isin(A_VALUES) & bg.cross_step.notna()]
     jobs += [("Block G base (lambda)", base, round(float(r.a), 2), int(r.seed), int(r.cross_step), float(r.cross_w2))
              for r in bg.itertuples()]
+    # the other four Block G windows (B2 pools crossing R over all five): added so that B2 can be cadence-matched
+    allw = {w.tag: w for w in old}
+    bo = pd.read_csv(RESULTS / "blockG_crossings.csv", float_precision="round_trip")
+    bo = bo[(bo.window != "base") & bo.cross_step.notna()]
+    jobs += [("Block G other windows (B2)", allw[r.window], round(float(r.a), 2), int(r.seed), int(r.cross_step),
+              float(r.cross_w2)) for r in bo.itertuples()]
     pr = pd.read_csv(RESULTS / "prospective_runs.csv", float_precision="round_trip")
     jobs += [("Block 3", held[r.window], round(float(r.a), 2), int(r.seed), int(r.cross_step), float(r.cross_w2))
              for r in pr[pr.cross_step.notna()].itertuples()]

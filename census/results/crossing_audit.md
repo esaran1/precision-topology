@@ -124,3 +124,36 @@ differs from the difference of the two medians.)
     as a labelled post hoc sensitivity. Doing that for the full run sets needs G at each 50-step check, which is
     not stored (the own-seed log keeps w₁ and w₂ but not b₁). That would be a rerun of all 720 Block 3 runs, 960
     own-seed runs and 80 base-window runs, logging G at checks only: minutes of compute.
+
+## 5. Full 50-step rerun and sensitivity analysis (approved by the author, 2026-09-24; POST HOC)
+
+- **Rerun.** Every crossing run of the 50-step experiments was replayed to its stored crossing, logging G and |w₂| at
+  each 50-step check (`python -m src.crossing_audit full`; `crossing_audit_full_runs.csv`):
+  - Block 3: 699 runs;
+  - own-seed: 920 runs;
+  - Block G base (λ, B1): 74 runs;
+  - the other four Block G windows: 305 runs. These were added so that B2, pooled over all five windows, could be
+    cadence-matched. That goes slightly beyond the 1,760 approved; the addition is disclosed here.
+- **Not rerun**: 67 of the approved 1,760 runs never crossed, so they have no crossing to locate.
+- **Reproduction.** Every one of the 1,998 replays reproduced its stored crossing step and |w₂| bit for bit.
+  - Resources: 337 s plus about 1 min, at ≤ 0.35 GB.
+  - The 305-run addition briefly ran as a fourth process beside three others, over the three-worker cap, for about
+    one minute.
+- **Validation of the sensitivity code** (`src/cadence_sensitivity.py`). The check-based path reproduces the committed
+  numbers exactly:
+  - λ(1.30) = 1.11487 and λ(1.50) = 1.16440;
+  - B2 = 0.22803;
+  - every Block 3 comparison (`prospective_comparisons.csv`) to 1e−12;
+  - every own-seed criterion (`prospective_own_scores.csv`, primary) to 1e−12.
+- **Results.** In `cadence_sensitivity.csv` (all quantities), `cadence_sensitivity_block3.csv` and
+  `cadence_sensitivity_own_seed.csv`. They are written into the writer inputs as WP-6, with the check interval stated
+  beside each number.
+  - Own-seed, median R_cross/U_own − 1 (460 crossers per a): 4.1% → 2.9% (a = 1.30) and 8.8% → 6.2% (a = 1.50).
+  - λ: 1.1149 → 1.0979 and 1.1644 → 1.1298.
+  - Every registered own-seed criterion passes under both definitions. At a = 1.50 the reading "C better than U_own"
+    (P2b, interval above 0) holds check-based but not interpolated.
+  - Block 3 with cadence-matched C, B1 and B2: every registered comparison keeps its sign and excludes 0. With the
+    registered (50-step) predictions against interpolated observations, C − B2 includes 0.
+- **The residual statement** (the author's narrower wording, finalised on the full rerun, WP-6). Against the run's
+  own threshold, the residual is about 3% at a = 1.30 and 6–6.5% at a = 1.50, both with every-step checks and with
+  50-step checks when the crossing is interpolated.
