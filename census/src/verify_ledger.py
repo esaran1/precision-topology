@@ -704,6 +704,12 @@ PRODUCERS = {
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
     "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
     "mirror_q2_s1_breakdown.csv": ("mirror_branches", "q2_s1_breakdown", "full", ""),
+    "mirror_init_match.csv": ("mirror_branches", "analyse", "full", ""),
+    "mirror_occupancy.csv": ("mirror_branches", "analyse", "full", ""),
+    "mirror_s1.csv": ("mirror_branches", "analyse", "full", ""),
+    "mirror_s3.csv": ("mirror_branches", "analyse", "full", ""),
+    "mirror_gap_summary.csv": ("mirror_branches", "mirror_gap", "full", ""),
+    "mirror_branch_thresholds.csv": ("mirror_branches", "thresholds", "full", ""),
     "sample_size_tests.csv": ("sample_size", "score", "full", ""),
     "sample_size_cells.csv": ("sample_size", "score", "full", ""),
     "sample_size_certify.csv": ("sample_size", "certify", "full", ""),
@@ -909,6 +915,21 @@ def v4_checks() -> None:
         chk(f"size test {a_}/{n_}: free offset", float(sc_.loc[(a_, n_), "free_offset"]), off_, 0.0001)
     scc_ = pd.read_csv(R / "sample_size_certify.csv")
     chk("size test: certified contradictions", float(((scc_.cert_lo == "plus") | (scc_.cert_hi == "minus")).sum()), 0.0, 0)
+    im_ = pd.read_csv(R / "mirror_init_match.csv").set_index("group")
+    chk("mirror: init match B45", float(im_.loc["B45 free crossing", "frac_matching_init"]), 0.4972, 0.0001)
+    oc_ = pd.read_csv(R / "mirror_occupancy.csv")
+    chk("mirror: pooled init match", float((oc_.branch == oc_.init_branch).mean()), 0.5138, 0.0001)
+    s1m_ = pd.read_csv(R / "mirror_s1.csv").set_index("rule")
+    chk("mirror S1: starting-branch agreement", float(s1m_.loc["branch at the replay's starting checkpoint", "agreement"]), 0.9941, 0.0001)
+    chk("mirror S1: init-branch agreement", float(s1m_.loc["branch selected by initialisation", "agreement"]), 0.7444, 0.0001)
+    chk("mirror S1: replays end on starting branch", float(s1m_.loc["replays ending on their starting checkpoint's branch", "agreement"]), 1.0, 0)
+    s3m_ = pd.read_csv(R / "mirror_s3.csv").set_index(["a", "threshold"])
+    chk("mirror S3 1.30: crossing-branch rho", float(s3m_.loc[(1.3, "branch occupied at the crossing"), "spearman_rho"]), 0.9974, 0.0001)
+    chk("mirror S3 1.50: crossing-branch residual", float(s3m_.loc[(1.5, "branch occupied at the crossing"), "residual_median_log"]), 0.0625, 0.0001)
+    chk("mirror S3 1.30: init-branch rho", float(s3m_.loc[(1.3, "branch selected by initialisation"), "spearman_rho"]), 0.1297, 0.0001)
+    gs_ = pd.read_csv(R / "mirror_gap_summary.csv").iloc[0]
+    chk("mirror gap median", float(gs_.gap_rel_median), 0.1063, 0.0001)
+    chk("mirror gap exceeds distance", float(gs_.gap_exceeds_distance), 281.0, 0)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

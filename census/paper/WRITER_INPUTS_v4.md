@@ -293,8 +293,24 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     - **Say**: "among replays that end on the globally preferred branch of their own loss, the own
       threshold matches the outcome in 99% of cases; the disagreements are runs that end in the mirror
       basin".
-    - Whether a branch known before the run (the starting branch, or the one the initialisation selects)
-      predicts outcomes is the separate, pending question.
+    - **Can the branch be known before the run?** (post hoc, `mirror_*.csv`)
+      - **Initialisation does not select the mirror branch.** The initialisation-selected branch matches
+        the branch at the free-training crossing in **51%** of runs: 0.50 for Block 4/5 (177 runs), 0.55
+        at 1.30 and 0.55 at 1.50 (38 runs each). That is a coin flip.
+      - The **starting checkpoint's branch** does determine a fixed-scale replay's end branch (100% of
+        replays). With that branch's threshold, S1's per-replay agreement is **0.994**, against 0.894
+        for the global own threshold and 0.760 for the population rule.
+      - The starting branch is known when a replay starts. For a free-training run it is not known before
+        training.
+    - **The mirror thresholds differ substantially**: |T₊ − T₋|/T_global has median 0.106, IQR
+      0.042–0.183 and maximum 0.40 at n = 400. That gap exceeds the replay's distance from its own
+      threshold for 281 of the 288 disagreements.
+    - **S3 with branch-matched thresholds**:
+      - using the branch occupied at the crossing (known only then), crossing R tracks the threshold with
+        **ρ = 0.997 (1.30) and 0.995 (1.50)**;
+      - using the initialisation-selected branch, ρ is 0.13 and 0.12.
+      - **The residual is unchanged either way**: 3.0% and 6.3%, against 3.1% and 6.4% with the global
+        threshold. So the residual is **not** mirror occupancy.
     - **The 15 disagreements on the preferred branch** (`mirror_basin_census_preferred.csv`):
       - **No third basin.**
       - **8 are on the degenerate plateau**: w₁ ≈ 0, flat Hessian, loss ≈ log 2. The run never left the

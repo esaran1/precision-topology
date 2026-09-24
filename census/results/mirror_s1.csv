@@ -1,0 +1,8 @@
+rule,agreement,n
+registered: own global threshold,0.8939226519337017,2715
+population rule (level > 1),0.7602209944751381,2715
+branch occupied at the 64k endpoint (circular),0.9941068139963167,2715
+branch at the replay's starting checkpoint,0.9941068139963167,2715
+branch selected by initialisation,0.7443830570902394,2715
+replays ending on the initialisation's branch,0.5156537753222836,2715
+replays ending on their starting checkpoint's branch,1.0,2715
