@@ -704,6 +704,7 @@ PRODUCERS = {
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
     "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
     "mirror_q2_s1_breakdown.csv": ("mirror_branches", "q2_s1_breakdown", "full", ""),
+    "mirror_basin_census_preferred.csv": ("mirror_branches", "basin_census", "full", ""),
     "mirror_global_branch.csv": ("mirror_branches", "global_branch_levels", "full", ""),
     "diagnose_below.csv": ("diagnose_below", "main", "full", ""),
     "fixed_scale_horizons_tests.csv": ("fixed_scale", "score_horizons", "full", ""),
@@ -884,6 +885,12 @@ def v4_checks() -> None:
     q2_ = mb_[mb_.part == "Q2 vs own"].set_index("level")
     chk("mirror: placed below own at 0.9/0.95 all on mirror",
         float((q2_.placed_below_own == q2_.placed_below_own_on_mirror).all() and q2_.placed_below_own.sum() == 41), 1.0, 0)
+    cp_ = pd.read_csv(R / "mirror_basin_census_preferred.csv")
+    chk("census preferred: 15 disagreements", float(len(cp_)), 15.0, 0)
+    chk("census preferred: no third basin", float((cp_.basin == "other").sum()), 0.0, 0)
+    chk("census preferred: plateau cases", float(cp_.kind.str.startswith("degenerate").sum()), 8.0, 0)
+    chk("census preferred: non-plateau within 0.35% of own threshold",
+        float((cp_[~cp_.kind.str.startswith("degenerate")].dist < 0.0035).all()), 1.0, 0)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

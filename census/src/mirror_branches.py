@@ -383,9 +383,10 @@ def basin_census(workers=2, subset="all"):
         rows = [r for part in pool.map(_census_job, jobs, chunksize=1) for r in part]
     c = pd.DataFrame(rows)
     c["switch_over_pop"] = c.switch_s / w2p
-    c["kind"] = np.where(c.basin == "other", "third basin",
-                         np.where((c.grad_norm_end > 1e-4) | (c.dist_end_to_loc_min > 1e-3), "slow relaxation",
-                                  "at the branch minimiser"))
+    c["kind"] = np.where(c.w1c.abs() < 0.05, "degenerate plateau (w1 ≈ 0, loss ≈ log 2; branch label arbitrary)",
+                np.where(c.basin == "other", "third basin",
+                         np.where((c.grad_norm_end > 1e-4) | (c.dist_end_to_loc_min > 1e-3), "slow relaxation near the switch",
+                                  "at the branch minimiser")))
     c.to_csv(RESULTS / ("mirror_basin_census.csv" if subset == "all" else "mirror_basin_census_preferred.csv"), index=False)
     print(c[["seed", "level", "placed", "dist", "G_end", "loc_min_G", "grad_norm_end", "dist_end_to_loc_min",
              "loc_min_hess_min", "basin", "kind"]].to_string(index=False))

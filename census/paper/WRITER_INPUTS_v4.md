@@ -295,6 +295,18 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
       basin".
     - Whether a branch known before the run (the starting branch, or the one the initialisation selects)
       predicts outcomes is the separate, pending question.
+    - **The 15 disagreements on the preferred branch** (`mirror_basin_census_preferred.csv`):
+      - **No third basin.**
+      - **8 are on the degenerate plateau**: w₁ ≈ 0, flat Hessian, loss ≈ log 2. The run never left the
+        constant predictor, so its branch label is arbitrary.
+      - **4 are slow relaxation within 0.35% of the run's own threshold.**
+      - **3 sit at the branch minimiser** within 0.023% of the threshold, below the own threshold's
+        bracket resolution.
+    - **Separating the plateau** (24 of 2,715 endpoints, 0.9%):
+      - off-plateau, preferred branch: 2,078 replays, agreement **0.9966** (7 disagreements, all within
+        0.35% of the own threshold);
+      - off-plateau, mirror branch: 613 replays, agreement 0.561;
+      - plateau: 24 replays, 12 disagreements.
     - Whether the mirror branch's own threshold then predicts those runs is pending (branch thresholds
       computing).
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
