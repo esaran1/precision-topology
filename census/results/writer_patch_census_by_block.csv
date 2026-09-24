@@ -1,0 +1,118 @@
+by,group,scoring,PASS,FAIL,PARTIAL,UNRESOLVED,n
+block,A5d k=1,registered rule,2,1,0,2,5
+block,A5d k=10,registered rule,1,2,0,2,5
+block,Arrhenius 08-27,registered rule,15,11,1,15,42
+block,B,post hoc (census),1,2,0,0,3
+block,Block 3 (held-out windows),post hoc (census),0,0,1,0,1
+block,Block 3 (held-out windows),registered rule,2,0,0,0,2
+block,Block 4 (fixed scale),registered rule,2,1,0,0,3
+block,Block 4 horizon extension,registered rule,0,2,0,0,2
+block,Block 5 (retention),registered rule,2,0,0,0,2
+block,C,registered rule,1,2,0,0,3
+block,E,post hoc (census),1,0,0,0,1
+block,E,registered rule,2,3,0,0,5
+block,E-stall,registered rule,0,2,0,0,2
+block,F,registered rule,1,1,0,2,4
+block,G,registered rule,3,2,0,0,5
+block,H,registered rule,0,1,0,2,3
+block,K,registered rule,3,2,0,0,5
+block,MNIST budget law 09-11,registered rule,0,1,0,2,3
+block,R-collapse 09-12,post hoc (census),0,0,1,0,1
+block,R-collapse 09-12,registered rule,0,1,1,0,2
+block,S2 (withdrawn),registered rule,1,1,0,0,2
+block,c1 first order,registered rule,1,0,0,2,3
+block,collapse 09-12,post hoc (census),0,1,0,0,1
+block,collapse 09-12,registered rule,1,2,0,0,3
+block,corrugation 08-06,registered rule,0,2,0,0,2
+block,corrugation readings 08-22,registered rule,2,0,0,0,2
+block,cross-family,registered rule,3,1,0,0,4
+block,early census 08-23,post hoc (census),0,2,0,0,2
+block,early census 08-23,registered rule,7,1,2,1,11
+block,early census 08-23 (basin),registered rule,1,4,0,0,5
+block,early census 08-23 (width),registered rule,3,1,0,0,4
+block,interleaved 08-05,registered rule,0,0,0,2,2
+block,kappa,registered rule,3,1,0,0,4
+block,lag test,registered rule,1,1,0,0,2
+block,lag test 2 (deconfounded),registered rule,0,2,0,0,2
+block,localization 08-22,post hoc (census),0,1,0,0,1
+block,localization 08-22,registered rule,1,0,1,0,2
+block,metric artifact 09-12,post hoc (census),0,0,2,0,2
+block,nu,registered rule,0,1,0,0,1
+block,own-seed thresholds,post hoc (census),0,0,1,0,1
+block,own-seed thresholds,registered rule,1,1,0,0,2
+block,phase1,registered rule,1,1,0,0,2
+block,phase2b,registered rule,0,1,0,0,1
+block,phase2b across a,registered rule,2,1,0,1,4
+block,precision,registered rule,0,0,0,1,1
+block,prospective own-seed,registered rule,8,0,0,0,8
+block,sample size,post hoc (census),0,0,1,0,1
+block,sample size,registered rule,1,1,0,0,2
+block,scaling limit,post hoc (census),0,0,1,0,1
+block,scaling limit,registered rule,3,0,0,0,3
+block,search 08-22,registered rule,2,0,2,0,4
+block,third optimizer 09-14,registered rule,2,0,0,0,2
+block,threshold 08-22,post hoc (census),1,0,0,0,1
+block,threshold 08-22,registered rule,2,1,1,0,4
+block,winding 08-22,registered rule,4,0,0,0,4
+registration_file,results/amplification_prediction.md,post hoc (census),0,1,0,0,1
+registration_file,results/amplification_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/arrhenius_prediction.md,registered rule,15,11,1,15,42
+registration_file,results/basin_prediction.md,registered rule,1,4,0,0,5
+registration_file,results/blockA5d_k1_prediction.md,registered rule,2,1,0,2,5
+registration_file,results/blockA5d_prediction.md,registered rule,1,2,0,2,5
+registration_file,results/blockB_prediction.md,post hoc (census),1,2,0,0,3
+registration_file,results/blockC_equivalence_prediction.md,registered rule,1,2,0,0,3
+registration_file,results/blockE_redesign.md,registered rule,1,1,0,0,2
+registration_file,results/blockE_stall_prediction.md,registered rule,0,2,0,0,2
+registration_file,results/blockF_lag_prediction.md,post hoc (census),1,0,0,0,1
+registration_file,results/blockF_lag_prediction.md,registered rule,2,3,0,2,7
+registration_file,results/blockG_g3_correction.md,registered rule,0,1,0,0,1
+registration_file,results/blockG_prediction.md,registered rule,3,1,0,0,4
+registration_file,results/blockH_rate_prediction.md,registered rule,0,1,0,2,3
+registration_file,results/blockK_prediction.md,registered rule,3,2,0,0,5
+registration_file,results/blockS2_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/bottleneck_prediction.md,registered rule,0,1,0,1,2
+registration_file,results/collapse_prediction.md,post hoc (census),0,1,0,0,1
+registration_file,results/collapse_prediction.md,registered rule,1,2,0,0,3
+registration_file,results/corrugation_prediction.md,registered rule,0,2,0,0,2
+registration_file,results/corrugation_readings_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/crossfamily_followup_prediction.md,registered rule,1,0,0,0,1
+registration_file,results/crossfamily_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/crossfamily_q1control_prediction.md,registered rule,1,0,0,0,1
+registration_file,results/first_order_prediction.md,registered rule,1,0,0,2,3
+registration_file,results/fixed_scale_horizon_prediction.md,registered rule,0,2,0,0,2
+registration_file,results/fixed_scale_prediction.md,registered rule,4,1,0,0,5
+registration_file,results/fold1d_prediction.md,registered rule,2,0,2,0,4
+registration_file,results/gelu_scale_prediction.md,post hoc (census),0,1,0,0,1
+registration_file,results/gelu_scale_prediction.md,registered rule,1,0,0,0,1
+registration_file,results/interleaved_predictions.md,registered rule,0,0,0,2,2
+registration_file,results/kappa_certification_prediction.md,registered rule,3,1,0,0,4
+registration_file,results/lag_test2_prediction.md,registered rule,0,2,0,0,2
+registration_file,results/lag_test_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/localization_prediction.md,post hoc (census),0,1,0,0,1
+registration_file,results/localization_prediction.md,registered rule,1,0,1,0,2
+registration_file,results/metric_artifact_prediction.md,post hoc (census),0,0,2,0,2
+registration_file,results/mnist_budget_law_prediction.md,registered rule,0,1,0,2,3
+registration_file,results/nu_prediction.md,registered rule,0,1,0,0,1
+registration_file,results/offset_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/own_threshold_prediction.md,post hoc (census),0,0,1,0,1
+registration_file,results/own_threshold_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/phase1_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/phase2b_across_a_prediction.md,registered rule,2,1,0,1,4
+registration_file,results/phase2b_prediction.md,registered rule,0,1,0,0,1
+registration_file,results/precision_prediction.md,registered rule,0,0,0,1,1
+registration_file,results/prospective_own_prediction.md,registered rule,8,0,0,0,8
+registration_file,results/prospective_prediction.md,post hoc (census),0,0,1,0,1
+registration_file,results/prospective_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/r_collapse_prediction.md,post hoc (census),0,0,1,0,1
+registration_file,results/r_collapse_prediction.md,registered rule,0,1,1,0,2
+registration_file,results/sample_size_prediction.md,post hoc (census),0,0,1,0,1
+registration_file,results/sample_size_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/scaling_limit_prediction.md,post hoc (census),0,0,1,0,1
+registration_file,results/scaling_limit_prediction.md,registered rule,3,0,0,0,3
+registration_file,results/search_prediction.md,registered rule,2,0,2,0,4
+registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
+registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4
+registration_file,results/width_prediction.md,registered rule,3,1,0,0,4
+registration_file,results/winding_prediction.md,registered rule,4,0,0,0,4

@@ -217,6 +217,52 @@ A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
 
 ## 5. Finite-a certificates (Block 1c)
 
+### 5.0 Localisation of the finite-a search: the bound W(s, a)
+
+The finite-a certificates (Block 1c: `conditional_certified.evaluate` → `profiled_bnb.certify`) search the
+compact domain |w₁| ≤ W(s, a), b₁ ∈ [0, 2π). The lemma below is what makes that domain sufficient.
+
+**Lemma (localisation of the finite-a conditional search).**
+
+- **Setting**:
+  - z(x) = s·f_a(w₁x + b₁) + b₂, with s = |w₂| > 0 in the orientation w₂ > 0, and f_a(t) = t + a sin t, so
+    t − a ≤ f_a(t) ≤ t + a.
+  - Class 1 lies on O = [−2, −1.2] ∪ [1.2, 2] and class 0 on I = [−0.8, 0.8], with n points in total and balanced
+    classes (ȳ = ½; true of the 800-point population and of every 400-point training set).
+  - L* is the profiled loss, minimised over b₂.
+- **Notation**: for a cut c ∈ [0, 0.8), let n_O⁻ = #{class 1: x ≤ −1.2} and n_I^{≥c} = #{class 0: x ≥ c}. Set
+  π(c) = min(n_O⁻, n_I^{≥c})/n and δ(π) = 2 log(2^{1/π} − 1).
+- **Claim**: if w₁ > W₊(s, a) = min_c (2a + δ(π(c))/s)/(1.2 + c), then L*(w₁, b₁; s) > log 2 for every b₁.
+  The case w₁ < 0 is the mirror image: use the right-outer class-1 points (x ≥ 1.2) against the class-0 points
+  with x ≤ −c, which gives W₋.
+- **Conclusion**: with W(s, a) = max(W₊, W₋), every global conditional minimiser has |w₁| ≤ W. The constant
+  predictor attains exactly log 2, so the global minimum is at most log 2.
+- **b₁**: it ranges over [0, 2π). A shift of b₁ by 2π adds 2πs to every logit, which the profiled b₂ absorbs.
+
+**Proof** (w₁ > 0).
+1. For x ≤ −1.2, w₁x + b₁ ≤ −1.2w₁ + b₁, so z ≤ A := s(−1.2w₁ + b₁ + a) + b₂.
+2. For x ≥ c, z ≥ s(cw₁ + b₁ − a) + b₂ = A + Δ, with Δ = s((1.2 + c)w₁ − 2a).
+3. Take Δ > 0 and let M = A + Δ/2.
+   - If M ≥ 0, every class-0 point with x ≥ c has z ≥ Δ/2, so its loss softplus(z) is at least softplus(Δ/2).
+   - If M < 0, every class-1 point with x ≤ −1.2 has z < −Δ/2, so its loss softplus(−z) exceeds softplus(Δ/2).
+4. All other losses are non-negative. So for every b₂, L ≥ π(c)·softplus(Δ/2), and hence
+   L* ≥ π(c)·softplus(Δ/2).
+5. π·softplus(Δ/2) > log 2 ⟺ Δ > δ(π) ⟺ w₁ > (2a + δ(π)/s)/(1.2 + c).
+6. Every c gives a valid bound. The certified search uses the smallest W over an 80-point grid of c in [0, 0.799].
+   (For 1/π ≥ 1000 the code replaces δ by the larger 2 log 2/π, which is conservative; this never occurs here.) ∎
+
+**Illustration** (a = 1.30, s = 4.95, the lower end of the certified R_glob bracket; population data):
+- **With the cut c = 0.4**: n_O⁻ = 200, n_I^{≥0.4} = 100, π = 1/8, δ = 2 log 255 = 11.08. This gives
+  W₊ = (2.6 + 11.08/4.95)/1.6 = 3.024.
+- **With the optimised cut c = 0.2225**: n_I^{≥c} = 145, π = 0.18125, which gives W = 2.908.
+
+**Checked numerically at every certified a** (`writer_patch.w_bound_table` → `writer_patch_w_bound.csv`: both
+ends of all 12 certified R_glob and R_solve brackets, population objective):
+- the formula reproduces the W used by the search to 1e−12;
+- the profiled loss at |w₁| = W, 1.5W and 3W, over 720 values of b₁ and both signs of w₁, is at least 4.34 > log 2.
+- W ranges from 2.56 (a = 1.30, R_solve bracket) to 4.86 (a = 1.60, R_glob bracket).
+
+
 - Certified brackets for s = |w₂|, width 0.0125, at a = 1.30 … 1.60 (`cond_certified_brackets.csv`).
   For example, R_glob(1.30) ∈ (0.21310, 0.21364] and R_solve(1.30) ∈ (0.30566, 0.30620].
 - The frozen Block B grid value is the first grid point above the bracket in every case.

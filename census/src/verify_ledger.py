@@ -800,6 +800,12 @@ PRODUCERS = {
     "limit_K_base.csv": ("limit_windows", "K_base", "full", ""),
     "limit_windows.csv": ("limit_windows", "main", "full", ""),
     "limit_windows_evaluations.csv": ("limit_windows", "main", "full", ""),
+    "writer_patch_prospective_own_per_setting.csv": ("writer_patch", "per_setting", "full", ""),
+    "writer_patch_windows.csv": ("writer_patch", "windows", "full", ""),
+    "writer_patch_calibration.csv": ("writer_patch", "windows", "full", ""),
+    "writer_patch_w_bound.csv": ("writer_patch", "w_bound_table", "full", ""),
+    "writer_patch_census_by_block.csv": ("writer_patch", "census_by_block", "full", ""),
+    "writer_patch_figure_sizes.csv": ("writer_patch", "figure_sizes", "full", ""),
     "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
 }
 
@@ -1113,6 +1119,34 @@ def v4_checks() -> None:
     for w_, lo_, hi_ in (("base", 0.1981, 0.1990), ("G2_narrow_gap", 0.1230, 0.1232), ("H10", 0.1864, 0.1875), ("H65", 0.1989, 0.2002)):
         chk(f"per-window R_inf lo {w_}", float(lw_.loc[w_, "R_inf_lo"]), lo_, 0.00006)
         chk(f"per-window R_inf hi {w_}", float(lw_.loc[w_, "R_inf_hi"]), hi_, 0.00006)
+    print("V4 patch (WRITER_INPUTS_v4_patch.md)")
+    wp1 = pd.read_csv(R / "writer_patch_prospective_own_per_setting.csv")
+    chk("WP-1: 16 settings + 2 per-a rows", float(len(wp1)), 18.0, 0)
+    agg = wp1[wp1.window.str.startswith("all")].set_index("a")
+    sc_ = pd.read_csv(R / "prospective_own_scores.csv", float_precision="round_trip")
+    p1_ = sc_[(sc_.analysis.str.startswith("primary")) & (sc_.comparison == "P1")].set_index("a").stat
+    p3_ = sc_[(sc_.analysis.str.startswith("primary")) & (sc_.comparison == "P3")].set_index("a").stat
+    for a_ in (1.3, 1.5):
+        chk(f"WP-1: mean U_own - U reproduces registered P1 at a={a_}",
+            float(agg.loc[a_, "U_own_mean_abs_log_err"] - agg.loc[a_, "U_mean_abs_log_err"]), float(p1_.loc[a_]), 1e-12)
+        chk(f"WP-1: mean C_own - C reproduces registered P3 at a={a_}",
+            float(agg.loc[a_, "C_own_mean_abs_log_err"] - agg.loc[a_, "C_mean_abs_log_err"]), float(p3_.loc[a_]), 1e-12)
+    chk("WP-1: crossers per a", float(agg.n_crossed.sum()), 920.0, 0)
+    wp2 = pd.read_csv(R / "writer_patch_windows.csv")
+    chk("WP-2: 4 H + 8 V windows", float(len(wp2)), 12.0, 0)
+    wp3 = pd.read_csv(R / "writer_patch_w_bound.csv")
+    chk("WP-3: loss > log 2 at and beyond W at every certified bracket end", float(wp3.exceeds_log2.all()), 1.0, 0)
+    chk("WP-3: 24 bracket ends checked", float(len(wp3)), 24.0, 0)
+    chk("WP-3: min loss at/beyond W", float(wp3.min_profiled_loss_at_and_beyond_W.min()), 4.337, 0.001)
+    chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
+        2.9077, 0.0001)
+    wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
+    chk("WP-4: by-block rows sum to 195", float(wp4[wp4.by == "block"].n.sum()), 195.0, 0)
+    chk("WP-4: by-file rows sum to 195", float(wp4[wp4.by == "registration_file"].n.sum()), 195.0, 0)
+    wp5 = pd.read_csv(R / "writer_patch_figure_sizes.csv")
+    chk("WP-5: 7 figures, all <= 5.5 in wide", float(len(wp5) == 7 and (wp5.width_in <= 5.5).all()), 1.0, 0)
+    chk("WP-5: tallest figure height", float(wp5.height_in.max()), 3.123, 0.002)
+
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),

@@ -1,0 +1,287 @@
+# Writer inputs v4 — completion patch (2026-09-24)
+
+Written for the paper's writer. Each item is tied to a ledger ID in `src/verify_ledger.py` (group "V4 patch").
+Producer: `src/writer_patch.py` (`python -m src.writer_patch`), which also renders this file. Every item here is
+**ready for the submission**.
+
+## WP-1. Prospective own-seed test, per setting
+
+Per setting: the number of runs that crossed, and the mean per-run |log(R_cross / prediction)| for five
+predictors:
+- **U_own**: the run's own threshold, nothing fitted;
+- **U**: the population R_glob;
+- **C**: λ(a)·R_glob, fitted;
+- **C_own**: ρ_res(a)·R_own, fitted;
+- **S-early**: the early branch's own threshold, unfitted. No run was undefined for S-early.
+
+**Intervals**:
+- **Per-setting rows**: a run-level bootstrap 95% (10,000 resamples, seed 0). This is **descriptive**. The
+  registered unit of uncertainty is the window, so no per-setting interval was registered.
+- **The "all 8" rows**: the registered window-level bootstrap (10,000 resamples of windows, seed 0).
+
+Source: `writer_patch_prospective_own_per_setting.csv`, built from `prospective_own_predictions.csv` and
+`prospective_own_runs.csv` with the registered definitions.
+
+| setting | crossed | U_own | U | C | C_own | S_early |
+|---|---|---|---|---|---|---|
+| V10, a = 1.30 | 57/60 | 0.046 [0.034, 0.061] | 0.121 [0.100, 0.143] | 0.086 [0.070, 0.104] | 0.022 [0.008, 0.039] | 0.075 [0.050, 0.104] |
+| V10, a = 1.50 | 57/60 | 0.079 [0.066, 0.096] | 0.143 [0.120, 0.167] | 0.088 [0.070, 0.107] | 0.033 [0.016, 0.054] | 0.102 [0.079, 0.128] |
+| V20, a = 1.30 | 57/60 | 0.053 [0.039, 0.070] | 0.115 [0.095, 0.136] | 0.082 [0.065, 0.100] | 0.028 [0.012, 0.048] | 0.072 [0.047, 0.104] |
+| V20, a = 1.50 | 57/60 | 0.085 [0.074, 0.099] | 0.142 [0.121, 0.164] | 0.079 [0.061, 0.097] | 0.033 [0.017, 0.053] | 0.098 [0.080, 0.122] |
+| V30, a = 1.30 | 57/60 | 0.052 [0.039, 0.067] | 0.109 [0.091, 0.128] | 0.073 [0.058, 0.090] | 0.027 [0.012, 0.045] | 0.070 [0.047, 0.098] |
+| V30, a = 1.50 | 57/60 | 0.087 [0.078, 0.097] | 0.139 [0.119, 0.159] | 0.069 [0.054, 0.084] | 0.033 [0.020, 0.050] | 0.113 [0.090, 0.141] |
+| V40, a = 1.30 | 57/60 | 0.053 [0.042, 0.067] | 0.100 [0.083, 0.117] | 0.065 [0.052, 0.079] | 0.026 [0.013, 0.043] | 0.070 [0.050, 0.095] |
+| V40, a = 1.50 | 57/60 | 0.092 [0.084, 0.101] | 0.143 [0.127, 0.160] | 0.058 [0.047, 0.070] | 0.037 [0.025, 0.051] | 0.118 [0.097, 0.142] |
+| V50, a = 1.30 | 58/60 | 0.056 [0.047, 0.068] | 0.166 [0.143, 0.190] | 0.091 [0.074, 0.111] | 0.029 [0.017, 0.045] | 0.070 [0.054, 0.090] |
+| V50, a = 1.50 | 58/60 | 0.103 [0.095, 0.112] | 0.219 [0.193, 0.246] | 0.098 [0.080, 0.117] | 0.046 [0.035, 0.060] | 0.125 [0.108, 0.146] |
+| V60, a = 1.30 | 58/60 | 0.052 [0.044, 0.063] | 0.146 [0.126, 0.167] | 0.075 [0.060, 0.091] | 0.025 [0.015, 0.039] | 0.074 [0.055, 0.098] |
+| V60, a = 1.50 | 58/60 | 0.108 [0.099, 0.117] | 0.204 [0.182, 0.227] | 0.084 [0.070, 0.099] | 0.051 [0.040, 0.063] | 0.136 [0.117, 0.159] |
+| V70, a = 1.30 | 58/60 | 0.056 [0.050, 0.064] | 0.116 [0.100, 0.131] | 0.053 [0.043, 0.065] | 0.028 [0.020, 0.040] | 0.079 [0.062, 0.097] |
+| V70, a = 1.50 | 58/60 | 0.108 [0.099, 0.118] | 0.170 [0.152, 0.187] | 0.061 [0.050, 0.073] | 0.051 [0.040, 0.063] | 0.138 [0.121, 0.159] |
+| V80, a = 1.30 | 58/60 | 0.053 [0.046, 0.061] | 0.104 [0.092, 0.115] | 0.042 [0.033, 0.053] | 0.026 [0.017, 0.037] | 0.070 [0.054, 0.089] |
+| V80, a = 1.50 | 58/60 | 0.109 [0.098, 0.120] | 0.167 [0.151, 0.183] | 0.055 [0.046, 0.065] | 0.052 [0.041, 0.065] | 0.133 [0.115, 0.154] |
+| all 8 (window-level), a = 1.30 | 460/480 | 0.052 [0.050, 0.054] | 0.122 [0.109, 0.138] | 0.071 [0.060, 0.081] | 0.026 [0.025, 0.028] | 0.072 [0.070, 0.075] |
+| all 8 (window-level), a = 1.50 | 460/480 | 0.096 [0.089, 0.104] | 0.166 [0.148, 0.188] | 0.074 [0.064, 0.084] | 0.042 [0.036, 0.048] | 0.120 [0.111, 0.130] |
+
+## WP-2. Window definitions and the calibration rules
+
+Class 0 on I, class 1 on O. Every window is x-symmetric. Source: `writer_patch_windows.csv`, built from
+`prospective_windows.csv` and `prospective_own_windows.csv`.
+
+| window | test | I | O | kappa0_lo | kappa0_hi |
+|---|---|---|---|---|---|
+| H10 | Block 3 | [-0.6, 0.6] | [-2.0, -0.8] U [0.8, 2.0] | 0.19101 | 0.19102 |
+| H35 | Block 3 | [-0.6, 0.6] | [-1.7, -0.9] U [0.9, 1.7] | 0.30072 | 0.30074 |
+| H65 | Block 3 | [-0.8, 0.8] | [-2.2, -1.4] U [1.4, 2.2] | 0.41889 | 0.41891 |
+| H90 | Block 3 | [-0.7, 0.7] | [-2.7, -1.5] U [1.5, 2.7] | 0.51326 | 0.51329 |
+| V10 | own-seed | [-0.7, 0.7] | [-1.5, -0.9] U [0.9, 1.5] | 0.19030 | 0.19031 |
+| V20 | own-seed | [-0.8, 0.8] | [-1.9, -1.1] U [1.1, 1.9] | 0.24159 | 0.24161 |
+| V30 | own-seed | [-0.9, 0.9] | [-2.1, -1.3] U [1.3, 2.1] | 0.27897 | 0.27899 |
+| V40 | own-seed | [-0.9, 0.9] | [-2.0, -1.4] U [1.4, 2.0] | 0.33443 | 0.33445 |
+| V50 | own-seed | [-0.5, 0.5] | [-2.1, -0.9] U [0.9, 2.1] | 0.35854 | 0.35856 |
+| V60 | own-seed | [-0.6, 0.6] | [-2.3, -1.1] U [1.1, 2.3] | 0.39845 | 0.39847 |
+| V70 | own-seed | [-0.5, 0.5] | [-1.5, -0.9] U [0.9, 1.5] | 0.43300 | 0.43304 |
+| V80 | own-seed | [-0.9, 0.9] | [-2.3, -1.7] U [1.7, 2.3] | 0.47250 | 0.47254 |
+
+**Calibration rules as registered** (`writer_patch_calibration.csv`):
+- **C (Block 3)**: C = λ(a)·R_glob, with λ(1.30) = 1.11487 and λ(1.50) = 1.1644. λ is the base
+  window's median crossing R divided by its certified R_glob, frozen before Block 3.
+- **C_own (own-seed test)**: C_own = ρ_res(a)·R_own, with ρ_res(1.30) = 1.0311 and
+  ρ_res(1.50) = 1.066.
+  - ρ_res = exp(median log(R_cross/R_own)) over the base window's phase 2b seeds 0–39 that crossed within
+    12,000 steps.
+  - It was frozen before any computation on the new settings (`prospective_own_prediction.md`).
+
+## WP-3. The localisation bound W(s, a) for the finite-a certificates
+
+**Lemma (localisation of the finite-a conditional search).**
+
+- **Setting**:
+  - z(x) = s·f_a(w₁x + b₁) + b₂, with s = |w₂| > 0 in the orientation w₂ > 0, and f_a(t) = t + a sin t, so
+    t − a ≤ f_a(t) ≤ t + a.
+  - Class 1 lies on O = [−2, −1.2] ∪ [1.2, 2] and class 0 on I = [−0.8, 0.8], with n points in total and balanced
+    classes (ȳ = ½; true of the 800-point population and of every 400-point training set).
+  - L* is the profiled loss, minimised over b₂.
+- **Notation**: for a cut c ∈ [0, 0.8), let n_O⁻ = #{class 1: x ≤ −1.2} and n_I^{≥c} = #{class 0: x ≥ c}. Set
+  π(c) = min(n_O⁻, n_I^{≥c})/n and δ(π) = 2 log(2^{1/π} − 1).
+- **Claim**: if w₁ > W₊(s, a) = min_c (2a + δ(π(c))/s)/(1.2 + c), then L*(w₁, b₁; s) > log 2 for every b₁.
+  The case w₁ < 0 is the mirror image: use the right-outer class-1 points (x ≥ 1.2) against the class-0 points
+  with x ≤ −c, which gives W₋.
+- **Conclusion**: with W(s, a) = max(W₊, W₋), every global conditional minimiser has |w₁| ≤ W. The constant
+  predictor attains exactly log 2, so the global minimum is at most log 2.
+- **b₁**: it ranges over [0, 2π). A shift of b₁ by 2π adds 2πs to every logit, which the profiled b₂ absorbs.
+
+**Proof** (w₁ > 0).
+1. For x ≤ −1.2, w₁x + b₁ ≤ −1.2w₁ + b₁, so z ≤ A := s(−1.2w₁ + b₁ + a) + b₂.
+2. For x ≥ c, z ≥ s(cw₁ + b₁ − a) + b₂ = A + Δ, with Δ = s((1.2 + c)w₁ − 2a).
+3. Take Δ > 0 and let M = A + Δ/2.
+   - If M ≥ 0, every class-0 point with x ≥ c has z ≥ Δ/2, so its loss softplus(z) is at least softplus(Δ/2).
+   - If M < 0, every class-1 point with x ≤ −1.2 has z < −Δ/2, so its loss softplus(−z) exceeds softplus(Δ/2).
+4. All other losses are non-negative. So for every b₂, L ≥ π(c)·softplus(Δ/2), and hence
+   L* ≥ π(c)·softplus(Δ/2).
+5. π·softplus(Δ/2) > log 2 ⟺ Δ > δ(π) ⟺ w₁ > (2a + δ(π)/s)/(1.2 + c).
+6. Every c gives a valid bound. The certified search uses the smallest W over an 80-point grid of c in [0, 0.799].
+   (For 1/π ≥ 1000 the code replaces δ by the larger 2 log 2/π, which is conservative; this never occurs here.) ∎
+
+**Illustration** (a = 1.30, s = 4.95, the lower end of the certified R_glob bracket; population data):
+- **With the cut c = 0.4**: n_O⁻ = 200, n_I^{≥0.4} = 100, π = 1/8, δ = 2 log 255 = 11.08. This gives
+  W₊ = (2.6 + 11.08/4.95)/1.6 = 3.024.
+- **With the optimised cut c = 0.2225**: n_I^{≥c} = 145, π = 0.18125, which gives W = 2.908.
+
+**Checked at every certified a** (`writer_patch_w_bound.csv`: population objective, both ends of every
+certified R_glob and R_solve bracket):
+- The W computed here equals the W used by the certified search (`profiled_bnb.w_bound`) to 1e−12.
+- The profiled loss at |w₁| = W, 1.5W and 3W, on 720 values of b₁ and both signs of w₁, is at least 4.34 > log 2
+  everywhere.
+- The table shows the lower end of each bracket; both ends are in the CSV. The two sides (w₁ > 0 and w₁ < 0)
+  give equal W because the population is x-symmetric.
+
+| a | kind | s | W | c_> | n_inner_> | pi_> | min_profiled_loss_at_and_beyond_W |
+|---|---|---|---|---|---|---|---|
+| 1.30 | glob | 4.9500 | 2.908 | 0.2225 | 145 | 0.18125 | 6.652 |
+| 1.30 | solve | 7.1000 | 2.562 | 0.3135 | 122 | 0.15250 | 7.040 |
+| 1.35 | glob | 4.0250 | 3.226 | 0.2225 | 145 | 0.18125 | 6.397 |
+| 1.35 | solve | 5.7125 | 2.828 | 0.2731 | 132 | 0.16500 | 7.170 |
+| 1.40 | glob | 3.3750 | 3.548 | 0.1821 | 155 | 0.19375 | 5.490 |
+| 1.40 | solve | 4.7375 | 3.097 | 0.2225 | 145 | 0.18125 | 7.256 |
+| 1.45 | glob | 2.8875 | 3.876 | 0.1618 | 160 | 0.20000 | 4.885 |
+| 1.45 | solve | 4.0125 | 3.371 | 0.2225 | 145 | 0.18125 | 6.416 |
+| 1.50 | glob | 2.5250 | 4.199 | 0.1416 | 165 | 0.20625 | 4.543 |
+| 1.50 | solve | 3.4750 | 3.646 | 0.2023 | 150 | 0.18750 | 5.667 |
+| 1.60 | glob | 2.0000 | 4.861 | 0.1214 | 170 | 0.21250 | 4.337 |
+| 1.60 | solve | 2.7000 | 4.218 | 0.1618 | 160 | 0.20000 | 4.822 |
+
+## WP-4. Registration census by block and by registration file
+
+**Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
+- **Headline**: 179 scored by their registered rules: 84 PASS, 55 FAIL, 8 PARTIAL,
+  32 UNRESOLVED.
+- **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
+
+**Row-level tables shipped in the supplementary**:
+- `results/registration_census.csv`: the headline, one row per prediction;
+- `results/registration_census_by_unit.csv`: the appendix view, per a;
+- `results/registration_census_v4_gates_and_reported.csv`: validity gates and no-criterion items;
+- `results/registration_tally.csv`: the tallies.
+
+Source for the tables below: `writer_patch_census_by_block.csv`.
+
+### By block
+| group | scoring | PASS | FAIL | PARTIAL | UNRESOLVED | n |
+|---|---|---|---|---|---|---|
+| A5d k=1 | registered rule | 2 | 1 | 0 | 2 | 5 |
+| A5d k=10 | registered rule | 1 | 2 | 0 | 2 | 5 |
+| Arrhenius 08-27 | registered rule | 15 | 11 | 1 | 15 | 42 |
+| B | post hoc (census) | 1 | 2 | 0 | 0 | 3 |
+| Block 3 (held-out windows) | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| Block 3 (held-out windows) | registered rule | 2 | 0 | 0 | 0 | 2 |
+| Block 4 (fixed scale) | registered rule | 2 | 1 | 0 | 0 | 3 |
+| Block 4 horizon extension | registered rule | 0 | 2 | 0 | 0 | 2 |
+| Block 5 (retention) | registered rule | 2 | 0 | 0 | 0 | 2 |
+| C | registered rule | 1 | 2 | 0 | 0 | 3 |
+| E | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
+| E | registered rule | 2 | 3 | 0 | 0 | 5 |
+| E-stall | registered rule | 0 | 2 | 0 | 0 | 2 |
+| F | registered rule | 1 | 1 | 0 | 2 | 4 |
+| G | registered rule | 3 | 2 | 0 | 0 | 5 |
+| H | registered rule | 0 | 1 | 0 | 2 | 3 |
+| K | registered rule | 3 | 2 | 0 | 0 | 5 |
+| MNIST budget law 09-11 | registered rule | 0 | 1 | 0 | 2 | 3 |
+| R-collapse 09-12 | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
+| S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
+| c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
+| collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
+| corrugation 08-06 | registered rule | 0 | 2 | 0 | 0 | 2 |
+| corrugation readings 08-22 | registered rule | 2 | 0 | 0 | 0 | 2 |
+| cross-family | registered rule | 3 | 1 | 0 | 0 | 4 |
+| early census 08-23 | post hoc (census) | 0 | 2 | 0 | 0 | 2 |
+| early census 08-23 | registered rule | 7 | 1 | 2 | 1 | 11 |
+| early census 08-23 (basin) | registered rule | 1 | 4 | 0 | 0 | 5 |
+| early census 08-23 (width) | registered rule | 3 | 1 | 0 | 0 | 4 |
+| interleaved 08-05 | registered rule | 0 | 0 | 0 | 2 | 2 |
+| kappa | registered rule | 3 | 1 | 0 | 0 | 4 |
+| lag test | registered rule | 1 | 1 | 0 | 0 | 2 |
+| lag test 2 (deconfounded) | registered rule | 0 | 2 | 0 | 0 | 2 |
+| localization 08-22 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| localization 08-22 | registered rule | 1 | 0 | 1 | 0 | 2 |
+| metric artifact 09-12 | post hoc (census) | 0 | 0 | 2 | 0 | 2 |
+| nu | registered rule | 0 | 1 | 0 | 0 | 1 |
+| own-seed thresholds | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| own-seed thresholds | registered rule | 1 | 1 | 0 | 0 | 2 |
+| phase1 | registered rule | 1 | 1 | 0 | 0 | 2 |
+| phase2b | registered rule | 0 | 1 | 0 | 0 | 1 |
+| phase2b across a | registered rule | 2 | 1 | 0 | 1 | 4 |
+| precision | registered rule | 0 | 0 | 0 | 1 | 1 |
+| prospective own-seed | registered rule | 8 | 0 | 0 | 0 | 8 |
+| sample size | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| sample size | registered rule | 1 | 1 | 0 | 0 | 2 |
+| scaling limit | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| scaling limit | registered rule | 3 | 0 | 0 | 0 | 3 |
+| search 08-22 | registered rule | 2 | 0 | 2 | 0 | 4 |
+| third optimizer 09-14 | registered rule | 2 | 0 | 0 | 0 | 2 |
+| threshold 08-22 | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
+| threshold 08-22 | registered rule | 2 | 1 | 1 | 0 | 4 |
+| winding 08-22 | registered rule | 4 | 0 | 0 | 0 | 4 |
+
+### By registration file
+| group | scoring | PASS | FAIL | PARTIAL | UNRESOLVED | n |
+|---|---|---|---|---|---|---|
+| results/amplification_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| results/amplification_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/arrhenius_prediction.md | registered rule | 15 | 11 | 1 | 15 | 42 |
+| results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
+| results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
+| results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
+| results/blockB_prediction.md | post hoc (census) | 1 | 2 | 0 | 0 | 3 |
+| results/blockC_equivalence_prediction.md | registered rule | 1 | 2 | 0 | 0 | 3 |
+| results/blockE_redesign.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/blockE_stall_prediction.md | registered rule | 0 | 2 | 0 | 0 | 2 |
+| results/blockF_lag_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
+| results/blockF_lag_prediction.md | registered rule | 2 | 3 | 0 | 2 | 7 |
+| results/blockG_g3_correction.md | registered rule | 0 | 1 | 0 | 0 | 1 |
+| results/blockG_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
+| results/blockH_rate_prediction.md | registered rule | 0 | 1 | 0 | 2 | 3 |
+| results/blockK_prediction.md | registered rule | 3 | 2 | 0 | 0 | 5 |
+| results/blockS2_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/bottleneck_prediction.md | registered rule | 0 | 1 | 0 | 1 | 2 |
+| results/collapse_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| results/collapse_prediction.md | registered rule | 1 | 2 | 0 | 0 | 3 |
+| results/corrugation_prediction.md | registered rule | 0 | 2 | 0 | 0 | 2 |
+| results/corrugation_readings_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/crossfamily_followup_prediction.md | registered rule | 1 | 0 | 0 | 0 | 1 |
+| results/crossfamily_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/crossfamily_q1control_prediction.md | registered rule | 1 | 0 | 0 | 0 | 1 |
+| results/first_order_prediction.md | registered rule | 1 | 0 | 0 | 2 | 3 |
+| results/fixed_scale_horizon_prediction.md | registered rule | 0 | 2 | 0 | 0 | 2 |
+| results/fixed_scale_prediction.md | registered rule | 4 | 1 | 0 | 0 | 5 |
+| results/fold1d_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
+| results/gelu_scale_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| results/gelu_scale_prediction.md | registered rule | 1 | 0 | 0 | 0 | 1 |
+| results/interleaved_predictions.md | registered rule | 0 | 0 | 0 | 2 | 2 |
+| results/kappa_certification_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
+| results/lag_test2_prediction.md | registered rule | 0 | 2 | 0 | 0 | 2 |
+| results/lag_test_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/localization_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
+| results/localization_prediction.md | registered rule | 1 | 0 | 1 | 0 | 2 |
+| results/metric_artifact_prediction.md | post hoc (census) | 0 | 0 | 2 | 0 | 2 |
+| results/mnist_budget_law_prediction.md | registered rule | 0 | 1 | 0 | 2 | 3 |
+| results/nu_prediction.md | registered rule | 0 | 1 | 0 | 0 | 1 |
+| results/offset_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/own_threshold_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/own_threshold_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/phase1_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/phase2b_across_a_prediction.md | registered rule | 2 | 1 | 0 | 1 | 4 |
+| results/phase2b_prediction.md | registered rule | 0 | 1 | 0 | 0 | 1 |
+| results/precision_prediction.md | registered rule | 0 | 0 | 0 | 1 | 1 |
+| results/prospective_own_prediction.md | registered rule | 8 | 0 | 0 | 0 | 8 |
+| results/prospective_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/prospective_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/r_collapse_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/r_collapse_prediction.md | registered rule | 0 | 1 | 1 | 0 | 2 |
+| results/sample_size_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/sample_size_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/scaling_limit_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/scaling_limit_prediction.md | registered rule | 3 | 0 | 0 | 0 | 3 |
+| results/search_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
+| results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
+| results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
+| results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
+| results/winding_prediction.md | registered rule | 4 | 0 | 0 | 0 | 4 |
+
+## WP-5. Figure manifest after the page-width rebuild
+
+All figures are built at ICLR's text width (5.5 in) and placed at their built size. Every glyph is at least 8 pt.
+Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figure_sizes.csv`).
+
+| file | width_in | height_in | description |
+|---|---|---|---|
+| results/figures/v4/v4_cond_candidates.pdf | 5.366 | 2.986 | Block 1 at a = 1.30: (a) every candidate of the frozen search above the single retained branch; (b) the branch's gap crossing G = 0 once, with the certified R_glob and R_solve brackets. |
+| results/figures/v4/v4_decomposition.pdf | 5.287 | 2.349 | Phase 1: fraction solved, failed on placement (G ≤ 0) or failed on bias (G > 0, b₂ outside its interval) against ε = a − 1; n = 400 runs per a; Clopper–Pearson 95%. |
+| results/figures/v4/v4_fixed_scale.pdf | 5.366 | 2.991 | (a) Block 4 placement, (b) Block 5 retention with E-2's criterion and Block E's 33/37 (FAIL), (c) horizon extension (Q1, Q2 FAIL), against held R/R_glob; Clopper–Pearson 95%. |
+| results/figures/v4/v4_mirror_branches.pdf | 5.407 | 2.771 | Post hoc: crossing R against the own threshold of the mirror branch occupied at the crossing, marked by branch; Spearman ρ = 0.997 (a = 1.30), 0.995 (a = 1.50), bootstrap 95%; n = 38 per a. |
+| results/figures/v4/v4_prospective.pdf | 5.288 | 2.699 | Block 3: predicted against observed median crossing R in 8 held-out settings; C (λ fitted) filled, U (nothing fitted) open, B1, B2; bootstrap 95%. |
+| results/figures/v4/v4_prospective_own.pdf | 5.379 | 3.096 | Prospective own-seed test: (a) per-run crossing R against the frozen own threshold, with the fitted C_own lines; (b) mean per-run |log error| of U, C, U_own, C_own at each a with the registered verdicts. |
+| results/figures/v4/v4_thresholds.pdf | 5.338 | 3.123 | (a) certified R_glob and R_solve at a = 1.30–1.60 against free-training crossing violins, with the certified ε → 0 limits; (b) small ε: certified brackets at a = 1.01–1.04, the sharp limit and the first-order line; the registered c₁ test INCONCLUSIVE. |
