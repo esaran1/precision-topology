@@ -786,6 +786,7 @@ PRODUCERS = {
     "rglob_convergence_points.csv": ("rglob_refit", "main", "full", ""),
     "limit_K_base.csv": ("limit_windows", "K_base", "full", ""),
     "limit_windows.csv": ("limit_windows", "main", "full", ""),
+    "limit_windows_evaluations.csv": ("limit_windows", "main", "full", ""),
     "fixed_scale_block5_splits.csv": ("fixed_scale", "score5_splits", "full", ""),
 }
 
@@ -1088,6 +1089,17 @@ def v4_checks() -> None:
     chk("lag2 primary: no plateau re-entry in any cell",
         float(lf_[lf_.rule == "primary"].frac_with_reentry.max()), 0.0, 0)
     chk("lag2: 192 phi=1 continuations", float(len(pd.read_csv(R / "lag_test2_runs.csv").query("factor == 1.0"))), 192.0, 0)
+    lw_ = pd.read_csv(R / "limit_windows.csv").set_index("window")
+    chk("per-window A*: 9 windows, all converged, ends certified minus/plus",
+        float(len(lw_) == 9 and lw_.all_converged.all() and (lw_.status_lo == "minus").all() and (lw_.status_hi == "plus").all()), 1.0, 0)
+    chk("per-window A*: localised windows", float(lw_.localised.sum()), 7.0, 0)
+    chk("per-window A*: G1, G4 not localised", float((~lw_.loc[["G1_wide_gap", "G4_shifted"], "localised"]).all()), 1.0, 0)
+    chk("per-window A*: H10 flagged (unresolved stop)", float(not bool(lw_.loc["H10", "switch_certified"])), 1.0, 0)
+    chk("per-window A*: base A* bracket contains sharp A*",
+        float(lw_.loc["base", "A_lo"] < 0.68544523757565 <= lw_.loc["base", "A_hi"]), 1.0, 0)
+    for w_, lo_, hi_ in (("base", 0.1981, 0.1990), ("G2_narrow_gap", 0.1230, 0.1232), ("H10", 0.1864, 0.1875), ("H65", 0.1989, 0.2002)):
+        chk(f"per-window R_inf lo {w_}", float(lw_.loc[w_, "R_inf_lo"]), lo_, 0.00006)
+        chk(f"per-window R_inf hi {w_}", float(lw_.loc[w_, "R_inf_hi"]), hi_, 0.00006)
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),

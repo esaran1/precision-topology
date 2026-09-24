@@ -678,6 +678,30 @@ Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea
 - **Mind the error sizes**: the per-run |log error| of the unfitted own threshold is about 4% at 1.30 and
   about 9% at 1.50. It is not an exact per-run predictor, and the residual is the lag that C and C_own absorb.
 
+## Per-window limit switch A* — FOR THE REBUTTAL (computed 2026-09-24 after the submission set was scored; not in the submission)
+
+- **Source**: `limit_windows.py` → `limit_windows.csv`, `limit_windows_evaluations.csv`, `math_note_v2.md` §4.
+- **Method**: certified branch and bound on K(24) per window. Brackets are bisected to width 0.003125.
+  - H10 stopped at 0.00625, on a tied midpoint; both of its ends are certified.
+- **Localisation** (global, not only on K(24)) holds for 7 of 9 windows. It does **not** hold for G1 or G4:
+  their branch loss exceeds B(24). For those two, state the threshold as the minimiser over K(24) only.
+- **R∞ intervals**:
+
+  | window | R∞ interval | localisation |
+  |---|---|---|
+  | base | [0.1981, 0.1990] | holds; consistent with the sharp 0.1985926 |
+  | G1 | [0.1964, 0.1982] | K(24) only |
+  | G2 | [0.1230, 0.1232] | holds |
+  | G3 | [0.1931, 0.1939] | holds |
+  | G4 | [0.1344, 0.1361] | K(24) only |
+  | H10 | [0.1864, 0.1875] | holds |
+  | H35 | [0.1978, 0.1987] | holds |
+  | H65 | [0.1989, 0.2002] | holds |
+  | H90 | [0.1984, 0.1999] | holds |
+
+- **Do not use in the submission.** For the rebuttal, say "the limit switch is certified per window; it is
+  global for seven of the nine and restricted to K(24) for G1 and G4".
+
 ## Figure manifest (v4)
 
 These are **not in `paper/figures` yet.** They are held until S1–S3 and the c₁ test are scored, since
