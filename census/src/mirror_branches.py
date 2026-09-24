@@ -80,9 +80,9 @@ def half_min(s, a, x, y, sign, step=0.02, n_refine=8):
     return best[0], best[1], best[2], float(gap([best[1]], [best[2]], a)[0])
 
 
-def branch_threshold(a, seed, sign, w2_start):
-    x, y = _data(seed)
-    placed = lambda s: half_min(s, a, x, y, sign)[3] > 0
+def branch_threshold(a, seed, sign, w2_start, data=None, step=0.02, n_refine=8):
+    x, y = data if data is not None else _data(seed)
+    placed = lambda s: half_min(s, a, x, y, sign, step=step, n_refine=n_refine)[3] > 0
     lo = hi = round(w2_start, 6)
     p = placed(lo)
     if p:
@@ -396,9 +396,36 @@ def basin_census(workers=2, subset="all"):
         print(oth[["seed", "level", "placed", "loc_min_G", "L_minus_global", "loc_min_hess_min", "switch_over_pop"]].to_string(index=False))
 
 
+
+def _size_gap_job(args):
+    from .sample_size import _data as ss_data
+    a, n, seed, w2_start = args
+    data = ss_data(n, seed)
+    return {"a": a, "n": n, "seed": seed,
+            "T_plus": branch_threshold(a, seed, +1, w2_start, data, step=0.05, n_refine=16),
+            "T_minus": branch_threshold(a, seed, -1, w2_start, data, step=0.05, n_refine=16)}
+
+
+def size_gap(workers=3, n_seeds=20):
+    """Post hoc: the mirror-threshold gap |T+ - T-| / T_global for the size-test seeds (first 20 per cell) at n = 400,
+    1,600 and 6,400 -- the size test's search settings (grid 0.05, 16 refinements); T_global from sample_size_own."""
+    from .own_threshold import _pop
+    from .sample_size import A_VALUES, N_VALUES, SEED0
+    jobs = [(a, n, SEED0 + i, _pop(a)[1]) for a in A_VALUES for n in N_VALUES for i in range(n_seeds)]
+    with Pool(workers) as p:
+        d = pd.DataFrame(p.map(_size_gap_job, jobs, chunksize=1))
+    o = pd.read_csv(RESULTS / "sample_size_own.csv", float_precision="round_trip")
+    d = d.merge(o[["a", "n", "seed", "w2_own"]], on=["a", "n", "seed"])
+    d["gap_rel"] = (d.T_plus - d.T_minus).abs() / d.w2_own
+    d.to_csv(RESULTS / "mirror_size_gap.csv", index=False)
+    t = d.groupby(["a", "n"]).gap_rel.agg(["size", "median", "min", "max"]).reset_index()
+    t.to_csv(RESULTS / "mirror_size_gap_summary.csv", index=False)
+    print(t.to_string(index=False))
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else int(os.environ.get("MB_WORKERS", "3"))
     {"thresholds": lambda: thresholds(w), "analyse": analyse, "global_branch": lambda: global_branch_levels(w),
      "breakdown": q2_s1_breakdown, "gap": mirror_gap, "census": lambda: basin_census(w),
-     "census_preferred": lambda: basin_census(w, "preferred")}[cmd]()
+     "census_preferred": lambda: basin_census(w, "preferred"), "size_gap": lambda: size_gap(w)}[cmd]()
