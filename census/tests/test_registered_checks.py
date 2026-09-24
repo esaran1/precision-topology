@@ -325,3 +325,17 @@ def test_lag_branch_rule(tmp_path):
     occ = pd.DataFrame({"branch": [1] * 89 + [-1] * 11, "init_branch": [1] * 100})
     occ.to_csv(tmp_path / "mirror_occupancy.csv", index=False)
     assert lt.branch_rule(tmp_path)[0] == "global"
+
+
+# ------------------------------------------------------------------ prospective own-seed test: early-branch rule
+def test_early_branch_rule():
+    from src.prospective_own import early_branch
+    never = [(0, 0.4, 0.3), (50, -0.2, 0.5), (100, 0.6, 1.0)]
+    assert early_branch(never, "w1") == (0, 0, 1, 0.3)                 # never on the plateau: first logged check
+    passes = [(0, 0.4, 0.3), (50, 0.01, 0.5), (100, 0.02, 0.8), (150, -0.3, 1.1), (200, 0.5, 1.4)]
+    assert early_branch(passes, "w1") == (3, 150, -1, 1.1)             # first check after leaving the plateau
+    stuck = [(0, 0.01, 0.3), (50, 0.02, 0.5)]
+    assert early_branch(stuck, "w1") is None                           # never leaves: undefined
+    via_w2 = [(0, 0.4, 0.3), (50, 0.5, 0.02), (100, 0.6, -0.4)]
+    assert early_branch(via_w2, "w1") == (0, 0, 1, 0.3)                # |w1| rule ignores the w2 = 0 plateau
+    assert early_branch(via_w2, "w1w2") == (2, 100, -1, 0.4)           # combined rule catches the flip through w2 = 0

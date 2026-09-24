@@ -294,6 +294,14 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     - **Say**: "among replays that end on the globally preferred branch of their own loss, the own
       threshold matches the outcome in 99% of cases; the disagreements are runs that end in the mirror
       basin".
+    - **Summary, all post hoc**:
+      - initialisation selects the mirror branch at chance (51.4%);
+      - every replay ends on the branch it started on;
+      - with the starting branch's threshold, per-replay agreement is 0.994;
+      - with the branch occupied at the crossing, crossing R correlates with that branch's threshold at
+        ρ = 0.997 (1.30) and 0.995 (1.50), with a residual of 3.0% and 6.3% that branch-matching does not
+        change.
+      - **The registered S1 still failed.**
     - **Can the branch be known before the run?** (post hoc, `mirror_*.csv`)
       - **Initialisation does not select the mirror branch.** The initialisation-selected branch matches
         the branch at the free-training crossing in **51%** of runs: 0.50 for Block 4/5 (177 runs), 0.55

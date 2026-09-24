@@ -308,8 +308,124 @@ def score():
     print(pd.DataFrame(rows).to_string(index=False)); print(pd.DataFrame(cells).to_string(index=False))
 
 
+
+# ------------------------------------------------------------------ early-branch rule (for the amendment; not yet registered)
+PLATEAU = 0.05
+
+
+def train_logged(win, a, seed, budget=BUDGET):
+    """blockG_windows.train, unchanged in every operation, plus a read-only log of (step, w1, w2) at each 50-step check
+    until the crossing.  Returns (cross_step, cross_w2, final_w2, log)."""
+    import torch
+    from torch.nn import functional as F
+    from .blockG_windows import CHECK_EVERY, LR, f_a, oriented_gap
+    f = f_a(a)
+    x, y = win.data(200, seed)
+    torch.manual_seed(seed)
+    th = torch.empty(4).uniform_(-1.0, 1.0).double().clone().requires_grad_(True)
+    opt = torch.optim.Adam([th], lr=LR)
+    cross_step = cross_w2 = None
+    log = []
+    for i in range(budget):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(th[2] * f(th[0] * x + th[1]) + th[3], y).backward()
+        opt.step()
+        if i % CHECK_EVERY == 0 and cross_step is None:
+            with torch.no_grad():
+                w1, b1, w2, b2 = (float(v) for v in th)
+            log.append((i, w1, w2))
+            if oriented_gap(win, a, w1, b1) > 0:
+                cross_step, cross_w2 = i, abs(w2)
+    with torch.no_grad():
+        final_w2 = abs(float(th[2]))
+    return cross_step, cross_w2, final_w2, log
+
+
+def early_branch(log, plateau="w1"):
+    """The rule: the first logged check at which the run has left the constant-predictor plateau (having been on it);
+    a run never on the plateau takes its first logged check.  plateau="w1": |w1| < 0.05; "w1w2": |w1| < 0.05 or
+    |w2| < 0.05.  Returns (index, step, branch in canonical orientation, |w2|) or None if the run is still on the
+    plateau at every check."""
+    on = [(abs(w1) < PLATEAU) or (plateau == "w1w2" and abs(w2) < PLATEAU) for _, w1, w2 in log]
+    if not any(on):
+        i = 0
+    else:
+        i0 = on.index(True)
+        rest = [k for k in range(i0, len(on)) if not on[k]]
+        if not rest:
+            return None
+        i = rest[0]
+    step, w1, w2 = log[i]
+    return i, step, int(np.sign(w1) * np.sign(w2)), abs(w2)
+
+
+def _calib_job(args):
+    from .blockG_windows import WINDOWS
+    a, seed = args
+    base = next(w for w in WINDOWS if w.tag == "base")
+    cs, cw2, fw2, log = train_logged(base, a, seed)
+    out = {"a": a, "seed": seed, "cross_step": cs, "cross_w2": cw2, "final_w2": fw2, "n_checks": len(log)}
+    if cs is not None:
+        out["branch_cross"] = int(np.sign(log[-1][1]) * np.sign(log[-1][2]))
+    for pl in ("w1", "w1w2"):
+        e = early_branch(log, pl)
+        out.update({f"early_{pl}_defined": e is not None, f"early_{pl}_step": e[1] if e else np.nan,
+                    f"early_{pl}_branch": e[2] if e else np.nan, f"early_{pl}_w2": e[3] if e else np.nan})
+    out["ever_on_plateau_w1"] = any(abs(w1) < PLATEAU for _, w1, _ in log)
+    out["ever_on_plateau_w1w2"] = any(abs(w1) < PLATEAU or abs(w2) < PLATEAU for _, w1, w2 in log)
+    return out
+
+
+def calibrate_early(workers=3):
+    """On existing settings only (Block G base-window runs, seeds 0-39, a = 1.30 and 1.50): (i) exact reproduction of
+    blockG_crossings.csv by train_logged; (ii) the early-branch rule's match rate, lead time and per-run errors under
+    both plateau definitions.  Own branch thresholds: mirror_branch_thresholds.csv (group 'cross', the same training
+    sets up to float32 rounding of fold1d.make_data)."""
+    with Pool(workers) as p:
+        d = pd.DataFrame(p.map(_calib_job, [(a, s) for a in A_VALUES for s in range(40)], chunksize=1))
+    ref = pd.read_csv(RESULTS / "blockG_crossings.csv", float_precision="round_trip")
+    ref = ref[ref.window == "base"][["a", "seed", "cross_step", "cross_w2"]]
+    m = d.merge(ref, on=["a", "seed"], suffixes=("", "_ref"))
+    d["reproduced"] = bool(np.array_equal(m.cross_step.values, m.cross_step_ref.values, equal_nan=True) and
+                           np.array_equal(m.cross_w2.values, m.cross_w2_ref.values, equal_nan=True))
+    T = pd.read_csv(RESULTS / "mirror_branch_thresholds.csv", float_precision="round_trip")
+    T = T[T.group == "cross"].set_index(["a", "seed"])
+    from .own_threshold import _pop
+    rows = []
+    for pl in ("w1", "w1w2"):
+        for a in A_VALUES:
+            G = _pop(a)[0]
+            r_fit = RESID[a]
+            g = d[(d.a.round(2) == a) & d.cross_step.notna()].copy()
+            g["T_early"] = [T.loc[(a, s), "T_plus"] if b > 0 else T.loc[(a, s), "T_minus"] if b < 0 else np.nan
+                            for s, b in zip(g.seed, g[f"early_{pl}_branch"].fillna(0))]
+            g["R_cross"] = g.cross_w2 * G / 2
+            e_un = np.log(g.R_cross / (g.T_early * G / 2))
+            e_fit = e_un - np.log(1 + r_fit)
+            rows.append({"plateau": pl, "a": a, "n_cross": len(g), "defined": int(g[f"early_{pl}_defined"].sum()),
+                         "ever_on_plateau": float(g[f"ever_on_plateau_{pl}"].mean()),
+                         "match_rate": float((g[f"early_{pl}_branch"] == g.branch_cross).mean()),
+                         "lead_steps_median": float((g.cross_step - g[f"early_{pl}_step"]).median()),
+                         "lead_steps_min": float((g.cross_step - g[f"early_{pl}_step"]).min()),
+                         "lead_R_median": float(((g.cross_w2 - g[f"early_{pl}_w2"]) * G / 2).median()),
+                         "abs_err_unfitted_median": float(np.nanmedian(np.abs(e_un))),
+                         "abs_err_unfitted_p10": float(np.nanpercentile(np.abs(e_un), 10)),
+                         "abs_err_unfitted_p90": float(np.nanpercentile(np.abs(e_un), 90)),
+                         "abs_err_fitted_median": float(np.nanmedian(np.abs(e_fit))),
+                         "abs_err_fitted_p10": float(np.nanpercentile(np.abs(e_fit), 10)),
+                         "abs_err_fitted_p90": float(np.nanpercentile(np.abs(e_fit), 90))})
+    d.to_csv(RESULTS / "prospective_own_early_calibration_runs.csv", index=False)
+    t = pd.DataFrame(rows)
+    t.to_csv(RESULTS / "prospective_own_early_calibration.csv", index=False)
+    print("reproduced blockG_crossings exactly:", bool(d.reproduced.iloc[0]), "on", len(m), "runs")
+    print(t.to_string(index=False))
+
+
+RESID = {1.30: 0.030, 1.50: 0.063}               # r(a), frozen from base-window crossing runs (S3 crossing-branch residual)
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else WORKERS
     {"select": select, "power": power, "predict": lambda: predict(w), "validate": lambda: validate(w),
-     "train": lambda: train(w), "score": score}[cmd]()
+     "train": lambda: train(w), "score": score, "calibrate_early": lambda: calibrate_early(w)}[cmd]()
