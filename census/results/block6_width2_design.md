@@ -1,3 +1,5 @@
+**Superseded by `width2_design.md` (Route A, full design for review). Kept as the record of the first draft.**
+
 # Block 6 design (Route A): does conditional minimisation at fixed output scale predict width 2?
 
 **Design for review. Nothing in this block is run until this is approved.**
