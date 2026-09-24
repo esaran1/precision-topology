@@ -108,7 +108,7 @@ def manifest():
                              "bytes": f.stat().st_size, "regenerate": meta.get("regenerate", "")})
     out = CERTS.parent / "certificates_manifest.csv"
     with out.open("w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["file", "sha256", "bytes", "regenerate"])
+        w = csv.DictWriter(fh, fieldnames=["file", "sha256", "bytes", "regenerate"], lineterminator="\n")
         w.writeheader(); w.writerows(rows)
     return out
 

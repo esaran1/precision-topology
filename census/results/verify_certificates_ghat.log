@@ -348,3 +348,49 @@
         184901306887  instructions retired
          47753087616  cycles elapsed
           1018365032  peak memory footprint
+/Users/Evan/precision-topology/census/results/certificates_manifest.csv
+{
+ "name": "ghat_a1.05",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "coverage": true,
+  "domain_contains_reduction": true,
+  "every_leaf_below_claim_hi": true,
+  "bnb_lo_attained": false,
+  "ghat_cert_attained": false,
+  "ghat_cert_below_hi": true
+ },
+ "worst_leaf_upper": 0.00636383342045603,
+ "G_at_bnb_arg_lower": "[0.0063600840128752924485440 +/- 4.60e-26]",
+ "G_at_witness_lower": "[0.0063600859939503882445396 +/- 3.68e-26]",
+ "rigorous_lower": 0.006360085993950388,
+ "rigorous_upper": 0.00636383342045603,
+ "claim_hi_excess_over_published": -7.719519468096792e-17,
+ "ghat_cert_deficit": 1.6005529608233584e-16,
+ "bnb_lo_deficit": 3.9613751996186155e-16,
+ "ghat_cert": 0.006360085993950548,
+ "claim_hi": 0.006363833420456108,
+ "leaves": 18041202,
+ "failed_leaves": [],
+ "seconds": 397.14111733436584,
+ "pass": false
+}
+1 certificate(s) checked; failures: ['ghat_a1.05']
+      397.29 real       393.71 user         2.60 sys
+          3052371968  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              737261  page reclaims
+                 644  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               11778  voluntary context switches
+              138453  involuntary context switches
+        449913290121  instructions retired
+        134984098001  cycles elapsed
+          4295871896  peak memory footprint
