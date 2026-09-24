@@ -230,9 +230,16 @@ compact domain |w₁| ≤ W(s, a), b₁ ∈ [0, 2π). The lemma below is what ma
   - Class 1 lies on O = [−2, −1.2] ∪ [1.2, 2] and class 0 on I = [−0.8, 0.8], with n points in total and balanced
     classes (ȳ = ½; true of the 800-point population and of every 400-point training set).
   - L* is the profiled loss, minimised over b₂.
+- **Data**: the population objective has n = 800 points:
+  - 400 inner points x = linspace(−0.8, 0.8, 400), class 0;
+  - 200 outer points x = linspace(1.2, 2.0, 200), class 1, and their 200 negatives, class 1.
+  (`blockB_landscape.population_data`; a training set is `fold1d.make_data(200, seed)`.)
 - **Notation**: for a cut c ∈ [0, 0.8), let n_O⁻ = #{class 1: x ≤ −1.2} and n_I^{≥c} = #{class 0: x ≥ c}. Set
   π(c) = min(n_O⁻, n_I^{≥c})/n and δ(π) = 2 log(2^{1/π} − 1).
-- **Claim**: if w₁ > W₊(s, a) = min_c (2a + δ(π(c))/s)/(1.2 + c), then L*(w₁, b₁; s) > log 2 for every b₁.
+- **The cut grid**: C = {0.799·k/79 : k = 0, 1, …, 79}, the 80 cuts the certified code evaluates
+  (`np.linspace(0, 0.799, 80)`).
+- **Claim**: if w₁ > W₊(s, a) = min over c ∈ C of (2a + δ(π(c))/s)/(1.2 + c), then L*(w₁, b₁; s) > log 2 for every b₁.
+  (The argument holds for every single c; minimising over the grid C reproduces the code exactly.)
   The case w₁ < 0 is the mirror image: use the right-outer class-1 points (x ≥ 1.2) against the class-0 points
   with x ≤ −c, which gives W₋.
 - **Conclusion**: with W(s, a) = max(W₊, W₋), every global conditional minimiser has |w₁| ≤ W. The constant
@@ -248,13 +255,15 @@ compact domain |w₁| ≤ W(s, a), b₁ ∈ [0, 2π). The lemma below is what ma
 4. All other losses are non-negative. So for every b₂, L ≥ π(c)·softplus(Δ/2), and hence
    L* ≥ π(c)·softplus(Δ/2).
 5. π·softplus(Δ/2) > log 2 ⟺ Δ > δ(π) ⟺ w₁ > (2a + δ(π)/s)/(1.2 + c).
-6. Every c gives a valid bound. The certified search uses the smallest W over an 80-point grid of c in [0, 0.799].
+6. Every c gives a valid bound, so the minimum over the grid C does too.
    (For 1/π ≥ 1000 the code replaces δ by the larger 2 log 2/π, which is conservative; this never occurs here.) ∎
 
 **Illustration** (a = 1.30, s = 4.95, the lower end of the certified R_glob bracket; population data):
 - **With the cut c = 0.4**: n_O⁻ = 200, n_I^{≥0.4} = 100, π = 1/8, δ = 2 log 255 = 11.08. This gives
   W₊ = (2.6 + 11.08/4.95)/1.6 = 3.024.
-- **With the optimised cut c = 0.2225**: n_I^{≥c} = 145, π = 0.18125, which gives W = 2.908.
+- **With the grid-optimal cut c = 0.799·22/79 = 0.22251**: n_I^{≥c} = 145, π = 145/800 = 0.18125,
+  δ = 2 log(2^{1/0.18125} − 1) = 7.6045, W₊ = (2.6 + 7.6045/4.95)/(1.2 + 0.22251) = 2.9077.
+  W₋ is the same, because the data are x-symmetric, so **W = 2.908**: the value the certified search used.
 
 **Checked numerically at every certified a** (`writer_patch.w_bound_table` → `writer_patch_w_bound.csv`: both
 ends of all 12 certified R_glob and R_solve brackets, population objective):
