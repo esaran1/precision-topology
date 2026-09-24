@@ -470,14 +470,17 @@ def validate():
     act = act_of("f1.30")
     res = []
     # k = 1 reproduction on 20 checkpoints (pass) and a gradient-only freeze reference (fail)
-    seeds = PILOT_SEEDS[:4]
     cks = []
-    for s in seeds:
+    for s in PILOT_SEEDS:                                  # up to 5 per seed until 20 are collected
         r = train(s, act, gamma2("f1.30"), budget=400, checkpoint_steps=log_spaced_steps(400, 12))
         x, y = training_set(s)
         cks += [(c, x, y) for st, c in sorted(r["checkpoints"].items()) if st > 5][:5]
+        if len(cks) >= 20:
+            cks = cks[:20]
+            break
     diffs = [k1_check(c, x, y, act)[1] for c, x, y in cks]
-    res.append(("k=1 reproduction, 20 checkpoints, <= 1e-10", max(diffs) <= 1e-10, max(diffs)))
+    res.append((f"k=1 reproduction, {len(cks)} checkpoints (20 required), <= 1e-10",
+                len(cks) >= 20 and max(diffs) <= 1e-10, max(diffs)))
     c, x, y = cks[0]
     bad = reference_true_freeze(c, 25, x, y, act, reset=False)
     res.append(("fail case: gradient-only freeze reference rejected", not k1_check(c, x, y, act, reference=bad)[0], None))

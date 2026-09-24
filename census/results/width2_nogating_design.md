@@ -111,3 +111,17 @@ machinery that tested gating at width 1 (Blocks 4 and 5, and the approved W4 mac
 | positive control | 20 × 3 levels × 2 variants at width 1 | minutes |
 | tanh secondary | about the same as f_a | ≤ 2 CPU-hours |
 | **total** | | **about 4.5 CPU-hours** (under 2 hours at three workers), < 0.5 GB per worker |
+
+## Implementation note (2026-09-24, before any run)
+
+- **Producer**: `src/width2_nogating.py`; tests: `tests/test_width2_nogating.py`.
+- **Validity checks**: all ten pass on constructed pass and fail cases (`width2_nogating_validity.csv`, 3 s).
+  - k = 1 reproduction: 20 checkpoints, maximum difference 2.2e−16.
+  - Drift with projection: 6.9e−18; without projection (the fail case): 2.23.
+  - The width-1 control replay equals `fixed_scale.replay` at a = 1.30 exactly.
+- **Arithmetic of the primary criterion.** At n = 80 the 0.90 fraction is the binding condition. 72/80 already has a
+  Clopper–Pearson lower bound of 0.812 ≥ 0.80, so the CP condition binds only if runs are excluded (n < 80). This is
+  stated, not changed.
+- **Storage.** Only each run's latest pre-placement state is persisted (`width2_nogating_parts/ck_*.pkl`), since it
+  is the only state used. The count of states saved in memory is recorded per run.
+- **Not run**: the pilot, training, control and replays wait for the direct small-scale check.

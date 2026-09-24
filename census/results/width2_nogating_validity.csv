@@ -1,0 +1,11 @@
+check,pass,value
+"k=1 reproduction, 20 checkpoints (20 required), <= 1e-10",True,2.220446049250313e-16
+fail case: gradient-only freeze reference rejected,True,
+decisions preserved at k = 0.01,True,
+fail case: k < 0 flips decisions,True,
+drift <= 1e-12 with projection,True,6.938893903907228e-18
+fail case: no projection drifts,True,2.234382308860845
+training determinism,True,
+k_init = 1 reproduces width2_train.train's crossing step,True,81.0
+"placement agrees with the independent 20,001-point dense check",True,
+width-1 control replay = fixed_scale.replay at a = 1.30,True,
