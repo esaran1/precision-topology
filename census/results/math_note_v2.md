@@ -527,3 +527,52 @@ the maximum over the class-0 points. Let Γ_n = sup_θ G_n(θ) > 0, and suppose 
     Var(φ) = c²Var(x) + a²Var(cos α*x).
   - The Var-minimising member has **c = 0**, which needs two units with ṽ₁α₁ = −ṽ₂α₂: the cosine pair. It is
     unavailable at width 1.
+
+### 10.1 The second-order selection, in full (added at the author's request, 2026-09-24)
+
+**The expansion, with every constant.**
+- Let g(s) = L*(θ; s). The data are balanced (ȳ = ½), and b*(s) is the unique root of m(s, b) = mean σ(sφ + b) − ½.
+- **g(0) = log 2.** At s = 0, b* = 0.
+- **g′(0) = −Δμ/4.** By the envelope theorem, g′(s) = mean((σ(z*) − y)·φ), where ∂L/∂b = 0 at b*. At s = 0 this is
+  mean((½ − y)φ) = ¼(μ_O + μ_I) − ½μ_O = −Δμ/4.
+- **g″(0) = ¼·Var(φ).** g″(s) = mean(σ′(z*)·(φ + b*′)·φ).
+  - Differentiating m(s, b*(s)) = 0 gives mean(σ′(z*)(φ + b*′)) = 0, so b*′ = −mean(σ′φ)/mean(σ′).
+  - At s = 0, σ′ ≡ ¼, so b*′(0) = −φ̄ and g″(0) = ¼·mean((φ − φ̄)φ) = ¼·Var(φ).
+- **g‴(0) = 0.** g‴(s) = mean(σ″(z*)(φ + b*′)²φ) + mean(σ′(z*)·b*″·φ).
+  - Differentiating the identity mean(σ′(z*)(φ + b*′)) = 0 once more gives
+    mean(σ″(z*)(φ + b*′)²) + b*″·mean(σ′(z*)) = 0.
+  - At s = 0, z* ≡ 0 and σ″(0) = 0. So b*″(0) = 0, and both terms of g‴(0) vanish.
+- **Hence L*(θ; s) = log 2 − (s/4)·Δμ(θ) + (s²/8)·Var(φ_θ) + O(s⁴).**
+  - The remainder is bounded by K·s⁴·mean|φ − φ̄|⁴, with |σ⁽ᵏ⁾| ≤ 1.
+  - Checked numerically: 1e−9 at s = 1e−2 and 1e−13 at s = 1e−3.
+
+**Why the variance term favours the cancelling pair (f_a, width 2).**
+- On the first-order maximiser set M, every unit with nonzero weight has α = ±α* and sin β = ±1, aligned so that
+  the oscillatory part of φ is a·sign(D*)·cos(α*x) in every case. Δμ is the same on all of M.
+- The members differ only in the **linear part** c·x, with c = Σṽᵢαᵢ.
+  - The linear part contributes nothing to Δμ, because both classes are symmetric about 0.
+  - It adds c²·Var(x) to Var(φ), because Cov(x, cos α*x) = 0 by the same symmetry.
+- So on M, Var(φ) = c²·Var(x) + a²·Var(cos α*x). The s² term penalises the linear part and nothing else.
+- The minimum is at c = 0. That needs two units with ṽ₁α₁ = −ṽ₂α₂: the cancelling pair φ = const + a·sign(D*)·cos(α*x).
+  - A single unit has c = ±α* ≠ 0 and so has strictly larger Var.
+  - At width 1 no cancellation is possible.
+- **The second-order gap between the single unit and the pair is (s²/8)·α*²·Var(x).** It is small, which is why a
+  finite restart budget at very small s can retain a single unit; the validated search's independent check exists
+  for that reason.
+
+**The criterion.** Suppose Γ_n > 0 is attained (Lemma 2), so the minimisers are placed at large s. Then **output
+scale gates placement, meaning the conditional minimiser is unplaced below some scale and placed above it, if and
+only if the small-scale conditional minimiser is unplaced.** When the first-order maximisers tie, "the small-scale
+conditional minimiser" means the one the second-order term selects.
+- *If*: unplaced at small s and placed at large s implies a sign change of G along the minimisers.
+- *Only if*: Corollary 2.
+- The criterion concerns the conditional minimiser, the object of the paper's threshold. Whether training reaches
+  it is a separate question, tested by W4 at width 1 and by the fixed-scale design below at width 2.
+
+**The three cases, and how each was established.**
+
+| case | small-scale conditional minimiser | gating | evidence |
+|---|---|---|---|
+| width 1, f_a (a = 1.30–1.60) | unplaced (G = −3.66 … −3.35; `scale_limits_width1.csv`) | **yes**: certified thresholds | registered consistency check, passed |
+| width 2, f_a (a = 1.30, 1.50) | placed: the cancelling pair (G = +0.890, +1.026) | **none** | registered prediction (`scale_limits_prediction.md`); decided by the second-order selection; direct check at finite small scale below |
+| width 2, tanh | placed at every scanned scale (G₊ = 1; the conditional infimum is not attained, α → ∞) | **none** | exploratory pilot scan (`width2_pilot_scan.csv`, design revision 2); no Δμ computation was registered for tanh |
