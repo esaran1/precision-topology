@@ -471,16 +471,20 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions", float(len(rc)), 164.0, 0)
-    for v, n in (("PASS", 69), ("FAIL", 53), ("PARTIAL", 12), ("UNRESOLVED", 30)):
+    chk("registered predictions", float(len(rc)), 209.0, 0)
+    chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
+    for v, n in (("PASS", 97), ("FAIL", 67), ("PARTIAL", 13), ("UNRESOLVED", 32)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (151, 66, 47, 8, 30)),
-                        ("assigned post hoc in the census", (13, 3, 6, 4, 0))):
+    for scope, want in (("scored by registered rules", (195, 94, 61, 8, 32)),
+                        ("assigned post hoc in the census", (14, 3, 6, 5, 0)),
+                        ("since 2026-09-23: scored by registered rules", (44, 28, 14, 0, 2)),
+                        ("since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
+                        ("since 2026-09-23: validity gates (not predictions; not in the headline)", (14, 14, 0, 0, 0))):
         got = tl.loc[scope]
         chk(f"{scope}: n/PASS/FAIL/PARTIAL/UNRES",
             float(sum(int(got[k]) * 10 ** (3 * i) for i, k in enumerate(["n", "PASS", "FAIL", "PARTIAL", "UNRESOLVED"]))),

@@ -12,8 +12,8 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
 | 3′. Prospective own-seed test (16 new settings) | **complete; every registered comparison PASSED at both a** (P2b: C better at 1.50, as registered) | yes |
 | Lag tests | first test: L1 PASSED, L2 failed; **deconfounded test: L1′ and L2′ FAILED at both a** (the late-switch effect is 11–14%); the "adiabatic lag" sentence is withdrawn | yes, as scored |
-| 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
-| 5. Retention curve | queued after Block 4 | if scored and verified in time; otherwise rebuttal |
+| 4. Fixed-scale dynamics | **complete** (validity check amended before any outcome): **D1 PASSED, D2 FAILED**; horizon extension **Q1 FAILED, Q2 FAILED**; own-seed account **S1 FAILED, S2 PASSED, S3 PASSED at a = 1.30 and FAILED at 1.50** | yes |
+| 5. Retention curve | **complete: both registered predictions PASSED** (monotone; 50% point in [0.9, 1.1]); E-2 stays FAILED | yes |
 | 6. Width 2 | design committed for review (`block6_width2_design.md`); nothing run | rebuttal |
 
 ## Terminology (all paper text)
@@ -47,7 +47,8 @@ Registered `conditional_audit_prediction.md` (`6b17508`, before any audit comput
     too small to produce the +6% median excess.
   - **Say**: "the quadrature threshold is the population-level object; individual training sets have
     thresholds spread ±12% (IQR) around a median 6% above it". Whether that spread and offset explain
-    the fixed-scale curve width and the free-training offset is tested in S1–S3 (pending).
+    the fixed-scale curve width and the free-training offset was tested in S1–S3 (scored: S1 FAILED, S2 PASSED,
+    S3 PASSED at a = 1.30 and FAILED at 1.50; see Block 4).
 - **Certified full-range scan at a = 1.30** (`cond_scan_certified_a130.csv`): at every |w₂| from 1.5 to
   11 (step 0.5) the certified global conditional minimiser lies on one continuous branch.
   - Its gap changes sign once, between 4.5 and 5.0.
@@ -474,7 +475,7 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - Scored with the scorer committed before the data (`a015ace`), unchanged; the current refactored
     scorer gives identical output.
 
-## Adiabatic-lag test (registered `lag_test_prediction.md`, `bd8cb9c`; scored)
+## Lag test, first design (registered `lag_test_prediction.md`, `bd8cb9c`, titled there "adiabatic-lag test"; do not use that name in the paper; scored)
 
 - **Design**: w₂'s learning rate scaled by φ ∈ {0.25, 0.5, 1, 2} at n = 6,400, a = 1.30 and 1.50, on the size
   test's 50 training sets per a.
@@ -557,14 +558,17 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   from the final approach.
   - **So the data do not support a lag confined to the final approach to the threshold.**
   - They do not rule out a dependence on the output scale's growth rate earlier in training.
-- **Say**: "In a registered deconfounded test that slows the output weight only after the plateau is left
-  and the branch is committed, the residual shrinks by just 11–14% at a quarter of the learning rate; the
-  registered lag criteria fail. Slowing it from the plateau exit onward removes about three-quarters of the
-  residual (reported, not registered). The residual's sensitivity to the output weight's growth rate is
-  therefore set mainly in the early approach, not by a lag at the threshold (post hoc)."
+- **Say** (verbatim, author's wording 2026-09-24): "Slowing the output weight's growth from the plateau exit
+  onward removes about three-quarters of the residual in a secondary analysis (0.71% and 1.64% against 3.11%
+  and 6.56%), but slowing it only from 0.7 of each run's own threshold removes 11 to 14%, and the registered
+  test of a lag confined to the final approach failed (L1′, L2′). The residual therefore depends on how fast
+  output scale grows during the middle of training, before the approach to the threshold. Its mechanism
+  remains open."
 - **Do not say**:
-  - that the residual is explained by an adiabatic lag of the output scale;
-  - that the lag test passed, without adding that the deconfounded test failed.
+  - "adiabatic lag";
+  - "relaxation lag explains the offset";
+  - "the residual is a lag near the threshold";
+  - "slowing output-weight growth removes the residual", unless the phase qualifier is included.
 
 ## Sample-size test (registered `sample_size_prediction.md`, `04e7668`; scored)
 
@@ -608,7 +612,8 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - So the free-training offset tends to the residual, not to zero. The finite-sample part disappears
     with n; the residual does not, and it grows with a.
   - **Say**: "the finite-sample shift of the threshold vanishes as the training set grows; a residual
-    lag of about 4% (a = 1.30) and 7.5% (a = 1.50) remains and is not a finite-sample effect".
+    offset of about 4% (a = 1.30) and 7.5% (a = 1.50) remains and is not a finite-sample effect". (Changed
+    from "residual lag" on 2026-09-24, after the deconfounded lag test; its mechanism remains open.)
 
 ## Block 5 — retention just after placement: both registered predictions PASSED
 
@@ -701,6 +706,68 @@ Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea
 
 - **Do not use in the submission.** For the rebuttal, say "the limit switch is certified per window; it is
   global for seven of the nine and restricted to K(24) for G1 and G4".
+
+## Registration census, updated 2026-09-24 (supersedes the 151 of `WRITER_INPUTS.md` §9)
+
+`results/registration_census.csv` has one row per registered prediction. It is built by
+`src/registration_census.py` from the curated `registration_census_enumeration.csv`, with the tally in
+`registration_tally.csv`. This round adds every registration scored since the 2026-09-23 census
+(`census_round = 2026-09-24`):
+- Block 3;
+- Blocks 4 and 5, with the horizon extension;
+- the own-seed thresholds S1–S3;
+- the sample-size test N1–N3;
+- both lag tests, L1–L2 and L1′–L2′;
+- the c₁ test and its two components;
+- the prospective own-seed test, P1–P4 and S-early.
+
+**Headline — print this:** of the **195 registered predictions scored by their registered rules, 94
+passed, 61 failed, 8 partially passed and 32 were not resolved.**
+
+**Listed separately — 14 verdicts assigned post hoc in the census: 3 PASS, 6 FAIL, 5 PARTIAL.** They
+are the 13 in `WRITER_INPUTS.md` §9, plus one new row:
+
+| row | block | registration | verdict | why it is a judgement call |
+|---|---|---|---|---|
+| B3-U-range | Block 3 | `prospective_prediction.md` | PARTIAL | The registered rule only reports inside/outside per setting: 7 of 8 are inside, and H10 at a = 1.30 is outside at 0.0767 (a tie-limited bracket). There is no overall verdict. Alternatives: 8 per-setting rows (7 PASS, 1 FAIL), or FAIL as a joint prediction. |
+
+| scope | PASS | FAIL | PARTIAL | UNRESOLVED | total |
+|---|---:|---:|---:|---:|---:|
+| **scored by registered rules (headline)** | **94** | **61** | **8** | **32** | **195** |
+| assigned post hoc (listed separately) | 3 | 6 | 5 | 0 | 14 |
+| all | 97 | 67 | 13 | 32 | 209 |
+| of which new since 2026-09-23, registered rules | 28 | 14 | 0 | 2 | 44 |
+| of which new since 2026-09-23, post hoc | 0 | 0 | 1 | 0 | 1 |
+
+**The new rows by registration** (each counted by its registered rule):
+
+| registration | PASS | FAIL | UNRESOLVED | rows |
+|---|---:|---:|---:|---|
+| Block 3 (primary; secondary B3) | 2 | 0 | 0 | + the post hoc U-range row |
+| Block 4 (D1 preserved, D1 reset, D2) | 2 | 1 | 0 | D2, the competing outcome, failed |
+| Block 4 horizon (Q1, Q2) | 0 | 2 | 0 | |
+| Block 5 (monotone, location) | 2 | 0 | 0 | |
+| Own-seed thresholds (S1, S2, S3 per a) | 2 | 2 | 0 | S1 FAIL; S2 PASS; S3 PASS at 1.30, FAIL at 1.50 |
+| Sample size (N1–N3 per a) | 3 | 3 | 0 | N1 PASS ×2; N2 PASS at 1.50, FAIL at 1.30; N3 FAIL ×2 |
+| Lag test (L1, L2 per a) | 2 | 2 | 0 | L1 PASS ×2; L2 FAIL ×2 |
+| Deconfounded lag test (L1′, L2′ per a) | 0 | 4 | 0 | |
+| c₁ (primary; k₁, A′/A* components) | 1 | 0 | 2 | the primary and A′/A* INCONCLUSIVE (counted UNRESOLVED); k₁ PASS |
+| Prospective own-seed (P1–P4 per a; S-early per a) | 14 | 0 | 0 | 8 primary comparisons, 6 S-early expectations |
+
+**Counting conventions (state them if the tally is printed):**
+- **Per a.** Where a registration scores each a separately, each a is one row. That is the registered unit
+  for every v4 registration concerned. The 2026-09-23 census never split by a. Collapsing the new rows to
+  one per prediction would instead give 28 rows by registered rules (18 PASS, 8 FAIL, 2 UNRESOLVED), plus 3
+  post hoc PARTIAL: the U range, and S3 and N2, which are mixed across a.
+- **INCONCLUSIVE counts as UNRESOLVED.**
+- **Failed as registered stays FAIL**, whatever a later or supplementary analysis shows. For example, L1′ fails
+  although the t* analysis would pass, and L1 stays PASS although L1′ failed.
+- **Validity gates are not predictions and are not in the headline.** There were 14 new ones, all passed
+  (`registration_census_v4_gates_and_reported.csv`), including the Block 1 decision rule.
+  - Two of them fired first and passed after an amendment that came before any outcome: the Block 4 k = 1
+    reference (`10c1ea5`) and the horizon reproduction parsing (`4dbb987`).
+  - The same file lists the 20 reported items that have no criterion.
+- The S-early expectations are counted. They were registered with explicit ranges; the fitted ranges are in-sample.
 
 ## Figure manifest (v4)
 

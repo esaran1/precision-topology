@@ -38,6 +38,10 @@ CORRECTIONS = [
 # verdicts first assigned in the census (post hoc scoring against the registered criterion)
 POST_HOC = ["B-solve", "B-CV", "collapse-link", "thr-P5", "B-spin", "loc-2", "rc-1d", "S-3",
             "gelu-up", "amp-2a-match", "E-cold_low", "metric-1a", "metric-2"]
+# second round (2026-09-24): v4 registrations scored since the first census; one row per registered unit
+# (per a where the registration scores each a separately)
+POST_HOC_V4 = ["B3-U-range"]
+OTHER = RESULTS / "registration_census_v4_gates_and_reported.csv"   # validity gates + no-criterion items
 
 
 def build() -> pd.DataFrame:
@@ -55,15 +59,27 @@ def build() -> pd.DataFrame:
         assert m.sum() == 1, i
         d.loc[m, "verdict_status"] = ("SCORED IN CENSUS 2026-09-23 (post hoc scoring against the "
                                       "registered criterion; judgement call, see note)")
+    for i in POST_HOC_V4:
+        m = d.id == i
+        assert m.sum() == 1, i
+        d.loc[m, "verdict_status"] = ("SCORED IN CENSUS 2026-09-24 (post hoc scoring against the "
+                                      "registered criterion; judgement call, see note)")
     d["non_directional"] = d.note.fillna("").str.startswith("NON-DIRECTIONAL")
-    d["scoring"] = np.where(d.id.isin(POST_HOC), "post hoc (census)", "registered rule")
+    d["scoring"] = np.where(d.id.isin(POST_HOC + POST_HOC_V4), "post hoc (census)", "registered rule")
     assert not d.id.duplicated().any()
     assert d.verdict.isin(VERDICTS).all()
     d.to_csv(OUT, index=False)
     rows = []
+    v4 = d[d.census_round == "2026-09-24"]
+    other = pd.read_csv(OTHER)
+    gates = other[other.kind == "validity gate"]
+    assert not set(other.id) & set(d.id)
     for scope, g in (("scored by registered rules", d[d.scoring == "registered rule"]),
                      ("assigned post hoc in the census", d[d.scoring != "registered rule"]),
-                     ("all", d)):
+                     ("all", d),
+                     ("since 2026-09-23: scored by registered rules", v4[v4.scoring == "registered rule"]),
+                     ("since 2026-09-23: assigned post hoc", v4[v4.scoring != "registered rule"]),
+                     ("since 2026-09-23: validity gates (not predictions; not in the headline)", gates)):
         c = g.verdict.value_counts().reindex(VERDICTS).fillna(0).astype(int)
         rows.append({"scope": scope, "n": len(g), **c.to_dict()})
     pd.DataFrame(rows).to_csv(TALLY, index=False)
