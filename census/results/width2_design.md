@@ -283,3 +283,96 @@ write-and-read round trip it depends on (exact round-trip parsing).
 5. **Register** W1–W3 and the tanh criterion, with the frozen thresholds and hashes.
 6. Train, then score W1–W3. Then run the W4 replays (after W1's training, which provides the
    checkpoints) and score W4.
+
+## Revision 2 — 2026-09-24 (for review; nothing run beyond the exploratory pilot below)
+
+### What the pilot found (EXPLORATORY; `src/width2_pilot.py`, 100 restarts per scale, unvalidated)
+
+- **Cosine identity (checked to 1e−14)**: f_a(αx + π/2) − f_a(αx + 3π/2) = −π + 2a·cos(αx). With opposite output
+  weights, the linear parts cancel and the network represents a cosine.
+- **The single-cosine problem**: sup over α of G(cos(αx)) = **1/√2 exactly**, at α = 5π/8.
+  - *Proof*: G₊ ≤ 0 because the inner maximum is 1 at x = 0. For G₋ = min_I cos(αx) − max_O cos(αx), the
+    inner minimum is cos(0.8α) on [0, π/(0.8)]. The outer maximum is max(cos 1.2α, cos 2α) while
+    [1.2α, 2α] ⊂ [π/2, 3π/2].
+  - For 1.6α < π the outer maximum is cos 1.2α, and G₋ increases in α. For 1.6α > π it is cos 2α, and G₋
+    decreases.
+  - So the maximum is at 1.6α = π·… i.e. cos 1.2α = cos 2α, α = 2π/3.2 = 5π/8, where
+    G₋ = cos(π/2) − cos(3π/4) = 1/√2. ∎
+- **The width-2 maximiser is not the single cosine.** The pilot's best point has two different frequencies
+  (α₁ ≈ 7.7, α₂ ≈ 1.7) with linear parts that cancel (c = Σṽᵢαᵢ ≈ 0). Its value is Γ̂₂/a ≈ 0.911–0.913, above
+  1/√2.
+  - When c = 0 exactly, G(φ)/a is the a-free problem κ = sup G(Σṽᵢ sin(αᵢx + βᵢ)) subject to Σṽᵢαᵢ = 0.
+  - So **Γ₂ = κ·a holds if the maximiser always has c = 0**. That is not proved; a width-2 function cannot be
+    symmetrised within width 2.
+  - The full searches at a = 1.30 and 1.50 and the κ search (`width2_pilot gamma`, `kappa`) test it
+    numerically. It is reported as validated, not proved, unless a proof closes.
+- **Conditional minimisers are placed at very small output scale.**
+  - For f_a (a = 1.30, 1.50), G₊ of the retained minimiser changes sign between R₂ = 0.05 and 0.10, i.e.
+    ‖w₂‖₁ ≈ 0.08–0.17. That is about 30–50× below the width-1 switch scale.
+  - Above it the minimiser is a symmetric pair (α₁ = α₂ ≈ 1.79, β = π/2 and 3π/2, equal weights).
+  - For tanh the minimiser is placed at every scanned scale (G₊ = 1), with α diverging: the conditional infimum
+    is not attained.
+- The scans at a = 0.5 and 1.0 (monotone f_a) test whether width 2 places even without non-monotonicity; the
+  cosine identity predicts it does. They are exploratory.
+
+### Decisions recorded (author, 2026-09-24)
+
+1. **Γ̂₂**: reported as validated by the two independent searches (4,000-start Nelder–Mead; differential
+   evolution with a different parametrisation), agreeing to 1e−6 relative, and **labelled not certified**. The
+   5D branch and bound was measured not to fit: about 10²⁰ cells at 1e−6. Lemma 4 is not closed.
+2. **tanh: "not applicable"**, because the conditional infimum is not attained (α diverges; G₊ = 1 at every
+   scale). **The audit's non-convergence stop is waived for tanh only.** Both facts are disclosed. The tanh
+   criterion (H-general vs H-nonmonotone) is therefore not decided.
+
+### Revised design (replaces §4's initialisation; W1 and W4 criteria unchanged)
+
+**Primary arm: matched initialisation.** Only the output weights v are scaled at initialisation. The hidden layer
+(α, β) and the output bias b are unchanged, since b does not enter ‖w₂‖₁. The scale makes the median initial
+‖w₂‖₁ relative to the population threshold equal to the width-1 ratio.
+- **Width-1 ratio**:
+  - r₁(a) = median initial |w₂| / |w₂|_glob(a).
+  - Median initial |w₂| = **0.45899**, the width-1 protocol (`blockG_windows.train`: torch.manual_seed(seed),
+    U(−1, 1)⁴ in float32, then double) over the W1 seeds 600,000–600,079.
+  - |w₂|_glob(a) = the midpoint of the certified population bracket: **4.95625** at a = 1.30
+    ((4.9500, 4.9625]) and **2.53125** at a = 1.50 ((2.5250, 2.5375]).
+  - So **r₁(1.30) = 0.09261** and **r₁(1.50) = 0.18133**.
+- **Width-2 standard initialisation**: median ‖v‖₁ = **0.97946** over the same seeds (torch.manual_seed(seed),
+  U(−1, 1)⁷ in float64).
+- **Rule**: v₀ ← k(a)·v₀, with **k(a) = r₁(a)·s₂,glob(a)/0.97946**.
+  - s₂,glob(a) is the midpoint of the validated W0 bracket in ‖w₂‖₁, converted from R₂ with Γ̂₂.
+  - k(a) is computed from W0 and frozen, with a hash, before any W1 run.
+  - The median matched initial ‖w₂‖₁/s₂,glob then equals r₁(a) exactly on these seeds.
+- tanh has no threshold, so it has no matched arm.
+
+**Secondary arm: standard initialisation (descriptive only).** The same seeds with U(−1, 1)⁷ unscaled. The stated
+expectation is that the runs begin above the threshold: median ‖w₂‖₁ = 0.979 against s₂,glob ≈ 0.1–0.2 in the
+pilot. So crossing is not preceded by growth through the threshold. No criterion.
+
+**W1 and W4**: as approved (W1 with its upper bound 1.25; W4 co-primary), **on the primary arm**, per f_a arm.
+
+**W4 horizon, chosen from pilot convergence times that do not test the outcome.**
+- **Pilot**: calibration seeds 500,000–500,019, matched initialisation. Replays held at **2.0×** the threshold
+  (a level where placement is expected under every hypothesis), both optimiser variants. The measure is the step
+  after which sign-correctness no longer changes.
+- **Rule**: H = the smallest of {16k, 32k, 64k, 128k} steps that is at least 4× the 95th percentile of that time.
+  Outcomes are recorded at H/16, H/4 and H. H is stated in the registration.
+- No W1 seed and no other level is used in the pilot.
+
+**Iteration caps.**
+- The cap-hit rate is reported per activation at every scan scale.
+- For f_a, if any restart hits the cap within ±0.1 in R₂ of a threshold, the cap is raised (2,000 → 5,000 →
+  20,000 → 100,000) until none do there. The final cap is stated.
+- For tanh the rate is reported; the stop is waived (decision 2).
+
+**Per-unit realisation breakdown (descriptive; at every W1 crossing and every W4 endpoint)**:
+- the weight share maxᵢ |vᵢ|/‖v‖₁;
+- the linear-cancellation index |Σvᵢαᵢ|/Σ|vᵢαᵢ|;
+- the knockout class, using G₊ with unit i removed (vᵢ = 0; G₊ is invariant to b):
+  - **single-unit**: exactly one unit alone keeps G₊ > 0;
+  - **shared**: neither unit alone has G₊ > 0;
+  - **redundant**: each alone has G₊ > 0.
+- Fractions are reported per activation and arm, with Clopper–Pearson 95% intervals.
+
+**Unchanged**: W0 (the validated conditional scan; the constant predictor included; the audit; the restart
+ladder; the 10× stricter search; the CMA-ES search), W2, W3, every validity check and stop condition of §5, and
+compute priority.
