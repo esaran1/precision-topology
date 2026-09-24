@@ -709,63 +709,84 @@ Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea
 
 ## Registration census, updated 2026-09-24 (supersedes the 151 of `WRITER_INPUTS.md` §9)
 
-`results/registration_census.csv` has one row per registered prediction. It is built by
-`src/registration_census.py` from the curated `registration_census_enumeration.csv`, with the tally in
-`registration_tally.csv`. This round adds every registration scored since the 2026-09-23 census
-(`census_round = 2026-09-24`):
+`src/registration_census.py` builds two views from the curated `registration_census_enumeration.csv`, with the
+tally in `registration_tally.csv`.
+- `registration_census.csv` is the **headline**: one row per registered prediction.
+- `registration_census_by_unit.csv` is the **appendix**: one row per a where a registration scores each a
+  separately.
+
+This round adds every registration scored since the 2026-09-23 census:
 - Block 3;
 - Blocks 4 and 5, with the horizon extension;
-- the own-seed thresholds S1–S3;
-- the sample-size test N1–N3;
-- both lag tests, L1–L2 and L1′–L2′;
-- the c₁ test and its two components;
+- S1–S3;
+- N1–N3;
+- L1–L2 and L1′–L2′;
+- the c₁ test and its components;
 - the prospective own-seed test, P1–P4 and S-early.
 
-**Headline — print this:** of the **195 registered predictions scored by their registered rules, 94
-passed, 61 failed, 8 partially passed and 32 were not resolved.**
+**Convention (the same as the 151).** The 2026-09-23 census counted each registered prediction once, across
+every a at which it was scored.
+- None of its 164 rows is split by a. For example, G-2 is one row, "PASS at both a", and C-3 is one row, "PASS …
+  at every a".
+- A prediction with different outcomes across a or conditions became one PARTIAL, assigned post hoc (S-3).
+- The headline below uses exactly that convention.
 
-**Listed separately — 14 verdicts assigned post hoc in the census: 3 PASS, 6 FAIL, 5 PARTIAL.** They
-are the 13 in `WRITER_INPUTS.md` §9, plus one new row:
+**Headline — print this:** of the **179 registered predictions scored by their registered rules, 84 passed, 55
+failed, 8 partially passed and 32 were not resolved.**
 
-| row | block | registration | verdict | why it is a judgement call |
-|---|---|---|---|---|
-| B3-U-range | Block 3 | `prospective_prediction.md` | PARTIAL | The registered rule only reports inside/outside per setting: 7 of 8 are inside, and H10 at a = 1.30 is outside at 0.0767 (a tie-limited bracket). There is no overall verdict. Alternatives: 8 per-setting rows (7 PASS, 1 FAIL), or FAIL as a joint prediction. |
+**One clause for the paper, stating the convention:** "counting each registered prediction once across the values
+of a at which it was scored, and listing as post hoc partial any prediction that passed at one a and failed at
+another".
 
-| scope | PASS | FAIL | PARTIAL | UNRESOLVED | total |
+**Listed separately — 16 verdicts assigned post hoc in the census: 3 PASS, 6 FAIL, 7 PARTIAL.** They are the 13 in
+`WRITER_INPUTS.md` §9, plus three new rows:
+
+| row | registration | verdict | why it is a judgement call |
+|---|---|---|---|
+| B3-U-range | `prospective_prediction.md` | PARTIAL | The registered rule reports inside/outside per setting (7 of 8 inside; H10 at a = 1.30 outside at 0.0767, a tie-limited bracket) and gives no overall verdict. |
+| own-S3 | `own_threshold_prediction.md` | PARTIAL | Registered rule: PASS at a = 1.30, FAIL at a = 1.50. Merged across a, as S-3 was. |
+| size-N2 | `sample_size_prediction.md` | PARTIAL | Registered rule: PASS at a = 1.50, FAIL at a = 1.30 (on its interval only). Merged across a. |
+
+| scope (headline convention) | PASS | FAIL | PARTIAL | UNRESOLVED | total |
 |---|---:|---:|---:|---:|---:|
-| **scored by registered rules (headline)** | **94** | **61** | **8** | **32** | **195** |
-| assigned post hoc (listed separately) | 3 | 6 | 5 | 0 | 14 |
+| **scored by registered rules (headline)** | **84** | **55** | **8** | **32** | **179** |
+| assigned post hoc (listed separately) | 3 | 6 | 7 | 0 | 16 |
+| all | 87 | 61 | 15 | 32 | 195 |
+| of which new since 2026-09-23, registered rules | 18 | 8 | 0 | 2 | 28 |
+| of which new since 2026-09-23, post hoc | 0 | 0 | 3 | 0 | 3 |
+
+**The 28 new predictions scored by their registered rules:**
+- **PASS (18)**:
+  - Block 3 primary; Block 3 secondary B3;
+  - D1 (preserved); D1 (reset);
+  - Block 5 monotone; Block 5 location;
+  - S2; N1; L1; k₁;
+  - P1, P2a, P2b, P3, P4;
+  - S-early match, S-early unfitted error, S-early fitted error.
+- **FAIL (8)**: D2, Q1, Q2, S1, N3, L2, L1′, L2′.
+- **UNRESOLVED (2)**: c₁ primary and A′/A*, both registered INCONCLUSIVE.
+
+**Appendix view: one row per registered unit.** Here each a counts separately where the v4 registration scores
+each a separately; that is the unit those registrations define.
+
+| scope (per registered unit) | PASS | FAIL | PARTIAL | UNRESOLVED | total |
+|---|---:|---:|---:|---:|---:|
+| scored by registered rules | 94 | 61 | 8 | 32 | 195 |
+| assigned post hoc | 3 | 6 | 5 | 0 | 14 |
 | all | 97 | 67 | 13 | 32 | 209 |
 | of which new since 2026-09-23, registered rules | 28 | 14 | 0 | 2 | 44 |
-| of which new since 2026-09-23, post hoc | 0 | 0 | 1 | 0 | 1 |
 
-**The new rows by registration** (each counted by its registered rule):
+- Under this view S3 and N2 each contribute one PASS and one FAIL by the registered rule, instead of one post hoc
+  PARTIAL.
 
-| registration | PASS | FAIL | UNRESOLVED | rows |
-|---|---:|---:|---:|---|
-| Block 3 (primary; secondary B3) | 2 | 0 | 0 | + the post hoc U-range row |
-| Block 4 (D1 preserved, D1 reset, D2) | 2 | 1 | 0 | D2, the competing outcome, failed |
-| Block 4 horizon (Q1, Q2) | 0 | 2 | 0 | |
-| Block 5 (monotone, location) | 2 | 0 | 0 | |
-| Own-seed thresholds (S1, S2, S3 per a) | 2 | 2 | 0 | S1 FAIL; S2 PASS; S3 PASS at 1.30, FAIL at 1.50 |
-| Sample size (N1–N3 per a) | 3 | 3 | 0 | N1 PASS ×2; N2 PASS at 1.50, FAIL at 1.30; N3 FAIL ×2 |
-| Lag test (L1, L2 per a) | 2 | 2 | 0 | L1 PASS ×2; L2 FAIL ×2 |
-| Deconfounded lag test (L1′, L2′ per a) | 0 | 4 | 0 | |
-| c₁ (primary; k₁, A′/A* components) | 1 | 0 | 2 | the primary and A′/A* INCONCLUSIVE (counted UNRESOLVED); k₁ PASS |
-| Prospective own-seed (P1–P4 per a; S-early per a) | 14 | 0 | 0 | 8 primary comparisons, 6 S-early expectations |
-
-**Counting conventions (state them if the tally is printed):**
-- **Per a.** Where a registration scores each a separately, each a is one row. That is the registered unit
-  for every v4 registration concerned. The 2026-09-23 census never split by a. Collapsing the new rows to
-  one per prediction would instead give 28 rows by registered rules (18 PASS, 8 FAIL, 2 UNRESOLVED), plus 3
-  post hoc PARTIAL: the U range, and S3 and N2, which are mixed across a.
-- **INCONCLUSIVE counts as UNRESOLVED.**
-- **Failed as registered stays FAIL**, whatever a later or supplementary analysis shows. For example, L1′ fails
+**Other conventions (both views):**
+- INCONCLUSIVE counts as UNRESOLVED.
+- Failed as registered stays FAIL, whatever a later or supplementary analysis shows. For example, L1′ fails
   although the t* analysis would pass, and L1 stays PASS although L1′ failed.
-- **Validity gates are not predictions and are not in the headline.** There were 14 new ones, all passed
-  (`registration_census_v4_gates_and_reported.csv`), including the Block 1 decision rule.
-  - Two of them fired first and passed after an amendment that came before any outcome: the Block 4 k = 1
-    reference (`10c1ea5`) and the horizon reproduction parsing (`4dbb987`).
+- **Validity gates are not predictions and are not in either count.**
+  - There were 14 new gates, all passed, including the Block 1 decision rule
+    (`registration_census_v4_gates_and_reported.csv`).
+  - Two of them fired first and passed after amendments made before any outcome: `10c1ea5` and `4dbb987`.
   - The same file lists the 20 reported items that have no criterion.
 - The S-early expectations are counted. They were registered with explicit ranges; the fitted ranges are in-sample.
 

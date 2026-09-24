@@ -471,19 +471,27 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions", float(len(rc)), 209.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 195.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
+    ru = pd.read_csv(R / "registration_census_by_unit.csv")
+    chk("registered units (appendix convention: per a)", float(len(ru)), 209.0, 0)
     for v, n in (("PASS", 97), ("FAIL", 67), ("PARTIAL", 13), ("UNRESOLVED", 32)):
+        chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
+    for v, n in (("PASS", 87), ("FAIL", 61), ("PARTIAL", 15), ("UNRESOLVED", 32)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (195, 94, 61, 8, 32)),
-                        ("assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("since 2026-09-23: scored by registered rules", (44, 28, 14, 0, 2)),
-                        ("since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
+    for scope, want in (("scored by registered rules", (179, 84, 55, 8, 32)),
+                        ("assigned post hoc in the census", (16, 3, 6, 7, 0)),
+                        ("since 2026-09-23: scored by registered rules", (28, 18, 8, 0, 2)),
+                        ("since 2026-09-23: assigned post hoc", (3, 0, 0, 3, 0)),
+                        ("by registered unit: scored by registered rules", (195, 94, 61, 8, 32)),
+                        ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (44, 28, 14, 0, 2)),
+                        ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (14, 14, 0, 0, 0))):
         got = tl.loc[scope]
         chk(f"{scope}: n/PASS/FAIL/PARTIAL/UNRES",
@@ -691,6 +699,7 @@ PRODUCERS = {
     "mechanism_trajectories_a130.csv": ("mechanism_figure_data", "trajectories", "full", ""),
     "registration_census.csv": ("registration_census", "build", "full", ""),
     "registration_tally.csv": ("registration_census", "build", "full", ""),
+    "registration_census_by_unit.csv": ("registration_census", "build", "full", ""),
     "discrepancy_margin.csv": ("discrepancies", "margins", "full", ""),
     "discrepancy_margin_runs.csv": ("discrepancies", "margins", "full", ""),
     "discrepancy_pathwise_init.csv": ("discrepancies", "pathwise", "full", ""),
