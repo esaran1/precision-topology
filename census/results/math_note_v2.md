@@ -458,3 +458,72 @@ Both terms come from the sine series, including the (1 + ε) factor.
 
   The same signs hold at all six a. These use the sharp A* (certified once (c)'s chain closed) and are
   exploratory.
+
+## 10. Small- and large-scale limits of the conditional minimiser (lemma; any width)
+
+**Setting.**
+- The hidden output is φ_θ(x): at width 1, f_a(w₁x + b₁); at width 2, Σᵢ ṽᵢu(αᵢx + βᵢ) with ‖ṽ‖₁ = 1.
+- The logits are z = s·φ_θ(x) + b, with s = ‖w₂‖₁ > 0.
+- The data have balanced classes: n_O = n_I = n/2 and ȳ = ½. This holds for the population and for every training
+  set.
+- L*(θ; s) = min_b mean ℓ(z, y), where ℓ is the logistic loss.
+- μ_O(θ) and μ_I(θ) are the means of φ_θ over the class-1 (outer) and class-0 (inner) points. Δμ(θ) = μ_O − μ_I.
+- Var(φ_θ) is the population variance of φ_θ over all n points.
+
+**Lemma 1 (small s).** L*(θ; s) = log 2 − (s/4)·Δμ(θ) + (s²/8)·Var(φ_θ) + R(θ; s). Here |R| ≤ K·s⁴·m₄(θ), with
+m₄ = mean |φ_θ − mean φ_θ|⁴ and K an absolute constant. The s³ term vanishes.
+- *Proof.* g(s) = L*(θ; s) is smooth, because b*(s) is the unique root of mean σ(z) = ȳ, and b* is smooth by the
+  implicit-function theorem.
+  1. At s = 0 the logits are constant, so b*(0) = logit(ȳ) = 0 and g(0) = log 2.
+  2. By the envelope theorem, g′(s) = mean((σ(z*) − y)·φ). At s = 0, σ = ½, so
+     g′(0) = mean((½ − y)φ) = ½·½(μ_O + μ_I) − ½μ_O = −Δμ/4.
+  3. Next, g″(s) = mean(σ′(z*)(φ + b*′)φ). Differentiating mean σ(z*) = ȳ gives b*′ = −mean(σ′φ)/mean(σ′).
+     At s = 0, σ′ ≡ ¼, so b*′(0) = −mean φ and g″(0) = ¼·mean((φ − mean φ)φ) = ¼·Var(φ).
+  4. For the third derivative, write z* = s·(φ − mean φ) + o(s) at s → 0. The integrand involves σ″(z*), which
+     is odd at z = 0, so g‴(0) = 0.
+  5. The fourth derivative is bounded by K·m₄, using |σ⁽ᵏ⁾| ≤ 1 and the same implicit differentiation. Taylor's
+     theorem with remainder then gives the result. ∎
+- *Numerical check* (random width-2 f_a configurations): the remainder is 1e−9 at s = 1e−2 and 1e−13 at s = 1e−3,
+  scaling as s⁴.
+
+**Corollary 1 (s → 0).** Let θ*(s) be conditional minimisers staying in a compact set as s → 0. Then:
+- (i) every limit point maximises Δμ.
+- (ii) If Δμ has quadratic growth away from its maximiser set M, the limit points minimise Var(φ_θ) over M.
+- *Proof.* L* = log 2 − (s/4)[Δμ − (s/2)Var(φ) + O(s³)]. For (i), a point with Δμ below its supremum by δ loses to
+  a maximiser once s·Var < δ. For (ii), inside a neighbourhood of M, moving a distance d away from M costs about
+  c·d² in Δμ and gains at most C·s·d in Var, so the optimum stays within O(s) of M. On M itself, the next-order
+  term −(s²/8)·(−Var) selects the minimum Var. ∎
+
+**Corollary 2 (a placement threshold needs an unplaced small-scale limit).** Suppose every Var-minimising
+Δμ-maximiser has G > 0. Then for all sufficiently small s the conditional minimiser is placed, and there is no
+threshold below which it is unplaced. A threshold, in the sense of unplaced below and placed above, therefore
+requires the selected Δμ-maximiser to have G ≤ 0.
+
+**Lemma 2 (s → ∞).** Here G_n(θ) is the gap over the **data points**: the minimum of φ over the class-1 points minus
+the maximum over the class-0 points. Let Γ_n = sup_θ G_n(θ) > 0, and suppose it is attained at some θ_Γ.
+- (a) L*(θ_Γ; s) ≤ log(1 + e^{−sΓ_n/2}).
+- (b) For every θ, L*(θ; s) ≥ (1/n)·log(1 + e^{−sG_n(θ)/2}).
+- *Proof.* (a) Place b at the midpoint of the gap: every point then has margin at least sΓ_n/2. (b) For any b, the
+  extreme class-1 and class-0 points cannot both have margin above sG_n(θ)/2. The one that doesn't contributes at
+  least (1/n)·softplus(−sG_n/2). ∎
+- **Consequence**: a θ with G_n(θ) ≤ Γ_n − δ cannot be a conditional minimiser once (1/n)·e^{−s(Γ_n−δ)/2}/2 >
+  e^{−sΓ_n/2}, i.e. once s > (2/δ)·log(2n). So limit points of the minimisers, if they stay in a compact set,
+  maximise the **data** gap G_n.
+- G_n ≥ G, where G is the gap over the continuous windows. They differ by at most the Lipschitz constant of φ times
+  the data's gap from the window edges; for the 800-point population that spacing is 0.004.
+- **The condition matters.** If Γ_n is not attained, the minimisers need not converge. That is tanh at width 2:
+  α diverges and the conditional infimum is not attained.
+
+**Structure of the Δμ-maximisers (f_a).**
+- The data are symmetric about 0 in both classes, so the linear part of f_a contributes nothing to Δμ. For one unit,
+  Δμ = a·sin β·D(α), with D(α) = mean_O cos(αx) − mean_I cos(αx) over the data points.
+- **Width 1**:
+  - M = {w₁ = ±α*, sin b₁ = sign D(α*)}, with α* = argmax_{α>0} |D(α)|. α* does not depend on a.
+  - Var is the same on all of M; the members are mirror images.
+- **Width 2 (‖ṽ‖₁ = 1)**:
+  - Δμ ≤ a·maxᵢ|D(αᵢ)| ≤ a·|D(α*)|, so M = {every unit with nonzero weight has αᵢ = ±α* and ṽᵢ sin βᵢ D(αᵢ) =
+    |ṽᵢ||D(α*)|}.
+  - On M, φ = c·x + const + a·sign(D(α*))·cos(α*x), with c = Σṽᵢαᵢ. Cov(x, cos α*x) = 0 by symmetry, so
+    Var(φ) = c²Var(x) + a²Var(cos α*x).
+  - The Var-minimising member has **c = 0**, which needs two units with ṽ₁α₁ = −ṽ₂α₂: the cosine pair. It is
+    unavailable at width 1.
