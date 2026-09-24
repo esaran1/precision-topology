@@ -1,0 +1,4 @@
+check,pass
+control reproduces the lag test's phi = 1 continuation bit for bit,True
+a=1.3: excluded runs (teleport placed) 0 of 48,True
+a=1.5: excluded runs (teleport placed) 0 of 48,True

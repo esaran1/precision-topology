@@ -803,6 +803,8 @@ PRODUCERS = {
     "writer_patch_prospective_own_per_setting.csv": ("writer_patch", "per_setting", "full", ""),
     "residual_posthoc_runs.csv": ("residual_posthoc", "score", "full", ""),
     "scale_limits_D.csv": ("scale_limits", "main", "full", ""),
+    "residual_mechanism_scores.csv": ("residual_mechanism", "score", "full", ""),
+    "residual_mechanism_checks.csv": ("residual_mechanism", "score", "full", ""),
     "scale_limits_width1.csv": ("scale_limits", "main", "full", ""),
     "scale_limits_width2.csv": ("scale_limits", "main", "full", ""),
     "scale_limits_summary.csv": ("scale_limits", "main", "full", ""),
@@ -1153,6 +1155,16 @@ def v4_checks() -> None:
     chk("WP-5: 7 figures, all <= 5.5 in wide", float(len(wp5) == 7 and (wp5.width_in <= 5.5).all()), 1.0, 0)
     chk("WP-5: tallest figure height", float(wp5.height_in.max()), 3.123, 0.002)
 
+    print("Block 4b (registered: residual_mechanism_design.md)")
+    rmc = pd.read_csv(R / "residual_mechanism_checks.csv")
+    chk("4b: every validity check passed", float(rmc["pass"].all()), 1.0, 0)
+    rms = pd.read_csv(R / "residual_mechanism_scores.csv")
+    for a_ in (1.3, 1.5):
+        v_ = rms[(rms.a == a_) & (rms.arm == "VERDICT")].verdict.iloc[0]
+        chk(f"4b a={a_}: verdict competing (neither removes half)", float(v_.startswith("competing")), 1.0, 0)
+    chk("4b a=1.3 control residual", float(rms[(rms.a == 1.3) & (rms.arm == "control")].median_residual.iloc[0]), 0.031053, 1e-6)
+    chk("4b a=1.3 teleport residual", float(rms[(rms.a == 1.3) & (rms.arm == "teleport")].median_residual.iloc[0]), 0.030787, 1e-6)
+    chk("4b a=1.5 reset residual", float(rms[(rms.a == 1.5) & (rms.arm == "reset")].median_residual.iloc[0]), 0.067219, 1e-6)
     print("Scale limits (registered: scale_limits_prediction.md)")
     sd_ = pd.read_csv(R / "scale_limits_D.csv").iloc[0]
     chk("alpha*", float(sd_.alpha_star), 1.7913244, 1e-6)

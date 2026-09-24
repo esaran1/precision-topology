@@ -109,3 +109,30 @@ So the residual depends on the middle phase of training. There are two candidate
   occupied at the switch point, in canonical orientation (w₂ > 0, branch = sign(w₁)). **Stop if any run changes
   branch.** Constructed fail case: a target on the other mirror branch.
 - **Order**: runs after Block 4a (post hoc) is reported.
+
+## Result — scored 2026-09-24 with the committed scorer (`residual_mechanism score`)
+
+**Validity: every check passed.**
+- The control reproduces the lag test's φ = 1 continuation bit for bit.
+- Every teleport stayed on the run's mirror branch (0 stops).
+- Every teleport landed on the branch minimiser: profiled gradient ≤ 7e−9, b₂ optimal.
+- No teleport placed a run (0 excluded of 48 at each a).
+- All 48 runs crossed in every arm at each a.
+- Median teleport distance: 0.0086 at a = 1.30, 0.0239 at a = 1.50.
+
+**Residual (median R_cross/R_own − 1)** and the paired run-level bootstrap 95% interval of control − arm:
+
+| a | control | teleport | reset | teleport + reset |
+|---|---|---|---|---|
+| 1.30 | 3.105% | 3.079% [−0.05, +0.05]% | 3.148% [−0.16, +0.02]% | 3.122% [−0.14, +0.04]% |
+| 1.50 | 6.559% | 6.547% [−0.10, +0.17]% | 6.722% [−0.50, +0.02]% | 6.601% [−0.37, +0.16]% |
+
+**Registered verdict at both a: the competing outcome.** Neither teleport nor reset removes half of the residual,
+so the **mechanism is unresolved**. Neither inherited displacement nor optimiser memory is supported.
+
+**Post hoc reading (labelled; not a registered conclusion).**
+- Placing (w₁, b₁) exactly on the occupied branch's conditional minimiser at 0.7·R_own does not change the crossing.
+  Neither does erasing Adam's moments.
+- The deconfounded lag test showed that the late phase is also insensitive to w₂'s growth rate: an 11–14% change.
+- So Block 4a's displacement–residual correlation (ρ ≈ 0.68 at the switch point) is **not causal there**. The
+  residual is not carried by the hidden parameters' position or by the optimiser state at 0.7×.
