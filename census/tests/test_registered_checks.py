@@ -397,8 +397,10 @@ def test_lag2_score_verdicts(tmp_path, monkeypatch):
                 own.append({"a": a, "n": l2.N, "seed": s, "w2_own": w_own})
                 for fct in l2.FACTORS:
                     w2 = w_own * (1 + resid[fct] + rng.normal(0, 0.004))
-                    runs.append({"a": a, "seed": s, "factor": fct, "t_star": 5, "cross_step": 900.0, "w2_abs": w2,
-                                 "R_cross": w2 * G / 2, "w1": 0.8, "b1": 3.8, "w2": w2, "plateau_reentry_steps": 0})
+                    for rule in l2.RULES:
+                        runs.append({"rule": rule, "a": a, "seed": s, "factor": fct, "t_star": 5, "cross_step": 900.0,
+                                     "w2_abs": w2, "R_cross": w2 * G / 2, "w1": 0.8, "b1": 3.8, "w2": w2,
+                                     "plateau_reentry_steps": 0})
                     if fct == 1.0:
                         free.append({"a": a, "n": l2.N, "seed": s, "cross_step": 900.0, "w2_abs": w2})
         pd.DataFrame(own).to_csv(tmp_path / "sample_size_own.csv", index=False)
@@ -407,6 +409,7 @@ def test_lag2_score_verdicts(tmp_path, monkeypatch):
     build({0.25: 0.008, 0.5: 0.016, 1.0: 0.032, 2.0: 0.064})                      # proportional lag
     l2.score(tmp_path)
     t = pd.read_csv(tmp_path / "lag_test2_tests.csv")
+    assert set(t.rule) == {"primary", "tstar"} and (t[t.role == "primary (verdict)"].stratum == "all").all()
     assert t.L1p_pass.all() and t.L2p_pass.all() and not t.competing_no_dependence.any()
     build({0.25: 0.03, 0.5: 0.03, 1.0: 0.03, 2.0: 0.03})                          # no dependence
     l2.score(tmp_path)
@@ -414,3 +417,19 @@ def test_lag2_score_verdicts(tmp_path, monkeypatch):
     assert not t.L1p_pass.any() and not t.L2p_pass.any() and t.competing_no_dependence.all()
     pr = pd.read_csv(tmp_path / "lag_test2_pairs.csv")
     assert pr[~pr.strictly_increasing].note.str.contains("indistinguishable").all()
+
+
+
+def test_lag2_primary_switch_rule():
+    from src.lag_test2 import choose_switch
+    R = [0.002 * k for k in range(1, 201)]                                  # R after step k+1
+    flags = [True] * 10 + [False] * 190                                      # plateau early only
+    t, st, target, used = choose_switch(flags, R, 150, 0.2, 0.10)            # 0.7 x 0.2 = 0.14 > 0.10
+    assert (t, st, round(target, 6), used) == (70, "ok", 0.14, False)
+    t, st, target, used = choose_switch(flags, R, 150, 0.2, 0.15)            # commitment level larger: used
+    assert (t, st, target, used) == (75, "ok", 0.15, True)
+    reenter = [True] * 10 + [False] * 70 + [True] * 5 + [False] * 115        # re-enters the plateau after the switch point
+    assert choose_switch(reenter, R, 150, 0.2, 0.10)[1] == "excluded: last plateau visit at or after the switch point"
+    assert choose_switch(flags, R, 60, 0.2, 0.10)[1] == "excluded: crosses before reaching the switch level"
+    never = [False] * 200
+    assert choose_switch(never, R, 150, 0.2, 0.10)[:2] == (70, "ok")

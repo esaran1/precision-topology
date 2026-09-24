@@ -72,3 +72,39 @@
 
 It runs after the prospective own-seed test and before any width-2 runs. The sequence is `checkpoints`,
 `continue` (which includes the φ = 1 check), `diagnostics`, then `score`.
+
+## Amendment 1 — 2026-09-23 23:31 EDT (before any continuation at φ ≠ 1)
+
+**The primary switch rule is replaced; the t\* rule is kept as a secondary analysis.**
+
+- **Primary switch rule**: switch at the first step where **R ≥ 0.7 × the run's own threshold**, provided the
+  run has already left the plateau for the last time before its crossing. Plateau is the combined
+  definition, as before.
+  - **Exclusions** (counted): runs whose last plateau visit comes at or after that point, and runs that
+    cross before reaching it.
+  - **Branch commitment**: the switch must also lie past the branch-commitment level observed on the base
+    window (R > 0.10 at a = 1.30, R > 0.15 at a = 1.50).
+    - Checked on the own thresholds (n = 6,400): 0.7 × R_own exceeds 0.10 for all 50 runs at a = 1.30. At
+      a = 1.50 it is at or below 0.15 for **2 of 50 runs** (min 0.1500).
+    - For those two, the switch level is **the larger of the two, 0.15**. This is recorded per run
+      (`used_commit_level`).
+  - **Why**: every arm then shares identical training up to a point where the plateau phase is over and
+    the branch is committed. So φ can only affect the approach to the threshold.
+- **Verdict**: **L1′ and L2′ as registered are scored on the primary rule over all included runs.**
+- **Reported beside it**, with the same L1′ and L2′ criteria, no verdict:
+  - the **t\* rule** (secondary);
+  - both rules **split by stratum**: runs with a plateau visit before their crossing, and runs never on
+    the plateau.
+- **Unchanged**: the criteria, the bit-for-bit φ = 1 check (now applied to every rule's φ = 1
+  continuations), and the diagnostics (plateau re-entry, mirror share, lag diagnostic), now per rule.
+- **Check tests re-run with the new rule, all pass (24)**:
+  - the 0.7 × R_own switch;
+  - the commitment level taking over;
+  - **a run that re-enters the plateau after the switch point** (excluded);
+  - a run that crosses before the switch level (excluded);
+  - a run never on the plateau;
+  - the scorer with both rules and the strata.
+  - Real runs, φ = 1 only (a = 1.30 seed 300,000 and a = 1.50 seed 300,001, the latter at the 0.15
+    level): the continuations under both rules reproduce the stored crossings bit for bit.
+- **Compute**, about doubled by the second rule's continuations and diagnostics: about 2.6 CPU-hours,
+  about 1 hour at 3 workers.
