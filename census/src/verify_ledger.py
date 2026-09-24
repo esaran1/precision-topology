@@ -755,6 +755,13 @@ PRODUCERS = {
     "first_order_finite_evaluations.csv": ("first_order", "finite", "full", ""),
     "first_order_scores.csv": ("first_order", "score", "full", ""),
     "prospective_own_runs.csv": ("prospective_own", "train", "full", ""),
+    "lag_test2_checkpoints.csv": ("lag_test2", "checkpoints", "full", ""),
+    "lag_test2_runs.csv": ("lag_test2", "cont", "full", ""),
+    "lag_test2_diagnostics.csv": ("lag_test2", "diagnostics", "full", ""),
+    "lag_test2_cells.csv": ("lag_test2", "score", "full", ""),
+    "lag_test2_tests.csv": ("lag_test2", "score", "full", ""),
+    "lag_test2_pairs.csv": ("lag_test2", "score", "full", ""),
+    "lag_test2_confounds.csv": ("lag_test2", "score", "full", ""),
     "prospective_own_scores.csv": ("prospective_own", "score", "full", ""),
     "prospective_own_settings_scored.csv": ("prospective_own", "score", "full", ""),
     "prospective_own_early_scores.csv": ("prospective_own", "score_secondary", "full", ""),
@@ -1060,6 +1067,27 @@ def v4_checks() -> None:
                                                     and pe_.err_fitted_in_expected_range.all() and (pe_.n_undefined == 0).all()), 1.0, 0)
     pss_ = pd.read_csv(R / "prospective_own_settings_scored.csv")
     chk("prospective own non-crossers per a", float(pss_.groupby("a").non_crossers.sum().max()), 20.0, 0)
+    lt_ = pd.read_csv(R / "lag_test2_tests.csv")
+    lp_ = lt_[(lt_.rule == "primary") & (lt_.stratum == "all")].set_index("a")
+    chk("lag2 primary: L1' fails at both a", float((~lp_.L1p_pass.astype(bool)).all()), 1.0, 0)
+    chk("lag2 primary: L2' fails at both a", float((~lp_.L2p_pass.astype(bool)).all()), 1.0, 0)
+    chk("lag2 primary: competing (no dependence) not met", float((~lp_.competing_no_dependence.astype(bool)).all()), 1.0, 0)
+    chk("lag2 primary: all verdict cells sufficient", float(lp_.all_cells_sufficient.astype(bool).all()), 1.0, 0)
+    chk("lag2 primary ratio 0.25 a=1.3", float(lp_.loc[1.3, "ratio_025"]), 0.894, 0.0005)
+    chk("lag2 primary ratio 0.25 a=1.5", float(lp_.loc[1.5, "ratio_025"]), 0.859, 0.0005)
+    chk("lag2 primary ratio 0.5 a=1.3", float(lp_.loc[1.3, "ratio_05"]), 0.974, 0.0005)
+    chk("lag2 primary ratio 0.5 a=1.5", float(lp_.loc[1.5, "ratio_05"]), 0.958, 0.0005)
+    lc_ = pd.read_csv(R / "lag_test2_cells.csv")
+    lcp_ = lc_[(lc_.rule == "primary") & (lc_.stratum == "all")].set_index(["a", "factor"]).residual
+    for (a_, f_), v_ in {(1.3, 0.25): 0.0278, (1.3, 1.0): 0.0311, (1.5, 0.25): 0.0563, (1.5, 1.0): 0.0656}.items():
+        chk(f"lag2 primary residual a={a_} phi={f_}", float(lcp_.loc[(a_, f_)]), v_, 0.00005)
+    lct_ = lc_[(lc_.rule == "tstar") & (lc_.stratum == "all")].set_index(["a", "factor"]).residual
+    chk("lag2 tstar residual a=1.3 phi=0.25", float(lct_.loc[(1.3, 0.25)]), 0.0071, 0.00005)
+    chk("lag2 tstar residual a=1.5 phi=0.25", float(lct_.loc[(1.5, 0.25)]), 0.0164, 0.00005)
+    lf_ = pd.read_csv(R / "lag_test2_confounds.csv")
+    chk("lag2 primary: no plateau re-entry in any cell",
+        float(lf_[lf_.rule == "primary"].frac_with_reentry.max()), 0.0, 0)
+    chk("lag2: 192 phi=1 continuations", float(len(pd.read_csv(R / "lag_test2_runs.csv").query("factor == 1.0"))), 192.0, 0)
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),

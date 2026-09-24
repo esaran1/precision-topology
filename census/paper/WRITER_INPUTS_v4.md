@@ -11,6 +11,7 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 | 2. Proposition 2 made precise | **certified**: localisation, switch, H2′, neighbourhood, solve threshold, and global uniqueness (annulus and solve bracket, four-link chain); registered c₁ test scored **INCONCLUSIVE** (k₁ component PASSED) | yes |
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
 | 3′. Prospective own-seed test (16 new settings) | **complete; every registered comparison PASSED at both a** (P2b: C better at 1.50, as registered) | yes |
+| Lag tests | first test: L1 PASSED, L2 failed; **deconfounded test: L1′ and L2′ FAILED at both a** (the late-switch effect is 11–14%); the "adiabatic lag" sentence is withdrawn | yes, as scored |
 | 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
 | 5. Retention curve | queued after Block 4 | if scored and verified in time; otherwise rebuttal |
 | 6. Width 2 | design committed for review (`block6_width2_design.md`); nothing run | rebuttal |
@@ -522,10 +523,48 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
       1.07%).
     - A deconfounded test that switches φ only after the plateau has been left is registered separately
       (`lag_test2_prediction.md`).
-- **Say**: "slowing w₂'s growth removes most of the residual (to ≈ 0.5% and 1% at a quarter of the
-  learning rate), consistent with an adiabatic lag of the output scale; the dependence is not
-  proportional, and slower w₂ also lengthens the time spent on the constant-predictor plateau, which is a
-  possible confound".
+- ~~**Say**: "slowing w₂'s growth removes most of the residual … consistent with an adiabatic lag of the
+  output scale …"~~ **Superseded by the deconfounded test below.** Do not use this sentence.
+
+### Deconfounded lag test (registered `lag_test2_prediction.md`, `38e0cf7`, amendment 1 `d205a1a`; scored)
+
+- **Design**:
+  - φ is changed only after the run has left the constant-predictor plateau for the last time.
+  - **Primary rule**: the switch comes at R ≥ 0.7 × the run's own threshold, past the branch-commitment
+    level. So every arm shares identical training through the plateau phase.
+  - Otherwise identical to the first lag test: same 50 training sets per a, same criteria.
+  - φ = 1 continuations reproduce the original runs bit for bit (192 of 192). 48 of 50 runs per a cross at
+    φ = 1 and are included.
+- **L1′ (primary) FAIL at both a; L2′ FAIL at both a.**
+
+  | a | φ = 0.25 | 0.5 | 1 | 2 |
+  |---|---:|---:|---:|---:|
+  | 1.30: residual (95%) | 2.78% [2.29, 2.93] | 3.02% [2.77, 3.08] | 3.11% [2.98, 3.17] | 3.16% [3.07, 3.20] |
+  | 1.50: residual (95%) | 5.63% [4.46, 6.10] | 6.29% [5.53, 6.66] | 6.56% [6.21, 6.79] | 6.67% [6.55, 6.85] |
+
+  - **What holds**: the ordering holds, and residual(1) − residual(0.25) is above 0. The no-dependence
+    outcome is rejected.
+  - **What fails**: the reduction at a quarter of the learning rate is only 11% (1.30) and 14% (1.50),
+    against the ≥ 50% L1′ requires.
+  - With the late switch there is no plateau re-entry in any cell, and the mirror share is unchanged
+    (54%). The direct lag distance shrinks by the same small fraction (0.0049 vs 0.0058; 0.0122 vs 0.0149).
+- **Reported beside it, no verdict**: switching right after the plateau exit (the t\* rule) reproduces the
+  first test's large effect.
+  - The residual at φ = 0.25 is 0.71% and 1.64%, a reduction of about 75%.
+  - This holds in the runs that had a plateau visit, with no plateau re-entry at φ ≤ 0.5.
+- **Post hoc reading (label it as such)**: most of the residual's dependence on how fast w₂ grows is set
+  between leaving the plateau and reaching about 0.7 of the run's own threshold. Only about a tenth comes
+  from the final approach.
+  - **So the data do not support a lag confined to the final approach to the threshold.**
+  - They do not rule out a dependence on the output scale's growth rate earlier in training.
+- **Say**: "In a registered deconfounded test that slows the output weight only after the plateau is left
+  and the branch is committed, the residual shrinks by just 11–14% at a quarter of the learning rate; the
+  registered lag criteria fail. Slowing it from the plateau exit onward removes about three-quarters of the
+  residual (reported, not registered). The residual's sensitivity to the output weight's growth rate is
+  therefore set mainly in the early approach, not by a lag at the threshold (post hoc)."
+- **Do not say**:
+  - that the residual is explained by an adiabatic lag of the output scale;
+  - that the lag test passed, without adding that the deconfounded test failed.
 
 ## Sample-size test (registered `sample_size_prediction.md`, `04e7668`; scored)
 

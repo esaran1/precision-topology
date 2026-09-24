@@ -108,3 +108,77 @@ It runs after the prospective own-seed test and before any width-2 runs. The seq
     level): the continuations under both rules reproduce the stored crossings bit for bit.
 - **Compute**, about doubled by the second rule's continuations and diagnostics: about 2.6 CPU-hours,
   about 1 hour at 3 workers.
+
+## Result — scored 2026-09-24 08:30 EDT with the committed scorer (`lag_test2 score`)
+
+- **Validity**: every φ = 1 continuation under both rules reproduces the stored crossing bit for bit (192 of 192;
+  crossing step and |w₂|, exact parsing).
+- **Runs**:
+  - 48 of 50 per a are included under both rules.
+  - Excluded: seeds 300,006 and 300,028 at both a, which do not cross within 32,000 steps at φ = 1.
+  - No run was excluded by either switch rule.
+  - 2 runs at a = 1.50 use the 0.15 commitment level, as registered.
+- **Cells**: every verdict cell has 48 crossings, which is sufficient.
+
+### Primary rule (switch at R ≥ max(0.7·R_own, commitment level), after the last plateau exit) — the verdicts
+
+Residual (median R_cross/R_own − 1, bootstrap 95%):
+
+| a | φ = 0.25 | 0.5 | 1 | 2 |
+|---|---|---|---|---|
+| 1.30 | 2.78% [2.29, 2.93] | 3.02% [2.77, 3.08] | 3.11% [2.98, 3.17] | 3.16% [3.07, 3.20] |
+| 1.50 | 5.63% [4.46, 6.10] | 6.29% [5.53, 6.66] | 6.56% [6.21, 6.79] | 6.67% [6.55, 6.85] |
+
+- **L1′: FAIL at both a.** Of its three conditions:
+  - ordering 0.25 < 0.5 < 1 < 2: holds at both a;
+  - the interval of residual(1) − residual(0.25) lies above 0: holds, [0.22, 0.69]% (1.30) and
+    [0.66, 1.64]% (1.50);
+  - **residual(0.25) ≤ ½·residual(1): fails.** The ratio is 0.894 (1.30) and 0.859 (1.50).
+- **L2′: FAIL at both a.**
+  - residual(0.5)/residual(1) = 0.974 and 0.958, against [0.30, 0.70];
+  - residual(0.25)/residual(1) = 0.894 and 0.859, against [0.05, 0.45].
+- **Competing outcome (no dependence): not met.** The interval of residual(2) − residual(0.25) excludes 0:
+  [0.24, 0.80]% and [0.71, 1.97]%.
+- **So**: when φ is changed only after the plateau is left and the branch is committed, w₂'s learning rate
+  changes the residual detectably, but by about 10–14% at φ = 0.25. That is far short of the halving L1′
+  requires.
+
+### Beside the verdicts (primary rule)
+
+- **Plateau re-entry after the switch**: none. The median is 0 steps, and the fraction of runs with any
+  re-entry is 0 in every cell.
+- **Mirror share at the crossing**: unchanged across φ. Branch + holds in 54.2% of runs at every φ and a.
+- **Direct lag diagnostic** (median distance at the crossing to the branch minimiser at the current scale):
+  - a = 1.30: 0.00494 (φ = 0.25), 0.00557, 0.00584, 0.00589 (φ = 2);
+  - a = 1.50: 0.0122, 0.0142, 0.0149, 0.0153.
+  - It shrinks with φ in the same small proportion as the residual.
+
+### Reported, no verdict: the t\* rule and the strata
+
+- **t\* rule** (switch right after the last plateau exit). Residuals:
+  - a = 1.30: 0.71%, 2.71%, 3.11%, 3.15%;
+  - a = 1.50: 1.64%, 5.57%, 6.56%, 6.74%.
+  - With L1′'s criteria it would pass at both a (ratio 0.229 and 0.250). With L2′'s it would fail
+    (residual(0.5)/residual(1) = 0.874 and 0.849).
+  - Plateau re-entry after the switch occurs in 0–12.5% of runs, depending on the cell.
+- **Strata** (38 runs with a plateau visit; 10 never on the plateau). Each stratum has fewer than 40
+  crossings per cell, so they are reported as insufficient.
+  - **Primary rule**: both strata fail L1′ and L2′, as the full set does.
+  - **t\* rule**:
+    - the plateau stratum shows the large reduction with **no re-entry** at φ ≤ 0.5
+      (ratio 0.200 and 0.181);
+    - the never-on-plateau stratum shows no dependence at a = 1.30 (interval includes 0) and a reduction
+      at a = 1.50.
+
+### Post hoc reading (labelled; not a registered conclusion)
+
+- The two rules share every run's training up to the plateau exit. They differ only in when the slower
+  w₂ starts:
+  - from the plateau exit (t\*), the residual falls by about 75%;
+  - from 0.7·R_own, it falls by about 10–14%.
+- So most of the dependence on w₂'s learning rate arises between leaving the plateau and reaching 0.7 of
+  the own threshold, not in the final approach to it.
+- In the plateau stratum under t\*, re-entry is zero at φ ≤ 0.5 and the reduction is still large. So the
+  early-phase effect is not explained by extra plateau time after the switch.
+- **This does not support a lag confined to the final approach**, which is what L1′/L2′ tested. The first
+  lag test's large effect (L1 pass) came almost entirely from the earlier phase.
