@@ -480,3 +480,20 @@ rule, the DE budget (20 × 200 × 2,000) with 1e−6 agreement, and the per-unit
 
 **Refinement (clarification of "bisection to one grid step")**: after the registered 0.01 grid brackets the sign
 change, the bracket is bisected in s to a relative width of **2×10⁻⁴**.
+
+## Γ̂₂ at a = 1.30: reported with the searches' disagreement (author's decision, 2026-09-24)
+
+- **The §5 check fired.** The two Γ̂₂ searches disagree by 3.3×10⁻⁶ relative, above the 1e−6 tolerance:
+
+  | search | Γ̂₂(1.30) |
+  |---|---|
+  | Nelder–Mead, 4,000 starts | 1.1868729 |
+  | differential evolution, 20 × 200 × 2,000 | 1.1868690 |
+
+  - Both converged to the same two-cosine configuration; DE's value is less converged.
+- **The author chose to report Γ̂₂(1.30) with the disagreement disclosed**, beside two anchors:
+  - the **proved lower bound Γ₂ ≥ κ·a** = 1.1868723 (κ ≥ 0.9129787217);
+  - the Nelder–Mead value's **agreement with κ·a to 5×10⁻⁷**.
+- At a = 1.50 the searches agree to 7.2×10⁻⁷, so the check passes.
+- **The a = 1.50 W0 scan is terminated** (author's decision). W1 and W4 are not run (see
+  `scale_limits_prediction.md`), and the small-scale checks cover what matters.

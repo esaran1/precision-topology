@@ -85,3 +85,24 @@ Corollaries 1–2). Producer: `src/scale_limits.py`, committed with this file.
   - The same tie explains the pilot's occasional unplaced retained minimisers at very small scale. At first order
     the single unit and the pair tie, and at small s their loss difference is (s²/8)·ΔVar, which a finite restart
     budget can miss.
+
+## Dependency on the second-order selection, recorded explicitly (2026-09-24, at the author's request)
+
+- **The verdict depends on a rule the author did not specify.**
+  - The author's statement was: "if the Δμ-maximiser has G > 0, width 2 has no placement threshold".
+  - The first-order maximiser set is a **tie**: at width 2 it contains unplaced single units (G ≈ −3.5) and placed
+    pairs (up to G ≈ +1.0).
+  - "The Δμ-maximiser" is therefore not a single configuration.
+- **How the selection rule entered.**
+  - I added it: Var-minimisation among maximisers, from the s² term of the expansion. It is written into this
+    registration.
+  - That registration was committed before any Δμ-maximiser was computed (`d9e3ec4`). It was added **because
+    deriving the maximiser structure analytically, before computing, showed the tie**. It was never approved by the
+    author.
+- **What the selection decides.** With it, the verdict is "no threshold" (G = +0.890, +1.026). Without it, Δμ alone
+  leaves the outcome undetermined.
+- **Direct check, independent of the expansion.** The conditional minimiser is computed at small finite scales with
+  the validated W0 search: R₂ ∈ {0.001, 0.003, 0.01, 0.02} at a = 1.30 and 1.50 (`width2_w0 smallscale`). Its G is
+  reported, and whether it is the cancelling pair.
+  - If it is placed at every scale, the verdict is confirmed directly.
+  - If it is unplaced at any scale, that is reported immediately, and the verdict would be wrong.
