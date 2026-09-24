@@ -1217,6 +1217,20 @@ def v4_checks() -> None:
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12
                                                          and "12 certificate(s) checked; failures: none" in vcf_), 1.0, 0)
+    print("Block 2: Ghat enclosure certificates (certificate_audit.md)")
+    import json as _json, re as _re
+    gl_ = (R / "verify_certificates_ghat.log").read_text()
+    go_ = {}
+    for m_ in _re.findall(r"^\{\n.*?^\}", gl_, flags=_re.S | _re.M):
+        o_ = _json.loads(m_); go_[o_["name"]] = o_                      # the latest run of each certificate
+    chk("Ghat certificates checked (a = 1.05-3.0)", float(len(go_)), 12.0, 0)
+    chk("Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi)",
+        float(all(o_["checks"][k] for o_ in go_.values() for k in ("files_match_committed_hashes", "coverage",
+                                                                    "domain_contains_reduction", "ghat_cert_below_hi"))), 1.0, 0)
+    chk("Ghat: max |published - rigorous| endpoint discrepancy <= 1.1e-15",
+        float(max(max(abs(o_["claim_hi_excess_over_published"]), abs(o_["ghat_cert_deficit"]), abs(o_["bnb_lo_deficit"]))
+                  for o_ in go_.values()) <= 1.1e-15), 1.0, 0)
+    chk("Ghat(1.05) leaves", float(go_["ghat_a1.05"]["leaves"]), 18041202.0, 0)
     print("Scale limits (registered: scale_limits_prediction.md)")
     sd_ = pd.read_csv(R / "scale_limits_D.csv").iloc[0]
     chk("alpha*", float(sd_.alpha_star), 1.7913244, 1e-6)
