@@ -8,6 +8,7 @@ check (scale_limits_prediction.md, last section) confirms the registered verdict
     python -m src.width2_nogating train [workers]     # checkpoints: seeds 630,000-630,079, f1.30, f1.50, tanh
     python -m src.width2_nogating control [workers]   # width-1 positive control, seeds 630,000-630,019
     python -m src.width2_nogating replay [workers]    # the scored replays
+    python -m src.width2_nogating extend [workers]    # stuck (single-unit) primary replays continued to 4H and 16H
     python -m src.width2_nogating score
 """
 
@@ -122,6 +123,47 @@ def breakdown(q, act):
             "max_abs_alpha": max(abs(al[0]), abs(al[1]))}
 
 
+# ------------------------------------------------------------------------------------------ endpoint types (added 2026-09-24,
+# before any run, at the author's request; no registered prediction changes)
+SINGLE_SHARE, STATIONARY_TOL = 0.01, 1e-6
+EXTEND_FACTORS, EXTEND_MAX_PER_A = (4, 16), 80
+
+
+def tangent_grad_max(q, act, x, y):
+    """max |∇L| over the replay's free directions: every coordinate of (θ, b), and the v-gradient with its component
+    along the held ℓ₁ sphere's normal (sign(v)/√2) removed."""
+    g, gv = tangent_grad(q, act, x, y)
+    return float(max(np.abs(g[[0, 1, 3, 4, 6]]).max(), np.abs(gv).max()))
+
+
+def tangent_grad(q, act, x, y):
+    """(full gradient, v-gradient with the ℓ₁-sphere normal component removed)."""
+    import torch
+    from .width2_train import logits
+    t = torch.tensor(np.asarray(q, float), dtype=torch.float64, requires_grad=True)
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    torch.nn.functional.binary_cross_entropy_with_logits(logits(t, X, act), Y).backward()
+    g = t.grad.numpy().copy()
+    n = np.sign([q[2], q[5]]) / math.sqrt(2)
+    gv = np.array([g[2], g[5]])
+    gv = gv - (gv @ n) * n
+    return g, gv
+
+
+def endpoint_type(placed_flag, bd, grad_max):
+    """'placed pair' | 'single-unit local minimum' | 'other: <subtype>'."""
+    if placed_flag and bd["pair"]:
+        return "placed pair"
+    small = min(bd["share1"], bd["share2"]) <= SINGLE_SHARE
+    if placed_flag is False and small and grad_max <= STATIONARY_TOL:
+        return "single-unit local minimum"
+    if placed_flag:
+        return "other: placed, not the pair"
+    if small:
+        return "other: unplaced single unit, not stationary"
+    return "other: unplaced, two units" if placed_flag is False else "other: undecided"
+
+
 # ------------------------------------------------------------------------------------------ replays
 def replay_ng(ck, radius, steps, x, y, act, variant, record, every=None):
     """width2_train.replay's operations (rescale to ‖v‖₁ = radius, Adam, radial ℓ₁ projection after every step), recording
@@ -157,7 +199,10 @@ def replay_ng(ck, radius, steps, x, y, act, variant, record, every=None):
                 pl, glo = placed(qn, act)
             except RuntimeError:
                 pl, glo = None, None
-            out[step] = {"placed": pl, "G_lo": glo, "sign_correct": sign_correct(th, v, b, act), **breakdown(qn, act)}
+            bd = breakdown(qn, act)
+            gm = tangent_grad_max(qn, act, x, y)
+            out[step] = {"placed": pl, "G_lo": glo, "sign_correct": sign_correct(th, v, b, act), **bd,
+                         "grad_max": gm, "endpoint_type": endpoint_type(pl, bd, gm)}
     return {"record": out, "trace": trace, "drift": drift, "k": k}
 
 
@@ -383,6 +428,39 @@ def _replay_job(args):
     return rows
 
 
+def _extend_job(args):
+    """A stuck replay (single-unit local minimum at H) replayed to 16H (deterministic, so identical up to H); endpoint
+    types recorded at 4H and 16H."""
+    import pickle
+    from .width2_conditional import training_set
+    name, seed, R2, variant, H = args
+    with open(PARTS / f"ck_{name}_{seed}.pkl", "rb") as fh:
+        tr = pickle.load(fh)
+    x, y = training_set(seed)
+    rec = tuple(f * H for f in EXTEND_FACTORS)
+    r = replay_ng(tr["ck"], 2 * R2 / gamma2(name), max(rec), x, y, act_of(name), variant, record=rec)
+    return [{"act": name, "seed": seed, "R2": R2, "variant": variant, "step": t, "H": H, "extension": True,
+             "drift": r["drift"], **r["record"][t]} for t in rec]
+
+
+def extend(workers=3):
+    """Registered addition (2026-09-24): every primary-variant replay whose endpoint at H is a single-unit local minimum
+    is continued to 4H and 16H; if more than EXTEND_MAX_PER_A are stuck at an a, a seeded random subset of that size."""
+    H = int(frozen()["H"])
+    d = pd.read_csv(PARTS / "replays.csv")
+    st = d[(d.step == H) & (d.variant == "preserved") & (d.endpoint_type == "single-unit local minimum")]
+    jobs = []
+    for name, g in st.groupby("act"):
+        g = g.sample(n=min(len(g), EXTEND_MAX_PER_A), random_state=0) if len(g) > EXTEND_MAX_PER_A else g
+        jobs += [(name, int(r.seed), float(r.R2), "preserved", H) for r in g.itertuples()]
+    done = _done("extensions.csv", ("act", "seed", "R2", "variant"))
+    jobs = [j for j in jobs if (j[0], str(j[1]), str(j[2]), j[3]) not in done]
+    print(len(jobs), "stuck replays to extend", flush=True)
+    with Pool(workers) as p:
+        for rows in p.imap_unordered(_extend_job, jobs, chunksize=1):
+            _append("extensions.csv", rows)
+
+
 def replay(workers=3):
     fz = frozen()
     H = int(fz["H"])
@@ -430,6 +508,19 @@ def control(workers=2):
             print("STOP: the machinery cannot detect gating (control placed fraction > 0.2 at 0.1)"); raise SystemExit(2)
 
 
+def _escape(name, variant, R2, H):
+    """Beside the verdict: of the stuck replays extended, the fraction placed at 4H and at 16H."""
+    f = PARTS / "extensions.csv"
+    if variant != "preserved" or not f.exists():
+        return {"n_extended": 0, "escaped_by_4H": np.nan, "escaped_by_16H": np.nan}
+    e = pd.read_csv(f)
+    e = e[(e.act == name) & np.isclose(e.R2, R2)]
+    if e.empty:
+        return {"n_extended": 0, "escaped_by_4H": np.nan, "escaped_by_16H": np.nan}
+    pl = lambda k: float((e[e.step == k * H].placed == True).mean())
+    return {"n_extended": int(e.seed.nunique()), "escaped_by_4H": pl(4), "escaped_by_16H": pl(16)}
+
+
 def score():
     fz = frozen()
     H = int(fz["H"])
@@ -452,6 +543,10 @@ def score():
                              "pair_frac_unplaced": float(gl[gl.placed == False].pair.mean()) if (gl.placed == False).any() else np.nan,
                              "pair_strict_frac": float(gl.pair_strict.mean()),
                              "max_abs_alpha_median": float(gl.max_abs_alpha.median()),
+                             "frac_placed_pair": float((gl.endpoint_type == "placed pair").mean()),
+                             "frac_single_unit_min": float((gl.endpoint_type == "single-unit local minimum").mean()),
+                             "frac_other": float(gl.endpoint_type.str.startswith("other").mean()),
+                             **_escape(name, variant, float(L), H),
                              "outcome": out if (variant == "preserved" and name != "tanh") else f"descriptive: {out}"})
     s = pd.DataFrame(rows)
     s.to_csv(RESULTS / "width2_nogating_scores.csv", index=False)
@@ -537,5 +632,7 @@ if __name__ == "__main__":
         control(w)
     elif cmd == "replay":
         replay(w)
+    elif cmd == "extend":
+        extend(w)
     elif cmd == "score":
         score()

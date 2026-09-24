@@ -81,3 +81,37 @@ def test_breakdown_pair_vs_single():
     # the pair with unequal |α| beyond 10%: not a pair
     q2 = np.array([al, -math.pi / 2, 0.05, 1.3 * al, math.pi / 2, -0.05, 0.0])
     assert not breakdown(q2, act)["pair"]
+
+
+def test_endpoint_types():
+    from src.width2_nogating import endpoint_type
+    pair = {"pair": True, "share1": 0.5, "share2": 0.5}
+    single = {"pair": False, "share1": 0.999, "share2": 0.001}
+    two = {"pair": False, "share1": 0.6, "share2": 0.4}
+    assert endpoint_type(True, pair, 1e-3) == "placed pair"
+    assert endpoint_type(False, single, 1e-8) == "single-unit local minimum"
+    assert endpoint_type(False, single, 1e-3) == "other: unplaced single unit, not stationary"
+    assert endpoint_type(True, two, 1e-8) == "other: placed, not the pair"
+    assert endpoint_type(False, two, 1e-8) == "other: unplaced, two units"
+    assert endpoint_type(None, two, 1e-8) == "other: undecided"
+
+
+def test_tangent_gradient_matches_a_finite_difference_along_the_sphere():
+    import numpy as np
+    import torch
+    from src.width2_conditional import population
+    from src.width2_nogating import act_of, tangent_grad
+    from src.width2_train import logits
+    x, y = population()
+    act = act_of("f1.30")
+    q = np.array([1.79, -1.2, 0.004, 2.3, 0.3, -0.002, 0.1])
+    g, gv = tangent_grad(q, act, x, y)
+    t = np.array([np.sign(q[2]), -np.sign(q[5])]) / np.sqrt(2)      # tangent to |v1| + |v2| = const (fixed signs)
+    X, Y = torch.tensor(x), torch.tensor(y)
+    L = lambda qq: float(torch.nn.functional.binary_cross_entropy_with_logits(logits(torch.tensor(qq), X, act), Y))
+    h = 1e-6
+    e = np.zeros(7); e[2], e[5] = t
+    fd = (L(q + h * e) - L(q - h * e)) / (2 * h)
+    assert abs(fd - gv @ t) < 1e-8
+    n = np.sign([q[2], q[5]]) / np.sqrt(2)
+    assert abs(gv @ n) < 1e-15                                       # the normal component is removed

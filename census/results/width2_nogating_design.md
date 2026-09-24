@@ -125,3 +125,27 @@ machinery that tested gating at width 1 (Blocks 4 and 5, and the approved W4 mac
 - **Storage.** Only each run's latest pre-placement state is persisted (`width2_nogating_parts/ck_*.pkl`), since it
   is the only state used. The count of states saved in memory is recorded per run.
 - **Not run**: the pilot, training, control and replays wait for the direct small-scale check.
+
+## Addition (author's request, 2026-09-24, before any run): endpoint types and longer horizons
+
+**No registered prediction or criterion changes.** These are recorded and reported beside the verdict, descriptively.
+
+- **Endpoint type** at every recorded endpoint (H/16, H/4, H), with thresholds fixed now:
+  - **placed pair**: placed (exact G₊ > 0) and satisfying the cancelling-pair rule above;
+  - **single-unit local minimum**: unplaced, the smaller weight share ≤ 0.01, and stationary. Stationary means the
+    largest component of the loss gradient over the replay's free directions is ≤ 1e−6: every coordinate of (θ, b),
+    plus v tangent to the held ℓ₁ sphere;
+  - **other**, with a subtype: placed but not the pair; unplaced single unit, not stationary; unplaced with two
+    units; undecided.
+- **Why these types.** At these scales the unplaced region contains local minima: single units at α* with an idle
+  second unit (WP-8). A replay can stop in one of them.
+- **Longer horizons** (`python -m src.width2_nogating extend`). Every primary-variant ("preserved") replay whose H
+  endpoint is a single-unit local minimum is continued to 4H and 16H, and its endpoint type and placement are recorded
+  there.
+  - If more than 80 are stuck at an a, a seeded random 80 (random_state 0) are extended; the count is reported.
+  - The cost bound: up to 160 replays × 16H steps.
+- **Reported beside the verdict**, per a, held scale and variant:
+  - the fractions of placed pair / single-unit local minimum / other at H;
+  - for the extended replays, the fraction placed by 4H and by 16H ("escaped").
+- **Tests** (`tests/test_width2_nogating.py`): the classifier on constructed cases, and the tangent gradient against a
+  finite difference along the sphere with its normal component removed.
