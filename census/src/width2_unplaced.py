@@ -145,8 +145,19 @@ def report(act_name):
     m["difference"] = m.best_unplaced_loss - m.best_placed_loss
     m["difference_over_tie_tol_1e-9"] = m.difference / 1e-9
     m["predicted_single_unit_gap"] = m.s ** 2 / 8 * alpha_star ** 2 * float(np.var(x))
+    m["predicted_boundary_gap"] = m.s ** 2 / 8 * m.linear_c ** 2 * float(np.var(x))   # (s²/8)·c²·Var(x), §10.1
     return m
 
 
+def save():
+    """Committed copy of the per-scale best-unplaced results (the parts directory is not committed)."""
+    d = pd.concat([pd.read_csv(p, float_precision="round_trip") for p in sorted(PARTS.glob("unplaced_*.csv"))])
+    d.to_csv(RESULTS / "width2_unplaced.csv", index=False)
+    return d
+
+
 if __name__ == "__main__":
-    run(sys.argv[1])
+    if sys.argv[1] == "save":
+        print(save().to_string(index=False))
+    else:
+        run(sys.argv[1])
