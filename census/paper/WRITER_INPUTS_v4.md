@@ -423,6 +423,14 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   failed, so the "indistinguishable" flag does not apply.
 - **N2 at 1.30 fails** only on its interval condition: the offset decreases 7.1 → 5.6 → 4.2%, but the
   400 − 6,400 difference interval [−0.005, 0.056] includes 0.
+- **The offset decomposition, state it this way**:
+  - N1 passes at both a: the own-seed excess shrinks with training-set size, to about 1% at n = 6,400.
+  - N2 fails at 1.30 (its interval includes zero) and passes at 1.50.
+  - N3 fails at both a.
+  - The free-training offset tends not to zero but to about **4.2% at a = 1.30 and 7.5% at 1.50**, close
+    to S3's residual against the own threshold.
+  - So the offset has **a finite-sample part that vanishes with n**, and **a residual that persists and
+    grows with a, unexplained so far**.
 - **Reading, and the connection to S3's residual**:
   - As n grows, the own-seed excess shrinks toward zero: to about 1% at 6,400.
   - The free-training offset shrinks less, to 4.2% (1.30) and 7.5% (1.50). Those are close to S3's
