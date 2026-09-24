@@ -901,9 +901,18 @@ def audit():
 
 
 def provenance():
-    tracked = set(subprocess.run(["git", "ls-files", "results"], capture_output=True, text=True, cwd=ROOT).stdout.split())
-    missing = sorted(s for s in SOURCES if f"results/{s}" not in tracked)
-    print(f"\nPROVENANCE: {len(SOURCES)} source artifacts; not committed: {missing or 'none'}")
+    """In the repository: every source artifact must be committed. Outside a git checkout (e.g. the supplementary
+    archive, which ships files without history): every source artifact must be present and non-empty."""
+    in_git = subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], capture_output=True, text=True,
+                            cwd=ROOT).stdout.strip() == "true"
+    if in_git:
+        tracked = set(subprocess.run(["git", "ls-files", "results"], capture_output=True, text=True,
+                                     cwd=ROOT).stdout.split())
+        missing = sorted(s for s in SOURCES if f"results/{s}" not in tracked)
+        print(f"\nPROVENANCE: {len(SOURCES)} source artifacts; not committed: {missing or 'none'}")
+    else:
+        missing = sorted(s for s in SOURCES if not (RESULTS / s).is_file() or (RESULTS / s).stat().st_size == 0)
+        print(f"\nPROVENANCE (not a git checkout): {len(SOURCES)} source artifacts; missing or empty: {missing or 'none'}")
     return not missing
 
 
