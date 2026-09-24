@@ -802,6 +802,10 @@ PRODUCERS = {
     "limit_windows_evaluations.csv": ("limit_windows", "main", "full", ""),
     "writer_patch_prospective_own_per_setting.csv": ("writer_patch", "per_setting", "full", ""),
     "residual_posthoc_runs.csv": ("residual_posthoc", "score", "full", ""),
+    "scale_limits_D.csv": ("scale_limits", "main", "full", ""),
+    "scale_limits_width1.csv": ("scale_limits", "main", "full", ""),
+    "scale_limits_width2.csv": ("scale_limits", "main", "full", ""),
+    "scale_limits_summary.csv": ("scale_limits", "main", "full", ""),
     "residual_posthoc_correlations.csv": ("residual_posthoc", "score", "full", ""),
     "writer_patch_windows.csv": ("writer_patch", "windows", "full", ""),
     "writer_patch_calibration.csv": ("writer_patch", "windows", "full", ""),
@@ -1149,6 +1153,19 @@ def v4_checks() -> None:
     chk("WP-5: 7 figures, all <= 5.5 in wide", float(len(wp5) == 7 and (wp5.width_in <= 5.5).all()), 1.0, 0)
     chk("WP-5: tallest figure height", float(wp5.height_in.max()), 3.123, 0.002)
 
+    print("Scale limits (registered: scale_limits_prediction.md)")
+    sd_ = pd.read_csv(R / "scale_limits_D.csv").iloc[0]
+    chk("alpha*", float(sd_.alpha_star), 1.7913244, 1e-6)
+    w1s = pd.read_csv(R / "scale_limits_width1.csv")
+    chk("width 1: selected dmu-maximiser G <= 0 at all six a", float((w1s.G <= 0).all() and len(w1s) == 6), 1.0, 0)
+    w2s = pd.read_csv(R / "scale_limits_width2.csv").set_index("a")
+    chk("width 2: validation (ladder, independent, pair attains max, pair Var minimal)",
+        float(w2s.ladder_ok.all() and w2s.independent_ok.all() and w2s.pair_attains_max.all()
+              and w2s.pair_var_le_all_maximisers.all()), 1.0, 0)
+    chk("width 2: selected G at a=1.30", float(w2s.loc[1.3, "selected_G_lo"]), 0.8896, 0.0001)
+    chk("width 2: selected G at a=1.50", float(w2s.loc[1.5, "selected_G_lo"]), 1.0265, 0.0001)
+    chk("verdict: no placement threshold for f_a at width 2",
+        float(pd.read_csv(R / "scale_limits_summary.csv").verdict.iloc[0].startswith("width 2 f_a: NO")), 1.0, 0)
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),

@@ -50,3 +50,38 @@ Corollaries 1–2). Producer: `src/scale_limits.py`, committed with this file.
 - **Without the second-order selection, the maximiser set M contains both unplaced members (single units, whose
   linear part makes G < 0) and, by the structure, placed members.** In that case the outcome would be reported as
   undetermined by Δμ alone.
+
+## Result — computed 2026-09-24 with the committed producer (`python -m src.scale_limits`)
+
+- **α* = 1.7913244** and D(α*) = −1.5710673 on the population data (`scale_limits_D.csv`).
+- **Width 1 (the consistency check): passed.** The selected Δμ-maximiser has G ≤ 0 at all six a, as expected, since
+  certified thresholds exist there (`scale_limits_width1.csv`).
+  - G = −3.662, −3.610, −3.557, −3.505, −3.453 and −3.349 at a = 1.30, 1.35, 1.40, 1.45, 1.50 and 1.60.
+  - The maximiser is w₁ = ±α*, b₁ = 3π/2.
+  - The sine-only Δμ matches to ≤ 5e−12.
+- **Width 2 (the prediction)** (`scale_limits_width2.csv`, `scale_limits_width2_maximisers_a*.csv`):
+  - **Validation passed.**
+    - The search maximum of Δμ equals the bound a·|D(α*)| to 2e−13.
+    - The restart ladder (500 → 2,000) is unchanged to 1e−12.
+    - The independent CMA-ES search does not exceed it.
+    - The sine-only check holds to 1e−14.
+  - **The maximiser set** has 902 retained maximisers at a = 1.30 and 904 at a = 1.50. By type:
+
+    | maximiser type | number (1.30 / 1.50) | G range at a = 1.30 | G range at a = 1.50 |
+    |---|---|---|---|
+    | single unit | 546 / 547 | −3.66 (all) | −3.45 (all) |
+    | pair with c ≠ 0 | 356 / 357 | −3.66 to +0.036 | −3.45 to +0.929 |
+
+  - **The selected (Var-minimising) maximiser is the cancelling cosine pair (c = 0).**
+    - It attains the maximal Δμ.
+    - Its Var(φ) is at most that of every retained maximiser.
+    - The random search does not land exactly on it: c = 0 is a measure-zero slice of the maximiser set.
+  - **Its G is +0.8896 at a = 1.30 and +1.0265 at a = 1.50**, the same value for the data gap G_n.
+- **Registered verdict: width 2 has NO placement threshold for f_a.** Both f_a arms are recorded as **not
+  applicable**, like tanh. **W1 and W4 are not run.**
+- **Caveat, stated with the verdict.** The verdict rests on the second-order (Var) selection of Corollary 1(ii). I
+  added that rule; it is flagged for the author. The maximiser set itself contains unplaced single units and placed
+  pairs, so **Δμ alone does not decide the outcome**; the second-order term does.
+  - The same tie explains the pilot's occasional unplaced retained minimisers at very small scale. At first order
+    the single unit and the pair tie, and at small s their loss difference is (s²/8)·ΔVar, which a finite restart
+    budget can miss.

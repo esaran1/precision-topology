@@ -1,0 +1,2 @@
+width1_all_G_le_0,width2_validation_ok,verdict
+True,True,"width 2 f_a: NO placement threshold (selected dmu-maximiser has G > 0): both arms NOT APPLICABLE; W1, W4 not run"
