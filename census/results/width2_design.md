@@ -378,3 +378,47 @@ pilot. So crossing is not preceded by growth through the threshold. No criterion
 **Unchanged**: W0 (the validated conditional scan; the constant predictor included; the audit; the restart
 ladder; the 10× stricter search; the CMA-ES search), W2, W3, every validity check and stop condition of §5, and
 compute priority.
+
+### Pilot numbers, recorded 2026-09-24 (EXPLORATORY; `width2_pilot.py` → `width2_pilot_*.csv`)
+
+- **Cosine identity**: holds to ≤ 1e−14 at a ∈ {0.5, 1.0, 1.3, 1.5} (`width2_pilot_identity.csv`).
+- **Single cosine**: sup_α G(cos αx) = 0.70710678… = 1/√2 at α = 5π/8 = 1.9635 (`width2_pilot_single_cosine.csv`).
+- **The a-free (c = 0) two-sinusoid problem**: κ ∈ [0.91297872170245, 0.91297872170254] (exact enclosure at the
+  point found by a 3,000-start search; `width2_pilot_kappa.csv`). The optimiser is two cosines:
+  - frequencies α₁ ≈ 7.642 and α₂ ≈ 1.750;
+  - weights 0.1863 and 0.8137, with |ṽ₁|α₁ = |ṽ₂|α₂;
+  - phases β ∈ {±π/2, 3π/2}.
+- **Γ̂₂ (4,000-start Nelder–Mead)**:
+
+  | a | Γ̂₂ | Γ̂₂/a |
+  |---|---|---|
+  | 1.30 | 1.1868729 | 0.9129791 |
+  | 1.50 | 1.3694652 | 0.9129768 |
+
+  - Both have the same two-cosine maximiser with c ≈ 0.
+  - Coarse 400-start values: Γ̂₂/a = 0.9128 at a = 0.5 and 0.91276 at a = 1.0.
+  - So **Γ₂ = κ·a to about 5e−7 relative at the registered a**. This is validated, not proved; see "Γ₂ = κa?"
+    above.
+- **Differential evolution (60 × 500) converged to the single-cosine local optimum 1/√2·a at both a.** This
+  **disagrees** with Nelder–Mead, which is a §5 stop condition for the registered run.
+  - **Change, fixed before any registered Γ̂₂ run**: the independent search becomes **20 independent DE runs
+    (seeds 1–20), each population 200 × 2,000 generations**, keeping the best. Agreement with Nelder–Mead is
+    still required to 1e−6 relative, and a disagreement still stops.
+  - The DE budget is set so the search can escape the single-cosine basin. It is not tuned to any outcome.
+- **Coarse conditional scans** (100 restarts per scale, population objective; `width2_pilot_scan.csv`):
+  - **f_a at a = 1.30**: the retained minimiser's G₊ changes sign between R₂ = 0.02 and 0.05.
+  - **f_a at a = 1.50**: it changes sign between R₂ = 0.05 and 0.075.
+  - Above the sign change the minimiser is the equal-weight cosine pair.
+  - **Monotone f_a**: a = 0.5 is placed at every scanned R₂ (0.02–1.0); a = 1.0 from R₂ = 0.05.
+- **Iteration caps**: restarts hit the 2,000-iteration cap near the thresholds. The counts per 100 restarts are:
+
+  | scale | cap hits |
+  |---|---|
+  | a = 1.30, R₂ = 0.02 | 20 |
+  | a = 1.30, R₂ = 0.05 | 15 |
+  | a = 1.50, R₂ = 0.02 | 21 |
+  | a = 1.50, R₂ = 0.05 | 21 |
+  | a = 1.50, R₂ = 0.075 | 11 |
+
+  - Elsewhere the counts are 0–3.
+  - This confirms that the cap-raising rule is needed for f_a near the thresholds.
