@@ -292,12 +292,14 @@ write-and-read round trip it depends on (exact round-trip parsing).
   weights, the linear parts cancel and the network represents a cosine.
 - **The single-cosine problem**: sup over α of G(cos(αx)) = **1/√2 exactly**, at α = 5π/8.
   - *Proof*: G₊ ≤ 0 because the inner maximum is 1 at x = 0. For G₋ = min_I cos(αx) − max_O cos(αx), the
-    inner minimum is cos(0.8α) on [0, π/(0.8)]. The outer maximum is max(cos 1.2α, cos 2α) while
-    [1.2α, 2α] ⊂ [π/2, 3π/2].
-  - For 1.6α < π the outer maximum is cos 1.2α, and G₋ increases in α. For 1.6α > π it is cos 2α, and G₋
-    decreases.
-  - So the maximum is at 1.6α = π·… i.e. cos 1.2α = cos 2α, α = 2π/3.2 = 5π/8, where
-    G₋ = cos(π/2) − cos(3π/4) = 1/√2. ∎
+    inner minimum is cos(0.8α) while 0.8α ≤ π. The outer maximum is max(cos 1.2α, cos 2α) while
+    [1.2α, 2α] ⊂ [π/2, 3π/2]; cos is symmetric about π there.
+  - For 1.6α < π the outer maximum is cos 1.2α, and dG₋/dα = −0.8 sin 0.8α + 1.2 sin 1.2α > 0 near the switch.
+    For 1.6α > π it is cos 2α, and dG₋/dα = −0.8 sin 0.8α + 2 sin 2α < 0 there.
+  - So the maximum is where cos 1.2α = cos 2α, i.e. 1.2α + 2α = 2π,
+    α = 5π/8. There G₋ = cos(π/2) − cos(3π/4) = 1/√2.
+  - Outside that interval G₋ is smaller, which the grid check over α ∈ [0.01, 12] confirms
+    (`width2_pilot_single_cosine.csv`). ∎
 - **The width-2 maximiser is not the single cosine.** The pilot's best point has two different frequencies
   (α₁ ≈ 7.7, α₂ ≈ 1.7) with linear parts that cancel (c = Σṽᵢαᵢ ≈ 0). Its value is Γ̂₂/a ≈ 0.911–0.913, above
   1/√2.
