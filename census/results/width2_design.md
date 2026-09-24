@@ -1,6 +1,7 @@
-# Design for review: the width-2 extension (Route A)
+# Design (approved with amendments): the width-2 extension (Route A)
 
-**Design only. Nothing here has been computed or trained. It supersedes `block6_width2_design.md`.**
+**Design only, approved with the amendments marked below.** Nothing here has been computed or trained.
+It supersedes `block6_width2_design.md`.
 
 - Target: the rebuttal revision. If it finishes and verifies cleanly before 25 September, it can go into
   the submission.
@@ -143,9 +144,15 @@ then **m ≤ ½‖w₂‖₁Γ₂**.
   - **R₂,glob** is the smallest s at which the global conditional minimiser has G₊ > 0 (directional). It
     is found on a grid, then by bisection to one grid step, and expressed as R₂ = s·Γ̂₂/2.
   - R₂,solve is defined likewise, for sign correctness.
-  - A second sign change, or none at all, is reported. **If there is no sign change for an activation,
-    its threshold is undefined, and its registered predictions are recorded as not applicable, not
-    passed.**
+  - A second sign change, or none at all, is reported.
+  - **Scanned range (amendment)**, fixed for every activation before any result exists: R₂ = s·Γ̂₂/2 ∈
+    [0.02, 1.00] on a grid of 0.01 in R₂, then bisection. In |w₂|₁ that is s ∈ [0.04, 2.0]/Γ̂₂; for tanh
+    (Γ₂ = 1), s ∈ [0.04, 2.0].
+  - **"Not applicable", precisely (amendment)**: for an activation, the directional gap G₊ of the
+    retained global conditional minimiser has **no sign change over the scanned range**. That is, it is
+    ≤ 0 at every grid point, or > 0 at every grid point, both judged after the stricter search of step 3.
+    The activation's threshold is then undefined, and its registered predictions (W1, W4) are recorded as
+    **not applicable**, neither passed nor failed.
 
 ## 4. Unconstrained training and registered predictions
 
@@ -164,9 +171,14 @@ check and timing. It is never used for predictions.
 - **Registered predictions**, each scored per activation:
   - **W0 (thresholds)**: R₂,glob and R₂,solve per activation, frozen with the validation above, before
     training.
-  - **W1 (primary)**: unconstrained training first becomes correct above the conditional threshold.
+  - **W1 (co-primary with W4)**: unconstrained training first becomes correct above the conditional
+    threshold, **and not far above it**.
     - ≥ 90% of crossing runs have crossing R₂ ≥ R₂,glob;
-    - and the bootstrap 95% interval of the median crossing R₂/R₂,glob − 1 lies above 0.
+    - the bootstrap 95% interval of the median crossing R₂/R₂,glob − 1 lies above 0;
+    - **(amendment) an upper bound**: the median crossing R₂/R₂,glob ≤ **1.25**, so that W1 fails if the
+      threshold sits far below the crossings.
+      - The value is disclosed as informed by the width-1 free-training offsets (1.10–1.16). It is a
+        tolerance, not a predicted magnitude.
   - **W2 (own-seed thresholds)**, stated in advance on their own terms, not carried over from width 1.
     Each run's own R₂,glob on its 400 points is computed before training, by the same search with
     reduced restarts (validated on a subset).
@@ -183,6 +195,38 @@ check and timing. It is never used for predictions.
       the crossing in ≥ 95% of runs;
     - W3d: crossing R₂ correlates more strongly with the occupied branch's own threshold than with the
       global own threshold (the ρ difference, with a bootstrap interval above 0).
+- **W4 (co-primary with W1; amendment): fixed-scale test**, the width-2 analogue of Blocks 4 and 5. W1 alone
+  shows only that the threshold is a lower bound; W4 tests whether it is **where** placement switches.
+  - **Checkpoints**:
+    - pre-correct states (G₊(φ_v) ≤ 0) saved at 60 log-spaced steps of the W1 training runs, with the
+      full Adam state;
+    - one per run per stratum of current R₂/R₂,glob: [0.2, 0.5), [0.5, 0.8), [0.8, 1.0), [1.0, 1.3).
+      Within a stratum, the latest qualifying checkpoint.
+  - **Intervention**: (w₂, b) rescaled **jointly** by k > 0 so that R₂/R₂,glob lands on the grid
+    {0.6, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5, 2.0}.
+  - **Replay**: train (θ, v, b) with **‖v‖₁ held fixed**. After every Adam step, v is projected onto the ℓ₁
+    sphere of the held radius, so the output direction still trains. Horizon **64,000 steps**, recorded
+    at 4,000 / 16,000 / 64,000.
+    - Optimiser state: "preserved" (primary) and "reset" (secondary).
+  - **Outcome**: correct (sign-correct, with exact extrema) at 64,000 steps.
+  - **Reference: each training set's own threshold.** Own R₂,glob, and the own threshold of each branch
+    (canonical class, §3), are computed on each run's 400 points before any replay. **No expected sign or
+    magnitude is carried over from width 1.** Only the method is carried over.
+  - **W4a**: the correct fraction at 64,000 steps rises with held R₂ (no significant decrease between
+    levels, paired exact McNemar, one-sided p < 0.05). Its **50% point** (linear interpolation, in
+    R₂/R₂,glob) lies within **±0.05 of the median own/pop ratio** over the replays' seeds.
+  - **W4b**: per replay, "held R₂ above the replay's own threshold **on the branch it occupies at the
+    replay's start**" predicts correctness at 64,000 steps, with **agreement ≥ 0.90**.
+    - The starting branch is known when the replay starts. The end branch is reported beside it, labelled
+      circular.
+  - **Validity checks** (the width-1 set, each with constructed pass and fail cases):
+    - **k = 1 reproduction**: at k = 1, the replay reproduces an **independent** reference continuation
+      that truly freezes ‖v‖₁ (it resets v onto the sphere after every step, as in width-1 amendment 2)
+      to 1e−10 over its first 25 steps, on 20 checkpoints;
+    - **decisions preserved** at the moment of rescaling: the sign of N at every training point is
+      unchanged by (w₂, b) → k(w₂, b);
+    - **a true freeze of ‖v‖₁**: |‖v‖₁ − held| ≤ 1e−12 at every step of every replay.
+    - Any failure is a stop condition.
 - **The tanh arm.** Tanh can solve the task at width 2 (Theorem 2 gives Γ₂ = 1 > 0).
   - **Two hypotheses**, stated in advance:
     - **H-general**: the conditional threshold predicts tanh too, so the mechanism concerns output scale
@@ -191,9 +235,9 @@ check and timing. It is never used for predictions.
   - **Expected: H-general.** The conditional argument only uses the fact that, at a fixed output scale,
     the logistic loss trades gap against fit. Nothing in it uses non-monotonicity.
   - **Criterion that decides**:
-    - H-general iff W1 passes for tanh and for both f_a arms;
-    - H-nonmonotone iff W1 passes for both f_a arms and fails for tanh;
-    - if W1 fails for an f_a arm, neither hypothesis is supported, and that is reported;
+    - H-general iff **W1 and W4** pass for tanh and for both f_a arms;
+    - H-nonmonotone iff W1 and W4 pass for both f_a arms and either fails for tanh;
+    - if W1 or W4 fails for an f_a arm, neither hypothesis is supported, and that is reported;
     - if tanh's threshold is undefined (no sign change, §3), the arm is "not applicable" and neither
       hypothesis is decided by it.
 
@@ -213,6 +257,9 @@ write-and-read round trip it depends on (exact round-trip parsing).
 | symmetry invariance and canonicalisation | any generator changes loss or G₊ beyond 1e−12 | a deliberately asymmetric window |
 | training determinism | the same seed twice not bit-identical | a nondeterministic perturbation |
 | crossing detection | disagreement with an independent every-step dense-grid check | an off-by-one step |
+| W4 k = 1 reproduction (true-freeze reference) | difference > 1e−10 | a reference that only zeroes the gradient (the width-1 amendment-2 error) |
+| W4 decisions preserved at rescaling | any sign change | k < 0 |
+| W4 true freeze of ‖v‖₁ | any drift > 1e−12 | a replay without the projection |
 
 ## 6. Compute and hardware (this laptop)
 
@@ -234,4 +281,5 @@ write-and-read round trip it depends on (exact round-trip parsing).
 3. Γ̂₂; the identity and Theorem 1 checks on calibration runs.
 4. Conditional scans and thresholds (W0), with the full validation.
 5. **Register** W1–W3 and the tanh criterion, with the frozen thresholds and hashes.
-6. Train, then score.
+6. Train, then score W1–W3. Then run the W4 replays (after W1's training, which provides the
+   checkpoints) and score W4.
