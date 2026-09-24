@@ -486,6 +486,14 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
     - The fraction of runs with any plateau time falls from 0.68 to 0.40–0.42.
   - Slower w₂ keeps runs near the constant predictor longer. That could move the residual independently
     of lag, so it has to be weighed with the L1 verdict.
+  - **Post hoc observation (it does not remove the caveat)**: plateau time does not track the residual's
+    collapse step for step.
+    - Between φ = 1 and 0.5, plateau time rises from 21 to 702 steps (a = 1.30) and from 13 to 1,244
+      (1.50), while the residual changes little (3.11 → 2.66% and 6.56 → 5.34%).
+    - Between 0.5 and 0.25, plateau time roughly doubles, while the residual collapses (to 0.47% and
+      1.07%).
+    - A deconfounded test that switches φ only after the plateau has been left is registered separately
+      (`lag_test2_prediction.md`).
 - **Say**: "slowing w₂'s growth removes most of the residual (to ≈ 0.5% and 1% at a quarter of the
   learning rate), consistent with an adiabatic lag of the output scale; the dependence is not
   proportional, and slower w₂ also lengthens the time spent on the constant-predictor plateau, which is a
