@@ -92,6 +92,8 @@ def _perm_spearman(a, b, n_perm=10_000, seed=0):
 def score():
     d = pd.read_csv(PARTS)
     ck = pd.read_csv(RESULTS / "lag_test2_checkpoints.csv")[["a", "seed", "R_own"]]
+    ck["R_own"] = pd.to_numeric(ck.R_own, errors="coerce")       # excluded runs carry a text note; they drop out
+    ck = ck.dropna()
     runs = pd.read_csv(RESULTS / "lag_test2_runs.csv")
     base = runs[(runs.rule == "primary") & (runs.factor == 1.0)][["a", "seed", "R_cross"]]
     res = base.merge(ck, on=["a", "seed"]); res["residual"] = res.R_cross / res.R_own - 1

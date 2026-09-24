@@ -22,3 +22,5 @@ results/lag_test2_parts/
 
 # Block 2: certificate data files are regenerated bit-identically by src/cert_export.py; their SHA-256 is committed
 results/certificates/
+results/residual_posthoc_parts.csv
+results/width2_w0_parts/

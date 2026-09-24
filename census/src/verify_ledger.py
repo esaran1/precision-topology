@@ -801,6 +801,8 @@ PRODUCERS = {
     "limit_windows.csv": ("limit_windows", "main", "full", ""),
     "limit_windows_evaluations.csv": ("limit_windows", "main", "full", ""),
     "writer_patch_prospective_own_per_setting.csv": ("writer_patch", "per_setting", "full", ""),
+    "residual_posthoc_runs.csv": ("residual_posthoc", "score", "full", ""),
+    "residual_posthoc_correlations.csv": ("residual_posthoc", "score", "full", ""),
     "writer_patch_windows.csv": ("writer_patch", "windows", "full", ""),
     "writer_patch_calibration.csv": ("writer_patch", "windows", "full", ""),
     "writer_patch_w_bound.csv": ("writer_patch", "w_bound_table", "full", ""),
