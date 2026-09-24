@@ -19,3 +19,6 @@ results/prospective_own_parts/
 results/first_order_finite_parts/
 results/lag_test2_parts/
 .sched/
+
+# Block 2: certificate data files are regenerated bit-identically by src/cert_export.py; their SHA-256 is committed
+results/certificates/

@@ -53,6 +53,7 @@ def finite(a, s, name, x=None, y=None):
             "gap": "G = min_O f_a(w1 x + b1) - max_I f_a(w1 x + b1), I = [-0.8, 0.8], O = +-[1.2, 2.0]",
             "lower_bound_search": "L*(c) - |dL/dw| hw - |dL/db| hb - 0.5 s a mean((|x| hw + hb)^2)",
             "gap_step_search": "(1 + a)(2.8 hw + 2 hb)",
+            "regenerate": f"python -m src.cert_export finite {a} {s} {name}",
             "search_result": {"minus": {k: rm[k] for k in ("lower", "upper", "rounds")},
                               "plus": {k: rp[k] for k in ("lower", "upper", "rounds")}}}
     CERTS.mkdir(parents=True, exist_ok=True)
@@ -61,6 +62,27 @@ def finite(a, s, name, x=None, y=None):
     return meta
 
 
+def manifest():
+    """results/certificates_manifest.csv: every exported file's SHA-256 and size, and the command that regenerates
+    it bit-identically.  The data files themselves are not committed."""
+    import csv
+    import hashlib
+    rows = []
+    for p in sorted(CERTS.glob("*.json")):
+        meta = json.loads(p.read_text())
+        for f in (p, p.with_suffix(".npz")):
+            if f.exists():
+                rows.append({"file": f"results/certificates/{f.name}", "sha256": hashlib.sha256(f.read_bytes()).hexdigest(),
+                             "bytes": f.stat().st_size, "regenerate": meta.get("regenerate", "")})
+    out = CERTS.parent / "certificates_manifest.csv"
+    with out.open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=["file", "sha256", "bytes", "regenerate"])
+        w.writeheader(); w.writerows(rows)
+    return out
+
+
 if __name__ == "__main__":
-    if sys.argv[1] == "finite":
+    if sys.argv[1] == "manifest":
+        print(manifest())
+    elif sys.argv[1] == "finite":
         print(json.dumps(finite(float(sys.argv[2]), float(sys.argv[3]), sys.argv[4]), indent=1, default=float)[:1500])

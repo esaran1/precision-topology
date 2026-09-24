@@ -20,6 +20,24 @@ Finite-a conditional certificate (one status at one scale s):
               (5) every leaf's own claimed lower bound (both regions) holds (same subdivision rule)
               (6) U < log 2 when the winning region is {G > 0}, so the lemma's region |w₁| > W (L* > log 2) loses.
 
+Rigour notes (every step below is an enclosure in Arb ball arithmetic; nothing is decided in floats):
+  * Comparisons are made between Arb balls (`a > b` is True only if it holds for every point of both balls), or
+    between an Arb ball and the exact binary value of a float (arb(float) is exact).  No Arb endpoint is converted
+    to a float before a comparison.
+  * The bias bracket.  For fixed (w₁, b₁), F(b) = ∂L/∂b = mean σ(z0 + b) − ȳ is strictly increasing in b.  On a cell,
+    z0ᵢ ∈ [zloᵢ, zhiᵢ] pointwise, so mean σ(zlo + b) − ȳ ≤ F(b) ≤ mean σ(zhi + b) − ȳ.  If the upper function is < 0 at
+    β (checked in Arb) then F(β) < 0 for every point of the cell, so b* > β; likewise b* < γ.  Hence b* ∈ [β, γ].
+  * Lower bound of L* at the cell centre c (the boundary-leaf argument).  g(b) = L(c, b) = mean softplus(z0ᵢ + b)
+    − yᵢ(z0ᵢ + b) is convex in b (softplus is convex; the other term is linear), with g′(b) = F(b).  For convex g
+    and any b̂, g(b*) ≥ g(b̂) + g′(b̂)(b* − b̂) (the tangent line lies below a convex function).  So
+        L*(c) = g(b*) ≥ g(b̂) − |F(b̂)|·|b* − b̂|,   |b* − b̂| ≤ width of the certified bracket [β, γ] ∋ b*, b̂ ∈ [β, γ].
+    g(b̂) and F(b̂) are evaluated in Arb at the exact point b̂ (a float), which avoids the dependency loss of
+    evaluating g over the whole bracket (softplus(z) and y·z do not cancel in interval arithmetic).
+  * Mean-value step over the cell: for every θ in the cell, L*(θ) ≥ L*(c) − sup|∂_w L*|·h_w − sup|∂_b L*|·h_b, with
+    the envelope gradient ∂L*/∂θ = mean((σ(z) − y)·s·f_a′(t)·(x, 1)) enclosed over the cell × the bias bracket.
+  * The class gap uses the exact range of f_a over an interval (endpoints and the critical points t = ±acos(−1/a)
+    + 2πk inside it, all evaluated in Arb).
+
     python -m src.verify_certificates [certificate-name ...]     # all certificates if none given
 """
 
@@ -37,7 +55,7 @@ from flint import arb, ctx
 CERTS = Path(__file__).resolve().parents[1] / "results" / "certificates"
 PREC = 80                      # bits; Arb tracks every radius, so the result is rigorous at any precision
 MAX_DEPTH = 6
-WORKERS = 3
+WORKERS = int(__import__('os').environ.get('VC_WORKERS', '3'))
 
 
 # ------------------------------------------------------------------------------------------ ball helpers
@@ -157,7 +175,7 @@ class Objective:
         Wc, Bc = arb(wc), arb(bc)
         Bpt, _ = self.b_bracket(Wc, Bc)
         if Bpt is None:
-            return -math.inf
+            return None
         # L*(c) = L(c, b*) with b* ∈ Bpt.  L(c, ·) is convex, so L(c, b*) ≥ L(c, b̂) + F(b̂)(b* − b̂) with
         # F = ∂L/∂b = mean σ(z) − ȳ: evaluate at the single point b̂ (no dependency loss over the bracket).
         bhat = arb(float(Bpt.mid()))
@@ -167,10 +185,9 @@ class Objective:
         W, B = ball(wc - hw, wc + hw), ball(bc - hb, bc + hb)
         Bcell, Z = self.b_bracket(W, B)
         if Bcell is None:
-            return -math.inf
+            return None
         _, gw, gb = self.value_and_grad(W, B, Bcell, Z)
-        lb = lo_(Lc) - hi_(abs(gw)) * arb(hw) - hi_(abs(gb)) * arb(hb)
-        return float(lo_(lb))
+        return Lc - abs(gw) * arb(hw) - abs(gb) * arb(hb)            # a ball; its lower end is the bound
 
     def F_at(self, W, B, b):
         """F(b) = mean σ(z0 + b) − ȳ at a (w, b₁) ball."""
@@ -181,8 +198,9 @@ class Objective:
         return acc / self.n - self.ybar
 
     def upper_at(self, w, b1, b2):
+        """An Arb ball containing L(w, b₁, b₂) ≥ L*(w, b₁); its upper end is a rigorous upper bound of L*."""
         L, _, _ = self.value_and_grad(arb(w), arb(b1), arb(b2))
-        return float(hi_(L))
+        return L
 
     def gap_bounds(self, wl, wh, bl, bh, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
         """Rigorous (G_lower, G_upper) over the cell, G = min_O φ − max_I φ, φ = f_a(w x + b₁)."""
@@ -193,7 +211,7 @@ class Objective:
         to2 = t_interval(wl, wh, bl, bh, arb(-outer[1]), arb(-outer[0]))
         imn, imx = fa.range(*ti)
         o1mn, _ = fa.range(*to1); o2mn, _ = fa.range(*to2)
-        G_lower = float(lo_(min(o1mn, o2mn) - imx))
+        G_lower = min(o1mn, o2mn) - imx                            # Arb (an exact lower endpoint)
         # upper: G(θ) ≤ φ(x_o, θ) − φ(x_i, θ) for any fixed x_o ∈ O, x_i ∈ I; take the best of a few pairs
         wm, bm = float(((wl + wh) / 2).mid()), float(((bl + bh) / 2).mid())
         xs_i = np.linspace(inner[0], inner[1], 81); xs_o = np.r_[np.linspace(*outer, 41), -np.linspace(*outer, 41)]
@@ -202,7 +220,7 @@ class Objective:
         xo, xi = float(xs_o[np.argmin(fo)]), float(xs_i[np.argmax(fi)])
         _, fomax = fa.range(*t_interval(wl, wh, bl, bh, arb(xo), arb(xo)))
         fimin, _ = fa.range(*t_interval(wl, wh, bl, bh, arb(xi), arb(xi)))
-        G_upper = float(hi_(fomax - fimin))
+        G_upper = fomax - fimin
         return G_lower, G_upper
 
 
@@ -248,6 +266,21 @@ def coverage_ok(level, iw, ib, nw, nb):
     return True, "exact tiling"
 
 
+def files_match_manifest(name):
+    """Both data files hash to the SHA-256 committed in results/certificates_manifest.csv."""
+    import csv
+    import hashlib
+    man = CERTS.parent / "certificates_manifest.csv"
+    if not man.exists():
+        return False
+    want = {r["file"]: r["sha256"] for r in csv.DictReader(man.open())}
+    for ext in ("json", "npz"):
+        key = f"results/certificates/{name}.{ext}"
+        if want.get(key) != hashlib.sha256((CERTS / f"{name}.{ext}").read_bytes()).hexdigest():
+            return False
+    return True
+
+
 _OBJ = {}
 
 
@@ -263,7 +296,8 @@ def _leaf_ok(obj, wc, bc, hw, hb, kind, target, depth, stats):
     stats["evals"] += 1
     stats["max_depth"] = max(stats["max_depth"], depth)
     if kind == "lb":
-        if obj.lower_bound(wc, bc, hw, hb) >= target:
+        lb = obj.lower_bound(wc, bc, hw, hb)
+        if lb is not None and lb >= arb(target):                    # certain: every point of the ball ≥ target
             return True
     else:
         gl, gu = obj.gap_bounds(wc - hw, wc + hw, bc - hb, bc + hb)
@@ -297,21 +331,21 @@ def check_finite(name, verbose=True, workers=WORKERS):
     x, y = dat["x"], dat["y"]
     s, a = meta["s"], meta["a"]
     obj = Objective(x, y, s, a)
-    res = {"name": name, "checks": {}}
+    res = {"name": name, "checks": {"files_match_committed_hashes": files_match_manifest(name)}}
     t0 = time.time()
     W = lemma_W(x, y, s, a)
     res["checks"]["lemma_W"] = abs(W - meta["W"]) <= 1e-12
     win, lose = meta["winning_region"], meta["losing_region"]
     if meta["U_point"] is None:
-        U = float(hi_(arb(2).log()))
-        res["checks"]["U_point_in_region"] = win == "-" and abs(float(obj.ybar.mid()) - 0.5) < 1e-15
+        U = arb(2).log()                                   # the constant predictor with ȳ = ½ has loss exactly log 2
+        res["checks"]["U_point_in_region"] = win == "-" and (obj.ybar == arb(1) / 2)
     else:
         w, b1, b2 = meta["U_point"]
         U = obj.upper_at(w, b1, b2)
         gl, gu = obj.gap_bounds(w, w, b1, b1)
-        res["checks"]["U_point_in_region"] = (gl > 0) if win == "+" else (gu <= 0)
-    res["U"] = U
-    res["checks"]["outside_W_loses"] = (U < math.log(2)) if win == "+" else True
+        res["checks"]["U_point_in_region"] = bool((gl > 0) if win == "+" else (gu <= 0))
+    res["U_upper"] = float(hi_(U).mid()) if hasattr(hi_(U), "mid") else str(hi_(U))
+    res["checks"]["outside_W_loses"] = bool(U < arb(2).log()) if win == "+" else True
     jobs = []
     for reg in ("-", "+"):
         lv, iw, ib = dat[f"level_{reg}"], dat[f"iw_{reg}"], dat[f"ib_{reg}"]
@@ -322,7 +356,7 @@ def check_finite(name, verbose=True, workers=WORKERS):
         reason, claim = dat[f"reason_{reg}"], dat[f"lb_{reg}"]
         if reg == lose:
             lbl = reason != 2
-            res["checks"]["losing_claims_exceed_U"] = bool((claim[lbl] > U).all())
+            res["checks"]["losing_claims_exceed_U"] = all(arb(float(c)) > U for c in claim[lbl])
         for k in range(len(lv)):
             kind = f"out{reg}" if reason[k] == 2 else "lb"
             jobs.append(((reg, k), float(cw[k]), float(cb[k]), float(hw[k]), float(hb[k]), kind, float(claim[k])))

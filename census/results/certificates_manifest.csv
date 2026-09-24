@@ -1,0 +1,3 @@
+file,sha256,bytes,regenerate
+results/certificates/finite_a1.30_glob_lo.json,ca818d6487df2cebe9a35a6f54235929273cdc391a36a86fd0720f5332eff687,1093,python -m src.cert_export finite 1.3 4.95 finite_a1.30_glob_lo
+results/certificates/finite_a1.30_glob_lo.npz,60afb3d76966000c892714111b0553f7bd5c85269fb92a42a34ce1fc4989e4e4,577121,python -m src.cert_export finite 1.3 4.95 finite_a1.30_glob_lo
