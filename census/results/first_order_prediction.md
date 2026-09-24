@@ -84,3 +84,23 @@ The same feasible-set construction is applied to each component separately:
   allowance), reported with the prediction's position relative to it. **No verdict attaches to it.**
 - **Tried beforehand only at a = 1.05**, outside the registered set: certified, with a bracket width of
   1e−9 in s and a competitor margin of +0.0135.
+
+## Status and a second supplementary cross-check — 2026-09-23 22:58 EDT (before the registered a = 1.01 result exists)
+
+- **The registered computation at a = 1.01 continues unchanged.**
+  - Its first step is the certified Ĝ(1.01) (`ghat_bnb.certify`, target 1e−6). After six hours it had
+    grown to 15 GB, which threatened the machine.
+  - It is **paused** (SIGSTOP), not killed. Nothing is lost, including the in-memory results for
+    a = 1.02–1.04.
+  - It resumes **alone** once the heavier jobs finish. **The registered result is the verdict.**
+- **Supplementary cross-check of Ĝ(a), a = 1.01–1.04** (`first_order.ghat_rescaled` →
+  `first_order_ghat_rescaled.csv`, committed before it runs). It is reported beside the registered Ĝ.
+  - It certifies the same global supremum to the same relative target, split into two parts:
+    - **the rescaled box** w₁ = √ε u, b₁ = π + √ε v, (u, v) ∈ [0, 8] × [−12, 12]: a branch and bound
+      with exact extrema of φ_ε and step |φ_ε′| ≤ 1 + aσ²/2, relative target 1e−6;
+    - **an exclusion branch and bound** over the rest of `ghat_bnb`'s domain (w₁ ∈ (0, a], b₁ ∈ [0, 2π),
+      its step (1 + a)(2.8h_w + 2h_b)), proving that every point outside the box has G below the box's
+      attained value.
+  - Ĝ ∈ ε^{3/2}[K_lo, K_hi] iff the exclusion closes.
+  - **Tried beforehand only at a = 1.05**, outside the test set: [0.00636009, 0.00636009], consistent
+    with the registered certified value there (0.006360–0.006361), in 1.6 s at 0.6 GB.

@@ -580,6 +580,10 @@ if __name__ == "__main__":
         supplementary(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
     elif cmd == "score_supplementary":
         score_supplementary()
+    elif cmd == "ghat_rescaled":
+        d = pd.DataFrame([ghat_rescaled(a) for a in A_TEST])
+        d.to_csv(RESULTS / "first_order_ghat_rescaled.csv", index=False)
+        print(d.to_string(index=False))
     else:
         main()
 
@@ -709,3 +713,57 @@ def score_supplementary():
     pts.to_csv(RESULTS / "first_order_supplementary.csv", index=False)
     out.to_csv(RESULTS / "first_order_supplementary_scores.csv", index=False)
     print(pts.to_string(index=False)); print(out.T.to_string())
+
+
+# ------------------------------------------------------------------ SUPPLEMENTARY: Ĝ(a) certified via the rescaled box
+def _gap_both(w1, b1, a):
+    """Vectorised exact oriented gap, both orientations: max(min_O f − max_I f, min_I f − max_O f)."""
+    from .profiled_bnb import _interval_extrema
+    w1 = np.asarray(w1, float); b1 = np.asarray(b1, float)
+
+    def ext(lo, hi):
+        t1, t2 = w1 * lo + b1, w1 * hi + b1
+        return _interval_extrema(np.minimum(t1, t2), np.maximum(t1, t2), a)
+    imn, imx = ext(-0.8, 0.8)
+    p_mn, p_mx = ext(1.2, 2.0)
+    n_mn, n_mx = ext(-2.0, -1.2)
+    return np.maximum(np.minimum(p_mn, n_mn) - imx, imn - np.maximum(p_mx, n_mx))
+
+
+def ghat_rescaled(a, rel=1e-6, U=8.0, V=12.0, h0=0.05, max_cells=2_000_000, max_rounds=60, chunk=200_000):
+    """SUPPLEMENTARY to the registered Ĝ (ghat_bnb.certify): the global supremum of G over placements, certified as
+    (i) the branch-and-bound supremum over the rescaled box w1 = √ε u, b1 = π + √ε v, (u, v) ∈ [0, U] × [−V, V]
+    (K_free: exact extrema of φ_ε, step |φ_ε'| <= 1 + aσ²/2), and (ii) an exclusion branch and bound over the rest of
+    the placement domain (w1 ∈ (0, a], b1 ∈ [0, 2π); ghat_bnb's domain and step (1 + a)(2.8 h_w + 2 h_b)) proving
+    every point outside the box has G below the box's attained value.  Ĝ ∈ ε^{3/2}[K_lo, K_hi] iff (ii) closes."""
+    eps = a - 1
+    K_lo, K_hi, arg, spread = K_free(eps, U=U, V=V, rel=rel)
+    tau = K_lo * eps ** 1.5
+    se = math.sqrt(eps)
+    box_w, box_b = (0.0, U * se), (math.pi - V * se, math.pi + V * se)
+    nw, nb = max(1, math.ceil(a / h0)), math.ceil(2 * math.pi / h0)
+    hw, hb = a / nw / 2, 2 * math.pi / nb / 2
+    cw, cb = np.meshgrid((np.arange(nw) + 0.5) * 2 * hw, (np.arange(nb) + 0.5) * 2 * hb, indexing="ij")
+    cw, cb = cw.ravel(), cb.ravel()
+    closed, rounds, peak = False, 0, len(cw)
+    for rounds in range(1, max_rounds + 1):
+        inside = (cw - hw >= box_w[0]) & (cw + hw <= box_w[1]) & (cb - hb >= box_b[0]) & (cb + hb <= box_b[1])
+        cw, cb = cw[~inside], cb[~inside]
+        if not len(cw):
+            closed = True; break
+        ub = np.empty(len(cw))
+        for i in range(0, len(cw), chunk):
+            ub[i:i + chunk] = _gap_both(cw[i:i + chunk], cb[i:i + chunk], a) + (1 + a) * (2.8 * hw + 2 * hb)
+        keep = ub >= tau
+        if not keep.any():
+            closed = True; break
+        cw, cb = cw[keep], cb[keep]
+        if 4 * len(cw) > max_cells:
+            break
+        hw, hb = hw / 2, hb / 2
+        cw = np.concatenate([cw - hw, cw - hw, cw + hw, cw + hw])
+        cb = np.concatenate([cb - hb, cb + hb, cb - hb, cb + hb])
+        peak = max(peak, len(cw))
+    return {"a": a, "eps": eps, "K_lo": K_lo, "K_hi": K_hi, "box_argmax_u": arg[0], "box_argmax_v": arg[1],
+            "box_kept_spread": spread, "exclusion_closed": closed, "exclusion_rounds": rounds, "exclusion_peak_cells": peak,
+            "Ghat_lo": K_lo * eps ** 1.5 if closed else np.nan, "Ghat_hi": K_hi * eps ** 1.5 if closed else np.nan}
