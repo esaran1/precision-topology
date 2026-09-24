@@ -567,23 +567,6 @@ def score():
     print(t.to_string(index=False)); print(d.to_string(index=False))
 
 
-if __name__ == "__main__":
-    import sys
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "c1"
-    if cmd == "finite":
-        finite(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
-    elif cmd == "score":
-        score()
-    elif cmd == "corner":
-        corner()
-    elif cmd == "supplementary":
-        supplementary(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
-    elif cmd == "score_supplementary":
-        score_supplementary()
-    elif cmd == "ghat_rescaled":
-        d = pd.DataFrame([ghat_rescaled(a) for a in A_TEST])
-        d.to_csv(RESULTS / "first_order_ghat_rescaled.csv", index=False)
-        print(d.to_string(index=False))
     else:
         main()
 
@@ -767,3 +750,21 @@ def ghat_rescaled(a, rel=1e-6, U=8.0, V=12.0, h0=0.05, max_cells=2_000_000, max_
     return {"a": a, "eps": eps, "K_lo": K_lo, "K_hi": K_hi, "box_argmax_u": arg[0], "box_argmax_v": arg[1],
             "box_kept_spread": spread, "exclusion_closed": closed, "exclusion_rounds": rounds, "exclusion_peak_cells": peak,
             "Ghat_lo": K_lo * eps ** 1.5 if closed else np.nan, "Ghat_hi": K_hi * eps ** 1.5 if closed else np.nan}
+
+if __name__ == "__main__":
+    import sys
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "c1"
+    if cmd == "finite":
+        finite(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
+    elif cmd == "score":
+        score()
+    elif cmd == "corner":
+        corner()
+    elif cmd == "supplementary":
+        supplementary(int(sys.argv[2]) if len(sys.argv) > 2 else 2)
+    elif cmd == "score_supplementary":
+        score_supplementary()
+    elif cmd == "ghat_rescaled":
+        d = pd.DataFrame([ghat_rescaled(a) for a in A_TEST])
+        d.to_csv(RESULTS / "first_order_ghat_rescaled.csv", index=False)
+        print(d.to_string(index=False))
