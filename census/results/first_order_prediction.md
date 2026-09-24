@@ -104,3 +104,18 @@ The same feasible-set construction is applied to each component separately:
   - Ĝ ∈ ε^{3/2}[K_lo, K_hi] iff the exclusion closes.
   - **Tried beforehand only at a = 1.05**, outside the test set: [0.00636009, 0.00636009], consistent
     with the registered certified value there (0.006360–0.006361), in 1.6 s at 0.6 GB.
+
+## Amendment 2 — 2026-09-24 00:51 EDT (before any a = 1.01 verdict exists)
+
+- **What changes**: at **a = 1.01 only**, the registered Ĝ step (`ghat_bnb.certify`, relative target 1e−6)
+  is replaced by the **rescaled certified search** (`first_order.ghat_rescaled`: the box branch and bound
+  plus the exclusion branch and bound over the rest of the domain).
+- **Reason**: the registered Ĝ step at a = 1.01 **exceeded the available memory**. It reached 15 GB after six
+  hours; the job was paused, and it was then lost in a machine crash. At ε = 0.01 the supremum is about 6e−4,
+  while that routine's Lipschitz step does not shrink with ε.
+- **The quantity and the tolerance are unchanged**: the same global supremum of the class gap over placements,
+  certified to the same 1e−6 relative target. It was already computed and committed, before any a = 1.01
+  verdict existed: **Ĝ(1.01) ∈ [0.00057731, 0.00057731]**, exclusion closed (`first_order_ghat_rescaled.csv`).
+- **Unchanged**: the switch bracket at a = 1.01 uses the **registered procedure**, run under the memory
+  watchdog. **a = 1.02–1.04 stay exactly as registered.**
+- The c₁ runs lost in the crash (a = 1.02–1.04, and a = 1.01's unfinished Ĝ step) rerun from this procedure.

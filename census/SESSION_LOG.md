@@ -373,3 +373,22 @@ already-run dose-response). `Ĝ` is a **supremum**, so a grid can only
 **Naming note**: the priority list called the κ certification "Block H". Block H
 is the growth-rate dose-response (registered `3c1c0f4`, run, reported). The
 certification is recorded under its own name to keep the register unambiguous.
+
+---
+
+**Machine crash, 2026-09-24 (about 00:40 EDT).** The laptop crashed under memory pressure from long certified
+computations.
+- **Jobs lost**, none of which had finished:
+  - the annulus certificate (10.5 h);
+  - the solve competitor check (7 h);
+  - the c₁ test's registered finite run (a = 1.02–1.04 held their results in memory; a = 1.01 was paused in its Ĝ
+    step);
+  - the per-window A* (queued, restarted).
+- **No registered result was affected.** Every scored result had already been committed. `/tmp` logs were lost.
+- **Every lost job reruns** from its registered or amended procedure:
+  - the c₁ test: as registered at a = 1.02–1.04, and under amendment 2 at a = 1.01;
+  - the annulus and the solve competitor check: redesigned before rerunning, because the original design could not
+    close (math_note_v2);
+  - the per-window A*: unchanged.
+- **Since then**: long jobs checkpoint each finished unit to disk; at most 3 workers at low priority; a memory
+  watchdog pauses any job above 3 GB.

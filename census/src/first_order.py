@@ -468,7 +468,17 @@ def _finite_job(a):
     from .ghat_bnb import certify as ghat_certify
     eps = a - 1.0
     x, y = _population()
-    g = ghat_certify(a, target_rel=GHAT_REL)
+    if round(a, 2) == 1.01:
+        # Amendment 2 (first_order_prediction.md): at a = 1.01 the registered Ĝ step exceeded available memory; Ĝ(1.01)
+        # comes from the rescaled certified search (same supremum, same 1e-6 relative target), computed and committed
+        # before any a = 1.01 verdict existed.  The switch bracket below is the registered procedure, unchanged.
+        gr = pd.read_csv(RESULTS / "first_order_ghat_rescaled.csv", float_precision="round_trip")
+        gr = gr[gr.a.round(2) == 1.01].iloc[0]
+        assert bool(gr.exclusion_closed)
+        g = {"Ghat_lo": float(gr.Ghat_lo), "Ghat_hi": float(gr.Ghat_hi), "converged": True,
+             "w1": math.sqrt(eps) * float(gr.box_argmax_u), "b1": math.pi + math.sqrt(eps) * float(gr.box_argmax_v)}
+    else:
+        g = ghat_certify(a, target_rel=GHAT_REL)
     A_star = float(pd.read_csv(RESULTS / "first_order_c1.csv").A_star_lo.iloc[0])
     rows = []
 
