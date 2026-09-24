@@ -362,9 +362,15 @@ def wp7():
     g = pd.read_csv(RESULTS / "ghat_rigorous.csv", float_precision="round_trip")
     ds = pd.read_csv(RESULTS / "ghat_digit_stability.csv").iloc[0]
     e = lambda v: f"{v:+.1e}"
-    rows = "".join(f"| {r.a:.2f} | [{r.Ghat_cert_rigorous:.12f}, {r.Ghat_hi_rigorous:.12f}] | {r.Ghat_cert_published:.12f} | "
-                   f"{e(r.delta_cert)} | {e(r.delta_hi)} | {r.bnb_arg_lower:.12f} | {int(r.leaves):,} |\n"
-                   for r in g.itertuples())
+    rows = "".join(f"| {r.a:.2f} | {r.Ghat_cert_rigorous:.12f} | {r.Ghat_cert_published:.12f} | "
+                   f"{e(r.delta_cert)} | {int(r.leaves):,} |\n" for r in g.itertuples())
+    g["best_lo"] = np.maximum(g.Ghat_cert_rigorous, g.bnb_arg_lower)
+    g["d_abs"] = g.best_lo - g.Ghat_cert_rigorous
+    g["d_rel"] = g.d_abs / g.Ghat_cert_rigorous
+    rows_g = "".join(f"| {r.a:.2f} | [{r.best_lo:.12f}, {r.Ghat_hi_rigorous:.12f}] | "
+                     f"{'branch and bound point' if r.bnb_arg_lower > r.Ghat_cert_rigorous else 'Ĝ_cert witness'} | "
+                     f"{r.d_abs:.2e} | {r.d_rel:.2e} | {e(r.delta_hi)} |\n" for r in g.itertuples())
+    imax = int(g.d_rel.idxmax())
     return f"""
 ## WP-7. Ĝ(a) as rigorous enclosures (replaces the float values; Block 2)
 
@@ -373,9 +379,20 @@ Source: `ghat_rigorous.csv` (producer `src/ghat_rigorous.py`, from the independe
 the same witness point as the published float value, rounded down to a double. The upper end is the checker's bound
 over every leaf of the branch and bound, rounded up. The domain reduction to w₁ ∈ (0, a/1.4] is analytic.
 
-| a | Ĝ(a) ∈ [Ĝ_cert, Ĝ_hi] (rigorous) | old float Ĝ_cert | change of Ĝ_cert | change of Ĝ_hi | larger proven lower bound (not adopted) | leaves |
-|---|---|---|---|---|---|---|
+**(i) Ĝ_cert, the value every R uses** (the rigorous value at the same witness as the old float value):
+
+| a | Ĝ_cert (rigorous, rounded down) | old float Ĝ_cert | change | leaves checked |
+|---|---|---|---|---|
 {rows}
+**(ii) The enclosure of the supremum G* = Ĝ(a), reported separately.** Lower end: the best certified lower bound at each
+a, the larger of the rigorous values at the two recorded attained points (Ĝ_cert's witness and the branch and bound's
+own point). Upper end: the rigorous leaf bound, rounded up. The difference between the best certified lower bound and
+Ĝ_cert is given **both absolute and relative**; the largest is {g.d_abs[imax]:.2e} absolute, which is
+{g.d_rel[imax]:.2e} **relative**, at a = {g.a[imax]:.2f} (the "up to 8.4e−5" is relative).
+
+| a | G* ∈ [best certified lower, upper] | lower end from | best lower − Ĝ_cert (absolute) | (relative) | change of upper end vs old float |
+|---|---|---|---|---|---|
+{rows_g}
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = {ds.delta:.1e}. Every R is linear in Ĝ.
 All {int(ds.printed_number_checks)} printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
@@ -389,9 +406,8 @@ checks on them keep reporting that they are not rigorous in the last one or two 
 Artifacts computed before the switch (stored R columns) keep the old float Ĝ; they differ by at most δ relative, which
 the check above covers. Every code path that computes R now reads `ghat_rigorous.ghat_R`.
 
-The "larger proven lower bound" column is the rigorous value at the branch and bound's own attained point. At nine a it
-exceeds Ĝ_cert, by up to {float(((g.bnb_arg_lower - g.Ghat_cert_rigorous) / g.Ghat_cert_rigorous).max()):.1e} relative. It is a valid lower bound but a different number from the one R has
-always used, so it is not adopted.
+R keeps Ĝ_cert (table (i)); the best certified lower bound in table (ii) is a valid bound on G* but a different number
+from the one R has always used (author's decision 2026-09-24).
 """
 
 
@@ -423,12 +439,21 @@ def wp6():
     sz = {a: (fam("size test", a, "median_residual_check"), fam("size test", a, "median_residual_interp_check")) for a in (1.3, 1.5)}
     o = cs[(cs.experiment == "own-seed") & cs.quantity.str.endswith("[registered predictions]")]
     b = cs[(cs.experiment == "Block 3") & cs.quantity.str.contains("ci95_hi")]
+    p2 = o[o.quantity.str.startswith("P2b")].iloc[0]
+    p2b_c = f"{p2.check_based:+.3f} [{p2.check_lo:+.3f}, {p2.check_hi:+.3f}]"
+    p2b_i = f"{p2.interpolated:+.3f} [{p2.interp_lo:+.3f}, {p2.interp_hi:+.3f}]"
     rows_o = "".join(f"| own-seed {r.quantity.split()[0]}, a = {r.a:.2f} | {r.check_based:.4f} [{r.check_lo:.4f}, {r.check_hi:.4f}] "
                      f"| {r.interpolated:.4f} [{r.interp_lo:.4f}, {r.interp_hi:.4f}] | {'pass' if r.check_pass else 'FAIL'} / "
                      f"{'pass' if r.interp_pass else 'FAIL'} |\n" for r in o.itertuples())
-    rows_b = "".join(f"| Block 3 {r.quantity.split(' ci95')[0]}, {r.quantity.split('[')[1].rstrip(']')} | upper {r.check_based:.4f} "
-                     f"| upper {r.interpolated:.4f} | {'excludes 0' if r.check_pass else 'includes 0'} / "
-                     f"{'excludes 0' if r.interp_pass else 'includes 0'} |\n" for r in b.itertuples())
+    def _b3(comp, lab):
+        r = b[b.quantity == f"{comp} ci95_hi [{lab}]"].iloc[0]
+        return r
+    rows_b = ""
+    for comp in ("C - B1", "C - B2", "C - U"):
+        full, mix = _b3(comp, "cadence-matched C, B1 and B2"), _b3(comp, "registered predictions")
+        ex = lambda ok: "excludes 0" if ok else "includes 0"
+        rows_b += (f"| {comp} | {full.check_based:+.4f} ({ex(full.check_pass)}) | {full.interpolated:+.4f} "
+                   f"({ex(full.interp_pass)}) | {mix.interpolated:+.4f} ({ex(mix.interp_pass)}) |\n")
     return f"""
 ## WP-6. Crossing detection and the residual (post hoc audit; no registered verdict changes)
 
@@ -475,16 +500,25 @@ criteria as registered (statistic [95% interval]; pass/fail check-based / interp
 | criterion | check-based | interpolated | verdict check / interpolated |
 |---|---|---|---|
 {rows_o}
-For P4 the bracket is the registered acceptance range, not an interval. At a = 1.50 the P2b reading "C better than U_own (interval above 0)" holds check-based but not interpolated.
+For P4 the bracket is the registered acceptance range, not an interval.
 
-Block 3, C against each baseline (upper end of the 95% interval of the |log error| difference; C better if < 0):
+**Own-seed at a = 1.50.** P2b passes under both definitions. The stronger reading, that C beats U_own at a = 1.50
+(interval above 0), holds check-based ({p2b_c}) but does **not** survive interpolation ({p2b_i}).
+**Flag for softening:** the draft's "C is better, as registered" (`WRITER_INPUTS_v4.md` line 13, "P2b: C better at 1.50,
+as registered", and line 662, "C is better, +0.023 [+0.009, +0.036]") should say that P2b passes, and that C's advantage
+at a = 1.50 depends on the detection rule (check-based +0.023 [+0.009, +0.036]; interpolated {p2b_i}).
 
-| comparison | check-based | interpolated | check / interpolated |
+**Block 3.** The sensitivity analysis is the **fully interpolated** version: calibration (λ, hence C; B1; B2, all from
+the Block G runs) and observations both use interpolated crossings, so one detection rule applies throughout. The
+observations-only version is reported beside it, **labelled as mixing detection rules** (predictions calibrated on
+50-step checks, observations interpolated). Upper end of the 95% interval of the |log error| difference (C better if
+< 0):
+
+| comparison | check-based (as registered) | fully interpolated (sensitivity) | observations only (mixes detection rules) |
 |---|---|---|---|
 {rows_b}
-With the registered predictions (built from 50-step data) and interpolated observations the detection is mismatched;
-with C, B1 and B2 rebuilt from interpolated Block G crossings (cadence-matched) every registered comparison keeps its
-sign and excludes 0.
+In the fully interpolated version every registered comparison keeps its sign and excludes 0. Mixing the detection
+rules makes C − B2 include 0; that version is shown for completeness, not as the analysis.
 """
 
 

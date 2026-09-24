@@ -348,22 +348,28 @@ criteria as registered (statistic [95% interval]; pass/fail check-based / interp
 | own-seed P3, a = 1.50 | -0.0318 [-0.0436, -0.0196] | -0.0468 [-0.0530, -0.0397] | pass / pass |
 | own-seed P4, a = 1.50 | 0.0867 [0.0340, 0.0940] | 0.0615 [0.0340, 0.0940] | pass / pass |
 
-For P4 the bracket is the registered acceptance range, not an interval. At a = 1.50 the P2b reading "C better than U_own (interval above 0)" holds check-based but not interpolated.
+For P4 the bracket is the registered acceptance range, not an interval.
 
-Block 3, C against each baseline (upper end of the 95% interval of the |log error| difference; C better if < 0):
+**Own-seed at a = 1.50.** P2b passes under both definitions. The stronger reading, that C beats U_own at a = 1.50
+(interval above 0), holds check-based (+0.023 [+0.009, +0.036]) but does **not** survive interpolation (-0.003 [-0.013, +0.008]).
+**Flag for softening:** the draft's "C is better, as registered" (`WRITER_INPUTS_v4.md` line 13, "P2b: C better at 1.50,
+as registered", and line 662, "C is better, +0.023 [+0.009, +0.036]") should say that P2b passes, and that C's advantage
+at a = 1.50 depends on the detection rule (check-based +0.023 [+0.009, +0.036]; interpolated -0.003 [-0.013, +0.008]).
 
-| comparison | check-based | interpolated | check / interpolated |
+**Block 3.** The sensitivity analysis is the **fully interpolated** version: calibration (λ, hence C; B1; B2, all from
+the Block G runs) and observations both use interpolated crossings, so one detection rule applies throughout. The
+observations-only version is reported beside it, **labelled as mixing detection rules** (predictions calibrated on
+50-step checks, observations interpolated). Upper end of the 95% interval of the |log error| difference (C better if
+< 0):
+
+| comparison | check-based (as registered) | fully interpolated (sensitivity) | observations only (mixes detection rules) |
 |---|---|---|---|
-| Block 3 C - B1, registered predictions | upper -0.1312 | upper -0.1270 | excludes 0 / excludes 0 |
-| Block 3 C - B2, registered predictions | upper -0.0105 | upper 0.0053 | excludes 0 / includes 0 |
-| Block 3 C - U, registered predictions | upper -0.0630 | upper -0.0363 | excludes 0 / excludes 0 |
-| Block 3 C - B1, cadence-matched C, B1 and B2 | upper -0.1312 | upper -0.1349 | excludes 0 / excludes 0 |
-| Block 3 C - B2, cadence-matched C, B1 and B2 | upper -0.0105 | upper -0.0169 | excludes 0 / excludes 0 |
-| Block 3 C - U, cadence-matched C, B1 and B2 | upper -0.0630 | upper -0.0544 | excludes 0 / excludes 0 |
+| C - B1 | -0.1312 (excludes 0) | -0.1349 (excludes 0) | -0.1270 (excludes 0) |
+| C - B2 | -0.0105 (excludes 0) | -0.0169 (excludes 0) | +0.0053 (includes 0) |
+| C - U | -0.0630 (excludes 0) | -0.0544 (excludes 0) | -0.0363 (excludes 0) |
 
-With the registered predictions (built from 50-step data) and interpolated observations the detection is mismatched;
-with C, B1 and B2 rebuilt from interpolated Block G crossings (cadence-matched) every registered comparison keeps its
-sign and excludes 0.
+In the fully interpolated version every registered comparison keeps its sign and excludes 0. Mixing the detection
+rules makes C − B2 include 0; that version is shown for completeness, not as the analysis.
 
 ## WP-7. Ĝ(a) as rigorous enclosures (replaces the float values; Block 2)
 
@@ -372,21 +378,45 @@ Source: `ghat_rigorous.csv` (producer `src/ghat_rigorous.py`, from the independe
 the same witness point as the published float value, rounded down to a double. The upper end is the checker's bound
 over every leaf of the branch and bound, rounded up. The domain reduction to w₁ ∈ (0, a/1.4] is analytic.
 
-| a | Ĝ(a) ∈ [Ĝ_cert, Ĝ_hi] (rigorous) | old float Ĝ_cert | change of Ĝ_cert | change of Ĝ_hi | larger proven lower bound (not adopted) | leaves |
-|---|---|---|---|---|---|---|
-| 1.02 | [0.001626744762, 0.001627653245] | 0.001626744762 | -1.4e-16 | +1.5e-17 | 0.001626745002 | 110,724,630 |
-| 1.05 | [0.006360085994, 0.006363833420] | 0.006360085994 | -1.6e-16 | -7.7e-17 | 0.006360084013 | 18,041,202 |
-| 1.10 | [0.017671950853, 0.017688791467] | 0.017671950853 | -3.8e-17 | -2.9e-16 | 0.017673427712 | 4,086,270 |
-| 1.15 | [0.031918407628, 0.031951889476] | 0.031918407628 | -4.8e-16 | -1.2e-16 | 0.031920435133 | 1,814,754 |
-| 1.25 | [0.066505622211, 0.066573122000] | 0.066505622211 | -1.8e-16 | -5.6e-17 | 0.066507277337 | 722,136 |
-| 1.30 | [0.086101793878, 0.086170343941] | 0.086101793878 | +4.3e-16 | +3.1e-16 | 0.086103036064 | 580,392 |
-| 1.35 | [0.106913550661, 0.106982835379] | 0.106913550661 | -6.9e-17 | +1.8e-16 | 0.106914064287 | 484,512 |
-| 1.40 | [0.128771895556, 0.128842740347] | 0.128771895556 | +1.4e-16 | -1.9e-16 | 0.128772506040 | 415,350 |
-| 1.45 | [0.151545318737, 0.151689017080] | 0.151545318737 | -3.9e-16 | -1.1e-16 | 0.151545622037 | 272,292 |
-| 1.50 | [0.175126200489, 0.175272043337] | 0.175126200489 | -1.1e-15 | -1.7e-16 | 0.175125721865 | 243,594 |
-| 1.60 | [0.224360202126, 0.224519465715] | 0.224360202126 | -1.1e-16 | +3.3e-16 | 0.224367291384 | 200,394 |
-| 2.00 | [0.441033924063, 0.441384755802] | 0.441033924063 | +8.3e-16 | -3.3e-16 | 0.441033584269 | 91,668 |
-| 3.00 | [1.052297757851, 1.053233148730] | 1.052297757851 | -6.7e-16 | +4.4e-16 | 1.052296691308 | 41,988 |
+**(i) Ĝ_cert, the value every R uses** (the rigorous value at the same witness as the old float value):
+
+| a | Ĝ_cert (rigorous, rounded down) | old float Ĝ_cert | change | leaves checked |
+|---|---|---|---|---|
+| 1.02 | 0.001626744762 | 0.001626744762 | -1.4e-16 | 110,724,630 |
+| 1.05 | 0.006360085994 | 0.006360085994 | -1.6e-16 | 18,041,202 |
+| 1.10 | 0.017671950853 | 0.017671950853 | -3.8e-17 | 4,086,270 |
+| 1.15 | 0.031918407628 | 0.031918407628 | -4.8e-16 | 1,814,754 |
+| 1.25 | 0.066505622211 | 0.066505622211 | -1.8e-16 | 722,136 |
+| 1.30 | 0.086101793878 | 0.086101793878 | +4.3e-16 | 580,392 |
+| 1.35 | 0.106913550661 | 0.106913550661 | -6.9e-17 | 484,512 |
+| 1.40 | 0.128771895556 | 0.128771895556 | +1.4e-16 | 415,350 |
+| 1.45 | 0.151545318737 | 0.151545318737 | -3.9e-16 | 272,292 |
+| 1.50 | 0.175126200489 | 0.175126200489 | -1.1e-15 | 243,594 |
+| 1.60 | 0.224360202126 | 0.224360202126 | -1.1e-16 | 200,394 |
+| 2.00 | 0.441033924063 | 0.441033924063 | +8.3e-16 | 91,668 |
+| 3.00 | 1.052297757851 | 1.052297757851 | -6.7e-16 | 41,988 |
+
+**(ii) The enclosure of the supremum G* = Ĝ(a), reported separately.** Lower end: the best certified lower bound at each
+a, the larger of the rigorous values at the two recorded attained points (Ĝ_cert's witness and the branch and bound's
+own point). Upper end: the rigorous leaf bound, rounded up. The difference between the best certified lower bound and
+Ĝ_cert is given **both absolute and relative**; the largest is 1.48e-06 absolute, which is
+8.36e-05 **relative**, at a = 1.10 (the "up to 8.4e−5" is relative).
+
+| a | G* ∈ [best certified lower, upper] | lower end from | best lower − Ĝ_cert (absolute) | (relative) | change of upper end vs old float |
+|---|---|---|---|---|---|
+| 1.02 | [0.001626745002, 0.001627653245] | branch and bound point | 2.40e-10 | 1.48e-07 | +1.5e-17 |
+| 1.05 | [0.006360085994, 0.006363833420] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | -7.7e-17 |
+| 1.10 | [0.017673427712, 0.017688791467] | branch and bound point | 1.48e-06 | 8.36e-05 | -2.9e-16 |
+| 1.15 | [0.031920435133, 0.031951889476] | branch and bound point | 2.03e-06 | 6.35e-05 | -1.2e-16 |
+| 1.25 | [0.066507277337, 0.066573122000] | branch and bound point | 1.66e-06 | 2.49e-05 | -5.6e-17 |
+| 1.30 | [0.086103036064, 0.086170343941] | branch and bound point | 1.24e-06 | 1.44e-05 | +3.1e-16 |
+| 1.35 | [0.106914064287, 0.106982835379] | branch and bound point | 5.14e-07 | 4.80e-06 | +1.8e-16 |
+| 1.40 | [0.128772506040, 0.128842740347] | branch and bound point | 6.10e-07 | 4.74e-06 | -1.9e-16 |
+| 1.45 | [0.151545622037, 0.151689017080] | branch and bound point | 3.03e-07 | 2.00e-06 | -1.1e-16 |
+| 1.50 | [0.175126200489, 0.175272043337] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | -1.7e-16 |
+| 1.60 | [0.224367291384, 0.224519465715] | branch and bound point | 7.09e-06 | 3.16e-05 | +3.3e-16 |
+| 2.00 | [0.441033924063, 0.441384755802] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | -3.3e-16 |
+| 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
 All 376 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
@@ -401,6 +431,5 @@ checks on them keep reporting that they are not rigorous in the last one or two 
 Artifacts computed before the switch (stored R columns) keep the old float Ĝ; they differ by at most δ relative, which
 the check above covers. Every code path that computes R now reads `ghat_rigorous.ghat_R`.
 
-The "larger proven lower bound" column is the rigorous value at the branch and bound's own attained point. At nine a it
-exceeds Ĝ_cert, by up to 8.4e-05 relative. It is a valid lower bound but a different number from the one R has
-always used, so it is not adopted.
+R keeps Ĝ_cert (table (i)); the best certified lower bound in table (ii) is a valid bound on G* but a different number
+from the one R has always used (author's decision 2026-09-24).

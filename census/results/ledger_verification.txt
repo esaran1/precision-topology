@@ -1,1 +1,2 @@
-no findings
+G* best lower - Ghat_cert, max absolute: artifact=7.089258260317699e-06 ledger=1.48e-06
+digit stability under the rigorous Ĝ: G* best lower - Ghat_cert, max absolute

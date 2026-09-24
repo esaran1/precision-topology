@@ -1254,6 +1254,14 @@ def v4_checks() -> None:
     b3m_ = cs_[(cs_.experiment == "Block 3") & cs_.quantity.str.contains("ci95_hi") & cs_.quantity.str.contains("cadence-matched")]
     chk("Block 3 cadence-matched: every comparison excludes 0", float(b3m_.interp_pass.astype(bool).all() and len(b3m_) == 3), 1.0, 0)
     chk("Block 3 registered preds: C - B2 upper interp", float(cs_[cs_.quantity == "C - B2 ci95_hi [registered predictions]"].interpolated.iloc[0]), 0.0053, 0.00006)
+    print("WP-7: Ghat enclosures and G* best lower bound")
+    gr_ = pd.read_csv(R / "ghat_rigorous.csv")
+    bl_ = np.maximum(gr_.Ghat_cert_rigorous, gr_.bnb_arg_lower)
+    rel_ = (bl_ - gr_.Ghat_cert_rigorous) / gr_.Ghat_cert_rigorous
+    chk("G* best lower above Ghat_cert at nine a", float((gr_.bnb_arg_lower > gr_.Ghat_cert_rigorous).sum()), 9.0, 0)
+    chk("G* best lower - Ghat_cert, max relative", float(rel_.max()), 8.36e-5, 0.006e-5)
+    chk("G* best lower - Ghat_cert, max absolute", float((bl_ - gr_.Ghat_cert_rigorous).max()), 1.48e-6, 0.006e-6)
+    chk("... at a = 1.10", float(gr_.a[rel_.idxmax()]), 1.10, 1e-9)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

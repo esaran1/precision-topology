@@ -61,3 +61,6 @@
 - **The strict checks on the old float endpoints keep reporting as they are.**
 - **The branch and bound's own attained point** gives a larger proven lower bound at nine a (by up to 8.4e−5
   relative). It is reported in WP-7 and not adopted, because it is a different number, not a rounding correction.
+- **Confirmed (2026-09-24).** R keeps the rigorous value at Ĝ_cert's witness. The enclosure of G* = Ĝ(a), with the best
+  certified lower bound at each a, is reported separately (WP-7 (ii)). The largest difference from Ĝ_cert is 1.48e−6
+  absolute, which is 8.36e−5 **relative**, at a = 1.10.

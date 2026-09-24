@@ -152,8 +152,13 @@ differs from the difference of the two medians.)
   - λ: 1.1149 → 1.0979 and 1.1644 → 1.1298.
   - Every registered own-seed criterion passes under both definitions. At a = 1.50 the reading "C better than U_own"
     (P2b, interval above 0) holds check-based but not interpolated.
-  - Block 3 with cadence-matched C, B1 and B2: every registered comparison keeps its sign and excludes 0. With the
-    registered (50-step) predictions against interpolated observations, C − B2 includes 0.
+  - Block 3 (author's decision 2026-09-24). The sensitivity analysis is the **fully interpolated** version:
+    calibration (λ, so C; B1; B2) and observations both use interpolated crossings, one detection rule throughout.
+    In it, every registered comparison keeps its sign and excludes 0. The observations-only version (50-step
+    predictions against interpolated observations) is reported as **mixing detection rules**; in it, C − B2
+    includes 0.
+  - Own-seed at a = 1.50 (author's decision). P2b passes under both definitions; the stronger reading "C beats U_own"
+    does not survive interpolation. The draft's "C is better, as registered" is flagged for softening in WP-6.
 - **The residual statement** (the author's narrower wording, finalised on the full rerun, WP-6). Against the run's
   own threshold, the residual is about 3% at a = 1.30 and 6–6.5% at a = 1.50, both with every-step checks and with
   50-step checks when the crossing is interpolated.
