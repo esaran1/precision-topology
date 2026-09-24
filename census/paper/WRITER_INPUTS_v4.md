@@ -795,12 +795,14 @@ each a separately; that is the unit those registrations define.
 Built 2026-09-24 after S1–S3 and the c₁ test were scored.
 - **Producer**: `src/figures_v4.py` (`PYTHONPATH=. python -m src.figures_v4`).
 - **Output**: `results/figures/v4/*.pdf` (vector, tight bounding box) and `.png` previews at 300 dpi.
+- **Width**: every figure is built for ICLR's single-column \textwidth, **5.5 in** (`iclr2027_conference.sty`), and
+  is placed at its built size, with no scaling. Multi-panel figures have their panels side by side.
 - **Checks run on every build** (`audit()`, `provenance()`):
-  - every PDF is at most 3.25 in wide (single column);
+  - every PDF is at most 5.5 in wide;
   - **every glyph is ≥ 8 pt at that size**, including sub- and superscripts, read from the PDF;
   - no text lies outside the page box;
   - no legend or text touches data or another text;
-  - every source artifact is committed.
+  - every source artifact is committed (outside a git checkout: present and non-empty).
 - Builds are deterministic: two runs give byte-identical files.
 - **Style**: one table (`STYLE`) fixes the colour, marker, line style and fill of each quantity across all
   figures.
@@ -821,17 +823,18 @@ Built 2026-09-24 after S1–S3 and the c₁ test were scored.
 - **ρ for the mirror-branch relation**: quote "Spearman ρ = 0.997 (a = 1.30) and 0.995 (a = 1.50)".
   - The "≈ 0.996" in `prospective_own_prediction.md` Amendment 2 is an approximation written into a frozen
     registration. It is not a committed value.
-- **Heights at 3.25 in width**:
+- **Final sizes** (width × height, in; all under 3.5 in tall, so no panel content needed changing):
 
-  | figure | height |
-  |---|---|
-  | decomposition | 3.1 in |
-  | prospective | 4.1 in |
-  | prospective_own | 7.8 in |
-  | mirror_branches | 7.9 in |
-  | thresholds | 8.0 in |
-  | fixed_scale | 8.7 in |
-  | cond_candidates | 8.9 in |
+  | figure | size | arrangement |
+  |---|---|---|
+  | decomposition | 5.29 × 2.35 | one panel; legend and note to the right |
+  | prospective (Block 3) | 5.29 × 2.70 | one panel; legend and note to the right |
+  | mirror_branches | 5.41 × 2.77 | (a) and (b) side by side; shared legend row |
+  | cond_candidates | 5.37 × 2.99 | (a) and (b) side by side; shared legend row |
+  | fixed_scale | 5.37 × 2.99 | (a), (b) and (c) in one row; shared legend row |
+  | prospective_own | 5.38 × 3.10 | (a) and (b) side by side; shared legend row |
+  | thresholds | 5.34 × 3.12 | (a) and (b) side by side; shared legend row |
 
-  The 8 pt minimum and the legends above the axes make the multi-panel figures tall. Splitting or
-  rearranging them would change the panel structure and needs the author's approval.
+  - Every n, uncertainty statement and verdict that was in a panel title is now in a note block below the panels.
+    No panel's content changed.
+

@@ -4,9 +4,10 @@
 
 Output: results/figures/v4/*.pdf (vector) and 300-dpi .png previews at true size, then
   - a layout check per figure (layout_check: no legend or in-axes text over data, no text over text), and
-  - an audit per PDF (audit: width <= 3.25 in, every glyph actually set in the PDF >= 8 pt, every text run inside the
+  - an audit per PDF (audit: width <= 5.5 in, every glyph actually set in the PDF >= 8 pt, every text run inside the
     page box).
-Single column, 3.25 in wide.  One style table (STYLE) sets colour, marker, line style and fill for every series type;
+Built at the ICLR text width (5.5 in, single-column template) and placed at built size; panels side by side, one
+shared legend row above the panels, one note block (n, uncertainty, verdicts) below them.  One style table (STYLE) sets colour, marker, line style and fill for every series type;
 nothing is distinguished by colour alone; fitted predictors are filled, unfitted open.  Every panel states n and
 shows uncertainty: bootstrap 95% intervals (10,000 resamples, seed 0), Clopper-Pearson 95% intervals of fractions,
 certified intervals of thresholds.
@@ -47,12 +48,12 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
 OUT = RESULTS / "figures" / "v4"
 OUT.mkdir(parents=True, exist_ok=True)
-COL = 3.25                 # single column, inches; nothing here spans two columns
+TEXT_W = 5.5               # ICLR \textwidth (iclr2027_conference.sty); figures are placed at built size
 SMALLEST_PT = 8.0          # every glyph in every PDF, sub- and superscripts included
 TICK_PT = 8.0              # tick labels (never contain scripts)
 NOTE_PT = 8.5              # legends, titles, in-axes text (may contain scripts)
 LABEL_PT = 9.0             # axis labels
-LEG_RAISE = 0.7            # gap between an above-axes legend and the axes, in legend font sizes
+TITLE_PAD = 8.0            # pt between the axes top and a panel title (clears the top tick label)
 SOURCES: set[str] = set()
 LAYOUT: dict[str, list[str]] = {}
 
@@ -148,49 +149,101 @@ def read(name, **kw):
 
 
 # ------------------------------------------------------------------------------------------ layout helpers
-def head(ax, title, handles=None, labels=None, ncol=1, legend=True):
-    """Legend ABOVE the axes (never over data), and the panel title above the legend."""
-    fig = ax.figure
-    pad = 3.0
-    if legend:
-        if handles is None:
-            handles, labels = ax.get_legend_handles_labels()
-        leg = ax.legend(handles, labels, loc="lower left", bbox_to_anchor=(0.0, 1.0), ncol=ncol,
-                        borderaxespad=LEG_RAISE)        # clears the top tick label
-        fig.canvas.draw()
-        pad += leg.get_window_extent().height * 72 / fig.dpi + LEG_RAISE * NOTE_PT + 3.0
-    ax.set_title(title, loc="left", pad=pad, fontsize=NOTE_PT)
-    ax._v4_head = (title, pad)
+def title(ax, text):
+    """Short panel title, left-aligned with the panel's y-axis labels (see finish)."""
+    ax.set_title(text, loc="left", pad=TITLE_PAD, fontsize=NOTE_PT)
+    ax._v4_head = (text, TITLE_PAD)
 
 
-def finish(fig, h_pad=1.0, rounds=3):
-    """tight_layout, then start every panel title and above-axes legend at the left edge of the y-axis labels (so they
-    may use the full column width), and repeat until the layout settles."""
+def right_legend(ax, handles, labels, note=None, ncol=1):
+    """Legend to the right of the axes (never over data); an optional note block sits above its entries."""
+    ax.legend(handles, labels, loc="upper left", bbox_to_anchor=(1.03, 1.0), ncol=ncol, title=note,
+              title_fontsize=NOTE_PT, alignment="left")
+
+
+def finish(fig, w_pad=1.2, h_pad=1.0, rounds=3):
+    """tight_layout, then start every panel title at the left edge of that panel's y tick labels; repeat until the
+    layout settles."""
     for _ in range(rounds):
-        fig.tight_layout(h_pad=h_pad)
+        fig.tight_layout(w_pad=w_pad, h_pad=h_pad)
         fig.canvas.draw()
         r = fig.canvas.get_renderer()
-        left = min(ax.yaxis.get_tightbbox(r).x0 for ax in fig.axes)
         for ax in fig.axes:
-            bb = ax.get_window_extent(r)
-            xoff = (left - bb.x0) / bb.width
             if hasattr(ax, "_v4_head"):
-                title, pad = ax._v4_head
-                ax.set_title(title, loc="left", pad=pad, fontsize=NOTE_PT, x=xoff)
-            if ax.get_legend() is not None:
-                ax.get_legend().set_bbox_to_anchor((xoff, 1.0), transform=ax.transAxes)
+                bb = ax.get_window_extent(r)
+                yt = [t.get_window_extent(r).x0 for t in _in_view_ticklabels(ax) if t in ax.get_yticklabels()]
+                xoff = (min(yt + [bb.x0]) - bb.x0) / bb.width           # start at the y tick labels, clear of the y label
+                text, pad = ax._v4_head
+                ax.set_title(text, loc="left", pad=pad, fontsize=NOTE_PT, x=xoff)
 
 
-def top_legend(fig, ax, handles, labels, ncol=1):
-    """One shared legend above the top panel's title (call after tight_layout)."""
+def _outer(fig):
     fig.canvas.draw()
     r = fig.canvas.get_renderer()
-    ttl = ax.get_tightbbox(r)
-    x0 = min(a_.yaxis.get_tightbbox(r).x0 for a_ in fig.axes)
-    y = ttl.y1 + 3 * fig.dpi / 72
-    inv = fig.transFigure.inverted()
-    fx, fy = inv.transform((x0, y))
-    fig.legend(handles, labels, loc="lower left", bbox_to_anchor=(fx, fy), bbox_transform=fig.transFigure, ncol=ncol)
+    boxes = [ax.get_tightbbox(r) for ax in fig.axes]
+    x0 = min(ax.yaxis.get_tightbbox(r).x0 for ax in fig.axes)
+    return r, x0, min(b.y0 for b in boxes), max(b.y1 for b in boxes)
+
+
+def _tokens(line):
+    """Words of a line, never splitting inside $...$ mathtext."""
+    out, cur = [], None
+    for w in line.split(" "):
+        cur = w if cur is None else cur + " " + w
+        if cur.count("$") % 2 == 0:
+            out.append(cur); cur = None
+    if cur is not None:
+        out.append(cur)
+    return out
+
+
+def _wrap(fig, text, width_px, fontsize=NOTE_PT):
+    """Greedy line wrap of text (hard breaks kept) to a measured width in display pixels."""
+    r = fig.canvas.get_renderer()
+    probe = fig.text(0, 0, "", fontsize=fontsize)
+    lines = []
+    for para in text.split("\n"):
+        line = ""
+        for tok in _tokens(para):
+            cand = tok if not line else line + " " + tok
+            probe.set_text(cand)
+            if line and probe.get_window_extent(r).width > width_px:
+                lines.append(line); line = tok
+            else:
+                line = cand
+        lines.append(line)
+    probe.remove()
+    return "\n".join(lines)
+
+
+def _avail(fig, x0):
+    return fig.bbox.x1 - 2 * fig.dpi / 72 - x0
+
+
+def legend_row(fig, handles, labels, ncol):
+    """One shared legend row above all panels (call after finish); labels wrapped to the column width."""
+    r, x0, _, y1 = _outer(fig)
+    fs = NOTE_PT * fig.dpi / 72
+    rc = plt.rcParams
+    while True:
+        col_w = ((_avail(fig, x0) - 2 * rc["legend.borderpad"] * fs - (ncol - 1) * rc["legend.columnspacing"] * fs) / ncol
+                 - (rc["legend.handlelength"] + rc["legend.handletextpad"]) * fs - 1)
+        wrapped = [_wrap(fig, lab, col_w) for lab in labels]
+        fx, fy = fig.transFigure.inverted().transform((x0, y1 + 4 * fig.dpi / 72))
+        leg = fig.legend(handles, wrapped, loc="lower left", bbox_to_anchor=(fx, fy), bbox_transform=fig.transFigure,
+                         ncol=ncol)
+        fig.canvas.draw()
+        if leg.get_window_extent(r).x1 <= fig.bbox.x1 or ncol == 1:
+            return leg
+        leg.remove()
+        ncol -= 1
+
+
+def note_row(fig, text):
+    """Figure-level note (n, uncertainty, verdicts) below all panels, wrapped to the text width (call after finish)."""
+    r, x0, y0, _ = _outer(fig)
+    fx, fy = fig.transFigure.inverted().transform((x0, y0 - 3 * fig.dpi / 72))
+    fig.text(fx, fy, _wrap(fig, text, _avail(fig, x0)), ha="left", va="top", fontsize=NOTE_PT)
 
 
 def _in_view_ticklabels(ax):
@@ -285,7 +338,7 @@ def layout_check(fig):
     fb = fig.bbox
     for name, bb, _ in items:
         if bb.x0 < fb.x0 - 0.5 or bb.x1 > fb.x1 + 0.5:
-            probs.append(f"{name} beyond the {COL} in column ({(bb.x1 - fb.x1) / fig.dpi:+.2f} in)")
+            probs.append(f"{name} beyond the {TEXT_W} in text width ({(bb.x1 - fb.x1) / fig.dpi:+.2f} in)")
     geo = {id(ax): _data_geometry(ax) for ax in fig.axes}
     for name, bb, ax in items:
         targets = [ax] if isinstance(ax, matplotlib.axes.Axes) else (fig.axes if ax == "legend" else [])
@@ -362,16 +415,17 @@ def fig_decomposition():
     assert both.disagreements == 0
     g = d.groupby("a")
     eps = np.array(sorted(d.a.unique())) - 1
-    fig, ax = plt.subplots(figsize=(COL, 3.3))
+    fig, ax = plt.subplots(figsize=(TEXT_W, 2.55))
     ns = g.size().values
+    hs, ls = [], []
     for cls, dx, lab in (("placement", 0.97, r"placement failure ($G\leq0$)"),
-                         ("bias", 1.0, r"bias failure ($G>0$, $b_2$ outside its interval)"),
+                         ("bias", 1.0, "bias failure ($G>0$,\n$b_2$ outside its interval)"),
                          ("solved", 1.03, "solved")):
         k = g.failure.apply(lambda f: int((f == cls).sum())).values
         fr = k / ns
         ci = np.array([clopper(int(kk), int(nn)) for kk, nn in zip(k, ns)])
-        ax.errorbar(eps * dx, fr, yerr=[fr - ci[:, 0], ci[:, 1] - fr], capsize=1.5, elinewidth=0.6,
-                    label=f"{lab}: {int(k.sum()):,} runs", **sty(cls, ms=3.5))
+        ax.errorbar(eps * dx, fr, yerr=[fr - ci[:, 0], ci[:, 1] - fr], capsize=1.5, elinewidth=0.6, **sty(cls, ms=3.5))
+        hs.append(handle(cls, ms=3.5)); ls.append(f"{lab}: {int(k.sum()):,} runs")
     ax.set_xscale("log")
     ax.set_xticks([0.02, 0.05, 0.1, 0.2, 0.5, 1, 2])
     ax.set_xticklabels(["0.02", "0.05", "0.1", "0.2", "0.5", "1", "2"])
@@ -381,8 +435,9 @@ def fig_decomposition():
     ax.set_ylim(-0.03, 1.03)
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
     n_each = int(ns.min()) if ns.min() == ns.max() else f"{ns.min()}–{ns.max()}"
-    head(ax, f"Phase 1: $n={n_each}$ runs per $a$ (200 seeds $\\times$ 2 precisions);\n"
-             f"{len(d):,} runs, 0 disagreements with the solve check;\nbars: Clopper–Pearson 95%")
+    title(ax, "Phase 1: every failure is a placement or a bias failure")
+    right_legend(ax, hs, ls, note=f"$n={n_each}$ runs per $a$ (200 seeds $\\times$ 2 precisions);\n"
+                                  f"{len(d):,} runs, 0 disagreements with the\nsolve check; bars: Clopper–Pearson 95%")
     finish(fig)
     save(fig, "v4_decomposition")
     return {"n_per_a": n_each, "n_total": len(d), "solved": int(tot["solved"]), "placement": int(tot["placement"]),
@@ -399,7 +454,7 @@ def fig_prospective():
     runs["R"] = [w2 * gh[(w, round(a, 2))] / 2 for w, a, w2 in zip(runs.window, runs.a, runs.cross_w2)]
     sc = read("prospective_scores.csv")
     cal = read("prospective_calibration.csv").set_index("a")
-    fig, ax = plt.subplots(figsize=(COL, 4.3))
+    fig, ax = plt.subplots(figsize=(TEXT_W, 2.9))
     models = [("C", r"C $=\lambda(a)\,R_{\mathrm{glob}}$ ($\lambda$ fitted)"),
               ("U", r"U $=R_{\mathrm{glob}}$ (nothing fitted)"),
               ("B1", r"B1: base window's crossing $|w_2|$"),
@@ -421,9 +476,10 @@ def fig_prospective():
     hs = [handle(m, ms=4.5) for m, _ in models] + [Line2D([], [], color=STYLE["C"]["color"], lw=0.6),
                                                    Line2D([], [], lw=0.7, **sty("identity"))]
     ls = [lab for _, lab in models] + [r"U$\to$C: fitted lag factor $\lambda$", "identity"]
-    head(ax, f"Block 3: 8 held-out settings, $n={min(ns)}$–${max(ns)}$ crossings of 90 each;\n"
-             f"$\\lambda$ fitted on the base window: $\\lambda(1.30)={cal.loc[1.3, 'lambda_fitted']:.3f}$, "
-             f"$\\lambda(1.50)={cal.loc[1.5, 'lambda_fitted']:.3f}$", hs, ls)
+    title(ax, "Block 3: held-out windows, per setting")
+    right_legend(ax, hs, ls, note=f"8 held-out settings, $n={min(ns)}$–${max(ns)}$\ncrossings of 90 each; "
+                                  f"$\\lambda$ fitted on the\nbase window: $\\lambda(1.30)={cal.loc[1.3, 'lambda_fitted']:.3f}$,\n"
+                                  f"$\\lambda(1.50)={cal.loc[1.5, 'lambda_fitted']:.3f}$")
     finish(fig)
     save(fig, "v4_prospective")
     return {"n_min": min(ns), "n_max": max(ns)}
@@ -442,40 +498,37 @@ def fig_prospective_own():
     x = d[d.R_cross.notna()].copy()
     x["own_lo"], x["own_hi"] = x.w2_own_lo * x.Ghat_lo / 2, x.w2_own_hi * x.Ghat_lo / 2
     prim = sc[sc.analysis == "primary (crossers)"]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(COL, 8.0), gridspec_kw={"height_ratios": [1.25, 1]})
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(TEXT_W, 1.75), gridspec_kw={"width_ratios": [1.2, 1]})
     info = {}
     lim = [0.15, 0.36]
     hs, ls = [], []
+    ncross, rho_res_all = {}, []
     for a in (1.3, 1.5):
         k = f"a{a:.2f}"
         g = x[x.a.round(2) == a]
         a1.errorbar(g.U_own, g.R_cross, xerr=[g.U_own - g.own_lo, g.own_hi - g.U_own], elinewidth=0.4, alpha=0.8,
                     zorder=2, ecolor=STYLE[k]["color"], **sty(k, filled=False, ms=2.4, mew=0.45))
-        hs.append(handle(k, filled=False, ms=3.5)); ls.append(f"U$_{{\\mathrm{{own}}}}$, $a={a:.2f}$: $n={len(g)}$ "
-                                                              f"crossers of {len(d[d.a.round(2) == a])}")
+        hs.append(handle(k, filled=False, ms=3.5)); ls.append(f"U$_{{\\mathrm{{own}}}}$ per run, $a={a:.2f}$")
         rho_res = float(np.median(g.C_own / g.U_own))
         assert np.allclose(g.C_own / g.U_own, rho_res, rtol=1e-12)
-        a1.plot(lim, [rho_res * v for v in lim], color=STYLE[k]["color"], lw=0.9, ls=(0, (5, 1.5)), zorder=3)
-        hs.append(Line2D([], [], color=STYLE[k]["color"], lw=0.9, ls=(0, (5, 1.5))))
-        ls.append(f"C$_{{\\mathrm{{own}}}}={rho_res:.4f}\\,R_{{\\mathrm{{own}}}}$ (fitted), $a={a:.2f}$")
+        dash = (0, (5, 1.5)) if a == 1.3 else (0, (2, 1))       # line style differs by a, not colour alone
+        a1.plot(lim, [rho_res * v for v in lim], color=STYLE[k]["color"], lw=0.9, ls=dash, zorder=3)
+        hs.append(Line2D([], [], color=STYLE[k]["color"], lw=0.9, ls=dash))
+        ls.append(f"C$_{{\\mathrm{{own}}}}$, $a={a:.2f}$ (fitted)")
+        rho_res_all.append(f"{rho_res:.4f} ($a={a:.2f}$)")
         info[f"n_{a}"] = len(g)
+        ncross[a] = (len(g), len(d[d.a.round(2) == a]))
     a1.plot(lim, lim, lw=0.7, zorder=1, **sty("identity"))
-    hs.append(Line2D([], [], lw=0.7, **sty("identity"))); ls.append("identity")
     s13, s15 = ss[ss.a.round(2) == 1.3].spearman_R_cross_vs_R_own, ss[ss.a.round(2) == 1.5].spearman_R_cross_vs_R_own
     wmax = float((x.own_hi - x.own_lo).max())
     a1.set_xlim(*lim); a1.set_ylim(*lim)
     a1.set_xlabel(r"own threshold $R_{\mathrm{own}}$ (frozen before training)")
-    a1.set_ylabel(r"observed crossing $R$ of that run")
-    head(a1, "(a) own-seed test per run: 16 never-trained settings, 60 runs\neach; "
-             f"$x$ bars: frozen bracket of $R_{{\\mathrm{{own}}}}$ ($\\leq${wmax:.1e});\n"
-             f"per-setting Spearman $\\rho$: {s13.min():.2f}–{s13.max():.2f} at $a=1.30$,\n"
-             f"{s15.min():.2f}–{s15.max():.2f} at $a=1.50$", hs, ls)
+    a1.set_ylabel(r"observed crossing $R$ of the run")
+    title(a1, "(a) own-seed test, per run")
     # (b) mean per-run |log error| per model, window-level bootstrap as registered
-    models = [("U", "U: population $R_{\\mathrm{glob}}$ (nothing fitted)"),
-              ("C", "C: $\\lambda(a)R_{\\mathrm{glob}}$ ($\\lambda$ fitted, Block 3)"),
-              ("U_own", "U$_{\\mathrm{own}}$: own threshold (nothing fitted)"),
-              ("C_own", "C$_{\\mathrm{own}}$: $\\rho_{\\mathrm{res}}(a)R_{\\mathrm{own}}$ (fitted)")]
-    ticks = []
+    models = [("U", "U (nothing fitted)"), ("C", "C (fitted)"), ("U_own", "U$_{\\mathrm{own}}$ (nothing fitted)"),
+              ("C_own", "C$_{\\mathrm{own}}$ (fitted)")]
+    verdicts = []
     for i, a in enumerate((1.3, 1.5)):
         g = x[x.a.round(2) == a]
         lev = {}
@@ -490,15 +543,26 @@ def fig_prospective_own():
         p3 = prim[(prim.a.round(2) == a) & (prim.comparison == "P3")].stat.iloc[0]
         assert abs((lev["U_own"] - lev["U"]) - p1) < 1e-12 and abs((lev["C_own"] - lev["C"]) - p3) < 1e-12
         v = prim[prim.a.round(2) == a]
-        verdict = " ".join(f"{r.comparison}" for _, r in v.iterrows()) + (": PASS" if v["pass"].all() else ": see scores")
-        ticks.append(f"$a={a:.2f}$ ($n={len(g)}$ runs)\n{verdict}")
-    a2.set_xticks([0, 1]); a2.set_xticklabels(ticks)
+        verdicts.append(", ".join(f"{r.comparison}" for _, r in v.iterrows()) + f" at $a={a:.2f}$"
+                        + (": all PASS" if v["pass"].all() else ": see scores"))
+    a2.set_xticks([0, 1]); a2.set_xticklabels(["$a=1.30$", "$a=1.50$"])
     a2.set_xlim(-0.5, 1.5); a2.set_ylim(0, 0.2)
     a2.set_ylabel(r"mean per-run $|\log(R_{\mathrm{cross}}/\mathrm{pred})|$")
-    head(a2, "(b) per-run error by model (crossers), 8 windows per $a$;\n"
-             "window-level bootstrap 95% (10,000 resamples, seed 0);\nfilled: fitted, open: nothing fitted",
-         [handle(m, ms=5) for m, _ in models], [lab for _, lab in models])
-    finish(fig)
+    title(a2, "(b) per-run error by model (crossers)")
+    finish(fig, w_pad=1.5)
+    legend_row(fig, hs + [Line2D([], [], lw=0.7, **sty("identity"))] + [handle(m, ms=5) for m, _ in models],
+               ls + ["identity"] + [lab for _, lab in models], ncol=3)
+    crossed = (f"$n={ncross[1.3][0]}$ of {ncross[1.3][1]} crossed at each $a$" if ncross[1.3] == ncross[1.5] else
+               f"$n={ncross[1.3][0]}$ of {ncross[1.3][1]} ($a=1.30$) and {ncross[1.5][0]} of {ncross[1.5][1]} "
+               f"($a=1.50$) crossed")
+    note_row(fig, f"(a) 16 never-trained settings (8 windows $\\times$ 2 $a$), 60 runs each; {crossed}; $x$ bars: frozen bracket of $R_{{\\mathrm{{own}}}}$ ($\\leq${wmax:.1e}); "
+                  f"per-setting Spearman $\\rho$: {s13.min():.2f}–{s13.max():.2f} ($a=1.30$), "
+                  f"{s15.min():.2f}–{s15.max():.2f} ($a=1.50$).\n"
+                  f"U $=R_{{\\mathrm{{glob}}}}$ (population); C $=\\lambda(a)R_{{\\mathrm{{glob}}}}$, $\\lambda$ fitted on the "
+                  f"base window (Block 3); U$_{{\\mathrm{{own}}}}=R_{{\\mathrm{{own}}}}$ (own threshold); "
+                  f"C$_{{\\mathrm{{own}}}}=\\rho_{{\\mathrm{{res}}}}(a)R_{{\\mathrm{{own}}}}$, fitted $\\rho_{{\\mathrm{{res}}}}$ = "
+                  f"{', '.join(rho_res_all)}.\n(b) 8 windows per $a$; window-level bootstrap 95% (10,000 resamples, seed 0); filled: fitted, "
+                  f"open: nothing fitted. Registered: {verdicts[0]}; {verdicts[1]}.")
     save(fig, "v4_prospective_own")
     return info
 
@@ -518,14 +582,14 @@ def fig_fixed_scale(horizons=True):
     e2 = read("wi_e2_rescore.csv").set_index("arm").loc["hold_high"]
     kept, n_e = int(e2.kept), int(e2.intervened)
     if horizons:
-        fig = plt.figure(figsize=(COL, 8.6))
-        gs = fig.add_gridspec(3, 1, height_ratios=[1, 1, 0.9])
-        a1 = fig.add_subplot(gs[0]); a2 = fig.add_subplot(gs[1], sharex=a1); a3 = fig.add_subplot(gs[2])
+        fig = plt.figure(figsize=(TEXT_W, 1.72))
+        gs = fig.add_gridspec(1, 3, width_ratios=[1, 1, 0.85])
+        a1 = fig.add_subplot(gs[0]); a2 = fig.add_subplot(gs[1], sharex=a1, sharey=a1); a3 = fig.add_subplot(gs[2])
     else:
-        fig, (a1, a2) = plt.subplots(2, 1, figsize=(COL, 6.0), sharex=True)
-    plt.setp(a1.get_xticklabels(), visible=False)
-    for ax, blk, band, ylab in ((a1, 4, (0.9, 1.25), "placed at 4,000 steps"),
-                                (a2, 5, (0.9, 1.1), "retained through 12,000 steps")):
+        fig, (a1, a2) = plt.subplots(1, 2, figsize=(TEXT_W, 1.95), sharex=True, sharey=True)
+    notes = []
+    for ax, blk, band, ylab in ((a1, 4, (0.9, 1.25), "placed at 4k steps"),
+                                (a2, 5, (0.9, 1.1), "retained to 12k steps")):
         cv = read(f"fixed_scale_block{blk}_curve.csv")
         ts = read(f"fixed_scale_block{blk}_tests.csv").set_index("variant")
         ax.axvspan(*band, color=STYLE["band"]["color"], zorder=0, lw=0)
@@ -535,24 +599,24 @@ def fig_fixed_scale(horizons=True):
             ax.errorbar(g.level + dx, g.frac, yerr=[g.frac - g.ci95_lo, g.ci95_hi - g.frac], capsize=1.5,
                         elinewidth=0.6, **sty(var, ms=3.5))
         n = int(cv.n.max())
-        ax.set_ylabel(ylab)
+        ax.set_ylabel(ylab, labelpad=2)
+        ax.tick_params(axis="y", labelleft=True)
         ax.set_ylim(-0.04, 1.06)
-        ttl = (f"({'a' if blk == 4 else 'b'}) Block {blk}, " + ("before placement" if blk == 4 else "just after placement")
-               + f": $n={n}$ {'checkpoints' if blk == 4 else 'runs'} per level;\n"
-               f"x$_{{50}}$ = {ts.loc['preserved', 'x50']:.3f} (preserved), {ts.loc['reset', 'x50']:.3f} (reset); "
-               f"Clopper–Pearson 95%;\nshaded: registered 50% band {band[0]}–{band[1]}")
-        if blk == 4:
-            head(ax, ttl, legend=False)
-        else:
+        ax.set_xticks([0.6, 1.0, 1.5, 2.0])
+        ax.set_xlabel(r"held $R/R_{\mathrm{glob}}$")
+        title(ax, f"({'a' if blk == 4 else 'b'}) Block {blk}: " + ("before placement" if blk == 4 else "after placement"))
+        notes.append(f"({'a' if blk == 4 else 'b'}) $n={n}$ {'checkpoints' if blk == 4 else 'runs'} per level, "
+                     f"x$_{{50}}$ = {ts.loc['preserved', 'x50']:.3f} (preserved), {ts.loc['reset', 'x50']:.3f} (reset), "
+                     f"shaded: registered 50% band {band[0]}–{band[1]}")
+        if blk == 5:
             lo, hi = clopper(kept, n_e)
             # E-2: Block E's registered criterion, retention >= 0.9 at 1.15 x R_glob (frozen), and its observed kept/n
             ax.plot([e2_x - 0.05, e2_x + 0.05], [0.9, 0.9], color=STYLE["criterion"]["color"], lw=1.6, zorder=4)
             ax.errorbar([e2_x], [kept / n_e], yerr=[[kept / n_e - lo], [hi - kept / n_e]], capsize=1.5,
                         elinewidth=0.6, zorder=5, **sty("blockE", ms=6))
-            head(ax, ttl, [Line2D([], [], color="k", lw=1.6), handle("blockE", ms=6)],
-                 [f"E-2 criterion: kept $\\geq$ 0.9 at 1.15$\\times$ Block E's {RG}\n(= {e2_x:.3f} in certified units)",
-                  f"Block E observed: {kept}/{n_e} kept (E-2 FAIL)"])
-    a2.set_xlabel(r"held $R/R_{\mathrm{glob}}$ ($a=1.30$, certified $R_{\mathrm{glob}}$)")
+    hs = [handle("preserved", ms=3.5), handle("reset", ms=3.5), Line2D([], [], color="k", lw=1.6),
+          handle("blockE", ms=6)]
+    ls = ["moments preserved (4k in c)", "moments reset", "E-2 criterion", f"Block E: {kept}/{n_e} kept, FAIL"]
     out = {"e2_x": e2_x}
     if horizons:
         hz = read("fixed_scale_horizons.csv", float_precision="round_trip")
@@ -561,7 +625,7 @@ def fig_fixed_scale(horizons=True):
         hz = hz[hz.variant == "preserved"]
         a3.axvline(1.0, color="0.5", lw=0.6, ls=":")
         ns = set()
-        hs, ls = [], []
+        x50s = []
         for H, key, dx in ((4000, "preserved", -0.008), (16000, "h16000", 0.0), (64000, "h64000", 0.008)):
             g = hz.groupby("level")[f"placed_{H}"]
             k, n = g.sum().astype(int), g.size()
@@ -573,19 +637,24 @@ def fig_fixed_scale(horizons=True):
             x50 = hc.loc[("preserved", H), "x50"]
             a3.errorbar(fr.index + dx, fr.values, yerr=[fr.values - ci[:, 0], ci[:, 1] - fr.values], lw=0.7,
                         capsize=1.5, elinewidth=0.6, **sty(key, ms=3.5))
-            hs.append(handle(key, ms=3.5, lw=0.7)); ls.append(f"{H:,} steps (x$_{{50}}$ = {x50:.4f})")
+            if H != 4000:
+                hs.append(handle(key, ms=3.5, lw=0.7)); ls.append(f"{H:,} steps")
+            x50s.append(f"{x50:.4f} ({H // 1000}k)")
         q1, q2 = ht.loc["preserved", "Q1_pass"], ht.loc["preserved", "Q2_pass"]
         a3.set_xlim(0.87, 1.13); a3.set_ylim(-0.04, 0.8)
-        a3.set_xticks([0.9, 0.95, 1.0, 1.05, 1.1])
-        a3.set_xlabel(r"held $R/R_{\mathrm{glob}}$ ($a=1.30$, certified $R_{\mathrm{glob}}$)")
-        a3.set_ylabel("placed (preserved moments)")
-        head(a3, f"(c) Block 4 horizon extension: $n={min(ns)}$ replays per level;\n"
-                 f"Clopper–Pearson 95%; registered Q1 {'PASS' if q1 else 'FAIL'}, Q2 {'PASS' if q2 else 'FAIL'}",
-             hs, ls)
+        a3.set_xticks([0.9, 1.0, 1.1])
+        a3.set_xlabel(r"held $R/R_{\mathrm{glob}}$")
+        a3.set_ylabel("placed (preserved)", labelpad=2)
+        title(a3, "(c) horizon extension")
+        notes.append(f"(c) Block 4 horizon extension, $n={min(ns)}$ replays per level, x$_{{50}}$ = "
+                     + ", ".join(x50s) + f"; registered Q1 {'PASS' if q1 else 'FAIL'}, Q2 {'PASS' if q2 else 'FAIL'}")
         out["horizon_n"] = min(ns)
-    finish(fig)
-    top_legend(fig, a1, [handle("preserved", ms=3.5), handle("reset", ms=3.5)],
-               ["Adam moments preserved", "Adam moments reset"], ncol=2)
+    finish(fig, w_pad=1.0)
+    legend_row(fig, hs, ls, ncol=3)
+    note_row(fig, ";\n".join(notes) + ".\n"
+                  f"E-2 criterion (Block E, registered): kept $\\geq$ 0.9 at 1.15$\\times$ Block E's {RG} = {e2_x:.3f} "
+                  f"certified units; Block E observed {kept}/{n_e} kept (E-2 FAIL). Adam moments preserved or reset; "
+                  f"(c) preserved only. $a=1.30$, certified {RG}; bars: Clopper–Pearson 95%.")
     save(fig, "v4_fixed_scale")
     return out
 
@@ -603,7 +672,7 @@ def fig_thresholds():
     assert bool(c1.switch_krawczyk_ok) and kb.R_glob_inf_lo <= c1.R_glob_inf_lo <= c1.R_glob_inf_hi <= kb.R_glob_inf_hi
     runs = read("wi_crossing_runs.csv")
     runs = runs[runs.budget == 32_000]
-    fig, (ax, bx) = plt.subplots(2, 1, figsize=(COL, 8.2), gridspec_kw={"height_ratios": [1.3, 1]})
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(TEXT_W, 1.8), gridspec_kw={"width_ratios": [1.45, 1]})
     eps = sorted(br.a.round(2).unique() - 1)
     w = 0.018
     ns = []
@@ -628,25 +697,17 @@ def fig_thresholds():
     ax.plot([-w / 2, w / 2], [c1.R_glob_inf_lo] * 2, color=STYLE["R_glob"]["color"], lw=1.2)
     ax.add_patch(plt.Rectangle((-w / 2, sl.R_solve_inf_lo), w, sl.R_solve_inf_hi - sl.R_solve_inf_lo,
                                color=STYLE["R_solve"]["color"], lw=0))
-    # limit markers in the series' own styles (no leader lines: they read as data)
-    ax.plot([0], [c1.R_glob_inf_lo], marker=STYLE["R_glob"]["marker"], color=STYLE["R_glob"]["color"], ms=3, ls="none")
-    ax.plot([0], [0.5 * (sl.R_solve_inf_lo + sl.R_solve_inf_hi)], marker=STYLE["R_solve"]["marker"],
-            color=STYLE["R_solve"]["color"], ms=3, ls="none")
-    ax.text(0.02, 0.255, r"limit $\varepsilon\to0$" + "\n(certified, global)", va="center")
+    ax.text(0.03, 0.262, r"limit $\varepsilon\to0$" + "\n(certified, global)", va="center")
+    for yv in (kb.R_glob_inf_hi, sl.R_solve_inf_lo):
+        ax.annotate("", (w / 2 + 0.002, yv), xytext=(0.028, 0.262), textcoords="data",
+                    arrowprops=dict(arrowstyle="-", lw=0.4, color="0.4", shrinkA=0, shrinkB=0))
     ax.add_patch(plt.Rectangle((-0.006, 0.1955), 0.054, 0.0075, fill=False, lw=0.5, ls=":", ec="k"))
     ax.text(0.052, 0.1972, "zoom: (b)", va="center")
     nlab = f"{min(ns)}" if min(ns) == max(ns) else f"{min(ns)}$–${max(ns)}"
     ax.set_xlim(-0.04, 0.64)
     ax.set_xlabel(r"$\varepsilon=a-1$")
     ax.set_ylabel(RDEF)
-    head(ax, f"(a) certified thresholds and crossings; $n={nlab}$ runs per $a$;\n"
-             "boxes: certified intervals (to scale); bars: bootstrap 95%",
-         [Line2D([], [], color=STYLE["R_glob"]["color"], marker="o", ls="-", ms=3, lw=0.6),
-          Line2D([], [], color=STYLE["R_solve"]["color"], marker="s", ls="--", ms=3, lw=0.6),
-          Patch(color=STYLE["R_glob_bnb"]["color"], lw=0),
-          Patch(facecolor=STYLE["crossing"]["color"], edgecolor="0.5", lw=0.4)],
-         [f"{RG} (certified)", f"{RS} (certified)", r"limit $R^{\infty}_{\mathrm{glob}}$: unconditional B&B bracket",
-          "free-training crossing $R$ (budget 32k)\nviolin; median with bootstrap 95%"])
+    title(ax, "(a) certified thresholds and free-training crossings")
     # (b) small ε: the registered c1 test's brackets and the first-order line (certified range |ε| <= 0.05)
     wb = 0.0028
     bx.add_patch(plt.Rectangle((-wb / 2, kb.R_glob_inf_lo), wb, kb.R_glob_inf_hi - kb.R_glob_inf_lo,
@@ -664,18 +725,28 @@ def fig_thresholds():
     f = fs.loc["c1 (primary): R_glob"]
     bx.set_xlim(-0.004, 0.048)
     bx.set_ylim(0.1970, 0.2016)
-    bx.set_xlabel(r"$\varepsilon=a-1$ (first-order range certified for $|\varepsilon|\leq0.05$)")
+    bx.set_xticks([0, 0.02, 0.04])
+    bx.set_xlabel(r"$\varepsilon=a-1$")
     bx.set_ylabel(RG)
-    head(bx, f"(b) small $\\varepsilon$; $n$ = 4 certified brackets and the limit (no runs);\n"
-             f"registered $c_1$ test: {f.verdict.split(' ')[0]}: feasible $c_1\\in$\n"
-             f"[{f.feasible_lo:.3f}, {f.feasible_hi:.3f}], width {f.feasible_width:.3f} > 0.1",
-         [Patch(color=STYLE["R_glob_bnb"]["color"], lw=0), Line2D([], [], color=STYLE["R_glob"]["color"], lw=1.6),
-          Patch(color=STYLE["R_glob"]["color"], lw=0), Line2D([], [], lw=0.8, **sty("first_order"))],
-         [r"$R^{\infty}_{\mathrm{glob}}$: unconditional B&B bracket",
-          f"$R^{{\\infty}}_{{\\mathrm{{glob}}}}$ sharp: [{c1.R_glob_inf_lo:.7f}, {c1.R_glob_inf_hi:.7f}]",
-          f"certified {RG}, $a=1.01$–$1.04$",
-          f"first order $R^{{\\infty}}(1+c_1\\varepsilon)$, $c_1={c1m:.4f}$ (certified)"])
-    finish(fig)
+    title(bx, r"(b) small $\varepsilon$ and the registered $c_1$ test")
+    finish(fig, w_pad=1.2)
+    legend_row(fig,
+               [Patch(color=STYLE["R_glob"]["color"], lw=0),
+                Line2D([], [], color=STYLE["R_glob"]["color"], marker="o", ls="-", ms=3, lw=0.6),
+                Line2D([], [], color=STYLE["R_solve"]["color"], marker="s", ls="--", ms=3, lw=0.6),
+                Patch(color=STYLE["R_glob_bnb"]["color"], lw=0), Line2D([], [], color=STYLE["R_glob"]["color"], lw=1.6),
+                Line2D([], [], lw=0.8, **sty("first_order")),
+                Patch(facecolor=STYLE["crossing"]["color"], edgecolor="0.5", lw=0.4)],
+               [f"certified {RG} (boxes)", f"{RG}, $a=1.30$–$1.60$", f"{RS} (certified)",
+                r"$R^{\infty}_{\mathrm{glob}}$ B&B bracket", r"$R^{\infty}_{\mathrm{glob}}$ sharp",
+                f"first order, $c_1={c1m:.4f}$", "crossing $R$ (budget 32k)"], ncol=3)
+    note_row(fig, f"(a) free-training crossings, $n={nlab}$ runs per $a$ (violins; medians with bootstrap 95%); boxes: "
+                  f"certified intervals to scale; limit $R^{{\\infty}}_{{\\mathrm{{solve}}}}$ global.\n(b) $n$ = 4 "
+                  f"certified brackets ($a=1.01$–$1.04$) and the limit (no runs); unconditional B&B bracket of "
+                  f"$R^{{\\infty}}_{{\\mathrm{{glob}}}}$ and sharp value [{c1.R_glob_inf_lo:.7f}, {c1.R_glob_inf_hi:.7f}]; "
+                  f"first order $R^{{\\infty}}(1+c_1\\varepsilon)$, $c_1$ certified; first-order range certified for "
+                  f"$|\\varepsilon|\\leq0.05$; registered $c_1$ test: {f.verdict.split(' ')[0]}: feasible "
+                  f"$c_1\\in$ [{f.feasible_lo:.3f}, {f.feasible_hi:.3f}], width {f.feasible_width:.3f} > 0.1.")
     save(fig, "v4_thresholds")
     return {"n_min": min(ns), "n_max": max(ns)}
 
@@ -693,11 +764,11 @@ def fig_cond_candidates(a=1.30):
     br = br[br.a.round(2) == round(a, 2)].set_index("kind")
     ret = g[g.status == "RETAINED"].drop_duplicates("s").sort_values("s")
     assert g.frozen_reproduced.all()
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(COL, 7.6), sharex=True)
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(TEXT_W, 1.85), sharex=True)
     hs, ls = [], []
     for sts, key, ms, lab in ((("degenerate",), "cand_degenerate", 2.6, "degenerate (discarded)"),
                               (("not carried (screen rank > 8)", "carried"), "cand_screen", 2.4, "screening runs"),
-                              (("not lowest",), "cand_full", 2.8, "full runs, not lowest (on the branch)")):
+                              (("not lowest",), "cand_full", 2.8, "full runs, not lowest")):
         h = g[g.status.isin(sts)]
         a1.plot(h.s, h.loss, zorder=1, mew=0.5, **sty(key, ms=ms))
         hs.append(handle(key, ms=4, mew=0.6)); ls.append(f"{lab}: {len(h):,}")
@@ -712,15 +783,16 @@ def fig_cond_candidates(a=1.30):
            Line2D([], [], color=STYLE["R_glob"]["color"], lw=0.9, ls=STYLE["R_glob"]["ls"]),
            Line2D([], [], color=STYLE["R_solve"]["color"], lw=0.9, ls=STYLE["R_solve"]["ls"])]
     ls += [f"retained branch ({len(ret)} scales)", "constant predictor ($\\log 2$)",
-           f"certified global minimum ({len(scan)} scales)", f"stricter optimisation, 1e ({len(st)})",
-           f"certified {RG} bracket: $|w_2|\\in$ ({br.loc['glob', 'w2_lo']:.4f}, {br.loc['glob', 'w2_hi']:.4f}]",
-           f"certified {RS} bracket: $|w_2|\\in$ ({br.loc['solve', 'w2_lo']:.4f}, {br.loc['solve', 'w2_hi']:.4f}]"]
+           f"certified global min. ({len(scan)})", f"stricter optimisation, 1e ({len(st)})",
+           f"certified {RG} bracket", f"certified {RS} bracket"]
     a1.set_yscale("log")
     a1.set_ylim(0.17, 25)
     a1.set_yticks([0.2, 0.5, 1, 2, 5, 10, 20])
     a1.set_yticklabels(["0.2", "0.5", "1", "2", "5", "10", "20"])
     a1.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-    a1.set_ylabel("conditional loss (log scale)")
+    a1.set_ylabel("conditional loss")
+    a1.set_xlabel(f"output scale $|w_2|$ ($a={a:.2f}$)")
+    a1.tick_params(axis="x", labelbottom=True)
     nk = g.groupby(["kind", "s"]).ngroups
     # (b) gap of the retained minimiser: one sign change, one continuous branch
     a2.axhline(0, color="0.5", lw=0.6)
@@ -736,16 +808,19 @@ def fig_cond_candidates(a=1.30):
         cm = float(scan.competitor_margin.min())
     sep = float(max(br.loc["glob", "argmin_separation_lo"], br.loc["glob", "argmin_separation_hi"]))
     a2.set_xlabel(f"output scale $|w_2|$ ($a={a:.2f}$)")
-    a2.set_ylabel(r"gap $G$ of the minimiser")
+    a2.set_ylabel(r"minimiser gap $G$")
     a2.set_ylim(-0.5, 0.12)
-    head(a1, f"(a) every candidate of the frozen search, $a={a:.2f}$: $n=${len(g):,}\n"
-             f"candidates at {nk} evaluations; frozen result reproduced {nk}/{nk};\n"
-             f"none below the retained branch; certified widths $\\leq${wmax:.0e}", legend=False)
-    head(a2, f"(b) the branch crosses $G=0$ continuously: $G$ changes sign once;\n"
-             f"minimisers either side of the switch $\\leq${sep:.1e} apart (certified);\n"
-             f"other basins $\\geq$ +{cm:.4f} above (certified, radius 0.1)", legend=False)
-    finish(fig)
-    top_legend(fig, a1, hs, ls)
+    title(a1, f"(a) every candidate of the frozen search")
+    title(a2, "(b) the branch crosses $G=0$ continuously")
+    finish(fig, w_pad=1.2)
+    legend_row(fig, hs, ls, ncol=3)
+    note_row(fig, f"(a) $a={a:.2f}$: $n=${len(g):,} candidates at {nk} evaluations; frozen result reproduced "
+                  f"{nk}/{nk}; none below the retained branch (full runs not lowest lie on it); certified widths "
+                  f"$\\leq${wmax:.0e}.\n(b) certified brackets: {RG} at $|w_2|\\in$ ({br.loc['glob', 'w2_lo']:.4f}, "
+                  f"{br.loc['glob', 'w2_hi']:.4f}], {RS} at ({br.loc['solve', 'w2_lo']:.4f}, "
+                  f"{br.loc['solve', 'w2_hi']:.4f}]; "
+                  f"$G$ changes sign once; minimisers either side of the switch $\\leq${sep:.1e} apart (certified); "
+                  f"other basins $\\geq$ +{cm:.4f} above (certified, radius 0.1).")
     save(fig, "v4_cond_candidates")
     return {"a": a, "n_candidates": len(g), "evaluations": nk, "scan": 0 if scan is None else len(scan), "strict": len(st)}
 
@@ -758,9 +833,10 @@ def fig_mirror_branches():
     T = read("mirror_branch_thresholds.csv", float_precision="round_trip")
     s3 = read("mirror_s3.csv").set_index(["a", "threshold"])
     T = T[T.group == "cross"]
-    fig, axes = plt.subplots(2, 1, figsize=(COL, 7.4))
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT_W, 1.95))
     out = {}
     counts = {}
+    notes = []
     for ax, a, tag in zip(axes, (1.3, 1.5), "ab"):
         G = _ghat(a)
         o = occ[occ.group == f"phase 2b crossing a={a:.2f}"].merge(T[T.a.round(2) == a][["seed", "T_plus", "T_minus"]],
@@ -783,21 +859,21 @@ def fig_mirror_branches():
             ax.plot(h.R_occ, h.R_cross, zorder=3, mew=0.3, **sty(key, ms=3.8))
         ax.set_xlim(*lim); ax.set_ylim(*lim)
         ax.set_ylabel("crossing $R$")
-        ax.set_xlabel(r"own threshold $T$ of the mirror branch, as $R=|w_2|\hat G/2$")
-        head(ax, f"({tag}) $a={a:.2f}$, budget 32k, $n={len(o)}$ runs (post hoc, exploratory);\n"
-                 f"branch at crossing: Spearman $\\rho={rho.spearman_rho:.3f}$, bootstrap 95%\n"
-                 f"[{lo:.4f}, {hi:.4f}]; initialisation branch $\\rho={rho_i.spearman_rho:.2f}$; own global\n"
-                 f"threshold $\\rho={rho_g.spearman_rho:.2f}$; median residual $\\log(R/T)$ = {rho.residual_median_log:.3f}",
-             legend=False)
+        ax.set_xlabel(r"own threshold $T$ of the branch ($R$ units)")
+        title(ax, f"({tag}) $a={a:.2f}$: Spearman $\\rho={rho.spearman_rho:.3f}$ [{lo:.4f}, {hi:.4f}]")
+        notes.append(f"({tag}) $n={len(o)}$ runs; initialisation branch $\\rho={rho_i.spearman_rho:.2f}$; "
+                     f"own global threshold $\\rho={rho_g.spearman_rho:.2f}$; median residual $\\log(R/T)$ = "
+                     f"{rho.residual_median_log:.3f}")
         out[a] = {"spearman": float(rho.spearman_rho), "ci": (lo, hi), "n": len(o)}
-    finish(fig)
+    finish(fig, w_pad=1.5)
     cnt = {k: "/".join(str(c) for c in sorted(v)) for k, v in counts.items()}
-    top_legend(fig, axes[0],
-               [handle("branch+", ms=3.8), handle("branch-", ms=3.8), handle("branch_init", ms=3.8, mew=0.6),
-                Line2D([], [], lw=0.7, **sty("identity"))],
+    legend_row(fig, [handle("branch+", ms=3.8), handle("branch-", ms=3.8), handle("branch_init", ms=3.8, mew=0.6),
+                     Line2D([], [], lw=0.7, **sty("identity"))],
                [f"branch + at the crossing ({cnt['branch+']} runs per $a$)",
                 f"branch $-$ at the crossing ({cnt['branch-']} runs per $a$)",
-                "same runs, initialisation-selected branch's $T$", "identity"])
+                "same runs, initialisation-selected branch's $T$", "identity"], ncol=2)
+    note_row(fig, "Post hoc, exploratory. Free-training crossings, budget 32k; $T$ as $R=|w_2|\\hat G/2$; "
+                  "titles: $\\rho$ with the branch occupied at the crossing, bootstrap 95%.\n" + ";\n".join(notes) + ".")
     save(fig, "v4_mirror_branches")
     return out
 
@@ -878,9 +954,9 @@ def _pdf_text_runs(pdf):
 
 
 def audit():
-    """Width of every v4 PDF (<= 3.25 in), the smallest glyph actually set in it (>= 8 pt, scripts included), every text
+    """Width of every v4 PDF (<= 5.5 in), the smallest glyph actually set in it (>= 8 pt, scripts included), every text
     run inside the page box, and the layout check (no legend/text over data, no overlapping text)."""
-    print("\nAUDIT: single-column width, smallest glyph, text inside page box, layout")
+    print("\nAUDIT: text width, smallest glyph, text inside page box, layout")
     ok_all = True
     for pdf in sorted(OUT.glob("v4_*.pdf")):
         runs, mb, npages = _pdf_text_runs(pdf)
@@ -888,7 +964,7 @@ def audit():
         smallest = min(r[0] for r in runs)
         outside = [r[2] for r in runs if r[1][0] < -0.01 or r[1][1] < -0.01 or r[1][2] > W + 0.01 or r[1][3] > H + 0.01]
         lay = LAYOUT.get(pdf.stem)
-        ok = npages == 1 and W / 72 <= COL + 0.005 and smallest >= SMALLEST_PT - 1e-6 and not outside and lay == []
+        ok = npages == 1 and W / 72 <= TEXT_W + 0.005 and smallest >= SMALLEST_PT - 1e-6 and not outside and lay == []
         ok_all &= ok
         print(f"  {'PASS' if ok else 'FAIL'}  {pdf.name:24s} width {W / 72:.3f} in  height {H / 72:.2f} in  "
               f"smallest glyph {smallest:.2f} pt  ({len(runs)} runs; outside page box: {len(outside)}; "
