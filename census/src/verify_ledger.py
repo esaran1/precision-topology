@@ -704,6 +704,10 @@ PRODUCERS = {
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
     "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
     "mirror_q2_s1_breakdown.csv": ("mirror_branches", "q2_s1_breakdown", "full", ""),
+    "lag_test_tests.csv": ("lag_test", "score", "full", ""),
+    "lag_test_cells.csv": ("lag_test", "score", "full", ""),
+    "lag_test_confounds.csv": ("lag_test", "score", "full", ""),
+    "lag_test_runs.csv": ("lag_test", "run", "full", ""),
     "mirror_init_match.csv": ("mirror_branches", "analyse", "full", ""),
     "mirror_occupancy.csv": ("mirror_branches", "analyse", "full", ""),
     "mirror_s1.csv": ("mirror_branches", "analyse", "full", ""),
@@ -935,6 +939,19 @@ def v4_checks() -> None:
     msg_ = pd.read_csv(R / "mirror_size_gap_summary.csv").set_index(["a", "n"])
     for (a_, n_), v_ in (((1.3, 400), 0.0972), ((1.3, 6400), 0.0366), ((1.5, 400), 0.0993), ((1.5, 6400), 0.0365)):
         chk(f"mirror gap vs n {a_}/{n_}", float(msg_.loc[(a_, n_), "median"]), v_, 0.0001)
+    lt_ = pd.read_csv(R / "lag_test_tests.csv")
+    ltp_ = lt_[lt_.primary].set_index("a")
+    for a_ in (1.3, 1.5):
+        chk(f"lag a={a_}: L1", float(ltp_.loc[a_, "L1_pass"]), 1.0, 0)
+        chk(f"lag a={a_}: L2", float(ltp_.loc[a_, "L2_pass"]), 0.0, 0)
+        chk(f"lag a={a_}: competing", float(ltp_.loc[a_, "competing_no_dependence"]), 0.0, 0)
+    lc_ = pd.read_csv(R / "lag_test_cells.csv")
+    lc_ = lc_[lc_.primary].set_index(["a", "factor"])
+    for (a_, f_), v_ in (((1.3, 0.25), 0.00473), ((1.3, 1.0), 0.03105), ((1.5, 0.25), 0.01069), ((1.5, 1.0), 0.06559)):
+        chk(f"lag residual {a_}/{f_}", float(lc_.loc[(a_, f_), "residual"]), v_, 0.00001)
+    cf_ = pd.read_csv(R / "lag_test_confounds.csv").set_index(["a", "factor"])
+    chk("lag confound: plateau steps 1.30/0.25", float(cf_.loc[(1.3, 0.25), "median_plateau_steps"]), 1308.5, 0.1)
+    chk("lag diag: dist 1.30/0.25", float(cf_.loc[(1.3, 0.25), "median_dist_to_branch_min"]), 0.001257, 0.000001)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

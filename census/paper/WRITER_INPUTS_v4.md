@@ -445,6 +445,52 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - Scored with the scorer committed before the data (`a015ace`), unchanged; the current refactored
     scorer gives identical output.
 
+## Adiabatic-lag test (registered `lag_test_prediction.md`, `bd8cb9c`; scored)
+
+- **Design**: w₂'s learning rate scaled by φ ∈ {0.25, 0.5, 1, 2} at n = 6,400, a = 1.30 and 1.50, on the size
+  test's 50 training sets per a.
+- **Validity**:
+  - φ = 1 reproduces the size test's runs **bit-identically on all 100 runs**;
+  - 44–49 of 50 runs cross in every cell.
+- **Primary threshold**: the global own threshold. The registered branch rule chose it because the
+  initialisation-selected branch matched only 51.4% of crossings, against the required 90%.
+
+| a | φ = 0.25 | 0.5 | 1 | 2 |
+|---|---:|---:|---:|---:|
+| 1.30: residual (95%) | 0.47% [0.26, 1.05] | 2.66% [2.56, 2.77] | 3.11% [2.98, 3.17] | 3.12% [3.04, 3.19] |
+| 1.50: residual (95%) | 1.07% [0.64, 2.18] | 5.34% [5.11, 5.65] | 6.56% [6.21, 6.79] | 6.64% [6.40, 6.78] |
+
+- **L1 (primary) PASS at both a.** The residual decreases with w₂'s learning rate and tends toward zero:
+  the ordering is strict; the interval of residual(1) − residual(0.25) is above 0 ([2.1, 2.8]% and
+  [4.4, 5.9]%); and residual(0.25) ≤ ½·residual(1).
+  - The competing outcome (no dependence) is rejected at both a.
+  - The same verdicts hold with the initialisation-selected branch threshold (secondary).
+- **L2 (secondary, proportionality) FAIL at both a.**
+  - residual(0.5)/residual(1) = 0.86 and 0.81, outside [0.30, 0.70];
+  - residual(0.25)/residual(1) = 0.15 and 0.16, inside [0.05, 0.45].
+  - The dependence is not linear: the residual is nearly flat from φ = 0.5 to 2 and collapses between 0.5
+    and 0.25. (Between φ = 1 and 2 the ordering holds, but the difference interval includes 0.)
+- **Direct lag diagnostic.** At the crossing, the median distance from the hidden parameters to the
+  branch minimiser at the current scale is:
+  - a = 1.30: 0.0013 at φ = 0.25, against 0.0050–0.0059 above;
+  - a = 1.50: 0.0029, against 0.012–0.015.
+  - It shrinks with φ, with the same shape as the residual.
+- **Confound checks (per φ), stated beside the verdicts**:
+  - **The mirror-branch share at the crossing does not shift** (w₁·w₂ > 0 in 50–57% of runs at every φ).
+  - **Time on the constant-predictor plateau shifts materially with φ.** The median number of steps with
+    |w₁| < 0.05 before the crossing is:
+    - 1,309 and 1,691 at φ = 0.25;
+    - 702 and 1,244 at φ = 0.5;
+    - 21 and 13 at φ = 1;
+    - 0 at φ = 2.
+    - The fraction of runs with any plateau time falls from 0.68 to 0.40–0.42.
+  - Slower w₂ keeps runs near the constant predictor longer. That could move the residual independently
+    of lag, so it has to be weighed with the L1 verdict.
+- **Say**: "slowing w₂'s growth removes most of the residual (to ≈ 0.5% and 1% at a quarter of the
+  learning rate), consistent with an adiabatic lag of the output scale; the dependence is not
+  proportional, and slower w₂ also lengthens the time spent on the constant-predictor plateau, which is a
+  possible confound".
+
 ## Sample-size test (registered `sample_size_prediction.md`, `04e7668`; scored)
 
 - **Design**: a ∈ {1.30, 1.50} × n ∈ {400, 1,600, 6,400}, with 50 fresh seeds per cell for both arms.
