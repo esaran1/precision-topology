@@ -296,7 +296,8 @@ def test_lag_score_pass_and_fail(tmp_path, monkeypatch):
                 own.append({"a": a, "n": lt.N, "seed": s, "w2_own": w_own})
                 for fct in lt.FACTORS:
                     w2 = w_own * (1 + resid[fct] + rng.normal(0, 0.005))
-                    runs.append({"a": a, "seed": s, "factor": fct, "cross_step": 100.0, "w2_abs": w2, "R_cross": w2 * G / 2})
+                    runs.append({"a": a, "seed": s, "factor": fct, "cross_step": 100.0, "w2_abs": w2, "R_cross": w2 * G / 2,
+                                 "w1": 0.8, "b1": 3.8, "w2": w2, "plateau_steps": 0})
                     if fct == 1.0:
                         free.append({"a": a, "n": lt.N, "seed": s, "cross_step": 100.0, "w2_abs": w2})
         pd.DataFrame(own).to_csv(tmp_path / "sample_size_own.csv", index=False)
@@ -306,7 +307,21 @@ def test_lag_score_pass_and_fail(tmp_path, monkeypatch):
     lt.score(tmp_path)
     t = pd.read_csv(tmp_path / "lag_test_tests.csv")
     assert t.L1_pass.all() and not t.competing_no_dependence.any()
+    assert t.L2_pass.all()                                              # 0.015/0.04 = 0.375, 0.005/0.04 = 0.125
     build({0.25: 0.04, 0.5: 0.04, 1.0: 0.04, 2.0: 0.04})
     lt.score(tmp_path)
     t = pd.read_csv(tmp_path / "lag_test_tests.csv")
-    assert not t.L1_pass.any() and t.competing_no_dependence.all()
+    assert not t.L1_pass.any() and t.competing_no_dependence.all() and not t.L2_pass.any()
+    pr = pd.read_csv(tmp_path / "lag_test_pairs.csv")
+    failed = pr[~pr.strictly_increasing]
+    assert len(failed) and failed.note.str.contains("indistinguishable").all()
+
+
+def test_lag_branch_rule(tmp_path):
+    from src import lag_test as lt
+    occ = pd.DataFrame({"branch": [1] * 90 + [-1] * 10, "init_branch": [1] * 100})
+    occ.to_csv(tmp_path / "mirror_occupancy.csv", index=False)
+    assert lt.branch_rule(tmp_path)[0] == "init-selected branch"
+    occ = pd.DataFrame({"branch": [1] * 89 + [-1] * 11, "init_branch": [1] * 100})
+    occ.to_csv(tmp_path / "mirror_occupancy.csv", index=False)
+    assert lt.branch_rule(tmp_path)[0] == "global"

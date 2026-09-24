@@ -1,7 +1,10 @@
-# Design for review: is the free-training residual adiabatic lag of w₂?
+# Registration: is the free-training residual adiabatic lag of w₂?
 
-**Design only: not registered, not run.** On approval it becomes the registration, committed before any
-run at φ ≠ 1. Producer: `src/lag_test.py`. Check tests: `tests/test_registered_checks.py`, the `lag` tests.
+**Registered 2026-09-23 20:38 EDT.**
+- Written before any run at φ ≠ 1, and **before any output of the mirror-branch analysis exists or has
+  been read** (`mirror_occupancy.csv` and `mirror_branch_thresholds.csv` did not exist at this commit).
+- This is the design approved on review (`aa53931`), with the four approved additions.
+- Producer: `src/lag_test.py`. Check tests: `tests/test_registered_checks.py`, the `lag` tests.
 
 ## Question
 
@@ -53,26 +56,60 @@ run at φ ≠ 1. Producer: `src/lag_test.py`. Check tests: `tests/test_registere
 
 - **residual(a, φ)** = median over crossing runs of (R_cross / R_own) − 1, with R_own each run's own
   threshold at n = 6,400.
-- **Threshold used**: the own global threshold (`sample_size_own.csv`), or the branch-matched one.
-  **This is decided before registration**, from the mirror-branch analysis:
-  - if that analysis shows the branch a run ends on is predictable from its initialisation (criterion to
-    be set with you once the analysis is in), the branch-matched threshold selected by initialisation is
-    used;
-  - otherwise, the global own threshold.
+- **Threshold used (the branch rule, fixed now)**:
+  - **Primary**: if the mirror-branch analysis shows that the initialisation-selected branch matches the
+    branch at the free-training crossing in **at least 90%** of runs, the primary threshold is the
+    **initialisation-selected branch's own threshold**. Otherwise it is the **global own threshold**.
+  - The 90% is pooled over the analysis's free-training groups: Block 4/5 first placements, and phase 2b
+    crossings at a = 1.30 and 1.50 (`lag_test.branch_rule`, reading `mirror_occupancy.csv`).
+  - **The residual is reported against both thresholds either way.**
+  - Both mirror branches' own thresholds are computed for all 100 training sets
+    (`lag_test_branch_thresholds.csv`, size-test search settings). The initialisation-selected branch
+    comes from each seed's initial draw.
 - **Uncertainty**: bootstrap 95% intervals (10,000 resamples, seed 0) for each residual, and for the
   differences between residuals.
 
-## Registered predictions (scored separately at a = 1.30 and 1.50)
+## Registered predictions (scored separately at a = 1.30 and 1.50, on the primary threshold)
 
-- **L1 (lag)**: the residual decreases as w₂'s learning rate decreases, and tends toward zero. All three
-  must hold:
+- **L1 (lag, primary)**: the residual decreases as w₂'s learning rate decreases, and tends toward zero.
+  All three must hold:
   - residual(0.25) < residual(0.5) < residual(1) < residual(2);
   - the 95% interval of residual(1) − residual(0.25) lies above 0;
   - residual(0.25) ≤ ½·residual(1).
+- **L2 (proportionality, secondary)**: adiabatic lag predicts that the residual scales roughly linearly
+  with φ at small φ. **residual(0.5)/residual(1) ∈ [0.30, 0.70]** and **residual(0.25)/residual(1) ∈
+  [0.05, 0.45]**, i.e. 0.5 ± 0.20 and 0.25 ± 0.20.
 - **Competing (no dependence)**: the 95% interval of residual(2) − residual(0.25) contains 0. Then the
   residual is not adiabatic lag of w₂.
-- **Scorer tests** (constructed data): a planted lag passes L1 and fails the competing outcome; a flat
-  residual fails L1 and meets the competing outcome.
+- **Failed ordering steps**, carried over from the size test's reporting addendum: for any failed
+  strict-ordering step whose two values' intervals overlap, the registered failure is recorded, and it
+  is noted separately that the two values are indistinguishable (`lag_test_pairs.csv`).
+
+## Direct diagnostic of the lag (reported, no criterion)
+
+- At each run's crossing: the distance between the hidden parameters and the conditional branch
+  minimiser of that run's own objective at the current scale |w₂|, in the symmetry-aware metric.
+  - The metric uses the canonical orientation (w₂ > 0), the same mirror branch as the run, and b₁ mod 2π.
+- Its median is reported per φ. Adiabatic lag predicts it shrinks with φ (`lag_test_diagnostics.csv`).
+
+## Confound checks (reported per φ, beside the L1 and L2 verdicts)
+
+- The fraction of runs on each mirror branch at the crossing.
+- The number of steps spent on the constant-predictor plateau (|w₁| < 0.05) before the crossing: the
+  median, and the fraction of runs with any.
+- If either shifts materially with φ, that is stated beside the verdicts, since it could move the
+  residual independently of lag (`lag_test_confounds.csv`).
+
+## Tests of every check and rule (constructed data, all pass)
+
+- **φ = 1 reproduction check**: passes on identical data; fails on a one-ulp change in |w₂|, and on a
+  crossing where the reference had none.
+- **The rescaling**: equals a per-parameter-learning-rate Adam to 1e−12, and is a no-op at φ = 1.
+- **The branch rule**: 90% gives the initialisation-selected branch, and 89% gives the global threshold.
+- **L1 and L2**: a planted lag passes both; a flat residual fails both and meets the competing outcome.
+- **The indistinguishable note**: it appears on a failed ordering step with overlapping intervals.
+- **Real runs**: re-verified bit-identical at φ = 1 on three seeds after the read-only instrumentation
+  (crossing parameters, plateau steps) was added.
 
 ## Cost (estimate)
 
