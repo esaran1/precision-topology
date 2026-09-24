@@ -1,0 +1,4 @@
+quantity,pred_lo,pred_hi,feasible_lo,feasible_hi,feasible_width,verdict,excludes_0.49,excludes_k1_only_-0.377,excludes_switch_only_0.662,excludes_0
+c1 (primary): R_glob,0.2852299861201777,0.2852302997512185,0.22521299568830147,0.3301972796842516,0.10498428399595014,INCONCLUSIVE (feasible width > 0.1),True,True,True,True
+k1 (secondary): Ghat/eps^1.5,-0.3769247232753412,-0.3769247231118399,-0.37749390370834923,-0.37619536127684555,0.0012985424315036798,PASS,True,False,True,True
+A'/A* (secondary): s eps^1.5,0.662154709395519,0.6621550228630584,0.6019001457827434,0.7073291051666794,0.10542895938393593,INCONCLUSIVE (feasible width > 0.1),True,True,False,True

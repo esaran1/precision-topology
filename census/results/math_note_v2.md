@@ -348,7 +348,12 @@ Both terms come from the sine series, including the (1 + ε) factor.
 3. **Full first-order calculation** (`f92b1b5`, this section): c₁ ∈ [0.2852300, 0.2852303]. It was done
    after the refit had been seen. It has no fitted input, but it was not blind to the large-ε range.
 4. **Independent check**: the registered small-ε test at a = 1.01–1.04 (`first_order_prediction.md`,
-   registered in `f92b1b5` before any finite-a computation there). Pending.
+   registered in `f92b1b5` before any finite-a computation there).
+   - **Scored: INCONCLUSIVE.** The feasible set [0.2252, 0.3302] is 0.105 wide, against a registered limit
+     of 0.1. The prediction lies inside it, and all four competing values are excluded.
+   - The component k₁ test PASSED.
+   - A supplementary branch-root analysis, with no verdict attached, narrows the feasible set to
+     [0.28460, 0.28590], which contains the prediction (`first_order_prediction.md`, Result).
 
 **Why the earlier prediction (≈ 0.49, `scaling_limit_results.md`) was wrong.**
 - It used K(ε) alone, with only the σ³/6 part of r.

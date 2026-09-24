@@ -1,0 +1,2 @@
+all_certified,feasible_lo,feasible_hi,feasible_width,pred_lo,pred_hi,pred_inside,max_rel_bracket_width,competing_0.49_earlier,competing_-0.377_K_only,competing_0.662_switch_only,competing_0_no_first_order
+True,0.28459572163741725,0.28589503559877577,0.001299313961358517,0.28522998612017775,0.2852302997512185,True,2.519520040257432e-11,above,below,above,below

@@ -119,3 +119,61 @@ The same feasible-set construction is applied to each component separately:
 - **Unchanged**: the switch bracket at a = 1.01 uses the **registered procedure**, run under the memory
   watchdog. **a = 1.02–1.04 stay exactly as registered.**
 - The c₁ runs lost in the crash (a = 1.02–1.04, and a = 1.01's unfinished Ĝ step) rerun from this procedure.
+
+## Result — scored 2026-09-24 03:20 EDT with the committed scorers (`first_order score`, `score_supplementary`)
+
+**Registered primary verdict: INCONCLUSIVE.**
+
+- **Why**: the feasible set C = [0.22521, 0.33020] has width 0.105, just over the registered 0.1 limit.
+- **The prediction** c₁ ∈ [0.2852300, 0.2852303] lies inside C.
+  - By the registered rule that is **not a pass**, and it is not reported as one.
+- **Brackets**: all four a stopped at an unresolved midpoint, as the procedure allows, so the last resolved
+  bracket was used. Relative widths in s:
+
+  | a | relative width in s |
+  |---|---:|
+  | 1.01 | 6.2e−4 |
+  | 1.02 | 1.2e−3 |
+  | 1.03 | 6.2e−4 |
+  | 1.04 | 2.5e−3 |
+
+  All four are above the 2e−4 bisection target. The registered tolerance adapts to them, and the
+  resulting C is what is too wide.
+- **Registered R_glob intervals**: 1.01 [0.199085, 0.199209]; 1.02 [0.199583, 0.199832];
+  1.03 [0.200212, 0.200336]; 1.04 [0.200602, 0.201101].
+  - Ĝ is converged at every a, with relative width ≤ 7.9e−7.
+- **Competing values**, reported as registered:
+  - 0.49 (earlier): excluded by C;
+  - −0.377 (K correction alone): excluded;
+  - 0.662 (switch shift alone): excluded;
+  - 0 (no first-order term): excluded.
+- **Secondary component tests** (same construction):
+  - **k₁: PASS**. The prediction −0.376925 lies in C_k = [−0.377494, −0.376195], width 0.0013.
+  - **A′(0)/A\***: INCONCLUSIVE. C_A = [0.6019, 0.7073], width 0.105; the prediction 0.662155 lies inside.
+- **R_glob^∞ is no longer conditional.** The registration called the limit interval conditional on the
+  annulus certificate, and that certificate now holds (`certv2_annulus_summary.csv`, commit `133cd83`). So
+  the limit interval used by C is certified.
+
+**Supplementary branch-root analysis** (committed before the registered result existed; no verdict
+attaches to it).
+- **Switch scale**: certified at every a by the Krawczyk test.
+  - Hessian PD, λ_min ≥ 0.1525.
+  - Active pair unique.
+  - Global at the switch: competitor margin ≥ +0.0131.
+- **s-brackets**: width below 1e−9 relative. Each lies inside the registered bracket at the same a.
+
+  | a | s |
+  |---|---:|
+  | 1.01 | 689.975926 |
+  | 1.02 | 245.539519 |
+  | 1.03 | 134.520585 |
+  | 1.04 | 87.934061 |
+
+- **Implied feasible c₁ set** (registered construction, registered Ĝ): [0.284596, 0.285895], width 0.0013.
+  - The prediction lies inside.
+  - All four competing values lie outside it: 0.49 and 0.662 above; −0.377 and 0 below.
+
+**Ĝ cross-check** (`first_order_ghat_rescaled.csv`):
+- At a = 1.02–1.04 it is independent of the registered `ghat_bnb` run and agrees with it. The lower bounds
+  coincide, and the rescaled upper bounds are nested inside the registered ones. Both exclusions closed.
+- At a = 1.01 the two are identical by construction (Amendment 2), so there it is not a cross-check.

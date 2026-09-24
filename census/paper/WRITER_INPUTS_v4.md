@@ -8,7 +8,7 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 | block | status | for the 25 September submission? |
 |---|---|---|
 | 1. Audit of the conditional threshold | **complete**; registered decision rule met; 1d done (below) | yes |
-| 2. Proposition 2 made precise | **certified**: localisation, switch, H2′, neighbourhood, solve threshold, and global uniqueness (annulus and solve bracket, four-link chain); the registered c₁ test is running | yes |
+| 2. Proposition 2 made precise | **certified**: localisation, switch, H2′, neighbourhood, solve threshold, and global uniqueness (annulus and solve bracket, four-link chain); registered c₁ test scored **INCONCLUSIVE** (k₁ component PASSED) | yes |
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
 | 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
 | 5. Retention curve | queued after Block 4 | if scored and verified in time; otherwise rebuttal |
@@ -203,11 +203,22 @@ windows'. It outperformed an output-weight baseline (mean absolute log error 0.2
     2. The certified refit showed it was inconsistent with the data: two-term laws allow only
        [0.243, 0.321].
     3. The full first-order calculation was then done and gives c₁ ∈ [0.2852300, 0.2852303].
-    4. The registered small-ε test (`f92b1b5`, a = 1.01–1.04) is the independent check. It is
-       **pending**.
-  - **Until that test is scored**, the paper may say only: "the corrected first-order calculation is
-    consistent with the certified large-ε values". It may **not** say that the first-order coefficient
-    is confirmed.
+    4. The registered small-ε test (`f92b1b5`, a = 1.01–1.04) was the independent check. **It scored
+       INCONCLUSIVE** (`first_order_prediction.md`, Result; `first_order_scores.csv`).
+  - **The registered small-ε test** (scored 2026-09-24):
+    - **Verdict: INCONCLUSIVE.** The certified brackets at a = 1.01–1.04 give a feasible set
+      c₁ ∈ [0.225, 0.330], width 0.105, just over the registered 0.1 limit. The prediction 0.2852 lies
+      inside it.
+    - All four competing values are excluded by that set: 0.49, −0.377, 0.662 and 0.
+    - Component tests: k₁ **PASSED** (feasible width 0.0013); A′(0)/A* was inconclusive (width 0.105).
+    - **Supplementary**, not a verdict: a branch-root measurement of the same switch, at the same four a,
+      narrows the feasible set to [0.2846, 0.2859], which contains the prediction.
+  - **Say**: "A registered test at a = 1.01–1.04 was inconclusive by its pre-set width criterion (feasible
+    set [0.225, 0.330], width 0.105 against a limit of 0.1). The predicted 0.285 lies inside, and the set
+    excludes 0, 0.49, and each of the two components alone. A supplementary measurement of the same switch
+    along the branch minimiser gives [0.2846, 0.2859]."
+  - **Do not say**: that c₁ is confirmed or that the test passed. Do not present the supplementary interval
+    as the registered result, or without its label.
   - **Range of validity**: the first-order expansion of K is certified for |ε| ≤ 0.05, i.e.
     a ∈ [0.95, 1.05] (active set unchanged, strict maximum, two-sided; `math_note_v2.md` §8).
     - The registered c₁ test (a = 1.01–1.04) lies inside that range, so its premises hold where it is

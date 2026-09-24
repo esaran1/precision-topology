@@ -750,6 +750,10 @@ PRODUCERS = {
     "limit_switch.csv": ("limit_bnb", "switch", "full", ""),
     "certv2_annulus_parts.csv": ("certificates_v2", "_run", "full", ""),
     "first_order_supplementary.csv": ("first_order", "supplementary", "full", ""),
+    "first_order_supplementary_scores.csv": ("first_order", "score_supplementary", "full", ""),
+    "first_order_finite.csv": ("first_order", "finite", "full", ""),
+    "first_order_finite_evaluations.csv": ("first_order", "finite", "full", ""),
+    "first_order_scores.csv": ("first_order", "score", "full", ""),
     "certv2_annulus_summary.csv": ("certificates_v2", "_summary", "full", ""),
     "certv2_solve_parts.csv": ("certificates_v2", "_run", "full", ""),
     "certv2_solve_pd.csv": ("certificates_v2", "pd_boxes_solve", "full", ""),
@@ -1010,6 +1014,24 @@ def v4_checks() -> None:
         chk(f"certv2 {nm_}: min outer margin", float(cp_.outer_margin.min()), mg_, 0.005e-4)
         chk(f"certv2 {nm_}: min ring gradient bound", float(cp_.ring_grad_lower.min()), gr_, 0.005e-3)
         chk(f"certv2 {nm_}: max branch upper < B(24)", float(cp_.branch_upper.max()), bu_, 1e-6)
+    fs_ = pd.read_csv(R / "first_order_scores.csv", float_precision="round_trip")
+    p_ = fs_[fs_.quantity.str.startswith("c1")].iloc[0]
+    chk("c1 test: registered verdict INCONCLUSIVE", float(str(p_.verdict).startswith("INCONCLUSIVE")), 1.0, 0)
+    chk("c1 test: feasible lo", float(p_.feasible_lo), 0.22521, 0.00001)
+    chk("c1 test: feasible hi", float(p_.feasible_hi), 0.33020, 0.00001)
+    chk("c1 test: all four competing values excluded",
+        float(bool(p_["excludes_0.49"]) and bool(p_["excludes_k1_only_-0.377"])
+              and bool(p_["excludes_switch_only_0.662"]) and bool(p_["excludes_0"])), 1.0, 0)
+    k_ = fs_[fs_.quantity.str.startswith("k1")].iloc[0]
+    chk("c1 test: k1 component PASS", float(k_.verdict == "PASS"), 1.0, 0)
+    chk("c1 test: k1 feasible width", float(k_.feasible_width), 0.0013, 0.00005)
+    ss_ = pd.read_csv(R / "first_order_supplementary_scores.csv").iloc[0]
+    chk("c1 supplementary: feasible lo", float(ss_.feasible_lo), 0.284596, 0.000001)
+    chk("c1 supplementary: feasible hi", float(ss_.feasible_hi), 0.285895, 0.000001)
+    chk("c1 supplementary: all certified, prediction inside",
+        float(bool(ss_.all_certified) and bool(ss_.pred_inside)), 1.0, 0)
+    ff_ = pd.read_csv(R / "first_order_finite.csv")
+    chk("c1 test: Ghat converged at all four a", float(ff_.Ghat_converged.all() and len(ff_) == 4), 1.0, 0)
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),
