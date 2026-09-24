@@ -1,0 +1,9 @@
+part,level,frac_seeds_own_below_level,placed_frac_64k,placed_n,placed_above_own,placed_below_own,placed_below_own_on_mirror,group,n,agreement,disagreements,placed_but_below_own,unplaced_but_above_own
+Q2 vs own,0.9,0.005747126436781609,0.014732965009208104,8.0,0.0,8.0,8.0,,,,,,
+Q2 vs own,0.95,0.08620689655172414,0.09392265193370165,51.0,18.0,33.0,33.0,,,,,,
+S1 by dist_bin,,,,,,,,<1%,145.0,0.8896551724137931,16.0,11.0,5.0
+S1 by dist_bin,,,,,,,,1-3%,357.0,0.865546218487395,48.0,21.0,27.0
+S1 by dist_bin,,,,,,,,3-5%,348.0,0.9166666666666666,29.0,13.0,16.0
+S1 by dist_bin,,,,,,,,>5%,1865.0,0.8954423592493298,195.0,104.0,91.0
+S1 by on_mirror,,,,,,,,False,2097.0,0.9928469241773963,15.0,5.0,10.0
+S1 by on_mirror,,,,,,,,True,618.0,0.558252427184466,273.0,144.0,129.0

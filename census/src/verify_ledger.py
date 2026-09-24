@@ -703,6 +703,8 @@ PRODUCERS = {
     "first_order_c1.csv": ("first_order", "main", "full", ""),
     "own_threshold_scores.csv": ("own_threshold", "score", "full", ""),
     "diagnose_below_endpoints.csv": ("diagnose_below", "endpoints", "full", ""),
+    "mirror_q2_s1_breakdown.csv": ("mirror_branches", "q2_s1_breakdown", "full", ""),
+    "mirror_global_branch.csv": ("mirror_branches", "global_branch_levels", "full", ""),
     "diagnose_below.csv": ("diagnose_below", "main", "full", ""),
     "fixed_scale_horizons_tests.csv": ("fixed_scale", "score_horizons", "full", ""),
     "fixed_scale_horizons_curve.csv": ("fixed_scale", "score_horizons", "full", ""),
@@ -873,6 +875,15 @@ def v4_checks() -> None:
     chk("0.9x endpoints: loss gap max", float(en_.loss_gap_to_global_64000.max()), 0.064, 0.0005)
     chk("0.9x endpoints: mirror (opposite w1 sign)", float((en_.loc_min_w1_64000 * en_.global_w1 < 0).all()), 1.0, 0)
     chk("0.9x endpoints: barrier = log 2", float(en_.barrier_level.max()), 0.693147, 0.00001)
+    mb_ = pd.read_csv(R / "mirror_q2_s1_breakdown.csv")
+    om_ = mb_[mb_.part == "S1 by on_mirror"].set_index("group")
+    chk("mirror: on-global agreement", float(om_.loc["False", "agreement"]), 0.9928, 0.0001)
+    chk("mirror: on-global disagreements", float(om_.loc["False", "disagreements"]), 15.0, 0)
+    chk("mirror: on-mirror replays", float(om_.loc["True", "n"]), 618.0, 0)
+    chk("mirror: on-mirror agreement", float(om_.loc["True", "agreement"]), 0.5583, 0.0001)
+    q2_ = mb_[mb_.part == "Q2 vs own"].set_index("level")
+    chk("mirror: placed below own at 0.9/0.95 all on mirror",
+        float((q2_.placed_below_own == q2_.placed_below_own_on_mirror).all() and q2_.placed_below_own.sum() == 41), 1.0, 0)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

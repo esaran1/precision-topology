@@ -277,6 +277,21 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
   - **Say**: "the training set's own threshold sets where the population of fixed-scale runs switches,
     not the outcome of an individual run". The mirror-branch analysis and a basin census are examining
     what determines individual outcomes; both are exploratory.
+  - **Mirror occupancy accounts for almost all of S1's disagreements** (post hoc, exploratory;
+    `mirror_q2_s1_breakdown.csv`, `mirror_global_branch.csv`). A replay's 64k endpoint either lies on the
+    globally preferred mirror branch of its own training loss at the held scale, or on the other mirror
+    branch:
+
+    | 64k endpoint | replays | own-seed rule agreement | disagreements |
+    |---|---:|---:|---:|
+    | on the globally preferred branch | 2,097 | **0.993** | 15 |
+    | on the mirror branch | 618 (23%) | 0.558 | 273 |
+
+    - All 41 replays placed below their own threshold at 0.9× and 0.95× are on the mirror.
+    - **Say**: "where a run sits on the globally preferred branch of its own loss, its own threshold
+      predicts its fixed-scale outcome in 99% of replays; the misses are runs held in the mirror basin".
+    - Whether the mirror branch's own threshold then predicts those runs is pending (branch thresholds
+      computing).
 - **Horizon extension, registered** (`fixed_scale_horizon_prediction.md`, `cdfbf9d`): does the 50%
   point move toward 1.0 at 4× and 16× the horizon? **Q1 FAILED, Q2 FAILED; the registered competing
   outcome holds** (`fixed_scale_horizons_tests.csv`).
