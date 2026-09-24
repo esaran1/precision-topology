@@ -266,20 +266,38 @@ def lemma_W(x, y, s, a, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
 # ------------------------------------------------------------------------------------------ checks
 def coverage_ok(level, iw, ib, nw, nb):
     """The leaves tile the grid exactly: areas sum to 1 (exact integer arithmetic), every leaf lies inside the grid,
-    no two leaves coincide and no leaf is an ancestor of another."""
+    no two leaves coincide and no leaf is an ancestor of another.  Vectorised (each leaf is encoded as one exact
+    integer key; memory is linear in the leaf count)."""
+    level = np.asarray(level, np.int64); iw = np.asarray(iw, np.int64); ib = np.asarray(ib, np.int64)
+    if (level < 0).any():
+        return False, "negative level"
     L = int(level.max())
-    area = sum(4 ** (L - int(l)) for l in level)
+    area = sum(int(c) * 4 ** (L - l) for l, c in enumerate(np.bincount(level)))
     if area != nw * nb * 4 ** L:
         return False, f"area {area} != {nw * nb * 4 ** L}"
     if ((iw < 0) | (ib < 0) | (iw >= nw * 2 ** level) | (ib >= nb * 2 ** level)).any():
         return False, "leaf outside the grid"
-    keys = set(zip(level.tolist(), iw.tolist(), ib.tolist()))
-    if len(keys) != len(level):
+    bi = max(1, int(nw * 2 ** L - 1).bit_length()); bj = max(1, int(nb * 2 ** L - 1).bit_length())
+    bl = max(1, L.bit_length())
+    if bi + bj + bl > 63:
+        raise ValueError("quadtree too deep for exact 63-bit keys")
+
+    def key(l, i, j):
+        return (l << (bi + bj)) | (i << bj) | j
+    keys = key(level, iw, ib)
+    if len(np.unique(keys)) != len(keys):
         return False, "duplicate leaf"
-    for l, i, j in keys:
-        for up in range(1, l + 1):
-            if (l - up, i >> up, j >> up) in keys:
-                return False, f"leaf ({l},{i},{j}) has an ancestor leaf"
+    skeys = np.sort(keys)
+    for up in range(1, L + 1):
+        m = level >= up
+        if not m.any():
+            continue
+        par = key(level[m] - up, iw[m] >> up, ib[m] >> up)
+        pos = np.searchsorted(skeys, par)
+        hit = (pos < len(skeys)) & (skeys[np.minimum(pos, len(skeys) - 1)] == par)
+        if hit.any():
+            k = int(np.flatnonzero(hit)[0])
+            return False, f"leaf ({int(level[m][k])},{int(iw[m][k])},{int(ib[m][k])}) has an ancestor leaf"
     return True, "exact tiling"
 
 
@@ -458,7 +476,7 @@ def check_ghat(name, verbose=True, workers=WORKERS):
     fa = FA(a)
     res = {"name": name, "checks": {"files_match_committed_hashes": files_match_manifest(name)}}
     t0 = time.time()
-    lv, iw, ib = dat["level"].astype(np.int64), dat["iw"], dat["ib"]
+    lv, iw, ib = dat["level"].astype(np.int64), dat["iw"].astype(np.int64), dat["ib"].astype(np.int64)
     ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
     res["checks"]["coverage"] = ok
     res["checks"]["domain_contains_reduction"] = a / 1.4 <= a

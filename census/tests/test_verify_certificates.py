@@ -38,6 +38,20 @@ def test_coverage_accepts_an_exact_tiling_and_rejects_gaps_and_overlaps():
     assert not vc.coverage_ok(np.r_[lv, 0], np.r_[iw, 1], np.r_[ib, 0], 2, 1)[0]            # parent + children
 
 
+def test_coverage_duplicate_and_ancestor_branches_with_the_area_preserved():
+    # grid 2 x 2 at level 0; tiling: (0,0,0), (0,0,1), (0,1,0), and the four children of (0,1,1)
+    lv = np.array([0, 0, 0, 1, 1, 1, 1]); iw = np.array([0, 0, 1, 2, 2, 3, 3]); ib = np.array([0, 1, 0, 2, 3, 2, 3])
+    assert vc.coverage_ok(lv, iw, ib, 2, 2)[0]
+    # duplicate one level-1 child, drop another: area unchanged
+    ok, why = vc.coverage_ok(np.r_[lv[:-1], 1], np.r_[iw[:-1], 2], np.r_[ib[:-1], 2], 2, 2)
+    assert not ok and why == "duplicate leaf"
+    # replace the level-0 leaf (0,0,0) by its four children and add... instead: add parent (0,1,1) of the children and
+    # drop the level-0 leaf (0,0,0) (area 4 at level 1 either way): area unchanged, ancestor present
+    ok, why = vc.coverage_ok(np.r_[lv[1:], 0], np.r_[iw[1:], 1], np.r_[ib[1:], 1], 2, 2)
+    assert not ok and "ancestor" in why
+    assert not vc.coverage_ok(np.array([-1, 0]), np.array([0, 0]), np.array([0, 0]), 1, 1)[0]    # negative level
+
+
 def test_convexity_bound_at_the_centre_is_below_the_profiled_value(obj):
     """L*(c) ≥ g(b̂) − |F(b̂)|·|b* − b̂| must hold; check against the float profile at random centres."""
     from src.profiled_bnb import profile

@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | finite-a glob brackets (a = 1.30–1.60, lo and hi ends) | 12 | **all pass** (every leaf claim verified, exact tiling, lemma W, hashes) | 554–658 s each at one worker, ≈ 75 MB | `verify_certificates_finite.log` |
 | Ĝ(a) enclosures (a = 1.10–3.0) | 11 | **structure passes; the float endpoints miss by ≤ 1.1e−15** (see below) | 1–90 s check; export ≤ 0.6 GB | `verify_certificates_ghat.log` |
-| Ĝ(1.05) | 1 | as for a ≥ 1.10: structure passes (18.0M leaves, exact tiling, every leaf below hi); the endpoints miss by ≤ 4e−16 | export 119 s, 1.5 GB; check 397 s | `verify_certificates_ghat.log` |
+| Ĝ(1.05) | 1 | as for a ≥ 1.10: structure passes (18.0M leaves, exact tiling, every leaf below hi); the endpoints miss by ≤ 4e−16 | export 119 s, 1.5 GB; check 394–397 s. **The first check peaked at 3.05 GB, over the 3 GB rule.** I had not extrapolated it: the set-based tiling check held 18M tuples. The vectorised tiling check (same verdicts on constructed and real cases) brought it to 2.85 GB | `verify_certificates_ghat.log` |
 | Ĝ(1.02) | — | **not exported: stopped under the 3 GB rule.** It has 147M search cells, 6× a = 1.05, which peaked at 1.5 GB, so ≈ 9 GB is extrapolated. It needs the recording to stream leaves to disk, or a tighter certifier | | |
 | solve brackets, limit switch, outer exclusion and ring, PD boxes, K, Krawczyk boxes, localisation | — | to do | | |
 
