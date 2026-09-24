@@ -234,3 +234,79 @@ def test_block4_rerun_check(tmp_path):
     b.to_csv(tmp_path / "fixed_scale_block4_rerun.csv", index=False)
     with pytest.raises(SystemExit):
         check_rerun(tmp_path)
+
+
+# ------------------------------------------------------------------ lag test (design)
+def test_lag_reproduce_check(tmp_path):
+    from src import lag_test as lt
+    G = _awkward(100) + 5.0
+    ref = pd.DataFrame({"a": 1.3, "n": 6400, "seed": range(100), "cross_step": np.arange(100, dtype=float), "w2_abs": G})
+    ref.loc[3, ["cross_step", "w2_abs"]] = np.nan                       # a non-crosser on both sides
+    ref.to_csv(tmp_path / "sample_size_free.csv", index=False)
+    new = ref.drop(columns="n").assign(factor=1.0)
+    new.to_csv(tmp_path / "lag_test_reproduce.csv", index=False)
+    assert lt.check_reproduce(tmp_path) == 100
+    bad = new.copy(); bad.loc[7, "w2_abs"] = np.nextafter(bad.loc[7, "w2_abs"], np.inf)
+    bad.to_csv(tmp_path / "lag_test_reproduce.csv", index=False)
+    with pytest.raises(SystemExit):
+        lt.check_reproduce(tmp_path)
+    bad = new.copy(); bad.loc[3, "cross_step"] = 50.0                     # crosses where the reference did not
+    bad.to_csv(tmp_path / "lag_test_reproduce.csv", index=False)
+    with pytest.raises(SystemExit):
+        lt.check_reproduce(tmp_path)
+
+
+def test_lag_w2_scaling_is_per_parameter_lr():
+    """The rescaled step equals Adam with a per-parameter learning rate for w2 (hand-written reference Adam)."""
+    import torch
+    from src.lag_test import scale_w2_step
+    torch.manual_seed(0)
+    target = torch.randn(4, dtype=torch.float64)
+    for factor in (0.25, 1.0, 2.0):
+        th = torch.tensor([0.3, -0.2, 0.7, 0.1], dtype=torch.float64, requires_grad=True)
+        opt = torch.optim.Adam([th], lr=1e-2)
+        ref = th.detach().clone(); m = torch.zeros(4, dtype=torch.float64); v = torch.zeros(4, dtype=torch.float64)
+        lr = torch.tensor([1e-2, 1e-2, 1e-2 * factor, 1e-2], dtype=torch.float64)
+        for t in range(1, 51):
+            opt.zero_grad(); ((th - target) ** 2 * torch.arange(1, 5)).sum().backward()
+            w2b = float(th.detach()[2]); opt.step(); scale_w2_step(th, w2b, factor)
+            g = 2 * (ref - target) * torch.arange(1, 5)
+            m = 0.9 * m + 0.1 * g; v = 0.999 * v + 0.001 * g * g
+            ref = ref - lr * (m / (1 - 0.9 ** t)) / ((v / (1 - 0.999 ** t)).sqrt() + 1e-8)
+        assert torch.allclose(th.detach(), ref, rtol=0, atol=1e-12)
+    th = torch.tensor([0.3, -0.2, 0.7, 0.1], dtype=torch.float64, requires_grad=True)
+    before = th.detach().clone(); scale_w2_step(th, float(before[2]), 1.0)
+    assert torch.equal(th.detach(), before)                               # factor 1: no operation at all
+
+
+def test_lag_score_pass_and_fail(tmp_path, monkeypatch):
+    from src import lag_test as lt, own_threshold as ot
+    for f in ("cond_certified_brackets.csv", "ghat_certified_all.csv"):
+        (tmp_path / f).write_bytes((ot.Path(ot.__file__).resolve().parents[1] / "results" / f).read_bytes())
+    monkeypatch.setattr(ot, "RESULTS", tmp_path)
+    rng = np.random.default_rng(0)
+
+    def build(resid):
+        from src.sample_size import _pop
+        own, runs, free = [], [], []
+        for a in lt.A_VALUES:
+            G, w2p, _ = _pop(a)
+            for i in range(50):
+                s = lt.SEED0 + i; w_own = w2p * (1 + rng.normal(0.01, 0.02))
+                own.append({"a": a, "n": lt.N, "seed": s, "w2_own": w_own})
+                for fct in lt.FACTORS:
+                    w2 = w_own * (1 + resid[fct] + rng.normal(0, 0.005))
+                    runs.append({"a": a, "seed": s, "factor": fct, "cross_step": 100.0, "w2_abs": w2, "R_cross": w2 * G / 2})
+                    if fct == 1.0:
+                        free.append({"a": a, "n": lt.N, "seed": s, "cross_step": 100.0, "w2_abs": w2})
+        pd.DataFrame(own).to_csv(tmp_path / "sample_size_own.csv", index=False)
+        pd.DataFrame(runs).to_csv(tmp_path / "lag_test_runs.csv", index=False)
+        pd.DataFrame(free).to_csv(tmp_path / "sample_size_free.csv", index=False)
+    build({0.25: 0.005, 0.5: 0.015, 1.0: 0.04, 2.0: 0.07})
+    lt.score(tmp_path)
+    t = pd.read_csv(tmp_path / "lag_test_tests.csv")
+    assert t.L1_pass.all() and not t.competing_no_dependence.any()
+    build({0.25: 0.04, 0.5: 0.04, 1.0: 0.04, 2.0: 0.04})
+    lt.score(tmp_path)
+    t = pd.read_csv(tmp_path / "lag_test_tests.csv")
+    assert not t.L1_pass.any() and t.competing_no_dependence.all()
