@@ -1,0 +1,254 @@
+/Users/Evan/precision-topology/census/results/certificates_manifest.csv
+{
+ "name": "finite_a1.30_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.34910996464807137,
+ "leaves": 39084,
+ "failed_leaves": [],
+ "evaluations": 111020,
+ "max_subdivision_depth": 3,
+ "leaves_needing_subdivision": 16046,
+ "seconds": 616.3762471675873,
+ "pass": true
+}
+{
+ "name": "finite_a1.30_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3495050145375298,
+ "leaves": 45240,
+ "failed_leaves": [],
+ "evaluations": 122416,
+ "max_subdivision_depth": 3,
+ "leaves_needing_subdivision": 17356,
+ "seconds": 657.8120548725128,
+ "pass": true
+}
+{
+ "name": "finite_a1.35_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.348711510950612,
+ "leaves": 42498,
+ "failed_leaves": [],
+ "evaluations": 113690,
+ "max_subdivision_depth": 3,
+ "leaves_needing_subdivision": 16286,
+ "seconds": 601.7146430015564,
+ "pass": true
+}
+{
+ "name": "finite_a1.35_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3492018010038522,
+ "leaves": 43974,
+ "failed_leaves": [],
+ "evaluations": 116086,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 16716,
+ "seconds": 610.4733712673187,
+ "pass": true
+}
+{
+ "name": "finite_a1.40_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3482333087304497,
+ "leaves": 38952,
+ "failed_leaves": [],
+ "evaluations": 101240,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 14396,
+ "seconds": 553.9295511245728,
+ "pass": true
+}
+{
+ "name": "finite_a1.40_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.34882344528971587,
+ "leaves": 44604,
+ "failed_leaves": [],
+ "evaluations": 113700,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 16102,
+ "seconds": 632.1164948940277,
+ "pass": true
+}
+{
+ "name": "finite_a1.45_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.34821036848569364,
+ "leaves": 47790,
+ "failed_leaves": [],
+ "evaluations": 116886,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 16194,
+ "seconds": 635.2886509895325,
+ "pass": true
+}
+{
+ "name": "finite_a1.45_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3489055077754422,
+ "leaves": 42516,
+ "failed_leaves": [],
+ "evaluations": 104516,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 14498,
+ "seconds": 582.9473009109497,
+ "pass": true
+}
+{
+ "name": "finite_a1.50_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3475736732848203,
+ "leaves": 45408,
+ "failed_leaves": [],
+ "evaluations": 106272,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 14364,
+ "seconds": 582.6907551288605,
+ "pass": true
+}
+{
+ "name": "finite_a1.50_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.34837613950657936,
+ "leaves": 48096,
+ "failed_leaves": [],
+ "evaluations": 113888,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 15610,
+ "seconds": 603.653767824173,
+ "pass": true
+}
+{
+ "name": "finite_a1.60_glob_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "losing_claims_exceed_U": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.3472256545504782,
+ "leaves": 51906,
+ "failed_leaves": [],
+ "evaluations": 112298,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 14482,
+ "seconds": 611.9790029525757,
+ "pass": true
+}
+{
+ "name": "finite_a1.60_glob_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "losing_claims_exceed_U": true,
+  "every_leaf_claim_verified": true
+ },
+ "U_upper": 0.34825501392126146,
+ "leaves": 54714,
+ "failed_leaves": [],
+ "evaluations": 120162,
+ "max_subdivision_depth": 2,
+ "leaves_needing_subdivision": 15548,
+ "seconds": 624.8317868709564,
+ "pass": true
+}
+12 certificate(s) checked; failures: none

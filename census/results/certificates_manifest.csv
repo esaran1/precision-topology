@@ -1,3 +1,25 @@
 file,sha256,bytes,regenerate
+results/certificates/finite_a1.30_glob_hi.json,639d81120e15b7a35dd2d556265559b635692647c6b6270ebc5381948a7179f5,1097,python -m src.cert_export finite 1.3 4.9625 finite_a1.30_glob_hi
+results/certificates/finite_a1.30_glob_hi.npz,b44cd49991da3efd0d6375b2513e99726553fd4efbc05b8f8fef06032fc55a6c,495140,python -m src.cert_export finite 1.3 4.9625 finite_a1.30_glob_hi
 results/certificates/finite_a1.30_glob_lo.json,ca818d6487df2cebe9a35a6f54235929273cdc391a36a86fd0720f5332eff687,1093,python -m src.cert_export finite 1.3 4.95 finite_a1.30_glob_lo
 results/certificates/finite_a1.30_glob_lo.npz,60afb3d76966000c892714111b0553f7bd5c85269fb92a42a34ce1fc4989e4e4,577121,python -m src.cert_export finite 1.3 4.95 finite_a1.30_glob_lo
+results/certificates/finite_a1.35_glob_hi.json,f15c21d553091592905923d13cad314389585ef65cf740d0b243584cd19d08db,1098,python -m src.cert_export finite 1.35 4.0375 finite_a1.35_glob_hi
+results/certificates/finite_a1.35_glob_hi.npz,35f682387a76cfc04a0589795c9596af9517ab4ee173588c7aa1ff018daadf27,565433,python -m src.cert_export finite 1.35 4.0375 finite_a1.35_glob_hi
+results/certificates/finite_a1.35_glob_lo.json,4f2aa1f4c6cf7c221242c27c5a6986af4fad589ab4bb337f6a9aedbee32ced04,1099,python -m src.cert_export finite 1.35 4.025 finite_a1.35_glob_lo
+results/certificates/finite_a1.35_glob_lo.npz,88593c1d11f9073bbea8ad49fa5a3c36e361b12bf56b95ca44bbf27912612ce6,588217,python -m src.cert_export finite 1.35 4.025 finite_a1.35_glob_lo
+results/certificates/finite_a1.40_glob_hi.json,90d30e4fbfabb6d5e75b8fcf581121bf83c6c3ca0783295f30a51202d6edfc2c,1097,python -m src.cert_export finite 1.4 3.3875 finite_a1.40_glob_hi
+results/certificates/finite_a1.40_glob_hi.npz,092db84352d0238e846ae7c719be9112fad4b44df1c0adadf3dfc5a08931504f,524552,python -m src.cert_export finite 1.4 3.3875 finite_a1.40_glob_hi
+results/certificates/finite_a1.40_glob_lo.json,798473c24ecb488cc58d57d6823e0c1d37e20d060b8ea7985d34d18bfb0691b2,1097,python -m src.cert_export finite 1.4 3.375 finite_a1.40_glob_lo
+results/certificates/finite_a1.40_glob_lo.npz,4fac298f59153ed4067f1d2d99c88da788980108b10e9f1fbb745a5b08c658c4,605365,python -m src.cert_export finite 1.4 3.375 finite_a1.40_glob_lo
+results/certificates/finite_a1.45_glob_hi.json,d72fea4f52496fee67c3ac9ff03e63d493c1dd8951959394b1e76ee36cae42f5,1091,python -m src.cert_export finite 1.45 2.9 finite_a1.45_glob_hi
+results/certificates/finite_a1.45_glob_hi.npz,25a2af68bdd7299a94ea3d24379b3bc629d8ef321ee3322c540a0bcab9ff0b63,641630,python -m src.cert_export finite 1.45 2.9 finite_a1.45_glob_hi
+results/certificates/finite_a1.45_glob_lo.json,f73e97c3b8ff87444eff6c3b7c5f872597cc4a6d9353c1f179268fd76f91c9bf,1098,python -m src.cert_export finite 1.45 2.8875 finite_a1.45_glob_lo
+results/certificates/finite_a1.45_glob_lo.npz,68b56542a5a44c15009e7b045923c63df87d455698a43c0abcadb9f396a31a6c,580231,python -m src.cert_export finite 1.45 2.8875 finite_a1.45_glob_lo
+results/certificates/finite_a1.50_glob_hi.json,7be08166996db2a619775246e5a7b9b8e8e11b6a635a40813db598e1186621dc,1093,python -m src.cert_export finite 1.5 2.5375 finite_a1.50_glob_hi
+results/certificates/finite_a1.50_glob_hi.npz,5b0d38e88148c8807d572e28b3609f4c053e31110513d7691626dfd356818690,621326,python -m src.cert_export finite 1.5 2.5375 finite_a1.50_glob_hi
+results/certificates/finite_a1.50_glob_lo.json,8b27e48b84b01d3058872be222f9792c027a53d3a867cefc92a99edfa604f6ed,1095,python -m src.cert_export finite 1.5 2.525 finite_a1.50_glob_lo
+results/certificates/finite_a1.50_glob_lo.npz,5a181ad577a3e1256c1677b01a7bb7d2117381899a1036925cee138692519e1e,653983,python -m src.cert_export finite 1.5 2.525 finite_a1.50_glob_lo
+results/certificates/finite_a1.60_glob_hi.json,48ebfaf15e6854c374dec11f673cab4993cf86212e5f426468c6e192efe960f9,1096,python -m src.cert_export finite 1.6 2.0125 finite_a1.60_glob_hi
+results/certificates/finite_a1.60_glob_hi.npz,e0aa120ef01ce6b934d0700308c21735b8860a8a7bb074fecd307f4f3563df7f,699310,python -m src.cert_export finite 1.6 2.0125 finite_a1.60_glob_hi
+results/certificates/finite_a1.60_glob_lo.json,230f23f106944034df2f9778624ff1654909aff41ac8de4a88c8893031d61963,1089,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
+results/certificates/finite_a1.60_glob_lo.npz,1d42ab3da52f25a9cef2e4f78e2ad28dcb0ab3757e51354305612b388efb2eb9,729650,python -m src.cert_export finite 1.6 2.0 finite_a1.60_glob_lo
