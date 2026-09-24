@@ -299,12 +299,19 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
         **11–16% too low** (−0.115 at 1.30, −0.159 at 1.50);
       - by the crossing, 77–90% of runs sit on the globally preferred branch, although initialisation
         chooses it at chance;
-      - a run commits to its branch early: from 10% of its time to crossing, the branch at every check
-        matches the branch at the crossing;
-      - every observed branch switch happens while the training loss is at log 2 (switch loss median
-        0.6931, range 0.685–0.729), and none after the loss falls clearly below it. That is consistent
-        with the log 2 barrier trapping each run in the mirror it reaches first below the plateau
-        (exploratory, `prospective_own_switch_losses.csv`).
+      - **Exploratory — when and why runs commit** (base-window runs; `prospective_own_switch_losses.csv`,
+        `prospective_own_commit_by_*.csv`):
+        - A branch switch must pass through w₁ = 0 or w₂ = 0, where the network is constant and the loss is
+          log 2. So a switch occurring at log 2 is **forced, not an observation**.
+        - The finding: **branch switches occur only early, while the loss is still at log 2** (all 30 of
+          them, none afterwards).
+        - During that phase, runs drift toward the lower-loss mirror. That takes the global-branch share
+          from chance at initialisation to 77–90% at crossing.
+        - Once the loss falls below log 2, a switch would require the loss to rise back to it, and that
+          does not happen.
+        - **Commitment curve**: the branch matches the crossing branch at every check **from 10% of the
+          time to crossing onward**, and **once R exceeds 0.10 at a = 1.30 or 0.15 at a = 1.50**. Before
+          that the match rate is 62% in the first 1% of the time, 78–86% at 1–5%, and 95–98% at 5–10%.
     - **Summary, all post hoc**:
       - initialisation selects the mirror branch at chance (51.4%);
       - every replay ends on the branch it started on;
