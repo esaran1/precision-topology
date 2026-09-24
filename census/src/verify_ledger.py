@@ -754,6 +754,13 @@ PRODUCERS = {
     "first_order_finite.csv": ("first_order", "finite", "full", ""),
     "first_order_finite_evaluations.csv": ("first_order", "finite", "full", ""),
     "first_order_scores.csv": ("first_order", "score", "full", ""),
+    "prospective_own_runs.csv": ("prospective_own", "train", "full", ""),
+    "prospective_own_scores.csv": ("prospective_own", "score", "full", ""),
+    "prospective_own_settings_scored.csv": ("prospective_own", "score", "full", ""),
+    "prospective_own_early_scores.csv": ("prospective_own", "score_secondary", "full", ""),
+    "prospective_own_mixture_scores.csv": ("prospective_own", "score_secondary", "full", ""),
+    "prospective_own_mixture_settings.csv": ("prospective_own", "score_secondary", "full", ""),
+    "prospective_own_validation.csv": ("prospective_own", "validate", "full", ""),
     "certv2_annulus_summary.csv": ("certificates_v2", "_summary", "full", ""),
     "certv2_solve_parts.csv": ("certificates_v2", "_run", "full", ""),
     "certv2_solve_pd.csv": ("certificates_v2", "pd_boxes_solve", "full", ""),
@@ -1032,6 +1039,27 @@ def v4_checks() -> None:
         float(bool(ss_.all_certified) and bool(ss_.pred_inside)), 1.0, 0)
     ff_ = pd.read_csv(R / "first_order_finite.csv")
     chk("c1 test: Ghat converged at all four a", float(ff_.Ghat_converged.all() and len(ff_) == 4), 1.0, 0)
+    ps_ = pd.read_csv(R / "prospective_own_scores.csv", float_precision="round_trip")
+    chk("prospective own: all 16 registered comparisons pass (primary + sensitivity)", float(ps_["pass"].all() and len(ps_) == 16), 1.0, 0)
+    pr_ = ps_[ps_.analysis.str.startswith("primary")].set_index(["a", "comparison"])
+    for (a_, c_), (st_, lo_, hi_) in {(1.3, "P1"): (-0.0696, -0.0852, -0.0565), (1.3, "P2a"): (-0.0136, -0.0256, -0.0016),
+                                      (1.3, "P3"): (-0.0448, -0.0553, -0.0334), (1.5, "P1"): (-0.0695, -0.0864, -0.0562),
+                                      (1.5, "P2b"): (0.0226, 0.0091, 0.0363), (1.5, "P3"): (-0.0318, -0.0436, -0.0196)}.items():
+        r_ = pr_.loc[(a_, c_)]
+        chk(f"prospective own {c_} a={a_} stat", float(r_.stat), st_, 0.00006)
+        chk(f"prospective own {c_} a={a_} lo", float(r_.lo), lo_, 0.00006)
+        chk(f"prospective own {c_} a={a_} hi", float(r_.hi), hi_, 0.00006)
+    chk("prospective own P4 a=1.3", float(pr_.loc[(1.3, "P4")].stat), 0.0419, 0.00006)
+    chk("prospective own P4 a=1.5", float(pr_.loc[(1.5, "P4")].stat), 0.0867, 0.00006)
+    pv_ = pd.read_csv(R / "prospective_own_validation.csv")
+    chk("prospective own validation: 0 contradictions of 48", float(pv_.contradiction.sum() == 0 and len(pv_) == 48), 1.0, 0)
+    pe_ = pd.read_csv(R / "prospective_own_early_scores.csv").set_index("a")
+    chk("S-early match 1.30", float(pe_.loc[1.3, "match_rate"]), 0.8696, 0.00005)
+    chk("S-early match 1.50", float(pe_.loc[1.5, "match_rate"]), 0.8783, 0.00005)
+    chk("S-early all expectations consistent", float(pe_.match_consistent.all() and pe_.err_unfitted_in_expected_range.all()
+                                                    and pe_.err_fitted_in_expected_range.all() and (pe_.n_undefined == 0).all()), 1.0, 0)
+    pss_ = pd.read_csv(R / "prospective_own_settings_scored.csv")
+    chk("prospective own non-crossers per a", float(pss_.groupby("a").non_crossers.sum().max()), 20.0, 0)
     chk("certv2 annulus: 40 sub-intervals over [0.66, 0.71]",
         float(len(pd.read_csv(R / "certv2_annulus_parts.csv"))), 40.0, 0)
     chk("certv2 solve: PD lambda_min", float(pd.read_csv(R / "certv2_solve_summary.csv").pd_lambda_min_lower.iloc[0]),

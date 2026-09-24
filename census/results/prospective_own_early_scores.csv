@@ -1,0 +1,3 @@
+a,n_crossed,n_undefined,match_rate,match_expected,match_consistent,lead_steps_median,lead_steps_min,lead_R_median,lead_R_min,err_unfitted_median,err_fitted_median,err_unfitted_in_expected_range,err_fitted_in_expected_range
+1.3,460,0,0.8695652173913043,0.865,True,2250.0,450.0,0.2179369382908085,0.16087683823616192,0.04404807515770512,0.014529761449199822,True,True
+1.5,460,0,0.8782608695652174,0.892,True,1000.0,100.0,0.22290081074322543,0.13145998675283893,0.09189158184691673,0.030796482487106015,True,True

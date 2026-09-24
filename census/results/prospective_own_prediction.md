@@ -228,3 +228,74 @@ For every run, in addition to R_own:
 The rule has pass and fail cases: never on the plateau, leaves it, never leaves (undefined), and a flip
 through w₂ = 0. The weighted median and the early-prediction selection are also tested
 (`tests/test_registered_checks.py`).
+
+## Result — scored 2026-09-24 07:56 EDT with the committed scorers (`score`, `score_secondary`)
+
+- **Predictions frozen** in commit `44f3031` (SHA-256 c428e556…e042; `gate_hash` passed at validate, train
+  and score).
+  - Sequencing: that git commit followed `validate` rather than preceding it, because the queued job ran
+    predict && validate back to back. The hash was recorded by `predict` and still matched. The file was
+    committed before any training, as Amendment 1 requires.
+- **Validation**: 48 runs × 2 ends, **0 contradictions**.
+  - Lower ends: 42 certified minus, 6 unresolved.
+  - Upper ends: 43 certified plus, 5 unresolved.
+  - The 11 unresolved ends fall in 11 runs, at most one per run:
+    - V10 at 1.30 (seeds 400,000–400,002);
+    - V20 at 1.30 (400,002) and at 1.50 (400,001);
+    - V30 at 1.30 (400,000 and 400,001);
+    - V40 at 1.30 (400,002) and at 1.50 (400,000);
+    - V60 at 1.30 and at 1.50 (400,000).
+    - Every run has at least one certified end that agrees with its bracket (`prospective_own_validation.csv`).
+- **Non-crossers**: 20 of 480 runs at each a, 2–3 per setting (`prospective_own_settings_scored.csv`).
+
+**Primary (crossers; window-level bootstrap 95% intervals). Every registered comparison PASSES at both a.**
+
+| a | comparison | statistic | 95% interval | criterion | verdict |
+|---|---|---:|---|---|---|
+| 1.30 | P1: U_own − U (mean \|err\|) | −0.0696 | [−0.0852, −0.0565] | entirely below 0 | **PASS** |
+| 1.30 | P2a: U_own − C (median \|err\|) | −0.0136 | [−0.0256, −0.0016] | upper end < 0.01 | **PASS** (the interval is also entirely below 0) |
+| 1.30 | P3: C_own − C (mean \|err\|) | −0.0448 | [−0.0553, −0.0334] | entirely below 0 | **PASS** |
+| 1.30 | P4: pooled median \|err\| of U_own | 0.0419 | — | in [0.001, 0.061] | **PASS** |
+| 1.50 | P1: U_own − U | −0.0695 | [−0.0864, −0.0562] | entirely below 0 | **PASS** |
+| 1.50 | P2b: U_own − C (mean \|err\|) | +0.0226 | [+0.0091, +0.0363] | not entirely below 0 | **PASS** (expectation held; C better, interval entirely above 0) |
+| 1.50 | P3: C_own − C | −0.0318 | [−0.0436, −0.0196] | entirely below 0 | **PASS** |
+| 1.50 | P4: pooled median \|err\| of U_own | 0.0867 | — | in [0.034, 0.094] | **PASS** |
+
+- **Registered sensitivity** (non-crossers at their final R): every comparison passes again.
+  - a = 1.30: P1 [−0.0811, −0.0540]; P2a upper end −0.0039; P3 [−0.0556, −0.0348]; P4 0.0425.
+  - a = 1.50: P1 [−0.0824, −0.0536]; P2b [+0.0024, +0.0293]; P3 [−0.0449, −0.0220]; P4 0.0874.
+- **Also reported**:
+  - **Spearman ρ(R_cross, R_own) per setting**:
+    - a = 1.30: 0.757–0.863 (median 0.819);
+    - a = 1.50: 0.574–0.822 (median 0.776).
+    - Both are below S3's ≈ 0.88.
+  - **Per-setting median |log error|**:
+
+    | predictor | a = 1.30 | a = 1.50 |
+    |---|---|---|
+    | U_own | 0.040–0.053 | 0.072–0.125 |
+    | C_own | 0.009–0.022 | 0.008–0.061 |
+    | U | 0.094–0.153 | 0.134–0.224 |
+    | C | 0.001–0.045 | 0.003–0.072 |
+
+**Secondary S-early** (per run, prospective in time): consistent with every registered expectation at both a.
+- **Match rate**: 0.870 at a = 1.30 (expected 0.865 ± 0.10) and 0.878 at a = 1.50 (expected 0.892 ± 0.10).
+  - 460 crossers at each a; 0 undefined.
+- **Lead time**:
+  - a = 1.30: median 2,250 steps (minimum 450); median R 0.218 (minimum 0.161);
+  - a = 1.50: median 1,000 steps (minimum 100); median R 0.223 (minimum 0.131).
+- **Per-run |log error| median**:
+  - unfitted: 0.0440 at a = 1.30, in [0.029, 0.053]; 0.0919 at a = 1.50, in [0.065, 0.124];
+  - fitted: 0.0145 at a = 1.30, in [0.004, 0.023]; 0.0308 at a = 1.50, in [0.005, 0.063]. The fitted ranges
+    are in-sample for r.
+
+**Secondary S-mix** (setting-level, fitted; no pass criterion):
+- **Mean per-setting |log error|**:
+  - a = 1.30: 0.0616 [0.0574, 0.0661];
+  - a = 1.50: 0.1112 [0.0965, 0.1248].
+  - With the ×(1 + r) variant: 0.0321 and 0.0501.
+- **The weighted mixture against the other predictors**:
+  - it is better than U at both a;
+  - it is worse than C at both a, in both variants;
+  - against the per-setting median of U_own it is worse unweighted and better with ×(1 + r)
+    (`prospective_own_mixture_scores.csv`).

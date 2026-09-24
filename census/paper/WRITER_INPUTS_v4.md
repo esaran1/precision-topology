@@ -10,6 +10,7 @@ handoff (`WRITER_INPUTS.md`, tag `paper-submitted-v3`) remains correct except wh
 | 1. Audit of the conditional threshold | **complete**; registered decision rule met; 1d done (below) | yes |
 | 2. Proposition 2 made precise | **certified**: localisation, switch, H2′, neighbourhood, solve threshold, and global uniqueness (annulus and solve bracket, four-link chain); registered c₁ test scored **INCONCLUSIVE** (k₁ component PASSED) | yes |
 | 3. Prospective held-out prediction | **complete; primary criterion PASSED** | yes |
+| 3′. Prospective own-seed test (16 new settings) | **complete; every registered comparison PASSED at both a** (P2b: C better at 1.50, as registered) | yes |
 | 4. Fixed-scale dynamics | running under an amended validity check (see below) | if scored and verified in time; otherwise rebuttal |
 | 5. Retention curve | queued after Block 4 | if scored and verified in time; otherwise rebuttal |
 | 6. Width 2 | design committed for review (`block6_width2_design.md`); nothing run | rebuttal |
@@ -598,6 +599,45 @@ Registered `fixed_scale_prediction.md` (`888344d`, amendments `0f9f67e`, `10c1ea
 - The same caveat as Block 4 applies to the width: it reflects heterogeneity across runs (S1–S3 test
   whether own-seed thresholds account for it).
 
+
+## Prospective own-seed test (registered `prospective_own_prediction.md`, `e149370`, amendments `07e1529`, `2758622`; predictions frozen `44f3031`; scored)
+
+- **Registered design**, fixed before any computation on these settings:
+  - **Settings**: 16 new settings, 8 never-trained windows (V10–V80) × a ∈ {1.30, 1.50}, with 60 runs each.
+  - **Predictor**: each run's **own** threshold R_own, computed from its own 200-point training set before
+    training. It is computed independently of unconstrained training trajectories, and **nothing in it is
+    fitted**.
+  - **Integrity**: the predictions were frozen with a SHA-256 before any training. Certified validation of
+    48 runs × 2 ends found 0 contradictions.
+- **Verdict: every registered comparison PASSED at both a** (`prospective_own_scores.csv`; window-level
+  bootstrap 95% intervals):
+  - **P1 (primary)**: the own threshold beats the population threshold per run.
+    - Mean |log err| difference −0.070 [−0.085, −0.057] at a = 1.30 and −0.070 [−0.086, −0.056] at a = 1.50.
+  - **P2a** (a = 1.30): the unfitted own threshold is non-inferior to Block 3's fitted C. The difference is
+    −0.014 [−0.026, −0.002], so it is in fact better there.
+  - **P2b** (a = 1.50): as registered, it does **not** beat C. C is better, +0.023 [+0.009, +0.036].
+  - **P3**: C_own (fitted, labelled) beats C at both a: −0.045 and −0.032.
+  - **P4**: the pooled median per-run error of the own threshold is 0.042 at a = 1.30 and 0.087 at a = 1.50.
+    Both lie inside their registered ranges.
+  - **Sensitivity**: all of the above hold again with the 20 non-crossers per a included at their final R.
+- **Secondary S-early** (per run, prospective in time): the branch a run occupies when it first leaves the
+  constant-predictor plateau matches the branch at crossing in 87% of runs at a = 1.30 and 88% at 1.50.
+  Both match the registered expectations (0.865, 0.892).
+  - The prediction precedes the crossing by a median of 2,250 steps at 1.30 and 1,000 steps at 1.50.
+  - Its unfitted per-run error medians (0.044, 0.092) lie in their registered ranges.
+- **Also reported, no criterion**:
+  - Spearman ρ(R_cross, R_own) per setting is 0.76–0.86 at 1.30 and 0.57–0.82 at 1.50, lower than S3's 0.88.
+  - S-mix (fitted) beats U but not C.
+- **Say**: "On 16 settings no run had been trained on, each run's own conditional threshold was computed
+  from its own training set before training, independently of unconstrained training trajectories, and
+  frozen by hash. It predicted where that run became correct better than the population threshold did, at
+  both a (registered, all criteria passed). Without fitting, it matched a fitted lag model at a = 1.30. At
+  a = 1.50 the fitted lag model remained better, as registered."
+- **Do not say**:
+  - that the own threshold beats the fitted model at a = 1.50;
+  - that S-mix passed. It had no criterion.
+- **Mind the error sizes**: the per-run |log error| of the unfitted own threshold is about 4% at 1.30 and
+  about 9% at 1.50. It is not an exact per-run predictor, and the residual is the lag that C and C_own absorb.
 
 ## Figure manifest (v4)
 
