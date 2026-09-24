@@ -422,3 +422,40 @@ compute priority.
 
   - Elsewhere the counts are 0–3.
   - This confirms that the cap-raising rule is needed for f_a near the thresholds.
+
+## Revision 3 — 2026-09-24 (approved by the author with these changes; nothing run)
+
+**Recorded**:
+- **Γ₂ ≥ κ·a is proved.** The κ configuration (two cosines with cancelling linear parts) is a width-2 f_a network
+  whose gap is exactly a·κ, with κ ≥ 0.9129787217024 by exact extrema.
+- **Γ₂ = κ·a is validated, not proved.** Γ̂₂/a equals κ to 5e−7 at a = 1.30 and 1.50. Equality would need the
+  maximiser to have c = 0, which is not proved.
+
+**Sweep-rate matching becomes the primary W1 arm.**
+- **Why**:
+  - Under Adam the output weights move by about the learning rate per step.
+  - With matched initialisation alone, ‖w₂‖₁ would pass the width-2 threshold in tens of steps, against
+    thousands at width 1.
+  - Crossings would then sit far above threshold for a dynamical reason, and fail W1's upper bound spuriously.
+- **Rule**: the output weights' learning-rate factor φ₂(a) is chosen so that two medians match:
+  - the median number of steps for ‖w₂‖₁ to go from its initial value to the width-2 threshold s₂,glob(a), at
+    width 2 with matched initialisation;
+  - the median number of steps for |w₂| to go from its initial value to |w₂|_glob(a), at width 1 with the
+    width-1 protocol, at the same a.
+- **Implementation**: after each Adam step, v ← v_before + φ₂(v_after − v_before). Adam's update is proportional
+  to its learning rate, so this is exactly learning rate φ₂·lr for v, as in the lag test's `scale_w2_step`.
+- **The pilot that chooses φ₂** records **only ‖w₂‖₁ (and |w₂| at width 1) trajectories, not correctness**.
+  - It uses calibration seeds **510,000–510,039**, separate from every registered seed (W1: 600,000–600,079;
+    W4 horizon pilot: 500,000–500,019).
+  - φ₂ is found by bisection in log φ₂ until the width-2 median is within 2% of the width-1 median.
+- **Frozen with a hash before any W1 run**: φ₂(a) and k(a).
+- **Arms**:
+  - **Primary**: matched initialisation plus matched sweep rate.
+  - **Secondary**: matched initialisation only.
+  - **Descriptive**: standard initialisation.
+- **W1 criteria** are unchanged, registered and reported on the **primary and secondary** arms.
+- **W4** is unaffected by the sweep rate, because scale is held. It runs from the **primary arm's** checkpoints
+  and is **the principal test of the general principle at width 2**.
+
+**Everything else in Revision 2 is approved as written**: the k(a) rule, the W4 horizon rule, the cap-raising
+rule, the DE budget (20 × 200 × 2,000) with 1e−6 agreement, and the per-unit breakdown.

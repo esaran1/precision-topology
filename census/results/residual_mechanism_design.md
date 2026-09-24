@@ -102,3 +102,10 @@ So the residual depends on the middle phase of training. There are two candidate
 - **OM supported**: the residual is an optimiser-state effect, specific to Adam's moment dynamics.
 - **Neither or both**: the mechanism remains open, and the wording stays as it is ("Its mechanism remains
   open").
+
+## Approval — 2026-09-24 (author), with one added check
+
+- **Added validity check (stop)**: after teleporting, the state must be on the same mirror branch the run
+  occupied at the switch point, in canonical orientation (w₂ > 0, branch = sign(w₁)). **Stop if any run changes
+  branch.** Constructed fail case: a target on the other mirror branch.
+- **Order**: runs after Block 4a (post hoc) is reported.
