@@ -12,3 +12,6 @@ results/phase2b_checkpoints.csv
 
 # built supplementary archives (rebuild from the tag, never commit)
 dist/
+
+# deterministic lag-test-2 checkpoints (regenerate: python -m src.lag_test2 checkpoints)
+results/lag_test2_states/

@@ -349,3 +349,68 @@ def test_secondary_predictor_pieces():
     assert early_prediction(row) == 0.21
     assert early_prediction({**row, "early_branch": -1}) == 0.23
     assert early_prediction({**row, "early_defined": False}) is None     # undefined: a miss
+
+
+# ------------------------------------------------------------------ deconfounded lag test
+def test_lag2_choose_tstar():
+    from src.lag_test2 import choose_tstar
+    R = [0.01 * k for k in range(1, 101)]
+    assert choose_tstar([False] * 100, R, 50, 0.2) == (1, "ok")                        # never on the plateau
+    flags = [True] * 5 + [False] * 10 + [True] * 3 + [False] * 82                        # last plateau step: 18
+    assert choose_tstar(flags, R, 60, 0.3) == (19, "ok")
+    assert choose_tstar(flags, R, 60, 0.2)[1].startswith("excluded: R")                 # R(19) = 0.19 > 0.8 x 0.2
+    assert choose_tstar([True] * 100, R, 40, 1.0)[1].startswith("excluded: leaves")      # on the plateau to crossing
+
+
+def test_lag2_continuation_check(tmp_path):
+    from src import lag_test2 as l2
+    G = _awkward(60) + 5.0
+    ref = pd.DataFrame({"a": 1.3, "n": 6400, "seed": range(60), "cross_step": np.arange(60, dtype=float) + 100, "w2_abs": G})
+    ref.to_csv(tmp_path / "sample_size_free.csv", index=False)
+    new = ref.drop(columns="n").assign(factor=1.0).iloc[:50]                             # excluded runs simply absent
+    new.to_csv(tmp_path / "lag_test2_runs.csv", index=False)
+    assert l2.check_continuation(tmp_path) == 50
+    bad = new.copy(); bad.loc[4, "w2_abs"] = np.nextafter(bad.loc[4, "w2_abs"], -np.inf)
+    bad.to_csv(tmp_path / "lag_test2_runs.csv", index=False)
+    with pytest.raises(SystemExit):
+        l2.check_continuation(tmp_path)
+    bad = new.copy(); bad.loc[4, "cross_step"] += 1
+    bad.to_csv(tmp_path / "lag_test2_runs.csv", index=False)
+    with pytest.raises(SystemExit):
+        l2.check_continuation(tmp_path)
+
+
+def test_lag2_score_verdicts(tmp_path, monkeypatch):
+    from src import lag_test2 as l2, own_threshold as ot
+    for f in ("cond_certified_brackets.csv", "ghat_certified_all.csv"):
+        (tmp_path / f).write_bytes((ot.Path(ot.__file__).resolve().parents[1] / "results" / f).read_bytes())
+    monkeypatch.setattr(ot, "RESULTS", tmp_path)
+    rng = np.random.default_rng(1)
+
+    def build(resid):
+        from src.sample_size import _pop
+        own, runs, free = [], [], []
+        for a in l2.A_VALUES:
+            G, w2p, _ = _pop(a)
+            for i in range(45):
+                s = l2.SEED0 + i; w_own = w2p * (1 + rng.normal(0.01, 0.02))
+                own.append({"a": a, "n": l2.N, "seed": s, "w2_own": w_own})
+                for fct in l2.FACTORS:
+                    w2 = w_own * (1 + resid[fct] + rng.normal(0, 0.004))
+                    runs.append({"a": a, "seed": s, "factor": fct, "t_star": 5, "cross_step": 900.0, "w2_abs": w2,
+                                 "R_cross": w2 * G / 2, "w1": 0.8, "b1": 3.8, "w2": w2, "plateau_reentry_steps": 0})
+                    if fct == 1.0:
+                        free.append({"a": a, "n": l2.N, "seed": s, "cross_step": 900.0, "w2_abs": w2})
+        pd.DataFrame(own).to_csv(tmp_path / "sample_size_own.csv", index=False)
+        pd.DataFrame(runs).to_csv(tmp_path / "lag_test2_runs.csv", index=False)
+        pd.DataFrame(free).to_csv(tmp_path / "sample_size_free.csv", index=False)
+    build({0.25: 0.008, 0.5: 0.016, 1.0: 0.032, 2.0: 0.064})                      # proportional lag
+    l2.score(tmp_path)
+    t = pd.read_csv(tmp_path / "lag_test2_tests.csv")
+    assert t.L1p_pass.all() and t.L2p_pass.all() and not t.competing_no_dependence.any()
+    build({0.25: 0.03, 0.5: 0.03, 1.0: 0.03, 2.0: 0.03})                          # no dependence
+    l2.score(tmp_path)
+    t = pd.read_csv(tmp_path / "lag_test2_tests.csv")
+    assert not t.L1p_pass.any() and not t.L2p_pass.any() and t.competing_no_dependence.all()
+    pr = pd.read_csv(tmp_path / "lag_test2_pairs.csv")
+    assert pr[~pr.strictly_increasing].note.str.contains("indistinguishable").all()
