@@ -709,6 +709,7 @@ PRODUCERS = {
     "mirror_s1.csv": ("mirror_branches", "analyse", "full", ""),
     "mirror_s3.csv": ("mirror_branches", "analyse", "full", ""),
     "mirror_gap_summary.csv": ("mirror_branches", "mirror_gap", "full", ""),
+    "mirror_size_gap_summary.csv": ("mirror_branches", "size_gap", "full", ""),
     "mirror_branch_thresholds.csv": ("mirror_branches", "thresholds", "full", ""),
     "sample_size_tests.csv": ("sample_size", "score", "full", ""),
     "sample_size_cells.csv": ("sample_size", "score", "full", ""),
@@ -930,6 +931,9 @@ def v4_checks() -> None:
     gs_ = pd.read_csv(R / "mirror_gap_summary.csv").iloc[0]
     chk("mirror gap median", float(gs_.gap_rel_median), 0.1063, 0.0001)
     chk("mirror gap exceeds distance", float(gs_.gap_exceeds_distance), 281.0, 0)
+    msg_ = pd.read_csv(R / "mirror_size_gap_summary.csv").set_index(["a", "n"])
+    for (a_, n_), v_ in (((1.3, 400), 0.0972), ((1.3, 6400), 0.0366), ((1.5, 400), 0.0993), ((1.5, 6400), 0.0365)):
+        chk(f"mirror gap vs n {a_}/{n_}", float(msg_.loc[(a_, n_), "median"]), v_, 0.0001)
     va_ = pd.read_csv(R / "own_threshold_validation.csv")
     chk("own validation: agreement (registered)", float(va_.agrees.mean()), 0.65, 0)
     vt_ = pd.read_csv(R / "own_threshold_validation_tight.csv")

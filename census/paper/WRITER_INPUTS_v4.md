@@ -311,6 +311,12 @@ Results `fixed_scale_block4_curve.csv`, `fixed_scale_block4_tests.csv`; producer
       - using the initialisation-selected branch, ρ is 0.13 and 0.12.
       - **The residual is unchanged either way**: 3.0% and 6.3%, against 3.1% and 6.4% with the global
         threshold. So the residual is **not** mirror occupancy.
+    - **The mirror gap shrinks with training-set size** (`mirror_size_gap_summary.csv`; size-test seeds,
+      20 per cell). The median |T₊ − T₋|/T_global goes 9.7% → 8.8% → 3.7% at a = 1.30 and 9.9% → 8.8% →
+      3.6% at a = 1.50, for n = 400 → 1,600 → 6,400.
+      - That is consistent with finite samples breaking the x → −x symmetry.
+      - So mirror asymmetry is a finite-sample effect, and it cannot account for the residual (about 4%
+        and 7.5%) that persists at large n.
     - **The 15 disagreements on the preferred branch** (`mirror_basin_census_preferred.csv`):
       - **No third basin.**
       - **8 are on the degenerate plateau**: w₁ ≈ 0, flat Hessian, loss ≈ log 2. The run never left the
