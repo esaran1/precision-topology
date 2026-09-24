@@ -370,7 +370,7 @@ def wp7():
     rows_g = "".join(f"| {r.a:.2f} | [{r.best_lo:.12f}, {r.Ghat_hi_rigorous:.12f}] | "
                      f"{'branch and bound point' if r.bnb_arg_lower > r.Ghat_cert_rigorous else 'Ĝ_cert witness'} | "
                      f"{r.d_abs:.2e} | {r.d_rel:.2e} | {e(r.delta_hi)} |\n" for r in g.itertuples())
-    imax = int(g.d_rel.idxmax())
+    imax = int(g.d_rel.idxmax()); jmax = int(g.d_abs.idxmax())
     return f"""
 ## WP-7. Ĝ(a) as rigorous enclosures (replaces the float values; Block 2)
 
@@ -387,8 +387,9 @@ over every leaf of the branch and bound, rounded up. The domain reduction to w�
 **(ii) The enclosure of the supremum G* = Ĝ(a), reported separately.** Lower end: the best certified lower bound at each
 a, the larger of the rigorous values at the two recorded attained points (Ĝ_cert's witness and the branch and bound's
 own point). Upper end: the rigorous leaf bound, rounded up. The difference between the best certified lower bound and
-Ĝ_cert is given **both absolute and relative**; the largest is {g.d_abs[imax]:.2e} absolute, which is
-{g.d_rel[imax]:.2e} **relative**, at a = {g.a[imax]:.2f} (the "up to 8.4e−5" is relative).
+Ĝ_cert is given **both absolute and relative**. The largest relative difference is {g.d_rel[imax]:.2e} (at
+a = {g.a[imax]:.2f}, where it is {g.d_abs[imax]:.2e} absolute); the "up to 8.4e−5" is this relative figure. The largest
+absolute difference is {g.d_abs[jmax]:.2e} (at a = {g.a[jmax]:.2f}, {g.d_rel[jmax]:.2e} relative).
 
 | a | G* ∈ [best certified lower, upper] | lower end from | best lower − Ĝ_cert (absolute) | (relative) | change of upper end vs old float |
 |---|---|---|---|---|---|

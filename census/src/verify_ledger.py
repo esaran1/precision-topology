@@ -1260,8 +1260,12 @@ def v4_checks() -> None:
     rel_ = (bl_ - gr_.Ghat_cert_rigorous) / gr_.Ghat_cert_rigorous
     chk("G* best lower above Ghat_cert at nine a", float((gr_.bnb_arg_lower > gr_.Ghat_cert_rigorous).sum()), 9.0, 0)
     chk("G* best lower - Ghat_cert, max relative", float(rel_.max()), 8.36e-5, 0.006e-5)
-    chk("G* best lower - Ghat_cert, max absolute", float((bl_ - gr_.Ghat_cert_rigorous).max()), 1.48e-6, 0.006e-6)
-    chk("... at a = 1.10", float(gr_.a[rel_.idxmax()]), 1.10, 1e-9)
+    chk("G* best lower - Ghat_cert, max relative at a = 1.10", float(gr_.a[rel_.idxmax()]), 1.10, 1e-9)
+    chk("G* best lower - Ghat_cert, absolute at a = 1.10", float((bl_ - gr_.Ghat_cert_rigorous)[rel_.idxmax()]), 1.48e-6, 0.006e-6)
+    ab_ = bl_ - gr_.Ghat_cert_rigorous
+    chk("G* best lower - Ghat_cert, max absolute", float(ab_.max()), 7.09e-6, 0.006e-6)
+    chk("G* best lower - Ghat_cert, max absolute at a = 1.60", float(gr_.a[ab_.idxmax()]), 1.60, 1e-9)
+    chk("G* best lower - Ghat_cert, relative at a = 1.60", float(rel_[ab_.idxmax()]), 3.16e-5, 0.006e-5)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

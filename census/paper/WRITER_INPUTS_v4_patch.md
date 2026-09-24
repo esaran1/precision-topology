@@ -399,8 +399,9 @@ over every leaf of the branch and bound, rounded up. The domain reduction to w�
 **(ii) The enclosure of the supremum G* = Ĝ(a), reported separately.** Lower end: the best certified lower bound at each
 a, the larger of the rigorous values at the two recorded attained points (Ĝ_cert's witness and the branch and bound's
 own point). Upper end: the rigorous leaf bound, rounded up. The difference between the best certified lower bound and
-Ĝ_cert is given **both absolute and relative**; the largest is 1.48e-06 absolute, which is
-8.36e-05 **relative**, at a = 1.10 (the "up to 8.4e−5" is relative).
+Ĝ_cert is given **both absolute and relative**. The largest relative difference is 8.36e-05 (at
+a = 1.10, where it is 1.48e-06 absolute); the "up to 8.4e−5" is this relative figure. The largest
+absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 
 | a | G* ∈ [best certified lower, upper] | lower end from | best lower − Ĝ_cert (absolute) | (relative) | change of upper end vs old float |
 |---|---|---|---|---|---|
@@ -419,9 +420,9 @@ own point). Upper end: the rigorous leaf bound, rounded up. The difference betwe
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 376 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 379 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
-scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 1 are unstable
 (`ghat_digit_stability.csv`). A further 10 checks compare two artifacts to 1e−12; they are
 not printed numbers. 5 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and

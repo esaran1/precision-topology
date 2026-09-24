@@ -62,5 +62,6 @@
 - **The branch and bound's own attained point** gives a larger proven lower bound at nine a (by up to 8.4e−5
   relative). It is reported in WP-7 and not adopted, because it is a different number, not a rounding correction.
 - **Confirmed (2026-09-24).** R keeps the rigorous value at Ĝ_cert's witness. The enclosure of G* = Ĝ(a), with the best
-  certified lower bound at each a, is reported separately (WP-7 (ii)). The largest difference from Ĝ_cert is 1.48e−6
-  absolute, which is 8.36e−5 **relative**, at a = 1.10.
+  certified lower bound at each a, is reported separately (WP-7 (ii)). The largest relative difference from Ĝ_cert is
+  8.36e−5, at a = 1.10, where it is 1.48e−6 absolute. The largest absolute difference is 7.09e−6, at a = 1.60, where it
+  is 3.16e−5 relative.
