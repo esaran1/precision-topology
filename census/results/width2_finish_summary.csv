@@ -1,0 +1,2 @@
+act,R2,finished,converged,end_placed_pair,end_placed_other,end_unplaced_single_unit,end_unplaced_other,retained_loss,min_final_minus_retained,n_below_retained
+f1.30,0.001,1656,1654,21,0,1359,276,0.6922871697903527,-5.329070518200751e-15,0
