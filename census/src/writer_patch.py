@@ -1150,6 +1150,11 @@ def wp15():
     tb_f = json.loads((RESULTS / "asym_t23b_frozen.json").read_text())
     e2 = json.loads((RESULTS / "asym_posthoc" / "exploratory2.json").read_text())
     tc = json.loads((RESULTS / "asym_t23c" / "scores.json").read_text())
+    _ma = pd.read_csv(RESULTS / "width2_diagnosis" / "metrics_all.csv")
+    dg_sel = dict(zip(_ma[_ma.predictor == "P5"].arm, _ma[_ma.predictor == "P5"].median_abs_log_err))
+    dg_p3 = dict(zip(_ma[_ma.predictor == "P3"].arm, _ma[_ma.predictor == "P3"].median_abs_log_err))
+    _pr = pd.read_csv(RESULTS / "width2_diagnosis" / "predictors.csv")
+    dg_undef = int(((_pr.kind == "P5") & _pr.value.isna()).sum())
     tc_f = json.loads((RESULTS / "asym_t23c_frozen.json").read_text())
     pk = ph["knockout_counts"]
     return f"""
@@ -1256,6 +1261,25 @@ IDs: {_id("Track 2 expl own median", "Track 2 expl cross over own", "Track 2 exp
 - For information only, the criteria alone would give FAIL: {tc["crossed"]}/{tc["runs"]} crossed,
   {round(tc["criteria"]["frac_above_s_hi"] * tc["crossed"])}/{tc["crossed"]} at or above s_hi, median ratio {tc["criteria"]["median_ratio_s_lo"]:.1f}.
 IDs: {_id("Track 2 T2-3c UNRESOLVED", "Track 2 T2-3c phi2", "Track 2 T2-3c median ratio at crossing", "Track 2 T2-3c frac above", "Track 2 T2-3c median crossing ratio")}.
+
+**EXPLORATORY diagnosis (item 2; POST HOC; gate STOP, so no further test and no change to this section's claims).**
+The rules and the gate were committed before any result (`width2_diagnosis_gate.md`, 4b7826e). Producer:
+`src/width2_diagnosis.py` → `width2_diagnosis/`.
+- **Predictors of each run's crossing scale:** the population width-2 threshold; the own-sample width-2 threshold; the
+  own-sample width-1 threshold; the population width-1 threshold (s = 5.09); and the switch of the branch reached from
+  the run's own crossing configuration.
+- **Selected (lowest pooled error): the branch switch.** Median |log error| is {dg_sel["T2-3b"]:.3f} (T2-3b) and
+  {dg_sel["T2-3c"]:.3f} (T2-3c), but **{dg_sel["T2-3"]:.2f} (T2-3)**, so the gate (≤ 0.10 in every φ₂ setting) STOPS.
+- In the two slowed arms, the **width-1 own-sample threshold on the same training set** also matches the crossings closely:
+  median |log error| {dg_p3["T2-3b"]:.3f} and {dg_p3["T2-3c"]:.3f} (10 seeds each). Nothing tracks the full-speed T2-3
+  crossings.
+- Caveats:
+  - the branch switch is computed from the crossing configuration itself, so it is close to circular;
+  - it is undefined for {dg_undef} slowed-arm runs;
+  - the own-sample predictors rest on 10 seeds per arm.
+IDs: {_id("Item 2 gate STOP", "Item 2 selected P5", "Item 2 P5 T2-3 error", "Item 2 P3 T2-3b error", "Item 2 P3 T2-3c error")}.
+**Do not say** that any predictor explains where width-2 training crosses, or that width-2 crossings follow the
+width-1 threshold. This is a post hoc, 10-seed observation in the slowed arms only, and it failed the gate.
 
 **Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
 failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as

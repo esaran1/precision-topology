@@ -1,0 +1,27 @@
+{
+ "label": "POST HOC diagnosis; gate fixed in width2_diagnosis_gate.md",
+ "common_subset_n": 30,
+ "selected": "P5",
+ "gate": "STOP",
+ "selected_per_arm": [
+  {
+   "arm": "T2-3",
+   "n": 77,
+   "median_abs_log_err": 1.1705475914750907,
+   "spearman": 0.2959934802040065
+  },
+  {
+   "arm": "T2-3b",
+   "n": 49,
+   "median_abs_log_err": 0.009618620948080001,
+   "spearman": 0.9908163265306121
+  },
+  {
+   "arm": "T2-3c",
+   "n": 61,
+   "median_abs_log_err": 0.006175021384671873,
+   "spearman": 0.9859862506610257
+  }
+ ],
+ "selected_pooled_spearman": 0.9324724086926841
+}

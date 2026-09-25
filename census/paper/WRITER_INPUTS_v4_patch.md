@@ -1083,6 +1083,25 @@ IDs: `Track 2 expl own median`; `Track 2 expl cross over own`; `Track 2 expl Spe
   47/80 at or above s_hi, median ratio 10.8.
 IDs: `Track 2 T2-3c UNRESOLVED`; `Track 2 T2-3c phi2`; `Track 2 T2-3c median ratio at crossing`; `Track 2 T2-3c frac above`; `Track 2 T2-3c median crossing ratio`.
 
+**EXPLORATORY diagnosis (item 2; POST HOC; gate STOP, so no further test and no change to this section's claims).**
+The rules and the gate were committed before any result (`width2_diagnosis_gate.md`, 4b7826e). Producer:
+`src/width2_diagnosis.py` → `width2_diagnosis/`.
+- **Predictors of each run's crossing scale:** the population width-2 threshold; the own-sample width-2 threshold; the
+  own-sample width-1 threshold; the population width-1 threshold (s = 5.09); and the switch of the branch reached from
+  the run's own crossing configuration.
+- **Selected (lowest pooled error): the branch switch.** Median |log error| is 0.010 (T2-3b) and
+  0.006 (T2-3c), but **1.17 (T2-3)**, so the gate (≤ 0.10 in every φ₂ setting) STOPS.
+- In the two slowed arms, the **width-1 own-sample threshold on the same training set** also matches the crossings closely:
+  median |log error| 0.015 and 0.011 (10 seeds each). Nothing tracks the full-speed T2-3
+  crossings.
+- Caveats:
+  - the branch switch is computed from the crossing configuration itself, so it is close to circular;
+  - it is undefined for 41 slowed-arm runs;
+  - the own-sample predictors rest on 10 seeds per arm.
+IDs: `Item 2 gate STOP`; `Item 2 selected P5`; `Item 2 P5 T2-3 error`; `Item 2 P3 T2-3b error`; `Item 2 P3 T2-3c error`.
+**Do not say** that any predictor explains where width-2 training crosses, or that width-2 crossings follow the
+width-1 threshold. This is a post hoc, 10-seed observation in the slowed arms only, and it failed the gate.
+
 **Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
 failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as
 such, to put width-2 training in width 1's timescale regime. T2-3b (steps-matched output rate) is unresolved: its runs
