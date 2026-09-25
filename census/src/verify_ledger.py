@@ -1632,6 +1632,15 @@ def tracks_checks() -> None:
     chk("Item 1 within-a slope a=1.50", s1_["slope_within_a_all"]["1.50"], 3.09, 0.006)
     chk("Item 1 partial Spearman", s1_["partial_spearman_all"], 0.51, 0.006)
     chk("Item 1 replays reproduce", float(pd.read_csv(R / "timescale_consistency" / "runs.csv").reproduced.all()), 1.0, 0)
+    print("Block 4b correction and state audit")
+    bc_ = pd.read_csv(R / "residual_mechanism_corrected" / "scores.csv")
+    vv_ = bc_[bc_.arm == "VERDICT"]
+    chk("Block 4b corrected ID FAIL", float((vv_["4b-ID"] == "FAIL").all() and len(vv_) == 2), 1.0, 0)
+    chk("Block 4b corrected OM FAIL", float((vv_["4b-OM"] == "FAIL").all() and len(vv_) == 2), 1.0, 0)
+    au_ = pd.read_csv(R / "state_audit.csv")
+    other_ = au_[~au_.experiment.str.startswith("Block 4b (as registered)")]
+    chk("State audit clean arms", float(other_.clean.sum()), float(len(other_)), 0)
+    chk("State audit positive control", float(json.loads((R / "state_audit.json").read_text())["positive_control_flagged"]), 1.0, 0)
     print("Item 2 (width-2 diagnosis, post hoc)")
     g2_ = json.loads((R / "width2_diagnosis" / "gate.json").read_text())
     chk("Item 2 gate STOP", float(g2_["gate"] == "STOP"), 1.0, 0)

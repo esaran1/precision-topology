@@ -1,0 +1,273 @@
+experiment,unit,arm,params_match,state_match,clean
+Block 4b (as registered),a 1.3 seed 300000,control,True,True,True
+Block 4b (as registered),a 1.3 seed 300000,teleport,True,False,False
+Block 4b (as registered),a 1.3 seed 300000,reset,True,True,True
+Block 4b (as registered),a 1.3 seed 300000,teleport_reset,True,False,False
+Block 4b (as registered),a 1.3 seed 300001,control,True,True,True
+Block 4b (as registered),a 1.3 seed 300001,teleport,True,False,False
+Block 4b (as registered),a 1.3 seed 300001,reset,True,True,True
+Block 4b (as registered),a 1.3 seed 300001,teleport_reset,True,False,False
+Block 4b (as registered),a 1.5 seed 300000,control,True,True,True
+Block 4b (as registered),a 1.5 seed 300000,teleport,True,False,False
+Block 4b (as registered),a 1.5 seed 300000,reset,True,True,True
+Block 4b (as registered),a 1.5 seed 300000,teleport_reset,True,False,False
+Block 4b (as registered),a 1.5 seed 300001,control,True,True,True
+Block 4b (as registered),a 1.5 seed 300001,teleport,True,False,False
+Block 4b (as registered),a 1.5 seed 300001,reset,True,True,True
+Block 4b (as registered),a 1.5 seed 300001,teleport_reset,True,False,False
+Block 4b (corrected),a 1.3 seed 300000,teleport,True,True,True
+Block 4b (corrected),a 1.3 seed 300000,teleport_reset,True,True,True
+Block 4b (corrected),a 1.3 seed 300001,teleport,True,True,True
+Block 4b (corrected),a 1.3 seed 300001,teleport_reset,True,True,True
+Block 4b (corrected),a 1.5 seed 300000,teleport,True,True,True
+Block 4b (corrected),a 1.5 seed 300000,teleport_reset,True,True,True
+Block 4b (corrected),a 1.5 seed 300001,teleport,True,True,True
+Block 4b (corrected),a 1.5 seed 300001,teleport_reset,True,True,True
+Block 4,seed 200000 step 7443,0.6/preserved,True,True,True
+Block 4,seed 200000 step 7443,0.6/reset,True,True,True
+Block 4,seed 200000 step 7443,0.8/preserved,True,True,True
+Block 4,seed 200000 step 7443,0.8/reset,True,True,True
+Block 4,seed 200000 step 7443,0.9/preserved,True,True,True
+Block 4,seed 200000 step 7443,0.9/reset,True,True,True
+Block 4,seed 200000 step 7443,1.0/preserved,True,True,True
+Block 4,seed 200000 step 7443,1.0/reset,True,True,True
+Block 4,seed 200000 step 7443,1.1/preserved,True,True,True
+Block 4,seed 200000 step 7443,1.1/reset,True,True,True
+Block 4,seed 200000 step 7443,1.25/preserved,True,True,True
+Block 4,seed 200000 step 7443,1.25/reset,True,True,True
+Block 4,seed 200000 step 7443,1.5/preserved,True,True,True
+Block 4,seed 200000 step 7443,1.5/reset,True,True,True
+Block 4,seed 200000 step 7443,2.0/preserved,True,True,True
+Block 4,seed 200000 step 7443,2.0/reset,True,True,True
+Block 4,seed 200001 step 801,0.6/preserved,True,True,True
+Block 4,seed 200001 step 801,0.6/reset,True,True,True
+Block 4,seed 200001 step 801,0.8/preserved,True,True,True
+Block 4,seed 200001 step 801,0.8/reset,True,True,True
+Block 4,seed 200001 step 801,0.9/preserved,True,True,True
+Block 4,seed 200001 step 801,0.9/reset,True,True,True
+Block 4,seed 200001 step 801,1.0/preserved,True,True,True
+Block 4,seed 200001 step 801,1.0/reset,True,True,True
+Block 4,seed 200001 step 801,1.1/preserved,True,True,True
+Block 4,seed 200001 step 801,1.1/reset,True,True,True
+Block 4,seed 200001 step 801,1.25/preserved,True,True,True
+Block 4,seed 200001 step 801,1.25/reset,True,True,True
+Block 4,seed 200001 step 801,1.5/preserved,True,True,True
+Block 4,seed 200001 step 801,1.5/reset,True,True,True
+Block 4,seed 200001 step 801,2.0/preserved,True,True,True
+Block 4,seed 200001 step 801,2.0/reset,True,True,True
+Block 4,seed 200001 step 1101,0.6/preserved,True,True,True
+Block 4,seed 200001 step 1101,0.6/reset,True,True,True
+Block 4,seed 200001 step 1101,0.8/preserved,True,True,True
+Block 4,seed 200001 step 1101,0.8/reset,True,True,True
+Block 4,seed 200001 step 1101,0.9/preserved,True,True,True
+Block 4,seed 200001 step 1101,0.9/reset,True,True,True
+Block 4,seed 200001 step 1101,1.0/preserved,True,True,True
+Block 4,seed 200001 step 1101,1.0/reset,True,True,True
+Block 4,seed 200001 step 1101,1.1/preserved,True,True,True
+Block 4,seed 200001 step 1101,1.1/reset,True,True,True
+Block 4,seed 200001 step 1101,1.25/preserved,True,True,True
+Block 4,seed 200001 step 1101,1.25/reset,True,True,True
+Block 4,seed 200001 step 1101,1.5/preserved,True,True,True
+Block 4,seed 200001 step 1101,1.5/reset,True,True,True
+Block 4,seed 200001 step 1101,2.0/preserved,True,True,True
+Block 4,seed 200001 step 1101,2.0/reset,True,True,True
+Block 4,seed 200001 step 1514,0.6/preserved,True,True,True
+Block 4,seed 200001 step 1514,0.6/reset,True,True,True
+Block 4,seed 200001 step 1514,0.8/preserved,True,True,True
+Block 4,seed 200001 step 1514,0.8/reset,True,True,True
+Block 4,seed 200001 step 1514,0.9/preserved,True,True,True
+Block 4,seed 200001 step 1514,0.9/reset,True,True,True
+Block 4,seed 200001 step 1514,1.0/preserved,True,True,True
+Block 4,seed 200001 step 1514,1.0/reset,True,True,True
+Block 4,seed 200001 step 1514,1.1/preserved,True,True,True
+Block 4,seed 200001 step 1514,1.1/reset,True,True,True
+Block 4,seed 200001 step 1514,1.25/preserved,True,True,True
+Block 4,seed 200001 step 1514,1.25/reset,True,True,True
+Block 4,seed 200001 step 1514,1.5/preserved,True,True,True
+Block 4,seed 200001 step 1514,1.5/reset,True,True,True
+Block 4,seed 200001 step 1514,2.0/preserved,True,True,True
+Block 4,seed 200001 step 1514,2.0/reset,True,True,True
+Block 5,seed 200000 step 7641,0.6/preserved,True,True,True
+Block 5,seed 200000 step 7641,0.6/reset,True,True,True
+Block 5,seed 200000 step 7641,0.8/preserved,True,True,True
+Block 5,seed 200000 step 7641,0.8/reset,True,True,True
+Block 5,seed 200000 step 7641,0.9/preserved,True,True,True
+Block 5,seed 200000 step 7641,0.9/reset,True,True,True
+Block 5,seed 200000 step 7641,1.0/preserved,True,True,True
+Block 5,seed 200000 step 7641,1.0/reset,True,True,True
+Block 5,seed 200000 step 7641,1.1/preserved,True,True,True
+Block 5,seed 200000 step 7641,1.1/reset,True,True,True
+Block 5,seed 200000 step 7641,1.25/preserved,True,True,True
+Block 5,seed 200000 step 7641,1.25/reset,True,True,True
+Block 5,seed 200000 step 7641,1.5/preserved,True,True,True
+Block 5,seed 200000 step 7641,1.5/reset,True,True,True
+Block 5,seed 200000 step 7641,2.0/preserved,True,True,True
+Block 5,seed 200000 step 7641,2.0/reset,True,True,True
+Block 5,seed 200001 step 1555,0.6/preserved,True,True,True
+Block 5,seed 200001 step 1555,0.6/reset,True,True,True
+Block 5,seed 200001 step 1555,0.8/preserved,True,True,True
+Block 5,seed 200001 step 1555,0.8/reset,True,True,True
+Block 5,seed 200001 step 1555,0.9/preserved,True,True,True
+Block 5,seed 200001 step 1555,0.9/reset,True,True,True
+Block 5,seed 200001 step 1555,1.0/preserved,True,True,True
+Block 5,seed 200001 step 1555,1.0/reset,True,True,True
+Block 5,seed 200001 step 1555,1.1/preserved,True,True,True
+Block 5,seed 200001 step 1555,1.1/reset,True,True,True
+Block 5,seed 200001 step 1555,1.25/preserved,True,True,True
+Block 5,seed 200001 step 1555,1.25/reset,True,True,True
+Block 5,seed 200001 step 1555,1.5/preserved,True,True,True
+Block 5,seed 200001 step 1555,1.5/reset,True,True,True
+Block 5,seed 200001 step 1555,2.0/preserved,True,True,True
+Block 5,seed 200001 step 1555,2.0/reset,True,True,True
+Block 5,seed 200002 step 3538,0.6/preserved,True,True,True
+Block 5,seed 200002 step 3538,0.6/reset,True,True,True
+Block 5,seed 200002 step 3538,0.8/preserved,True,True,True
+Block 5,seed 200002 step 3538,0.8/reset,True,True,True
+Block 5,seed 200002 step 3538,0.9/preserved,True,True,True
+Block 5,seed 200002 step 3538,0.9/reset,True,True,True
+Block 5,seed 200002 step 3538,1.0/preserved,True,True,True
+Block 5,seed 200002 step 3538,1.0/reset,True,True,True
+Block 5,seed 200002 step 3538,1.1/preserved,True,True,True
+Block 5,seed 200002 step 3538,1.1/reset,True,True,True
+Block 5,seed 200002 step 3538,1.25/preserved,True,True,True
+Block 5,seed 200002 step 3538,1.25/reset,True,True,True
+Block 5,seed 200002 step 3538,1.5/preserved,True,True,True
+Block 5,seed 200002 step 3538,1.5/reset,True,True,True
+Block 5,seed 200002 step 3538,2.0/preserved,True,True,True
+Block 5,seed 200002 step 3538,2.0/reset,True,True,True
+Block 5,seed 200003 step 2161,0.6/preserved,True,True,True
+Block 5,seed 200003 step 2161,0.6/reset,True,True,True
+Block 5,seed 200003 step 2161,0.8/preserved,True,True,True
+Block 5,seed 200003 step 2161,0.8/reset,True,True,True
+Block 5,seed 200003 step 2161,0.9/preserved,True,True,True
+Block 5,seed 200003 step 2161,0.9/reset,True,True,True
+Block 5,seed 200003 step 2161,1.0/preserved,True,True,True
+Block 5,seed 200003 step 2161,1.0/reset,True,True,True
+Block 5,seed 200003 step 2161,1.1/preserved,True,True,True
+Block 5,seed 200003 step 2161,1.1/reset,True,True,True
+Block 5,seed 200003 step 2161,1.25/preserved,True,True,True
+Block 5,seed 200003 step 2161,1.25/reset,True,True,True
+Block 5,seed 200003 step 2161,1.5/preserved,True,True,True
+Block 5,seed 200003 step 2161,1.5/reset,True,True,True
+Block 5,seed 200003 step 2161,2.0/preserved,True,True,True
+Block 5,seed 200003 step 2161,2.0/reset,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,0.9/preserved,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,0.9/reset,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,0.95/preserved,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,0.95/reset,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.0/preserved,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.0/reset,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.05/preserved,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.05/reset,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.1/preserved,True,True,True
+Block 4 horizon extension,seed 200000 step 7443,1.1/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 801,0.9/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 801,0.9/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 801,0.95/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 801,0.95/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.0/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.0/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.05/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.05/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.1/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 801,1.1/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,0.9/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,0.9/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,0.95/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,0.95/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.0/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.0/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.05/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.05/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.1/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1101,1.1/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,0.9/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,0.9/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,0.95/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,0.95/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.0/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.0/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.05/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.05/reset,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.1/preserved,True,True,True
+Block 4 horizon extension,seed 200001 step 1514,1.1/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.003/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.003/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.01/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.01/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.03/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.03/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.1/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630000,0.1/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.003/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.003/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.01/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.01/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.03/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.03/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.1/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630001,0.1/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.003/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.003/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.01/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.01/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.03/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.03/reset,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.1/preserved,True,True,True
+no-gating (Track 7),f1.30 seed 630002,0.1/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.003/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.003/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.01/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.01/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.03/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.03/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.1/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630000,0.1/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.003/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.003/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.01/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.01/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.03/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.03/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.1/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630001,0.1/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.003/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.003/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.01/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.01/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.03/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.03/reset,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.1/preserved,True,True,True
+no-gating (Track 7),f1.50 seed 630002,0.1/reset,True,True,True
+lag test 2 (primary),a 1.3 seed 300000,phi 0.25,True,True,True
+lag test 2 (primary),a 1.3 seed 300000,phi 0.5,True,True,True
+lag test 2 (primary),a 1.3 seed 300000,phi 1.0,True,True,True
+lag test 2 (primary),a 1.3 seed 300000,phi 2.0,True,True,True
+lag test 2 (primary),a 1.3 seed 300001,phi 0.25,True,True,True
+lag test 2 (primary),a 1.3 seed 300001,phi 0.5,True,True,True
+lag test 2 (primary),a 1.3 seed 300001,phi 1.0,True,True,True
+lag test 2 (primary),a 1.3 seed 300001,phi 2.0,True,True,True
+lag test 2 (primary),a 1.5 seed 300000,phi 0.25,True,True,True
+lag test 2 (primary),a 1.5 seed 300000,phi 0.5,True,True,True
+lag test 2 (primary),a 1.5 seed 300000,phi 1.0,True,True,True
+lag test 2 (primary),a 1.5 seed 300000,phi 2.0,True,True,True
+lag test 2 (primary),a 1.5 seed 300001,phi 0.25,True,True,True
+lag test 2 (primary),a 1.5 seed 300001,phi 0.5,True,True,True
+lag test 2 (primary),a 1.5 seed 300001,phi 1.0,True,True,True
+lag test 2 (primary),a 1.5 seed 300001,phi 2.0,True,True,True
+lag test 2 (tstar),a 1.3 seed 300000,phi 0.25,True,True,True
+lag test 2 (tstar),a 1.3 seed 300000,phi 0.5,True,True,True
+lag test 2 (tstar),a 1.3 seed 300000,phi 1.0,True,True,True
+lag test 2 (tstar),a 1.3 seed 300000,phi 2.0,True,True,True
+lag test 2 (tstar),a 1.3 seed 300001,phi 0.25,True,True,True
+lag test 2 (tstar),a 1.3 seed 300001,phi 0.5,True,True,True
+lag test 2 (tstar),a 1.3 seed 300001,phi 1.0,True,True,True
+lag test 2 (tstar),a 1.3 seed 300001,phi 2.0,True,True,True
+lag test 2 (tstar),a 1.5 seed 300000,phi 0.25,True,True,True
+lag test 2 (tstar),a 1.5 seed 300000,phi 0.5,True,True,True
+lag test 2 (tstar),a 1.5 seed 300000,phi 1.0,True,True,True
+lag test 2 (tstar),a 1.5 seed 300000,phi 2.0,True,True,True
+lag test 2 (tstar),a 1.5 seed 300001,phi 0.25,True,True,True
+lag test 2 (tstar),a 1.5 seed 300001,phi 0.5,True,True,True
+lag test 2 (tstar),a 1.5 seed 300001,phi 1.0,True,True,True
+lag test 2 (tstar),a 1.5 seed 300001,phi 2.0,True,True,True

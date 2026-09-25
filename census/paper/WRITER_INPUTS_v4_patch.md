@@ -458,7 +458,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 495 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 498 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -591,8 +591,21 @@ arms shared optimiser-state tensors, and PyTorch's `load_state_dict` does not co
   "Adam state kept") started from the control run's *end-of-run* Adam state.
 - Likewise, the **teleport_reset** arm started from the reset run's end state rather than zeroed moments.
 - Control and reset are unaffected. Replaying in the original order reproduces every recorded crossing (WP-23).
-- 4b-ID and 4b-OM (both FAIL) were scored on the affected arms. A corrected rerun of the two teleport arms is the
-  author's decision; until then, do not rely on the teleport-arm comparisons.
+- **Corrected rerun (author's instruction; `residual_mechanism_corrected`, 1838f21).** Both teleport arms were rerun
+  from fresh deep copies of each checkpoint, with each start state verified bit for bit.
+  - Under the registered criteria, **4b-ID and 4b-OM still FAIL at both a.** No verdict changes.
+  - Teleport median residual: 0.03066 (a = 1.30) and 0.06504 (a = 1.50), against as-run 0.03079 and 0.06547.
+  - Teleport_reset: 0.03130 and 0.06542, against as-run 0.03122 and 0.06601.
+- **Audit of every multi-arm experiment that restarts from saved optimiser state** (`state_audit`). Each arm's actual
+  starting parameters and Adam state were compared bit for bit with a fresh load of its checkpoint, with the arms run
+  in their original order.
+  - Clean: Blocks 4 and 5 (128 arms), the horizon extension (40), both lag-test-2 rules (32) and the no-gating
+    replays (48).
+  - Only Block 4b's registered teleport arms are flagged. This was the audit's positive control, and the corrected
+    arms are clean.
+- **Say:** "A shared-state bug affected two arms of one block. A corrected rerun leaves its registered verdicts
+  unchanged, and an audit of every other multi-arm experiment found no contamination."
+IDs: `Block 4b corrected ID FAIL`; `Block 4b corrected OM FAIL`; `State audit clean arms`; `State audit positive control`.
 
 ## WP-11. The independent certificate checker: what is verified, what is pending, what ships
 
@@ -1462,8 +1475,8 @@ Producer: `src/timescale_consistency.py` → `timescale_consistency/runs.csv`, `
   - The **teleport** arm therefore started from the control run's end-of-run Adam state, not the state at the switch.
   - The **teleport_reset** arm started from the reset run's end state, not zeroed moments.
   - Control and reset are unaffected.
-  - Here the arms were replayed *as run*, which reproduces them exactly. 4b-ID and 4b-OM (both FAIL) were scored on the
-    affected arms, and a corrected rerun is the author's decision.
+  - Here the arms were replayed *as run*, which reproduces them exactly. The corrected rerun leaves 4b-ID and 4b-OM
+    FAIL (WP-10).
 IDs: `Item 1 arms within tolerance`; `Item 1 misses are the phi=0.25 arms`; `Item 1 within-a slope a=1.30`; `Item 1 within-a slope a=1.50`; `Item 1 partial Spearman`; `Item 1 replays reproduce`.
 
 **Statement (in between, stated exactly).**

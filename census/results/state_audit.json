@@ -1,0 +1,57 @@
+{
+ "summary": [
+  {
+   "experiment": "Block 4",
+   "arms": 64,
+   "clean": 64
+  },
+  {
+   "experiment": "Block 4 horizon extension",
+   "arms": 40,
+   "clean": 40
+  },
+  {
+   "experiment": "Block 4b (as registered)",
+   "arms": 16,
+   "clean": 8
+  },
+  {
+   "experiment": "Block 4b (corrected)",
+   "arms": 8,
+   "clean": 8
+  },
+  {
+   "experiment": "Block 5",
+   "arms": 64,
+   "clean": 64
+  },
+  {
+   "experiment": "lag test 2 (primary)",
+   "arms": 16,
+   "clean": 16
+  },
+  {
+   "experiment": "lag test 2 (tstar)",
+   "arms": 16,
+   "clean": 16
+  },
+  {
+   "experiment": "no-gating (Track 7)",
+   "arms": 48,
+   "clean": 48
+  }
+ ],
+ "flagged": [
+  {
+   "experiment": "Block 4b (as registered)",
+   "arm": "teleport",
+   "n": 4
+  },
+  {
+   "experiment": "Block 4b (as registered)",
+   "arm": "teleport_reset",
+   "n": 4
+  }
+ ],
+ "positive_control_flagged": true
+}
