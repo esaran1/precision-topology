@@ -338,3 +338,18 @@ def test_K_bounds_enclose_float_G0_and_cells_fail_below_K():
     assert vc._k_cells([(i, j)], 0, 50.0)[0] == []          # pass case: a loose target is proved
     ex = vc.k_domain_lemma_exact()
     assert all(ex.values())
+
+
+def test_solve_margin_sign_pass_and_fail_cases():
+    import json
+    from src import verify_certificates as vc
+    from src.conditional_certified import _population
+    w, b = json.load(open("results/certificates/ghat_a1.30.json"))["ghat_cert_witness"]
+    x, y = _population()
+    if float(vc.Objective(x, y, 60.0, 1.3).gap_bounds(w, w, b, b)[0].mid()) <= 0:
+        w, b = -w, -b                                            # the w2 > 0 orientation
+    box = (w - 1e-7, w + 1e-7, b - 1e-7, b + 1e-7)
+    assert vc.solve_sign_on_box(vc.Objective(x, y, 60.0, 1.3), *box) == "solves"
+    assert vc.solve_sign_on_box(vc.Objective(x, y, 0.5, 1.3), *box) == "fails"
+    wide = (w - 0.5, w + 0.5, b - 0.5, b + 0.5)                # a box too wide to decide: undecided, never a guess
+    assert vc.solve_sign_on_box(vc.Objective(x, y, 60.0, 1.3), *wide, max_depth=1) is None

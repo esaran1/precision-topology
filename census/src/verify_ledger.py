@@ -5,6 +5,8 @@ printed as FINDING: and written to results/ledger_verification.txt.
 """
 from __future__ import annotations
 from pathlib import Path
+import json
+
 import numpy as np, pandas as pd
 
 R = Path(__file__).resolve().parents[1] / "results"
@@ -569,6 +571,7 @@ def main() -> None:
 
     v4_checks()
     harsh_review_checks()
+    tracks_checks()
 
     provenance_check()
 
@@ -1504,6 +1507,71 @@ def harsh_review_checks() -> None:
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
     chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 7.0, 0)
     chk("A4 rows", float(len(cr)), 199.0, 0)
+
+
+def tracks_checks() -> None:
+    """Fast-track follow-up, Tracks 3-8 (2026-09-25)."""
+    print("Track 4 (SGD own thresholds, registered)")
+    sc = pd.read_csv(R / "sgd_own_scores.csv").set_index("a")
+    for a in (1.3, 1.5):
+        t = f"a={a:.2f}"
+        chk(f"Track 4 G1 {t}", float(sc.loc[a, "G1"] == "PASS"), 1.0, 0)
+        chk(f"Track 4 G2 {t}", float(sc.loc[a, "G2"] == "PASS"), 1.0, 0)
+        chk(f"Track 4 crossed {t}", float(sc.loc[a, "crossed"]), 30.0, 0)
+    chk("Track 4 G1 lo a=1.30", float(sc.loc[1.3, "G1_lo"]), -0.0738, 0.00006)
+    chk("Track 4 G1 hi a=1.30", float(sc.loc[1.3, "G1_hi"]), -0.0172, 0.00006)
+    chk("Track 4 G1 lo a=1.50", float(sc.loc[1.5, "G1_lo"]), -0.0727, 0.00006)
+    chk("Track 4 G1 hi a=1.50", float(sc.loc[1.5, "G1_hi"]), -0.0148, 0.00006)
+    chk("Track 4 G1 mean a=1.30", float(sc.loc[1.3, "G1_mean_diff"]), -0.0459, 0.00006)
+    chk("Track 4 G1 mean a=1.50", float(sc.loc[1.5, "G1_mean_diff"]), -0.0439, 0.00006)
+    chk("Track 4 Spearman a=1.30", float(sc.loc[1.3, "G2_spearman"]), 0.674, 0.0006)
+    chk("Track 4 Spearman a=1.50", float(sc.loc[1.5, "G2_spearman"]), 0.684, 0.0006)
+    chk("Track 4 residual vs own a=1.30", float(sc.loc[1.3, "G3_median_resid_own"]) * 100, 2.95, 0.006)
+    chk("Track 4 residual vs own a=1.50", float(sc.loc[1.5, "G3_median_resid_own"]) * 100, 6.43, 0.006)
+    chk("Track 4 residual vs pop a=1.30", float(sc.loc[1.3, "G3_median_resid_pop"]) * 100, 9.45, 0.006)
+    chk("Track 4 residual vs pop a=1.50", float(sc.loc[1.5, "G3_median_resid_pop"]) * 100, 12.74, 0.006)
+    ex = pd.read_csv(R / "sgd_own_extension_scores.csv").set_index("a")
+    chk("Track 4 EXT a=1.30", float(ex.loc[1.3, "EXT"] == "PASS"), 1.0, 0)
+    chk("Track 4 EXT a=1.50", float(ex.loc[1.5, "EXT"] == "PASS"), 1.0, 0)
+    chk("Track 4 EXT pred a=1.30", float(ex.loc[1.3, "pred"]), 0.0251, 0.00006)
+    chk("Track 4 EXT pred a=1.50", float(ex.loc[1.5, "pred"]), 0.0530, 0.00006)
+    chk("Track 4 EXT obs a=1.30", float(ex.loc[1.3, "obs"]), 0.0295, 0.00006)
+    chk("Track 4 EXT obs a=1.50", float(ex.loc[1.5, "obs"]), 0.0643, 0.00006)
+    chk("Track 4 EXT tol a=1.50", float(ex.loc[1.5, "tol"]), 0.0133, 0.00006)
+    chk("Track 4 SGD replays reproduce", float(pd.read_csv(R / "sgd_own_ratios.csv").reproduced.all()), 1.0, 0)
+    chk("Track 4 budget", float(json.loads((R / "sgd_own_budget.json").read_text())["budget"]), 32000.0, 0)
+    print("Track 3 (residual timescale, post hoc)")
+    ts = json.loads((R / "residual_timescale_summary.json").read_text())
+    chk("Track 3 Spearman pooled", ts["spearman_run_level"], 0.634, 0.0006)
+    chk("Track 3 Spearman CI lo", ts["spearman_ci95"][0], 0.542, 0.0006)
+    chk("Track 3 Spearman CI hi", ts["spearman_ci95"][1], 0.721, 0.0006)
+    chk("Track 3 Spearman within a=1.30", ts["spearman_within_a"]["a=1.30"], 0.454, 0.0006)
+    chk("Track 3 Spearman within a=1.50", ts["spearman_within_a"]["a=1.50"], 0.507, 0.0006)
+    chk("Track 3 runs", float(ts["n_runs"]), 384.0, 0)
+    chk("Track 3 replays reproduce", float(pd.read_csv(R / "residual_timescale_runs.csv").reproduced.all()), 1.0, 0)
+    fit = json.loads((R / "residual_timescale_fit.json").read_text())
+    chk("Track 3 fit alpha", fit["alpha"], 0.0157, 0.00006)
+    chk("Track 3 fit beta", fit["beta"], 2.658, 0.0006)
+    print("Track 6 (stronger baselines, post hoc)")
+    v = pd.read_csv(R / "baselines_posthoc_validation.csv")
+    chk("Track 6 reproduction checks", float(v.ok.all() and len(v) == 163), 1.0, 0)
+    b3 = pd.read_csv(R / "baselines_posthoc_block3.csv")
+    chk("Track 6 C mean abs log err", float(b3.abslogerr_C.mean()), 0.0223, 0.00006)
+    chk("Track 6 PL mean abs log err", float(b3.abslogerr_PL.mean()), 0.0231, 0.00006)
+    chk("Track 6 PL5 mean abs log err", float(b3.abslogerr_PL5.mean()), 0.0274, 0.00006)
+    chk("Track 6 RK mean abs log err", float(b3.abslogerr_RK.mean()), 0.1099, 0.00006)
+    chk("Track 6 RG mean abs log err", float(b3.abslogerr_RG.mean()), 0.1047, 0.00006)
+    cm = pd.read_csv(R / "baselines_posthoc_comparisons.csv")
+    cm = cm[cm.test == "Block 3 (post hoc baselines)"].set_index("comparison")
+    chk("Track 6 C - PL lo", float(cm.loc["C - PL", "ci95_lo"]), -0.0088, 0.00006)
+    chk("Track 6 C - PL hi", float(cm.loc["C - PL", "ci95_hi"]), 0.0074, 0.00006)
+    chk("Track 6 C - RK hi", float(cm.loc["C - RK", "ci95_hi"]), -0.0746, 0.00006)
+    print("Track 5 (independent certificate checks)")
+    kb = json.loads((R / "certificate_checks" / "K_base.json").read_text())
+    chk("Track 5 K check passes (published hi)", float(kb["pass"]), 1.0, 0)
+    kt = json.loads((R / "certificate_checks" / "K_base_target0.5794559217.json").read_text())
+    chk("Track 5 K check passes (tight hi)", float(kt["pass"]), 1.0, 0)
+
 
 def _decimals(v) -> int:
     t = repr(float(v))

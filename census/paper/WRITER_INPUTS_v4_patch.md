@@ -446,7 +446,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 419 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 451 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 12 checks compare two artifacts to 1e−12; they are
@@ -741,7 +741,7 @@ proceedings metadata, not arXiv's.** They differ as follows:
 
 openreview.net refused every automated request, so no OpenReview decision string is verified.
 
-**Six fully verified.** Each has one sentence on what it shares with this paper and how it differs, written from the
+**Six verified on proceedings pages.** Each has one sentence on what it shares with this paper and how it differs, written from the
 paper's own abstract.
 
 - **Ahn et al. (NeurIPS 2023), `ahn2023threshold`.** They prove, for gradient descent on simplified two-layer models,
@@ -773,9 +773,8 @@ paper's own abstract.
   delays generalisation and ends in floating-point failure. In ours, output-scale growth is what makes placement the
   preferred solution, and the transition occurs when the scale crosses a certified threshold.
 
-**Two checked against the official ICLR 2023 conference pages (iclr.cc) only.** OpenReview was unreachable, and
-proceedings.iclr.cc has no 2023 volume. Every field below matches iclr.cc. Include them only if you accept iclr.cc as
-the primary source; otherwise leave them out.
+**Two verified against the official ICLR 2023 conference pages (iclr.cc).** The author accepted iclr.cc as the source
+on 2026-09-25; OpenReview was unreachable, and proceedings.iclr.cc has no 2023 volume. Every field below matches iclr.cc.
 - **Liu, Michaud and Tegmark (ICLR 2023), `liu2023omnigrok`.** Grokking is explained by the "LU mechanism": training
   and test losses plotted against weight norm look like "L" and "U". Weight norm, controlled by initialisation and
   weight decay, then decides whether grokking occurs. Shared: a norm/scale variable organises a qualitative change.
@@ -791,7 +790,7 @@ the primary source; otherwise leave them out.
 decision ("oral", "poster") from these notes; iclr.cc lists the two 2023 papers as "Oral presentation / top 25%", and
 that is the only source checked.
 
-BibTeX, fully verified:
+BibTeX (all eight; the two 2023 ICLR entries are verified on iclr.cc):
 ```bibtex
 % verified: https://proceedings.neurips.cc/paper_files/paper/2023/hash/3e592c571de69a43d7a870ea89c7e33a-Abstract-Conference.html
 @inproceedings{ahn2023threshold,
@@ -858,11 +857,8 @@ BibTeX, fully verified:
   pages     = {81151--81168},
   year      = {2025}
 }
-```
 
-BibTeX, checked against iclr.cc only:
-```bibtex
-% checked against https://iclr.cc/virtual/2023/oral/12716 only (OpenReview unreachable; arXiv 2210.01117 lists "Eric J. Michaud")
+% verified: https://iclr.cc/virtual/2023/oral/12716 (OpenReview unreachable; arXiv 2210.01117 lists "Eric J. Michaud")
 @inproceedings{liu2023omnigrok,
   title     = {Omnigrok: Grokking Beyond Algorithmic Data},
   author    = {Liu, Ziming and Michaud, Eric and Tegmark, Max},
@@ -870,7 +866,7 @@ BibTeX, checked against iclr.cc only:
   year      = {2023}
 }
 
-% checked against https://iclr.cc/virtual/2023/oral/12746 only (OpenReview forum QC10RmRbZy9 unreachable; no arXiv version)
+% verified: https://iclr.cc/virtual/2023/oral/12746 (OpenReview forum QC10RmRbZy9 unreachable; no arXiv version)
 @inproceedings{chiang2023loss,
   title     = {Loss Landscapes are All You Need: Neural Network Generalization Can Be Explained Without the Implicit Bias of Gradient Descent},
   author    = {Chiang, Ping-yeh and Ni, Renkun and Miller, David Y. and Bansal, Arpit and Geiping, Jonas and Goldblum, Micah and Goldstein, Tom},
@@ -955,3 +951,93 @@ own-seed primary) passed.
 most of these concern the residual's mechanism, which the paper reports as open." **Do not say** "the central
 claims never failed" or "the failures are peripheral". Do not present the relevance classification as registered;
 it is post hoc.
+
+## WP-16. Does the conditional threshold predict SGD crossings? (Track 4, registered; for the submission)
+
+Registration: `sgd_own_registration.md` (0506650); budget fixed before any registered run (988c1d7); amendment 1,
+the timescale extension (1df48d1, 13:13 EDT), registered before any SGD run was scored. Producer: `src/sgd_own.py` →
+`sgd_own_runs.csv`, `sgd_own_scores.csv`, `sgd_own_ratios.csv`, `sgd_own_extension_scores.csv`. This answers "does the
+conditional threshold predict SGD crossings, or only the a = 1.25 midpoint?"
+
+**Design.**
+- SGD at lr 0.3 (the only rate that solves in this setting), full batch.
+- Exactly the phase-2b training sets (seeds 0–39, a = 1.30 and 1.50, n = 400), whose own-sample global thresholds were
+  already computed. So there is no new threshold computation.
+- The same initialisation as the Adam runs of each seed, and every-step crossing detection.
+- Budget 32,000 steps, fixed by a rule on calibration seeds that recorded only |w₂| growth.
+
+| a | crossed | G1: mean(e_own − e_pop) [95% CI] | G2: Spearman(cross, own) | residual vs own | vs population |
+|---|---|---|---|---|---|
+| 1.30 | 30/40 | -0.0459 [-0.0738, -0.0172] **PASS** | 0.674 **PASS** | +2.95% | +9.45% |
+| 1.50 | 30/40 | -0.0439 [-0.0727, -0.0148] **PASS** | 0.684 **PASS** | +6.43% | +12.74% |
+
+- **G1 passes at both a.** Each run's own threshold predicts its SGD crossing better than the population threshold.
+- **G2 passes at both a.**
+- The SGD residuals against the own threshold, +2.95% and +6.43%, are close to Adam's in the deconfounded lag test
+  (+3.1% and +6.6% at φ = 1).
+- **Caveat.** The budget rule aimed at ≥ 90% crossing; 75% crossed at each a (30/40), which is exactly the registered
+  minimum of 30. Report the crossing fraction.
+IDs: `Track 4 G1 a=1.30`; `Track 4 G1 a=1.50`; `Track 4 G2 a=1.30`; `Track 4 G2 a=1.50`; `Track 4 crossed a=1.30`; `Track 4 crossed a=1.50`; `Track 4 residual vs own a=1.30`; `Track 4 residual vs own a=1.50`.
+
+**The residual's timescale (Track 3, POST HOC, exploratory).**
+- For each of the 384 crossings of the deconfounded lag test (both a, four learning-rate arms), the run was replayed
+  to its crossing. Every replay reproduces its crossing exactly.
+- Two rates were measured at the crossing: the output scale's growth rate d log s/dt, and the branch's
+  Adam-preconditioned relaxation rate, lr·λ_min(D^(−1/2) H D^(−1/2)).
+- Spearman(residual, growth/relaxation) is **0.634 [0.542, 0.721]**
+  pooled. Within each a it is **0.454** and **0.507**; much
+  of the pooled value is the difference between the two a. Across the 8 cells it is 1.0.
+- The growth rate varies only about 25% across an 8× range of w₂'s learning rate, because Adam's normalisation
+  compensates. This matches L1′'s registered failure.
+IDs: `Track 3 Spearman pooled`; `Track 3 Spearman CI lo`; `Track 3 Spearman CI hi`; `Track 3 Spearman within a=1.30`; `Track 3 Spearman within a=1.50`; `Track 3 replays reproduce`.
+
+**The timescale account, tested prospectively on SGD (EXT, registered amendment).**
+- The residual = α + β·ratio fit on Adam (α = 0.0157, β = 2.658) was frozen before scoring.
+- Each SGD run's own ratio at its crossing was measured with the identity preconditioner.
+
+| a | median SGD ratio | predicted residual | observed | tolerance | verdict |
+|---|---|---|---|---|---|
+| 1.30 | 0.00354 | 0.0251 | 0.0295 | ±0.0100 | **PASS** |
+| 1.50 | 0.01404 | 0.0530 | 0.0643 | ±0.0133 | **PASS** |
+
+- It passes at both a. At a = 1.50 the miss (0.0113) is close to the tolerance (0.0133).
+- The SGD ratios lie inside the fitted Adam range, so this is interpolation across optimisers, not extrapolation.
+IDs: `Track 4 EXT a=1.30`; `Track 4 EXT a=1.50`; `Track 4 EXT pred a=1.30`; `Track 4 EXT pred a=1.50`.
+
+**Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
+than the population threshold (registered; both a). A timescale ratio fitted post hoc on Adam predicted the median SGD
+residual within the registered tolerance."
+
+**Do not say:** that the timescale ratio is the residual's mechanism. It is a post hoc correlation with a pooled
+Spearman of 0.63, and weaker within each a; one prospective check passed. Do not say that SGD crossings were
+universal: 75% crossed. Do not merge these runs with Block F's a = 1.25 SGD arm.
+
+## WP-18. Stronger baselines (Track 6; POST HOC; for the submission)
+
+Producer: `src/baselines_posthoc.py` → `baselines_posthoc*.csv`, `baselines_posthoc.md` (d7d88d8). Every baseline is fitted
+only on the ten Block G settings, the data available before the held-out runs. The re-implementation first reproduces
+the committed C, B1, B2, U and own-seed numbers (163 checks, largest difference 2.2e−16). This answers "B1 and B2 are
+weak".
+
+| model | what it uses | Block 3 mean \|log err\| | C − model [95% CI] |
+|---|---|---|---|
+| C (registered) | U × λ fitted on the base window | 0.0223 | — |
+| PL | U × λ pooled over all five Block G windows | 0.0231 | −0.0007 [−0.0088, +0.0074]: **matches C** |
+| PL5 | U × median of the five windows' λ | 0.0274 | −0.0051 [−0.0120, +0.0019]: not separated |
+| B2 (registered) | pooled median crossing R | 0.0773 | −0.0550 [−0.1027, −0.0105] |
+| RG | per-a regression on log Ĝ | 0.1047 | −0.0823 [−0.0926, −0.0722] |
+| RK | regression on log κ₀ and a (no conditional threshold) | 0.1099 | −0.0875 [−0.0993, −0.0746] |
+| B1 (registered) | base-window median \|w₂\| | 0.2796 | −0.2573 [−0.3704, −0.1312] |
+
+- On the own-seed test, PL is not separated from C at a = 1.50. At a = 1.30, C is better by 0.001 (the interval
+  just excludes 0).
+- **Stated plainly: a stronger baseline (PL) matches C.** PL still uses the conditional threshold U; it differs from C
+  only in fitting the lag factor on five windows instead of one.
+- **Every baseline that does not use the conditional threshold loses to C by a factor of 4–5 in error, and also to
+  B2.**
+IDs: `Track 6 reproduction checks`; `Track 6 PL mean abs log err`; `Track 6 C - PL lo`; `Track 6 C - PL hi`; `Track 6 C - RK hi`.
+
+**Say:** "Baselines that do not use the conditional threshold do 4–5 times worse than the registered predictor. A
+variant that pools the lag factor over all calibration windows matches it (post hoc)."
+
+**Do not say:** "C beats every baseline". Do not present PL as registered: it is post hoc.

@@ -802,6 +802,85 @@ def check_ghat(name, verbose=True, workers=WORKERS):
 
 
 
+# ------------------------------------------------------------------------------------------ finite-a solve brackets
+def _margin_signs(obj, wl, wh, bl, bh, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+    """Over the box [wl, wh] × [bl, bh] (and b₂ ∈ its certified bracket): ('solves' | 'fails' | None).
+    solves: s·max_I f + b₂ < 0 and s·min_O f + b₂ > 0 at every point (the enclosures' outer ends).
+    fails:  at every point some sign is wrong -- s·(a lower bound of max_I f) + b₂ > 0, or s·(an upper bound of min_O f)
+            + b₂ < 0, with those bounds from single sample points x (valid at every point of the box)."""
+    W, B = ball(wl, wh), ball(bl, bh)
+    Bb, _ = obj.b_bracket(W, B)
+    if Bb is None:
+        return None
+    fa, S = obj.fa, obj.s
+    A = lambda v: arb(repr(v))
+    ti = t_interval(A(wl), A(wh), A(bl), A(bh), arb(inner[0]), arb(inner[1]))
+    t1 = t_interval(A(wl), A(wh), A(bl), A(bh), arb(outer[0]), arb(outer[1]))
+    t2 = t_interval(A(wl), A(wh), A(bl), A(bh), arb(-outer[1]), arb(-outer[0]))
+    _, imx = fa.range(*ti)
+    o1, _ = fa.range(*t1); o2, _ = fa.range(*t2)
+    if hi_(S * imx + hi_(Bb)) < 0 and lo_(S * min(o1, o2) + lo_(Bb)) > 0:
+        return "solves"
+    for xi in np.linspace(inner[0], inner[1], 17):
+        fmn, _ = fa.range(*t_interval(A(wl), A(wh), A(bl), A(bh), A(float(xi)), A(float(xi))))
+        if lo_(S * fmn + lo_(Bb)) > 0:
+            return "fails"
+    for xo in np.r_[np.linspace(*outer, 9), -np.linspace(*outer, 9)]:
+        _, fmx = fa.range(*t_interval(A(wl), A(wh), A(bl), A(bh), A(float(xo)), A(float(xo))))
+        if hi_(S * fmx + hi_(Bb)) < 0:
+            return "fails"
+    return None
+
+
+def solve_sign_on_box(obj, wl, wh, bl, bh, depth=0, max_depth=5):
+    """The solve margin's sign on the whole box, subdividing (4-way) up to max_depth; None if undecided or mixed."""
+    r = _margin_signs(obj, wl, wh, bl, bh)
+    if r is not None or depth >= max_depth:
+        return r
+    wm, bm = 0.5 * (wl + wh), 0.5 * (bl + bh)
+    parts = [solve_sign_on_box(obj, w0, w1, b0, b1, depth + 1, max_depth)
+             for w0, w1 in ((wl, wm), (wm, wh)) for b0, b1 in ((bl, bm), (bm, bh))]
+    return parts[0] if parts[0] is not None and all(p == parts[0] for p in parts) else None
+
+
+def check_solve(name, verbose=True, workers=WORKERS):
+    """Finite-a solve-bracket end.  The status certificate's checks (check_finite: hashes, lemma W, tiling, every leaf's
+    claim, losing claims > U), plus: every winning-region leaf discarded by its bound has claim > U, so the global
+    minimiser lies in the union of the winning region's KEPT leaves; their bounding box E is recomputed from the
+    integer indices; on E (b₂ in its certified bracket) the solve margin's sign is decided in Arb and must equal the
+    published certified sign."""
+    meta = json.loads((CERTS / f"{name}.json").read_text())
+    res = check_finite(name, verbose=False, workers=workers)
+    res["name"] = name
+    dat = np.load(CERTS / f"{name}.npz")
+    obj = Objective(dat["x"], dat["y"], meta["s"], meta["a"])
+    win = meta["winning_region"]
+    if meta["U_point"] is None:
+        res["checks"]["solve_winner_not_constant"] = False
+        res["pass"] = False
+        return res
+    U = obj.upper_at(*meta["U_point"])
+    lv, iw, ib = dat[f"level_{win}"], dat[f"iw_{win}"], dat[f"ib_{win}"]
+    reason, claim = dat[f"reason_{win}"], dat[f"lb_{win}"]
+    res["checks"]["winning_discarded_exceed_U"] = all(arb(float(c)) > U for c in claim[reason == 1])
+    kept = reason == 0
+    hw = meta["hw0"] / 2.0 ** lv[kept]; hb = meta["hb0"] / 2.0 ** lv[kept]
+    cw = -meta["W"] + (iw[kept] + 0.5) * 2 * hw; cb = (ib[kept] + 0.5) * 2 * hb
+    E = (float((cw - hw).min()), float((cw + hw).max()), float((cb - hb).min()), float((cb + hb).max()))
+    res["E"] = E; res["kept_leaves"] = int(kept.sum())
+    sign = solve_sign_on_box(obj, *E)
+    res["solve_sign"] = sign
+    res["checks"]["sign_decided"] = sign is not None
+    res["checks"]["sign_equals_published"] = sign == meta["published_sign"]
+    res["pass"] = all(res["checks"].values())
+    out_dir = CERTS.parent / "certificate_checks"
+    out_dir.mkdir(exist_ok=True)
+    (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps(res, indent=1, default=str))
+    return res
+
+
 # ------------------------------------------------------------------------------------------ K = sup G₀ (limit class gap)
 K_BOX = (0.0, 8.0, -12.0, 12.0)
 K_H0 = 0.05
@@ -934,7 +1013,7 @@ def check_K(target=None, workers=WORKERS, verbose=True, max_level=K_MAX_LEVEL, s
 
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
-    return {"ghat_enclosure": check_ghat, "limit_status": check_limit}.get(kind, check_finite)(name)
+    return {"ghat_enclosure": check_ghat, "limit_status": check_limit, "finite_a_solve": check_solve}.get(kind, check_finite)(name)
 
 
 def main(names):

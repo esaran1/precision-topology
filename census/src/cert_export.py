@@ -18,17 +18,17 @@ import numpy as np
 CERTS = Path(__file__).resolve().parents[1] / "results" / "certificates"
 
 
-def finite(a, s, name, x=None, y=None):
+def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, kind="finite_a_status", extra=None):
     """One finite-a status certificate at scale s: both regions' leaves, with the status rule of
     conditional_certified.evaluate (tolerance 1e−7, then 1e−9 if unresolved)."""
     from .conditional_certified import _population
     from .profiled_bnb import certify, profile
     if x is None:
         x, y = _population()
-    for tol in (1e-7, 1e-9):
+    for tol in tols:
         rec = {"-": {}, "+": {}}
-        rm = certify(s, a, x, y, "-", tol=tol, record=rec["-"])
-        rp = certify(s, a, x, y, "+", tol=tol, record=rec["+"])
+        rm = certify(s, a, x, y, "-", tol=tol, max_cells=max_cells, record=rec["-"])
+        rp = certify(s, a, x, y, "+", tol=tol, max_cells=max_cells, record=rec["+"])
         status = "minus" if rp["lower"] > rm["upper"] else "plus" if rm["lower"] > rp["upper"] else "unresolved"
         if status != "unresolved":
             break
@@ -45,7 +45,7 @@ def finite(a, s, name, x=None, y=None):
         L = np.concatenate(rec[reg]["leaves"])
         for k in ("level", "iw", "ib", "cw", "cb", "lb", "G", "reason"):
             arrays[f"{k}_{reg}"] = np.asarray(L[k])
-    meta = {"kind": "finite_a_status", "name": name, "a": a, "s": s, "tol": tol, "status": status,
+    meta = {"kind": kind, "name": name, "a": a, "s": s, "tol": tol, "status": status,
             "winning_region": win, "losing_region": lose, "U_search": wr["upper"], "U_point": U_point,
             "W": rec["-"]["W"], "nw": int(rec["-"]["nw"]), "nb": int(rec["-"]["nb"]), "hw0": rec["-"]["hw0"],
             "hb0": rec["-"]["hb0"], "h0": rec["-"]["h0"], "domain": "w1 in [-W, W], b1 in [0, 2pi)",
@@ -56,10 +56,27 @@ def finite(a, s, name, x=None, y=None):
             "regenerate": f"python -m src.cert_export finite {a} {s} {name}",
             "search_result": {"minus": {k: rm[k] for k in ("lower", "upper", "rounds")},
                               "plus": {k: rp[k] for k in ("lower", "upper", "rounds")}}}
+    if extra is not None:
+        meta.update(extra(rm, rp, win))
     CERTS.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(CERTS / f"{name}.npz", **arrays)
     (CERTS / f"{name}.json").write_text(json.dumps(meta, indent=1, default=float))
     return meta
+
+
+def solve(a, s, name):
+    """One finite-a SOLVE-bracket-end certificate (Track 5 item 2): the status branch and bound at tolerance 1e−11
+    (as math_note_v2_checks.solve_finite), recorded, plus the search's argmin enclosure of the winning region and the
+    published certified sign of the solve margin there (mn2_solve_finite.csv), which the checker re-derives."""
+    import pandas as pd
+    pub = pd.read_csv(CERTS.parent / "mn2_solve_finite.csv", float_precision="round_trip")
+    pub = pub[(pub.a.round(2) == round(a, 2)) & (pub.s == s)].iloc[0]
+
+    def extra(rm, rp, win):
+        g = rp if win == "+" else rm
+        return {"encl_search": g.get("encl_pos"), "published_sign": pub.certified_sign,
+                "published_margin": [float(pub.margin_lo), float(pub.margin_hi)]}
+    return finite(a, s, name, tols=(1e-11,), max_cells=16_000_000, kind="finite_a_solve", extra=extra)
 
 
 def ghat(a, name):
@@ -194,5 +211,7 @@ if __name__ == "__main__":
         print(json.dumps(ghat_stream(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "ghat":
         print(json.dumps(ghat(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
+    elif sys.argv[1] == "solve":
+        print(json.dumps(solve(float(sys.argv[2]), float(sys.argv[3]), sys.argv[4]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "finite":
         print(json.dumps(finite(float(sys.argv[2]), float(sys.argv[3]), sys.argv[4]), indent=1, default=float)[:1500])
