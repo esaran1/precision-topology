@@ -1,0 +1,16 @@
+baseline,a,parameter,value,fitted_on,n
+PL,1.3,lambda_pool,1.1036919898795055,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified R_glob; pooled per-run R/R_glob at a",189
+PL5,1.3,lambda_5,1.1102393793223726,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified R_glob; median of 5 per-window ratios at a",5
+RKa,1.3,intercept,-1.3988611185263742,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); 5 settings at a",5
+RKa,1.3,slope_log_kappa0,0.16944012712613993,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); 5 settings at a",5
+RG,1.3,intercept,-1.1571751758794264,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified Ghat; 5 settings at a",5
+RG,1.3,slope_log_Ghat,0.17887661915646402,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified Ghat; 5 settings at a",5
+PL,1.5,lambda_pool,1.1778723889829417,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified R_glob; pooled per-run R/R_glob at a",190
+PL5,1.5,lambda_5,1.1811468194076897,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified R_glob; median of 5 per-window ratios at a",5
+RKa,1.5,intercept,-1.2422281947545635,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); 5 settings at a",5
+RKa,1.5,slope_log_kappa0,0.2145459311135908,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); 5 settings at a",5
+RG,1.5,intercept,-1.0886429872245353,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified Ghat; 5 settings at a",5
+RG,1.5,slope_log_Ghat,0.23016300007814375,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + certified Ghat; 5 settings at a",5
+RK,,intercept,-1.3707136034343825,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); all 10 settings",10
+RK,,slope_log_kappa0,0.19199302911986516,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); all 10 settings",10
+RK,,shift_a1.50,0.10033789358782529,"Block G only: 10 settings (5 windows x a in {1.30, 1.50}), blockG_crossings.csv crossers + K (limit_windows.csv); all 10 settings",10
