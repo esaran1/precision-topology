@@ -175,11 +175,6 @@ def score():
     return s
 
 
-if __name__ == "__main__":
-    w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
-    {"pilot": lambda: pilot(w), "train": lambda: train(w), "score": score, "ratios": lambda: ratios(w),
-     "score_extension": score_extension}[sys.argv[1]]()
-
 
 # ------------------------------------------------------------------------------------------ extension (amendment 1)
 EXT_WINDOW = 100
@@ -257,3 +252,8 @@ def score_extension():
             for a, g in m.groupby("a")]
     pd.DataFrame(rows).to_csv(RESULTS / "sgd_own_extension_scores.csv", index=False)
     print(pd.DataFrame(rows).to_string(index=False))
+
+if __name__ == "__main__":
+    w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    {"pilot": lambda: pilot(w), "train": lambda: train(w), "score": score, "ratios": lambda: ratios(w),
+     "score_extension": score_extension}[sys.argv[1]]()
