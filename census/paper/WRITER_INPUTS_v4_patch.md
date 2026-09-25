@@ -481,7 +481,7 @@ every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× t
 | a = 1.50, R₂ = 0.001 | 0.6922871675820 (placed, cancelling pair) | 0.6922872667961 (boundary, G₊ = -1.7e-10) | 9.92e-08 (99× 1e−9) | 1.21e-06 (single unit, G₊ = -3.45) |
 | a = 1.50, R₂ = 0.003 | 0.6905695190120 (placed, cancelling pair) | 0.6905704102030 (boundary, G₊ = -1.9e-12) | 8.91e-07 (891× 1e−9) | 1.09e-05 (single unit, G₊ = -3.44) |
 | a = 1.50, R₂ = 0.01 | 0.6845827109908 (placed, cancelling pair) | 0.6845925452478 (boundary, G₊ = -4.4e-13) | 9.83e-06 (9,834× 1e−9) | 1.20e-04 (single unit, G₊ = -3.40) |
-| a = 1.50, R₂ = 0.02 | PENDING | 0.6761364244002 (boundary, G₊ = -2.9e-13) | PENDING | 4.77e-04 (single unit, G₊ = -3.34) |
+| a = 1.50, R₂ = 0.02 | 0.6760974787560 (placed, cancelling pair) | 0.6761364244002 (boundary, G₊ = -2.9e-13) | 3.89e-05 (38,946× 1e−9) | 4.77e-04 (single unit, G₊ = -3.34) |
 
 ## WP-9. Width 2: the small-scale criterion, the registered verdict and the tanh case (rebuttal revision)
 
