@@ -9,7 +9,7 @@ from src.asym_register import _act, _setup
 
 def test_knockout_classes_on_constructed_configurations():
     _setup(); act = _act()
-    pair = [1.6, math.pi / 2, 0.5, -1.6, math.pi / 2, 0.5, 0.0]           # ramp-cancelling cosine pair
+    pair = [1.6, math.pi / 2, -0.5, -1.6, math.pi / 2, -0.5, 0.0]         # ramp-cancelling cosine pair, outer above inner
     assert ap.features(pair, act)["knockout"] == "pair"
     sb = pd.read_csv(ap.OUT / "single_unit_branch.csv")                  # a placed single-unit-branch configuration
     assert sb.placed.iloc[-1]
