@@ -1,0 +1,30 @@
+{
+ "label": "POST HOC, EXPLORATORY; no verdict changes",
+ "replays_reproduce": true,
+ "T2-3": {
+  "runs": 79,
+  "frac_checks_stationary_two_unit": 0.0,
+  "median_run_frac_time_stationary": 0.0,
+  "runs_with_episode": 0,
+  "of_those_escaped_before_crossing": 0,
+  "of_those_still_stationary_at_last_check": 0,
+  "stationary_median_min_share": null,
+  "stationary_median_cancel": null
+ },
+ "T2-3c": {
+  "runs": 80,
+  "frac_checks_stationary_two_unit": 0.0,
+  "median_run_frac_time_stationary": 0.0,
+  "runs_with_episode": 0,
+  "of_those_escaped_before_crossing": 0,
+  "of_those_still_stationary_at_last_check": 0,
+  "stationary_median_min_share": null,
+  "stationary_median_cancel": null
+ },
+ "track7_unplaced_endpoints": {
+  "n": 225,
+  "median_min_share": 0.4999999806314731,
+  "median_cancel": 1.0,
+  "median_grad_rel": 1.376608692923677e-07
+ }
+}
