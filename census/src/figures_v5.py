@@ -629,7 +629,7 @@ def captions():
            f"ε → 0 limits: R_glob^∞ ∈ [{c1.R_glob_inf_lo:.7f}, {c1.R_glob_inf_hi:.7f}] (sharp value); "
            f"R_solve^∞ ∈ [{sl.R_solve_inf_lo:.4f}, {sl.R_solve_inf_hi:.4f}] (global)",
            "R_glob^∞ rests on K = sup G₀, certified by branch and bound over a box with a domain lemma (math note §8); its "
-           "independent Arb check is pending (WP-11)"])
+           "independent Arb check (verify_certificates.py, python-flint/Arb) verifies it (WP-17)"])
     fs = read("first_order_scores.csv").set_index("quantity").loc["c1 (primary): R_glob"]
     fo = read("first_order_finite.csv")
     entry("app_thresholds_small_eps", "appendix (companion to thresholds)",

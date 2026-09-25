@@ -12,7 +12,7 @@ crossing residual from the imposed rate, with no free parameter.
 
 ## Protocol
 
-- Width 1, f_a(t) = t + a sin t, a ∈ {1.30, 1.50}. Each seed has its own 200-point training sample (`fold1d.make_data`).
+- Width 1, f_a(t) = t + a sin t, a ∈ {1.30, 1.50}. Each seed has its own training sample of 400 points, 200 per class (`fold1d.make_data(200, seed)`; the registered text said "200-point", corrected 2026-09-25 before any crossing was read; the code is unchanged).
 - Registered seeds: 860,000–860,039 (the same 40 in every cell).
 - w₂ = +s(t), set every step. s = s₀ = 0.5·s\* during a warm-up of 4,000 steps, then s = s₀·exp(γ(t − 4000)) up to 3·s\*.
   Here s\* is the population switch (certified glob-bracket midpoint).

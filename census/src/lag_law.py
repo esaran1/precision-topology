@@ -410,6 +410,38 @@ def compare():
     print("arms within tolerance:", int(A.within.sum()), "of", len(A))
 
 
+# ------------------------------------------------------------------------------------------ winding check (controlled ramps)
+WINDING_CHECKS = ((1.30, 0, 0.003), (1.30, -1, 0.003), (1.30, 1, 0.003), (1.50, 0, 0.002), (1.50, 0, 0.005))
+
+
+def winding_check():
+    """Controlled population GD ramps (η = 0.3, P = I) on the winding copy k of the branch, from 0.9·s* at
+    s = s₀·exp(γt) with γ = χ·η·λ_min(H): measured r = s_c/s* − 1 against κ_k·χ.  Run before any comparison of the
+    committed predictions (math note §13); written to winding_check.csv."""
+    import torch
+    x, y = _pop(); X, Y = torch.tensor(x), torch.tensor(y)
+    rows = []
+    for a, k, chi in WINDING_CHECKS:
+        sw = switch(a); s_star = sw["s_star"]; H = np.array(sw["H"]); tan = np.array(sw["tangent"]); g = np.array(sw["gradG"])
+        lam = float(np.linalg.eigvalsh(H).min())
+        kap = lam * float(g @ np.linalg.solve(H, tan - TWO_PI * k * np.array([0, 0, 1.0]))) / float(g @ tan)
+        eta = 0.3; gamma = chi * eta * lam; s0 = 0.9 * s_star
+        z0 = np.array(sw["z_star"]); z0 = np.array([z0[0], z0[1] + TWO_PI * k, z0[2] - TWO_PI * k * s_star])
+        z, _ = branch_point(z0, s0, a, x, y); z = torch.tensor(z, requires_grad=True); t = 0
+        while True:
+            t += 1; s = s0 * math.exp(gamma * t)
+            gg, = torch.autograd.grad(_loss_t(z, s, a, X, Y), z)
+            with torch.no_grad():
+                z -= eta * gg
+            if gap(float(z[0].detach()), float(z[1].detach()), a) > 0 or s > 2 * s_star:
+                break
+        rows.append({"a": a, "k": k, "chi": chi, "b1_at_crossing": float(z[1].detach()), "kappa_k_sgd": kap,
+                     "measured_r": s / s_star - 1, "predicted_r": kap * chi})
+        print(rows[-1], flush=True)
+    pd.DataFrame(rows).to_csv(OUT / "winding_check.csv", index=False)
+
+
 if __name__ == "__main__":
     {"kappa": lambda: run_kappa(int(sys.argv[2]) if len(sys.argv) > 2 else 3),
-     "commit": lambda: commit_predictions(int(sys.argv[2]) if len(sys.argv) > 2 else 3), "compare": compare}[sys.argv[1]]()
+     "commit": lambda: commit_predictions(int(sys.argv[2]) if len(sys.argv) > 2 else 3), "compare": compare,
+     "winding_check": winding_check}[sys.argv[1]]()
