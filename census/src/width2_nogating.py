@@ -406,7 +406,7 @@ def pilot(workers=2):
         for row in p.imap_unordered(_pilot_job, jobs, chunksize=1):
             _append("pilot.csv", [row]); print(row, flush=True)
     d = pd.read_csv(PARTS / "pilot.csv")
-    T = d[~d.excluded].T.values
+    T = d.loc[~d.excluded.astype(bool), "T"].values          # the column "T" (not the transpose)
     H, need = choose_H(T)
     print("pilot: p95(T) =", np.percentile(T, 95), "4 x p95 =", need, "H =", H)
     if H is None:

@@ -1,0 +1,53 @@
+{'act': 'f1.30', 'seed': 500000, 'excluded': False, 'ck_step': 68, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500001, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500002, 'excluded': False, 'ck_step': 2, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500003, 'excluded': False, 'ck_step': 233, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500004, 'excluded': False, 'ck_step': 81, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500005, 'excluded': False, 'ck_step': 137, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500006, 'excluded': False, 'ck_step': 81, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500007, 'excluded': False, 'ck_step': 57, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500008, 'excluded': False, 'ck_step': 2, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500009, 'excluded': False, 'ck_step': 115, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500010, 'excluded': False, 'ck_step': 233, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500011, 'excluded': False, 'ck_step': 12, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500012, 'excluded': False, 'ck_step': 137, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500013, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500014, 'excluded': False, 'ck_step': 195, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500015, 'excluded': False, 'ck_step': 57, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500016, 'excluded': False, 'ck_step': 48, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500017, 'excluded': False, 'ck_step': 97, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500018, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.30', 'seed': 500019, 'excluded': False, 'ck_step': 81, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500000, 'excluded': False, 'ck_step': 68, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500001, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500002, 'excluded': False, 'ck_step': 2, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500003, 'excluded': False, 'ck_step': 233, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500004, 'excluded': False, 'ck_step': 68, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500005, 'excluded': False, 'ck_step': 115, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500006, 'excluded': False, 'ck_step': 81, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500007, 'excluded': False, 'ck_step': 57, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500008, 'excluded': False, 'ck_step': 2, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500009, 'excluded': False, 'ck_step': 115, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500010, 'excluded': False, 'ck_step': 233, 'T': 200, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500011, 'excluded': False, 'ck_step': 8, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500012, 'excluded': False, 'ck_step': 164, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500013, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500014, 'excluded': False, 'ck_step': 195, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500015, 'excluded': False, 'ck_step': 57, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500016, 'excluded': False, 'ck_step': 48, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500017, 'excluded': False, 'ck_step': 8, 'T': 600, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500018, 'excluded': False, 'ck_step': 97, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+{'act': 'f1.50', 'seed': 500019, 'excluded': False, 'ck_step': 68, 'T': 100, 'final_placed': True, 'drift': 2.220446049250313e-16}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/Evan/precision-topology/census/src/width2_nogating.py", line 657, in <module>
+    H, need, T = pilot(w)
+                 ^^^^^^^^
+  File "/Users/Evan/precision-topology/census/src/width2_nogating.py", line 410, in pilot
+    H, need = choose_H(T)
+              ^^^^^^^^^^^
+  File "/Users/Evan/precision-topology/census/src/width2_nogating.py", line 255, in choose_H
+    need = 4 * float(np.percentile(np.asarray(T, float), 95))
+                                   ^^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: 'f1.30'
