@@ -1,0 +1,31 @@
+(A) window values at (p,q)=(1.6,1.2):
+    I: endpoint h = ['3746/46875', '2914/46875'] = [0.07991466666666666, 0.062165333333333336], interior crit signs [1]
+    Om: endpoint h = ['2/3', '10278/15625'] = [0.6666666666666666, 0.657792], interior crit signs [-1]
+    Op: endpoint h = ['30342/15625', '3674/375'] = [1.941888, 9.797333333333333], interior crit signs []
+    G0(1.6,1.2) orientation O-over-I = 27088/46875 = 0.5778773333
+    other orientation <= -9.717419 (< 0)
+(B) max x_a^2/(6 eps) = 1.000000 (<= 1 required); max beta^2/(eps(2+eps)) = 1.000000
+(C) sup|g| on [0,4.4] check: 2.2943 (eps=0.2), 2.7713 (eps=0); bound 12^1.5/15 = 2.7713
+    K(eps) lower bound > 0 for eps < 0.08593; > 0.4 for eps < 0.02998
+    eps=0.001: Lambda=1.00030  p < 1.7499  |q| < 1.7615  box: p < 1.7496, |q| < 2.4643  Klow=0.5723
+    eps=0.01: Lambda=1.00316  p < 1.7524  |q| < 1.7640  box: p < 1.7496, |q| < 2.4675  Klow=0.5212
+    eps=0.02: Lambda=1.00664  p < 1.7554  |q| < 1.7671  box: p < 1.7496, |q| < 2.4710  Klow=0.4619
+    eps=0.029: Lambda=1.01006  p < 1.7584  |q| < 1.7701  box: p < 1.7496, |q| < 2.4742  Klow=0.4062
+    eps=0.05: Lambda=1.01911  p < 1.7663  |q| < 1.7780  box: p < 1.7496, |q| < 2.4816  Klow=0.2675
+    eps=0.1: Lambda=1.04716  p < 1.7904  |q| < 1.8023  box: p < 1.7496, |q| < 2.4989  Klow=-0.1157
+    eps=0.2: Lambda=1.13657  p < 1.8653  |q| < 1.8777  box: p < 1.7496, |q| < 2.5330  Klow=-1.1388
+(D) random placements (w1 > 0, b1 in [0, 2pi)):
+    eps=0.5: n=800000, #G>0=22427, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9898, max G/dropmax = 0.3158
+    eps=0.2: n=800000, #G>0=20209, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9905, max G/dropmax = 0.3109
+    eps=0.05: n=800000, #G>0=18735, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9909, max G/dropmax = 0.3083
+    eps=0.029: n=800000, #G>0=18486, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9909, max G/dropmax = 0.3076
+    eps=0.01: n=800000, #G>0=18141, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9910, max G/dropmax = 0.3072
+    eps=0.001: n=800000, #G>0=18252, 1.4w1<x_a: True, |m|<beta: True, ellipse: True, max G/(0.4 eps w1) = 0.9910, max G/dropmax = 0.3070
+    cross-check vs src.exact_extrema.exact_gap (200 pts, a=1.05): max diff 0.00e+00
+(E) grid argmax of the rescaled gap (p in (0, 1.8], q in [-2.6, 2.6]):
+    eps=0.2: K_grid=0.54039 at (p,q)=(1.496,-1.132); max over p<1: 0.3919; max over |q|>=2: -0.0035; proved lower bound -1.1388
+    eps=0.05: K_grid=0.56867 at (p,q)=(1.576,1.184); max over p<1: 0.3874; max over |q|>=2: -0.0030; proved lower bound 0.2675
+    eps=0.029: K_grid=0.57302 at (p,q)=(1.588,-1.192); max over p<1: 0.3866; max over |q|>=2: -0.0029; proved lower bound 0.4062
+    eps=0.01: K_grid=0.57710 at (p,q)=(1.598,-1.200); max over p<1: 0.3861; max over |q|>=2: -0.0028; proved lower bound 0.5212
+    eps=0.001: K_grid=0.57922 at (p,q)=(1.604,-1.204); max over p<1: 0.3854; max over |q|>=2: -0.0028; proved lower bound 0.5723
+    eps=0.0001: K_grid=0.57927 at (p,q)=(1.604,1.204); max over p<1: 0.3855; max over |q|>=2: -0.0028; proved lower bound 0.5773
