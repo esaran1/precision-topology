@@ -1,6 +1,6 @@
 act,R2,direct_check_landed,direct_check_placed,direct_check_pair,direct_check_G,finished,converged,end_placed_pair,end_placed_other,end_unplaced_single_unit,end_unplaced_other,retained_loss,min_final_minus_retained,n_below_retained
 f1.30,0.001,True,True,True,0.8894736056836365,1656,1654,21,0,1359,276,0.6922871697903527,-5.329070518200751e-15,0
-f1.30,0.003,False,,,,1224,1222,11,0,970,243,,,0
+f1.30,0.003,True,True,True,0.8896025833777514,1224,1222,11,0,970,243,0.6905695256247887,-5.551115123125783e-16,0
 f1.30,0.01,False,,,,284,284,3,0,125,156,,,0
 f1.30,0.02,False,,,,55,55,0,0,11,44,,,0
 f1.50,0.001,True,True,True,1.0263364446340466,1690,1689,21,0,1401,268,0.6922871675820338,-5.662137425588298e-15,0
