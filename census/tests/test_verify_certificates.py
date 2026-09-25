@@ -220,3 +220,41 @@ def test_per_round_tiling_rejects_constructed_faults(ghat_stream_cert):
         nk = f"r{lvl + 1:02d}_pruned"
         anc = dict(base); anc[nk] = np.r_[base.get(nk, np.empty((0, 2), np.int32)), 2 * base[k][:1]]
         assert not vc.coverage_per_round(Z(anc), m["nw"], m["nb"], R)[0]
+
+
+# ------------------------------------------------------------------------------------------ limit-problem pieces
+def test_h_range_encloses_dense_samples():
+    h = vc.HAct()
+    rng = np.random.default_rng(2)
+    for _ in range(200):
+        lo, hi = np.sort(rng.uniform(-6, 6, 2))
+        mn, mx = h.range(arb(lo), arb(hi))
+        t = np.linspace(lo, hi, 20001); f = -t + t ** 3 / 6
+        assert float(mn.mid()) <= f.min() + 1e-12 and float(mx.mid()) >= f.max() - 1e-12
+
+
+def test_pava_matches_an_independent_float_implementation():
+    from src.limit_bnb import isotonic_logloss
+    rng = np.random.default_rng(3)
+    for _ in range(30):
+        ys = (rng.random(rng.integers(5, 200)) < rng.random()).astype(int)
+        assert abs(float(vc.pava_logloss(ys).mid()) - isotonic_logloss(ys)) < 1e-9
+
+
+def test_localisation_bounds_match_the_search_values():
+    from src.limit_bnb import R2, isotonic_logloss, monotone_bound, population
+    x, y = population()
+    BP, Bf = vc.localisation_bounds(x, y, 24.0)
+    ys = y[np.argsort(x)]
+    full = min(isotonic_logloss(ys), isotonic_logloss(ys[::-1])) / len(x)
+    assert abs(float(Bf.mid()) - full) < 1e-9
+    assert float(BP.mid()) <= monotone_bound(x, y, 4 * R2 / 24.0) + 1e-9        # never above the search's value
+
+
+def test_rejects_a_constant_predictor_claim_that_is_false_for_limit_objective():
+    # a leaf whose claimed lower bound exceeds log 2 at the constant predictor must be rejected
+    from src.limit_bnb import population
+    x, y = population()
+    obj = vc.Objective(x, y, 0.68, None, vc.HAct())
+    st = {"evals": 0, "max_depth": 0}
+    assert not vc._leaf_ok(obj, 0.0, 0.0, 1e-3, 1e-3, "lb", 0.7, vc.MAX_DEPTH, st)   # L0* ≈ log 2 < 0.7 there

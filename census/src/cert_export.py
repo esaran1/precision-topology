@@ -94,6 +94,48 @@ def ghat(a, name):
     return meta
 
 
+def limit(A, name, P=24.0):
+    """One limit-problem status certificate at A (limit_bnb._status with recording): both regions' leaves.  The status
+    must equal the one the committed switch bracket rests on (minus at A_lo, plus at A_hi)."""
+    from .limit_bnb import _status, monotone_bound, population, profile, isotonic_logloss, R2
+    x, y = population()
+    recs = {"-": {}, "+": {}}
+    st, rm, rp = _status(A, x, y, P, records=recs)
+    assert st in ("minus", "plus"), st
+    win, lose = ("-", "+") if st == "minus" else ("+", "-")
+    wr = rm if win == "-" else rp
+    if win == "-" and wr["upper"] == math.log(2) and (wr["arg_p"], wr["arg_q"]) == (0.0, 0.0):
+        U_point = None
+    else:
+        _, b2, _, _ = profile([wr["arg_p"]], [wr["arg_q"]], A, x, y)
+        U_point = [float(wr["arg_p"]), float(wr["arg_q"]), float(b2[0])]
+    arrays = {"x": np.asarray(x, float), "y": np.asarray(y, float)}
+    for reg in ("-", "+"):
+        L = np.concatenate(recs[reg]["leaves"])
+        arrays[f"level_{reg}"] = np.asarray(L["level"]).astype(np.int64)
+        arrays[f"iw_{reg}"] = np.asarray(L["ip"]); arrays[f"ib_{reg}"] = np.asarray(L["iq"])
+        for k in ("lb", "G", "reason"):
+            arrays[f"{k}_{reg}"] = np.asarray(L[k])
+    r = recs["-"]
+    ys = y[np.argsort(x)]
+    meta = {"kind": "limit_status", "name": name, "A": A, "P": P, "status": st, "winning_region": win,
+            "losing_region": lose, "U_search": wr["upper"], "U_point": U_point, "half": True,
+            "p0": r["p0"], "Q": r["Q"], "nw": int(r["npn"]), "nb": int(r["nq"]), "hw0": r["hp0"], "hb0": r["hq0"],
+            "inner": [-0.8, 0.8], "outer": [1.2, 2.0], "X": 2.0,
+            "B_P_search": monotone_bound(x, y, 4 * R2 / P),
+            "B_full_search": min(isotonic_logloss(ys), isotonic_logloss(ys[::-1])) / len(x),
+            "objective": "L0*(p, q; A) = min_b2 mean softplus(z) - y z, z = A h(p x + q) + b2, h(s) = -s + s^3/6",
+            "gap": "G0 = min_O h(p x + q) - max_I h(p x + q), I = [-0.8, 0.8], O = +-[1.2, 2.0]",
+            "domain": "p in [0, P] (x-symmetry), q in [-Q, Q], Q = 2 sqrt 2 + 2P",
+            "regenerate": f"python -m src.cert_export limit {A} {name}",
+            "search_result": {"minus": {k: rm[k] for k in ("lower", "upper", "rounds")},
+                              "plus": {k: rp[k] for k in ("lower", "upper", "rounds")}}}
+    CERTS.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(CERTS / f"{name}.npz", **arrays)
+    (CERTS / f"{name}.json").write_text(json.dumps(meta, indent=1, default=float))
+    return meta
+
+
 def ghat_stream(a, name):
     """ghat() with bounded memory (ghat_bnb.certify_stream): leaves streamed to <name>.npz, one int32 (iw, ib) array per
     round ('r{round:02d}_pruned' / 'r{round:02d}_kept', level = round).  The same assertions as ghat()."""
@@ -146,6 +188,8 @@ def manifest():
 if __name__ == "__main__":
     if sys.argv[1] == "manifest":
         print(manifest())
+    elif sys.argv[1] == "limit":
+        print(json.dumps(limit(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "ghat_stream":
         print(json.dumps(ghat_stream(float(sys.argv[2]), sys.argv[3]), indent=1, default=float)[:1500])
     elif sys.argv[1] == "ghat":

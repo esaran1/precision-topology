@@ -49,3 +49,7 @@ results/certificates/ghat_a2.00.json,a90fa04400c197a5e5b757a5e848019ec34d36b882d
 results/certificates/ghat_a2.00.npz,e34f117c5d53640bec5e43b5a2fda6544737ceb28182637bea72df3805ecd11a,42328,python -m src.cert_export ghat 2.0 ghat_a2.00
 results/certificates/ghat_a3.00.json,cb0bcdffbe937c5294c3809e5cc4d61a2837ae49a0134d9dd6cf8ce127b24417,658,python -m src.cert_export ghat 3.0 ghat_a3.00
 results/certificates/ghat_a3.00.npz,0e38aaa3a3785092594591ed83d032c1006af712d546ee83c5576196c86fb073,19939,python -m src.cert_export ghat 3.0 ghat_a3.00
+results/certificates/limit_A_hi.json,8901ab67da73aa47a70b628c9ec64e7df0402fc47567d8f89b131320c69eaf51,1070,python -m src.cert_export limit 0.6875 limit_A_hi
+results/certificates/limit_A_hi.npz,f8a698a9026da4e601d4a8aa1810fda1ad36c241d24b2fca6e33011b871f862b,2126333,python -m src.cert_export limit 0.6875 limit_A_hi
+results/certificates/limit_A_lo.json,112981c8de17cefdc3cf3e0cef79fcb88e8edefeffe66ecb6dec21d4523dc15d,1097,python -m src.cert_export limit 0.6812499999999999 limit_A_lo
+results/certificates/limit_A_lo.npz,c29a80d3a8a084dc6e76da6328d8b9c69905043bc1ab9e12c9cdb5d92a76bc56,2164456,python -m src.cert_export limit 0.6812499999999999 limit_A_lo

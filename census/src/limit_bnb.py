@@ -144,7 +144,7 @@ def monotone_bound(x, y, window):
 
 
 def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=True,
-            inner=(-0.8, 0.8), outer=(1.2, 2.0)):
+            inner=(-0.8, 0.8), outer=(1.2, 2.0), record=None):
     """half=True searches p >= 0 only: valid when the data and windows are x-symmetric, since then
     L0*(p, q) = L0*(-p, q) and G0(p, q) = G0(-p, q) (substitute x -> -x).
     Window-general: X = max|x| over I ∪ O sets the q-range 2√2 + X·P and the σ bound; the gap step uses
@@ -162,6 +162,10 @@ def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=Tru
     arg = (0.0, 0.0) if region == "-" else None
     ax = np.abs(x)
     rounds = 0
+    if record is not None:        # certificate export (Block 2): integer quadtree indices, leaves and claims
+        ip, iq = np.meshgrid(np.arange(npn), np.arange(nq), indexing="ij")
+        ip, iq = ip.ravel().astype(np.int64), iq.ravel().astype(np.int64)
+        record.update(npn=npn, nq=nq, hp0=hpp, hq0=hq, p0=p0, Q=Q, P=P, A=A, region=region, tol=tol, leaves=[])
     while True:
         rounds += 1
         n = len(cp)
@@ -186,7 +190,17 @@ def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=Tru
         keep = may & (lb < upper)
         lower = float(lb[keep].min()) if keep.any() else upper
         conv = upper - lower <= tol or not keep.any()
+        if record is not None:
+            gone = ~keep
+            record["leaves"].append(np.rec.fromarrays(
+                [np.full(gone.sum(), rounds - 1, np.int16), ip[gone], iq[gone], lb[gone], G[gone],
+                 np.where(may[gone], 1, 2).astype(np.int8)], names="level,ip,iq,lb,G,reason"))
         if conv or (region == "+" and lower > math.log(2)) or 4 * keep.sum() > max_cells:
+            if record is not None:
+                record["leaves"].append(np.rec.fromarrays(
+                    [np.full(keep.sum(), rounds - 1, np.int16), ip[keep], iq[keep], lb[keep], G[keep],
+                     np.zeros(keep.sum(), np.int8)], names="level,ip,iq,lb,G,reason"))
+                record.update(upper=upper, arg=arg, lower=min(lower, upper))
             encl = None
             if keep.any():
                 kp, kq = cp[keep], cq[keep]
@@ -199,6 +213,10 @@ def certify(A, x, y, region, P, tol=1e-7, h0=0.25, max_cells=4_000_000, half=Tru
         hpp, hq = hpp / 2, hq / 2
         cp = np.concatenate([cp - hpp, cp - hpp, cp + hpp, cp + hpp])
         cq = np.concatenate([cq - hq, cq + hq, cq - hq, cq + hq])
+        if record is not None:
+            kp, kq = 2 * ip[keep], 2 * iq[keep]
+            ip = np.concatenate([kp, kp, kp + 1, kp + 1])
+            iq = np.concatenate([kq, kq + 1, kq, kq + 1])
 
 
 def localisation():
@@ -219,9 +237,11 @@ if __name__ == "__main__" and sys.argv[1] == "localisation":
 
 
 # ------------------------------------------------------------------------- switch and H2'
-def _status(A, x, y, P, half=True, tol=1e-7, inner=(-0.8, 0.8), outer=(1.2, 2.0)):
-    rm = certify(A, x, y, "-", P, tol=tol, half=half, inner=inner, outer=outer)
-    rp = certify(A, x, y, "+", P, tol=tol, half=half, inner=inner, outer=outer)
+def _status(A, x, y, P, half=True, tol=1e-7, inner=(-0.8, 0.8), outer=(1.2, 2.0), records=None):
+    rm = certify(A, x, y, "-", P, tol=tol, half=half, inner=inner, outer=outer,
+                 record=None if records is None else records["-"])
+    rp = certify(A, x, y, "+", P, tol=tol, half=half, inner=inner, outer=outer,
+                 record=None if records is None else records["+"])
     if rp["lower"] > rm["upper"]:
         st = "minus"
     elif rm["lower"] > rp["upper"]:

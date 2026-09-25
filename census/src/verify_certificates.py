@@ -106,6 +106,9 @@ class FA:
     def df(self, t):
         return 1 + self.a * t.cos()
 
+    def np_f(self, t):
+        return t + self.af * np.sin(t)
+
     def range(self, tlo, thi):
         """Rigorous [min, max] of f_a over [tlo, thi] (tlo, thi arb): endpoints and the critical points inside."""
         cand = [self.f(tlo), self.f(thi)]
@@ -123,6 +126,31 @@ class FA:
         mn = min((lo_(c) for c in cand))
         mx = max((hi_(c) for c in cand))
         return mn, mx
+
+
+class HAct:
+    """The limit-problem activation h(σ) = −σ + σ³/6 (critical points ±√2), with the interface of FA."""
+
+    def __init__(self):
+        self.c = arb(2).sqrt()                            # h′(σ) = σ²/2 − 1 = 0 at ±√2
+        self.twopi = None
+
+    def f(self, t):
+        return -t + t ** 3 / 6
+
+    def df(self, t):
+        return t ** 2 / 2 - 1
+
+    def np_f(self, t):
+        return -t + t ** 3 / 6
+
+    def range(self, tlo, thi):
+        """Rigorous [min, max] over [tlo, thi]: endpoints and ±√2 if possibly inside."""
+        cand = [self.f(tlo), self.f(thi)]
+        for cc in (self.c, -self.c):
+            if not (hi_(cc) < lo_(tlo) or lo_(cc) > hi_(thi)):
+                cand.append(self.f(cc))
+        return min(lo_(c) for c in cand), max(hi_(c) for c in cand)
 
 
 def range_inner(fa, tlo, thi):
@@ -152,13 +180,14 @@ def t_interval(wl, wh, bl, bh, xl, xh):
 
 # ------------------------------------------------------------------------------------------ the finite-a objective
 class Objective:
-    def __init__(self, x, y, s, a):
+    def __init__(self, x, y, s, a, act=None):
+        """a: the f_a parameter (act None), or act = HAct() for the limit problem (s is then A)."""
         ctx.prec = PREC
         self.xf = np.asarray(x, float); self.yf = np.asarray(y, float)
         self.X = [arb(float(v)) for v in self.xf]
         self.Y = [int(v) for v in self.yf]
         self.n = len(self.X)
-        self.s = arb(s); self.fa = FA(a)
+        self.s = arb(s); self.fa = act if act is not None else FA(a)
         k = sum(self.Y)
         self.ybar = arb(k) / self.n
 
@@ -250,8 +279,7 @@ class Objective:
         # upper: G(θ) ≤ φ(x_o, θ) − φ(x_i, θ) for any fixed x_o ∈ O, x_i ∈ I; take the best of a few pairs
         wm, bm = float(((wl + wh) / 2).mid()), float(((bl + bh) / 2).mid())
         xs_i = np.linspace(inner[0], inner[1], 81); xs_o = np.r_[np.linspace(*outer, 41), -np.linspace(*outer, 41)]
-        fi = xs_i * wm + bm; fo = xs_o * wm + bm
-        fi = fi + fa.af * np.sin(fi); fo = fo + fa.af * np.sin(fo)
+        fi = fa.np_f(xs_i * wm + bm); fo = fa.np_f(xs_o * wm + bm)       # float heuristic: only picks the points
         xo, xi = float(xs_o[np.argmin(fo)]), float(xs_i[np.argmax(fi)])
         _, fomax = fa.range(*t_interval(wl, wh, bl, bh, arb(xo), arb(xo)))
         fimin, _ = fa.range(*t_interval(wl, wh, bl, bh, arb(xi), arb(xi)))
@@ -341,10 +369,10 @@ def files_match_manifest(name):
 _OBJ = {}
 
 
-def _init_worker(npz_path, s, a):
+def _init_worker(npz_path, s, a, act_name=None):
     ctx.prec = PREC
     d = np.load(npz_path)
-    _OBJ["obj"] = Objective(d["x"], d["y"], s, a)
+    _OBJ["obj"] = Objective(d["x"], d["y"], s, a, HAct() if act_name == "h" else None)
 
 
 def _leaf_ok(obj, wc, bc, hw, hb, kind, target, depth, stats):
@@ -429,6 +457,124 @@ def check_finite(name, verbose=True, workers=WORKERS):
     res["leaves_needing_subdivision"] = int(sum(r[2] > 1 for r in results))
     res["seconds"] = time.time() - t0
     res["pass"] = all(res["checks"].values())
+    if verbose:
+        print(json.dumps(res, indent=1))
+    return res
+
+
+# ------------------------------------------------------------------------------------------ limit-problem status certificates
+def pava_logloss(ys):
+    """Rigorous total log loss of the isotonic (non-decreasing) regression of the 0/1 sequence ys: PAVA with exact
+    integer block sums and counts, then −Σ k·log(mean) in Arb."""
+    blocks = []                                           # [ones, count], exact integers
+    for v in ys:
+        blocks.append([int(v), 1])
+        while len(blocks) > 1 and blocks[-2][0] * blocks[-1][1] > blocks[-1][0] * blocks[-2][1]:
+            s2, c2 = blocks.pop()
+            blocks[-1][0] += s2; blocks[-1][1] += c2
+    tot = arb(0)
+    for k1, c in blocks:
+        k0 = c - k1
+        if k1:
+            tot -= k1 * (arb(k1) / c).log()
+        if k0:
+            tot -= k0 * (arb(k0) / c).log()
+    return tot
+
+
+def localisation_bounds(x, y, P):
+    """Rigorous lower bounds (Arb) of L0* for |p| >= P (B(P)) and for |q| > 2√2 + X|p| (B_full), math in
+    src/limit_bnb.py: points with |σ| < 2√2 lie in an open x-window of length 4√2/|p| <= w = 4√2/P; outside it the
+    logit is monotone in x, so L0* >= (1/n)·(best monotone log loss of the rest).  Windows starting at a data point
+    dominate every window (they remove a superset), and removing points never increases the bound, so the minimum over
+    windows [x_i, x_i + w) is a valid bound; a point whose membership is undecided in Arb is removed (conservative)."""
+    n = len(x)
+    order = np.argsort(x)
+    xs, ys = x[order], y[order]
+    w = 4 * arb(2).sqrt() / arb(P)
+    X = [arb(float(v)) for v in xs]
+    best = None
+    for i in range(n):
+        c = X[i]
+        keep = [j for j in range(n) if (X[j] < c) or (X[j] >= c + w)]       # certainly outside [c, c + w)
+        yk = ys[keep]
+        v = min_ball(pava_logloss(yk), pava_logloss(yk[::-1])) / n
+        best = v if best is None else min_ball(best, v)
+    full = min_ball(pava_logloss(ys), pava_logloss(ys[::-1])) / n
+    return best, full
+
+
+def min_ball(a, b):
+    """A ball whose LOWER end is min(lower(a), lower(b)) -- a rigorous lower bound of min(a, b)."""
+    return arb(min(lo_(a), lo_(b)))
+
+
+def check_limit(name, verbose=True, workers=WORKERS):
+    """Limit-problem status certificate at scale A.  Checks: hashes; the data are exactly x-symmetric with the labels
+    (the half-domain p >= 0) and the windows are symmetric; max|x| <= X; h is increasing on |σ| >= 2√2 with
+    h(−2√2) < h(2√2) (the monotone-logit step of the localisation); the localisation bounds B(P), B_full recomputed
+    rigorously and the winner's U below both (so the global minimiser lies in the certified box); exact tiling of each
+    region; U's point in the winning region (or the constant predictor, exactly log 2); every leaf's claim (lower bound
+    of L0* or outside the region) verified in Arb; every losing-region claim > U."""
+    from multiprocessing import Pool
+    ctx.prec = PREC
+    meta = json.loads((CERTS / f"{name}.json").read_text())
+    dat = np.load(CERTS / f"{name}.npz")
+    x, y = dat["x"], dat["y"]
+    A, P = meta["A"], meta["P"]
+    hact = HAct()
+    obj = Objective(x, y, A, None, hact)
+    res = {"name": name, "checks": {"files_match_committed_hashes": files_match_manifest(name)}}
+    t0 = time.time()
+    pos = sorted(zip(x.tolist(), y.tolist())); neg = sorted(zip((-x).tolist(), y.tolist()))
+    res["checks"]["data_x_symmetric"] = pos == neg
+    inn, out = meta["inner"], meta["outer"]
+    res["checks"]["windows_symmetric"] = inn[0] == -inn[1]
+    res["checks"]["max_abs_x_le_X"] = float(np.abs(x).max()) <= meta["X"]
+    r2 = 2 * arb(2).sqrt()
+    res["checks"]["h_monotone_outside_2sqrt2"] = bool(hact.f(-r2) < hact.f(r2)) and bool(hact.df(r2) > 0)
+    res["checks"]["Q_matches"] = abs(meta["Q"] - (2 * math.sqrt(2) + meta["X"] * P)) <= 1e-12
+    BP, Bfull = localisation_bounds(x, y, P)
+    res["B_P_lower"] = float(lo_(BP).mid()); res["B_full_lower"] = float(lo_(Bfull).mid())
+    win, lose = meta["winning_region"], meta["losing_region"]
+    if meta["U_point"] is None:
+        U = arb(2).log()
+        res["checks"]["U_point_in_region"] = win == "-" and (obj.ybar == arb(1) / 2)
+    else:
+        p_, q_, b2_ = meta["U_point"]
+        U = obj.upper_at(p_, q_, b2_)
+        gl, gu = obj.gap_bounds(p_, p_, q_, q_, tuple(inn), tuple(out))
+        res["checks"]["U_point_in_region"] = bool((gl > 0) if win == "+" else (gu <= 0))
+    res["U_upper"] = float(hi_(U).mid())
+    res["checks"]["U_below_localisation_bounds"] = bool(U < BP) and bool(U < Bfull)
+    jobs = []
+    for reg in ("-", "+"):
+        lv, iw, ib = dat[f"level_{reg}"], dat[f"iw_{reg}"], dat[f"ib_{reg}"]
+        ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
+        res["checks"][f"coverage_{reg}"] = ok
+        hw = meta["hw0"] / 2.0 ** lv; hb = meta["hb0"] / 2.0 ** lv
+        cw = meta["p0"] + (iw + 0.5) * 2 * hw; cb = -meta["Q"] + (ib + 0.5) * 2 * hb
+        reason, claim = dat[f"reason_{reg}"], dat[f"lb_{reg}"]
+        if reg == lose:
+            lbl = reason != 2
+            res["checks"]["losing_claims_exceed_U"] = all(arb(float(c)) > U for c in claim[lbl])
+        for k in range(len(lv)):
+            kind = f"out{reg}" if reason[k] == 2 else "lb"
+            jobs.append(((reg, k), float(cw[k]), float(cb[k]), float(hw[k]), float(hb[k]), kind, float(claim[k])))
+    chunks = [jobs[i:i + 200] for i in range(0, len(jobs), 200)]
+    with Pool(workers, initializer=_init_worker, initargs=(str(CERTS / f"{name}.npz"), A, None, "h")) as p:
+        results = [r for part in p.imap_unordered(_chunk, chunks) for r in part]
+    fails = [r for r in results if not r[1]]
+    res["checks"]["every_leaf_claim_verified"] = not fails
+    res["leaves"] = len(results)
+    res["failed_leaves"] = [(r[0][0], int(r[0][1])) for r in fails[:20]]
+    res["evaluations"] = int(sum(r[2] for r in results))
+    res["max_subdivision_depth"] = int(max(r[3] for r in results))
+    res["seconds"] = time.time() - t0
+    res["pass"] = all(res["checks"].values())
+    out_dir = CERTS.parent / "certificate_checks"
+    out_dir.mkdir(exist_ok=True)
+    (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
     if verbose:
         print(json.dumps(res, indent=1))
     return res
@@ -593,7 +739,7 @@ def check_ghat(name, verbose=True, workers=WORKERS):
 
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
-    return check_ghat(name) if kind == "ghat_enclosure" else check_finite(name)
+    return {"ghat_enclosure": check_ghat, "limit_status": check_limit}.get(kind, check_finite)(name)
 
 
 def main(names):
