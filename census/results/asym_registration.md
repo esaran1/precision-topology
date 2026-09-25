@@ -125,3 +125,33 @@ matching cannot move a hidden layer that is already placed.
 - All else is unchanged: budget 32,000 steps, Adam lr 0.01, the crossing is the first step with G₊ > 0 (exact
   extrema), and the T2-3 criterion and constants (≥ 90% at or above s_hi; bootstrap CI above 0; median/s_lo ≤ 1.25;
   at least 40 crossings) stay as registered.
+
+## Amendment 2 (2026-09-25 14:28 EDT): T2-3b, REGISTERED AFTER T2-3's FAILURE
+
+**Status of T2-3: FAIL as registered. This does not change it.** When the author instructed amendment 1, only
+matched initialisation was specified. The approved width-2 design's sweep-rate matching (Revision 3, primary W1 arm)
+was left out. The exploratory timescale analysis found T2-3's crossings at a median ratio of 2.73, about 100× beyond the
+width-1 Adam range. So the author registers a follow-up with sweep-rate matching. It is labelled as registered after
+T2-3's failure, and T2-3's outcome was known when it was written.
+
+**T2-3b.**
+- **Same as T2-3:** a = 1.30, Δ = 0.4, the population threshold bracket [0.4371, 0.4532] (T2-1), the criteria
+  (≥ 90% at or above s_hi; bootstrap CI of median(s_cross/s_hi) − 1 above 0; median(s_cross/s_lo) ≤ 1.25; at least 40
+  crossings), matched initialisation (k = 0.04209), budget 32,000, and placement from step 0 with the 20% stop.
+- **New: the output weights' learning-rate factor φ₂**, applied as v ← v_before + φ₂(v_after − v_before) after each
+  Adam step.
+- **φ₂ comes from Revision 3's steps-matching rule.** The median steps for ‖w₂‖₁ to reach s₂,glob (0.4451) at width 2
+  must equal, within 2%, the median steps for |w₂| to reach |w₂|_glob(1.30) = 4.95625 at width 1 (width-1 protocol).
+  - The pilot used calibration seeds 510,000–510,039 and recorded ‖w₂‖₁ and |w₂| only; no placement was evaluated.
+  - Bisection in log φ₂ on [1e−4, 1].
+  - Result: width-1 median 2,499 steps; **φ₂ = 0.009306**, width-2 median 2,530 steps (+1.2%). Record:
+    `asym_t23b/pilot.json`.
+  - Frozen in `asym_t23b_frozen.json` (SHA-256 ab3b39e110072851…).
+- **Seeds:** 600,160–600,239. Registered extension if fewer than 40 cross: 600,240–600,319.
+- **Validity check.** The achieved median timescale ratio at crossing must lie in the width-1 Adam range
+  [0.0014, 0.023]. Otherwise **T2-3b is UNRESOLVED**, whatever the criteria give. The ratio is defined as in the
+  exploratory analysis (`asym_posthoc2`), with growth measured under φ₂.
+- Code: `src/asym_t23b.py`. Tests: `tests/test_asym_t23b.py` (the φ₂ bisection and the validity check, on pass
+  and fail cases).
+- **Competing outcome:** even with a matched sweep rate, crossings sit far above the width-2 threshold, and T2-3b
+  fails.

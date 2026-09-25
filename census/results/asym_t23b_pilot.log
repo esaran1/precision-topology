@@ -1,0 +1,10 @@
+{"phi": 0.0001, "median_steps": 64000.0, "capped": 40}
+{"phi": 1.0, "median_steps": 32.0, "capped": 0}
+{"phi": 0.01, "median_steps": 2356.5, "capped": 0}
+{"phi": 0.001, "median_steps": 21201.5, "capped": 0}
+{"phi": 0.0031622776601683794, "median_steps": 7191.0, "capped": 0}
+{"phi": 0.005623413251903491, "median_steps": 4206.5, "capped": 0}
+{"phi": 0.007498942093324559, "median_steps": 3151.5, "capped": 0}
+{"phi": 0.008659643233600654, "median_steps": 2723.0, "capped": 0}
+{"phi": 0.00930572040929699, "median_steps": 2530.0, "capped": 0}
+{"median_steps_w1": 2499.0, "phi2": 0.00930572040929699, "result": 2530.0}
