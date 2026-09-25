@@ -37,6 +37,7 @@ BLOCKS = {
     "scale limits (width 2)": ("central", "width2"),
     "SGD own thresholds (Track 4)": ("central", "threshold"),
     "asymmetric windows (Track 2)": ("central", "width2"),
+    "width 2 no-gating test (Track 7)": ("central", "width2"),
     # peripheral
     "Arrhenius 08-27": ("peripheral", "budget law / barriers"), "MNIST budget law 09-11": ("peripheral", "budget law"),
     "collapse 09-12": ("peripheral", "budget law"), "nu": ("peripheral", "budget law"),

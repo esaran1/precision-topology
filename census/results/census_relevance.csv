@@ -205,3 +205,4 @@ T2-1,asymmetric windows (Track 2),registered rule,PASS,central,width2
 T2-2,asymmetric windows (Track 2),registered rule,PASS,central,width2
 T2-3,asymmetric windows (Track 2),registered rule,FAIL,central,width2
 T2-3b,asymmetric windows (Track 2),registered rule,UNRESOLVED,central,width2
+nogating,width 2 no-gating test (Track 7),registered rule,FAIL,central,width2

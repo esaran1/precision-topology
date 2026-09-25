@@ -377,7 +377,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp7()
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
-    text += wp15() + wp16() + wp17() + wp18() + wp19()
+    text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -438,8 +438,9 @@ tolerance is of the order of 1 − max (4.1e−9) there. Non-attainment of the s
 IDs: {_id("tanh: registered outcome 'neither'", "tanh: validation passed at every A", "tanh: box maxima < 1 and rising", "tanh: boundary condition fails only at A = 40", "tanh: selected member is the symmetric pair at every A", "tanh: single units unplaced at every A")}.
 
 **Say**
-- "At width 2, output scale does not gate placement for f_a: the registered small-scale prediction selects the placed
-  cancelling pair, and a direct search at small scales finds that pair as the conditional minimiser."
+- "At width 2, output scale does not gate the placement of the conditional minimiser for f_a: the registered
+  small-scale prediction selects the placed cancelling pair, and a direct search at small scales finds that pair as the
+  conditional minimiser. Training at small held scale is nevertheless gated (WP-20)."
 - "The prediction rests on a second-order selection: at first order, unplaced single units and placed pairs tie."
 - "For tanh the supremum of Δμ is not attained; the registered test returned 'neither' because its boundary criterion
   failed at the largest box, although every other expectation held."
@@ -450,6 +451,7 @@ IDs: {_id("tanh: registered outcome 'neither'", "tanh: validation passed at ever
 - that the direct check is complete while any scale is PENDING (it completed on 2026-09-25: all 8 scales placed).
 - that the unplaced region has no local minima, or that the boundary point is a competing minimum (WP-8 wording).
 - that tanh "confirmed" or "passed" the registered expectation.
+- that output scale does not gate width-2 *training*: the registered training test found gating (WP-20).
 """
 
 
@@ -1061,6 +1063,8 @@ CENTRAL_FAILS = {
     "4b-OM": "optimiser memory: likewise, neither arm removes half the residual.",
     "T2-3": "asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x "
             "the threshold scale, above the registered bound of 1.25.",
+    "nogating": "width 2, symmetric windows, fixed-scale training: placement is gated at small held scale (placed "
+                "0.46 at R2 = 0.003, rising to 0.98-0.99 at 0.1, both a), against the predicted no gating.",
     "B-spin": "(post hoc scoring) the registered falsifier of the spinodal / hysteresis picture fired at a = 1.30; the "
               "framing was dropped.",
     "B-solve": "(post hoc scoring) R at solve exceeds R_solve by 16-29%, against a 15% tolerance.",
@@ -1460,6 +1464,65 @@ uniqueness chain. The outer-exclusion certificates and the solve brackets are ve
 
 **Do not say:** "all certificates are independently verified", or that the sharp R_glob^∞ = 0.19859 is independently
 verified.
+"""
+
+
+def wp20():
+    """WP-20: the width-2 no-gating training test (Track 7, registered)."""
+    s = pd.read_csv(RESULTS / "width2_nogating_scores.csv")
+    fz = json.loads((RESULTS / "width2_nogating_frozen.json").read_text())
+    ctl = pd.read_csv(RESULTS / "width2_nogating_parts" / "control.csv") if (RESULTS / "width2_nogating_parts" / "control.csv").exists() else None
+    row = lambda act, var: " / ".join(f"{r.placed_frac:.2f}" for r in s[(s.act == act) & (s.variant == var)].sort_values("R2").itertuples())
+    return f"""
+## WP-20. Does output scale gate placement in width-2 training? (Track 7, registered; for the submission)
+
+Design and registration: `width2_nogating_design.md` (approved 2026-09-24, with amendments before any run). Horizon
+H = {int(fz["H"]):,}, frozen with a hash from a pilot that cannot see the outcome (5922e24). Producer:
+`src/width2_nogating.py` → `width2_nogating_scores.csv`. This answers "the width-2 analysis contains no width-2 training
+test".
+
+**Design.**
+- Width 2, symmetric windows, a = 1.30 and 1.50.
+- The latest pre-placement checkpoints of 80 training runs per a (matched initialisation) are replayed with ‖w₂‖₁
+  held at R₂ ∈ {{0.003, 0.01, 0.03, 0.1}}, far below width 1's switch. The primary arm preserves the optimiser state.
+- The outcome is placement at H, from exact extrema.
+- The landscape verdict (WP-9) says the conditional minimiser is placed at every scale, so the prediction was
+  **no gating**.
+
+| arm | placed fraction at R₂ = 0.003 / 0.01 / 0.03 / 0.1 |
+|---|---|
+| a = 1.30, preserved (primary) | {row("f1.30", "preserved")} |
+| a = 1.50, preserved (primary) | {row("f1.50", "preserved")} |
+| a = 1.30, reset | {row("f1.30", "reset")} |
+| a = 1.50, reset | {row("f1.50", "reset")} |
+| tanh, preserved (descriptive) | {row("tanh", "preserved")} |
+
+- **Registered verdict: the predicted "no gating" FAILS at both a. The registered competing outcome, gating at small
+  scale, holds.**
+- Validity: the positive control passed (width 1: 0.0 placed at R/R_glob = 0.1, both a). The validity checks passed
+  on constructed cases before the run.
+- **Where the unplaced runs sit (descriptive, reported beside the verdict).**
+  - At H they are stationary two-unit configurations: median scale-relative gradient 1.4e−7, and 59% below the 1e−6
+    tolerance.
+  - None is a single-unit local minimum, so the registered longer-horizon extension applied to 0 runs.
+  - Only 5 of 640 endpoints changed status between H/4 and H, all to placed.
+  - Placed endpoints are almost all the cancelling pair.
+IDs: {_id("Track 7 no-gating FAIL a=1.30", "Track 7 no-gating FAIL a=1.50", "Track 7 placed 0.003 a=1.30", "Track 7 placed 0.1 a=1.30", "Track 7 positive control", "Track 7 H")}.
+
+**Reading.**
+- At width 2 on symmetric windows, the *conditional minimiser* is placed at every scale (WP-9, registered).
+- *Training* at a fixed small output scale nevertheless stays unplaced about half the time, at stationary unplaced
+  two-unit configurations.
+- So gating in training does not require a threshold of the conditional minimiser. Here it comes from where training
+  gets stuck, not from what the loss prefers globally.
+
+**Say:** "The landscape predicts no gating at width 2 on symmetric windows, and none exists in the conditional
+minimiser. The registered training test nevertheless found gating: at small held scale about half the runs remain
+unplaced, at stationary two-unit configurations. So the conditional-threshold account does not by itself predict
+width-2 training."
+
+**Do not say:** "width 2 confirms no gating", or that the width-2 result is a training-level confirmation. The training
+prediction failed.
 """
 
 

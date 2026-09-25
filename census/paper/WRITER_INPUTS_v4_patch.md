@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 190 scored by their registered rules: 90 PASS, 59 FAIL, 8 PARTIAL,
+- **Headline**: 191 scored by their registered rules: 90 PASS, 60 FAIL, 8 PARTIAL,
   33 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 206 registered predictions.
+- **Total**: 207 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -237,6 +237,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | third optimizer 09-14 | registered rule | 2 | 0 | 0 | 0 | 2 |
 | threshold 08-22 | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | threshold 08-22 | registered rule | 2 | 1 | 1 | 0 | 4 |
+| width 2 no-gating test (Track 7) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | winding 08-22 | registered rule | 4 | 0 | 0 | 0 | 4 |
 
 ### By registration file
@@ -310,6 +311,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
+| results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/winding_prediction.md | registered rule | 4 | 0 | 0 | 0 | 4 |
 
@@ -453,7 +455,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 470 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 483 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -533,8 +535,9 @@ tolerance is of the order of 1 − max (4.1e−9) there. Non-attainment of the s
 IDs: `tanh: registered outcome 'neither'`; `tanh: validation passed at every A`; `tanh: box maxima < 1 and rising`; `tanh: boundary condition fails only at A = 40`; `tanh: selected member is the symmetric pair at every A`; `tanh: single units unplaced at every A`.
 
 **Say**
-- "At width 2, output scale does not gate placement for f_a: the registered small-scale prediction selects the placed
-  cancelling pair, and a direct search at small scales finds that pair as the conditional minimiser."
+- "At width 2, output scale does not gate the placement of the conditional minimiser for f_a: the registered
+  small-scale prediction selects the placed cancelling pair, and a direct search at small scales finds that pair as the
+  conditional minimiser. Training at small held scale is nevertheless gated (WP-20)."
 - "The prediction rests on a second-order selection: at first order, unplaced single units and placed pairs tie."
 - "For tanh the supremum of Δμ is not attained; the registered test returned 'neither' because its boundary criterion
   failed at the largest box, although every other expectation held."
@@ -545,6 +548,7 @@ IDs: `tanh: registered outcome 'neither'`; `tanh: validation passed at every A`;
 - that the direct check is complete while any scale is PENDING (it completed on 2026-09-25: all 8 scales placed).
 - that the unplaced region has no local minima, or that the boundary point is a competing minimum (WP-8 wording).
 - that tanh "confirmed" or "passed" the registered expectation.
+- that output scale does not gate width-2 *training*: the registered training test found gating (WP-20).
 
 ## WP-10. The residual mechanism: Block 4a (post hoc) and Block 4b (registered)
 
@@ -899,12 +903,12 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 43 | 24 | 1 | 8 |
+| registered rule | central | 43 | 25 | 1 | 8 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
 
-**Failed central predictions (26: 24 under the registered rule, 2 by post hoc scoring), with one line each:**
+**Failed central predictions (27: 25 under the registered rule, 2 by post hoc scoring), with one line each:**
 
 *threshold* (18):
 - `H-3`: growth-rate dose-response validity gate failed (m = 1 placed 0.500 vs control 0.925); block inconclusive.
@@ -936,9 +940,10 @@ IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL pos
 - `G-1`: training-free out-of-distribution windows: 6 of 10 within 15%, short of the registered count.
 - `G-3b`: sub-claim (far-outer window threshold >= base) was wrong by a provable inequality: a registration error.
 
-*width2* (2):
+*width2* (3):
 - `sl-tanh`: tanh at width 2: the boundary condition failed at A = 40 (criterion flaw); recorded 'neither'.
 - `T2-3`: asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x the threshold scale, above the registered bound of 1.25.
+- `nogating`: width 2, symmetric windows, fixed-scale training: placement is gated at small held scale (placed 0.46 at R2 = 0.003, rising to 0.98-0.99 at 0.1, both a), against the predicted no gating.
 
 **The pattern, stated plainly.** The central failures cluster in the **training-side** claims, and most of them
 concern the **residual**, i.e. where crossings sit relative to the threshold and why:
@@ -956,7 +961,7 @@ The rest are:
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
-**Say:** "Of 65 failed predictions (59 under the registered rule, 6 by post hoc scoring), 26 bear on a central
+**Say:** "Of 66 failed predictions (60 under the registered rule, 6 by post hoc scoring), 27 bear on a central
 claim; most of these concern the residual's mechanism, which the paper reports as open, and one is the width-2 training
 prediction on asymmetric windows (WP-15)." **Do not say** "the central claims never failed" or "the failures are
 peripheral". Do not present the relevance classification as registered;
@@ -1242,3 +1247,53 @@ is proved.**
 **Say:** "Hypothesis H1 of Proposition 2 is proved for ε ≤ 0.029 (Appendix …)."
 **Do not say:** "H1 is proved for all tested a", or "the corner is proved to be the global maximiser". The latter is
 certified, not proved.
+
+## WP-20. Does output scale gate placement in width-2 training? (Track 7, registered; for the submission)
+
+Design and registration: `width2_nogating_design.md` (approved 2026-09-24, with amendments before any run). Horizon
+H = 16,000, frozen with a hash from a pilot that cannot see the outcome (5922e24). Producer:
+`src/width2_nogating.py` → `width2_nogating_scores.csv`. This answers "the width-2 analysis contains no width-2 training
+test".
+
+**Design.**
+- Width 2, symmetric windows, a = 1.30 and 1.50.
+- The latest pre-placement checkpoints of 80 training runs per a (matched initialisation) are replayed with ‖w₂‖₁
+  held at R₂ ∈ {0.003, 0.01, 0.03, 0.1}, far below width 1's switch. The primary arm preserves the optimiser state.
+- The outcome is placement at H, from exact extrema.
+- The landscape verdict (WP-9) says the conditional minimiser is placed at every scale, so the prediction was
+  **no gating**.
+
+| arm | placed fraction at R₂ = 0.003 / 0.01 / 0.03 / 0.1 |
+|---|---|
+| a = 1.30, preserved (primary) | 0.46 / 0.50 / 0.68 / 0.99 |
+| a = 1.50, preserved (primary) | 0.46 / 0.49 / 0.64 / 0.97 |
+| a = 1.30, reset | 0.44 / 0.45 / 0.64 / 1.00 |
+| a = 1.50, reset | 0.42 / 0.46 / 0.62 / 0.97 |
+| tanh, preserved (descriptive) | 0.59 / 0.61 / 0.68 / 0.75 |
+
+- **Registered verdict: the predicted "no gating" FAILS at both a. The registered competing outcome, gating at small
+  scale, holds.**
+- Validity: the positive control passed (width 1: 0.0 placed at R/R_glob = 0.1, both a). The validity checks passed
+  on constructed cases before the run.
+- **Where the unplaced runs sit (descriptive, reported beside the verdict).**
+  - At H they are stationary two-unit configurations: median scale-relative gradient 1.4e−7, and 59% below the 1e−6
+    tolerance.
+  - None is a single-unit local minimum, so the registered longer-horizon extension applied to 0 runs.
+  - Only 5 of 640 endpoints changed status between H/4 and H, all to placed.
+  - Placed endpoints are almost all the cancelling pair.
+IDs: `Track 7 no-gating FAIL a=1.30`; `Track 7 no-gating FAIL a=1.50`; `Track 7 placed 0.003 a=1.30`; `Track 7 placed 0.1 a=1.30`; `Track 7 positive control`; `Track 7 H`.
+
+**Reading.**
+- At width 2 on symmetric windows, the *conditional minimiser* is placed at every scale (WP-9, registered).
+- *Training* at a fixed small output scale nevertheless stays unplaced about half the time, at stationary unplaced
+  two-unit configurations.
+- So gating in training does not require a threshold of the conditional minimiser. Here it comes from where training
+  gets stuck, not from what the loss prefers globally.
+
+**Say:** "The landscape predicts no gating at width 2 on symmetric windows, and none exists in the conditional
+minimiser. The registered training test nevertheless found gating: at small held scale about half the runs remain
+unplaced, at stationary two-unit configurations. So the conditional-threshold account does not by itself predict
+width-2 training."
+
+**Do not say:** "width 2 confirms no gating", or that the width-2 result is a training-level confirmation. The training
+prediction failed.

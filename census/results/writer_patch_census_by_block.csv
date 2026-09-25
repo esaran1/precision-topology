@@ -57,6 +57,7 @@ block,search 08-22,registered rule,2,0,2,0,4
 block,third optimizer 09-14,registered rule,2,0,0,0,2
 block,threshold 08-22,post hoc (census),1,0,0,0,1
 block,threshold 08-22,registered rule,2,1,1,0,4
+block,width 2 no-gating test (Track 7),registered rule,0,1,0,0,1
 block,winding 08-22,registered rule,4,0,0,0,4
 registration_file,results/amplification_prediction.md,post hoc (census),0,1,0,0,1
 registration_file,results/amplification_prediction.md,registered rule,2,0,0,0,2
@@ -126,5 +127,6 @@ registration_file,results/sgd_own_registration.md (amendment 1),registered rule,
 registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
 registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4
+registration_file,results/width2_nogating_design.md,registered rule,0,1,0,0,1
 registration_file,results/width_prediction.md,registered rule,3,1,0,0,4
 registration_file,results/winding_prediction.md,registered rule,4,0,0,0,4
