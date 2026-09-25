@@ -317,3 +317,24 @@ def test_F_tails_resolves_sign_when_every_sigmoid_is_saturated():
             assert (Fd < 0) == (Ft < 0)
         finally:
             ctx.prec = old
+
+
+def test_K_bounds_enclose_float_G0_and_cells_fail_below_K():
+    import numpy as np
+    from src import verify_certificates as vc
+    h = lambda s: -s + s ** 3 / 6
+    def g0(u, v):
+        xs = lambda lo, hi: np.linspace(lo, hi, 20001)
+        I, O = h(u * xs(-0.8, 0.8) + v), h(np.r_[u * xs(1.2, 2) + v, u * xs(-2, -1.2) + v])
+        return max(O.min() - I.max(), I.min() - O.max())
+    rng = np.random.default_rng(0)
+    for u, v in zip(rng.uniform(0, 8, 40), rng.uniform(-12, 12, 40)):
+        g = g0(u, v)
+        tol = 1e-8 * (1 + abs(g))            # the grid value is >= the true G0 by the grid spacing
+        assert float(vc.g0_upper(u, v).mid()) >= g - tol and float(vc.g0_lower(u, v).mid()) <= g + tol
+    uK, vK = 1.605574798583984, 1.2041816711425795          # published argmax: G0 ~ 0.57946
+    i, j = int(uK / vc.K_H0), int((vK + 12) / vc.K_H0)
+    assert vc._k_cells([(i, j)], 0, 0.5)[0] == [(i, j)]     # fail case: target below K cannot be proved
+    assert vc._k_cells([(i, j)], 0, 50.0)[0] == []          # pass case: a loose target is proved
+    ex = vc.k_domain_lemma_exact()
+    assert all(ex.values())

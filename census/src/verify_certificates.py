@@ -801,6 +801,137 @@ def check_ghat(name, verbose=True, workers=WORKERS):
     return res
 
 
+
+# ------------------------------------------------------------------------------------------ K = sup G₀ (limit class gap)
+K_BOX = (0.0, 8.0, -12.0, 12.0)
+K_H0 = 0.05
+K_MAX_LEVEL = 30
+
+
+def _h_attained(t1, t2):
+    """(upper bound of min, lower bound of max) of h over the exact interval between the exact points t1, t2 (arb):
+    attained values only (the endpoints and ±√2 when certainly strictly inside)."""
+    H = HAct()
+    lo, hi = (t1, t2) if float(t1.mid()) <= float(t2.mid()) else (t2, t1)
+    cand = [H.f(lo), H.f(hi)]
+    for cc in (H.c, -H.c):
+        if lo_(cc) > hi_(lo) and hi_(cc) < lo_(hi):
+            cand.append(H.f(cc))
+    if not all(c.is_finite() for c in cand):
+        return arb("inf"), arb("-inf")
+    return min(hi_(c) for c in cand), max(lo_(c) for c in cand)
+
+
+def g0_upper(u, v):
+    """Rigorous upper bound of G₀(u, v) = max(min_O h − max_I h, min_I h − max_O h) at the exact point (u, v)."""
+    u, v = arb(u), arb(v)
+    i_minU, i_maxL = _h_attained(u * arb("-0.8") + v, u * arb("0.8") + v)
+    p_minU, p_maxL = _h_attained(u * arb("1.2") + v, u * arb(2) + v)
+    n_minU, n_maxL = _h_attained(u * arb(-2) + v, u * arb("-1.2") + v)
+    # min over O <= min(p, n) of attained values; max over I >= attained lower values (exact points throughout)
+    return max(hi_(min(p_minU, n_minU) - i_maxL), hi_(i_minU - max(p_maxL, n_maxL)))
+
+
+def g0_lower(u, v):
+    """Rigorous lower bound of G₀ at the exact point (HAct.range includes every possibly-contained critical point)."""
+    H = HAct()
+    u, v = arb(u), arb(v)
+    rng = lambda x1, x2: H.range(*sorted((u * arb(x1) + v, u * arb(x2) + v), key=lambda b: float(b.mid())))
+    imn, imx = rng("-0.8", "0.8")
+    pmn, pmx = rng("1.2", "2")
+    nmn, nmx = rng("-2", "-1.2")
+    return max(lo_(min(pmn, nmn) - imx), lo_(imn - max(pmx, nmx)))
+
+
+def _k_cells(cells, level, target):
+    """One level of the branch and bound: returns the cells not yet shown to satisfy sup G₀ <= target, and the worst
+    upper bound seen.  Cell = (i, j) at `level`; centre and half-widths are exact dyadic rationals."""
+    ctx.prec = PREC
+    u0, u1, v0, v1 = (arb(repr(z)) for z in K_BOX)
+    hu = arb(K_H0) / 2 ** (level + 1); hv = hu
+    T = arb(repr(target))
+    keep, worst = [], None
+    for i, j in cells:
+        uc = u0 + (2 * i + 1) * hu; vc = v0 + (2 * j + 1) * hv
+        ub_c = g0_upper(uc, vc)
+        smax = 2 * (abs(uc) + hu) + abs(vc) + hv                           # |σ| <= 2|u| + |v| on the cell
+        S = max(arb(1), smax * smax / 2 - 1)                                 # sup |h′| on the σ-range (h′ = σ²/2 − 1)
+        ub = hi_(ub_c + S * (arb("2.8") * hu + 2 * hv))
+        worst = ub if worst is None else max(worst, ub)
+        if not (ub <= T):
+            keep.append((i, j))
+    return keep, (None if worst is None else float_up(worst))
+
+
+def _k_chunk(args):
+    return _k_cells(*args)
+
+
+def k_domain_lemma_exact():
+    """Exact (rational) checks of the domain lemma (math_note_v2 §8): the cubic identity
+    h(a) − h(a + d) = d[1 − ((a + d/2)² + d²/12)/2] as a polynomial identity (verified on a 5 x 5 rational grid, which
+    determines a polynomial of degree <= 3 in each variable), and 0.12·(50/3) = 2 (the u-bound), and that
+    |v| >= √2 + 0.6u implies (v ∓ 0.6u)² >= 2 (sign cases, u >= 0)."""
+    from fractions import Fraction as Fr
+    h = lambda s: -s + s ** 3 / 6
+    grid = [Fr(k, 3) - 2 for k in range(5)]
+    ident = all(h(a) - h(a + d) == d * (1 - ((a + d / 2) ** 2 + d ** 2 / 12) / 2) for a in grid for d in grid)
+    ubound = Fr(12, 100) * Fr(50, 3) == 2 and (Fr(12, 10) ** 2) / 12 == Fr(12, 100)
+    # v >= r + 0.6u with r = √2, u >= 0: v − 0.6u >= r and v + 0.6u >= r + 1.2u >= r; symmetric for v <= −r − 0.6u
+    samples = [(Fr(p, 7), Fr(q, 5)) for p in range(0, 60) for q in range(-60, 61)]
+    r2 = Fr(2)
+    sign_cases = all(((v - Fr(3, 5) * u) ** 2 >= r2 and (v + Fr(3, 5) * u) ** 2 >= r2)
+                     for u, v in samples
+                     if (v >= 0 and (v - Fr(3, 5) * u) ** 2 >= r2 and v - Fr(3, 5) * u > 0)
+                     or (v <= 0 and (v + Fr(3, 5) * u) ** 2 >= r2 and v + Fr(3, 5) * u < 0))
+    return {"cubic_identity_exact": ident, "u_bound_exact": ubound, "v_bound_sign_cases": sign_cases}
+
+
+def check_K(target=None, workers=WORKERS, verbose=True, max_level=K_MAX_LEVEL, sample=None):
+    """K = sup G₀ over [0, 8] x [−12, 12]: an independent branch and bound in Arb (every cell: rigorous upper bound at
+    its exact centre + sup|h′|·(2.8 hu + 2 hv)), the attained lower end at the published argmax, and the domain lemma
+    in exact arithmetic.  `sample`: time only the first `sample` levels."""
+    import csv
+    from multiprocessing import Pool
+    ctx.prec = PREC
+    row = next(csv.DictReader((CERTS.parent / "limit_K_base.csv").open()))
+    K_lo, K_hi = float(row["K_lo"]), float(row["K_hi"])
+    target = K_hi if target is None else target
+    res = {"name": "K_base", "claim_lo": K_lo, "claim_hi": K_hi, "target": target, "checks": {}}
+    t0 = time.time()
+    nu = int(round((K_BOX[1] - K_BOX[0]) / K_H0)); nv = int(round((K_BOX[3] - K_BOX[2]) / K_H0))
+    cells = [(i, j) for i in range(nu) for j in range(nv)]
+    level, worst_all, per_level = 0, None, []
+    with Pool(workers) as p:
+        while cells and level <= max_level and (sample is None or level < sample):
+            chunks = [(cells[k:k + 2000], level, target) for k in range(0, len(cells), 2000)]
+            out = p.map(_k_chunk, chunks)
+            keep = [c for o in out for c in o[0]]
+            w = max(o[1] for o in out)
+            per_level.append({"level": level, "cells": len(cells), "open": len(keep), "worst_upper": w,
+                              "seconds": time.time() - t0})
+            if verbose:
+                print(json.dumps(per_level[-1]), flush=True)
+            cells = [(2 * i + di, 2 * j + dj) for i, j in keep for di in (0, 1) for dj in (0, 1)]
+            level += 1
+    res["levels"] = per_level
+    res["checks"]["every_cell_below_target"] = (not cells) and sample is None
+    res["checks"]["lower_end_attained"] = bool(g0_lower(row["u"], row["v"]) >= arb(repr(K_lo)))
+    res["G0_at_argmax_lower"] = float_down(g0_lower(row["u"], row["v"]))
+    res["checks"].update(k_domain_lemma_exact())
+    res["checks"]["box_contains_lemma_region"] = bool(math.sqrt(50 / 3) < K_BOX[1] and
+                                                      math.sqrt(2) + 0.6 * math.sqrt(50 / 3) < K_BOX[3])
+    res["seconds"] = time.time() - t0
+    res["pass"] = all(res["checks"].values())
+    if sample is None:
+        out_dir = CERTS.parent / "certificate_checks"
+        out_dir.mkdir(exist_ok=True)
+        tag = "" if target == K_hi else f"_target{target:.10f}"
+        (out_dir / f"K_base{tag}.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps({k: v for k, v in res.items() if k != "levels"}, indent=1, default=str))
+    return res
+
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
     return {"ghat_enclosure": check_ghat, "limit_status": check_limit}.get(kind, check_finite)(name)
@@ -814,5 +945,8 @@ def main(names):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["K"]:
+        smp = int(sys.argv[2]) if len(sys.argv) > 2 else None
+        raise SystemExit(0 if check_K(sample=smp)["pass"] or smp else 1)
     names = sys.argv[1:] or sorted(p.stem for p in CERTS.glob("*.json"))
     raise SystemExit(main(names))
