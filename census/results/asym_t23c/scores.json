@@ -1,0 +1,18 @@
+{
+ "runs": 80,
+ "placed_at_init": 0,
+ "crossed": 80,
+ "median_ratio_at_cross": 1.3197951155564757e-05,
+ "criteria": {
+  "verdict": "FAIL",
+  "n": 80,
+  "frac_above_s_hi": 0.5875,
+  "median_ratio_s_hi": 10.460235601234174,
+  "ci_median_minus_1": [
+   -0.0737247352399727,
+   9.977900269418472
+  ],
+  "median_ratio_s_lo": 10.843424663455647
+ },
+ "T2-3c": "UNRESOLVED (median ratio 1.32e-05 outside [0.0014, 0.023])"
+}
