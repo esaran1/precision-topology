@@ -1,0 +1,26 @@
+{
+ "name": "limit_A_hi",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "data_x_symmetric": true,
+  "windows_symmetric": true,
+  "max_abs_x_le_X": true,
+  "h_monotone_outside_2sqrt2": true,
+  "Q_matches": true,
+  "U_point_in_region": true,
+  "U_below_localisation_bounds": true,
+  "coverage_-": true,
+  "coverage_+": true,
+  "every_losing_leaf_outside_or_above_U": true
+ },
+ "B_P_lower": 0.38797358308679,
+ "B_full_lower": 0.47738562622110964,
+ "U_upper": 0.3520606123059904,
+ "winning_region_leaves_not_reverified": 67941,
+ "leaves": 69102,
+ "failed_leaves": [],
+ "evaluations": 206526,
+ "max_subdivision_depth": 3,
+ "seconds": 2114.265427827835,
+ "pass": true
+}

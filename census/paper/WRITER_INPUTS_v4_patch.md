@@ -586,11 +586,14 @@ ball arithmetic; imports nothing from `src/`; every decision an Arb comparison).
   original searches miss the rigorous enclosure by at most 1.1e−15, so the rigorous enclosures replace them (WP-7).
   IDs: `Ghat certificates checked (a = 1.02-3.0)`; `Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi)`.
 
-**Pending (not yet exported or checked).** In priority order (the main theorem rests on the first two):
-1. the limit-problem chain: the limit-switch status certificates at both ends of the A* bracket (exported; the Arb
-   check is running); K = sup G₀; the Krawczyk boxes for c₁;
-2. the solve brackets;
-3. outer exclusion and ring, the PD boxes, localisation (B(24) and B_full).
+- **Limit switch**: the status certificates at both ends of the search-certified bracket, A = 0.68125 ("minus") and
+  A = 0.6875 ("plus"), both pass. So **A* ∈ [0.68125, 0.6875] is independently verified**, the same bracket as the
+  search's. The checks cover every losing-region leaf (outside its region, or loss above U), exact tiling, data
+  symmetry, and the localisation bounds B(24) and B_full, recomputed by exact PAVA (so the localisation is verified
+  too). IDs: `limit check A_lo passes`; `limit check A_hi passes`.
+
+**Pending (not yet exported or checked):** K = sup G₀ (its domain lemma is written, math note §8), the Krawczyk boxes
+for c₁, the solve brackets (finite and limit), outer exclusion and ring, and the PD boxes.
 
 **K's domain (lemma written and checked, 2026-09-24).** K's branch and bound searches (u, v) ∈ [0, 8] × [−12, 12].
 The domain lemma (math note §8, "Domain lemma for K") proves G₀(u, v) ≤ 0 whenever |u| ≥ √(50/3) ≈ 4.08 or
@@ -607,8 +610,8 @@ data files are not shipped (regenerated from the commands and verified against t
 checker, with its expected output.
 
 **Say**
-- "An independent checker in ball arithmetic, sharing no code with the searches, verifies the finite-a certificates
-  and the Ĝ enclosures; the remaining certificate families are being exported."
+- "An independent checker in ball arithmetic, sharing no code with the searches, verifies the finite-a certificates,
+  the Ĝ enclosures and the limit-switch bracket; the remaining certificate families are being exported."
 
 **Say** (the sharp limit threshold)
 - "K = sup G₀ is certified by branch and bound over a box, and a domain lemma shows the supremum lies inside it."

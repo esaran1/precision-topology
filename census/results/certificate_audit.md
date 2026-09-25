@@ -18,7 +18,9 @@
 | Ĝ(a) enclosures (a = 1.10–3.0) | 11 | **structure passes; the float endpoints miss by ≤ 1.1e−15** (see below) | 1–90 s check; export ≤ 0.6 GB | `verify_certificates_ghat.log` |
 | Ĝ(1.05) | 1 | as for a ≥ 1.10: structure passes (18.0M leaves, exact tiling, every leaf below hi); the endpoints miss by ≤ 4e−16 | export 119 s, 1.5 GB; check 394–397 s. **The first check peaked at 3.05 GB, over the 3 GB rule.** I had not extrapolated it: the set-based tiling check held 18M tuples. The vectorised tiling check (same verdicts on constructed and real cases) brought it to 2.85 GB | `verify_certificates_ghat.log` |
 | Ĝ(1.02) | 1 | as for the others: structure passes (110.7M leaves, exact tiling by the per-level check); the endpoints miss by ≤ 1.4e−16 | streamed export 747 s, 2.08 GB (under the rule); check 2,307 s. **The check peaked at 3.74 GB, over the 3 GB rule**: I had not extrapolated the per-level tiling check's copies (`setdiff1d` and per-child temporaries on a 36M-key level). It is fixed (in-place marking, preallocated children; tests pass). Re-measured on this certificate: the tiling check alone peaks at 2.54 GB (50 s) and returns an exact tiling | `verify_certificates_ghat.log` |
-| solve brackets, limit switch, outer exclusion and ring, PD boxes, K, Krawczyk boxes, localisation | — | to do | | |
+| limit-switch status, A = 0.68125 ("minus") and A = 0.6875 ("plus"): both ends of the search-certified bracket A* ∈ [0.68125, 0.6875] | 2 | **both pass**: every losing-region leaf lies outside its region or has a rigorous lower bound of L0* above U (72,075 and 69,102 leaves); hashes, exact data x-symmetry, window symmetry, the monotone-logit step of the localisation, exact tiling of both regions, U's point in its region, and U below the localisation bounds B(24) = 0.38797 and B_full = 0.47739 (recomputed by exact PAVA) | 3,046 s at one worker and 2,114 s at two; ≈ 80 MB | `certificate_checks/limit_A_lo.json`, `limit_A_hi.json` |
+| localisation B(24), B_full | (inside the two limit checks) | **pass** (recomputed rigorously in each limit check) | | as above |
+| solve brackets (finite and limit), outer exclusion and ring, PD boxes, K = sup G₀ (its domain lemma is written; math note §8), Krawczyk boxes for c₁ | — | pending | | |
 
 ## Ĝ enclosure certificates: what passed and what did not
 
@@ -65,3 +67,25 @@
   certified lower bound at each a, is reported separately (WP-7 (ii)). The largest relative difference from Ĝ_cert is
   8.36e−5, at a = 1.10, where it is 1.48e−6 absolute. The largest absolute difference is 7.09e−6, at a = 1.60, where it
   is 3.16e−5 relative.
+
+## Limit-switch checks (2026-09-25): what was checked, and three checker fixes found on the way
+
+- **What the status claim needs** (author's decision): the winning region's rigorous upper bound U, and every
+  losing-region leaf outside its region or with L0* > U. The losing leaves are checked against U. The winning
+  region's leaves are tiled (coverage) but their own search bounds are not re-verified, since they do not enter the
+  claim.
+- **Three checker defects, found by timing a sample before the full run, fixed and tested before the results above.**
+  1. **python-flint's `arb ** 3` returns NaN on a ball containing 0, and the limit activation h used it.** A NaN
+     could be skipped by `min`/`max` in the range function, which could give a too-narrow range and a false
+     "outside the region" pass. h now uses products, and every range function returns the whole line if any
+     candidate is non-finite. **An A_lo run made before this fix passed; that result is void and was rerun.**
+     f_a (the finite-a and Ĝ checks) never used powers, so those checks are unaffected.
+  2. **The bias bracket's float search** was limited to ±80. It now covers the monotone range, and the sign of F is
+     computed in tail form (exact integer count of the saturated units; log-domain comparison on the balanced
+     plateau), so the bracket stays decidable when every logit is ~10⁴–10⁵. Arb still decides every bracket.
+  3. **A direct (zeroth-order) cell lower bound** is taken alongside the mean-value bound. It uses the per-point loss
+     at its favourable logit endpoint, given the certified bias bracket. Limit checks may subdivide to depth 10; the
+     results above never needed more than depth 3.
+- **Probe of larger A** (the author's fallback for the upper end): with the fixed checker, the upper end A = 0.6875
+  itself verified all 300 sampled leaves (projected 0.9 CPU-hours), so the primary bracket is verified directly and no
+  wider bracket is needed.

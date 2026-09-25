@@ -1333,6 +1333,14 @@ def v4_checks() -> None:
                                                                    & dc_.stricter_ok & dc_.independent_ok).astype(bool).all()), 1.0, 0)
     chk("direct check: min G+ at a = 1.30", float(dc_[dc_.act == "f1.30"].Gplus_lo.min()), 0.8895, 0.00006)
     chk("direct check: min G+ at a = 1.50", float(dc_[dc_.act == "f1.50"].Gplus_lo.min()), 1.0263, 0.00006)
+    print("Block 2: limit-switch status checks")
+    import json as _j
+    for n_, st_ in (("limit_A_lo", "minus"), ("limit_A_hi", "plus")):
+        r_ = _j.loads((R / "certificate_checks" / f"{n_}.json").read_text())
+        chk(f"limit check {'A_lo' if n_.endswith('lo') else 'A_hi'} passes",
+            float(r_["pass"] and all(r_["checks"].values()) and not r_["failed_leaves"]), 1.0, 0)
+    chk("limit check A_lo losing leaves", float(_j.loads((R / "certificate_checks" / "limit_A_lo.json").read_text())["leaves"]), 72075.0, 0)
+    chk("limit check A_hi losing leaves", float(_j.loads((R / "certificate_checks" / "limit_A_hi.json").read_text())["leaves"]), 69102.0, 0)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12
