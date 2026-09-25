@@ -826,6 +826,7 @@ PRODUCERS = {
     "cadence_sensitivity.csv": ("cadence_sensitivity", "main", "full", ""),
     "width2_unplaced.csv": ("width2_unplaced", "save", "full", ""),
     "width2_finish_summary.csv": ("width2_finish", "summary", "full", ""),
+    "k_domain_check.csv": ("k_domain", "main", "full", ""),
     "width2_unplaced_localmin.csv": ("width2_unplaced", "save", "full", ""),
     "ghat_rigorous.csv": ("ghat_rigorous", "build", "full", ""),
     "ghat_digit_stability.csv": ("verify_ledger", "digit_stability", "full", ""),
@@ -1301,6 +1302,13 @@ def v4_checks() -> None:
         float(len(ld_) > 0 and ld_.direct_check_placed.astype(bool).all() and ld_.direct_check_pair.astype(bool).all()), 1.0, 0)
     chk("direct check: no finished restart below the retained minimiser (landed scales)",
         float((ld_.n_below_retained == 0).all()), 1.0, 0)
+    print("K domain lemma (math note s8)")
+    kd_ = pd.read_csv(R / "k_domain_check.csv").iloc[0]
+    chk("K domain: identity max relative error", float(kd_.identity_max_rel_err), 1.4e-12, 0.05e-12)
+    chk("K domain: G0 <= 0 on the excluded region (u > 0 max)", float(kd_.max_G0_on_excluded_region_u_positive), -1.19e-3, 0.006e-3)
+    chk("K domain: excluded points checked", float(kd_.excluded_points_checked), 4035775.0, 0)
+    chk("K domain: region inside the certified box", float(bool(kd_.region_inside_box)), 1.0, 0)
+    chk("K domain: K argmax inside the region", float(bool(kd_.K_argmax_inside_region)), 1.0, 0)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

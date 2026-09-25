@@ -554,9 +554,18 @@ ball arithmetic; imports nothing from `src/`; every decision an Arb comparison).
   IDs: `Ghat certificates checked (a = 1.02-3.0)`; `Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi)`.
 
 **Pending (not yet exported or checked).** In priority order (the main theorem rests on the first two):
-1. the limit-problem chain (limit switch, K, the Krawczyk boxes for c₁);
+1. the limit-problem chain: the limit-switch status certificates at both ends of the A* bracket (exported; the Arb
+   check is running); K = sup G₀; the Krawczyk boxes for c₁;
 2. the solve brackets;
 3. outer exclusion and ring, the PD boxes, localisation (B(24) and B_full).
+
+**K's domain (lemma written and checked, 2026-09-24).** K's branch and bound searches (u, v) ∈ [0, 8] × [−12, 12].
+The domain lemma (math note §8, "Domain lemma for K") proves G₀(u, v) ≤ 0 whenever |u| ≥ √(50/3) ≈ 4.08 or
+|v| ≥ √2 + 0.6|u|. So the supremum lies inside the box, and K is the supremum over the whole plane. The lemma is an exact
+algebraic argument, checked numerically: the identity holds to 1.4e−12, and G₀ ≤ 0 at 4.0 million excluded points
+(`k_domain_check.csv`). The Arb check of K's branch and bound over the box is still pending, as listed above.
+IDs: `K domain: G0 <= 0 on the excluded region (u > 0 max)`; `K domain: region inside the certified box`;
+`K domain: K argmax inside the region`.
 
 **What the supplementary will ship** (not rebuilt yet; built once every claim is final): the checker
 (`src/verify_certificates.py`) and its tests; the manifest of SHA-256 hashes, each with the command that regenerates
@@ -568,7 +577,11 @@ checker, with its expected output.
 - "An independent checker in ball arithmetic, sharing no code with the searches, verifies the finite-a certificates
   and the Ĝ enclosures; the remaining certificate families are being exported."
 
+**Say** (the sharp limit threshold)
+- "K = sup G₀ is certified by branch and bound over a box, and a domain lemma shows the supremum lies inside it."
+
 **Do not say**
+- that K (or the sharp limit threshold built on it) has been independently checked in Arb, until that check is done;
 - that every certificate has been independently checked, until the pending families are;
 - that the checker verified the original float endpoints of Ĝ (it verified rigorous enclosures that differ from them
   by at most 1.1e−15).

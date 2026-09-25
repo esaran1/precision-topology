@@ -1,0 +1,2 @@
+identity_max_rel_err,excluded_points_checked,max_G0_on_excluded_region,max_G0_on_excluded_region_u_positive,symmetry_max_abs_diff,u_bound,v_bound,region_inside_box,K_argmax_inside_region,K_lo
+1.4230502156393243e-12,4035775,0.0,-0.0011928186666660956,0.0,4.08248290463863,3.8637033051562737,True,True,0.5794557826009681

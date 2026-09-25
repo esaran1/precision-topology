@@ -334,6 +334,23 @@ Both terms come from the sine series, including the (1 + ε) factor.
   - The linear system is enclosed rigorously.
 - Result: **A′(0)/A* ∈ [0.6621547, 0.6621550]**.
 
+**Domain lemma for K = sup G₀ (added 2026-09-24).** The branch and bound for K searches (u, v) ∈ [0, 8] × [−12, 12];
+this lemma shows nothing outside that box can exceed K.
+- **Identity.** For h(σ) = −σ + σ³/6 and d ≥ 0: h(a) − h(a + d) = d·[1 − ((a + d/2)² + d²/12)/2].
+- **Bounds.** For u ≥ 0, σ = ux + v increases with x. Each orientation of G₀ is at most its value at one outer point
+  against one inner point (a minimum is at most any member of its set, a maximum at least any member):
+  - O over I: ≤ h(σ(−2)) − h(σ(−0.8)) (d = 1.2u), and ≤ h(σ(−2)) − h(σ(0.8)) (d = 2.8u, a + d/2 = v − 0.6u);
+  - I over O: ≤ h(σ(0.8)) − h(σ(2)) (d = 1.2u), and ≤ h(σ(−0.8)) − h(σ(2)) (d = 2.8u, a + d/2 = v + 0.6u).
+- **Lemma.** G₀(u, v) ≤ 0 if u ≥ √(50/3) ≈ 4.0825 (then d²/12 ≥ 2 for d = 1.2u), or if |v| ≥ √2 + 0.6u (then
+  (a + d/2)² ≥ 2 in both orientations). G₀(−u, v) = G₀(u, v) by x ↦ −x, since I and O are symmetric.
+- **Consequence.** K > 0, so sup G₀ over the whole plane equals sup over {|u| < 4.0825, |v| < 3.8637}. With u ≥ 0 by
+  the symmetry, that region lies inside the certified box. K's argmax (1.6056, 1.2042) lies inside the region.
+- **Check** (`src/k_domain.py` → `k_domain_check.csv`, numerical, not a certificate):
+  - the identity holds to 1.4e−12 relative at 100,000 random (a, d);
+  - G₀ ≤ 0 at 4.0 million points of the excluded region (a dense grid on u ∈ [0, 60], v ∈ [−80, 80] and random
+    points to 10⁴), with maximum exactly 0 at u = 0 and −1.19e−3 for u > 0;
+  - the symmetry holds exactly on 10,000 random points.
+
 **Gap-maximiser correction, k₁.**
 - K = sup G₀ is attained at a vertex of the max–min: I(−0.8) = I(0.8) and O(−2.0) = O(−1.2). The mirror
   vertex is v ↦ −v.
