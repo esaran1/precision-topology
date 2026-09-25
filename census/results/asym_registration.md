@@ -155,3 +155,46 @@ T2-3's failure, and T2-3's outcome was known when it was written.
   and fail cases).
 - **Competing outcome:** even with a matched sweep rate, crossings sit far above the width-2 threshold, and T2-3b
   fails.
+
+## Amendment 3 (2026-09-25 15:09 EDT): T2-3c, REGISTERED AFTER T2-3's FAIL AND T2-3b's UNRESOLVED
+
+**T2-3 stays FAIL and T2-3b stays UNRESOLVED, whatever T2-3c shows.**
+- T2-3 ran at full output speed and crossed at a timescale ratio of about 2.73, roughly 100× above width 1's Adam
+  range.
+- T2-3b's steps-matching rule overshot the other way, to 6.8e−6 at crossing, and failed its validity check.
+- T2-3c matches the timescale ratio itself.
+
+**Unchanged from T2-3:** a = 1.30, Δ = 0.4, matched initialisation (k = 0.04209), the bracket s ∈ [0.4371, 0.4532],
+the criteria (≥ 90% of crossings at or above s_hi; bootstrap CI of median(s_cross/s_hi) − 1 above 0; median(s_cross/s_lo)
+≤ 1.25), and placement from step 0 with the 20% stop.
+
+**φ₂ rule and pilot.**
+- Calibration seeds 520,000–520,039, never used before.
+- Each pilot run records **only** the timescale ratio at the first step where ‖v‖₁ reaches s_glob = 0.4451: growth under
+  φ₂ over the last min(100, step − 1) steps, and the branch relaxation rate at that state. Placement and crossings are
+  never evaluated.
+- Bisection in log φ₂ within [1e−4, 1] until the median is within 20% of 0.0057. The endpoints were not evaluated; the
+  bracket comes from T2-3 and T2-3b.
+- Trials: φ₂ = 0.01 → 0.00141; 0.1 → 0.196; 0.0316 → 0.0153; **0.01778 → 0.00487** (−15%, accepted).
+  Record: `asym_t23c/pilot.json`.
+
+**Budget.** ceil(1.5 × p95(steps to 3·s_glob) / 1000) × 1000, with a floor of 32,000; that is **32,000**.
+
+**Seeds.** 600,320–600,399. Registered extension if fewer than 40 cross: 600,400–600,479.
+
+**Frozen** in `asym_t23c_frozen.json` (SHA-256 85b30ae1f6fd819d…).
+
+**Validity checks** (otherwise UNRESOLVED): the achieved median timescale ratio at crossing lies in [0.0014, 0.023],
+and at least 40 runs cross.
+
+**Stated risk.** The ratio at crossing can differ greatly from the pilot's ratio at the threshold-reaching step. At
+φ₂ ≈ 0.01, T2-3b's ratio at crossing was 6.8e−6, while this pilot's ratio at threshold was 1.4e−3. So the validity check
+may fail again. It stays as registered.
+
+**Interpretation, stated in advance.**
+- A PASS means the width-1 predictive link holds at width 2 when the output-scale sweep is slow relative to
+  relaxation, as at width 1. Together with T2-3, that would tie the width-2 behaviour to the timescale account.
+- A FAIL in the matched regime is a firm negative for width 2.
+
+Code: `src/asym_t23c.py`. Tests: `tests/test_asym_t23c.py` (φ₂ bisection, budget, verdict with both validity checks,
+on pass, fail and unresolved cases).
