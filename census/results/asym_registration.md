@@ -198,3 +198,33 @@ may fail again. It stays as registered.
 
 Code: `src/asym_t23c.py`. Tests: `tests/test_asym_t23c.py` (φ₂ bisection, budget, verdict with both validity checks,
 on pass, fail and unresolved cases).
+
+## Amendment 4 (2026-09-25 16:42 EDT): T2-3d, DESIGNED AFTER THE ITEM 2 DIAGNOSIS (post hoc design, prospective test)
+
+**Labelled as designed after the item 2 diagnosis** (`width2_diagnosis_gate.md`; gate STOP). That diagnosis found,
+post hoc and on 10 seeds per arm, that in the slowed arms (T2-3b, T2-3c) each run's width-1 own-sample threshold matched
+its crossing scale (median |log error| 0.015 and 0.011). T2-3d tests that prospectively on fresh training sets.
+**T2-3 stays FAIL, and T2-3b and T2-3c stay UNRESOLVED, whatever T2-3d shows.**
+
+**Setup.**
+- Unchanged: a = 1.30, Δ = 0.4, matched initialisation (k = 0.04209), placement from step 0 with the 20% stop.
+- **φ₂ = 0.01778** (T2-3c's) and budget 32,000.
+- **Fresh seeds 600,480–600,559.** Registered extension 600,560–600,639 if fewer than 40 cross.
+
+**Predictor, frozen before any training.** Each seed's width-1 own-sample threshold on its own training set, by the
+item 2 method (`width2_diagnosis.own_w1`: 100 restarts, scan s = 10^(k/8), bisection to 5%). Written to
+`asym_t23d_own_frozen.csv`, whose SHA-256 is committed before any T2-3d training run.
+
+**Criteria**, on crossing runs with a defined own threshold; UNRESOLVED with fewer than 40:
+- (i) the median of |log(s_cross / s_w1,own)| is ≤ 0.10;
+- (ii) the paired run-level bootstrap 95% interval (10,000 resamples) of mean(|log(s_cross/s_w1,own)| − |log(s_cross/0.44508)|)
+  lies entirely below 0. That is, the width-1 own threshold beats the population width-2 threshold.
+
+PASS iff both.
+
+**Scope, stated now.**
+- T2-3d covers the slowed regime (φ₂ = 0.01778) only. The full-speed regime (T2-3, φ₂ = 1) remains unexplained.
+- T2-3d has no timescale-ratio validity check: it tests the width-1 own-threshold predictor at this φ₂ setting, not
+  the timescale regime.
+
+Code: `src/asym_t23d.py`. Tests: `tests/test_asym_t23d.py`, on pass, fail (each criterion) and unresolved cases.
