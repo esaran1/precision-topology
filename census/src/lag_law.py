@@ -369,6 +369,47 @@ def commit_predictions(workers=3):
     print("mirror-branch runs:", int(d.mirror.sum()), "of", len(d), "; max |b1 offset|:", float(d.b1_offset.abs().max()))
 
 
+def compare():
+    """After the commit: per-arm predicted vs observed median residual (tolerance max(0.01, 0.25|pred|)), per-a
+    observed-to-predicted slope ratio, and the post hoc through-origin fit per a beside it.  No refit of κ."""
+    pr = pd.read_csv(OUT / "predictions.csv")
+    tc = pd.read_csv(RESULTS / "timescale_consistency" / "runs.csv")
+    obs = [pd.DataFrame({"set": tc.test, "a": tc.a.round(2), "seed": tc.seed, "arm": tc.arm.astype(str), "obs_r": tc.residual})]
+    p = pd.read_csv(RESULTS / "residual_timescale_runs.csv")
+    obs.append(pd.DataFrame({"set": "lag2-prim", "a": p.a.round(2), "seed": p.seed, "arm": p.factor.astype(str), "obs_r": p.residual}))
+    s = pd.read_csv(RESULTS / "sgd_own_runs.csv"); s = s[s.crossed].copy(); s["a"] = s.a.round(2)
+    own = pd.read_csv(RESULTS / "own_threshold_crossing.csv"); own["a"] = own.a.round(2)
+    s = s.merge(own[["a", "seed", "w2_own"]], on=["a", "seed"])
+    obs.append(pd.DataFrame({"set": "SGD", "a": s.a, "seed": s.seed, "arm": "sgd", "obs_r": s.w2_cross / s.w2_own - 1}))
+    t = pd.read_csv(RESULTS / "ts_test" / "runs.csv"); t = t[t.crossed].copy(); t["a"] = t.a.round(2)
+    fo = pd.read_csv(RESULTS / "ts_test_own_frozen.csv"); fo["a"] = fo.a.round(2)
+    t = t.merge(fo[["a", "seed", "w2_own"]], on=["a", "seed"])
+    obs.append(pd.DataFrame({"set": "TaskB", "a": t.a, "seed": t.seed, "arm": "adam", "obs_r": t.w2_cross / t.w2_own - 1}))
+    o = pd.concat(obs, ignore_index=True)
+    norm = lambda v: str(float(v)) if str(v).replace(".", "", 1).isdigit() else str(v)
+    o["arm"] = o.arm.map(norm); pr["arm"] = pr.arm.astype(str).map(norm)
+    m = pr.merge(o, on=["set", "a", "seed", "arm"], how="inner")
+    assert len(m) == len(pr), (len(m), len(pr))
+    arms = []
+    for (st, a, arm), g in m.groupby(["set", "a", "arm"]):
+        ok = g[np.isfinite(g.chi) & (g.chi > 0)]
+        pred = float(ok.pred_r.median()); obsm = float(g.obs_r.median()); tol = max(0.01, 0.25 * abs(pred))
+        arms.append({"set": st, "a": a, "arm": arm, "n": len(g), "median_chi": float(ok.chi.median()), "pred": pred,
+                     "obs": obsm, "tol": tol, "within": abs(obsm - pred) <= tol, "obs_over_pred": obsm / pred})
+    A = pd.DataFrame(arms)
+    A.to_csv(OUT / "compare_arms.csv", index=False)
+    per_a = []
+    for a, g in m[np.isfinite(m.chi) & (m.chi > 0)].groupby("a"):
+        kap = float(g.kappa_k.median())
+        slope_obs = float((g.chi * g.obs_r).sum() / (g.chi ** 2).sum())          # post hoc through-origin fit
+        per_a.append({"a": a, "n": len(g), "kappa_committed": kap, "slope_posthoc_through_origin": slope_obs,
+                      "ratio_obs_to_pred": slope_obs / kap})
+    P = pd.DataFrame(per_a); P.to_csv(OUT / "compare_per_a.csv", index=False)
+    pd.set_option("display.width", 220)
+    print(A.round(4).to_string(index=False)); print(P.round(4).to_string(index=False))
+    print("arms within tolerance:", int(A.within.sum()), "of", len(A))
+
+
 if __name__ == "__main__":
     {"kappa": lambda: run_kappa(int(sys.argv[2]) if len(sys.argv) > 2 else 3),
-     "commit": lambda: commit_predictions(int(sys.argv[2]) if len(sys.argv) > 2 else 3)}[sys.argv[1]]()
+     "commit": lambda: commit_predictions(int(sys.argv[2]) if len(sys.argv) > 2 else 3), "compare": compare}[sys.argv[1]]()
