@@ -88,3 +88,40 @@ its registered constants unchanged, written in s units. Ratios of s need no Γ̂
 
 - One worker for the landscape stages and one for training, at nice 15. Each job is under 200 MB.
 - Hard cutoff 23:00 EDT. Whatever is not complete and validated then is reported as not done.
+
+## Amendment 1 (2026-09-25 12:59 EDT, author's instruction): T2-3 uses matched initialisation
+
+**What happened before this amendment (disclosed).** At 12:54 EDT, right after this registration was committed
+(53dce22), T2-3's training was launched with the **standard** initialisation, θ ~ U(−1, 1)⁷ (median ‖v‖₁ ≈ 0.98).
+- All 80 runs (seeds 0–79) finished within about a minute.
+- The author then pointed out that runs from standard initialisation may start above the switch. The Δ = 0.8
+  pilot's switch is at s ≈ 0.56–1.0.
+- The job's outputs were **moved aside unread**, with SHA-256 hashes committed:
+  - `results/asym_sealed/train_uniform_init_seeds0-79.csv` b212646a7435a1bbbfc8b4af84876e2ee03e66a8bfbce7acdd4de1b4ee0be2a8
+  - `results/asym_sealed/train_uniform_init_seeds0-79.log` bc595073185d999fd49273304a1642fafa9d7542f57ad6070d750849ceec7633
+- No crossing value, crossing count or step has been read. The standard-initialisation T2-3 is **withdrawn,
+  unscored**. Its sealed runs may be opened later only as a descriptive standard-initialisation arm with no criterion,
+  as in the approved width-2 design, revision 2 (`width2_design.md`, "Secondary arm").
+
+**T2-3 now uses the matched-initialisation rule of the approved width-2 design (revision 2), scaled to this geometry's
+bracketed threshold.**
+- Only the output weights are scaled: v₀ ← k·v₀. The hidden layer (α, β) and b are unchanged.
+- k = r₁(1.30)·s_glob/0.97946, where:
+  - r₁(1.30) = 0.09261 is the width-1 ratio of median initial |w₂| to |w₂|_glob;
+  - 0.97946 is the width-2 standard median initial ‖v‖₁ over seeds 600,000–600,079;
+  - s_glob is the **midpoint of T2-1's validated bracket at Δ = 0.4**, (s_lo + s_hi)/2.
+- So the median matched initial ‖v‖₁/s_glob equals r₁(1.30) on these seeds.
+- k is computed only after T2-1's bracket is validated. It is written to `results/asym_frozen.json`, and that file's
+  SHA-256 is committed before any matched run. If T2-1 does not pass, T2-3 is not run.
+
+**Seeds** are 600,000–600,079, the seeds on which 0.97946 was computed. The registered extension, if fewer than 40
+cross, is 600,080–600,159. Training sets come from `asym_register.training_set(seed)` (asymmetric windows, as
+registered).
+
+**Placement checked from step 0** (as in the approved no-gating design). G₊ ≥ 0 is invariant to rescaling v, so
+matching cannot move a hidden layer that is already placed.
+- A run placed at step 0 has no crossing through the threshold. It is excluded from T2-3 and counted.
+- **If more than 20% of runs are placed at step 0, stop and report**: the test would sample a selected subset.
+- All else is unchanged: budget 32,000 steps, Adam lr 0.01, the crossing is the first step with G₊ > 0 (exact
+  extrema), and the T2-3 criterion and constants (≥ 90% at or above s_hi; bootstrap CI above 0; median/s_lo ≤ 1.25;
+  at least 40 crossings) stay as registered.

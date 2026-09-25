@@ -34,8 +34,11 @@ GRID_UP = tuple(10 ** (1 + k / 8) for k in range(1, 9))       # extension above 
 RESTARTS, CAP, POLISH, TIE = 1000, 3000, 5, 1e-9
 BISECT_REL = 0.05
 LADDER = (500, 1000, 2000, 4000)
-SEEDS = tuple(range(80))
-SEEDS_EXT = tuple(range(80, 160))
+SEEDS = tuple(range(600_000, 600_080))                         # amendment 1 (matched initialisation)
+SEEDS_EXT = tuple(range(600_080, 600_160))
+R1_130, W2_STD_MEDIAN = 0.09261, 0.97946
+STEP0_STOP = 0.20
+FROZEN = RESULTS / "asym_frozen.json"
 MIN_CROSS = 40
 BUDGET = 32_000
 
@@ -251,16 +254,59 @@ def training_set(seed, delta=DELTA, n_per_class=200):
     return x, y
 
 
+def k_matched(s_lo, s_hi):
+    return R1_130 * 0.5 * (s_lo + s_hi) / W2_STD_MEDIAN
+
+
+def freeze():
+    """Amendment 1: k from T2-1's validated bracket, written with its hash before any matched run."""
+    import hashlib
+    val = _read("validate.csv")
+    if len(val) != 2 or not validated(val.to_dict("records")):
+        raise SystemExit("T2-1 bracket not validated: T2-3 is not run")
+    s_lo, s_hi = float(val.s.min()), float(val.s.max())
+    d = {"s_lo": s_lo, "s_hi": s_hi, "k": k_matched(s_lo, s_hi), "seeds": [SEEDS[0], SEEDS[-1]],
+         "seeds_ext": [SEEDS_EXT[0], SEEDS_EXT[-1]], "budget": BUDGET, "r1": R1_130, "w2_std_median": W2_STD_MEDIAN}
+    txt = json.dumps(d, indent=1, sort_keys=True)
+    FROZEN.write_text(txt)
+    h = hashlib.sha256(txt.encode()).hexdigest()
+    (RESULTS / "asym_frozen.sha256").write_text(h + "\n")
+    print(txt, h)
+
+
+def train_one(seed, k, budget=BUDGET):
+    """Matched initialisation (v scaled by k; hidden layer and b unchanged), placement checked from step 0."""
+    import torch
+    from .width2_train import LR, init_params, logits, placed, unpack
+    torch.set_num_threads(1)
+    _setup()
+    act = _act()
+    x, y = training_set(seed)
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    q0 = init_params(seed)
+    q0[2] *= k; q0[5] *= k
+    s0 = float(abs(q0[2]) + abs(q0[5]))
+    if placed(q0.numpy(), act)[0]:
+        return {"seed": seed, "placed_at_init": True, "crossed": False, "step": 0, "s_init": s0, "s_cross": np.nan}
+    q = q0.clone().requires_grad_(True)
+    opt = torch.optim.Adam([q], lr=LR)
+    for step in range(1, budget + 1):
+        opt.zero_grad()
+        torch.nn.functional.binary_cross_entropy_with_logits(logits(q, X, act), Y).backward()
+        opt.step()
+        qn = q.detach().numpy().copy()
+        if placed(qn, act)[0]:
+            _, v, _ = unpack(qn)
+            return {"seed": seed, "placed_at_init": False, "crossed": True, "step": step, "s_init": s0,
+                    "s_cross": float(np.abs(v).sum())}
+    return {"seed": seed, "placed_at_init": False, "crossed": False, "step": np.nan, "s_init": s0, "s_cross": np.nan}
+
+
 def _train_job(seed):
     os.nice(15)
-    from .width2_train import train
-    _setup()
-    x, y = training_set(seed)
-    r = train(seed, _act(), 2.0, budget=BUDGET, log_every=10**9, x=x, y=y)   # gamma2_hat = 2 → R2 field = ‖v‖₁
-    c = r["cross"]
-    row = {"seed": seed, "crossed": c is not None, "step": c["step"] if c else np.nan,
-           "s_cross": c["R2"] if c else np.nan, "q": json.dumps([float(v) for v in c["q"]]) if c else ""}
-    print(json.dumps({k: row[k] for k in ("seed", "crossed", "step", "s_cross")}), flush=True)
+    k = json.loads(FROZEN.read_text())["k"]
+    row = train_one(seed, k)
+    print(json.dumps({"seed": seed, "done": True}), flush=True)                  # nothing outcome-bearing printed
     return row
 
 
@@ -273,6 +319,8 @@ def train_all(workers=1):
         for r in pool.imap_unordered(_train_job, todo):
             _append("train.csv", r)
     d = _read("train.csv")
+    if d.placed_at_init.mean() > STEP0_STOP:
+        print(json.dumps({"STOP": "more than 20% placed at step 0"})); return
     if d.crossed.sum() < MIN_CROSS:                               # registered extension
         todo = [s for s in SEEDS_EXT if s not in set(d.seed)]
         with get_context("spawn").Pool(workers) as pool:
@@ -291,8 +339,11 @@ def score():
                     "T2-2": "PASS" if s_hi < PILOT_LO else "FAIL"})
         tr = _read("train.csv")
         if ok and not tr.empty:
-            out["T2-3"] = score_t2_3(tr[tr.crossed].s_cross.values, s_lo, s_hi)
-            out["runs"] = len(tr); out["crossed"] = int(tr.crossed.sum())
+            out["runs"] = len(tr); out["placed_at_init"] = int(tr.placed_at_init.sum())
+            out["crossed"] = int(tr.crossed.sum())
+            out["T2-3"] = ({"verdict": "STOP (more than 20% placed at step 0)"}
+                           if tr.placed_at_init.mean() > STEP0_STOP else
+                           score_t2_3(tr[tr.crossed & ~tr.placed_at_init].s_cross.values, s_lo, s_hi))
     elif v in ("all_placed", "all_unplaced", "alternation"):
         out.update({"T2-1": "FAIL", "T2-2": "not applicable", "T2-3": "not applicable (no threshold)"})
     else:
@@ -305,5 +356,5 @@ def score():
 if __name__ == "__main__":
     cmd = sys.argv[1]
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
-    {"scan": lambda: scan(w), "bisect": bisect, "validate": validate, "train": lambda: train_all(w),
+    {"scan": lambda: scan(w), "bisect": bisect, "validate": validate, "freeze": freeze, "train": lambda: train_all(w),
      "score": score}[cmd]()

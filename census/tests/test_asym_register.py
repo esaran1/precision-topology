@@ -54,3 +54,26 @@ def test_training_set_geometry():
     assert abs(fr - 1.2 / 2.0) < 0.02                                   # side chosen by length
     x0, _ = ar.training_set(3, delta=0.0)
     assert (np.abs(x0[200:]) <= 2.0 + 1e-6).all()
+
+
+def test_matched_k_and_scale_invariance_of_placement():
+    k = ar.k_matched(0.3, 0.32)
+    assert abs(k - 0.09261 * 0.31 / 0.97946) < 1e-15
+    from src.width2_train import init_params
+    ar._setup()
+    from src.width2_train import placed
+    for seed in range(600_000, 600_020):                       # placement status invariant to scaling v
+        q = init_params(seed).numpy().copy()
+        q2 = q.copy(); q2[2] *= k; q2[5] *= k
+        assert placed(q, ar._act())[0] == placed(q2, ar._act())[0]
+
+
+def test_freeze_refuses_without_validated_bracket(tmp_path, monkeypatch):
+    import pytest
+    monkeypatch.setattr(ar, "PARTS", tmp_path)
+    with pytest.raises(SystemExit):
+        ar.freeze()
+    pd.DataFrame([{"s": 0.3, "ladder_ok": True, "independent_ok": False, "audit_ok": True},
+                  {"s": 0.32, "ladder_ok": True, "independent_ok": True, "audit_ok": True}]).to_csv(tmp_path / "validate.csv", index=False)
+    with pytest.raises(SystemExit):
+        ar.freeze()
