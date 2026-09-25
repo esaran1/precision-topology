@@ -214,6 +214,22 @@ class Objective:
 
         yb = float(self.ybar.mid())
         L0 = math.log(yb / (1 - yb))
+        k_y = sum(self.Y)
+
+        def sign_F(z, m):
+            """Sign of F(m) = mean σ(z + m) − ȳ in floats, robust to saturation: count the positive units exactly; when
+            the count balances (a plateau where every tail underflows), compare the tails in the log domain."""
+            u = z + m
+            pos = u > 0
+            d = int(pos.sum()) - k_y
+            if d != 0:
+                t = np.exp(-np.logaddexp(0, -u[~pos])).sum() - np.exp(-np.logaddexp(0, u[pos])).sum()   # Σσ(u) − Σσ(−u)
+                v = d + t
+                if v != 0:
+                    return np.sign(v)
+            lneg = np.logaddexp.reduce(-np.logaddexp(0, -u[~pos])) if (~pos).any() else -np.inf      # log Σ σ(u)
+            lpos = np.logaddexp.reduce(-np.logaddexp(0, u[pos])) if pos.any() else -np.inf           # log Σ σ(−u)
+            return np.sign(lneg - lpos) if d == 0 else np.sign(d)
 
         def root(z):
             # F is increasing in b; its root lies in [logit(ȳ) − max z, logit(ȳ) − min z] (monotonicity), which can be far
@@ -222,8 +238,7 @@ class Objective:
             lo, hi = L0 - float(z.max()) - 1.0, L0 - float(z.min()) + 1.0
             for _ in range(200):
                 m = 0.5 * (lo + hi)
-                v = (0.5 * (1 + np.tanh(0.5 * (z + m)))).mean() - yb       # overflow-free logistic
-                lo, hi = (m, hi) if v < 0 else (lo, m)
+                lo, hi = (m, hi) if sign_F(z, m) < 0 else (lo, m)
             return 0.5 * (lo + hi)
         r_hi, r_lo = root(zh), root(zl)
         beta = r_hi - 1e-12 * max(1.0, abs(r_hi))
