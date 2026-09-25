@@ -1,0 +1,266 @@
+{"a": 1.45, "seed": 830000, "w2_lo": 2.725, "w2_hi": 2.73125, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830001, "w2_lo": 3.1, "w2_hi": 3.10625, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830002, "w2_lo": 2.91875, "w2_hi": 2.925, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830003, "w2_lo": 2.7375, "w2_hi": 2.74375, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830004, "w2_lo": 3.14375, "w2_hi": 3.15, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830005, "w2_lo": 3.1125, "w2_hi": 3.11875, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830006, "w2_lo": 2.69375, "w2_hi": 2.7, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830007, "w2_lo": 3.16875, "w2_hi": 3.175, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830008, "w2_lo": 2.75625, "w2_hi": 2.7625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830009, "w2_lo": 2.9625, "w2_hi": 2.96875, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830010, "w2_lo": 3.45625, "w2_hi": 3.4625, "evals": 11, "note": ""}
+{"a": 1.45, "seed": 830011, "w2_lo": 3.4, "w2_hi": 3.40625, "evals": 11, "note": ""}
+{"a": 1.45, "seed": 830012, "w2_lo": 3.06875, "w2_hi": 3.075, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830013, "w2_lo": 3.2125, "w2_hi": 3.21875, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830014, "w2_lo": 3.0625, "w2_hi": 3.06875, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830015, "w2_lo": 3.05, "w2_hi": 3.05625, "evals": 7, "note": ""}
+Process SpawnPoolWorker-1:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+{"a": 1.45, "seed": 830017, "w2_lo": 2.74375, "w2_hi": 2.75, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830016, "w2_lo": 3.03125, "w2_hi": 3.0375, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830018, "w2_lo": 2.875, "w2_hi": 2.88125, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830019, "w2_lo": 3.34375, "w2_hi": 3.35, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830020, "w2_lo": 3.1, "w2_hi": 3.10625, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830021, "w2_lo": 2.875, "w2_hi": 2.88125, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830023, "w2_lo": 2.94375, "w2_hi": 2.95, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830022, "w2_lo": 3.48125, "w2_hi": 3.4875, "evals": 11, "note": ""}
+{"a": 1.45, "seed": 830025, "w2_lo": 2.80625, "w2_hi": 2.8125, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830024, "w2_lo": 3.2625, "w2_hi": 3.26875, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830026, "w2_lo": 2.85625, "w2_hi": 2.8625, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830027, "w2_lo": 3.0, "w2_hi": 3.00625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830028, "w2_lo": 2.7125, "w2_hi": 2.71875, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830029, "w2_lo": 2.59375, "w2_hi": 2.6, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830030, "w2_lo": 3.175, "w2_hi": 3.18125, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830031, "w2_lo": 2.9125, "w2_hi": 2.91875, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830032, "w2_lo": 3.38125, "w2_hi": 3.3875, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830033, "w2_lo": 3.2625, "w2_hi": 3.26875, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830034, "w2_lo": 3.13125, "w2_hi": 3.1375, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830035, "w2_lo": 2.7375, "w2_hi": 2.74375, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830036, "w2_lo": 3.26875, "w2_hi": 3.275, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830037, "w2_lo": 3.25625, "w2_hi": 3.2625, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830038, "w2_lo": 3.30625, "w2_hi": 3.3125, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830039, "w2_lo": 3.2, "w2_hi": 3.20625, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830040, "w2_lo": 2.75625, "w2_hi": 2.7625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830041, "w2_lo": 2.85, "w2_hi": 2.85625, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830042, "w2_lo": 3.2625, "w2_hi": 3.26875, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830043, "w2_lo": 3.05, "w2_hi": 3.05625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830044, "w2_lo": 2.7, "w2_hi": 2.70625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830045, "w2_lo": 2.9, "w2_hi": 2.90625, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830046, "w2_lo": 3.00625, "w2_hi": 3.0125, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830047, "w2_lo": 3.36875, "w2_hi": 3.375, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830048, "w2_lo": 3.2125, "w2_hi": 3.21875, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830049, "w2_lo": 2.9625, "w2_hi": 2.96875, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830050, "w2_lo": 3.08125, "w2_hi": 3.0875, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830051, "w2_lo": 3.0375, "w2_hi": 3.04375, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830052, "w2_lo": 2.9375, "w2_hi": 2.94375, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830053, "w2_lo": 2.625, "w2_hi": 2.63125, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830054, "w2_lo": 2.89375, "w2_hi": 2.9, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830055, "w2_lo": 3.18125, "w2_hi": 3.1875, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830056, "w2_lo": 3.05625, "w2_hi": 3.0625, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830057, "w2_lo": 3.1, "w2_hi": 3.10625, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830058, "w2_lo": 3.15625, "w2_hi": 3.1625, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830059, "w2_lo": 3.3375, "w2_hi": 3.34375, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830060, "w2_lo": 3.35625, "w2_hi": 3.3625, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830061, "w2_lo": 2.65625, "w2_hi": 2.6625, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830062, "w2_lo": 2.7125, "w2_hi": 2.71875, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830063, "w2_lo": 3.21875, "w2_hi": 3.225, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830064, "w2_lo": 3.64375, "w2_hi": 3.65, "evals": 13, "note": ""}
+{"a": 1.45, "seed": 830065, "w2_lo": 3.70625, "w2_hi": 3.7125, "evals": 14, "note": ""}
+{"a": 1.45, "seed": 830067, "w2_lo": 3.04375, "w2_hi": 3.05, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830066, "w2_lo": 3.74375, "w2_hi": 3.75, "evals": 14, "note": ""}
+{"a": 1.45, "seed": 830069, "w2_lo": 2.95, "w2_hi": 2.95625, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830068, "w2_lo": 3.1625, "w2_hi": 3.16875, "evals": 8, "note": ""}
+{"a": 1.45, "seed": 830070, "w2_lo": 2.93125, "w2_hi": 2.9375, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830071, "w2_lo": 3.0625, "w2_hi": 3.06875, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830072, "w2_lo": 3.19375, "w2_hi": 3.2, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830073, "w2_lo": 3.31875, "w2_hi": 3.325, "evals": 10, "note": ""}
+{"a": 1.45, "seed": 830074, "w2_lo": 2.9625, "w2_hi": 2.96875, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830075, "w2_lo": 3.24375, "w2_hi": 3.25, "evals": 9, "note": ""}
+{"a": 1.45, "seed": 830076, "w2_lo": 3.04375, "w2_hi": 3.05, "evals": 7, "note": ""}
+{"a": 1.45, "seed": 830077, "w2_lo": 2.84375, "w2_hi": 2.85, "evals": 6, "note": ""}
+Process SpawnPoolWorker-2:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+Process SpawnPoolWorker-1:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+{"a": 1.45, "seed": 830078, "w2_lo": 3.175, "w2_hi": 3.18125, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830000, "w2_lo": 1.90625, "w2_hi": 1.9125, "evals": 6, "note": ""}
+{"a": 1.45, "seed": 830079, "w2_lo": 3.1125, "w2_hi": 3.11875, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830001, "w2_lo": 2.14375, "w2_hi": 2.15, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830002, "w2_lo": 2.025, "w2_hi": 2.03125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830003, "w2_lo": 1.89375, "w2_hi": 1.9, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830005, "w2_lo": 2.16875, "w2_hi": 2.175, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830004, "w2_lo": 2.175, "w2_hi": 2.18125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830006, "w2_lo": 1.8625, "w2_hi": 1.86875, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830007, "w2_lo": 2.2, "w2_hi": 2.20625, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830008, "w2_lo": 1.9, "w2_hi": 1.90625, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830009, "w2_lo": 2.05, "w2_hi": 2.05625, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830012, "w2_lo": 2.125, "w2_hi": 2.13125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830011, "w2_lo": 2.35, "w2_hi": 2.35625, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830010, "w2_lo": 2.3875, "w2_hi": 2.39375, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830014, "w2_lo": 2.11875, "w2_hi": 2.125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830015, "w2_lo": 2.11875, "w2_hi": 2.125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830013, "w2_lo": 2.225, "w2_hi": 2.23125, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830016, "w2_lo": 2.09375, "w2_hi": 2.1, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830018, "w2_lo": 1.9875, "w2_hi": 1.99375, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830017, "w2_lo": 1.89375, "w2_hi": 1.9, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830021, "w2_lo": 1.9875, "w2_hi": 1.99375, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830019, "w2_lo": 2.30625, "w2_hi": 2.3125, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830020, "w2_lo": 2.15, "w2_hi": 2.15625, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830023, "w2_lo": 2.0375, "w2_hi": 2.04375, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830024, "w2_lo": 2.25625, "w2_hi": 2.2625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830022, "w2_lo": 2.40625, "w2_hi": 2.4125, "evals": 10, "note": ""}
+{"a": 1.6, "seed": 830025, "w2_lo": 1.94375, "w2_hi": 1.95, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830026, "w2_lo": 1.975, "w2_hi": 1.98125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830027, "w2_lo": 2.075, "w2_hi": 2.08125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830028, "w2_lo": 1.875, "w2_hi": 1.88125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830030, "w2_lo": 2.19375, "w2_hi": 2.2, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830029, "w2_lo": 1.79375, "w2_hi": 1.8, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830031, "w2_lo": 2.025, "w2_hi": 2.03125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830032, "w2_lo": 2.3375, "w2_hi": 2.34375, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830033, "w2_lo": 2.25625, "w2_hi": 2.2625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830034, "w2_lo": 2.1625, "w2_hi": 2.16875, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830035, "w2_lo": 1.8875, "w2_hi": 1.89375, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830036, "w2_lo": 2.2625, "w2_hi": 2.26875, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830037, "w2_lo": 2.25, "w2_hi": 2.25625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830038, "w2_lo": 2.2875, "w2_hi": 2.29375, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830039, "w2_lo": 2.2125, "w2_hi": 2.21875, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830040, "w2_lo": 1.9125, "w2_hi": 1.91875, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830041, "w2_lo": 1.96875, "w2_hi": 1.975, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830043, "w2_lo": 2.1125, "w2_hi": 2.11875, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830042, "w2_lo": 2.25, "w2_hi": 2.25625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830044, "w2_lo": 1.86875, "w2_hi": 1.875, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830045, "w2_lo": 2.00625, "w2_hi": 2.0125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830046, "w2_lo": 2.08125, "w2_hi": 2.0875, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830047, "w2_lo": 2.3375, "w2_hi": 2.34375, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830048, "w2_lo": 2.225, "w2_hi": 2.23125, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830049, "w2_lo": 2.05, "w2_hi": 2.05625, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830050, "w2_lo": 2.13125, "w2_hi": 2.1375, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830052, "w2_lo": 2.03125, "w2_hi": 2.0375, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830051, "w2_lo": 2.10625, "w2_hi": 2.1125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830054, "w2_lo": 2.00625, "w2_hi": 2.0125, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830053, "w2_lo": 1.81875, "w2_hi": 1.825, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830055, "w2_lo": 2.2, "w2_hi": 2.20625, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830056, "w2_lo": 2.11875, "w2_hi": 2.125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830057, "w2_lo": 2.15, "w2_hi": 2.15625, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830058, "w2_lo": 2.1875, "w2_hi": 2.19375, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830059, "w2_lo": 2.3125, "w2_hi": 2.31875, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830060, "w2_lo": 2.325, "w2_hi": 2.33125, "evals": 9, "note": ""}
+{"a": 1.6, "seed": 830061, "w2_lo": 1.84375, "w2_hi": 1.85, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830062, "w2_lo": 1.875, "w2_hi": 1.88125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830063, "w2_lo": 2.23125, "w2_hi": 2.2375, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830064, "w2_lo": 2.51875, "w2_hi": 2.525, "evals": 11, "note": ""}
+{"a": 1.6, "seed": 830065, "w2_lo": 2.55625, "w2_hi": 2.5625, "evals": 11, "note": ""}
+{"a": 1.6, "seed": 830067, "w2_lo": 2.10625, "w2_hi": 2.1125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830066, "w2_lo": 2.59375, "w2_hi": 2.6, "evals": 11, "note": ""}
+{"a": 1.6, "seed": 830069, "w2_lo": 2.04375, "w2_hi": 2.05, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830068, "w2_lo": 2.1875, "w2_hi": 2.19375, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830070, "w2_lo": 2.03125, "w2_hi": 2.0375, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830071, "w2_lo": 2.11875, "w2_hi": 2.125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830072, "w2_lo": 2.2125, "w2_hi": 2.21875, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830074, "w2_lo": 2.05, "w2_hi": 2.05625, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830073, "w2_lo": 2.3, "w2_hi": 2.30625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830075, "w2_lo": 2.25, "w2_hi": 2.25625, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830077, "w2_lo": 1.9625, "w2_hi": 1.96875, "evals": 6, "note": ""}
+{"a": 1.6, "seed": 830076, "w2_lo": 2.10625, "w2_hi": 2.1125, "evals": 7, "note": ""}
+{"a": 1.6, "seed": 830078, "w2_lo": 2.20625, "w2_hi": 2.2125, "evals": 8, "note": ""}
+{"a": 1.6, "seed": 830079, "w2_lo": 2.15, "w2_hi": 2.15625, "evals": 7, "note": ""}

@@ -41,3 +41,8 @@ Adam crossings for seeds 0–39 at these a.)
 
 **Competing outcome.** The residual at these a is not predicted by the Adam-fitted timescale relationship (TS-1
 fails), or the own threshold does not beat the population (TS-2 fails).
+
+## Own thresholds frozen (2026-09-25 15:38 EDT, before any Adam run)
+
+All 160 (seed, a) own thresholds were computed with no flagged cases. They are in `ts_test_own_frozen.csv`, SHA-256
+6865905eae7659cc7e098f3a85c6cbc1733bbb2c0cc296bb70045ca32d6c7de4. This file is committed before `python -m src.ts_test train` runs.
