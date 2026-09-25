@@ -828,6 +828,7 @@ PRODUCERS = {
     "width2_unplaced.csv": ("width2_unplaced", "save", "full", ""),
     "width2_finish_summary.csv": ("width2_finish", "summary", "full", ""),
     "width2_direct_check.csv": ("width2_finish", "summary", "full", ""),
+    "width2_w0_scan_coverage.csv": ("width2_w0", "scan_coverage", "full", ""),
     "k_domain_check.csv": ("k_domain", "main", "full", ""),
     "width2_unplaced_localmin.csv": ("width2_unplaced", "save", "full", ""),
     "ghat_rigorous.csv": ("ghat_rigorous", "build", "full", ""),
@@ -1315,6 +1316,14 @@ def v4_checks() -> None:
     chk("K domain: excluded points checked", float(kd_.excluded_points_checked), 4035775.0, 0)
     chk("K domain: region inside the certified box", float(bool(kd_.region_inside_box)), 1.0, 0)
     chk("K domain: K argmax inside the region", float(bool(kd_.K_argmax_inside_region)), 1.0, 0)
+    print("W0 scan coverage (never registered)")
+    sc_ = pd.read_csv(R / "width2_w0_scan_coverage.csv")
+    c15 = sc_[(sc_.act == "f1.50") & sc_.completed.astype(bool)]
+    chk("W0 a=1.50: 9 grid points completed", float(len(c15)), 9.0, 0)
+    chk("W0 a=1.50: R2 = 0.02..0.10", float(abs(c15.R2.min() - 0.02) < 1e-9 and abs(c15.R2.max() - 0.10) < 1e-9), 1.0, 0)
+    chk("W0 a=1.50: placed and audit passed at every point", float(c15.placed.astype(bool).all() and c15.audit_ok.astype(bool).all()), 1.0, 0)
+    chk("W0 a=1.50: none validated", float((~c15.validated.astype(bool)).all()), 1.0, 0)
+    chk("W0 a=1.30: no point completed", float(sc_[(sc_.act == "f1.30") & sc_.completed.astype(bool)].shape[0]), 0.0, 0)
     print("Direct check (complete)")
     dc_ = pd.read_csv(R / "width2_direct_check.csv")
     chk("direct check: 8 scales", float(len(dc_)), 8.0, 0)

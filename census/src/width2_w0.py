@@ -296,7 +296,30 @@ def smallscale(act_name):
     return _read(f"smallscale_{act_name}.csv")
 
 
+def scan_coverage():
+    """results/width2_w0_scan_coverage.csv: every W0 grid point completed, per activation (a committed copy of the scan
+    rows; an activation with no scan file contributes a row saying so), and the stop record."""
+    rows = []
+    for act in ("f1.30", "f1.50"):
+        d = _read(f"scan_{act}.csv")
+        if d.empty:
+            rows.append({"act": act, "R2": np.nan, "completed": False, "note": "scan never started"})
+        else:
+            for r in d.sort_values("R2").itertuples():
+                rows.append({"act": act, "R2": r.R2, "completed": True, "restarts": r.restarts, "cap": r.cap,
+                             "Gplus_lo": r.Gplus_lo, "placed": bool(r.Gplus_lo > 0), "audit_ok": r.audit_ok,
+                             "cap_hits": r.cap_hits, "validated": False,
+                             "note": "validation runs only within 0.1 of a threshold; none found"})
+    st = _read("stops.csv")
+    for r in st.itertuples():
+        rows.append({"act": r.act, "R2": np.nan, "completed": False, "note": f"STOP: {r.stop}"})
+    out = pd.DataFrame(rows)
+    out.to_csv(RESULTS / "width2_w0_scan_coverage.csv", index=False)
+    return out
+
+
 if __name__ == "__main__":
     cmd, act = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else None)
     {"gamma": lambda: gamma(act), "scan": lambda: scan(act), "refine": lambda: refine(act),
-     "validate": lambda: validate(act), "summary": summary, "smallscale": lambda: smallscale(act)}[cmd]()
+     "validate": lambda: validate(act), "summary": summary, "smallscale": lambda: smallscale(act),
+     "coverage": scan_coverage}[cmd]()

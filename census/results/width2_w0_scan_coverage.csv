@@ -1,0 +1,12 @@
+act,R2,completed,note,restarts,cap,Gplus_lo,placed,audit_ok,cap_hits,validated
+f1.30,,False,scan never started,,,,,,,
+f1.50,0.02,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0264297262768292,True,True,294.0,False
+f1.50,0.03,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0264082263200145,True,True,201.0,False
+f1.50,0.04,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.026386135117177,True,True,227.0,False
+f1.50,0.05,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0263634892353208,True,True,391.0,False
+f1.50,0.06,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0263406662317014,True,True,245.0,False
+f1.50,0.07,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0263175843527552,True,True,212.0,False
+f1.50,0.08,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0262940867352297,True,True,132.0,False
+f1.50,0.09,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0262703762512293,True,True,79.0,False
+f1.50,0.1,True,validation runs only within 0.1 of a threshold; none found,2000.0,2000.0,1.0262463570081644,True,True,35.0,False
+f1.30,,False,STOP: Gamma2 searches disagree: NM 1.1868728875468348 vs DE 1.1868689894230235,,,,,,,

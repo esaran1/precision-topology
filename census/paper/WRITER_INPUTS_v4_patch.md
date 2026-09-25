@@ -446,7 +446,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 393 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 395 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 12 checks compare two artifacts to 1e−12; they are
@@ -511,6 +511,12 @@ minimiser itself. Complete: all 8 scales (placed cancelling pair at each,
 every validation passed, the best unplaced configuration on the G = 0 boundary, at least 99× the tie tolerance above)
 — the verdict is confirmed directly (table in WP-8, not repeated
 here). IDs: `direct check: every landed scale placed, cancelling pair`; `direct check: no finished restart below the retained minimiser (landed scales)`; `min margin at R2 = 0.001`; `all best-unplaced on the boundary`.
+
+**Coverage of the width-2 threshold scan (W0; never registered).** At a = 1.30 no R₂ value was completed: the scan
+never started, because its Γ̂₂ stop fired first. At a = 1.50 the scan completed R₂ = 0.02, 0.03, …, 0.10 (9 of 99
+planned points; 2,000 restarts each, audit passed, placed at every point), not validated in the design's sense
+(validation runs only near a threshold, and there was none), and was terminated. The validated small-scale results
+are the direct check's 8 scales (WP-8). Source: `width2_design.md`, "W0 threshold-scan coverage, as run".
 
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
 size, the maxima are < 1 and rising, the first-order tie is present, the Var-selected symmetric pair is placed at every

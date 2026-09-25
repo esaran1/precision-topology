@@ -497,3 +497,20 @@ change, the bracket is bisected in s to a relative width of **2×10⁻⁴**.
 - At a = 1.50 the searches agree to 7.2×10⁻⁷, so the check passes.
 - **The a = 1.50 W0 scan is terminated** (author's decision). W1 and W4 are not run (see
   `scale_limits_prediction.md`), and the small-scale checks cover what matters.
+
+## W0 threshold-scan coverage, as run (recorded 2026-09-25)
+
+**The W0 scan was never registered.** The design registers W0–W4 at its step 5, with frozen thresholds and hashes.
+That step was never reached: the scan was stopped, and then the registered small-scale verdict
+(`scale_limits_prediction.md`) found no threshold for f_a at width 2. The census lists W0–W4 as designed, never
+registered.
+
+| a | R₂ values completed | per point | "validated" in the §3 sense? |
+|---|---|---|---|
+| 1.30 | **none** | — | no. The scan never started: the §5 stop fired first (the two Γ̂₂ searches disagree by 3.3e−6 relative; `width2_w0_parts/stops.csv`), and after the author's decision to report Γ̂₂(1.30) with the disagreement, the small-scale verdict made W0 moot |
+| 1.50 | **0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10** (9 of the 99 planned grid points on [0.02, 1.00]) | 2,000 restarts, iteration cap 2,000, audit passed (no discarded candidate below the retained one); retained minimiser placed at every point, G₊ = 1.0262–1.0264 | **no.** The §3 validation (restart ladder 500 → 4,000, 10× stricter search, independent CMA-ES, cap raising) runs only within ±0.1 of a threshold, and there was no sign change. At the 2,000 cap, 35–391 restarts per point hit the cap (before the cap-rule amendment). The scan was terminated by the author's decision |
+
+- The **validated** conditional minimiser at small scale is the direct check instead: R₂ ∈ {0.001, 0.003, 0.01, 0.02}
+  at both a, with the full validation (4,000 restarts, the amended cap rule, ladder, stricter and independent
+  searches). All 8 scales are placed, as the cancelling pair (`width2_direct_check.csv`, WP-8). R₂ = 0.02 at
+  a = 1.50 is covered by both.

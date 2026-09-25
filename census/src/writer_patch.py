@@ -421,6 +421,12 @@ every validation passed, the best unplaced configuration on the G = 0 boundary, 
 {"— the verdict is confirmed directly" if n_pend == 0 else f"; **{n_pend} scale(s) PENDING**"} (table in WP-8, not repeated
 here). IDs: {_id("direct check: every landed scale placed, cancelling pair", "direct check: no finished restart below the retained minimiser (landed scales)", "min margin at R2 = 0.001", "all best-unplaced on the boundary")}.
 
+**Coverage of the width-2 threshold scan (W0; never registered).** At a = 1.30 no R₂ value was completed: the scan
+never started, because its Γ̂₂ stop fired first. At a = 1.50 the scan completed R₂ = 0.02, 0.03, …, 0.10 (9 of 99
+planned points; 2,000 restarts each, audit passed, placed at every point), not validated in the design's sense
+(validation runs only near a threshold, and there was none), and was terminated. The validated small-scale results
+are the direct check's 8 scales (WP-8). Source: `width2_design.md`, "W0 threshold-scan coverage, as run".
+
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
 size, the maxima are < 1 and rising, the first-order tie is present, the Var-selected symmetric pair is placed at every
 box (G₊ → 1) and the single units are unplaced. The boundary criterion as written fails at A = 40, because the 1e−9 tie

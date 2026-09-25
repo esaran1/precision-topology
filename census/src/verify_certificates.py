@@ -204,14 +204,22 @@ class Objective:
         Z = self.z0_ranges(W, B)
         zl = np.array([float(lo_(z)) for z in Z]); zh = np.array([float(hi_(z)) for z in Z])
 
+        yb = float(self.ybar.mid())
+        L0 = math.log(yb / (1 - yb))
+
         def root(z):
-            lo, hi = -80.0, 80.0
-            for _ in range(90):
+            # F is increasing in b; its root lies in [logit(ȳ) − max z, logit(ȳ) − min z] (monotonicity), which can be far
+            # beyond ±80 when z is large (the limit problem's cubic logit).  Float bisection only PROPOSES the bracket;
+            # the Arb sign checks below decide it.
+            lo, hi = L0 - float(z.max()) - 1.0, L0 - float(z.min()) + 1.0
+            for _ in range(200):
                 m = 0.5 * (lo + hi)
-                v = (1 / (1 + np.exp(-(z + m)))).mean() - float(self.ybar.mid())
+                v = (0.5 * (1 + np.tanh(0.5 * (z + m)))).mean() - yb       # overflow-free logistic
                 lo, hi = (m, hi) if v < 0 else (lo, m)
             return 0.5 * (lo + hi)
-        beta, gamma = root(zh) - 1e-12, root(zl) + 1e-12
+        r_hi, r_lo = root(zh), root(zl)
+        beta = r_hi - 1e-12 * max(1.0, abs(r_hi))
+        gamma = r_lo + 1e-12 * max(1.0, abs(r_lo))
 
         def F(Zb, b):
             acc = arb(0)
@@ -514,8 +522,9 @@ def check_limit(name, verbose=True, workers=WORKERS):
     (the half-domain p >= 0) and the windows are symmetric; max|x| <= X; h is increasing on |σ| >= 2√2 with
     h(−2√2) < h(2√2) (the monotone-logit step of the localisation); the localisation bounds B(P), B_full recomputed
     rigorously and the winner's U below both (so the global minimiser lies in the certified box); exact tiling of each
-    region; U's point in the winning region (or the constant predictor, exactly log 2); every leaf's claim (lower bound
-    of L0* or outside the region) verified in Arb; every losing-region claim > U."""
+    region; U's point in the winning region (or the constant predictor, exactly log 2); every LOSING-region leaf outside
+    its region or with a rigorous lower bound of L0* above U, i.e. exactly what the status needs (author's decision
+    2026-09-25). Winning-region leaves are tiled (coverage) but their own search bounds are not re-verified."""
     from multiprocessing import Pool
     ctx.prec = PREC
     meta = json.loads((CERTS / f"{name}.json").read_text())
@@ -547,25 +556,32 @@ def check_limit(name, verbose=True, workers=WORKERS):
         res["checks"]["U_point_in_region"] = bool((gl > 0) if win == "+" else (gu <= 0))
     res["U_upper"] = float(hi_(U).mid())
     res["checks"]["U_below_localisation_bounds"] = bool(U < BP) and bool(U < Bfull)
+    # What the status needs (author's decision 2026-09-25): every LOSING-region leaf is outside its region or has a
+    # rigorous lower bound of L0* above U.  The target is the smallest double above U's upper end, so a pass means
+    # L0* > U on the leaf.  Winning-region leaves are tiled (coverage) but their own search bounds are not re-verified:
+    # they do not enter the status claim.
+    target = float(np.nextafter(float(hi_(U).mid()), np.inf))
+    while not (arb(target) > U):
+        target = float(np.nextafter(target, np.inf))
     jobs = []
     for reg in ("-", "+"):
         lv, iw, ib = dat[f"level_{reg}"], dat[f"iw_{reg}"], dat[f"ib_{reg}"]
         ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
         res["checks"][f"coverage_{reg}"] = ok
+        if reg != lose:
+            res["winning_region_leaves_not_reverified"] = int(len(lv))
+            continue
         hw = meta["hw0"] / 2.0 ** lv; hb = meta["hb0"] / 2.0 ** lv
         cw = meta["p0"] + (iw + 0.5) * 2 * hw; cb = -meta["Q"] + (ib + 0.5) * 2 * hb
-        reason, claim = dat[f"reason_{reg}"], dat[f"lb_{reg}"]
-        if reg == lose:
-            lbl = reason != 2
-            res["checks"]["losing_claims_exceed_U"] = all(arb(float(c)) > U for c in claim[lbl])
+        reason = dat[f"reason_{reg}"]
         for k in range(len(lv)):
             kind = f"out{reg}" if reason[k] == 2 else "lb"
-            jobs.append(((reg, k), float(cw[k]), float(cb[k]), float(hw[k]), float(hb[k]), kind, float(claim[k])))
+            jobs.append(((reg, k), float(cw[k]), float(cb[k]), float(hw[k]), float(hb[k]), kind, target))
     chunks = [jobs[i:i + 200] for i in range(0, len(jobs), 200)]
     with Pool(workers, initializer=_init_worker, initargs=(str(CERTS / f"{name}.npz"), A, None, "h")) as p:
         results = [r for part in p.imap_unordered(_chunk, chunks) for r in part]
     fails = [r for r in results if not r[1]]
-    res["checks"]["every_leaf_claim_verified"] = not fails
+    res["checks"]["every_losing_leaf_outside_or_above_U"] = not fails
     res["leaves"] = len(results)
     res["failed_leaves"] = [(r[0][0], int(r[0][1])) for r in fails[:20]]
     res["evaluations"] = int(sum(r[2] for r in results))
