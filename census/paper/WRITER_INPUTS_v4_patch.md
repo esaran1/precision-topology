@@ -992,6 +992,38 @@ IDs: `Track 2 T2-1 PASS`; `Track 2 s_lo`; `Track 2 s_hi`; `Track 2 T2-2 PASS`; `
   within the registered 25%. So at width 2 the landscape threshold does not predict *where* training crosses, as the
   width-1 threshold does (within 3–7%).
 
+
+**POST HOC, EXPLORATORY (the author's request, after T2-3 failed): what the runs cross on.** Producer:
+`src/asym_posthoc.py` → `asym_posthoc/`. The definitions were fixed before running: knockout class at the crossing;
+weight shares along the trajectory; each run's branch switch scale by continuation from its crossing configuration;
+the explicit single-unit branch; and the width-1 threshold for these windows. All 79 replays reproduce their
+crossings exactly.
+- **No run crosses on a single-unit branch.** At the crossing, 76 of 79 are a cooperating pair (neither unit
+  alone is placed) and 3 are redundant; **0 are single-unit**. Before the crossing, the median run
+  has a dominant unit (share ≥ 0.75) at only 19% of its logged steps.
+- **The single-unit branch** (the width-1 minimiser embedded in width 2, with 99% of the weight on one unit) switches
+  at s ∈ (4.87, 5.62]. The width-1 threshold for these windows
+  is s = 5.09. **97.5% of crossings lie below it**: median crossing
+  s = 1.44 (10–90%: 0.77–2.42), i.e. 0.29× the width-1
+  threshold.
+- **The branch the runs actually cross on** (continuation from each crossing configuration) switches at a median
+  s = 0.439, essentially the width-2 global threshold (0.445). The runs cross at
+  3.2× their own branch's switch.
+- **No reference tracks the crossings.** Mean |log error|: branch 1.11, width-2 global
+  1.19, width-1 1.27. Branch − global is
+  -0.077 [-0.196, +0.015] and width-1 − global is
+  +0.081 [-0.140, +0.301]; both intervals contain 0.
+  Spearman(crossing, branch switch) = 0.30.
+IDs: `Track 2 posthoc single-unit at crossing`; `Track 2 posthoc pair at crossing`; `Track 2 posthoc single branch switch lo`; `Track 2 posthoc single branch switch hi`; `Track 2 posthoc width-1 threshold`; `Track 2 posthoc frac below single branch`; `Track 2 posthoc median branch switch`; `Track 2 posthoc branch minus glob hi`; `Track 2 posthoc Spearman branch`.
+
+**Say (post hoc, beside the failure):** "The registered training prediction failed. Post hoc, the runs cross as
+cooperating pairs, on the branch whose switch is the width-2 threshold, but about three times above it, and below the
+single-unit (width-1) threshold. Neither threshold, nor the branch's own switch, predicts the crossing scale."
+
+**Do not say:** that the failure is explained by a single-unit branch (no run is single-unit at its crossing), that
+crossings "track" any of these thresholds, or that the post hoc analysis rescues T2-3. It is exploratory, and the
+registered verdict is FAIL.
+
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered
 training prediction fails."

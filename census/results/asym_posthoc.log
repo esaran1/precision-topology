@@ -1,0 +1,49 @@
+{
+ "n_runs": 79,
+ "n_branch_defined": 77,
+ "replay_reproduces": true,
+ "knockout_counts": {
+  "pair": 76,
+  "redundant": 3
+ },
+ "median_max_share_at_cross": 0.5482594174237088,
+ "median_cancel_at_cross": 0.4415936220883372,
+ "median_frac_pre_dominant": 0.1904761904761904,
+ "s_glob_w2": 0.44507940623559955,
+ "s_w1": 5.0936752167801345,
+ "w1_scan_changes": 1,
+ "median_s_branch": 0.439096921177498,
+ "median_ratio_glob": 3.279671050957589,
+ "median_ratio_w1": 0.28657383556759586,
+ "median_ratio_branch": 3.2237574573859447,
+ "mean_abslog_glob": [
+  1.1903159681739468,
+  1.0812855230078189,
+  1.2992198401283919
+ ],
+ "mean_abslog_w1": [
+  1.2709464418109864,
+  1.1584989703186834,
+  1.3838723096499044
+ ],
+ "mean_abslog_branch": [
+  1.1136319637993024,
+  1.0070758966625386,
+  1.2109991352127203
+ ],
+ "branch_minus_glob": [
+  -0.07668400437464443,
+  -0.19601914567766332,
+  0.014961628575129157
+ ],
+ "w1_minus_glob": [
+  0.08063047363703948,
+  -0.14046297236228025,
+  0.30098931466107576
+ ],
+ "spearman_cross_branch": 0.2959934802040065,
+ "branch_notes": {
+  "ok": 77,
+  "not placed at 4x s_cross": 2
+ }
+}

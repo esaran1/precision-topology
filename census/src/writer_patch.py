@@ -1132,6 +1132,8 @@ def wp15():
     """WP-15: a width-2 threshold on asymmetric windows (Track 2, registered)."""
     sc = json.loads((RESULTS / "asym_scores.json").read_text())
     t3 = sc["T2-3"]
+    ph = json.loads((RESULTS / "asym_posthoc" / "summary.json").read_text())
+    pk = ph["knockout_counts"]
     return f"""
 ## WP-15. Width 2 on asymmetric windows: the landscape threshold survives; training crosses far above it (Track 2, registered; for the submission)
 
@@ -1163,6 +1165,38 @@ IDs: {_id("Track 2 T2-1 PASS", "Track 2 s_lo", "Track 2 s_hi", "Track 2 T2-2 PAS
 - Training does cross above that threshold (94% of runs), but at a median of about **3.3×** the threshold scale, not
   within the registered 25%. So at width 2 the landscape threshold does not predict *where* training crosses, as the
   width-1 threshold does (within 3–7%).
+
+
+**POST HOC, EXPLORATORY (the author's request, after T2-3 failed): what the runs cross on.** Producer:
+`src/asym_posthoc.py` → `asym_posthoc/`. The definitions were fixed before running: knockout class at the crossing;
+weight shares along the trajectory; each run's branch switch scale by continuation from its crossing configuration;
+the explicit single-unit branch; and the width-1 threshold for these windows. All 79 replays reproduce their
+crossings exactly.
+- **No run crosses on a single-unit branch.** At the crossing, {pk["pair"]} of 79 are a cooperating pair (neither unit
+  alone is placed) and {pk.get("redundant", 0)} are redundant; **0 are single-unit**. Before the crossing, the median run
+  has a dominant unit (share ≥ 0.75) at only {100 * ph["median_frac_pre_dominant"]:.0f}% of its logged steps.
+- **The single-unit branch** (the width-1 minimiser embedded in width 2, with 99% of the weight on one unit) switches
+  at s ∈ ({ph["single_branch_switch_lo"]:.2f}, {ph["single_branch_switch_hi"]:.2f}]. The width-1 threshold for these windows
+  is s = {ph["s_w1"]:.2f}. **{100 * ph["frac_cross_below_single_branch"]:.1f}% of crossings lie below it**: median crossing
+  s = {ph["median_s_cross"]:.2f} (10–90%: {ph["s_cross_p10"]:.2f}–{ph["s_cross_p90"]:.2f}), i.e. {ph["median_ratio_w1"]:.2f}× the width-1
+  threshold.
+- **The branch the runs actually cross on** (continuation from each crossing configuration) switches at a median
+  s = {ph["median_s_branch"]:.3f}, essentially the width-2 global threshold ({ph["s_glob_w2"]:.3f}). The runs cross at
+  {ph["median_ratio_branch"]:.1f}× their own branch's switch.
+- **No reference tracks the crossings.** Mean |log error|: branch {ph["mean_abslog_branch"][0]:.2f}, width-2 global
+  {ph["mean_abslog_glob"][0]:.2f}, width-1 {ph["mean_abslog_w1"][0]:.2f}. Branch − global is
+  {ph["branch_minus_glob"][0]:+.3f} [{ph["branch_minus_glob"][1]:+.3f}, {ph["branch_minus_glob"][2]:+.3f}] and width-1 − global is
+  {ph["w1_minus_glob"][0]:+.3f} [{ph["w1_minus_glob"][1]:+.3f}, {ph["w1_minus_glob"][2]:+.3f}]; both intervals contain 0.
+  Spearman(crossing, branch switch) = {ph["spearman_cross_branch"]:.2f}.
+IDs: {_id("Track 2 posthoc single-unit at crossing", "Track 2 posthoc pair at crossing", "Track 2 posthoc single branch switch lo", "Track 2 posthoc single branch switch hi", "Track 2 posthoc width-1 threshold", "Track 2 posthoc frac below single branch", "Track 2 posthoc median branch switch", "Track 2 posthoc branch minus glob hi", "Track 2 posthoc Spearman branch")}.
+
+**Say (post hoc, beside the failure):** "The registered training prediction failed. Post hoc, the runs cross as
+cooperating pairs, on the branch whose switch is the width-2 threshold, but about three times above it, and below the
+single-unit (width-1) threshold. Neither threshold, nor the branch's own switch, predicts the crossing scale."
+
+**Do not say:** that the failure is explained by a single-unit branch (no run is single-unit at its crossing), that
+crossings "track" any of these thresholds, or that the post hoc analysis rescues T2-3. It is exploratory, and the
+registered verdict is FAIL.
 
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered
