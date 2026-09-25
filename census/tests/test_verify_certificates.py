@@ -258,3 +258,38 @@ def test_rejects_a_constant_predictor_claim_that_is_false_for_limit_objective():
     obj = vc.Objective(x, y, 0.68, None, vc.HAct())
     st = {"evals": 0, "max_depth": 0}
     assert not vc._leaf_ok(obj, 0.0, 0.0, 1e-3, 1e-3, "lb", 0.7, vc.MAX_DEPTH, st)   # L0* ≈ log 2 < 0.7 there
+
+
+def test_direct_bound_is_a_lower_bound_of_the_profiled_loss():
+    # the combined (mean-value, direct) cell bound never exceeds the profiled loss at points inside the cell,
+    # including far out where the direct bound is the active one
+    from src.limit_bnb import population, profile
+    x, y = population()
+    obj = vc.Objective(x, y, 0.69, None, vc.HAct())
+    rng = np.random.default_rng(5)
+    for pc, qc, h in ((0.5, 1.0, 0.01), (7.5, -40.0, 0.125), (20.0, -20.0, 0.125), (0.02, -9.8, 0.023)):
+        lb = obj.lower_bound(pc, qc, h, h)
+        assert lb is not None
+        ps, qs = pc + rng.uniform(-h, h, 20), qc + rng.uniform(-h, h, 20)
+        L, *_ = profile(ps, qs, 0.69, x, y)
+        assert float(vc.lo_(lb).mid()) <= L.min() + 1e-9
+
+
+def test_h_on_a_ball_containing_zero_is_finite_and_encloses():
+    # regression: arb ** 3 returns nan on a ball containing 0 (python-flint); HAct must not
+    h = vc.HAct()
+    t = vc.ball(-0.03, 0.03)
+    v = h.f(t)
+    assert v.is_finite()
+    for tt in np.linspace(-0.03, 0.03, 101):
+        assert float(vc.lo_(v).mid()) <= -tt + tt ** 3 / 6 <= float(vc.hi_(v).mid())
+    mn, mx = h.range(vc.ball(-0.5, -0.49), vc.ball(0.49, 0.5))     # interval endpoints given as balls
+    assert mn.is_finite() and mx.is_finite()
+    tt = np.linspace(-0.5, 0.5, 2001); f = -tt + tt ** 3 / 6
+    assert float(mn.mid()) <= f.min() + 1e-12 and float(mx.mid()) >= f.max() - 1e-12
+
+
+def test_range_is_conservative_when_a_candidate_is_not_finite():
+    h = vc.HAct()
+    mn, mx = h.range(arb("nan"), arb(1.0))
+    assert not mn.is_finite() and not mx.is_finite()

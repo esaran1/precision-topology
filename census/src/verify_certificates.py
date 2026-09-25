@@ -123,6 +123,8 @@ class FA:
                         continue
                     cand.append(self.f(tk))       # a critical point possibly inside: its value is attained or not;
                                                   # including it can only widen the enclosure (still rigorous)
+        if not all(c.is_finite() for c in cand):
+            return arb("-inf"), arb("inf")                   # conservative (see HAct)
         mn = min((lo_(c) for c in cand))
         mx = max((hi_(c) for c in cand))
         return mn, mx
@@ -135,11 +137,13 @@ class HAct:
         self.c = arb(2).sqrt()                            # h′(σ) = σ²/2 − 1 = 0 at ±√2
         self.twopi = None
 
+    # NOTE: python-flint's arb ** int returns nan for a ball containing 0; products are used instead (bug found
+    # 2026-09-25, before which a nan could be skipped by min/max in range()).
     def f(self, t):
-        return -t + t ** 3 / 6
+        return -t + t * t * t / 6
 
     def df(self, t):
-        return t ** 2 / 2 - 1
+        return t * t / 2 - 1
 
     def np_f(self, t):
         return -t + t ** 3 / 6
@@ -150,6 +154,8 @@ class HAct:
         for cc in (self.c, -self.c):
             if not (hi_(cc) < lo_(tlo) or lo_(cc) > hi_(thi)):
                 cand.append(self.f(cc))
+        if not all(c.is_finite() for c in cand):
+            return arb("-inf"), arb("inf")                   # conservative: never let a nan be skipped by min/max
         return min(lo_(c) for c in cand), max(hi_(c) for c in cand)
 
 
@@ -167,6 +173,8 @@ def range_inner(fa, tlo, thi):
                 tk = cc + k * fa.twopi
                 if lo_(tk) > hi_(tlo) and hi_(tk) < lo_(thi):
                     cand.append(fa.f(tk))
+    if not all(c.is_finite() for c in cand):
+        return arb("inf"), arb("-inf")                       # conservative: no attained value is claimed
     return min(hi_(c) for c in cand), max(lo_(c) for c in cand)
 
 
@@ -259,7 +267,18 @@ class Objective:
         if Bcell is None:
             return None
         _, gw, gb = self.value_and_grad(W, B, Bcell, Z)
-        return Lc - abs(gw) * arb(hw) - abs(gb) * arb(hb)            # a ball; its lower end is the bound
+        mv = Lc - abs(gw) * arb(hw) - abs(gb) * arb(hb)                # mean-value bound (a ball; lower end)
+        # Direct (zeroth-order) bound: on the cell, b* ∈ Bcell and each point's z0 ∈ Z[i], so z = z0 + b* ∈
+        # [lo Z[i] + lo Bcell, hi Z[i] + hi Bcell].  The per-point loss is monotone in z (softplus(−z) for y = 1,
+        # softplus(z) for y = 0), so it is at least its value at the favourable endpoint.  Decisive where the loss is
+        # large (far out in the box), where the mean-value bound is swamped by the gradient.
+        acc = arb(0)
+        bl, bh = lo_(Bcell), hi_(Bcell)
+        for zi, yi in zip(Z, self.Y):
+            e = -(hi_(zi) + bh) if yi else (lo_(zi) + bl)
+            acc += (arb(lo_(e)).exp() + 1).log()                          # lower bound: softplus is increasing
+        direct = arb(lo_(acc / self.n))
+        return mv if lo_(mv) >= lo_(direct) else direct
 
     def F_at(self, W, B, b):
         """F(b) = mean σ(z0 + b) − ȳ at a (w, b₁) ball."""
@@ -381,9 +400,13 @@ def _init_worker(npz_path, s, a, act_name=None):
     ctx.prec = PREC
     d = np.load(npz_path)
     _OBJ["obj"] = Objective(d["x"], d["y"], s, a, HAct() if act_name == "h" else None)
+    _OBJ["max_depth"] = MAX_DEPTH_LIMIT if act_name == "h" else None
 
 
-def _leaf_ok(obj, wc, bc, hw, hb, kind, target, depth, stats):
+MAX_DEPTH_LIMIT = 10          # the limit check's near-margin leaves (margin ~1e-7) need finer cells
+
+
+def _leaf_ok(obj, wc, bc, hw, hb, kind, target, depth, stats, max_depth=None):
     """kind 'lb': L* ≥ target over the cell; kind 'out+' / 'out-': the cell lies outside {G > 0} / {G ≤ 0}.
     Adaptive: a failed cell is split in four, up to MAX_DEPTH."""
     stats["evals"] += 1
@@ -396,20 +419,21 @@ def _leaf_ok(obj, wc, bc, hw, hb, kind, target, depth, stats):
         gl, gu = obj.gap_bounds(wc - hw, wc + hw, bc - hb, bc + hb)
         if (kind == "out+" and gu <= 0) or (kind == "out-" and gl > 0):
             return True
-    if depth >= MAX_DEPTH:
+    if depth >= (MAX_DEPTH if max_depth is None else max_depth):
         return False
     h2w, h2b = hw / 2, hb / 2
-    return all(_leaf_ok(obj, wc + dw * h2w, bc + db * h2b, h2w, h2b, kind, target, depth + 1, stats)
+    return all(_leaf_ok(obj, wc + dw * h2w, bc + db * h2b, h2w, h2b, kind, target, depth + 1, stats, max_depth)
                for dw in (-1, 1) for db in (-1, 1))
 
 
 def _chunk(args):
     rows = args
     obj = _OBJ["obj"]
+    md = _OBJ.get("max_depth")
     out = []
     for (k, wc, bc, hw, hb, kind, target) in rows:
         st = {"evals": 0, "max_depth": 0}
-        ok = _leaf_ok(obj, wc, bc, hw, hb, kind, target, 0, st)
+        ok = _leaf_ok(obj, wc, bc, hw, hb, kind, target, 0, st, md)
         out.append((k, ok, st["evals"], st["max_depth"]))
     return out
 
