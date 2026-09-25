@@ -416,7 +416,7 @@ pairs (placed). Δμ alone does not decide the verdict; the s² (Var) term does.
 registration (committed before any maximiser was computed) and was not in the author's original rule. The direct
 check (WP-8) tests the verdict without the expansion: at each scale the validated W0 search finds the conditional
 minimiser itself. Landed so far: {land} (placed cancelling pair at each, every validation passed, the best unplaced
-configuration on the G = 0 boundary ≈ 99× the tie tolerance above); **{n_pend} scale(s) PENDING** (table in WP-8, not
+configuration on the G = 0 boundary, at least 99× the tie tolerance above); **{n_pend} scale(s) PENDING** (table in WP-8, not
 repeated here). IDs: {_id("direct check: every landed scale placed, cancelling pair", "direct check: no finished restart below the retained minimiser (landed scales)", "min margin at R2 = 0.001", "all best-unplaced on the boundary")}.
 
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
