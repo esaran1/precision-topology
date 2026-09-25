@@ -374,7 +374,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp6()
     text += wp7()
     text += wp8()
-    text += wp9() + wp10() + wp11()
+    text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -761,6 +761,368 @@ In the fully interpolated version every registered comparison keeps its sign and
 rules makes C − B2 include 0; that version is shown for completeness, not as the analysis.
 """
 
+
+
+
+def wp12():
+    """WP-12: the mechanism stated analytically, the scaling law and Adam's per-step bound (harsh review A1-A2)."""
+    m = pd.read_csv(RESULTS / "wp12_mechanism.csv").set_index("a")
+    sc = pd.read_csv(RESULTS / "wp12_scaling.csv").set_index("a")
+    ad = pd.read_csv(RESULTS / "wp12_adam_bound.csv").iloc[0]
+    ob = pd.read_csv(RESULTS / "wp12_onset_bound.csv").set_index("budget")
+    rows = "\n".join(f"| {a:.2f} | {r.s0:.3f} | {r.s1_data:.1f} | [{r.w2_glob_cert_lo:.4g}, {r.w2_glob_cert_hi:.4g}] |"
+                     for a, r in m.iterrows() if np.isfinite(r.w2_glob_cert_lo))
+    srows = "\n".join(f"| {a:.2f} | {r.w2_limit_krawczyk:.4g} | {r.w2_first_order:.4g} | "
+                      + (f"[{r.w2_cert_lo:.4g}, {r.w2_cert_hi:.4g}] | {100 * r.rel_err_first_order_vs_cert_mid:+.1f}% |"
+                         if np.isfinite(r.w2_cert_lo) else "not certified | — |")
+                      for a, r in sc.iterrows() if a <= 1.6)
+    return f"""
+## WP-12. The mechanism, stated analytically; the scaling law; why Adam is delayed (for the submission)
+
+Sources: math note §11 and §11.1 (`math_note_for_writer.md`); producer `src/harsh_review_a.py` → `wp12_identity.csv`,
+`wp12_mechanism.csv`, `wp12_scaling.csv`, `wp12_onset_bound.csv`, `wp12_adam_bound.csv`. This answers the review's
+point that the mechanism is in the appendix but not the main text. The recommended placement is a short main-text
+proposition (Step 1, Step 2 and the Proposition) with the proof in the appendix.
+
+**What the loss rewards (the mechanism in one paragraph).** At small output scale the profiled loss is
+log 2 − (s/4)Δμ + O(s²), so it rewards the **class-mean gap** Δμ. At large scale it is controlled by e^(−sG/2), so it
+rewards the **worst-case gap** G. The threshold R_glob is where the conditional minimiser switches from the first
+kind of solution to the second.
+
+**Step 1 (identity).** On windows symmetric about 0, the linear part of f_a contributes nothing to Δμ, and
+Δμ = sign(w₂)·a·sin b₁·D(w₁) with D(α) = E_O cos αx − E_I cos αx. The identity is checked to
+{pd.read_csv(RESULTS / "wp12_identity.csv").max_abs_err_data.max():.1e} on the data points and
+{pd.read_csv(RESULTS / "wp12_identity.csv").max_abs_err_continuous.max():.1e} on the continuous windows. The maximiser is
+|w₁| = α* = {m.alpha_star_data.iloc[0]:.7f} (data points; {m.alpha_star_cont.iloc[0]:.7f} on the continuous windows), with
+sin b₁ = ±1, and it does not depend on a.
+IDs: {_id("A1 identity: max abs err, data points", "A1 identity: max abs err, continuous windows", "A1 alpha* (data)", "A1 alpha* (continuous)")}.
+
+**Step 2 (placement needs a small first-layer weight).** G ≤ 2a − 2.8|w₁|, using the endpoint pairs (−2.0, 0.8) and
+(−0.8, 2.0). These four points are window endpoints and data points, so the bound holds for the continuous gap G and
+the data gap G_n alike. Placement therefore needs |w₁| < a/1.4. Since α* > a/1.4 for every a < 1.4α* =
+{m["a_limit_1.4_alpha_star"].iloc[0]:.5f}, the class-mean maximiser is unplaced there: G = {m.loc[1.3, "G_cont_hi_at_theta_star"]:.2f}
+at a = 1.30 and {m.loc[1.5, "G_cont_hi_at_theta_star"]:.2f} at a = 1.50.
+IDs: {_id("A1 1.4 alpha*", "A1 G at theta* (1.30)", "A1 G at theta* (1.50)")}.
+
+**Proposition (an explicit analytic bracket for the switch, width 1).** For 1 < a < 1.4α* and s < s₀(a), every placed
+parameter has a strictly higher profiled loss than the unplaced class-mean maximiser. For s > s₁(a), every unplaced
+parameter has a strictly higher loss than Ĝ's placed witness. So the switch exists and lies in [s₀, s₁]. The proof
+uses only convexity of the logistic loss, ℓ″ ≤ 1/4 and Step 2, plus four finite evaluations. No compactness and no
+attainment are needed.
+
+| a | s₀ | s₁ (data gap) | certified \\|w₂\\|_glob |
+|---|---|---|---|
+{rows}
+
+Every certified threshold lies inside the bracket. The bracket is loose, by roughly 15× below and 30× above: it
+proves the switch **exists**, and the certificates **locate** it. In R units the upper end is R₁ = log(n/log 2) =
+{m.R1_data.iloc[0]:.2f} for every a.
+IDs: {_id("A1 s0(1.30)", "A1 s0(1.50)", "A1 s1_data(1.30)", "A1 s1_data(1.50)", "A1 R1 = log(n/log 2)", "A1 every certified bracket inside [s0, s1]", "A1 bound check at s0 (1.30): L*(theta*) below placed lower bound")}.
+The window-gap version of s₁ needs Ĝ > η (a Lipschitz correction). That holds at every tabulated a except 1.02
+({_id("A1 window s1 defined for a >= 1.05")}).
+
+**Width 2, in the same terms.** On symmetric windows, the second-order term selects the pair ṽ₁α₁ = −ṽ₂α₂. It
+cancels the ramp and leaves a pure cosine, which is placed. So the class-mean maximiser is already placed and there
+is no switch (WP-9). The same criterion predicts a switch on **asymmetric** windows, where the ramp enters Δμ; see
+WP-15 if Track 2 lands. Do not cite that prediction as tested unless WP-15 exists.
+
+**The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + 0.66215ε + O(ε²)), with ε = a − 1. A* ∈ [0.68125, 0.6875]
+is certified and independently checked (Krawczyk value 0.6854452); the correction A′(0)/A* comes from math note §8.
+
+| a | limit A*ε^(−3/2) | with first-order term | certified \\|w₂\\|_glob | first order vs certified |
+|---|---|---|---|---|
+{srows}
+
+IDs: {_id("A2 w2 first order (1.02)", "A2 w2 limit (1.02)", "A2 first order vs certified, max rel", "A2 first order vs certified, min rel")}.
+
+**Adam's per-step bound (rigorous, for every gradient sequence).** Take torch Adam with lr = 0.01 and
+(β₁, β₂) = (0.9, 0.999), bias-corrected. By Cauchy–Schwarz, every coordinate moves at most lr·B_t per step, with
+B_t ≤ B_∞ = {ad.B_inf:.4f}. The bound is attained by a geometric gradient sequence. Summed, |w₂| ≤ {ad.reachable_2000:.2f}
+after 2,000 steps from |w₂(0)| ≤ 1. At a = 1.02 the required scale is {sc.loc[1.02, "w2_first_order"]:.1f} (≥ {sc.loc[1.02, "w2_limit_lo"]:.1f}
+even at A*'s certified lower end). So any Adam run needs **at least {int(sc.loc[1.02, "N_min_adam_worst_case"]):,} steps**, and
+about {int(sc.loc[1.02, "N_lr_per_step"]):,} at the typical rate of lr per step. Observed at 2,000 steps: {int(ad.a102_solved)}/{int(ad.a102_runs)}
+solves, with terminal |w₂| median {ad.a102_median_terminal_w2:.2f} and maximum {ad.a102_max_terminal_w2:.2f}.
+IDs: {_id("A2 B_inf", "A2 reachable |w2| at 2000 steps", "A2 bound attained (t = 400)", "A2 N_min at 1.02", "A2 N at lr per step, 1.02", "A2 a=1.02: solved", "A2 a=1.02: median terminal |w2|", "A2 a=1.02: max terminal |w2|")}.
+
+**What the law explains and what it does not.**
+- **It explains** why the required scale diverges as ε^(−3/2), with a certified constant and first-order term (within
+  3% of every certified finite-a threshold). It also shows that, with a bounded per-step move, the number of steps must
+  diverge at least as fast.
+- **It explains** the 0/200 at a = 1.02 in 2,000 steps. The threshold scale cannot be reached, whatever the gradients.
+  This makes the 0/200 *consistent with and forced by* the threshold-crossing picture; it is not independent evidence
+  for that picture.
+- **It does not explain** Adam's actual growth. The worst-case bound is loose by one to two orders of magnitude. At
+  2,000 steps it permits every a ≥ {ob.loc[2000, "a_min_worst_case"]:.3f}, but the observed onset is a = 1.60. At 128,000
+  steps it permits a ≥ {ob.loc[128000, "a_min_worst_case"]:.4f}; observed 1.03. The observed onset follows the *measured*
+  growth |w₂| ∝ B^α, α = 1.1172, and α's derivation failed (SGD). So −0.745 (registered) against −0.734 (measured)
+  tests the derived ε^(−3/2) combined with a measured α; it is not a derivation of α.
+- **It does not explain** the residual (why crossings sit above the conditional threshold).
+IDs: {_id("A2 worst-case a_min at 2000", "A2 lr-rate a_min at 2000", "A2 worst-case a_min at 128000")}.
+
+**Say:** "At small output scale the loss rewards the class-mean gap, whose maximiser is provably unplaced for
+a < 2.51; at large scale it rewards the worst-case gap, whose maximiser is placed. The conditional threshold is where
+the minimiser switches, and its existence follows analytically; its location is certified." / "Adam's per-step move
+is bounded (attainably) by 7.27·lr, so at a = 1.02 the conditional threshold scale cannot be reached within 2,000
+steps."
+
+**Do not say:** "we derive Adam's growth rate" or "the scaling law predicts the onset" (α is measured). Do not say
+"the per-step bound explains the delay quantitatively" (it is loose by one to two orders of magnitude). Do not say
+"the proposition locates the threshold" (the bracket spans more than two decades). Do not say "the 0/200 at a = 1.02
+confirms the mechanism" (it is forced by it).
+"""
+
+
+BIB_VERIFIED = r"""% verified: https://proceedings.neurips.cc/paper_files/paper/2023/hash/3e592c571de69a43d7a870ea89c7e33a-Abstract-Conference.html
+@inproceedings{ahn2023threshold,
+  title     = {Learning threshold neurons via edge of stability},
+  author    = {Ahn, Kwangjun and Bubeck, Sebastien and Chewi, Sinho and Lee, Yin Tat and Suarez, Felipe and Zhang, Yi},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {36},
+  pages     = {19540--19569},
+  publisher = {Curran Associates, Inc.},
+  doi       = {10.52202/075280-0858},
+  year      = {2023}
+}
+
+% verified: https://proceedings.iclr.cc/paper_files/paper/2024/hash/63ed15a46a143ff57484b38cd6b85d91-Abstract-Conference.html
+@inproceedings{kumar2024grokking,
+  title     = {Grokking as the transition from lazy to rich training dynamics},
+  author    = {Kumar, Tanishq and Bordelon, Blake and Gershman, Samuel and Pehlevan, Cengiz},
+  booktitle = {International Conference on Learning Representations},
+  pages     = {23010--23035},
+  year      = {2024}
+}
+
+% verified: https://proceedings.neurips.cc/paper_files/paper/2023/hash/17a9ab4190289f0e1504bbb98d1d111a-Abstract-Conference.html
+@inproceedings{pesme2023saddle,
+  title     = {Saddle-to-Saddle Dynamics in Diagonal Linear Networks},
+  author    = {Pesme, Scott and Flammarion, Nicolas},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {36},
+  pages     = {7475--7505},
+  publisher = {Curran Associates, Inc.},
+  doi       = {10.52202/075280-0329},
+  year      = {2023}
+}
+
+% verified: https://proceedings.mlr.press/v202/refinetti23a.html
+@inproceedings{refinetti2023neural,
+  title     = {Neural networks trained with {SGD} learn distributions of increasing complexity},
+  author    = {Refinetti, Maria and Ingrosso, Alessandro and Goldt, Sebastian},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {202},
+  pages     = {28843--28863},
+  publisher = {PMLR},
+  year      = {2023}
+}
+
+% verified: https://proceedings.neurips.cc/paper_files/paper/2022/hash/884baf65392170763b27c914087bde01-Abstract-Conference.html
+@inproceedings{barak2022hidden,
+  title     = {Hidden Progress in Deep Learning: {SGD} Learns Parities Near the Computational Limit},
+  author    = {Barak, Boaz and Edelman, Benjamin and Goel, Surbhi and Kakade, Sham and Malach, Eran and Zhang, Cyril},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  pages     = {21750--21764},
+  publisher = {Curran Associates, Inc.},
+  doi       = {10.52202/068431-1581},
+  year      = {2022}
+}
+
+% verified: https://proceedings.iclr.cc/paper_files/paper/2025/hash/c9e6ac15e689e06139d7b39e1667b165-Abstract-Conference.html
+@inproceedings{prieto2025grokking,
+  title     = {Grokking at the Edge of Numerical Stability},
+  author    = {Prieto, Lucas and Barsbey, Melih and Mediano, Pedro and Birdal, Tolga},
+  booktitle = {International Conference on Learning Representations},
+  pages     = {81151--81168},
+  year      = {2025}
+}
+"""
+
+BIB_ICLR_SITE_ONLY = r"""% checked against https://iclr.cc/virtual/2023/oral/12716 only (OpenReview unreachable; arXiv 2210.01117 lists "Eric J. Michaud")
+@inproceedings{liu2023omnigrok,
+  title     = {Omnigrok: Grokking Beyond Algorithmic Data},
+  author    = {Liu, Ziming and Michaud, Eric and Tegmark, Max},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+
+% checked against https://iclr.cc/virtual/2023/oral/12746 only (OpenReview forum QC10RmRbZy9 unreachable; no arXiv version)
+@inproceedings{chiang2023loss,
+  title     = {Loss Landscapes are All You Need: Neural Network Generalization Can Be Explained Without the Implicit Bias of Gradient Descent},
+  author    = {Chiang, Ping-yeh and Ni, Renkun and Miller, David Y. and Bansal, Arpit and Geiping, Jonas and Goldblum, Micah and Goldstein, Tom},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+"""
+
+
+def wp13():
+    """WP-13: related-work comparators named by the second reviewer (verified citations)."""
+    return f"""
+## WP-13. Related work: the reviewer's comparators (for the submission)
+
+How these were verified (2026-09-25): each field was read from the proceedings page (NeurIPS proceedings, PMLR,
+proceedings.iclr.cc) and from arXiv, using the pages' own citation metadata and official BibTeX. **Cite the
+proceedings metadata, not arXiv's.** They differ as follows:
+- Ahn et al.: the title differs.
+- Kumar et al., Barak et al., Prieto et al.: middle initials are dropped in the proceedings.
+- Pesme and Flammarion, Refinetti et al., Prieto et al.: the abstracts differ.
+
+openreview.net refused every automated request, so no OpenReview decision string is verified.
+
+**Six fully verified.** Each has one sentence on what it shares with this paper and how it differs, written from the
+paper's own abstract.
+
+- **Ahn et al. (NeurIPS 2023), `ahn2023threshold`.** They prove, for gradient descent on simplified two-layer models,
+  a sharp step-size transition below which the network fails to learn threshold neurons (non-zero first-layer bias).
+  Shared: a sharp transition decides whether a unit acquires a useful bias/placement. Differs: their control
+  parameter is the learning rate, acting through edge-of-stability dynamics. Ours is output scale, and our threshold
+  is a property of the loss at fixed scale, certified independently of any trajectory.
+- **Kumar et al. (ICLR 2024), `kumar2024grokking`.** Grokking arises from a transition from lazy to rich
+  (feature-learning) dynamics, whose rate is controlled by the parameters that scale the network output. Shared:
+  output scale governs when features are learned. Differs: they study the rate of feature learning along gradient
+  descent on polynomial regression. We locate a scale at which the preferred solution of the conditional loss changes,
+  a static property of the loss.
+- **Pesme and Flammarion (NeurIPS 2023), `pesme2023saddle`.** They prove that gradient flow on diagonal linear networks
+  from vanishing initialisation jumps from saddle to saddle, with the saddles and jump times given exactly. Shared: an
+  exact account of discrete transitions in a small model. Differs: their transitions happen in time along the flow;
+  ours are in output scale on the conditional loss, and training's relation to them is measured, not derived.
+- **Refinetti et al. (ICML 2023), `refinetti2023neural`.** Networks trained with SGD first classify with lower-order
+  input statistics (mean, covariance) and use higher-order statistics later. Shared: a low-order statistic comes
+  first. Our small-scale lemma (WP-12) shows the conditional minimiser at small scale maximises the class-mean gap, and
+  at large scale the worst-case gap. Differs: their ordering is in training time and over input statistics; ours is in
+  output scale, for a fixed finite objective, and is proved.
+- **Barak et al. (NeurIPS 2022), `barak2022hidden`.** Learning sparse parities shows abrupt transitions at about
+  n^O(k) iterations. SGD makes continual progress through a Fourier gap that loss and error do not show. Shared: an
+  abrupt change in training preceded by steady growth in a hidden variable (for us, the output scale grows before
+  placement). Differs: their delay is computational; ours is a scale threshold of the loss, with a certified location.
+- **Prieto et al. (ICLR 2025), `prieto2025grokking`.** Without regularisation, gradients align with a direction that
+  scales the logits without changing predictions. That scaling delays generalisation and ends in Softmax Collapse.
+  Shared: logit-scale growth as the variable behind a delayed transition. Differs: in their account the growth
+  delays generalisation and ends in floating-point failure. In ours, output-scale growth is what makes placement the
+  preferred solution, and the transition occurs when the scale crosses a certified threshold.
+
+**Two checked against the official ICLR 2023 conference pages (iclr.cc) only.** OpenReview was unreachable, and
+proceedings.iclr.cc has no 2023 volume. Every field below matches iclr.cc. Include them only if you accept iclr.cc as
+the primary source; otherwise leave them out.
+- **Liu, Michaud and Tegmark (ICLR 2023), `liu2023omnigrok`.** Grokking is explained by the "LU mechanism": training
+  and test losses plotted against weight norm look like "L" and "U". Weight norm, controlled by initialisation and
+  weight decay, then decides whether grokking occurs. Shared: a norm/scale variable organises a qualitative change.
+  Differs: their variable indexes a train–test mismatch in generalisation. Ours indexes which minimiser of the
+  training loss itself is placed at fixed scale.
+- **Chiang et al. (ICLR 2023), `chiang2023loss`.** Gradient-free optimisers, including guess-and-check (sample random
+  parameters until training accuracy is perfect), reach test accuracy comparable to SGD in low-sample regimes. So the
+  implicit-regularisation behaviour is largely independent of the optimiser. Shared: attributing an outcome to the
+  loss landscape rather than to the optimiser; our threshold is a property of the loss. Differs: they study
+  generalisation; we study which training-loss minimiser is placed at a given output scale.
+
+**Do not say** that any of these papers studies a conditional threshold in output scale. Do not cite an OpenReview
+decision ("oral", "poster") from these notes; iclr.cc lists the two 2023 papers as "Oral presentation / top 25%", and
+that is the only source checked.
+
+BibTeX, fully verified:
+```bibtex
+{BIB_VERIFIED}```
+
+BibTeX, checked against iclr.cc only:
+```bibtex
+{BIB_ICLR_SITE_ONLY}```
+"""
+
+
+CENTRAL_FAILS = {
+    "X1": "cross-family: q2 matches family A on R_glob at 6/6 a but on R_solve at 0/6, so the joint prediction fails "
+          "(the solve threshold does not transfer).",
+    "K-2b": "numeric sub-claim 'roughly 115-145x' was an arithmetic error (actual 11.8-145x).",
+    "K-3": "registered margin >= 0.10 not met (0.0089); the claim was removed.",
+    "C-2 (kappa)": "kappa's magnitude clause passes (0.69-0.76%), its containment clause fails; FAIL under the "
+                   "conjunctive falsifier.",
+    "G-1": "training-free out-of-distribution windows: 6 of 10 within 15%, short of the registered count.",
+    "G-3b": "sub-claim (far-outer window threshold >= base) was wrong by a provable inequality: a registration error.",
+    "sl-tanh": "tanh at width 2: the boundary condition failed at A = 40 (criterion flaw); recorded 'neither'.",
+    "H-3": "growth-rate dose-response validity gate failed (m = 1 placed 0.500 vs control 0.925); block inconclusive.",
+    "F-2": "offsets scaling with the optimiser's rate ratio: SGD misses by 6.19 pp.",
+    "rc-H": "'R is the controlling variable' fails across activation families (2 of 4 failure conditions): R is a "
+            "correlate there.",
+    "P1-b": "median solved rho predicted in [0.5, 0.95]; failed as registered.",
+    "p2b-Hreverse": "median R at crossing 0.2330 against the registered < 0.20.",
+    "p2bA-Rrho": "coefficient-of-variation comparison across a (R 0.083 vs R*rho 0.193) went against the prediction.",
+    "B4-D2": "the competing saturation outcome at fixed scale failed (favourable to D1).",
+    "B4h-Q1": "x50 did not move toward 1.0 with a longer horizon (1.046 / 1.045 / 1.045); the registered competing "
+              "outcome, a persistent offset, held.",
+    "B4h-Q2": "the placed fraction below threshold did not vanish at 64k steps (0.015 at 0.9, 0.094 at 0.95).",
+    "own-S1": "own-threshold rule agreement 0.894 < 0.95 (its +13.4 pp over the population rule passes).",
+    "size-N3": "the own-sample excess is below half the free offset at some n (a = 1.30 at n = 6,400; a = 1.50 at all n).",
+    "lag-L2": "residual proportional to rate: ratio 0.858 (1.30) and 0.815 (1.50), outside [0.30, 0.70].",
+    "lag2-L1'": "deconfounded lag test: the residual depends on rate too weakly (ratio 0.894 / 0.859 > 0.5).",
+    "lag2-L2'": "deconfounded proportionality fails (0.974 / 0.958).",
+    "4b-ID": "inherited displacement: neither teleport nor reset removes half the residual (the competing outcome held).",
+    "4b-OM": "optimiser memory: likewise, neither arm removes half the residual.",
+    "B-spin": "(post hoc scoring) the registered falsifier of the spinodal / hysteresis picture fired at a = 1.30; the "
+              "framing was dropped.",
+    "B-solve": "(post hoc scoring) R at solve exceeds R_solve by 16-29%, against a 15% tolerance.",
+}
+
+
+def wp14():
+    """WP-14: the census sorted by relevance (harsh review A4; post hoc classification)."""
+    cr = pd.read_csv(RESULTS / "census_relevance.csv")
+    f = cr[(cr.verdict == "FAIL") & (cr.relevance == "central")]
+    missing = set(f.id) - set(CENTRAL_FAILS)
+    if missing or set(CENTRAL_FAILS) - set(f.id):
+        raise RuntimeError(f"WP-14 central-failure list out of step with census_relevance.csv: {missing}")
+    t = cr.pivot_table(index=["scoring", "relevance"], columns="verdict", values="id", aggfunc="size", fill_value=0)
+    tab = "\n".join(f"| {s} | {r} | " + " | ".join(str(int(t.loc[(s, r)].get(v, 0))) for v in ("PASS", "FAIL", "PARTIAL", "UNRESOLVED")) + " |"
+                    for s, r in t.index)
+    lines = []
+    for claim in ("threshold", "scaling", "prospective", "width2"):
+        g = f[f.claim == claim]
+        lines.append(f"\n*{claim}* ({len(g)}):")
+        lines += [f"- `{i}`: {CENTRAL_FAILS[i]}" for i in g.id]
+    return f"""
+## WP-14. The census sorted by relevance (for the submission; POST HOC classification)
+
+Producer: `src/census_relevance.py` → `census_relevance.csv`, `census_relevance_counts.csv`. The rule was fixed by
+**block topic, never by outcome**, and ties were resolved toward *central*, so that no failure is hidden as
+peripheral.
+- **Central:** the block's predictions concern the conditional threshold (its value, what it predicts about training
+  crossings, the residual), the scaling reduction (κ, K, A*, c₁, the scaling limit, cross-family), the prospective
+  held-out predictions (Block G, Block 3, own-seed), or width 2.
+- **Peripheral:** budget laws, barriers and sharpness, trapping, optimiser equivalence, and the early exploratory
+  probes.
+- The classification is post hoc: it was made on 2026-09-25, after every verdict was known.
+
+| scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
+|---|---|---|---|---|---|
+{tab}
+
+IDs: {_id("A4 FAIL registered central", "A4 FAIL registered peripheral", "A4 FAIL post hoc central", "A4 FAIL post hoc peripheral", "A4 PASS registered central", "A4 PASS registered peripheral", "A4 rows")}.
+
+**Failed central predictions ({len(f)}: 23 under the registered rule, 2 by post hoc scoring), with one line each:**
+{chr(10).join(lines)}
+
+**The pattern, stated plainly.** The central failures cluster in the **training-side** claims, and most of them
+concern the **residual**, i.e. where crossings sit relative to the threshold and why:
+- the lag tests;
+- Block 4b;
+- the horizon extension;
+- own-S1;
+- sample size.
+
+The rest are:
+- sub-claims of the scaling reduction (two of them arithmetic or registration errors);
+- the solve-threshold transfer (X1);
+- tanh at width 2.
+
+None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
+own-seed primary) passed.
+
+**Say:** "Of 64 failed predictions (58 under the registered rule, 6 by post hoc scoring), 25 bear on a central claim;
+most of these concern the residual's mechanism, which the paper reports as open." **Do not say** "the central
+claims never failed" or "the failures are peripheral". Do not present the relevance classification as registered;
+it is post hoc.
+"""
 
 
 if __name__ == "__main__":

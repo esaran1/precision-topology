@@ -1,0 +1,200 @@
+id,block,scoring,verdict,relevance,claim
+P-W1,early census 08-23 (width),registered rule,FAIL,peripheral,exploratory probe
+P-W2,early census 08-23 (width),registered rule,PASS,peripheral,exploratory probe
+P-W3,early census 08-23 (width),registered rule,PASS,peripheral,exploratory probe
+P-W4,early census 08-23 (width),registered rule,PASS,peripheral,exploratory probe
+P-barrier,early census 08-23 (basin),registered rule,FAIL,peripheral,barriers / basin
+P-basin,early census 08-23 (basin),registered rule,FAIL,peripheral,barriers / basin
+P-calibration,early census 08-23 (basin),registered rule,FAIL,peripheral,barriers / basin
+P-onset,early census 08-23 (basin),registered rule,FAIL,peripheral,barriers / basin
+P-2a,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-2a-geom,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-2a-onset,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-2b,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-2c,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-3b,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-4a,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-4b,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-4c,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-EoS-1b,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-EoS-1c,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-EoS-1d,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-EoS-2b,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-SGD,Arrhenius 08-27,registered rule,PARTIAL,peripheral,budget law / barriers
+P-abs,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-alpha,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-beta-law,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-composition,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-cost,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-crit-1a,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-crit-1b,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-flip,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-joint,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-margin,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-no-flip-GELU,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-null,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-obj1,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-onset-law,early census 08-23 (basin),registered rule,PASS,peripheral,barriers / basin
+P-ratio,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-stall,Arrhenius 08-27,registered rule,PASS,peripheral,budget law / barriers
+P-step,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-1a,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-1b,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-1c,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+P-mnist-2a,MNIST budget law 09-11,registered rule,FAIL,peripheral,budget law
+P-mnist-2b,MNIST budget law 09-11,registered rule,UNRESOLVED,peripheral,budget law
+P-collapse,collapse 09-12,registered rule,FAIL,peripheral,budget law
+P-heldout,collapse 09-12,registered rule,FAIL,peripheral,budget law
+P-threshold,collapse 09-12,registered rule,PASS,peripheral,budget law
+A5d-k10-A1,A5d k=10,registered rule,PASS,peripheral,5-D probe
+A5d-k10-A2,A5d k=10,registered rule,FAIL,peripheral,5-D probe
+A5d-k10-A3,A5d k=10,registered rule,UNRESOLVED,peripheral,5-D probe
+A5d-k10-A4,A5d k=10,registered rule,FAIL,peripheral,5-D probe
+A5d-k10-A5,A5d k=10,registered rule,UNRESOLVED,peripheral,5-D probe
+A5d-k1-A1,A5d k=1,registered rule,PASS,peripheral,5-D probe
+A5d-k1-A2,A5d k=1,registered rule,FAIL,peripheral,5-D probe
+A5d-k1-A3,A5d k=1,registered rule,UNRESOLVED,peripheral,5-D probe
+A5d-k1-A4,A5d k=1,registered rule,PASS,peripheral,5-D probe
+A5d-k1-A5,A5d k=1,registered rule,UNRESOLVED,peripheral,5-D probe
+C-AdamvAdamW,C,registered rule,PASS,peripheral,optimiser equivalence
+C-AdamvSGD,C,registered rule,FAIL,peripheral,optimiser equivalence
+C-AdamWvSGD,C,registered rule,FAIL,peripheral,optimiser equivalence
+X1,cross-family,registered rule,FAIL,central,scaling
+X2,cross-family,registered rule,PASS,central,scaling
+Y1,cross-family,registered rule,PASS,central,scaling
+Z1,cross-family,registered rule,PASS,central,scaling
+E-1,E,registered rule,PASS,peripheral,trapping
+E-2,E,registered rule,FAIL,peripheral,trapping
+E-3,E,registered rule,PASS,peripheral,trapping
+E-4,E,registered rule,FAIL,peripheral,trapping
+E-5,E,registered rule,FAIL,peripheral,trapping
+E-cold_low,E,post hoc (census),PASS,peripheral,trapping
+E-stall-jump,E-stall,registered rule,FAIL,peripheral,trapping
+E-stall-cold_high,E-stall,registered rule,FAIL,peripheral,trapping
+H-1,H,registered rule,UNRESOLVED,central,threshold
+H-2,H,registered rule,UNRESOLVED,central,threshold
+H-3,H,registered rule,FAIL,central,threshold
+F-1,F,registered rule,UNRESOLVED,central,threshold
+F-2,F,registered rule,FAIL,central,threshold
+F-3,F,registered rule,PASS,central,threshold
+D-1,F,registered rule,UNRESOLVED,central,threshold
+G-1,G,registered rule,FAIL,central,prospective
+G-2,G,registered rule,PASS,central,prospective
+G-3,G,registered rule,PASS,central,prospective
+G-3b,G,registered rule,FAIL,central,prospective
+G-4,G,registered rule,PASS,central,prospective
+K-1,K,registered rule,PASS,central,scaling
+K-2,K,registered rule,PASS,central,scaling
+K-2b,K,registered rule,FAIL,central,scaling
+K-3,K,registered rule,FAIL,central,scaling
+K-4,K,registered rule,PASS,central,scaling
+interleaved-1,interleaved 08-05,registered rule,UNRESOLVED,peripheral,exploratory probe
+interleaved-2,interleaved 08-05,registered rule,UNRESOLVED,peripheral,exploratory probe
+corr-1,corrugation 08-06,registered rule,FAIL,peripheral,exploratory probe
+corr-2,corrugation 08-06,registered rule,FAIL,peripheral,exploratory probe
+corrR-2,corrugation readings 08-22,registered rule,PASS,peripheral,exploratory probe
+corrR-3,corrugation readings 08-22,registered rule,PASS,peripheral,exploratory probe
+loc-1,localization 08-22,registered rule,PASS,peripheral,exploratory probe
+loc-2,localization 08-22,post hoc (census),FAIL,peripheral,exploratory probe
+loc-3,localization 08-22,registered rule,PARTIAL,peripheral,exploratory probe
+search-1,search 08-22,registered rule,PASS,peripheral,exploratory probe
+search-2,search 08-22,registered rule,PASS,peripheral,exploratory probe
+search-3,search 08-22,registered rule,PARTIAL,peripheral,exploratory probe
+search-4,search 08-22,registered rule,PARTIAL,peripheral,exploratory probe
+thr-P1,threshold 08-22,registered rule,PARTIAL,peripheral,exploratory probe
+thr-P2,threshold 08-22,registered rule,PASS,peripheral,exploratory probe
+thr-P3,threshold 08-22,registered rule,FAIL,peripheral,exploratory probe
+thr-P4,threshold 08-22,registered rule,PASS,peripheral,exploratory probe
+thr-P5,threshold 08-22,post hoc (census),PASS,peripheral,exploratory probe
+wind-P1,winding 08-22,registered rule,PASS,peripheral,exploratory probe
+wind-P2,winding 08-22,registered rule,PASS,peripheral,exploratory probe
+wind-P3,winding 08-22,registered rule,PASS,peripheral,exploratory probe
+wind-P4,winding 08-22,registered rule,PASS,peripheral,exploratory probe
+amp-2a-match,early census 08-23,post hoc (census),FAIL,peripheral,exploratory probe
+amp-2b-tail,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+amp-2b-intervention,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+bneck-A,early census 08-23,registered rule,FAIL,peripheral,exploratory probe
+bneck-B,early census 08-23,registered rule,UNRESOLVED,peripheral,exploratory probe
+fold1d-P1-zero,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+fold1d-P2-onset,early census 08-23,registered rule,PARTIAL,peripheral,exploratory probe
+fold1d-P3-calibration,early census 08-23,registered rule,PARTIAL,peripheral,exploratory probe
+fold1d-P4-GELU,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+gelu-up,early census 08-23,post hoc (census),FAIL,peripheral,exploratory probe
+gelu-down,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+offset-E,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+offset-R,early census 08-23,registered rule,PASS,peripheral,exploratory probe
+arr-1a,Arrhenius 08-27,registered rule,FAIL,peripheral,budget law / barriers
+arr-1b,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+arr-2a,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+arr-2b,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+arr-3a,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+arr-3c,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+arr-5,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-ratio(1b),Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+P-1c-onset,Arrhenius 08-27,registered rule,UNRESOLVED,peripheral,budget law / barriers
+mnist-3b,MNIST budget law 09-11,registered rule,UNRESOLVED,peripheral,budget law
+collapse-link,collapse 09-12,post hoc (census),FAIL,peripheral,budget law
+metric-1a,metric artifact 09-12,post hoc (census),PARTIAL,central,threshold
+metric-2,metric artifact 09-12,post hoc (census),PARTIAL,central,threshold
+rc-H,R-collapse 09-12,registered rule,FAIL,central,threshold
+rc-1d,R-collapse 09-12,post hoc (census),PARTIAL,central,threshold
+rc-3,R-collapse 09-12,registered rule,PARTIAL,central,threshold
+3opt-primary,third optimizer 09-14,registered rule,PASS,peripheral,optimiser equivalence
+3opt-secondary,third optimizer 09-14,registered rule,PASS,peripheral,optimiser equivalence
+P1-a,phase1,registered rule,PASS,central,threshold
+P1-b,phase1,registered rule,FAIL,central,threshold
+p2b-Hreverse,phase2b,registered rule,FAIL,central,threshold
+O1,phase2b across a,registered rule,PASS,central,threshold
+p2bA-thresholds,phase2b across a,registered rule,UNRESOLVED,central,threshold
+p2bA-adiabatic,phase2b across a,registered rule,PASS,central,threshold
+p2bA-Rrho,phase2b across a,registered rule,FAIL,central,threshold
+B-spin,B,post hoc (census),FAIL,central,threshold
+B-solve,B,post hoc (census),FAIL,central,threshold
+B-CV,B,post hoc (census),PASS,central,threshold
+C-1 (kappa),kappa,registered rule,PASS,central,scaling
+C-2 (kappa),kappa,registered rule,FAIL,central,scaling
+C-3 (kappa),kappa,registered rule,PASS,central,scaling
+C-4 (kappa),kappa,registered rule,PASS,central,scaling
+N-1,nu,registered rule,FAIL,peripheral,budget law
+prec-Hdiv,precision,registered rule,UNRESOLVED,peripheral,retracted
+S-1,scaling limit,registered rule,PASS,central,scaling
+S-2,scaling limit,registered rule,PASS,central,scaling
+S-3,scaling limit,post hoc (census),PARTIAL,central,scaling
+S-4,scaling limit,registered rule,PASS,central,scaling
+S2-1,S2 (withdrawn),registered rule,FAIL,peripheral,budget law
+S2-2,S2 (withdrawn),registered rule,PASS,peripheral,budget law
+B3-primary,Block 3 (held-out windows),registered rule,PASS,central,prospective
+B3-secondary-B3,Block 3 (held-out windows),registered rule,PASS,central,prospective
+B3-U-range,Block 3 (held-out windows),post hoc (census),PARTIAL,central,prospective
+B4-D1,Block 4 (fixed scale),registered rule,PASS,central,threshold
+B4-D1-reset,Block 4 (fixed scale),registered rule,PASS,central,threshold
+B4-D2,Block 4 (fixed scale),registered rule,FAIL,central,threshold
+B5-monotone,Block 5 (retention),registered rule,PASS,central,threshold
+B5-location,Block 5 (retention),registered rule,PASS,central,threshold
+B4h-Q1,Block 4 horizon extension,registered rule,FAIL,central,threshold
+B4h-Q2,Block 4 horizon extension,registered rule,FAIL,central,threshold
+own-S1,own-seed thresholds,registered rule,FAIL,central,threshold
+own-S2,own-seed thresholds,registered rule,PASS,central,threshold
+own-S3,own-seed thresholds,post hoc (census),PARTIAL,central,threshold
+size-N1,sample size,registered rule,PASS,central,threshold
+size-N2,sample size,post hoc (census),PARTIAL,central,threshold
+size-N3,sample size,registered rule,FAIL,central,threshold
+lag-L1,lag test,registered rule,PASS,central,threshold
+lag-L2,lag test,registered rule,FAIL,central,threshold
+lag2-L1',lag test 2 (deconfounded),registered rule,FAIL,central,threshold
+lag2-L2',lag test 2 (deconfounded),registered rule,FAIL,central,threshold
+c1-primary,c1 first order,registered rule,UNRESOLVED,central,scaling
+c1-k1,c1 first order,registered rule,PASS,central,scaling
+c1-Aprime,c1 first order,registered rule,UNRESOLVED,central,scaling
+pown-P1,prospective own-seed,registered rule,PASS,central,prospective
+pown-P2a,prospective own-seed,registered rule,PASS,central,prospective
+pown-P2b,prospective own-seed,registered rule,PASS,central,prospective
+pown-P3,prospective own-seed,registered rule,PASS,central,prospective
+pown-P4,prospective own-seed,registered rule,PASS,central,prospective
+pown-Searly-match,prospective own-seed,registered rule,PASS,central,prospective
+pown-Searly-err-unfitted,prospective own-seed,registered rule,PASS,central,prospective
+pown-Searly-err-fitted,prospective own-seed,registered rule,PASS,central,prospective
+sl-width1,scale limits (width 2),registered rule,PASS,central,width2
+sl-tanh,scale limits (width 2),registered rule,FAIL,central,width2
+4b-ID,Block 4b (residual mechanism),registered rule,FAIL,central,threshold
+4b-OM,Block 4b (residual mechanism),registered rule,FAIL,central,threshold

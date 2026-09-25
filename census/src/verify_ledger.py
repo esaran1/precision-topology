@@ -568,6 +568,7 @@ def main() -> None:
     chk("registered-rate ratio 0.00207/0.00075", 0.00207 / 0.00075, 2.76, 0.01)
 
     v4_checks()
+    harsh_review_checks()
 
     provenance_check()
 
@@ -1445,6 +1446,64 @@ def v4_checks() -> None:
     chk("predicted offset at 1.30 (%)", float(cs.loc[1.3, "pred_offset_pct"]), 1.08, 0.01)
     chk("observed offset at 1.30 (%)", float(cs.loc[1.3, "obs_offset_pct"]), 9.59, 0.01)
 
+
+
+def harsh_review_checks() -> None:
+    """Harsh review Phase A (WP-12 to WP-14; 2026-09-25)."""
+    print("WP-12 mechanism (A1)")
+    idn = pd.read_csv(R / "wp12_identity.csv")
+    chk("A1 identity: max abs err, data points", float(idn.max_abs_err_data.max() < 1e-13), 1.0, 0)
+    chk("A1 identity: max abs err, continuous windows", float(idn.max_abs_err_continuous.max() < 1e-12), 1.0, 0)
+    m = pd.read_csv(R / "wp12_mechanism.csv").set_index("a")
+    chk("A1 alpha* (data)", float(m.alpha_star_data.iloc[0]), 1.7913244, 1e-6)
+    chk("A1 alpha* (continuous)", float(m.alpha_star_cont.iloc[0]), 1.7922917, 1e-6)
+    chk("A1 |D*| (data)", float(m.D_star_data.iloc[0]), 1.571067, 1e-6)
+    chk("A1 1.4 alpha*", float(m["a_limit_1.4_alpha_star"].iloc[0]), 2.50785, 1e-5)
+    chk("A1 s0(1.30)", float(m.loc[1.3, "s0"]), 0.342, 0.0005)
+    chk("A1 s0(1.50)", float(m.loc[1.5, "s0"]), 0.274, 0.0005)
+    chk("A1 s1_data(1.30)", float(m.loc[1.3, "s1_data"]), 163.8, 0.05)
+    chk("A1 s1_data(1.50)", float(m.loc[1.5, "s1_data"]), 80.5, 0.05)
+    chk("A1 R1 = log(n/log 2)", float(m.R1_data.iloc[0]), 7.05, 0.005)
+    chk("A1 every certified bracket inside [s0, s1]", float(m.bracket_contains_cert.all()), 1.0, 0)
+    chk("A1 G at theta* (1.30)", float(m.loc[1.3, "G_cont_hi_at_theta_star"]), -3.66, 0.005)
+    chk("A1 G at theta* (1.50)", float(m.loc[1.5, "G_cont_hi_at_theta_star"]), -3.45, 0.005)
+    chk("A1 bound check at s0 (1.30): L*(theta*) below placed lower bound",
+        float(m.loc[1.3, "bound_check_Lstar_at_s0"] < m.loc[1.3, "bound_check_lower_placed"]), 1.0, 0)
+    chk("A1 window s1 defined for a >= 1.05", float(m.s1_cont.iloc[1:].notna().all() and m.s1_cont.isna().iloc[0]), 1.0, 0)
+    print("WP-12 scaling and Adam (A2)")
+    sc = pd.read_csv(R / "wp12_scaling.csv").set_index("a")
+    chk("A2 w2 first order (1.02)", float(sc.loc[1.02, "w2_first_order"]), 245.6, 0.05)
+    chk("A2 w2 limit (1.02)", float(sc.loc[1.02, "w2_limit_krawczyk"]), 242.3, 0.05)
+    chk("A2 w2 limit, A* lower end (1.02)", float(sc.loc[1.02, "w2_limit_lo"]), 240.9, 0.05)
+    chk("A2 first order vs certified, max rel", float(sc.rel_err_first_order_vs_cert_mid.max()), 0.027, 0.0005)
+    chk("A2 first order vs certified, min rel", float(sc.rel_err_first_order_vs_cert_mid.min()), 0.009, 0.0005)
+    chk("A2 N_min at 1.02", float(sc.loc[1.02, "N_min_adam_worst_case"]), 3966.0, 0)
+    chk("A2 N at lr per step, 1.02", float(sc.loc[1.02, "N_lr_per_step"]), 24456.0, 0)
+    ad = pd.read_csv(R / "wp12_adam_bound.csv").iloc[0]
+    chk("A2 B_inf", float(ad.B_inf), 7.2703, 0.0001)
+    chk("A2 reachable |w2| at 2000 steps", float(ad.reachable_2000), 106.93, 0.005)
+    chk("A2 max B_t over 2000 steps", float(ad.B_max_2000), 6.76, 0.005)
+    chk("A2 bound attained (t = 400)", float(abs(ad.worst_case_attained_ratio - ad.B_t_400) < 1e-9), 1.0, 0)
+    chk("A2 a=1.02: runs", float(ad.a102_runs), 200.0, 0)
+    chk("A2 a=1.02: solved", float(ad.a102_solved), 0.0, 0)
+    chk("A2 a=1.02: median terminal |w2|", float(ad.a102_median_terminal_w2), 1.85, 0.005)
+    chk("A2 a=1.02: max terminal |w2|", float(ad.a102_max_terminal_w2), 3.92, 0.005)
+    ob = pd.read_csv(R / "wp12_onset_bound.csv").set_index("budget")
+    chk("A2 worst-case a_min at 2000", float(ob.loc[2000, "a_min_worst_case"]), 1.035, 0.0005)
+    chk("A2 lr-rate a_min at 2000", float(ob.loc[2000, "a_min_lr_per_step"]), 1.107, 0.0005)
+    chk("A2 worst-case a_min at 128000", float(ob.loc[128000, "a_min_worst_case"]), 1.0018, 0.00005)
+    print("WP-14 census by relevance (A4)")
+    cr = pd.read_csv(R / "census_relevance.csv")
+    n = lambda **k: float(len(cr.query(" and ".join(f"{a} == {b!r}" for a, b in k.items()))))
+    chk("A4 FAIL registered central", n(verdict="FAIL", scoring="registered rule", relevance="central"), 23.0, 0)
+    chk("A4 FAIL registered peripheral", n(verdict="FAIL", scoring="registered rule", relevance="peripheral"), 35.0, 0)
+    chk("A4 FAIL post hoc central", n(verdict="FAIL", scoring="post hoc (census)", relevance="central"), 2.0, 0)
+    chk("A4 FAIL post hoc peripheral", n(verdict="FAIL", scoring="post hoc (census)", relevance="peripheral"), 4.0, 0)
+    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 38.0, 0)
+    chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
+    chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
+    chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 7.0, 0)
+    chk("A4 rows", float(len(cr)), 199.0, 0)
 
 def _decimals(v) -> int:
     t = repr(float(v))

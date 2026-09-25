@@ -593,3 +593,163 @@ conditional minimiser" means the one the second-order term selects.
 | width 1, f_a (a = 1.30–1.60) | unplaced (G = −3.66 … −3.35; `scale_limits_width1.csv`) | **yes**: certified thresholds | registered consistency check, passed |
 | width 2, f_a (a = 1.30, 1.50) | placed: the cancelling pair (G = +0.890, +1.026) | **none** | registered prediction (`scale_limits_prediction.md`); decided by the second-order selection; direct check at finite small scale below |
 | width 2, tanh | supremum Δμ = 1 **not attained** (proved: Δμ < 1 at every finite parameter); the Var-selected near-maximisers are the symmetric step pair, placed, with G₊ = 0.762, 0.964, 0.99933 and 0.9999998 at box sizes A = 5, 10, 20 and 40; single steps tie at first order and are unplaced | **none** in the limit sense; outside the criterion's attainment hypothesis | registered (`scale_limits_tanh_prediction.md`); **registered outcome "neither"**: every T1 number held, but the boundary condition failed at A = 40, where 9 of 1,107 near-maximisers inside the 1e−9 tie sit at 0.991–0.999·A (a criterion flaw, disclosed); recorded as "neither" by the author's decision, with no re-registration; non-attainment is proved analytically; earlier exploratory pilot scan (`width2_pilot_scan.csv`) |
+
+## 11. The mechanism, stated analytically (harsh review A1–A2; for the submission, 2026-09-25)
+
+Producer: `src/harsh_review_a.py` → `wp12_identity.csv`, `wp12_mechanism.csv`, `wp12_scaling.csv`,
+`wp12_onset_bound.csv`, `wp12_adam_bound.csv`. The setting is §10's: width 1, f_a(t) = t + a sin t, φ_θ = sign(w₂)·f_a(w₁x + b₁),
+s = |w₂|, balanced classes, and the 800-point population unless stated otherwise.
+
+**Which gap each step uses.**
+- G is the gap over the continuous windows (exact extrema). G_n is the gap over the data points.
+- The four points used below, x = −2.0, −0.8, 0.8 and 2.0, are both window endpoints and data points of the
+  population (`linspace` includes its ends). So Step 2 holds for G and for G_n alike.
+- Step 3 (large s) is a statement about G_n. It transfers to G with the explicit correction η, stated there.
+
+**Step 1: the class-mean gap (identity).** On windows or data symmetric about 0,
+  Δμ(θ) = sign(w₂)·a·sin b₁·D(w₁),   D(α) = E_O cos αx − E_I cos αx.
+- *Proof.* The linear part of f_a contributes w₁(E_O x − E_I x) + b₁ − b₁ = 0. For the sine part, sin(w₁x + b₁) =
+  sin(w₁x)cos b₁ + cos(w₁x)sin b₁, and E sin(w₁x) = 0 in each class by symmetry. ∎
+- On the continuous windows, D_c(α) = [sin 2α − sin 1.2α]/(0.8α) − sin(0.8α)/(0.8α).
+- *Check.* Over 2,000 random (w₁, b₁) with |w₁| ≤ 10, at a = 1.30 and 1.50, the largest error was 3.3e−15 on the data
+  points and 2.3e−14 on the continuous windows (Gauss–Legendre, 200 nodes per window, against the closed form).
+- The maximiser of |D| is α* = 1.7913244 on the data points (the ledger value) and 1.7922917 on the continuous
+  windows. |D*| = 1.571067 on the data points and 1.573242 on the continuous windows.
+- α* does not depend on a, and the maximising bias is sin b₁ = ±1.
+
+**Step 2: the domain lemma (placement needs a small first-layer weight).** For every θ,
+  G(θ), G_n(θ) ≤ 2a − 2.8|w₁|, and more sharply ≤ 2a|sin(1.4w₁)| − 2.8|w₁|.
+- *Proof.* Take w₁ > 0; w₁ < 0 is the mirror image.
+  - G₊ ≤ φ(−2.0) − φ(0.8) = −2.8w₁ + a[sin(−2w₁ + b₁) − sin(0.8w₁ + b₁)].
+  - G₋ ≤ φ(−0.8) − φ(2.0) = −2.8w₁ + a[sin(−0.8w₁ + b₁) − sin(2w₁ + b₁)].
+  - Each bracket is at most 2|sin(1.4w₁)| ≤ 2 in absolute value, because |sin u − sin v| = 2|cos((u + v)/2)||sin((u − v)/2)|. ∎
+- **Hence G > 0 or G_n > 0 requires |w₁| < a/1.4.** This is the same bound as the Ĝ branch-and-bound domain
+  (`ghat_bnb.py`).
+- Because α* is independent of a, the class-mean maximiser (|w₁| = α*) is unplaced for every a < 1.4·α* = 2.50785.
+- At the maximiser itself, G = G_n = −3.66 at a = 1.30 and −3.45 at a = 1.50. Both lie below the sharp pair bound
+  (−3.48 and −3.24).
+
+**Proposition (width 1: an explicit analytic bracket for the placement switch).** Let 1 < a < 1.4α*. Define:
+- D_P(a) = max over |α| ≤ a/1.4 of |D(α)|;
+- θ* = (w₁, b₁) = (α*, sign(D*)·π/2) with w₂ > 0;
+- s₀(a) = 2(Δμ(θ*) − a·D_P)/Var(φ_θ*);
+- s₁(a) = 2·log(n/log 2)/(Ĝ(a) − η), with η = 0 for data placement and η = (a/1.4)(1 + a)(h_I + h_O) for window
+  placement, where h_I and h_O are the grid half-spacings.
+
+Then:
+- (i) for every s < s₀, every placed θ (G > 0 or G_n > 0) has L*(θ; s) > L*(θ*; s), and θ* is unplaced;
+- (ii) for every s > s₁, every θ with G_n(θ) ≤ η has a loss above that of Ĝ's witness, which is placed.
+
+So no placed parameter comes within the (i) margin of the conditional infimum below s₀, and no unplaced one comes
+within the (ii) margin above s₁. The placement switch lies in [s₀, s₁]. This needs no compactness and no attainment.
+
+*Proof.*
+- (i) The logistic loss is convex in z, so ℓ(z, y) ≥ log 2 + (½ − y)z. Averaging over balanced data, for every b,
+  mean ℓ(sφ + b) ≥ log 2 − (s/4)Δμ(θ). Hence L*(θ; s) ≥ log 2 − (s/4)Δμ(θ) for every θ, with no remainder.
+  - A placed θ has |w₁| < a/1.4 (Step 2), so Δμ(θ) ≤ a·D_P (Step 1).
+  - For θ*, ℓ″ ≤ ¼ gives ℓ(z, y) ≤ log 2 + (½ − y)z + z²/8. Take b = −s·mean φ*. Then
+    L*(θ*; s) ≤ log 2 − (s/4)Δμ(θ*) + (s²/8)Var(φ*).
+  - Comparing the two bounds gives (i) whenever s < s₀. θ* is unplaced by Step 2.
+- (ii) Lemma 2(b) of §10 with G_n(θ) ≤ η, and log(1 + e^{−u}) ≥ log 2·e^{−u} for u ≥ 0, give
+  L*(θ; s) ≥ (log 2/n)·e^{−sη/2}.
+  - For the witness, G_n ≥ G ≥ Ĝ_cert, so L* ≤ log(1 + e^{−sĜ/2}) < e^{−sĜ/2}.
+  - Comparing the two gives (ii).
+  - For window placement: if G(θ) ≤ 0 and |w₁| < a/1.4, then G_n(θ) ≤ G(θ) + Lip(φ)(h_I + h_O) ≤ η, since
+    Lip(φ) ≤ |w₁|(1 + a). If |w₁| ≥ a/1.4, then G_n ≤ 0 ≤ η by Step 2. ∎
+
+**The constants are four finite evaluations:** D*, D_P (a grid of step 1e−5 plus the Lipschitz step
+(E_O|x| + E_I|x|)·h/2), Var(φ*), and Ĝ's rigorous witness value (`ghat_rigorous.csv`).
+
+| a | s₀ | s₁ (data) | certified |w₂|_glob | R₀ = s₀Ĝ/2 | R₁ = log(n/log 2) |
+|---|---|---|---|---|---|
+| 1.30 | 0.342 | 163.8 | [4.950, 4.9625] | 0.0147 | 7.05 |
+| 1.50 | 0.274 | 80.5 | [2.525, 2.5375] | 0.0240 | 7.05 |
+
+- Every certified bracket (a = 1.30–1.60) lies inside [s₀, s₁] (`wp12_mechanism.csv`, `bracket_contains_cert`).
+- The window-placement s₁ is defined wherever Ĝ > η, which holds at every tabulated a except 1.02.
+- **The bracket is loose, by roughly 15× below and 30× above.** Its point is that the switch's *existence* is
+  analytic, not that its location is.
+- *Sanity check at s₀* (a = 1.30): L*(θ*; s₀) = 0.59659 lies below the placed lower bound, 0.60119.
+
+**Step 3: what the loss rewards, and why the threshold is a change of objective.**
+- The two bounds in the proof are the two regimes.
+- For small s, L* = log 2 − (s/4)Δμ + O(s²), so the loss rewards the **class-mean gap**. Its maximiser uses the
+  ramp-free cosine with |w₁| = α*, which Step 2 says is unplaced.
+- For large s, the loss is controlled by e^{−sG_n/2}, so it rewards the **worst-case gap**, whose maximiser is placed.
+- R_glob is where the global conditional minimiser switches from the first kind of solution to the second. The
+  certified thresholds locate this switch; the proposition proves it exists.
+
+**Step 4: width 2 in the same terms (§10.1).**
+- On symmetric windows the ramp contributes nothing to Δμ at either width.
+- With two units, the second-order term selects the pair with ṽ₁α₁ = −ṽ₂α₂. It cancels the ramp and leaves
+  φ = const + a·sign(D*)·cos(α*x).
+- That pair is placed: G = +0.890 at a = 1.30 and +1.026 at a = 1.50. So the class-mean maximiser is already
+  placed, and no switch is needed (the registered width-2 verdict).
+- The criterion predicts the opposite when the windows are asymmetric: there the ramp enters Δμ through
+  m = E_O x − E_I x ≠ 0. That prediction is being tested separately (Track 2, `asym_pilot_design.md`) and is not
+  claimed here.
+
+### 11.1 The scaling law and Adam's per-step bound (A2)
+
+**Required scale.**
+- From A = sε^{3/2} (§1) and the switch A_ε = A*(1 + (A′(0)/A*)ε + O(ε²)) (§8):
+  |w₂|_glob(a) = A*·ε^{−3/2}·(1 + 0.66215ε + O(ε²)), with ε = a − 1.
+- A* ∈ [0.68125, 0.6875] is certified and independently checked; the Krawczyk value is 0.6854452.
+  A′(0)/A* ∈ [0.6621547, 0.6621550].
+- (In R units the correction is c₁ = 0.28523. The difference is k₁ = −0.37692, from K(ε).)
+
+| a | limit A*ε^{−3/2} | with first-order term | certified |w₂|_glob | first-order − certified (rel.) |
+|---|---|---|---|---|
+| 1.02 | 242.3 | 245.6 | — | — |
+| 1.05 | 61.3 | 63.3 | — | — |
+| 1.10 | 21.7 | 23.1 | — | — |
+| 1.30 | 4.171 | 5.000 | [4.9500, 4.9625] | +0.9% |
+| 1.40 | 2.709 | 3.427 | [3.3750, 3.3875] | +1.4% |
+| 1.50 | 1.939 | 2.581 | [2.5250, 2.5375] | +1.9% |
+| 1.60 | 1.475 | 2.061 | [2.0000, 2.0125] | +2.7% |
+
+- The first-order law is within 3% of every certified finite-a threshold at ε ≤ 0.6.
+- The error grows with ε, as an O(ε²) remainder should.
+- Without the first-order term the limit value is 16–27% low at these ε.
+
+**Adam's per-step bound (rigorous, for every gradient sequence).**
+- The paper's training uses torch Adam with lr = 0.01, (β₁, β₂) = (0.9, 0.999), ε_Adam = 1e−8, full batch, no weight
+  decay, and θ(0) ~ U(−1, 1)⁴.
+- The update is Δθᵢ = −lr·m̂_t/(√v̂_t + ε_Adam), with m̂_t = m_t/(1 − β₁ᵗ) and v̂_t = v_t/(1 − β₂ᵗ).
+- By Cauchy–Schwarz, |Σ_k β₁^{t−k}g_k| ≤ (Σ_k γ^{t−k})^{1/2}(Σ_k β₂^{t−k}g_k²)^{1/2}, with γ = β₁²/β₂. So
+  |Δθᵢ| ≤ lr·B_t,   B_t = (1 − β₁)/(1 − β₁ᵗ)·√((1 − β₂ᵗ)/(1 − β₂))·√((1 − γᵗ)/(1 − γ)).
+- Also B_t ≤ B_∞ = (1 − β₁)/√((1 − β₂)(1 − γ)) = 7.2703.
+- The bound is **attained**: g_k ∝ (β₁/β₂)^{t−k} gives equality (checked at t = 400: 4.17529 both ways). ε_Adam only
+  lowers the step.
+- Summing, |w₂(T)| ≤ 1 + lr·Σ_{t≤T} B_t. That is **106.93 after 2,000 steps**, because the bias correction keeps B_t
+  small early on (max over t ≤ 2,000 is 6.76).
+
+**Consequence at a = 1.02.**
+- The required |w₂| is 245.6: 242.3 in the limit, and at least 240.9 even with A* at its certified lower end.
+  Any gradient sequence needs **at least 3,966 steps** to reach it.
+- So within the paper's 2,000 steps, **no Adam run can reach the conditional threshold scale at a = 1.02**. This is
+  a hard constraint, not a fitted one. It would still hold if the true threshold were 56% below the prediction.
+- At the typical Adam rate (|m̂/√v̂| ≈ 1 for a consistent gradient sign) the requirement is about 24,000 steps.
+- **Observed** (`fold1d_sweep.csv`): 0/200 solves at a = 1.02 within 2,000 steps. The terminal |w₂| has median 1.85
+  and maximum 3.92, far below both the worst-case reachable 106.9 and the required 245.6.
+
+**What this law explains and what it does not.**
+- *Explains:*
+  - why the required scale diverges as ε^{−3/2}, with its constant A* and first-order correction certified;
+  - that with a bounded per-step move, the steps needed must diverge at least as fast, N_min ≳ (A*/(lr·B_∞))·ε^{−3/2}.
+    This is why training near a = 1 is delayed.
+  - A solve before the threshold scale is reached would need the trajectory to be placed below the conditional
+    threshold, which the paper's crossing data do not show at this budget.
+  - The 0/200 at a = 1.02 is therefore **consistent with, and forced by,** the threshold-crossing picture. It is
+    not independent evidence for that picture.
+- *Does not explain:*
+  - **the actual growth rate.** The worst-case bound is loose by one to two orders of magnitude. At B = 2,000 it
+    allows every a ≥ 1.035 (the lr-per-step rate allows a ≥ 1.107), but the observed onset is a = 1.60. At B = 128,000
+    it allows a ≥ 1.0018; observed 1.03 (`wp12_onset_bound.csv`).
+  - The observed onset follows the measured growth |w₂| ∝ B^α with α = 1.1172. α is a measured quantity: its SGD
+    derivation failed (`alpha_derivation_results.md`). The onset exponent −2α/3 = −0.745 (registered) against the
+    measured −0.734 therefore tests the *combination* of the derived ε^{−3/2} and the measured α, not a derivation
+    of α.
+  - The bound also says α ≤ 1 asymptotically. Over the budgets tested the measured |w₂| stays far below the bound's
+    line, so this is no tension.
+  - It also does not explain the residual, meaning why crossings sit above the conditional threshold.
