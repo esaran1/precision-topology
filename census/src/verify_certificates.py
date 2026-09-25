@@ -1224,6 +1224,60 @@ def check_pd(name, p0, q0, rho, A_range, split, c, workers=WORKERS, verbose=True
     return res
 
 
+
+def _ring_interval(args):
+    """No critical point of L0*(·; A) in the ring rho_in <= |θ − c|_∞ <= rho_out for any A in [A_lo, A_hi]: every box
+    (padded) has b* bracketed and 0 ∉ ∂_p L or 0 ∉ ∂_q L (the envelope gradient at b*), in Arb; boxes split up to
+    `max_depth`.  Boxes inside the rho_in box (covered by the PD certificate) are dropped."""
+    A_lo, A_hi, p0, q0, rho_in, rho_out, side, max_depth = args
+    ctx.prec = PREC
+    d = np.load(CERTS / "limit_A_lo.npz")
+    obj = Objective(d["x"], d["y"], ball(A_lo, A_hi), None, act=HAct())
+    pad = 1e-12
+    n = int(round(2 * rho_out / side))
+    cells = [(-rho_out + (i + 0.5) * side, -rho_out + (j + 0.5) * side, side / 2) for i in range(n) for j in range(n)]
+    boxes, depth, gmin = 0, 0, math.inf
+    while cells and depth <= max_depth:
+        nxt = []
+        for cp, cq, hh in cells:
+            if abs(cp) + hh <= rho_in - pad and abs(cq) + hh <= rho_in - pad:
+                continue
+            boxes += 1
+            P = ball(p0 + cp - hh - pad, p0 + cp + hh + pad); Q = ball(q0 + cq - hh - pad, q0 + cq + hh + pad)
+            Bb, Z = obj.b_bracket(P, Q)
+            ok = False
+            if Bb is not None:
+                _, gp, gq = obj.value_and_grad(P, Q, Bb, Z)
+                ok = (not gp.contains(0)) or (not gq.contains(0))
+                if ok:
+                    mag = max(0 if gp.contains(0) else float(min(abs(lo_(gp)), abs(hi_(gp))).mid()),
+                              0 if gq.contains(0) else float(min(abs(lo_(gq)), abs(hi_(gq))).mid()))
+                    gmin = min(gmin, mag)
+            if not ok:
+                h2 = hh / 2
+                nxt += [(cp + dx * h2, cq + dy * h2, h2) for dx in (-1, 1) for dy in (-1, 1)]
+        cells, depth = nxt, depth + 1
+    return {"A_lo": A_lo, "A_hi": A_hi, "certified": not cells, "boxes": boxes, "left": len(cells), "grad_lower": gmin}
+
+
+def check_ring(name, centre, intervals, rho_in=0.05, rho_out=0.15, side=0.0125, max_depth=4, workers=WORKERS,
+               verbose=True):
+    from multiprocessing import Pool
+    t0 = time.time()
+    jobs = [(a0, a1, centre[0], centre[1], rho_in, rho_out, side, max_depth) for a0, a1 in intervals]
+    with Pool(workers) as pl:
+        out = pl.map(_ring_interval, jobs)
+    res = {"name": name, "intervals": len(out), "all_certified": all(r["certified"] for r in out),
+           "boxes": sum(r["boxes"] for r in out), "min_grad_lower": min(r["grad_lower"] for r in out),
+           "failed": [(r["A_lo"], r["A_hi"], r["left"]) for r in out if not r["certified"]], "seconds": time.time() - t0}
+    res["pass"] = res["all_certified"]
+    out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
+    (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps(res, indent=1, default=str))
+    return res
+
+
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
     return {"ghat_enclosure": check_ghat, "limit_status": check_limit, "finite_a_solve": check_solve}.get(kind, check_finite)(name)

@@ -377,7 +377,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp7()
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
-    text += wp16() + wp18()
+    text += wp16() + wp17() + wp18() + wp19()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1233,6 +1233,83 @@ IDs: {_id("Track 6 reproduction checks", "Track 6 PL mean abs log err", "Track 6
 variant that pools the lag factor over all calibration windows matches it (post hoc)."
 
 **Do not say:** "C beats every baseline". Do not present PL as registered: it is post hoc.
+"""
+
+
+def wp19():
+    """WP-19: H1 proved for small ε (Track 8)."""
+    return """
+## WP-19. H1 is proved for small ε (Track 8; for the submission)
+
+Source: math note §12 (`math_note_for_writer.md`), every step checked by hand. The numerical sanity checks
+(`src/h1_checks.py` → `h1_checks.log`) are separate from the proof. This answers "Proposition 2 also retains
+hypothesis H1".
+
+**Statement.** For 0 < ε ≤ 0.029 (a ≤ 1.029), Ĝ(a) > 0 is attained, and every maximiser has, up to the symmetries,
+rescaled coordinates with 1.0155 ≤ p < 1.74964 and |q| < 1.7956, inside the compact set C = {1 ≤ |u| ≤ 2.2, |v| ≤ 2}.
+Moreover |K(ε) − K| ≤ 23.3ε.
+
+**Proof idea, for the text.**
+- An exact identity: f_a(t_o) − f_a(t_i) = 2a cos(m) sin(d/2) − d. Applied to three pairs of window endpoints it
+  gives G ≤ 0.4εw₁, that G > 0 forces 1.4w₁ below the root of sin x = x/a, and an ellipse bound on the bias.
+- An exact rational evaluation, G₀(1.6, 1.2) = 27088/46875, bounds K(ε) from below.
+- No numerical certificate is used.
+
+**Consequence.** Proposition 2 is asymptotic ("for all sufficiently small ε"), so **H1 is no longer a hypothesis: it
+is proved.**
+
+**What remains certified rather than proved.**
+- That the maximiser is the tied corner (the K(ε) = K_loc(ε) step of the c₁ calculation). This needs uniqueness of
+  G₀'s maximiser, which K's branch and bound certifies; that check is now independently verified in Arb (WP-17).
+- The argument does not cover a ≥ 1.30: there the q-bound gives 2.0008 > 2. At a = 1.02–1.25 the location in C
+  follows from the proof's lemmas together with the certified Ĝ values.
+
+**Say:** "Hypothesis H1 of Proposition 2 is proved for ε ≤ 0.029 (Appendix …)."
+**Do not say:** "H1 is proved for all tested a", or "the corner is proved to be the global maximiser". The latter is
+certified, not proved.
+"""
+
+
+def wp17():
+    """WP-17: independent certificate checks, Track 5 status (updates WP-11's pending list)."""
+    cc = RESULTS / "certificate_checks"
+    J = lambda n: json.loads((cc / f"{n}.json").read_text()) if (cc / f"{n}.json").exists() else None
+    kb, kt, kr = J("K_base"), J("K_base_target0.5794559217"), J("c1_krawczyk")
+    pdg, pds = J("pd_glob_neighbourhood"), J("pd_solve_neighbourhood")
+    rg, rs = J("ring_glob_annulus"), J("ring_solve_annulus")
+    st = lambda r: "**verified**" if (r is not None and r.get("pass")) else ("**failed**" if r is not None else "not run")
+    return f"""
+## WP-17. Independent certificate checks: status after Track 5 (for the submission; replaces WP-11's "pending" list)
+
+Checker: `src/verify_certificates.py` (python-flint / Arb, 80-bit balls; imports nothing from `src/`). Each item is
+verified, failed, or not run. Tests exercise every new check on constructed pass and fail cases.
+
+| certificate | status | what the checker did |
+|---|---|---|
+| K = sup G₀ over [0, 8] × [−12, 12] | {st(kb)} | a fresh Arb branch and bound over the whole box: sup G₀ ≤ 0.5794951 (the published hi) and ≤ 0.5794559217 (the tight hi); the lower end is attained at the published argmax; the domain lemma is checked in exact rational arithmetic |
+| c₁ Krawczyk boxes (switch and K vertex) | {st(kr)} | switch: unique zero in the 1e−9 box, A* ∈ [{kr["A_star_lo"] if kr else ""}, {kr["A_star_hi"] if kr else ""}], A′(0)/A* ∈ [{kr["A1_over_A_lo"] if kr else ""}, {kr["A1_over_A_hi"] if kr else ""}], active set unique; K vertex unique, K = {kr["K_vertex_lo"] if kr else ""} |
+| PD boxes, glob chain (500 boxes, U × [0.66, 0.71]) | {st(pdg)} | b* bracketed; the Hessian enclosure minus 0.0473·I is PD by Sylvester on every box |
+| PD boxes, solve chain (100 boxes, × [1.05875, 1.06]) | {st(pds)} | as above, with margin 0.0209 |
+| ring (no critical point, 0.05–0.15), glob chain, 40 A-sub-intervals | {st(rg)} | the envelope gradient excludes 0 in p or q on every ring box, with b* bracketed, uniformly over each A-sub-interval |
+| ring, solve chain | {st(rs)} | as above, over [1.05875, 1.06] |
+| outer exclusion (K(24) minus the 0.15 box), both chains | not run | projected > 10 CPU-hours in Arb (about 39,000 cells per A-sub-interval before refinement, × 40 sub-intervals) |
+| limit solve bracket (A_solve ∈ (1.05875, 1.06]) | not run | needs the solve-chain outer exclusion above |
+| finite-a solve brackets (12 certificates) | not run | timing sample: one bracket end's search at the published 1e−11 tolerance took 19 min and produced 25.2 million losing-region leaves; at about 20 ms per leaf in Arb, that is several CPU-days per certificate |
+
+**What is now fully independently verified.**
+- **R_glob^∞ ∈ [0.19738, 0.19920]:** A*'s bracket (WP-11) and K's enclosure (above) are both independently checked.
+- **A* and A′(0)/A* on the branch (Krawczyk), and K at the vertex.** The sharp value R_glob^∞ ∈ [0.1985926, 0.1985927]
+  additionally needs the Krawczyk switch to be the *global* switch. That needs the uniqueness chain: localisation
+  (verified, WP-11), outer exclusion (not run), ring (above) and PD (above). So the sharp value is **not yet fully
+  independent**; the bracket is.
+
+**Say (certificate status paragraph):** "An independent checker in ball arithmetic (Arb) re-verifies the finite-a
+placement brackets, the Ĝ(a) enclosures, the limit switch bracket and its localisation, K = sup G₀ with its domain
+lemma, the Krawczyk boxes of the first-order calculation, and the positive-definite and ring certificates of the
+uniqueness chain. The outer-exclusion certificates and the solve brackets are verified by the original searches only."
+
+**Do not say:** "all certificates are independently verified", or that the sharp R_glob^∞ = 0.19859 is independently
+verified.
 """
 
 

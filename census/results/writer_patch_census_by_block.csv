@@ -21,6 +21,8 @@ block,MNIST budget law 09-11,registered rule,0,1,0,2,3
 block,R-collapse 09-12,post hoc (census),0,0,1,0,1
 block,R-collapse 09-12,registered rule,0,1,1,0,2
 block,S2 (withdrawn),registered rule,1,1,0,0,2
+block,SGD own thresholds (Track 4),registered rule,3,0,0,0,3
+block,asymmetric windows (Track 2),registered rule,2,0,0,0,2
 block,c1 first order,registered rule,1,0,0,2,3
 block,collapse 09-12,post hoc (census),0,1,0,0,1
 block,collapse 09-12,registered rule,1,2,0,0,3
@@ -59,6 +61,7 @@ block,winding 08-22,registered rule,4,0,0,0,4
 registration_file,results/amplification_prediction.md,post hoc (census),0,1,0,0,1
 registration_file,results/amplification_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/arrhenius_prediction.md,registered rule,15,11,1,15,42
+registration_file,results/asym_registration.md,registered rule,2,0,0,0,2
 registration_file,results/basin_prediction.md,registered rule,1,4,0,0,5
 registration_file,results/blockA5d_k1_prediction.md,registered rule,2,1,0,2,5
 registration_file,results/blockA5d_prediction.md,registered rule,1,2,0,2,5
@@ -116,6 +119,8 @@ registration_file,results/scale_limits_tanh_prediction.md,registered rule,0,1,0,
 registration_file,results/scaling_limit_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/scaling_limit_prediction.md,registered rule,3,0,0,0,3
 registration_file,results/search_prediction.md,registered rule,2,0,2,0,4
+registration_file,results/sgd_own_registration.md,registered rule,2,0,0,0,2
+registration_file,results/sgd_own_registration.md (amendment 1),registered rule,1,0,0,0,1
 registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
 registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4

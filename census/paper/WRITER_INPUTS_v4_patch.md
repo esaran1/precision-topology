@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 183 scored by their registered rules: 85 PASS, 58 FAIL, 8 PARTIAL,
+- **Headline**: 188 scored by their registered rules: 90 PASS, 58 FAIL, 8 PARTIAL,
   32 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 199 registered predictions.
+- **Total**: 204 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -201,6 +201,8 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | R-collapse 09-12 | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
 | S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
+| SGD own thresholds (Track 4) | registered rule | 3 | 0 | 0 | 0 | 3 |
+| asymmetric windows (Track 2) | registered rule | 2 | 0 | 0 | 0 | 2 |
 | c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -243,6 +245,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/amplification_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | results/amplification_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/arrhenius_prediction.md | registered rule | 15 | 11 | 1 | 15 | 42 |
+| results/asym_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
 | results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
 | results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
@@ -300,6 +303,8 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/scaling_limit_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/scaling_limit_prediction.md | registered rule | 3 | 0 | 0 | 0 | 3 |
 | results/search_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
+| results/sgd_own_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/sgd_own_registration.md (amendment 1) | registered rule | 1 | 0 | 0 | 0 | 1 |
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
@@ -891,7 +896,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 38 | 23 | 1 | 7 |
+| registered rule | central | 43 | 23 | 1 | 7 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1012,6 +1017,38 @@ residual within the registered tolerance."
 Spearman of 0.63, and weaker within each a; one prospective check passed. Do not say that SGD crossings were
 universal: 75% crossed. Do not merge these runs with Block F's a = 1.25 SGD arm.
 
+## WP-17. Independent certificate checks: status after Track 5 (for the submission; replaces WP-11's "pending" list)
+
+Checker: `src/verify_certificates.py` (python-flint / Arb, 80-bit balls; imports nothing from `src/`). Each item is
+verified, failed, or not run. Tests exercise every new check on constructed pass and fail cases.
+
+| certificate | status | what the checker did |
+|---|---|---|
+| K = sup G₀ over [0, 8] × [−12, 12] | **verified** | a fresh Arb branch and bound over the whole box: sup G₀ ≤ 0.5794951 (the published hi) and ≤ 0.5794559217 (the tight hi); the lower end is attained at the published argmax; the domain lemma is checked in exact rational arithmetic |
+| c₁ Krawczyk boxes (switch and K vertex) | **verified** | switch: unique zero in the 1e−9 box, A* ∈ [0.6854452375756532, 0.6854452375756537], A′(0)/A* ∈ [0.6621547824344876, 0.6621549498240902], active set unique; K vertex unique, K = 0.579455883427557 |
+| PD boxes, glob chain (500 boxes, U × [0.66, 0.71]) | **verified** | b* bracketed; the Hessian enclosure minus 0.0473·I is PD by Sylvester on every box |
+| PD boxes, solve chain (100 boxes, × [1.05875, 1.06]) | **verified** | as above, with margin 0.0209 |
+| ring (no critical point, 0.05–0.15), glob chain, 40 A-sub-intervals | not run | the envelope gradient excludes 0 in p or q on every ring box, with b* bracketed, uniformly over each A-sub-interval |
+| ring, solve chain | not run | as above, over [1.05875, 1.06] |
+| outer exclusion (K(24) minus the 0.15 box), both chains | not run | projected > 10 CPU-hours in Arb (about 39,000 cells per A-sub-interval before refinement, × 40 sub-intervals) |
+| limit solve bracket (A_solve ∈ (1.05875, 1.06]) | not run | needs the solve-chain outer exclusion above |
+| finite-a solve brackets (12 certificates) | not run | timing sample: one bracket end's search at the published 1e−11 tolerance took 19 min and produced 25.2 million losing-region leaves; at about 20 ms per leaf in Arb, that is several CPU-days per certificate |
+
+**What is now fully independently verified.**
+- **R_glob^∞ ∈ [0.19738, 0.19920]:** A*'s bracket (WP-11) and K's enclosure (above) are both independently checked.
+- **A* and A′(0)/A* on the branch (Krawczyk), and K at the vertex.** The sharp value R_glob^∞ ∈ [0.1985926, 0.1985927]
+  additionally needs the Krawczyk switch to be the *global* switch. That needs the uniqueness chain: localisation
+  (verified, WP-11), outer exclusion (not run), ring (above) and PD (above). So the sharp value is **not yet fully
+  independent**; the bracket is.
+
+**Say (certificate status paragraph):** "An independent checker in ball arithmetic (Arb) re-verifies the finite-a
+placement brackets, the Ĝ(a) enclosures, the limit switch bracket and its localisation, K = sup G₀ with its domain
+lemma, the Krawczyk boxes of the first-order calculation, and the positive-definite and ring certificates of the
+uniqueness chain. The outer-exclusion certificates and the solve brackets are verified by the original searches only."
+
+**Do not say:** "all certificates are independently verified", or that the sharp R_glob^∞ = 0.19859 is independently
+verified.
+
 ## WP-18. Stronger baselines (Track 6; POST HOC; for the submission)
 
 Producer: `src/baselines_posthoc.py` → `baselines_posthoc*.csv`, `baselines_posthoc.md` (d7d88d8). Every baseline is fitted
@@ -1041,3 +1078,32 @@ IDs: `Track 6 reproduction checks`; `Track 6 PL mean abs log err`; `Track 6 C - 
 variant that pools the lag factor over all calibration windows matches it (post hoc)."
 
 **Do not say:** "C beats every baseline". Do not present PL as registered: it is post hoc.
+
+## WP-19. H1 is proved for small ε (Track 8; for the submission)
+
+Source: math note §12 (`math_note_for_writer.md`), every step checked by hand. The numerical sanity checks
+(`src/h1_checks.py` → `h1_checks.log`) are separate from the proof. This answers "Proposition 2 also retains
+hypothesis H1".
+
+**Statement.** For 0 < ε ≤ 0.029 (a ≤ 1.029), Ĝ(a) > 0 is attained, and every maximiser has, up to the symmetries,
+rescaled coordinates with 1.0155 ≤ p < 1.74964 and |q| < 1.7956, inside the compact set C = {1 ≤ |u| ≤ 2.2, |v| ≤ 2}.
+Moreover |K(ε) − K| ≤ 23.3ε.
+
+**Proof idea, for the text.**
+- An exact identity: f_a(t_o) − f_a(t_i) = 2a cos(m) sin(d/2) − d. Applied to three pairs of window endpoints it
+  gives G ≤ 0.4εw₁, that G > 0 forces 1.4w₁ below the root of sin x = x/a, and an ellipse bound on the bias.
+- An exact rational evaluation, G₀(1.6, 1.2) = 27088/46875, bounds K(ε) from below.
+- No numerical certificate is used.
+
+**Consequence.** Proposition 2 is asymptotic ("for all sufficiently small ε"), so **H1 is no longer a hypothesis: it
+is proved.**
+
+**What remains certified rather than proved.**
+- That the maximiser is the tied corner (the K(ε) = K_loc(ε) step of the c₁ calculation). This needs uniqueness of
+  G₀'s maximiser, which K's branch and bound certifies; that check is now independently verified in Arb (WP-17).
+- The argument does not cover a ≥ 1.30: there the q-bound gives 2.0008 > 2. At a = 1.02–1.25 the location in C
+  follows from the proof's lemmas together with the certified Ĝ values.
+
+**Say:** "Hypothesis H1 of Proposition 2 is proved for ε ≤ 0.029 (Appendix …)."
+**Do not say:** "H1 is proved for all tested a", or "the corner is proved to be the global maximiser". The latter is
+certified, not proved.
