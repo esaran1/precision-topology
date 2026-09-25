@@ -479,7 +479,7 @@ every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× t
 | a = 1.30, R₂ = 0.01 | PENDING | 0.6845925670975 (boundary, G₊ = -2.0e-12) | PENDING | 1.60e-04 (single unit, G₊ = -3.59) |
 | a = 1.30, R₂ = 0.02 | PENDING | 0.6761364675950 (boundary, G₊ = -1.6e-13) | PENDING | 6.33e-04 (single unit, G₊ = -3.52) |
 | a = 1.50, R₂ = 0.001 | 0.6922871675820 (placed, cancelling pair) | 0.6922872667961 (boundary, G₊ = -1.7e-10) | 9.92e-08 (99× 1e−9) | 1.21e-06 (single unit, G₊ = -3.45) |
-| a = 1.50, R₂ = 0.003 | PENDING | 0.6905704102030 (boundary, G₊ = -1.9e-12) | PENDING | 1.09e-05 (single unit, G₊ = -3.44) |
+| a = 1.50, R₂ = 0.003 | 0.6905695190120 (placed, cancelling pair) | 0.6905704102030 (boundary, G₊ = -1.9e-12) | 8.91e-07 (891× 1e−9) | 1.09e-05 (single unit, G₊ = -3.44) |
 | a = 1.50, R₂ = 0.01 | PENDING | 0.6845925452478 (boundary, G₊ = -4.4e-13) | PENDING | 1.20e-04 (single unit, G₊ = -3.40) |
 | a = 1.50, R₂ = 0.02 | PENDING | 0.6761364244002 (boundary, G₊ = -2.9e-13) | PENDING | 4.77e-04 (single unit, G₊ = -3.34) |
 
@@ -506,8 +506,8 @@ W1 and W4 were not run. IDs: `width 2: validation (ladder, independent, pair att
 pairs (placed). Δμ alone does not decide the verdict; the s² (Var) term does. That selection rule was added in the
 registration (committed before any maximiser was computed) and was not in the author's original rule. The direct
 check (WP-8) tests the verdict without the expansion: at each scale the validated W0 search finds the conditional
-minimiser itself. Landed so far: a = 1.30 at R₂ = 0.001, a = 1.50 at R₂ = 0.001 (placed cancelling pair at each, every validation passed, the best unplaced
-configuration on the G = 0 boundary ≈ 99× the tie tolerance above); **6 scale(s) PENDING** (table in WP-8, not
+minimiser itself. Landed so far: a = 1.30 at R₂ = 0.001, a = 1.50 at R₂ = 0.001, a = 1.50 at R₂ = 0.003 (placed cancelling pair at each, every validation passed, the best unplaced
+configuration on the G = 0 boundary ≈ 99× the tie tolerance above); **5 scale(s) PENDING** (table in WP-8, not
 repeated here). IDs: `direct check: every landed scale placed, cancelling pair`; `direct check: no finished restart below the retained minimiser (landed scales)`; `min margin at R2 = 0.001`; `all best-unplaced on the boundary`.
 
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
