@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 191 scored by their registered rules: 90 PASS, 60 FAIL, 8 PARTIAL,
-  33 UNRESOLVED.
+- **Headline**: 192 scored by their registered rules: 90 PASS, 60 FAIL, 8 PARTIAL,
+  34 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 207 registered predictions.
+- **Total**: 208 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -202,7 +202,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
 | S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
 | SGD own thresholds (Track 4) | registered rule | 3 | 0 | 0 | 0 | 3 |
-| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 1 | 4 |
+| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 2 | 5 |
 | c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -249,6 +249,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/asym_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/asym_registration.md (amendment 1) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/asym_registration.md (amendment 2) | registered rule | 0 | 0 | 0 | 1 | 1 |
+| results/asym_registration.md (amendment 3) | registered rule | 0 | 0 | 0 | 1 | 1 |
 | results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
 | results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
 | results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
@@ -455,9 +456,9 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 483 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 487 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
-scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 1 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
 not printed numbers. 6 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
@@ -903,7 +904,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 43 | 25 | 1 | 8 |
+| registered rule | central | 43 | 25 | 1 | 9 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1060,10 +1061,27 @@ IDs: `Track 2 T2-3b UNRESOLVED`; `Track 2 T2-3b phi2`; `Track 2 T2-3b median rat
   2.23 observed. Within T2-3, Spearman(residual, ratio) = -0.24.
 IDs: `Track 2 expl own median`; `Track 2 expl cross over own`; `Track 2 expl Spearman own`; `Track 2 expl ratio median`; `Track 2 expl ratio Spearman within`.
 
-**Say (T2-3b):** "A follow-up with the design's sweep-rate matching, registered after the failure, is unresolved: its
-validity check failed, because the matched runs crossed at a timescale ratio far below the width-1 range."
-**Do not say:** that T2-3b supports or rescues the width-2 training prediction, or that own-sample thresholds or the
-timescale ratio explain the width-2 residual.
+**T2-3c (registered after T2-3's FAIL and T2-3b's UNRESOLVED; amendment 3, 9ba85f5): timescale-ratio matching.**
+- φ₂ = 0.01778 was chosen by a pilot on fresh calibration seeds. The pilot recorded only the timescale ratio
+  at the step where ‖v‖₁ first reaches the threshold scale (median 0.0049, within 20% of 0.0057),
+  and never evaluated placement.
+- **Result: UNRESOLVED.** The achieved median ratio **at crossing** is 1.3e-05, far below the
+  width-1 range. The risk stated in the registration materialised: the runs cross only much later (median
+  10.8× s_lo), after the scale has nearly stopped growing.
+- For information only, the criteria alone would give FAIL: 80/80 crossed,
+  47/80 at or above s_hi, median ratio 10.8.
+IDs: `Track 2 T2-3c UNRESOLVED`; `Track 2 T2-3c phi2`; `Track 2 T2-3c median ratio at crossing`; `Track 2 T2-3c frac above`; `Track 2 T2-3c median crossing ratio`.
+
+**Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
+failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as
+such, to put width-2 training in width 1's timescale regime. T2-3b (steps-matched output rate) is unresolved: its runs
+crossed at a timescale ratio far below width 1's range. T2-3c (ratio-matched at the threshold scale) is unresolved for
+the same reason: the ratio at crossing fell far below the range. Neither follow-up tested the prediction, and T2-3 stands
+as a failure."
+
+**Do not say:** that T2-3c (or T2-3b) is a retry of a failed test, that either rescues or qualifies T2-3's failure,
+that width-2 training "would" track the threshold in width 1's regime (never achieved), or that own-sample thresholds
+or the timescale ratio explain the width-2 residual.
 
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered

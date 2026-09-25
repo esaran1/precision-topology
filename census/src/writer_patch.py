@@ -1140,6 +1140,8 @@ def wp15():
     tb = json.loads((RESULTS / "asym_t23b" / "scores.json").read_text())
     tb_f = json.loads((RESULTS / "asym_t23b_frozen.json").read_text())
     e2 = json.loads((RESULTS / "asym_posthoc" / "exploratory2.json").read_text())
+    tc = json.loads((RESULTS / "asym_t23c" / "scores.json").read_text())
+    tc_f = json.loads((RESULTS / "asym_t23c_frozen.json").read_text())
     pk = ph["knockout_counts"]
     return f"""
 ## WP-15. Width 2 on asymmetric windows: the landscape threshold survives; training crosses far above it (Track 2, registered; for the submission)
@@ -1235,10 +1237,27 @@ IDs: {_id("Track 2 T2-3b UNRESOLVED", "Track 2 T2-3b phi2", "Track 2 T2-3b media
   {e2["observed_median_residual_vs_pop"]:.2f} observed. Within T2-3, Spearman(residual, ratio) = {e2["spearman_residual_ratio_within_T2_3"]:.2f}.
 IDs: {_id("Track 2 expl own median", "Track 2 expl cross over own", "Track 2 expl Spearman own", "Track 2 expl ratio median", "Track 2 expl ratio Spearman within")}.
 
-**Say (T2-3b):** "A follow-up with the design's sweep-rate matching, registered after the failure, is unresolved: its
-validity check failed, because the matched runs crossed at a timescale ratio far below the width-1 range."
-**Do not say:** that T2-3b supports or rescues the width-2 training prediction, or that own-sample thresholds or the
-timescale ratio explain the width-2 residual.
+**T2-3c (registered after T2-3's FAIL and T2-3b's UNRESOLVED; amendment 3, 9ba85f5): timescale-ratio matching.**
+- φ₂ = {tc_f["phi2"]:.5f} was chosen by a pilot on fresh calibration seeds. The pilot recorded only the timescale ratio
+  at the step where ‖v‖₁ first reaches the threshold scale (median {tc_f["pilot_median_ratio"]:.4f}, within 20% of 0.0057),
+  and never evaluated placement.
+- **Result: UNRESOLVED.** The achieved median ratio **at crossing** is {tc["median_ratio_at_cross"]:.1e}, far below the
+  width-1 range. The risk stated in the registration materialised: the runs cross only much later (median
+  {tc["criteria"]["median_ratio_s_lo"]:.1f}× s_lo), after the scale has nearly stopped growing.
+- For information only, the criteria alone would give FAIL: {tc["crossed"]}/{tc["runs"]} crossed,
+  {round(tc["criteria"]["frac_above_s_hi"] * tc["crossed"])}/{tc["crossed"]} at or above s_hi, median ratio {tc["criteria"]["median_ratio_s_lo"]:.1f}.
+IDs: {_id("Track 2 T2-3c UNRESOLVED", "Track 2 T2-3c phi2", "Track 2 T2-3c median ratio at crossing", "Track 2 T2-3c frac above", "Track 2 T2-3c median crossing ratio")}.
+
+**Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
+failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as
+such, to put width-2 training in width 1's timescale regime. T2-3b (steps-matched output rate) is unresolved: its runs
+crossed at a timescale ratio far below width 1's range. T2-3c (ratio-matched at the threshold scale) is unresolved for
+the same reason: the ratio at crossing fell far below the range. Neither follow-up tested the prediction, and T2-3 stands
+as a failure."
+
+**Do not say:** that T2-3c (or T2-3b) is a retry of a failed test, that either rescues or qualifies T2-3's failure,
+that width-2 training "would" track the threshold in width 1's regime (never achieved), or that own-sample thresholds
+or the timescale ratio explain the width-2 residual.
 
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered
