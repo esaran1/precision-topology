@@ -1,0 +1,29 @@
+{
+ "gelu": {
+  "verdict": "switch predicted",
+  "all_validated": true,
+  "Ghat_lo": 0.03754728719027985,
+  "statuses": {
+   "0.05": "unplaced",
+   "0.1": "unplaced"
+  }
+ },
+ "silu": {
+  "verdict": "undetermined",
+  "all_validated": false,
+  "Ghat_lo": 0.05091244854677461,
+  "statuses": {
+   "0.05": "unplaced",
+   "0.1": "undecided"
+  }
+ },
+ "mish": {
+  "verdict": "undetermined",
+  "all_validated": false,
+  "Ghat_lo": 0.05477201312967803,
+  "statuses": {
+   "0.05": "unplaced",
+   "0.1": "undecided"
+  }
+ }
+}
