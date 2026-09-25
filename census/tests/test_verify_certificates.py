@@ -372,3 +372,13 @@ def test_krawczyk_pass_and_fail_cases():
     assert vc.krawczyk_arb(fun, xt, [1e-9] * 4)[0]
     off = [xt[0] + 1e-4] + xt[1:]
     assert not vc.krawczyk_arb(fun, off, [1e-9] * 4)[0]      # a box that misses the zero cannot pass
+
+
+def test_ring_pass_and_fail_cases():
+    from src import verify_certificates as vc
+    c = (1.6685791015625, 1.3697166410041663)
+    ok = vc._ring_interval((0.66, 0.66125, c[0], c[1], 0.05, 0.15, 0.0125, 4))
+    assert ok["certified"]
+    # a "ring" that contains the minimiser (rho_in = 0) cannot be certified free of critical points
+    bad = vc._ring_interval((0.684, 0.685, 1.66808, 1.36923, 0.0, 0.004, 0.004, 2))
+    assert not bad["certified"]

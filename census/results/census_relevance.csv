@@ -203,3 +203,4 @@ sgd-G2,SGD own thresholds (Track 4),registered rule,PASS,central,threshold
 sgd-EXT,SGD own thresholds (Track 4),registered rule,PASS,central,threshold
 T2-1,asymmetric windows (Track 2),registered rule,PASS,central,width2
 T2-2,asymmetric windows (Track 2),registered rule,PASS,central,width2
+T2-3,asymmetric windows (Track 2),registered rule,FAIL,central,width2

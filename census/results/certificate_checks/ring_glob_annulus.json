@@ -1,0 +1,10 @@
+{
+ "name": "ring_glob_annulus",
+ "intervals": 40,
+ "all_certified": true,
+ "boxes": 21600,
+ "min_grad_lower": 0.003126200537630291,
+ "failed": [],
+ "seconds": 198.68782019615173,
+ "pass": true
+}

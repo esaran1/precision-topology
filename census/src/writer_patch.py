@@ -377,7 +377,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp7()
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
-    text += wp16() + wp17() + wp18() + wp19()
+    text += wp15() + wp16() + wp17() + wp18() + wp19()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1058,6 +1058,8 @@ CENTRAL_FAILS = {
     "lag2-L2'": "deconfounded proportionality fails (0.974 / 0.958).",
     "4b-ID": "inherited displacement: neither teleport nor reset removes half the residual (the competing outcome held).",
     "4b-OM": "optimiser memory: likewise, neither arm removes half the residual.",
+    "T2-3": "asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x "
+            "the threshold scale, above the registered bound of 1.25.",
     "B-spin": "(post hoc scoring) the registered falsifier of the spinodal / hysteresis picture fired at a = 1.30; the "
               "framing was dropped.",
     "B-solve": "(post hoc scoring) R at solve exceeds R_solve by 16-29%, against a 15% tolerance.",
@@ -1098,7 +1100,7 @@ peripheral.
 
 IDs: {_id("A4 FAIL registered central", "A4 FAIL registered peripheral", "A4 FAIL post hoc central", "A4 FAIL post hoc peripheral", "A4 PASS registered central", "A4 PASS registered peripheral", "A4 rows")}.
 
-**Failed central predictions ({len(f)}: 23 under the registered rule, 2 by post hoc scoring), with one line each:**
+**Failed central predictions ({len(f)}: {int((f.scoring == "registered rule").sum())} under the registered rule, {int((f.scoring != "registered rule").sum())} by post hoc scoring), with one line each:**
 {chr(10).join(lines)}
 
 **The pattern, stated plainly.** The central failures cluster in the **training-side** claims, and most of them
@@ -1117,10 +1119,56 @@ The rest are:
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
-**Say:** "Of 64 failed predictions (58 under the registered rule, 6 by post hoc scoring), 25 bear on a central claim;
-most of these concern the residual's mechanism, which the paper reports as open." **Do not say** "the central
-claims never failed" or "the failures are peripheral". Do not present the relevance classification as registered;
+**Say:** "Of {int((cr.verdict == "FAIL").sum())} failed predictions ({int(((cr.verdict == "FAIL") & (cr.scoring == "registered rule")).sum())} under the registered rule, {int(((cr.verdict == "FAIL") & (cr.scoring != "registered rule")).sum())} by post hoc scoring), {len(f)} bear on a central
+claim; most of these concern the residual's mechanism, which the paper reports as open, and one is the width-2 training
+prediction on asymmetric windows (WP-15)." **Do not say** "the central claims never failed" or "the failures are
+peripheral". Do not present the relevance classification as registered;
 it is post hoc.
+"""
+
+
+def wp15():
+    """WP-15: a width-2 threshold on asymmetric windows (Track 2, registered)."""
+    sc = json.loads((RESULTS / "asym_scores.json").read_text())
+    t3 = sc["T2-3"]
+    return f"""
+## WP-15. Width 2 on asymmetric windows: the landscape threshold survives; training crosses far above it (Track 2, registered; for the submission)
+
+Exploratory pilot (Δ = 0.8, a = 1.30): `asym_pilot_design.md`, with GO/no-go fixed before running (374b86a, GO
+129a487). Registration: `asym_registration.md` (53dce22), with amendment 1 (2505b2d, matched initialisation, the
+author's instruction). Producer: `src/asym_register.py` → `asym_parts/`, `asym_scores.json`. Windows:
+I = [−0.8, 0.8], O = [−2.0, −1.2] ∪ [1.2, 2.4], so Δ = 0.4. This answers "the width-2 analysis contains no threshold
+test where one is predicted".
+
+**Why a threshold was predicted.** On asymmetric windows the linear ramp enters the class-mean gap (m = E_O x − E_I x
+= 0.44). So the small-scale conditional minimiser uses the ramp and is unplaced, and the criterion (WP-12, math note
+§10.1) predicts a switch. On symmetric windows it predicts none, and none was found (WP-9).
+
+| prediction | criterion | result |
+|---|---|---|
+| **T2-1** (landscape) | a validated width-2 search finds exactly one switch (competing: placed at every scale) | **PASS**: unplaced at s ≤ 0.4217, placed at s ≥ 0.5623 on a 17-scale grid; bisection bracket **s ∈ [{sc["s_lo"]:.4f}, {sc["s_hi"]:.4f}]**, validated at both ends (restart ladder 500–4,000 unchanged; independent CMA-ES agrees; audit clean) |
+| **T2-2** (secondary) | s_hi(Δ = 0.4) < 0.5623 (the pilot's lower end at Δ = 0.8) | **PASS** ({sc["s_hi"]:.4f}) |
+| **T2-3** (training, W1's criterion) | ≥ 90% of crossings at or above s_hi; bootstrap CI of the median ratio − 1 above 0; **median(s_cross/s_lo) ≤ 1.25** | **FAIL**: {100 * t3["frac_above_s_hi"]:.1f}% at or above s_hi; CI [{t3["ci_median_minus_1"][0]:.2f}, {t3["ci_median_minus_1"][1]:.2f}]; **median ratio {t3["median_ratio_s_lo"]:.2f} > 1.25** |
+
+- T2-3 used matched initialisation, seeds 600,000–600,079: {sc["placed_at_init"]} run placed at initialisation
+  (excluded; under the 20% stop), and {sc["crossed"]} crossed.
+- **Disclosed:** a first T2-3 arm with standard initialisation ran before amendment 1. Its outputs were sealed unread
+  (hashes committed), and it is withdrawn and unscored.
+IDs: {_id("Track 2 T2-1 PASS", "Track 2 s_lo", "Track 2 s_hi", "Track 2 T2-2 PASS", "Track 2 T2-3 FAIL", "Track 2 T2-3 frac above", "Track 2 T2-3 median ratio")}.
+
+**Reading.**
+- The criterion's landscape prediction holds at width 2: where the small-scale class-mean maximiser is unplaced, a
+  placement threshold exists, validated like W0.
+- Training does cross above that threshold (94% of runs), but at a median of about **3.3×** the threshold scale, not
+  within the registered 25%. So at width 2 the landscape threshold does not predict *where* training crosses, as the
+  width-1 threshold does (within 3–7%).
+
+**Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
+(registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered
+training prediction fails."
+
+**Do not say** that the width-2 threshold predicts training crossings. Do not cite the Δ = 0.8 pilot as evidence:
+it is exploratory.
 """
 
 
@@ -1131,6 +1179,10 @@ def wp16():
     ts = json.loads((RESULTS / "residual_timescale_summary.json").read_text())
     fit = json.loads((RESULTS / "residual_timescale_fit.json").read_text())
     B = json.loads((RESULTS / "sgd_own_budget.json").read_text())["budget"]
+    sens = pd.read_csv(RESULTS / "sgd_own_sensitivity.csv").set_index("a")
+    srow = lambda a: (f"| {a:.2f} | [{sens.loc[a, 'G1_lo']:+.3f}, {sens.loc[a, 'G1_hi']:+.3f}] **{sens.loc[a, 'G1']}** | "
+                      f"{sens.loc[a, 'G2_spearman']:.3f} **{sens.loc[a, 'G2']}** | {sens.loc[a, 'EXT_obs_imputed']:.4f} vs "
+                      f"{sens.loc[a, 'EXT_pred']:.4f} (±{sens.loc[a, 'EXT_tol']:.4f}) **{sens.loc[a, 'EXT']}** |")
     row = lambda a: (f"| {a:.2f} | {int(sc.loc[a, 'crossed'])}/{int(sc.loc[a, 'runs'])} | {sc.loc[a, 'G1_mean_diff']:+.4f} "
                      f"[{sc.loc[a, 'G1_lo']:+.4f}, {sc.loc[a, 'G1_hi']:+.4f}] **{sc.loc[a, 'G1']}** | "
                      f"{sc.loc[a, 'G2_spearman']:.3f} **{sc.loc[a, 'G2']}** | {100 * sc.loc[a, 'G3_median_resid_own']:+.2f}% | "
@@ -1190,13 +1242,38 @@ IDs: {_id("Track 3 Spearman pooled", "Track 3 Spearman CI lo", "Track 3 Spearman
 - The SGD ratios lie inside the fitted Adam range, so this is interpolation across optimisers, not extrapolation.
 IDs: {_id("Track 4 EXT a=1.30", "Track 4 EXT a=1.50", "Track 4 EXT pred a=1.30", "Track 4 EXT pred a=1.50")}.
 
-**Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
-than the population threshold (registered; both a). A timescale ratio fitted post hoc on Adam predicted the median SGD
-residual within the registered tolerance."
+**Sensitivity analysis (POST HOC, author's request): non-crossers treated as crossing at their final |w₂|.**
+- 25% of runs did not cross (10 per a). Here each is scored as crossing at (or above) its final |w₂|, a lower bound on
+  its unobserved crossing. A replay confirms that none of them crosses within the budget.
 
-**Do not say:** that the timescale ratio is the residual's mechanism. It is a post hoc correlation with a pooled
-Spearman of 0.63, and weaker within each a; one prospective check passed. Do not say that SGD crossings were
-universal: 75% crossed. Do not merge these runs with Block F's a = 1.25 SGD arm.
+| a | G1 [95% CI] | G2: Spearman | EXT: observed median vs predicted |
+|---|---|---|---|
+{srow(1.3)}
+{srow(1.5)}
+
+- **One verdict changes: G2 fails at both a under this imputation.** G1 and EXT are unchanged.
+- The non-crossers ended at a median **{sens.loc[1.3, "median_final_over_own_noncrossers"]:.2f}×** (a = 1.30) and
+  **{sens.loc[1.5, "median_final_over_own_noncrossers"]:.2f}×** (a = 1.50) of their own threshold. They stalled well
+  below the threshold scale, so the imputed values are very loose lower bounds, not crossings.
+IDs: {_id("Track 4 sens G1 a=1.30", "Track 4 sens G1 a=1.50", "Track 4 sens G2 a=1.30", "Track 4 sens G2 a=1.50", "Track 4 sens EXT a=1.30", "Track 4 sens EXT a=1.50", "Track 4 sens noncrosser final/own a=1.30", "Track 4 sens noncrosser final/own a=1.50")}.
+
+**How to describe the timescale account.**
+- It is **supported by one prospective test, not established**.
+- The Adam relationship is a post hoc correlation. Always give the within-a values beside the pooled one: pooled
+  Spearman {ts["spearman_run_level"]:.2f}, but only {ts["spearman_within_a"]["a=1.30"]:.2f} (a = 1.30) and
+  {ts["spearman_within_a"]["a=1.50"]:.2f} (a = 1.50) within each a.
+- One registered prospective check on a different optimiser (EXT) passed. At a = 1.50 it passed near the edge of its
+  tolerance.
+
+**Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
+than the population threshold (registered; both a; 75% of runs crossed). A post hoc timescale ratio, correlated with
+the residual on Adam runs (Spearman 0.63 pooled; 0.45 and 0.51 within each a), predicted the median SGD residual
+within the registered tolerance. The timescale account is supported by this one prospective test; it is not
+established."
+
+**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established. Do not quote
+the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
+noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
 """
 
 

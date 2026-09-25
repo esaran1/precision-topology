@@ -1,0 +1,10 @@
+{
+ "name": "ring_solve_annulus",
+ "intervals": 1,
+ "all_certified": true,
+ "boxes": 540,
+ "min_grad_lower": 0.008203877319297401,
+ "failed": [],
+ "seconds": 5.75019907951355,
+ "pass": true
+}

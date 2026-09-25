@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 188 scored by their registered rules: 90 PASS, 58 FAIL, 8 PARTIAL,
+- **Headline**: 189 scored by their registered rules: 90 PASS, 59 FAIL, 8 PARTIAL,
   32 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 204 registered predictions.
+- **Total**: 205 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -202,7 +202,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
 | S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
 | SGD own thresholds (Track 4) | registered rule | 3 | 0 | 0 | 0 | 3 |
-| asymmetric windows (Track 2) | registered rule | 2 | 0 | 0 | 0 | 2 |
+| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 0 | 3 |
 | c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -246,6 +246,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/amplification_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/arrhenius_prediction.md | registered rule | 15 | 11 | 1 | 15 | 42 |
 | results/asym_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/asym_registration.md (amendment 1) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
 | results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
 | results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
@@ -451,7 +452,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 451 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 461 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 12 checks compare two artifacts to 1e−12; they are
@@ -896,12 +897,12 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 43 | 23 | 1 | 7 |
+| registered rule | central | 43 | 24 | 1 | 7 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
 
-**Failed central predictions (25: 23 under the registered rule, 2 by post hoc scoring), with one line each:**
+**Failed central predictions (26: 24 under the registered rule, 2 by post hoc scoring), with one line each:**
 
 *threshold* (18):
 - `H-3`: growth-rate dose-response validity gate failed (m = 1 placed 0.500 vs control 0.925); block inconclusive.
@@ -933,8 +934,9 @@ IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL pos
 - `G-1`: training-free out-of-distribution windows: 6 of 10 within 15%, short of the registered count.
 - `G-3b`: sub-claim (far-outer window threshold >= base) was wrong by a provable inequality: a registration error.
 
-*width2* (1):
+*width2* (2):
 - `sl-tanh`: tanh at width 2: the boundary condition failed at A = 40 (criterion flaw); recorded 'neither'.
+- `T2-3`: asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x the threshold scale, above the registered bound of 1.25.
 
 **The pattern, stated plainly.** The central failures cluster in the **training-side** claims, and most of them
 concern the **residual**, i.e. where crossings sit relative to the threshold and why:
@@ -952,10 +954,49 @@ The rest are:
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
-**Say:** "Of 64 failed predictions (58 under the registered rule, 6 by post hoc scoring), 25 bear on a central claim;
-most of these concern the residual's mechanism, which the paper reports as open." **Do not say** "the central
-claims never failed" or "the failures are peripheral". Do not present the relevance classification as registered;
+**Say:** "Of 65 failed predictions (59 under the registered rule, 6 by post hoc scoring), 26 bear on a central
+claim; most of these concern the residual's mechanism, which the paper reports as open, and one is the width-2 training
+prediction on asymmetric windows (WP-15)." **Do not say** "the central claims never failed" or "the failures are
+peripheral". Do not present the relevance classification as registered;
 it is post hoc.
+
+## WP-15. Width 2 on asymmetric windows: the landscape threshold survives; training crosses far above it (Track 2, registered; for the submission)
+
+Exploratory pilot (Δ = 0.8, a = 1.30): `asym_pilot_design.md`, with GO/no-go fixed before running (374b86a, GO
+129a487). Registration: `asym_registration.md` (53dce22), with amendment 1 (2505b2d, matched initialisation, the
+author's instruction). Producer: `src/asym_register.py` → `asym_parts/`, `asym_scores.json`. Windows:
+I = [−0.8, 0.8], O = [−2.0, −1.2] ∪ [1.2, 2.4], so Δ = 0.4. This answers "the width-2 analysis contains no threshold
+test where one is predicted".
+
+**Why a threshold was predicted.** On asymmetric windows the linear ramp enters the class-mean gap (m = E_O x − E_I x
+= 0.44). So the small-scale conditional minimiser uses the ramp and is unplaced, and the criterion (WP-12, math note
+§10.1) predicts a switch. On symmetric windows it predicts none, and none was found (WP-9).
+
+| prediction | criterion | result |
+|---|---|---|
+| **T2-1** (landscape) | a validated width-2 search finds exactly one switch (competing: placed at every scale) | **PASS**: unplaced at s ≤ 0.4217, placed at s ≥ 0.5623 on a 17-scale grid; bisection bracket **s ∈ [0.4371, 0.4532]**, validated at both ends (restart ladder 500–4,000 unchanged; independent CMA-ES agrees; audit clean) |
+| **T2-2** (secondary) | s_hi(Δ = 0.4) < 0.5623 (the pilot's lower end at Δ = 0.8) | **PASS** (0.4532) |
+| **T2-3** (training, W1's criterion) | ≥ 90% of crossings at or above s_hi; bootstrap CI of the median ratio − 1 above 0; **median(s_cross/s_lo) ≤ 1.25** | **FAIL**: 93.7% at or above s_hi; CI [1.89, 2.56]; **median ratio 3.29 > 1.25** |
+
+- T2-3 used matched initialisation, seeds 600,000–600,079: 1 run placed at initialisation
+  (excluded; under the 20% stop), and 79 crossed.
+- **Disclosed:** a first T2-3 arm with standard initialisation ran before amendment 1. Its outputs were sealed unread
+  (hashes committed), and it is withdrawn and unscored.
+IDs: `Track 2 T2-1 PASS`; `Track 2 s_lo`; `Track 2 s_hi`; `Track 2 T2-2 PASS`; `Track 2 T2-3 FAIL`; `Track 2 T2-3 frac above`; `Track 2 T2-3 median ratio`.
+
+**Reading.**
+- The criterion's landscape prediction holds at width 2: where the small-scale class-mean maximiser is unplaced, a
+  placement threshold exists, validated like W0.
+- Training does cross above that threshold (94% of runs), but at a median of about **3.3×** the threshold scale, not
+  within the registered 25%. So at width 2 the landscape threshold does not predict *where* training crosses, as the
+  width-1 threshold does (within 3–7%).
+
+**Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
+(registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered
+training prediction fails."
+
+**Do not say** that the width-2 threshold predicts training crossings. Do not cite the Δ = 0.8 pilot as evidence:
+it is exploratory.
 
 ## WP-16. Does the conditional threshold predict SGD crossings? (Track 4, registered; for the submission)
 
@@ -1009,13 +1050,38 @@ IDs: `Track 3 Spearman pooled`; `Track 3 Spearman CI lo`; `Track 3 Spearman CI h
 - The SGD ratios lie inside the fitted Adam range, so this is interpolation across optimisers, not extrapolation.
 IDs: `Track 4 EXT a=1.30`; `Track 4 EXT a=1.50`; `Track 4 EXT pred a=1.30`; `Track 4 EXT pred a=1.50`.
 
-**Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
-than the population threshold (registered; both a). A timescale ratio fitted post hoc on Adam predicted the median SGD
-residual within the registered tolerance."
+**Sensitivity analysis (POST HOC, author's request): non-crossers treated as crossing at their final |w₂|.**
+- 25% of runs did not cross (10 per a). Here each is scored as crossing at (or above) its final |w₂|, a lower bound on
+  its unobserved crossing. A replay confirms that none of them crosses within the budget.
 
-**Do not say:** that the timescale ratio is the residual's mechanism. It is a post hoc correlation with a pooled
-Spearman of 0.63, and weaker within each a; one prospective check passed. Do not say that SGD crossings were
-universal: 75% crossed. Do not merge these runs with Block F's a = 1.25 SGD arm.
+| a | G1 [95% CI] | G2: Spearman | EXT: observed median vs predicted |
+|---|---|---|---|
+| 1.30 | [-0.056, -0.004] **PASS** | 0.502 **FAIL** | 0.0277 vs 0.0251 (±0.0100) **PASS** |
+| 1.50 | [-0.056, -0.003] **PASS** | 0.507 **FAIL** | 0.0586 vs 0.0530 (±0.0133) **PASS** |
+
+- **One verdict changes: G2 fails at both a under this imputation.** G1 and EXT are unchanged.
+- The non-crossers ended at a median **0.15×** (a = 1.30) and
+  **0.30×** (a = 1.50) of their own threshold. They stalled well
+  below the threshold scale, so the imputed values are very loose lower bounds, not crossings.
+IDs: `Track 4 sens G1 a=1.30`; `Track 4 sens G1 a=1.50`; `Track 4 sens G2 a=1.30`; `Track 4 sens G2 a=1.50`; `Track 4 sens EXT a=1.30`; `Track 4 sens EXT a=1.50`; `Track 4 sens noncrosser final/own a=1.30`; `Track 4 sens noncrosser final/own a=1.50`.
+
+**How to describe the timescale account.**
+- It is **supported by one prospective test, not established**.
+- The Adam relationship is a post hoc correlation. Always give the within-a values beside the pooled one: pooled
+  Spearman 0.63, but only 0.45 (a = 1.30) and
+  0.51 (a = 1.50) within each a.
+- One registered prospective check on a different optimiser (EXT) passed. At a = 1.50 it passed near the edge of its
+  tolerance.
+
+**Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
+than the population threshold (registered; both a; 75% of runs crossed). A post hoc timescale ratio, correlated with
+the residual on Adam runs (Spearman 0.63 pooled; 0.45 and 0.51 within each a), predicted the median SGD residual
+within the registered tolerance. The timescale account is supported by this one prospective test; it is not
+established."
+
+**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established. Do not quote
+the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
+noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
 
 ## WP-17. Independent certificate checks: status after Track 5 (for the submission; replaces WP-11's "pending" list)
 
@@ -1028,8 +1094,8 @@ verified, failed, or not run. Tests exercise every new check on constructed pass
 | c₁ Krawczyk boxes (switch and K vertex) | **verified** | switch: unique zero in the 1e−9 box, A* ∈ [0.6854452375756532, 0.6854452375756537], A′(0)/A* ∈ [0.6621547824344876, 0.6621549498240902], active set unique; K vertex unique, K = 0.579455883427557 |
 | PD boxes, glob chain (500 boxes, U × [0.66, 0.71]) | **verified** | b* bracketed; the Hessian enclosure minus 0.0473·I is PD by Sylvester on every box |
 | PD boxes, solve chain (100 boxes, × [1.05875, 1.06]) | **verified** | as above, with margin 0.0209 |
-| ring (no critical point, 0.05–0.15), glob chain, 40 A-sub-intervals | not run | the envelope gradient excludes 0 in p or q on every ring box, with b* bracketed, uniformly over each A-sub-interval |
-| ring, solve chain | not run | as above, over [1.05875, 1.06] |
+| ring (no critical point, 0.05–0.15), glob chain, 40 A-sub-intervals | **verified** | the envelope gradient excludes 0 in p or q on every ring box, with b* bracketed, uniformly over each A-sub-interval |
+| ring, solve chain | **verified** | as above, over [1.05875, 1.06] |
 | outer exclusion (K(24) minus the 0.15 box), both chains | not run | projected > 10 CPU-hours in Arb (about 39,000 cells per A-sub-interval before refinement, × 40 sub-intervals) |
 | limit solve bracket (A_solve ∈ (1.05875, 1.06]) | not run | needs the solve-chain outer exclusion above |
 | finite-a solve brackets (12 certificates) | not run | timing sample: one bracket end's search at the published 1e−11 tolerance took 19 min and produced 25.2 million losing-region leaves; at about 20 ms per leaf in Arb, that is several CPU-days per certificate |
