@@ -68,4 +68,4 @@ def test_census_relevance_rejects_unclassified_block(monkeypatch):
         cr.build()
     monkeypatch.undo()
     d, _ = cr.build()
-    assert len(d) == 199
+    assert len(d) == len(pd.read_csv(cr.RESULTS / "registration_census.csv"))
