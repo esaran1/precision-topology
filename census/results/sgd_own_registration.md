@@ -55,3 +55,34 @@ be committed as an amendment before the SGD runs are scored. If not, it is not r
 
 Runs go to `results/sgd_own_runs.csv` and scores to `results/sgd_own_scores.csv` (`python -m src.sgd_own score`).
 Nothing is re-run to change a verdict. The cutoff is 01:00 EDT: whatever is incomplete then is reported as not done.
+
+## Amendment 1 (2026-09-25 13:13 EDT): the extension is registered, before any SGD run is scored
+
+**State at registration:**
+- All 80 SGD runs have finished (`sgd_own_runs.csv`). They have **not been scored or inspected**: no crossing |w₂|,
+  residual or crossing count has been read.
+- Track 3's post hoc analysis is complete (`residual_timescale_summary.json`). The run-level Spearman between
+  residual and timescale ratio, pooled over both a and the four learning-rate arms (n = 384), is **0.634**, with
+  bootstrap 95% interval [0.542, 0.721]. That meets the author's rule (≥ 0.6), so this extension is registered.
+- Caveat, stated now: within each a the correlation is weaker (0.454 at a = 1.30, 0.507 at a = 1.50). Much of the
+  pooled correlation is the difference between the two a values.
+
+**EXT (prospective, on a different optimiser).**
+- **Fitted relationship (Adam, post hoc, frozen now in `residual_timescale_fit.json`).** Residual = α + β·ratio,
+  fitted by OLS over the 384 Adam runs: α = 0.0157178, β = 2.65842. The fitted ratio range is [0.00137, 0.0229].
+- **Each SGD crossing run's own ratio at its crossing:**
+  - replay the run deterministically to its recorded crossing step (the replay must reproduce the crossing |w₂|
+    exactly);
+  - growth = d log|w₂|/dt over the last min(100, step − 1) steps;
+  - relax = 0.3·λ_min(H), where H is the Hessian of the joint loss in (w₁, b₁, b₂), w₂ fixed, at the branch
+    (damped Newton from the crossing state). SGD's preconditioner is the identity;
+  - ratio = growth/relax (`sgd_own.ratio_at_crossing`).
+- **Prediction at each a:** the median over crossing runs of α + β·ratioᵢ.
+- **Observed:** the median SGD residual against the own global threshold, w₂,cross/w₂,own − 1.
+- **PASS** iff |observed − predicted| ≤ max(0.01, 0.25·|predicted|).
+- UNRESOLVED with fewer than 30 runs whose ratio is finite and positive (a non-positive relaxation rate is unusable).
+- Tests: `tests/test_sgd_own.py::test_extension_scorer_cases`, on constructed pass, fail and unresolved cases.
+- The SGD ratios may lie outside the fitted Adam range. The prediction is then an extrapolation, which is stated and
+  not a reason to exempt it.
+- **Competing outcome:** the SGD residual is not governed by this timescale ratio, and the prediction misses the
+  tolerance.

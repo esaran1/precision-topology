@@ -177,4 +177,83 @@ def score():
 
 if __name__ == "__main__":
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
-    {"pilot": lambda: pilot(w), "train": lambda: train(w), "score": score}[sys.argv[1]]()
+    {"pilot": lambda: pilot(w), "train": lambda: train(w), "score": score, "ratios": lambda: ratios(w),
+     "score_extension": score_extension}[sys.argv[1]]()
+
+
+# ------------------------------------------------------------------------------------------ extension (amendment 1)
+EXT_WINDOW = 100
+EXT_TOL_ABS, EXT_TOL_REL = 0.01, 0.25
+
+
+def ratio_at_crossing(a, seed, step):
+    """Replay the SGD run to its crossing step; growth = d log|w2|/dt over the last min(100, step − 1) steps; relax =
+    lr_SGD·λ_min(H) at the branch (residual_timescale.branch_hessian: the joint loss in (w1, b1, b2), w2 fixed); SGD's
+    preconditioner is the identity.  ratio = growth / relax."""
+    import math
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import logits
+    from .residual_timescale import branch_hessian
+    f, x, y, th = _setup(a, seed)
+    opt = torch.optim.SGD([th], lr=SGD_LR)
+    win = min(EXT_WINDOW, int(step) - 1)
+    path = {0: abs(float(th.detach()[2]))}
+    for t in range(1, int(step) + 1):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(logits(th, x, f), y).backward()
+        opt.step()
+        if t >= step - win:
+            path[t] = abs(float(th.detach()[2]))
+    q = th.detach().numpy()
+    growth = math.log(path[int(step)] / path[int(step) - win]) / win if win >= 1 else float("nan")
+    z, H, g, conv = branch_hessian(a, x.numpy().astype(float), y.numpy().astype(float), q[0], q[1], q[2], q[3])
+    relax = SGD_LR * float(np.linalg.eigvalsh(H).min())
+    return {"growth": growth, "relax": relax, "ratio": growth / relax if relax > 0 else float("nan"),
+            "branch_converged": conv, "w2_replay": abs(float(q[2]))}
+
+
+def _ratio_job(args):
+    os.nice(15)
+    a, seed, step, w2 = args
+    r = ratio_at_crossing(a, seed, step)
+    return {"a": a, "seed": seed, "reproduced": r["w2_replay"] == w2, **{k: r[k] for k in ("growth", "relax", "ratio",
+                                                                                          "branch_converged")}}
+
+
+def ratios(workers=1):
+    from multiprocessing import get_context
+    r = pd.read_csv(RESULTS / "sgd_own_runs.csv", float_precision="round_trip")
+    r = r[r.crossed]
+    with get_context("spawn").Pool(workers) as pool:
+        rows = pool.map(_ratio_job, [(x.a, int(x.seed), int(x.step), x.w2_cross) for x in r.itertuples()])
+    pd.DataFrame(rows).to_csv(RESULTS / "sgd_own_ratios.csv", index=False)
+    print(json.dumps({"n": len(rows), "reproduced": all(x["reproduced"] for x in rows)}))
+
+
+def score_extension_a(ratios_, residual_obs, alpha, beta):
+    """Predicted median residual = median over crossing runs of alpha + beta·ratio_i; PASS iff |obs − pred| <=
+    max(0.01, 0.25·|pred|); UNRESOLVED with fewer than MIN_CROSS usable runs."""
+    ratios_ = np.asarray(ratios_, float)
+    ok = np.isfinite(ratios_) & (ratios_ > 0)
+    if ok.sum() < MIN_CROSS:
+        return {"EXT": "UNRESOLVED", "n": int(ok.sum())}
+    pred = float(np.median(alpha + beta * ratios_[ok]))
+    obs = float(np.median(np.asarray(residual_obs, float)[ok]))
+    tol = max(EXT_TOL_ABS, EXT_TOL_REL * abs(pred))
+    return {"EXT": "PASS" if abs(obs - pred) <= tol else "FAIL", "n": int(ok.sum()), "pred": pred, "obs": obs,
+            "tol": tol, "median_ratio": float(np.median(ratios_[ok]))}
+
+
+def score_extension():
+    fit = json.loads((RESULTS / "residual_timescale_fit.json").read_text())
+    r = pd.read_csv(RESULTS / "sgd_own_runs.csv"); r["a"] = r.a.round(2)
+    rt = pd.read_csv(RESULTS / "sgd_own_ratios.csv"); rt["a"] = rt.a.round(2)
+    if not rt.reproduced.all():
+        raise SystemExit("STOP: an SGD replay did not reproduce its crossing")
+    own = pd.read_csv(RESULTS / "own_threshold_crossing.csv"); own["a"] = own.a.round(2)
+    m = r[r.crossed].merge(rt, on=["a", "seed"]).merge(own[["a", "seed", "w2_own"]], on=["a", "seed"])
+    rows = [{"a": a, **score_extension_a(g.ratio, g.w2_cross / g.w2_own - 1, fit["alpha"], fit["beta"])}
+            for a, g in m.groupby("a")]
+    pd.DataFrame(rows).to_csv(RESULTS / "sgd_own_extension_scores.csv", index=False)
+    print(pd.DataFrame(rows).to_string(index=False))

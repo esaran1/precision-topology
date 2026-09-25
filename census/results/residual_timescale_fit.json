@@ -1,0 +1,10 @@
+{
+ "model": "residual = alpha + beta * ratio (OLS over the 384 Adam runs of lag test 2, primary rule, pooled a and phi)",
+ "alpha": 0.015717781678334056,
+ "beta": 2.6584244574981573,
+ "ratio_range_fitted": [
+  0.0013691085133025,
+  0.0228682301140319
+ ],
+ "n": 384
+}

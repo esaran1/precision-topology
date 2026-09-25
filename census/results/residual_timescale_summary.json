@@ -1,0 +1,17 @@
+{
+ "n_runs": 384,
+ "n_used": 384,
+ "excluded_nonpositive_relax": 0,
+ "branch_not_converged": 0,
+ "spearman_run_level": 0.6340201247838323,
+ "spearman_ci95": [
+  0.5417300417961157,
+  0.7208598962942014
+ ],
+ "spearman_cell_level": 1.0,
+ "spearman_within_a": {
+  "a=1.30": 0.4542546048883705,
+  "a=1.50": 0.5073769769145214
+ },
+ "clear_relationship_for_track4": true
+}

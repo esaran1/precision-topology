@@ -33,3 +33,13 @@ def test_init_matches_phase2b():
         torch.manual_seed(seed)
         ref = torch.empty(4).uniform_(-1.0, 1.0).double()
         assert torch.equal(th.detach(), ref)
+
+
+def test_extension_scorer_cases():
+    r = np.full(40, 0.01)
+    assert so.score_extension_a(r, np.full(40, 0.042), 0.0157, 2.658)["EXT"] == "PASS"     # pred 0.0423
+    assert so.score_extension_a(r, np.full(40, 0.10), 0.0157, 2.658)["EXT"] == "FAIL"
+    assert so.score_extension_a(r, np.full(40, 0.031), 0.0157, 2.658)["EXT"] == "FAIL"     # |0.031-0.0423| > 0.0106
+    assert so.score_extension_a(r[:20], np.full(20, 0.042), 0.0157, 2.658)["EXT"] == "UNRESOLVED"
+    bad = np.r_[np.full(35, -0.01), np.full(5, 0.01)]                                        # negative rates unusable
+    assert so.score_extension_a(bad, np.full(40, 0.04), 0.0157, 2.658)["EXT"] == "UNRESOLVED"
