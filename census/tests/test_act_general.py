@@ -210,7 +210,7 @@ def test_run_one_smoke_and_determinism():
 
 def test_kappa_scale_invariance():
     H = np.array([[2.0, 0.3, 0.1], [0.3, 1.0, 0.2], [0.1, 0.2, 0.5]])
-    tan = np.array([0.1, -0.2, 0.3]); dG = np.array([1.0, 0.5, 0.0]); p = np.array([0.2, 0.5, 0.3])
+    tan = np.array([0.1, -0.05, 0.3]); dG = np.array([1.0, 0.5, 0.0]); p = np.array([0.2, 0.5, 0.3])
     assert abs(ag.kappa(H, tan, dG, p)[0] - ag.kappa(H, tan, dG, 7 * p)[0]) < 1e-12
     # P = I: kappa = lambda_min(H) * (dG.H^-1 tan)/(dG.tan)
     k = ag.kappa(H, tan, dG, np.ones(3))[0]
