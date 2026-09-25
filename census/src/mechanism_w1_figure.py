@@ -78,7 +78,7 @@ def figure():
         ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
         ax.xaxis.set_minor_locator(NullLocator())
         ax.set_xlabel(r"output scale $R/R_{\mathrm{glob}}$" + f"  ($a = {a:.2f}$)")
-        ax.text(0.012 if a == 1.30 else 0.02, ALPHA_STAR + 0.04, "class-mean optimum α* = 1.79", color="0.35", va="bottom")
+        ax.text(0.012 if a == 1.30 else 0.02, ALPHA_STAR + 0.04, "class-mean optimum α*", color="0.35", va="bottom")
         ax.text(0.012 if a == 1.30 else 0.02, a / 1.4 - 0.05, r"placement bound $a/1.4$", color="0.35", va="top")
         F._clean(ax)
         stats[a] = {"w2_glob": wg, "n_cross": len(c), "x_min": float(g.x.min()), "x_max": float(g.x.max()),

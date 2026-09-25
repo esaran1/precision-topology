@@ -413,6 +413,98 @@ def fig_prospective_own():
     save(fig, "prospective_own")
 
 
+# ------------------------------------------------------------------------------------------ setting (redesign of fig1_setting)
+SETTING_SOLVER = (0.9437292267391273, 2.3593122836987837, -4.400602112045125, 13.150372704129833)   # a = 1.5, seed 0
+SETTING_MONO = (-0.8161124460820061, -2.3657288524708325, 2.6410341930922247, 7.321862160553577)    # a = 1.0, seed 38
+
+
+def fig_setting():
+    """One message: for a > 1 the activation folds, and only a folded unit can put both outer windows on the same side of
+    the inner one.  (a) f_a for a = 0.9, 1.05, 2.0 with the fold depth D(2) (exact closed form); (b) the task windows and
+    two trained networks (parameters as in paper/make_figures.fig1_setting, recovered from seeds; sign patterns asserted)."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(TEXT_W, 2.3))
+    t = np.linspace(-6.5, 6.5, 900)
+    for a_, c, ls, lw in ((0.9, GREY, "-", 1.2), (1.05, "0.35", "--", 1.0), (2.0, "k", "-", 1.2)):
+        ax1.plot(t, t + a_ * np.sin(t), color=c, ls=ls, lw=lw, zorder=2)
+    ax1.text(-6.2, 5.0, "$a = 2$", color="k")
+    ax1.text(1.2, -5.8, "$a = 0.9$, $1.05$", color="0.35")
+    a = 2.0
+    crit = np.arccos(1.0 / a)
+    tmax, tmin = np.pi - crit, np.pi + crit
+    fmax, fmin = tmax + a * np.sin(tmax), tmin + a * np.sin(tmin)
+    assert abs((fmax - fmin) - 2.0 * (np.sqrt(a * a - 1.0) - np.arccos(1.0 / a))) < 1e-9
+    ax1.plot([tmax, tmin], [fmax, fmin], "k.", ms=4, zorder=5)
+    xb = tmin + 1.4
+    ax1.annotate("", xy=(xb, fmin), xytext=(xb, fmax), arrowprops=dict(arrowstyle="<->", lw=0.8, color="k"))
+    ax1.plot([tmax, xb], [fmax, fmax], color="k", lw=0.5, ls=":")
+    ax1.plot([tmin, xb], [fmin, fmin], color="k", lw=0.5, ls=":")
+    ax1.text(xb + 0.2, (fmax + fmin) / 2, "fold", va="center")
+    ax1.set_xlabel("$t$")
+    ax1.set_ylabel(r"$f_a(t) = t + a\,\sin t$")
+    x = np.linspace(-2.3, 2.3, 900)
+    lo_y, hi_y = -1.45, 1.65
+    band = (0.12, 0.80)                                            # shading kept off the label strips (layout rule)
+    ax2.axvspan(-0.8, 0.8, ymin=band[0], ymax=band[1], color="0.88", lw=0, zorder=0)
+    for lo_, hi_ in ((1.2, 2.0), (-2.0, -1.2)):
+        ax2.axvspan(lo_, hi_, ymin=band[0], ymax=band[1], color="0.94", lw=0, zorder=0)
+    y_top = lo_y + (band[1] + 0.07) * (hi_y - lo_y)
+    ax2.text(0, y_top, "inner", ha="center", va="center")
+    ax2.text(1.6, y_top, "outer", ha="center", va="center")
+    ax2.text(-1.6, y_top, "outer", ha="center", va="center")
+    net = lambda p, a_: p[2] * ((p[0] * x + p[1]) + a_ * np.sin(p[0] * x + p[1])) + p[3]
+    sv, mv = net(SETTING_SOLVER, 1.5), net(SETTING_MONO, 1.0)
+
+    def signs(v):
+        w = [np.sign(v[(x >= -2.0) & (x <= -1.2)]), np.sign(v[np.abs(x) <= 0.8]), np.sign(v[(x >= 1.2) & (x <= 2.0)])]
+        return tuple(float(u[0]) for u in w) if all((u == u[0]).all() for u in w) else None
+    assert signs(sv) == (1.0, -1.0, 1.0)
+    assert signs(mv) != (1.0, -1.0, 1.0)
+    ax2.plot(x, np.tanh(sv), color=GREEN, lw=1.3, zorder=3)
+    ax2.plot(x, np.tanh(mv), color=GREY, lw=1.3, ls="--", zorder=3)
+    ax2.axhline(0, color="k", lw=0.6, zorder=1)
+    y_bot = lo_y + 0.05 * (hi_y - lo_y)
+    ax2.text(1.55, y_bot, "folded: solves", color=GREEN, ha="center", va="center")
+    ax2.text(-1.2, y_bot, "monotone: cannot", color="0.4", ha="center", va="center")
+    ax2.set_xlabel("input $x$")
+    ax2.set_ylabel("network output (tanh)")
+    ax2.set_ylim(lo_y, hi_y)
+    ax2.set_xlim(-2.3, 2.3)
+    ax2.set_yticks([-1, 0, 1])
+    for ax, lab in ((ax1, "(a)"), (ax2, "(b)")):
+        ax.text(0.01, 0.99, lab, transform=ax.transAxes, ha="left", va="top")
+    _clean(ax1, ax2)
+    fig.tight_layout(pad=0.3)
+    save(fig, "setting")
+    return {"fold_depth_a2": float(fmax - fmin)}
+
+
+def fig_metric_check():
+    """One message: the continuous test error falls over a wide range of R while the binary solve rate is still zero.
+    Two stacked panels sharing R (no twin axis); the 10-90% transition intervals as bars; numbers in the caption."""
+    from .metric_check import analyse, binned, runs
+    s_ = runs("certified"); g = binned(s_); m = analyse("certified")
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(TEXT_W, 2.9), sharex=True)
+    ax1.plot(g["mid"], g.rate, color="k", marker="o", ms=3.4, lw=1.2, zorder=3)
+    ax1.plot([m["binary_10"], m["binary_90"]], [1.14, 1.14], color="k", lw=2.2, solid_capstyle="butt")
+    ax1.set_ylim(-0.05, 1.26)
+    ax1.set_ylabel("solve rate")
+    ax1.text(m["binary_10"] - 0.008, 1.14, "rate rises", ha="right", va="center")
+    ax2.fill_between(g["mid"], g.q25, g.q75, color=GREY, alpha=0.35, lw=0, zorder=1)
+    ax2.plot(g["mid"], g.err, color="0.25", marker="s", ms=3.2, lw=1.2, zorder=3)
+    top = float(g.q75.max()) * 1.12
+    ax2.plot([m["continuous_10"], m["continuous_90"]], [top, top], color="0.25", lw=2.2, solid_capstyle="butt")
+    ax2.text(m["continuous_90"] + 0.008, top, "error falls", ha="left", va="center", color="0.25")
+    ax2.set_ylim(-5, top * 1.14)
+    ax2.set_ylabel("test errors")
+    ax2.set_xlabel(r"output scale $R = |w_2|\,\hat G(a)/2$")
+    for ax, lab in ((ax1, "(a)"), (ax2, "(b)")):
+        ax.text(0.005, 0.97, lab, transform=ax.transAxes, ha="left", va="top")
+    _clean(ax1, ax2)
+    fig.tight_layout(pad=0.3)
+    save(fig, "metric_check")
+    return m
+
+
 # ------------------------------------------------------------------------------------------ captions (for the writer)
 def captions():
     """results/figures/v5/captions.md: for each figure, its PDF path, one-sentence message, main text or appendix, the
@@ -426,6 +518,33 @@ def captions():
                  f"- **Message**: {message}\n- **Population and n**: {population}\n- **Uncertainty shown**: {uncertainty}\n"
                  "- **Numbers for the caption** (moved out of the image):\n" + "".join(f"  - {x}\n" for x in numbers)
                  + (f"- **Note**: {note}\n" if note else "") + "\n")
+    # setting and metric check (redesigns of the earlier fig1_setting and fig4_metric_check), 2026-09-25
+    import math as _m
+    entry("setting", "main text",
+          "For a > 1 the activation f_a folds, and only a folded unit can put both outer windows on the same side of the "
+          "inner window: a trained non-monotone network solves the task and the best monotone one cannot.",
+          "(a) f_a(t) = t + a sin t for a = 0.9, 1.05 and 2.0 (closed form). (b) Inner window [−0.8, 0.8] (class 0, "
+          "negative) and outer windows ±[1.2, 2.0] (class 1, positive); two trained width-1 networks recovered "
+          "deterministically from seeds (float64, Adam lr 0.01, 2,000 steps): a = 1.5, seed 0 (solves; dense 4,001-point "
+          "check) and a = 1.0, seed 38 (the best monotone run, 91/200 sample errors). Outputs shown through tanh.",
+          "None (a closed form and two individual runs).",
+          [f"fold depth at a = 2: D(2) = 2(√(a²−1) − arccos(1/a)) = {2 * (_m.sqrt(3) - _m.acos(0.5)):.4f} (the double arrow)",
+           "the folded unit's sign pattern across the windows is (+, −, +); the monotone unit changes sign only once across them"],
+          note="Replaces paper/figures/fig1_setting.pdf (v4 styling).")
+    from .metric_check import analyse as _an
+    _mm = _an("certified")
+    entry("metric_check", "main text (or appendix)",
+          "The continuous test error falls over a wide range of output scale while the binary solve rate is still zero, "
+          "so the sharp threshold is not an artifact of a binary metric.",
+          f"Width 1, {_mm['runs']:,} training runs (fold1d sweep and refinement; certified Ĝ), binned by R in 0.025 bins. "
+          "(a) Fraction of runs that solve. (b) Test errors per run: mean (squares) and interquartile band.",
+          "Interquartile band of the per-run test errors in (b); none in (a).",
+          [f"binary solve rate: 10–90% transition over R ∈ [{_mm['binary_10']:.3f}, {_mm['binary_90']:.3f}] (bar in (a))",
+           f"continuous error: 10–90% of its fall over R ∈ [{_mm['continuous_10']:.3f}, {_mm['continuous_90']:.3f}] (bar in (b)); "
+           f"width ratio {_mm['ratio']:.1f}",
+           f"{_mm['improvement_at_zero_rate_pct']:.0f}% of the error improvement occurs in bins where no run solves "
+           f"({_mm['runs_in_zero_rate_bins']:,} runs, R < {_mm['last_zero_rate_bin_right']:.2f})"],
+          note="Replaces paper/figures/fig4_metric_check.pdf (v4 styling, twin axis).")
     # mechanism (width 1): |w1| of the conditional minimiser against R/R_glob (Task C, 2026-09-25)
     if (RESULTS / "mechanism_w1_path.csv").exists():
         mp_ = read("mechanism_w1_path.csv"); ms_ = read("mechanism_w1_stats.csv").set_index("Unnamed: 0")
@@ -655,6 +774,8 @@ def main():
     fig_mirror_branches()
     fig_prospective()
     fig_prospective_own()
+    fig_setting()
+    fig_metric_check()
     if (RESULTS / "mechanism_w1_path.csv").exists():
         from . import figures_v5 as _F
         from .mechanism_w1_figure import figure as fig_mechanism_w1
