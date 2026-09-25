@@ -449,7 +449,7 @@ every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× t
 
 | scale | best placed: the direct check's retained minimiser | best unplaced (infimum over G₊ ≤ 0) | difference (× tie tolerance) | lowest unplaced local minimum, above the placed pair |
 |---|---|---|---|---|
-| a = 1.30, R₂ = 0.001 | pending | 0.6922872690039 (boundary, G₊ = -2.0e-10) | pending | 1.61e-06 (single unit, G₊ = -3.65) |
+| a = 1.30, R₂ = 0.001 | 0.6922871697904 (placed, cancelling pair) | 0.6922872690039 (boundary, G₊ = -2.0e-10) | 9.92e-08 (99× 1e−9) | 1.61e-06 (single unit, G₊ = -3.65) |
 | a = 1.30, R₂ = 0.003 | pending | 0.6905704168112 (boundary, G₊ = -1.2e-11) | pending | 1.45e-05 (single unit, G₊ = -3.64) |
 | a = 1.30, R₂ = 0.01 | pending | 0.6845925670975 (boundary, G₊ = -2.0e-12) | pending | 1.60e-04 (single unit, G₊ = -3.59) |
 | a = 1.30, R₂ = 0.02 | pending | 0.6761364675950 (boundary, G₊ = -1.6e-13) | pending | 6.33e-04 (single unit, G₊ = -3.52) |
