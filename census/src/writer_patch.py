@@ -338,13 +338,14 @@ certified R_glob and R_solve bracket):
   are FAIL at both a (neither intervention removes half the residual; the registered competing outcome holds). Its
   four validity gates pass; teleport + reset is reported with no criterion.
 - Width-1 consistency check (`scale_limits_prediction.md`): PASS.
-- Width-2 verdict (same file): no placement threshold for f_a. Recorded as PASS and marked NON-DIRECTIONAL: it is a
-  decision rule with two registered outcomes, and the outcome is decided by the second-order (Var) selection, which
-  the registration added.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
 
 **Not in the headline.**
+- *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
+  registration stated a two-outcome rule (G > 0: no placement threshold; G <= 0: a threshold exists) rather than a
+  predicted outcome. **Outcome: no placement threshold for f_a at width 2.** The outcome is decided by the
+  second-order (Var) selection, which the registration added; its direct check is pending (below).
 - *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
   the width-2 no-gating test (not run).
 - *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
@@ -353,8 +354,8 @@ certified R_glob and R_solve bracket):
 **Row-level tables shipped in the supplementary**:
 - `results/registration_census.csv`: the headline, one row per prediction;
 - `results/registration_census_by_unit.csv`: the appendix view, per a;
-- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, pending registrations
-  and designed-but-unregistered predictions;
+- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, the registered
+  decision rule, pending registrations and designed-but-unregistered predictions;
 - `results/registration_tally.csv`: the tallies.
 
 Source for the tables below: `writer_patch_census_by_block.csv`.

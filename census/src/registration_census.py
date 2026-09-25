@@ -80,6 +80,7 @@ def build() -> pd.DataFrame:
     other = pd.read_csv(OTHER)
     gates = other[other.kind == "validity gate"]
     pending = other[other.kind.astype(str).str.startswith("pending")]
+    rules = other[other.kind.astype(str).str.startswith("registered decision rule")]
     assert not set(other.id) & set(d.id)
     for label, t in (("", p), ("by registered unit: ", d)):
         v4 = t[t.census_round.isin(["2026-09-24", "2026-09-25"])]
@@ -95,6 +96,8 @@ def build() -> pd.DataFrame:
                  **c.to_dict()})
     rows.append({"scope": "pending: registered, not yet scored (not in the headline)", "n": len(pending),
                  **{v: 0 for v in VERDICTS}})
+    rows.append({"scope": "registered decision rules: outcome reported, not a prediction (not in the headline)",
+                 "n": len(rules), **{v: 0 for v in VERDICTS}})
     pd.DataFrame(rows).to_csv(TALLY, index=False)
     return p
 

@@ -143,23 +143,24 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 184 scored by their registered rules: 86 PASS, 58 FAIL, 8 PARTIAL,
+- **Headline**: 183 scored by their registered rules: 85 PASS, 58 FAIL, 8 PARTIAL,
   32 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 200 registered predictions.
+- **Total**: 199 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
   are FAIL at both a (neither intervention removes half the residual; the registered competing outcome holds). Its
   four validity gates pass; teleport + reset is reported with no criterion.
 - Width-1 consistency check (`scale_limits_prediction.md`): PASS.
-- Width-2 verdict (same file): no placement threshold for f_a. Recorded as PASS and marked NON-DIRECTIONAL: it is a
-  decision rule with two registered outcomes, and the outcome is decided by the second-order (Var) selection, which
-  the registration added.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
 
 **Not in the headline.**
+- *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
+  registration stated a two-outcome rule (G > 0: no placement threshold; G <= 0: a threshold exists) rather than a
+  predicted outcome. **Outcome: no placement threshold for f_a at width 2.** The outcome is decided by the
+  second-order (Var) selection, which the registration added; its direct check is pending (below).
 - *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
   the width-2 no-gating test (not run).
 - *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
@@ -168,8 +169,8 @@ certified R_glob and R_solve bracket):
 **Row-level tables shipped in the supplementary**:
 - `results/registration_census.csv`: the headline, one row per prediction;
 - `results/registration_census_by_unit.csv`: the appendix view, per a;
-- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, pending registrations
-  and designed-but-unregistered predictions;
+- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, the registered
+  decision rule, pending registrations and designed-but-unregistered predictions;
 - `results/registration_tally.csv`: the tallies.
 
 Source for the tables below: `writer_patch_census_by_block.csv`.
@@ -226,7 +227,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | prospective own-seed | registered rule | 8 | 0 | 0 | 0 | 8 |
 | sample size | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | sample size | registered rule | 1 | 1 | 0 | 0 | 2 |
-| scale limits (width 2) | registered rule | 2 | 1 | 0 | 0 | 3 |
+| scale limits (width 2) | registered rule | 1 | 1 | 0 | 0 | 2 |
 | scaling limit | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | scaling limit | registered rule | 3 | 0 | 0 | 0 | 3 |
 | search 08-22 | registered rule | 2 | 0 | 2 | 0 | 4 |
@@ -293,7 +294,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/residual_mechanism_design.md | registered rule | 0 | 2 | 0 | 0 | 2 |
 | results/sample_size_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/sample_size_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
-| results/scale_limits_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/scale_limits_prediction.md | registered rule | 1 | 0 | 0 | 0 | 1 |
 | results/scale_limits_tanh_prediction.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/scaling_limit_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/scaling_limit_prediction.md | registered rule | 3 | 0 | 0 | 0 | 3 |
