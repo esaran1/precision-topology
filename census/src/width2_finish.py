@@ -131,7 +131,11 @@ def summary():
             r = sm[np.isclose(sm.R2, R2)]
             ret = float(r.retained_loss.iloc[0]) if len(r) else np.nan
             below = g[g.loss_final < ret - 1e-12] if len(r) else g.iloc[0:0]
-            rows.append({"act": act, "R2": R2, "finished": len(g), "converged": int(g.converged.sum()),
+            rows.append({"act": act, "R2": R2, "direct_check_landed": bool(len(r)),
+                         "direct_check_placed": bool(r.placed.iloc[0]) if len(r) else np.nan,
+                         "direct_check_pair": bool(str(r.is_cancelling_pair.iloc[0]) == "True") if len(r) else np.nan,
+                         "direct_check_G": float(r.Gplus_lo.iloc[0]) if len(r) else np.nan,
+                         "finished": len(g), "converged": int(g.converged.sum()),
                          "end_placed_pair": int((g.placed & g.cancelling_pair).sum()),
                          "end_placed_other": int((g.placed & ~g.cancelling_pair).sum()),
                          "end_unplaced_single_unit": int((~g.placed & (g.min_share <= 0.01)).sum()),

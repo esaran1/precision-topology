@@ -353,9 +353,161 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp6()
     text += wp7()
     text += wp8()
+    text += wp9() + wp10() + wp11()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
+
+
+def _id(*labels):
+    return "; ".join(f"`{l}`" for l in labels)
+
+
+def wp9():
+    """WP-9: width 2 (rebuttal revision)."""
+    w1 = pd.read_csv(RESULTS / "scale_limits_width1.csv")
+    w2 = pd.read_csv(RESULTS / "scale_limits_width2.csv").set_index("a")
+    fs = pd.read_csv(RESULTS / "width2_finish_summary.csv")
+    landed = fs[fs.direct_check_landed.astype(bool)]
+    land = ", ".join(f"a = {float(r.act[1:]):.2f} at R₂ = {r.R2:g}" for r in landed.itertuples()) or "none yet"
+    n_pend = 8 - len(landed)
+    return f"""
+## WP-9. Width 2: the small-scale criterion, the registered verdict and the tanh case (rebuttal revision)
+
+Sources: `math_note_v2.md` §10 and §10.1 (at `census/results/math_note_v2.md`), `scale_limits_prediction.md`,
+`scale_limits_tanh_prediction.md`, WP-8. IDs are `src/verify_ledger.py` check labels.
+
+**The small-scale criterion (math note §10.1, summary).** For fixed hidden parameters θ, the profiled loss at output
+scale s is L*(θ; s) = log 2 − (s/4)·Δμ(θ) + (s²/8)·Var(φ_θ) + O(s⁴) (g‴(0) = 0; remainder checked numerically). So the
+small-scale conditional minimiser maximises the class-mean gap Δμ, and among tied maximisers the s² term selects the
+one with the smallest Var(φ). If the data gap Γ_n is attained (Lemma 2), output scale gates placement if and only if
+this small-scale minimiser is unplaced.
+
+**Width-1 consistency check (registered, passed).** The selected Δμ-maximiser has G ≤ 0 at all six a
+(G = {w1.G.max():.3f} … {w1.G.min():.3f}), as required by the certified width-1 thresholds.
+IDs: {_id("alpha*", "width 1: selected dmu-maximiser G <= 0 at all six a", "width 1: G range lo (a = 1.30)", "width 1: G range hi (a = 1.60)")}.
+
+**The registered width-2 verdict: no placement threshold for f_a.** The Var-selected Δμ-maximiser is the cancelling
+cosine pair, placed with G = +{w2.loc[1.3, "selected_G_lo"]:.3f} (a = 1.30) and +{w2.loc[1.5, "selected_G_lo"]:.3f} (a = 1.50);
+W1 and W4 were not run. IDs: {_id("width 2: validation (ladder, independent, pair attains max, pair Var minimal)", "width 2: selected G at a=1.30", "width 2: selected G at a=1.50", "verdict: no placement threshold for f_a at width 2")}.
+
+**Its dependency on the variance selection.** At first order the Δμ-maximisers tie: single units (unplaced) and
+pairs (placed). Δμ alone does not decide the verdict; the s² (Var) term does. That selection rule was added in the
+registration (committed before any maximiser was computed) and was not in the author's original rule. The direct
+check (WP-8) tests the verdict without the expansion: at each scale the validated W0 search finds the conditional
+minimiser itself. Landed so far: {land} (placed cancelling pair at each, every validation passed, the best unplaced
+configuration on the G = 0 boundary ≈ 99× the tie tolerance above); **{n_pend} scale(s) PENDING** (table in WP-8, not
+repeated here). IDs: {_id("direct check: every landed scale placed, cancelling pair", "direct check: no finished restart below the retained minimiser (landed scales)", "min margin at R2 = 0.001", "all best-unplaced on the boundary")}.
+
+**tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
+size, the maxima are < 1 and rising, the first-order tie is present, the Var-selected symmetric pair is placed at every
+box (G₊ → 1) and the single units are unplaced. The boundary criterion as written fails at A = 40, because the 1e−9 tie
+tolerance is of the order of 1 − max (4.1e−9) there. Non-attainment of the supremum is proved analytically
+(Δμ < 1 = sup Δμ). No re-registration. tanh lies outside the criterion's attainment hypothesis.
+IDs: {_id("tanh: registered outcome 'neither'", "tanh: validation passed at every A", "tanh: box maxima < 1 and rising", "tanh: boundary condition fails only at A = 40", "tanh: selected member is the symmetric pair at every A", "tanh: single units unplaced at every A")}.
+
+**Say**
+- "At width 2, output scale does not gate placement for f_a: the registered small-scale prediction selects the placed
+  cancelling pair, and a direct search at small scales finds that pair as the conditional minimiser."
+- "The prediction rests on a second-order selection: at first order, unplaced single units and placed pairs tie."
+- "For tanh the supremum of Δμ is not attained; the registered test returned 'neither' because its boundary criterion
+  failed at the largest box, although every other expectation held."
+
+**Do not say**
+- "proved" or "certified" for the width-2 verdict (it is a registered, validated computation plus a lemma, not a
+  certificate); or that Δμ alone decides it.
+- that the direct check is complete while any scale is PENDING.
+- that the unplaced region has no local minima, or that the boundary point is a competing minimum (WP-8 wording).
+- that tanh "confirmed" or "passed" the registered expectation.
+"""
+
+
+def wp10():
+    """WP-10: the residual mechanism."""
+    pc = pd.read_csv(RESULTS / "residual_posthoc_correlations.csv")
+    r = lambda a, f: float(pc[(pc.a.round(2) == a) & (pc.point == "primary") & (pc.feature == f)].spearman_rho.iloc[0])
+    rm = pd.read_csv(RESULTS / "residual_mechanism_scores.csv")
+    m = lambda a, arm: 100 * float(rm[(rm.a.round(2) == a) & (rm.arm == arm)].median_residual.iloc[0])
+    ci = lambda a, arm: rm[(rm.a.round(2) == a) & (rm.arm == arm)].iloc[0]
+    rows = ""
+    for a in (1.3, 1.5):
+        cells = [f"{m(a, 'control'):.3f}%"]
+        for arm in ("teleport", "reset", "teleport_reset"):
+            c = ci(a, arm)
+            cells.append(f"{m(a, arm):.3f}% [{100 * c.control_minus_arm_ci_lo:+.2f}, {100 * c.control_minus_arm_ci_hi:+.2f}]")
+        rows += f"| {a:.2f} | " + " | ".join(cells) + " |\n"
+    return f"""
+## WP-10. The residual mechanism: Block 4a (post hoc) and Block 4b (registered)
+
+Sources: `residual_posthoc_correlations.csv`, `residual_mechanism_design.md`, `residual_mechanism_scores.csv`.
+
+**Block 4a (POST HOC correlations).** At the deconfounded switch point (0.7× the own threshold), the final residual
+correlates with the displacement from the occupied branch's conditional minimiser (Spearman ρ = {r(1.3, "dist"):.2f} at
+a = 1.30, {r(1.5, "dist"):.2f} at a = 1.50; n = 48 each; permutation p ≈ 1e−4) and anti-correlates with Adam's
+√v̂(w₂) (ρ = {r(1.3, "sqrt_vhat_w2"):.2f}, {r(1.5, "sqrt_vhat_w2"):.2f}).
+IDs: {_id("4a a=1.3 displacement rho (post hoc)", "4a a=1.5 displacement rho (post hoc)", "4a a=1.3 sqrt vhat(w2) rho (post hoc)", "4a a=1.5 sqrt vhat(w2) rho (post hoc)")}.
+
+**Block 4b (registered): competing outcome at both a — neither teleporting to the branch minimiser nor resetting
+Adam's moments removes half the residual; the mechanism is unresolved.** Every validity check passed (control
+bit-identical to the lag test's φ = 1 continuation, branch preserved, teleports on the minimiser, 0 excluded, 48/48
+crossings per arm). Median residual against the own threshold [95% interval of control − arm]:
+
+| a | control | teleport | reset | teleport + reset (reported, no criterion) |
+|---|---|---|---|---|
+{rows}
+IDs: {_id("4b: every validity check passed", "4b a=1.3: verdict competing (neither removes half)", "4b a=1.5: verdict competing (neither removes half)", "4b a=1.3 control residual", "4b a=1.3 teleport residual", "4b a=1.5 reset residual", "4b a=1.3 teleport+reset residual", "4b a=1.5 teleport+reset residual")}.
+Detection does not explain the residual either (WP-6).
+
+**Say**
+- "Post hoc, the residual correlates with the run's displacement from its branch minimiser at the switch point; a
+  registered intervention that removes the displacement does not remove the residual, so the correlation is not causal
+  there. Neither inherited displacement nor optimiser memory alone accounts for it; the mechanism is open."
+
+**Do not say**
+- that displacement, optimiser memory or adiabatic lag causes or explains the residual;
+- that Block 4a's correlations are registered, or that 4b found a small effect of any arm (every interval includes 0).
+"""
+
+
+def wp11():
+    """WP-11: the independent certificate checker (Block 2)."""
+    gr = pd.read_csv(RESULTS / "ghat_rigorous.csv")
+    return f"""
+## WP-11. The independent certificate checker: what is verified, what is pending, what ships
+
+Sources: `certificate_audit.md`, `verify_certificates_finite.log`, `verify_certificates_ghat.log`,
+`certificate_checks/`, `certificates_manifest.csv`. Checker: `src/verify_certificates.py` (python-flint / Arb, 80-bit
+ball arithmetic; imports nothing from `src/`; every decision an Arb comparison).
+
+**Verified so far.**
+- **Finite-a status certificates**, both ends of the global bracket at a = 1.30, 1.35, 1.40, 1.45, 1.50, 1.60 (12
+  certificates): every leaf's claim verified, exact tiling, the localisation lemma W recomputed, hashes match. All pass.
+  ID: `Block 2: 12 finite-a certificates pass`.
+- **Ĝ(a) enclosures**, a = {", ".join(f"{a:.2f}" for a in gr.a)} ({len(gr)} certificates, 42 thousand to 111 million leaves):
+  hashes, exact tiling of the domain, and the analytic domain reduction pass at every a. The float endpoints of the
+  original searches miss the rigorous enclosure by at most 1.1e−15, so the rigorous enclosures replace them (WP-7).
+  IDs: `Ghat certificates checked (a = 1.02-3.0)`; `Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi)`.
+
+**Pending (not yet exported or checked).** In priority order (the main theorem rests on the first two):
+1. the limit-problem chain (limit switch, K, the Krawczyk boxes for c₁);
+2. the solve brackets;
+3. outer exclusion and ring, the PD boxes, localisation (B(24) and B_full).
+
+**What the supplementary will ship** (not rebuilt yet; built once every claim is final): the checker
+(`src/verify_certificates.py`) and its tests; the manifest of SHA-256 hashes, each with the command that regenerates
+the file bit-identically (`certificates_manifest.csv`); the exporting searches and `src/cert_export.py`. The certificate
+data files are not shipped (regenerated from the commands and verified against the hashes); a single command runs the
+checker, with its expected output.
+
+**Say**
+- "An independent checker in ball arithmetic, sharing no code with the searches, verifies the finite-a certificates
+  and the Ĝ enclosures; the remaining certificate families are being exported."
+
+**Do not say**
+- that every certificate has been independently checked, until the pending families are;
+- that the checker verified the original float endpoints of Ĝ (it verified rigorous enclosures that differ from them
+  by at most 1.1e−15).
+"""
 
 
 def wp8():
@@ -379,7 +531,7 @@ def wp8():
             diff = r.best_unplaced_loss - placed_l
             dd = f"{diff:.2e} ({diff / 1e-9:,.0f}× 1e−9)"
         else:
-            chk, dd = "pending", "pending"
+            chk, dd = "PENDING", "PENDING"
         rows += (f"| a = {float(r.act[1:]):.2f}, R₂ = {r.R2:g} | {chk} | {r.best_unplaced_loss:.13f} (boundary, G₊ = {r.G_hi:.1e}) "
                  f"| {dd} | {r.lowest_local_min_minus_placed:.2e} (single unit, G₊ = {r.lowest_local_min_G:.2f}) |\n")
     return f"""

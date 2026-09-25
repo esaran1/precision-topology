@@ -1284,6 +1284,23 @@ def v4_checks() -> None:
     chk("|c| min", float(un_.linear_c.abs().min()), 0.43, 0.006)
     chk("|c| max", float(un_.linear_c.abs().max()), 0.51, 0.006)
     chk("min margin at R2 = 0.001", float((mm_[mm_.R2 == 0.001].best_unplaced_loss - mm_[mm_.R2 == 0.001].local_descent_loss).min()), 9.9e-8, 0.06e-8)
+    print("WP-9/10 inputs")
+    w1g_ = pd.read_csv(R / "scale_limits_width1.csv")
+    chk("width 1: G range lo (a = 1.30)", float(w1g_.G.min()), -3.662, 0.0006)
+    chk("width 1: G range hi (a = 1.60)", float(w1g_.G.max()), -3.349, 0.0006)
+    pc_ = pd.read_csv(R / "residual_posthoc_correlations.csv")
+    def _rho(a, feat):
+        return float(pc_[(pc_.a.round(2) == a) & (pc_.point == "primary") & (pc_.feature == feat)].spearman_rho.iloc[0])
+    chk("4a a=1.3 displacement rho (post hoc)", _rho(1.3, "dist"), 0.675, 0.0006)
+    chk("4a a=1.5 displacement rho (post hoc)", _rho(1.5, "dist"), 0.668, 0.0006)
+    chk("4a a=1.3 sqrt vhat(w2) rho (post hoc)", _rho(1.3, "sqrt_vhat_w2"), -0.466, 0.0006)
+    chk("4a a=1.5 sqrt vhat(w2) rho (post hoc)", _rho(1.5, "sqrt_vhat_w2"), -0.480, 0.0006)
+    fs_ = pd.read_csv(R / "width2_finish_summary.csv")
+    ld_ = fs_[fs_.direct_check_landed.astype(bool)]
+    chk("direct check: every landed scale placed, cancelling pair",
+        float(len(ld_) > 0 and ld_.direct_check_placed.astype(bool).all() and ld_.direct_check_pair.astype(bool).all()), 1.0, 0)
+    chk("direct check: no finished restart below the retained minimiser (landed scales)",
+        float((ld_.n_below_retained == 0).all()), 1.0, 0)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12
