@@ -253,7 +253,73 @@ def score_extension():
     pd.DataFrame(rows).to_csv(RESULTS / "sgd_own_extension_scores.csv", index=False)
     print(pd.DataFrame(rows).to_string(index=False))
 
+
+
+# ------------------------------------------------------------------------------------------ sensitivity (POST HOC, author's request)
+def final_w2(a, seed, budget):
+    """|w2| after the full budget (a non-crossing run's final state), by deterministic replay; also re-checks that the
+    run does not cross (every-step state, as train_run)."""
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import logits
+    from .phase2b_ordering import state
+    f, x, y, th = _setup(a, seed)
+    opt = torch.optim.SGD([th], lr=SGD_LR)
+    crossed = False
+    for step in range(1, budget + 1):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(logits(th, x, f), y).backward()
+        opt.step()
+        if state(th.detach(), f, a, 1.0)["placement_ok"]:
+            crossed = True
+            break
+    return abs(float(th.detach()[2])), crossed
+
+
+def _final_job(args):
+    os.nice(15)
+    a, seed, budget = args
+    w, c = final_w2(a, seed, budget)
+    return {"a": a, "seed": seed, "w2_final": w, "crossed_on_replay": c}
+
+
+def sensitivity(workers=1):
+    """Each non-crossing run treated as crossing at (or above) its final |w2|: G1, G2 and EXT's observed median
+    re-scored on all runs.  Imputed values are lower bounds on the (unobserved) crossing."""
+    from multiprocessing import get_context
+    B = json.loads((RESULTS / "sgd_own_budget.json").read_text())["budget"]
+    r = pd.read_csv(RESULTS / "sgd_own_runs.csv", float_precision="round_trip"); r["a"] = r.a.round(2)
+    nc = r[~r.crossed]
+    with get_context("spawn").Pool(workers) as pool:
+        fin = pd.DataFrame(pool.map(_final_job, [(x.a, int(x.seed), B) for x in nc.itertuples()]))
+    if fin.crossed_on_replay.any():
+        raise SystemExit("STOP: a non-crossing run crossed on replay")
+    fin.to_csv(RESULTS / "sgd_own_noncrossers_final.csv", index=False)
+    own = pd.read_csv(RESULTS / "own_threshold_crossing.csv"); own["a"] = own.a.round(2)
+    m = r.merge(fin[["a", "seed", "w2_final"]], on=["a", "seed"], how="left").merge(
+        own[["a", "seed", "w2_own", "w2_pop"]], on=["a", "seed"])
+    m["w2_imp"] = np.where(m.crossed, m.w2_cross, m.w2_final)
+    fit = json.loads((RESULTS / "residual_timescale_fit.json").read_text())
+    rt = pd.read_csv(RESULTS / "sgd_own_ratios.csv"); rt["a"] = rt.a.round(2)
+    rows = []
+    for a in A_VALUES:
+        g = m[m.a == a]
+        sc = score_a(g.w2_imp, g.w2_own, g.w2_pop.iloc[0])
+        ratios_ = rt[rt.a == a].ratio.values
+        pred = float(np.median(fit["alpha"] + fit["beta"] * ratios_[np.isfinite(ratios_) & (ratios_ > 0)]))
+        obs = float(np.median(g.w2_imp / g.w2_own - 1))
+        tol = max(EXT_TOL_ABS, EXT_TOL_REL * abs(pred))
+        rows.append({"a": a, "n": len(g), "imputed": int((~g.crossed).sum()), **sc,
+                     "EXT_pred": pred, "EXT_obs_imputed": obs, "EXT_tol": tol,
+                     "EXT": "PASS" if abs(obs - pred) <= tol else "FAIL",
+                     "median_final_over_own_noncrossers": float(np.median((g.w2_imp / g.w2_own)[~g.crossed]))})
+    out = pd.DataFrame(rows)
+    out.to_csv(RESULTS / "sgd_own_sensitivity.csv", index=False)
+    print(out.to_string(index=False))
+
+
 if __name__ == "__main__":
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     {"pilot": lambda: pilot(w), "train": lambda: train(w), "score": score, "ratios": lambda: ratios(w),
-     "score_extension": score_extension}[sys.argv[1]]()
+     "score_extension": score_extension,
+     "sensitivity": lambda: sensitivity(w)}[sys.argv[1]]()
