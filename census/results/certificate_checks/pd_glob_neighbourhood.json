@@ -1,0 +1,10 @@
+{
+ "name": "pd_glob_neighbourhood",
+ "boxes": 500,
+ "b_bracket_all": true,
+ "pd_all_with_margin_c": true,
+ "c": 0.0473,
+ "seconds": 6.655309200286865,
+ "failed": [],
+ "pass": true
+}

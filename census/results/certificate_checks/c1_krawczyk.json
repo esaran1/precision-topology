@@ -1,0 +1,13 @@
+{
+ "switch_krawczyk_ok": true,
+ "active_set_unique": true,
+ "A_star_lo": 0.6854452375756532,
+ "A_star_hi": 0.6854452375756537,
+ "A1_over_A_lo": 0.6621547824344876,
+ "A1_over_A_hi": 0.6621549498240902,
+ "A_star_overlaps_published": true,
+ "vertex_krawczyk_ok": true,
+ "K_vertex_lo": 0.579455883427557,
+ "K_vertex_hi": 0.5794558834275573,
+ "pass": true
+}

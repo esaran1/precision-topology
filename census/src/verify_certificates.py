@@ -1011,6 +1011,219 @@ def check_K(target=None, workers=WORKERS, verbose=True, max_level=K_MAX_LEVEL, s
         print(json.dumps({k: v for k, v in res.items() if k != "levels"}, indent=1, default=str))
     return res
 
+# ------------------------------------------------------------------------------------------ limit problem: Krawczyk and PD boxes
+def _hh(t):
+    return -t + t * t * t / 6
+
+
+def _h1(t):
+    return t * t / 2 - 1
+
+
+def _r(t):
+    t2 = t * t
+    return t2 * t / 6 - t2 * t2 * t / 120
+
+
+def _r1(t):
+    t2 = t * t
+    return t2 / 2 - t2 * t2 / 24
+
+
+def _sig(z):
+    return 1 / (1 + (-z).exp())
+
+
+def _limit_data():
+    d = np.load(CERTS / "limit_A_lo.npz")
+    return [arb(float(v)) for v in d["x"]], [int(v) for v in d["y"]]
+
+
+def switch_system_arb(X, xs, ys, want_J=True):
+    """Φ(p, q, b, A) = (∂_p L, ∂_q L, ∂_b L, G₀^act) with L = mean softplus(z) − y z, z = A h(p x + q) + b and the active
+    gap G₀^act = h(q − 1.2p) − h(q + 0.8p); its Jacobian and ∂_εΦ (r(σ) = σ³/6 − σ⁵/120, the O(ε) profile term), in Arb."""
+    p, q, b, A = X
+    n = len(xs)
+    F = [arb(0)] * 3
+    J = [[arb(0)] * 4 for _ in range(3)]
+    E = [arb(0)] * 3
+    for xi, yi in zip(xs, ys):
+        sg = p * xi + q
+        hs, h1s = _hh(sg), _h1(sg)
+        z = A * hs + b
+        S = _sig(z); res = S - yi
+        dz = [A * h1s * xi, A * h1s, arb(1)]
+        for i in range(3):
+            F[i] += res * dz[i]
+        if not want_J:
+            continue
+        w = S * (1 - S)
+        h2s = sg
+        d2 = [[A * h2s * xi * xi, A * h2s * xi, arb(0)], [A * h2s * xi, A * h2s, arb(0)], [arb(0), arb(0), arb(0)]]
+        dA = [h1s * xi, h1s, arb(0)]
+        rs, r1s = _r(sg), _r1(sg)
+        de = [A * r1s * xi, A * r1s, arb(0)]
+        for i in range(3):
+            for j in range(3):
+                J[i][j] += w * dz[i] * dz[j] + res * d2[i][j]
+            J[i][3] += w * hs * dz[i] + res * dA[i]
+            E[i] += w * A * rs * dz[i] + res * de[i]
+    F = [f / n for f in F]
+    sO, sI = q - arb("1.2") * p, q + arb("0.8") * p
+    F.append(_hh(sO) - _hh(sI))
+    if not want_J:
+        return F
+    J = [[J[i][j] / n for j in range(4)] for i in range(3)]
+    J.append([-arb("1.2") * _h1(sO) - arb("0.8") * _h1(sI), _h1(sO) - _h1(sI), arb(0), arb(0)])
+    E = [e / n for e in E] + [_r(sO) - _r(sI)]
+    return F, J, E
+
+
+def _mid(b):
+    return float(b.mid())
+
+
+def krawczyk_arb(fun, xt, rad):
+    """Krawczyk test in Arb: K = x̃ − Y F(x̃) + (I − Y J(X))(X − x̃) ⊂ int X proves a unique zero in X.  Y is any float
+    matrix (the inverse of mid J); every other quantity is an Arb enclosure."""
+    k = len(xt)
+    X = [ball(xt[i] - rad[i], xt[i] + rad[i]) for i in range(k)]
+    F0 = fun([arb(repr(v)) for v in xt], False)
+    J = fun(X, True)[1]
+    Y = np.linalg.inv(np.array([[_mid(J[i][j]) for j in range(k)] for i in range(k)]))
+    Kb = []
+    for i in range(k):
+        acc = arb(repr(xt[i]))
+        for j in range(k):
+            acc -= arb(repr(float(Y[i, j]))) * F0[j]
+        for j in range(k):
+            cij = arb(1 if i == j else 0) - sum((arb(repr(float(Y[i, l]))) * J[l][j] for l in range(k)), arb(0))
+            acc += cij * (X[j] - arb(repr(xt[j])))
+        Kb.append(acc)
+    ok = all((lo_(Kb[i]) > lo_(X[i])) and (hi_(Kb[i]) < hi_(X[i])) for i in range(k))
+    return ok, Kb, X, J
+
+
+def lin_enclose_arb(J, b):
+    """Enclose {d : J d = −b} for every J, b in the balls: d̃ ± e (∞-norm), e = ‖Y(J d̃ + b)‖/(1 − ‖I − YJ‖)."""
+    k = len(b)
+    Y = np.linalg.inv(np.array([[_mid(J[i][j]) for j in range(k)] for i in range(k)]))
+    dt = -Y @ np.array([_mid(v) for v in b])
+    Ya = [[arb(repr(float(Y[i, j]))) for j in range(k)] for i in range(k)]
+    Rv = [sum((J[i][j] * arb(repr(float(dt[j]))) for j in range(k)), arb(0)) + b[i] for i in range(k)]
+    YR = [sum((Ya[i][l] * Rv[l] for l in range(k)), arb(0)) for i in range(k)]
+    nE = max(sum(abs(arb(1 if i == j else 0) - sum((Ya[i][l] * J[l][j] for l in range(k)), arb(0))) for j in range(k))
+             for i in range(k))
+    if not (nE < 1):
+        return None
+    e = max(abs(v) for v in YR) / (1 - nE)
+    return [arb(repr(float(dt[i]))) + ball(-float(e.upper()), float(e.upper())) for i in range(k)]
+
+
+def check_krawczyk(verbose=True):
+    """The c₁ chain's Krawczyk boxes, re-derived in Arb: (1) the switch system at the published point, radius 1e−9:
+    unique zero, A* enclosure; active set (inner max at 0.8, outer min at −1.2, all other candidates strictly
+    dominated over the box; no interior critical point); A′(0)/A* by an interval linear solve; (2) the K vertex
+    (the tied corner) by the 2×2 vertex system, and K there."""
+    import csv
+    ctx.prec = PREC
+    row = next(csv.DictReader((CERTS.parent / "first_order_c1.csv").open()))
+    xs, ys = _limit_data()
+    xt = [float(row["p_star"]), float(row["q_star"]), float(row["b_star"]),
+          0.5 * (float(row["A_star_lo"]) + float(row["A_star_hi"]))]
+    fun = lambda X, J=True: switch_system_arb(X, xs, ys, J)[:2] if J else switch_system_arb(X, xs, ys, False)
+    ok, Kb, X, _ = krawczyk_arb(fun, xt, [1e-9] * 4)
+    p, q = X[0], X[1]
+    I_act, O_act = _hh(q + arb("0.8") * p), _hh(q - arb("1.2") * p)
+    others_I = [_hh(q - arb("0.8") * p)]
+    others_O = [_hh(q - 2 * p), _hh(q + arb("1.2") * p), _hh(q + 2 * p)]
+    R2 = arb(2).sqrt()
+    crit_ok = (lo_(q - arb("0.8") * p) > hi_(-R2)) and (hi_(q - arb("1.2") * p) < lo_(R2)) and \
+              (lo_(q + arb("1.2") * p) > hi_(R2))
+    active_ok = all(lo_(I_act) > hi_(o) for o in others_I) and all(hi_(O_act) < lo_(o) for o in others_O) and crit_ok
+    _, J, Eps = switch_system_arb(X, xs, ys, True)
+    d = lin_enclose_arb(J, Eps)
+    A1_over_A = d[3] / X[3] if d is not None else None
+    res = {"switch_krawczyk_ok": bool(ok), "active_set_unique": bool(active_ok),
+           "A_star_lo": float_down(lo_(Kb[3])), "A_star_hi": float_up(hi_(Kb[3])),
+           "A1_over_A_lo": float_down(lo_(A1_over_A)) if d is not None else None,
+           "A1_over_A_hi": float_up(hi_(A1_over_A)) if d is not None else None}
+    # published enclosures must contain the Arb ones' points (consistency) -- the Arb enclosure is the verified one
+    res["A_star_overlaps_published"] = bool(res["A_star_lo"] <= float(row["A_star_hi"]) and
+                                            res["A_star_hi"] >= float(row["A_star_lo"]))
+    # (2) the vertex
+    def vfun(Xv, want_J=True):
+        u, v = Xv
+        s_ = {k: v + arb(repr(k)) * u for k in (-0.8, 0.8, -2.0, -1.2)}
+        F = [_hh(s_[-0.8]) - _hh(s_[0.8]), _hh(s_[-2.0]) - _hh(s_[-1.2])]
+        if not want_J:
+            return F
+        Jv = [[arb("-0.8") * _h1(s_[-0.8]) - arb("0.8") * _h1(s_[0.8]), _h1(s_[-0.8]) - _h1(s_[0.8])],
+              [-2 * _h1(s_[-2.0]) + arb("1.2") * _h1(s_[-1.2]), _h1(s_[-2.0]) - _h1(s_[-1.2])]]
+        return F, Jv
+    vok, Kv, Xv, _ = krawczyk_arb(vfun, [float(row["vertex_u"]), float(row["vertex_v"])], [1e-9, 1e-9])
+    u, v = Kv
+    Kval = _hh(v - arb("1.2") * u) - _hh(v + arb("0.8") * u)
+    res.update({"vertex_krawczyk_ok": bool(vok), "K_vertex_lo": float_down(lo_(Kval)), "K_vertex_hi": float_up(hi_(Kval))})
+    res["pass"] = all(res[k] for k in ("switch_krawczyk_ok", "active_set_unique", "vertex_krawczyk_ok",
+                                       "A_star_overlaps_published")) and d is not None
+    out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
+    (out_dir / "c1_krawczyk.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps(res, indent=1, default=str))
+    return res
+
+
+def _pd_box(args):
+    """(p, q, A) sub-box: b* enclosed (monotone bracket), the (p, q, b) Hessian enclosed over box × bracket; PD of
+    H − c·I by Sylvester's criterion on the Arb enclosure (every member of the enclosure is then PD)."""
+    pl, ph, ql, qh, al, ah, c = args
+    ctx.prec = PREC
+    d = np.load(CERTS / "limit_A_lo.npz")
+    obj = Objective(d["x"], d["y"], ball(al, ah), None, act=HAct())
+    P, Q, A = ball(pl, ph), ball(ql, qh), ball(al, ah)
+    Bb, _ = obj.b_bracket(P, Q)
+    if Bb is None:
+        return {"box": args[:6], "b_ok": False, "pd": False}
+    H = [[arb(0)] * 3 for _ in range(3)]
+    for xi, yi in zip(obj.X, obj.Y):
+        sg = P * xi + Q
+        z = A * _hh(sg) + Bb
+        S = _sig(z); w = S * (1 - S); res = S - yi
+        dz = [A * _h1(sg) * xi, A * _h1(sg), arb(1)]
+        d2 = {(0, 0): A * sg * xi * xi, (0, 1): A * sg * xi, (1, 1): A * sg}
+        for i in range(3):
+            for j in range(3):
+                H[i][j] += w * dz[i] * dz[j] + res * d2.get((min(i, j), max(i, j)), arb(0))
+    n = len(obj.X)
+    M = [[H[i][j] / n - (arb(repr(c)) if i == j else 0) for j in range(3)] for i in range(3)]
+    m1 = M[0][0]
+    m2 = M[0][0] * M[1][1] - M[0][1] * M[1][0]
+    m3 = (M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0])
+          + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]))
+    return {"box": args[:6], "b_ok": True, "pd": bool(m1 > 0 and m2 > 0 and m3 > 0)}
+
+
+def check_pd(name, p0, q0, rho, A_range, split, c, workers=WORKERS, verbose=True):
+    from multiprocessing import Pool
+    pe = np.linspace(p0 - rho, p0 + rho, split[0] + 1); qe = np.linspace(q0 - rho, q0 + rho, split[1] + 1)
+    ae = np.linspace(A_range[0], A_range[1], split[2] + 1)
+    boxes = [(pe[i], pe[i + 1], qe[j], qe[j + 1], ae[k], ae[k + 1], c)
+             for i in range(split[0]) for j in range(split[1]) for k in range(split[2])]
+    t0 = time.time()
+    with Pool(workers) as pl:
+        out = pl.map(_pd_box, boxes)
+    res = {"name": name, "boxes": len(out), "b_bracket_all": all(r["b_ok"] for r in out),
+           "pd_all_with_margin_c": all(r["pd"] for r in out), "c": c, "seconds": time.time() - t0,
+           "failed": [r["box"] for r in out if not r["pd"]][:10]}
+    res["pass"] = res["b_bracket_all"] and res["pd_all_with_margin_c"]
+    out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
+    (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps(res, indent=1, default=str))
+    return res
+
+
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
     return {"ghat_enclosure": check_ghat, "limit_status": check_limit, "finite_a_solve": check_solve}.get(kind, check_finite)(name)
@@ -1024,6 +1237,8 @@ def main(names):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["krawczyk"]:
+        raise SystemExit(0 if check_krawczyk()["pass"] else 1)
     if sys.argv[1:2] == ["K"]:
         smp = int(sys.argv[2]) if len(sys.argv) > 2 else None
         raise SystemExit(0 if check_K(sample=smp)["pass"] or smp else 1)

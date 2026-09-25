@@ -1,0 +1,10 @@
+{
+ "name": "pd_solve_neighbourhood",
+ "boxes": 100,
+ "b_bracket_all": true,
+ "pd_all_with_margin_c": true,
+ "c": 0.0209,
+ "seconds": 1.6751458644866943,
+ "failed": [],
+ "pass": true
+}

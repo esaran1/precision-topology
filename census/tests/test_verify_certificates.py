@@ -353,3 +353,22 @@ def test_solve_margin_sign_pass_and_fail_cases():
     assert vc.solve_sign_on_box(vc.Objective(x, y, 0.5, 1.3), *box) == "fails"
     wide = (w - 0.5, w + 0.5, b - 0.5, b + 0.5)                # a box too wide to decide: undecided, never a guess
     assert vc.solve_sign_on_box(vc.Objective(x, y, 60.0, 1.3), *wide, max_depth=1) is None
+
+
+def test_pd_box_pass_and_fail_cases():
+    from src import verify_certificates as vc
+    box = (1.6185, 1.6285, 1.3197, 1.3297, 0.66, 0.67)
+    assert vc._pd_box(box + (0.0473,))["pd"]
+    assert not vc._pd_box(box + (5.0,))["pd"]                  # margin above lambda_min: must fail
+
+
+def test_krawczyk_pass_and_fail_cases():
+    import csv
+    from src import verify_certificates as vc
+    row = next(csv.DictReader((vc.CERTS.parent / "first_order_c1.csv").open()))
+    xs, ys = vc._limit_data()
+    fun = lambda X, J=True: vc.switch_system_arb(X, xs, ys, J)[:2] if J else vc.switch_system_arb(X, xs, ys, False)
+    xt = [float(row["p_star"]), float(row["q_star"]), float(row["b_star"]), float(row["A_star_lo"])]
+    assert vc.krawczyk_arb(fun, xt, [1e-9] * 4)[0]
+    off = [xt[0] + 1e-4] + xt[1:]
+    assert not vc.krawczyk_arb(fun, off, [1e-9] * 4)[0]      # a box that misses the zero cannot pass
