@@ -101,6 +101,10 @@ def replay_4b(a, seed, arm, cross_step):
     else:
         th = theta0
     opt_state = rm.reset_moments(ck["opt"]) if arm.endswith("reset") else ck["opt"]
+    if arm == "teleport_reset":
+        # AS RUN: the reset arms shared one zeroed state dict (built once, before the arm loop); the reset arm's
+        # continuation mutated it in place, so the recorded teleport_reset arm started from the reset run's end state.
+        rm.continue_from(a, seed, theta0, opt_state, ck["t_star"])
     if arm == "teleport":
         # AS RUN: Block 4b ran the control arm first with the same optimiser-state dict, whose tensors the control
         # continuation mutated in place (load_state_dict shares them); the recorded teleport arm therefore started from

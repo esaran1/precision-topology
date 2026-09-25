@@ -377,7 +377,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp7()
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
-    text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22()
+    text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -499,6 +499,15 @@ Detection does not explain the residual either (WP-6).
 **Do not say**
 - that displacement, optimiser memory or adiabatic lag causes or explains the residual;
 - that Block 4a's correlations are registered, or that 4b found a small effect of any arm (every interval includes 0).
+
+**Validity note (found 2026-09-25 while replaying these runs; no verdict changed).** In the registered Block 4b run, the
+arms shared optimiser-state tensors, and PyTorch's `load_state_dict` does not copy them.
+- The control arm's continuation therefore mutated the stored Adam state in place. The **teleport** arm (registered as
+  "Adam state kept") started from the control run's *end-of-run* Adam state.
+- Likewise, the **teleport_reset** arm started from the reset run's end state rather than zeroed moments.
+- Control and reset are unaffected. Replaying in the original order reproduces every recorded crossing (WP-23).
+- 4b-ID and 4b-OM (both FAIL) were scored on the affected arms. A corrected rerun of the two teleport arms is the
+  author's decision; until then, do not rely on the teleport-arm comparisons.
 """
 
 
@@ -1611,6 +1620,69 @@ crosses below the placement bound; placement switches on at R_glob, where traini
 
 **Do not say:** that the minimiser path is certified (it is a validated search; only R_glob is certified), or that
 crossing the bound a/1.4 is the switch (the bound is necessary, not sufficient).
+"""
+
+
+def wp23():
+    """WP-23: is the timescale relationship consistent with the within-a interventions? (Item 1, POST HOC)"""
+    t = pd.read_csv(RESULTS / "timescale_consistency" / "arms.csv")
+    sm = json.loads((RESULTS / "timescale_consistency" / "summary.json").read_text())
+    miss = t[~t.within_tol]
+    rows = "\n".join(f"| {r.test} | {r.a:.2f} | {r.arm} | {r.n} | {r.median_ratio:.4f} | {r.pred:.4f} | {r.obs:.4f} | ±{r.tol:.4f} | "
+                     f"{'yes' if r.within_tol else '**no**'} |" for r in t.itertuples())
+    return f"""
+## WP-23. Is the timescale relationship consistent with the within-a interventions? (Item 1; POST HOC; for the submission)
+
+Producer: `src/timescale_consistency.py` → `timescale_consistency/runs.csv`, `arms.csv`, `summary.json`.
+- **Frozen relationship:** residual = α + β·ratio, with α = {sm["frozen_fit"]["alpha"]:.4f} and
+  β = {sm["frozen_fit"]["beta"]:.3f}. This is the file used by the SGD extension and Task B (SHA-256 16792946…).
+- **Runs:** every crossing run of the first lag test (all φ arms), the deconfounded lag test (primary and t\* rules,
+  all φ arms) and Block 4b (all arms), {sm["runs"]} in total.
+- Each run was replayed to its recorded crossing, and every replay reproduces its crossing exactly.
+- For each arm, the predicted median residual (from each run's own ratio at crossing) is compared with the observed
+  one, at the registered tests' tolerance, max(0.01, 0.25·|pred|).
+
+| test | a | arm (φ or intervention) | n | median ratio | predicted | observed | tolerance | within |
+|---|---|---|---|---|---|---|---|---|
+{rows}
+
+- **{sm["arms_within_tol"]} of {sm["arms"]} arms are within tolerance.** The {len(miss)} misses are exactly the φ = 0.25 arms of
+  the first lag test and of the t\* rule, at both a.
+- There, slowing w₂'s learning rate from early on lowers the ratio at crossing 3–4.5×. The residual falls in the
+  predicted direction but by more than predicted: observed {miss.obs.min():.3f}–{miss.obs.max():.3f} against predicted
+  {miss.pred.min():.3f}–{miss.pred.max():.3f}.
+- **Where the interventions barely move the ratio,** the relationship predicts every arm. That covers the deconfounded
+  primary rule (φ applied from 0.7 of the threshold), where Adam's normalisation absorbs the change, so the ratio moves
+  by at most 20% and the residual by 11–14%. It also covers all four Block 4b arms, where the ratio does not move.
+- **Slopes:** within a, over all arms, the residual–ratio slope is {sm["slope_within_a_all"]["1.30"]:.2f} (a = 1.30) and
+  {sm["slope_within_a_all"]["1.50"]:.2f} (a = 1.50), against the pooled fit's {sm["frozen_fit"]["beta"]:.2f}.
+- **Partial correlation:** the Spearman partial correlation of residual and ratio, controlling for a, is
+  {sm["partial_spearman_all"]:.2f} over all arms and {sm["partial_spearman_fitdata"]:.2f} on the fit's own data.
+- **Validity note (Block 4b; disclosed, no verdict changed).** In the registered Block 4b run, the arms shared optimiser-state
+  tensors, which the preceding arm's continuation mutated in place (`load_state_dict` shares them).
+  - The **teleport** arm therefore started from the control run's end-of-run Adam state, not the state at the switch.
+  - The **teleport_reset** arm started from the reset run's end state, not zeroed moments.
+  - Control and reset are unaffected.
+  - Here the arms were replayed *as run*, which reproduces them exactly. 4b-ID and 4b-OM (both FAIL) were scored on the
+    affected arms, and a corrected rerun is the author's decision.
+IDs: {_id("Item 1 arms within tolerance", "Item 1 misses are the phi=0.25 arms", "Item 1 within-a slope a=1.30", "Item 1 within-a slope a=1.50", "Item 1 partial Spearman", "Item 1 replays reproduce")}.
+
+**Statement (in between, stated exactly).**
+- The frozen relationship predicts the residual across activation values and optimisers (two registered prospective
+  tests). Within a, it predicts every intervention arm that leaves the timescale ratio near its unperturbed value.
+- It gets the *direction* of a large within-a slowdown right but not its *size*. When the output rate is slowed from
+  early on, the residual falls further than the linear relationship predicts; the within-a dependence is steeper.
+- So the account is quantitatively supported across a and optimisers and for small within-a changes, not for large
+  within-a changes of the ratio.
+
+**Say:** "A single linear relation between the residual and the ratio of output growth to branch relaxation predicts
+the residual across activation values and optimisers (two registered prospective tests) and for within-a interventions
+that leave the ratio nearly unchanged. It captures the direction but underestimates the size of the effect when the
+output rate is slowed substantially (post hoc)."
+
+**Do not say:** that the relation holds quantitatively within a for arbitrary interventions, that it is the residual's
+mechanism, or that the lag tests confirm it. The registered lag-test predictions L2, L1′ and L2′ failed, and those
+verdicts stand.
 """
 
 
