@@ -330,7 +330,8 @@ def layout_check(fig):
                 or t.figure is None):
             continue
         ax = t.axes if (t.axes is not None and t in t.axes.texts) else None
-        items.append((f"text '{t.get_text()[:30]}'", t.get_window_extent(r), ax))
+        # an Annotation's extent includes its leader line, which touches data by design: measure the text only
+        items.append((f"text '{t.get_text()[:30]}'", Text.get_window_extent(t, r), ax))
     for lg in legends:
         ax = lg.axes if lg.axes is not None else None
         items.append((f"legend '{lg.get_texts()[0].get_text()[:20]}'", lg.get_window_extent(r), "legend"))
