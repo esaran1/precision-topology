@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 189 scored by their registered rules: 90 PASS, 59 FAIL, 8 PARTIAL,
-  32 UNRESOLVED.
+- **Headline**: 190 scored by their registered rules: 90 PASS, 59 FAIL, 8 PARTIAL,
+  33 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 205 registered predictions.
+- **Total**: 206 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -202,7 +202,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
 | S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
 | SGD own thresholds (Track 4) | registered rule | 3 | 0 | 0 | 0 | 3 |
-| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 0 | 3 |
+| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 1 | 4 |
 | c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -247,6 +247,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/arrhenius_prediction.md | registered rule | 15 | 11 | 1 | 15 | 42 |
 | results/asym_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/asym_registration.md (amendment 1) | registered rule | 0 | 1 | 0 | 0 | 1 |
+| results/asym_registration.md (amendment 2) | registered rule | 0 | 0 | 0 | 1 | 1 |
 | results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
 | results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
 | results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
@@ -452,7 +453,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 462 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 470 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -898,7 +899,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 43 | 24 | 1 | 7 |
+| registered rule | central | 43 | 24 | 1 | 8 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1023,6 +1024,41 @@ single-unit (width-1) threshold. Neither threshold, nor the branch's own switch,
 **Do not say:** that the failure is explained by a single-unit branch (no run is single-unit at its crossing), that
 crossings "track" any of these thresholds, or that the post hoc analysis rescues T2-3. It is exploratory, and the
 registered verdict is FAIL.
+
+
+**T2-3b (registered after T2-3's failure; amendment 2, 61f3353): T2-3 plus the approved sweep-rate matching.**
+- When T2-3 was amended, only matched initialisation was specified. The approved design's sweep-rate matching
+  (Revision 3) was left out, and T2-3b adds it.
+- The output learning-rate factor φ₂ = 0.0093 came from the steps-matching pilot (calibration seeds,
+  ‖w₂‖₁ only). The validity check requires the achieved median timescale ratio at crossing to lie in the width-1 Adam
+  range [0.0014, 0.023].
+- **Result: UNRESOLVED.** The achieved median ratio is 6.8e-06, far *below* the range. Steps
+  matching over-slows the scale's growth at the crossing, so the two notions of rate matching disagree by about three
+  orders of magnitude.
+- For information only, the criteria alone would give FAIL: 71/80 crossed,
+  56.3% at or above s_hi, median ratio 10.4, and a
+  bootstrap interval [-0.41, 9.52] that contains 0.
+- **T2-3 stays FAIL.**
+IDs: `Track 2 T2-3b UNRESOLVED`; `Track 2 T2-3b phi2`; `Track 2 T2-3b median ratio at crossing`; `Track 2 T2-3b frac above`; `Track 2 T2-3b median crossing ratio`.
+
+**EXPLORATORY note (author's request; changes nothing above).**
+- *Training data.* The T2-3 runs trained on their own sampled sets, not on the population objective.
+- *Own-sample thresholds.* Own-sample width-2 thresholds for 10 seeds (200 restarts) have median
+  s = 0.445 (range 0.346–0.573), the population value.
+  - These seeds cross at 4.1× their own threshold, against 4.3× the
+    population's.
+  - Mean |log error| is 1.52 against own and 1.51 against the population;
+    5/10 runs are closer to their own; Spearman(crossing, own) = -0.74 (n = 10).
+  - So own-sample thresholds do not explain the width-2 residual.
+- *Timescale ratio.* At the T2-3 crossings the median ratio is 2.73, about 100× beyond the width-1
+  range. The width-1 fit, extrapolated, predicts a residual of 7.3 against
+  2.23 observed. Within T2-3, Spearman(residual, ratio) = -0.24.
+IDs: `Track 2 expl own median`; `Track 2 expl cross over own`; `Track 2 expl Spearman own`; `Track 2 expl ratio median`; `Track 2 expl ratio Spearman within`.
+
+**Say (T2-3b):** "A follow-up with the design's sweep-rate matching, registered after the failure, is unresolved: its
+validity check failed, because the matched runs crossed at a timescale ratio far below the width-1 range."
+**Do not say:** that T2-3b supports or rescues the width-2 training prediction, or that own-sample thresholds or the
+timescale ratio explain the width-2 residual.
 
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered

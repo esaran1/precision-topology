@@ -1133,6 +1133,9 @@ def wp15():
     sc = json.loads((RESULTS / "asym_scores.json").read_text())
     t3 = sc["T2-3"]
     ph = json.loads((RESULTS / "asym_posthoc" / "summary.json").read_text())
+    tb = json.loads((RESULTS / "asym_t23b" / "scores.json").read_text())
+    tb_f = json.loads((RESULTS / "asym_t23b_frozen.json").read_text())
+    e2 = json.loads((RESULTS / "asym_posthoc" / "exploratory2.json").read_text())
     pk = ph["knockout_counts"]
     return f"""
 ## WP-15. Width 2 on asymmetric windows: the landscape threshold survives; training crosses far above it (Track 2, registered; for the submission)
@@ -1197,6 +1200,41 @@ single-unit (width-1) threshold. Neither threshold, nor the branch's own switch,
 **Do not say:** that the failure is explained by a single-unit branch (no run is single-unit at its crossing), that
 crossings "track" any of these thresholds, or that the post hoc analysis rescues T2-3. It is exploratory, and the
 registered verdict is FAIL.
+
+
+**T2-3b (registered after T2-3's failure; amendment 2, 61f3353): T2-3 plus the approved sweep-rate matching.**
+- When T2-3 was amended, only matched initialisation was specified. The approved design's sweep-rate matching
+  (Revision 3) was left out, and T2-3b adds it.
+- The output learning-rate factor φ₂ = {tb_f["phi2"]:.4f} came from the steps-matching pilot (calibration seeds,
+  ‖w₂‖₁ only). The validity check requires the achieved median timescale ratio at crossing to lie in the width-1 Adam
+  range [0.0014, 0.023].
+- **Result: UNRESOLVED.** The achieved median ratio is {tb["median_ratio_at_cross"]:.1e}, far *below* the range. Steps
+  matching over-slows the scale's growth at the crossing, so the two notions of rate matching disagree by about three
+  orders of magnitude.
+- For information only, the criteria alone would give FAIL: {tb["crossed"]}/{tb["runs"]} crossed,
+  {100 * tb["criteria"]["frac_above_s_hi"]:.1f}% at or above s_hi, median ratio {tb["criteria"]["median_ratio_s_lo"]:.1f}, and a
+  bootstrap interval [{tb["criteria"]["ci_median_minus_1"][0]:.2f}, {tb["criteria"]["ci_median_minus_1"][1]:.2f}] that contains 0.
+- **T2-3 stays FAIL.**
+IDs: {_id("Track 2 T2-3b UNRESOLVED", "Track 2 T2-3b phi2", "Track 2 T2-3b median ratio at crossing", "Track 2 T2-3b frac above", "Track 2 T2-3b median crossing ratio")}.
+
+**EXPLORATORY note (author's request; changes nothing above).**
+- *Training data.* The T2-3 runs trained on their own sampled sets, not on the population objective.
+- *Own-sample thresholds.* Own-sample width-2 thresholds for 10 seeds (200 restarts) have median
+  s = {e2["own_median"]:.3f} (range {e2["own_range"][0]:.3f}–{e2["own_range"][1]:.3f}), the population value.
+  - These seeds cross at {e2["median_cross_over_own"]:.1f}× their own threshold, against {e2["median_cross_over_pop"]:.1f}× the
+    population's.
+  - Mean |log error| is {e2["mean_abslog_own"]:.2f} against own and {e2["mean_abslog_pop"]:.2f} against the population;
+    {e2["runs_closer_to_own"]}/10 runs are closer to their own; Spearman(crossing, own) = {e2["spearman_cross_own"]:.2f} (n = 10).
+  - So own-sample thresholds do not explain the width-2 residual.
+- *Timescale ratio.* At the T2-3 crossings the median ratio is {e2["ts_median_ratio"]:.2f}, about 100× beyond the width-1
+  range. The width-1 fit, extrapolated, predicts a residual of {e2["width1_fit_predicted_median_residual"]:.1f} against
+  {e2["observed_median_residual_vs_pop"]:.2f} observed. Within T2-3, Spearman(residual, ratio) = {e2["spearman_residual_ratio_within_T2_3"]:.2f}.
+IDs: {_id("Track 2 expl own median", "Track 2 expl cross over own", "Track 2 expl Spearman own", "Track 2 expl ratio median", "Track 2 expl ratio Spearman within")}.
+
+**Say (T2-3b):** "A follow-up with the design's sweep-rate matching, registered after the failure, is unresolved: its
+validity check failed, because the matched runs crossed at a timescale ratio far below the width-1 range."
+**Do not say:** that T2-3b supports or rescues the width-2 training prediction, or that own-sample thresholds or the
+timescale ratio explain the width-2 residual.
 
 **Say:** "On asymmetric windows, where the criterion predicts a switch, a validated width-2 placement threshold exists
 (registered). Width-2 training crosses above it, but at about three times the threshold scale, so the registered

@@ -477,27 +477,27 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 205.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 206.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
-    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 10.0, 0)
+    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 11.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 224.0, 0)
-    for v, n in (("PASS", 106), ("FAIL", 73), ("PARTIAL", 13), ("UNRESOLVED", 32)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 225.0, 0)
+    for v, n in (("PASS", 106), ("FAIL", 73), ("PARTIAL", 13), ("UNRESOLVED", 33)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 93), ("FAIL", 65), ("PARTIAL", 15), ("UNRESOLVED", 32)):
+    for v, n in (("PASS", 93), ("FAIL", 65), ("PARTIAL", 15), ("UNRESOLVED", 33)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (189, 90, 59, 8, 32)),
+    for scope, want in (("scored by registered rules", (190, 90, 59, 8, 33)),
                         ("assigned post hoc in the census", (16, 3, 6, 7, 0)),
-                        ("since 2026-09-23: scored by registered rules", (38, 24, 12, 0, 2)),
+                        ("since 2026-09-23: scored by registered rules", (39, 24, 12, 0, 3)),
                         ("since 2026-09-23: assigned post hoc", (3, 0, 0, 3, 0)),
-                        ("by registered unit: scored by registered rules", (210, 103, 67, 8, 32)),
+                        ("by registered unit: scored by registered rules", (211, 103, 67, 8, 33)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (59, 37, 20, 0, 2)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (60, 37, 20, 0, 3)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
@@ -1178,8 +1178,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 205", float(wp4[wp4.by == "block"].n.sum()), 205.0, 0)
-    chk("WP-4: by-file rows sum to 205", float(wp4[wp4.by == "registration_file"].n.sum()), 205.0, 0)
+    chk("WP-4: by-block rows sum to 206", float(wp4[wp4.by == "block"].n.sum()), 206.0, 0)
+    chk("WP-4: by-file rows sum to 206", float(wp4[wp4.by == "registration_file"].n.sum()), 206.0, 0)
     oth_ = pd.read_csv(R / "registration_census_v4_gates_and_reported.csv")
     chk("width-2 verdict listed as a registered decision rule, not a prediction",
         float((oth_.id == "sl-width2").sum() == 1
@@ -1505,8 +1505,8 @@ def harsh_review_checks() -> None:
     chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 43.0, 0)
     chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
-    chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 7.0, 0)
-    chk("A4 rows", float(len(cr)), 205.0, 0)
+    chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 8.0, 0)
+    chk("A4 rows", float(len(cr)), 206.0, 0)
 
 
 def tracks_checks() -> None:
@@ -1577,6 +1577,18 @@ def tracks_checks() -> None:
     chk("Track 2 posthoc branch minus glob hi", ph["branch_minus_glob"][2], 0.015, 0.0006)
     chk("Track 2 posthoc Spearman branch", ph["spearman_cross_branch"], 0.30, 0.006)
     chk("Track 2 posthoc median crossing", ph["median_s_cross"], 1.44, 0.006)
+    tb = json.loads((R / "asym_t23b" / "scores.json").read_text())
+    chk("Track 2 T2-3b UNRESOLVED", float(tb["T2-3b"].startswith("UNRESOLVED")), 1.0, 0)
+    chk("Track 2 T2-3b phi2", json.loads((R / "asym_t23b_frozen.json").read_text())["phi2"], 0.009306, 1e-6)
+    chk("Track 2 T2-3b median ratio at crossing", tb["median_ratio_at_cross"], 6.8e-6, 1e-7)
+    chk("Track 2 T2-3b frac above", tb["criteria"]["frac_above_s_hi"] * 100, 56.3, 0.06)
+    chk("Track 2 T2-3b median crossing ratio", tb["criteria"]["median_ratio_s_lo"], 10.4, 0.06)
+    e2 = json.loads((R / "asym_posthoc" / "exploratory2.json").read_text())
+    chk("Track 2 expl own median", e2["own_median"], 0.445, 0.0006)
+    chk("Track 2 expl cross over own", e2["median_cross_over_own"], 4.11, 0.006)
+    chk("Track 2 expl Spearman own", e2["spearman_cross_own"], -0.74, 0.006)
+    chk("Track 2 expl ratio median", e2["ts_median_ratio"], 2.73, 0.006)
+    chk("Track 2 expl ratio Spearman within", e2["spearman_residual_ratio_within_T2_3"], -0.24, 0.006)
     print("Track 3 (residual timescale, post hoc)")
     ts = json.loads((R / "residual_timescale_summary.json").read_text())
     chk("Track 3 Spearman pooled", ts["spearman_run_level"], 0.634, 0.0006)
