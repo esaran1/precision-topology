@@ -24,6 +24,7 @@ def test_set_windows_delta0_leaves_gaps_unchanged_and_delta_changes_them():
     from src import width2_geometry as g
     th, v = np.array([-1.0, 0.0, 0.0, 0.0]), np.array([1.0, 0.0])      # decreasing: min_O at the right end
     act = g.Act("fa", 1.3)
+    ap.set_windows(0.0)                        # other tests may have left the asymmetric windows set globally
     ref = g.gaps(th, v, act)["G+"]
     ap.set_windows(0.0)
     assert g.gaps(th, v, act)["G+"] == ref
