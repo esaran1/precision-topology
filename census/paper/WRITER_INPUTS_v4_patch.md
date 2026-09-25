@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 192 scored by their registered rules: 90 PASS, 60 FAIL, 8 PARTIAL,
+- **Headline**: 194 scored by their registered rules: 92 PASS, 60 FAIL, 8 PARTIAL,
   34 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 208 registered predictions.
+- **Total**: 210 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -237,6 +237,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | third optimizer 09-14 | registered rule | 2 | 0 | 0 | 0 | 2 |
 | threshold 08-22 | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | threshold 08-22 | registered rule | 2 | 1 | 1 | 0 | 4 |
+| timescale prospective test (Task B) | registered rule | 2 | 0 | 0 | 0 | 2 |
 | width 2 no-gating test (Track 7) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | winding 08-22 | registered rule | 4 | 0 | 0 | 0 | 4 |
 
@@ -312,6 +313,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
+| results/ts_test_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/winding_prediction.md | registered rule | 4 | 0 | 0 | 0 | 4 |
@@ -458,7 +460,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
 All 487 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
-scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 1 are unstable
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
 not printed numbers. 6 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
@@ -904,7 +906,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 43 | 25 | 1 | 9 |
+| registered rule | central | 45 | 25 | 1 | 9 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1158,20 +1160,22 @@ IDs: `Track 4 EXT a=1.30`; `Track 4 EXT a=1.50`; `Track 4 EXT pred a=1.30`; `Tra
 IDs: `Track 4 sens G1 a=1.30`; `Track 4 sens G1 a=1.50`; `Track 4 sens G2 a=1.30`; `Track 4 sens G2 a=1.50`; `Track 4 sens EXT a=1.30`; `Track 4 sens EXT a=1.50`; `Track 4 sens noncrosser final/own a=1.30`; `Track 4 sens noncrosser final/own a=1.50`.
 
 **How to describe the timescale account.**
-- It is **supported by one prospective test, not established**.
+- It is **supported by two prospective tests, not established**: the SGD extension (this section) and Task B (WP-21:
+  Adam at a = 1.45 and 1.60, which the fit never saw, on fresh training sets).
 - The Adam relationship is a post hoc correlation. Always give the within-a values beside the pooled one: pooled
   Spearman 0.63, but only 0.45 (a = 1.30) and
   0.51 (a = 1.50) within each a.
-- One registered prospective check on a different optimiser (EXT) passed. At a = 1.50 it passed near the edge of its
-  tolerance.
+- Two registered prospective checks passed: EXT on a different optimiser (at a = 1.50 near the edge of its tolerance),
+  and TS-1 at two unseen activation values (WP-21).
 
 **Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
 than the population threshold (registered; both a; 75% of runs crossed). A post hoc timescale ratio, correlated with
 the residual on Adam runs (Spearman 0.63 pooled; 0.45 and 0.51 within each a), predicted the median SGD residual
-within the registered tolerance. The timescale account is supported by this one prospective test; it is not
-established."
+within the registered tolerance, and a second registered test at unseen activation values also passed (WP-21). The
+timescale account is supported by these two prospective tests; it is not established."
 
-**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established. Do not quote
+**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established (it did not
+carry over to width 2: WP-15's exploratory note). Do not quote
 the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
 noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
 
@@ -1315,3 +1319,54 @@ width-2 training."
 
 **Do not say:** "width 2 confirms no gating", or that the width-2 result is a training-level confirmation. The training
 prediction failed.
+
+## WP-21. A second prospective test of the timescale account (Task B, registered; for the submission)
+
+Registration: `ts_test_registration.md` (db2a915), written before any run. The own thresholds for the fresh training
+sets were frozen with a hash before any Adam run (0da303c). Producer: `src/ts_test.py` → `ts_test/runs.csv`,
+`ts_test/scores.csv`.
+
+**Design.**
+- Adam, standard protocol, every-step crossing detection.
+- **Fresh training sets:** seeds 830,000–830,079, never used anywhere, at **a = 1.45 and 1.60**. The timescale fit
+  used only a = 1.30 and 1.50.
+- The residual–ratio relationship is the one frozen for the SGD extension (α = 0.0157, β = 2.658).
+
+| a | crossed | median ratio at crossing | TS-1 predicted | observed | tolerance | TS-1 | TS-2: own − population [95% CI] | TS-2 |
+|---|---|---|---|---|---|---|---|---|
+| 1.45 | 80/80 | 0.0112 | 0.0456 | 0.0532 | ±0.0114 | **PASS** | [-0.059, -0.022] **PASS** |
+| 1.60 | 80/80 | 0.0249 | 0.0818 | 0.0809 | ±0.0205 | **PASS** | [-0.059, -0.022] **PASS** |
+
+- Every run crossed, so the registered non-crosser sensitivity analysis is identical to the primary scores.
+- At a = 1.60 the median ratio (0.0249) is slightly above the fit's range (maximum
+  0.0229), so that prediction is a slight extrapolation.
+IDs: `Task B TS-1 a=1.45`; `Task B TS-1 a=1.60`; `Task B TS-2 a=1.45`; `Task B TS-2 a=1.60`; `Task B pred a=1.45`; `Task B obs a=1.45`; `Task B pred a=1.60`; `Task B obs a=1.60`; `Task B crossed`.
+
+**Say:** "A second registered test, at activation values the fit never saw and on fresh training sets, predicted the
+median residual from the Adam timescale relationship within tolerance at both values, and each run's own threshold
+again beat the population threshold."
+
+**Do not say:** that this establishes the timescale account as the residual's mechanism (it rests on a post hoc fit
+whose within-a correlations are weak, and it did not carry over to width 2), or that the a = 1.60 prediction is an
+interpolation.
+
+## WP-22. The mechanism figure (Task C; for the submission, main text)
+
+File: `results/figures/v5/mechanism_w1.pdf`. Caption entry in `results/figures/v5/captions.md` ("mechanism_w1"), with
+its one-sentence message, population and every number. Producer: `src/mechanism_w1_figure.py`. It passes the v5 audit
+(5.49 × 2.38 in, smallest glyph 8 pt).
+
+**What it shows.** For width 1 at a = 1.30 and 1.50, the conditional minimiser's |w₁| against R/R_glob (log scale).
+- It starts near the class-mean optimum α* = 1.79 at small scale: 1.751 and
+  1.756 at the smallest scale shown.
+- It falls below the placement bound a/1.4 before R_glob. The bound is necessary, not sufficient.
+- Placement switches on at R_glob, where all 38 + 38 free-training
+  crossings sit, every one with |w₁| < a/1.4.
+- It is the picture of WP-12: the loss moves from rewarding the class-mean gap to rewarding the worst-case gap.
+IDs: `Task C figure audit`; `Task C w1 at smallest a=1.30`; `Task C crossings below bound`.
+
+**Say:** "As output scale grows, the conditional minimiser's first-layer weight leaves the class-mean optimum and
+crosses below the placement bound; placement switches on at R_glob, where training crosses."
+
+**Do not say:** that the minimiser path is certified (it is a validated search; only R_glob is certified), or that
+crossing the bound a/1.4 is the switch (the bound is necessary, not sufficient).

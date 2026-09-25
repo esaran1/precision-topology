@@ -377,7 +377,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp7()
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
-    text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20()
+    text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1354,20 +1354,22 @@ IDs: {_id("Track 4 EXT a=1.30", "Track 4 EXT a=1.50", "Track 4 EXT pred a=1.30",
 IDs: {_id("Track 4 sens G1 a=1.30", "Track 4 sens G1 a=1.50", "Track 4 sens G2 a=1.30", "Track 4 sens G2 a=1.50", "Track 4 sens EXT a=1.30", "Track 4 sens EXT a=1.50", "Track 4 sens noncrosser final/own a=1.30", "Track 4 sens noncrosser final/own a=1.50")}.
 
 **How to describe the timescale account.**
-- It is **supported by one prospective test, not established**.
+- It is **supported by two prospective tests, not established**: the SGD extension (this section) and Task B (WP-21:
+  Adam at a = 1.45 and 1.60, which the fit never saw, on fresh training sets).
 - The Adam relationship is a post hoc correlation. Always give the within-a values beside the pooled one: pooled
   Spearman {ts["spearman_run_level"]:.2f}, but only {ts["spearman_within_a"]["a=1.30"]:.2f} (a = 1.30) and
   {ts["spearman_within_a"]["a=1.50"]:.2f} (a = 1.50) within each a.
-- One registered prospective check on a different optimiser (EXT) passed. At a = 1.50 it passed near the edge of its
-  tolerance.
+- Two registered prospective checks passed: EXT on a different optimiser (at a = 1.50 near the edge of its tolerance),
+  and TS-1 at two unseen activation values (WP-21).
 
 **Say:** "Trained with SGD on the same samples, each run's own conditional threshold predicted its crossing better
 than the population threshold (registered; both a; 75% of runs crossed). A post hoc timescale ratio, correlated with
 the residual on Adam runs (Spearman 0.63 pooled; 0.45 and 0.51 within each a), predicted the median SGD residual
-within the registered tolerance. The timescale account is supported by this one prospective test; it is not
-established."
+within the registered tolerance, and a second registered test at unseen activation values also passed (WP-21). The
+timescale account is supported by these two prospective tests; it is not established."
 
-**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established. Do not quote
+**Do not say:** that the timescale ratio is the residual's mechanism, or that the account is established (it did not
+carry over to width 2: WP-15's exploratory note). Do not quote
 the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
 noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
 """
@@ -1542,6 +1544,73 @@ width-2 training."
 
 **Do not say:** "width 2 confirms no gating", or that the width-2 result is a training-level confirmation. The training
 prediction failed.
+"""
+
+
+def wp21():
+    """WP-21: a second prospective test of the timescale account (Task B, registered)."""
+    sc = pd.read_csv(RESULTS / "ts_test" / "scores.csv").set_index("a")
+    fit = json.loads((RESULTS / "residual_timescale_fit.json").read_text())
+    row = lambda a: (f"| {a:.2f} | {int(sc.loc[a, 'crossed'])}/{int(sc.loc[a, 'runs'])} | {sc.loc[a, 'median_ratio']:.4f} | "
+                     f"{sc.loc[a, 'pred']:.4f} | {sc.loc[a, 'obs']:.4f} | ±{sc.loc[a, 'tol']:.4f} | **{sc.loc[a, 'TS-1']}** | "
+                     f"[{sc.loc[a, 'TS2_lo']:+.3f}, {sc.loc[a, 'TS2_hi']:+.3f}] **{sc.loc[a, 'TS-2']}** |")
+    return f"""
+## WP-21. A second prospective test of the timescale account (Task B, registered; for the submission)
+
+Registration: `ts_test_registration.md` (db2a915), written before any run. The own thresholds for the fresh training
+sets were frozen with a hash before any Adam run (0da303c). Producer: `src/ts_test.py` → `ts_test/runs.csv`,
+`ts_test/scores.csv`.
+
+**Design.**
+- Adam, standard protocol, every-step crossing detection.
+- **Fresh training sets:** seeds 830,000–830,079, never used anywhere, at **a = 1.45 and 1.60**. The timescale fit
+  used only a = 1.30 and 1.50.
+- The residual–ratio relationship is the one frozen for the SGD extension (α = {fit["alpha"]:.4f}, β = {fit["beta"]:.3f}).
+
+| a | crossed | median ratio at crossing | TS-1 predicted | observed | tolerance | TS-1 | TS-2: own − population [95% CI] | TS-2 |
+|---|---|---|---|---|---|---|---|---|
+{row(1.45)}
+{row(1.6)}
+
+- Every run crossed, so the registered non-crosser sensitivity analysis is identical to the primary scores.
+- At a = 1.60 the median ratio ({sc.loc[1.6, "median_ratio"]:.4f}) is slightly above the fit's range (maximum
+  {fit["ratio_range_fitted"][1]:.4f}), so that prediction is a slight extrapolation.
+IDs: {_id("Task B TS-1 a=1.45", "Task B TS-1 a=1.60", "Task B TS-2 a=1.45", "Task B TS-2 a=1.60", "Task B pred a=1.45", "Task B obs a=1.45", "Task B pred a=1.60", "Task B obs a=1.60", "Task B crossed")}.
+
+**Say:** "A second registered test, at activation values the fit never saw and on fresh training sets, predicted the
+median residual from the Adam timescale relationship within tolerance at both values, and each run's own threshold
+again beat the population threshold."
+
+**Do not say:** that this establishes the timescale account as the residual's mechanism (it rests on a post hoc fit
+whose within-a correlations are weak, and it did not carry over to width 2), or that the a = 1.60 prediction is an
+interpolation.
+"""
+
+
+def wp22():
+    """WP-22: the mechanism figure (Task C)."""
+    ms = pd.read_csv(RESULTS / "mechanism_w1_stats.csv").set_index("Unnamed: 0")
+    return f"""
+## WP-22. The mechanism figure (Task C; for the submission, main text)
+
+File: `results/figures/v5/mechanism_w1.pdf`. Caption entry in `results/figures/v5/captions.md` ("mechanism_w1"), with
+its one-sentence message, population and every number. Producer: `src/mechanism_w1_figure.py`. It passes the v5 audit
+(5.49 × 2.38 in, smallest glyph 8 pt).
+
+**What it shows.** For width 1 at a = 1.30 and 1.50, the conditional minimiser's |w₁| against R/R_glob (log scale).
+- It starts near the class-mean optimum α* = 1.79 at small scale: {ms.loc[1.3, "w1_at_smallest"]:.3f} and
+  {ms.loc[1.5, "w1_at_smallest"]:.3f} at the smallest scale shown.
+- It falls below the placement bound a/1.4 before R_glob. The bound is necessary, not sufficient.
+- Placement switches on at R_glob, where all {int(ms.loc[1.3, "n_cross"])} + {int(ms.loc[1.5, "n_cross"])} free-training
+  crossings sit, every one with |w₁| < a/1.4.
+- It is the picture of WP-12: the loss moves from rewarding the class-mean gap to rewarding the worst-case gap.
+IDs: {_id("Task C figure audit", "Task C w1 at smallest a=1.30", "Task C crossings below bound")}.
+
+**Say:** "As output scale grows, the conditional minimiser's first-layer weight leaves the class-mean optimum and
+crosses below the placement bound; placement switches on at R_glob, where training crosses."
+
+**Do not say:** that the minimiser path is certified (it is a validated search; only R_glob is certified), or that
+crossing the bound a/1.4 is the switch (the bound is necessary, not sufficient).
 """
 
 
