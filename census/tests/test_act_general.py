@@ -168,3 +168,50 @@ def test_mp_gap_agrees_and_exposes_underflow(acts):
 def test_cap_gives_undecided(acts):
     g = ag.gplus(775.118729, -620.844791, 1.0, acts["gelu"], max_cells=10)
     assert ag.classify(g) == "undecided"
+
+
+def test_score_runs_cases():
+    rng = np.random.default_rng(0)
+    s_lo, s_glob, kap = 6.61, 6.64, 2.0
+    chi = np.full(40, 0.02)                                    # pred = 0.04
+    good = s_glob * (1.04 + 0.002 * rng.standard_normal(40))
+    r = ag.score_runs(good, chi, s_lo, s_glob, kap)
+    assert r["T-a"] == "PASS" and r["T-b"] == "PASS" and abs(r["pred"] - 0.04) < 1e-12
+    early = good.copy(); early[:5] = 3.0                        # 12.5% below the lower end
+    assert ag.score_runs(early, chi, s_lo, s_glob, kap)["T-a"] == "FAIL"
+    edge = good.copy(); edge[:4] = 3.0                          # exactly 90% at or above: PASS
+    assert ag.score_runs(edge, chi, s_lo, s_glob, kap)["T-a"] == "PASS"
+    far = s_glob * np.full(40, 1.2)
+    assert ag.score_runs(far, chi, s_lo, s_glob, kap)["T-b"] == "FAIL"
+    assert ag.score_runs(good[:29], chi[:29], s_lo, s_glob, kap)["T-a"] == "UNRESOLVED"
+    bad_chi = np.full(40, -1.0)
+    assert ag.score_runs(good, bad_chi, s_lo, s_glob, kap)["T-b"] == "UNRESOLVED"
+    small = s_glob * np.full(40, 1.001)                        # tolerance floor 0.01: pred 0.004 vs obs 0.001 passes
+    assert ag.score_runs(small, np.full(40, 0.002), s_lo, s_glob, kap)["T-b"] == "PASS"
+
+
+def test_state_detection_with_activation(acts):
+    from src.phase2b_ordering import state
+    a = acts["gelu"]
+    th = torch.tensor([0.8642113, -0.9036362, 2.0, 0.0], dtype=torch.float64)
+    assert state(th, a.torch_u, None, 0.0375)["placement_ok"]
+    th[2] = -2.0
+    assert not state(th, a.torch_u, None, 0.0375)["placement_ok"]
+    th = torch.tensor([1.5, 0.3, 2.0, 0.0], dtype=torch.float64)            # ramp across I: unplaced
+    assert not state(th, a.torch_u, None, 0.0375)["placement_ok"]
+
+
+def test_run_one_smoke_and_determinism():
+    r1 = ag.run_one("silu", 12345, budget=30, ghat=0.05)
+    r2 = ag.run_one("silu", 12345, budget=30, ghat=0.05)
+    assert r1["w2_final"] == r2["w2_final"]
+    assert set(("placed_at_init", "crossed", "s_cross", "sens_crossed")) <= set(r1)
+
+
+def test_kappa_scale_invariance():
+    H = np.array([[2.0, 0.3, 0.1], [0.3, 1.0, 0.2], [0.1, 0.2, 0.5]])
+    tan = np.array([0.1, -0.2, 0.3]); dG = np.array([1.0, 0.5, 0.0]); p = np.array([0.2, 0.5, 0.3])
+    assert abs(ag.kappa(H, tan, dG, p)[0] - ag.kappa(H, tan, dG, 7 * p)[0]) < 1e-12
+    # P = I: kappa = lambda_min(H) * (dG.H^-1 tan)/(dG.tan)
+    k = ag.kappa(H, tan, dG, np.ones(3))[0]
+    assert abs(k - np.linalg.eigvalsh(H).min() * (dG @ np.linalg.solve(H, tan)) / (dG @ tan)) < 1e-12

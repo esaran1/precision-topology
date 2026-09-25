@@ -631,3 +631,342 @@ def criterion():
     (OUT / "criterion_verdicts.json").write_text(json.dumps(verdicts, indent=1, default=float))
     print(json.dumps(verdicts, indent=1, default=float))
     return verdicts
+
+
+# ------------------------------------------------------------------------------------------ step 3: the bracket
+SCAN = tuple(10 ** (k / 8) for k in range(-8, 25))
+
+
+def _scan_row(s, x, y, act, seed, restarts=200):
+    r, pol, _ = status_at(s, x, y, act, restarts=restarts, seed=seed)
+    best = lambda st: min((c["loss"] for c in pol if c["status"] == st), default=math.nan)
+    sg, l10 = (mp_log10_gap(r["w1"], r["b1"], r["sigma"], act.name) if isinstance(act, GAct) and r["k"] >= 0
+               else (0, -math.inf))
+    return {"s": s, "status": r["status"], "loss": r["loss"], "G_lo": r["G_lo"], "G_hi": r["G_hi"], "w1": r["w1"],
+            "b1": r["b1"], "sigma": r["sigma"], "best_placed_loss": best("placed"),
+            "best_unplaced_loss": best("unplaced"), "best_undecided_loss": best("undecided"),
+            "posthoc_mp_sign_G": sg, "posthoc_mp_log10_absG": l10}
+
+
+def bracket(name, rel=0.01):
+    import pandas as pd
+    OUT.mkdir(exist_ok=True)
+    act = GAct(name)
+    x, y = population()
+    rows = []
+    for i, s in enumerate(SCAN):
+        rows.append({"phase": "scan", **_scan_row(s, x, y, act, seed=50_000 + i)})
+        print(json.dumps(rows[-1], default=float), flush=True)
+    fs = first_switch([r["s"] for r in rows], [r["status"] for r in rows])
+    out = {"act": name, "scan_changes": fs["changes"], "scan_undecided": fs["undecided"],
+           "scan_bracket": fs["bracket"]}
+    if fs["bracket"] is not None:
+        lo, hi = fs["bracket"]
+        j = 0
+        while hi / lo - 1 > rel:
+            mid = math.sqrt(lo * hi); j += 1
+            r = _scan_row(mid, x, y, act, seed=51_000 + j)
+            rows.append({"phase": "bisect", **r})
+            print(json.dumps(rows[-1], default=float), flush=True)
+            if r["status"] == "placed":
+                hi = mid
+            elif r["status"] == "unplaced":
+                lo = mid
+            else:
+                out["bisection_stopped"] = f"undecided at s = {mid}"
+                break
+        vlo = validate_point(lo, x, y, act, seed=52_000)
+        vhi = validate_point(hi, x, y, act, seed=52_100)
+        ok = bool(vlo["validated"] and vhi["validated"] and vlo["status"] == "unplaced" and vhi["status"] == "placed")
+        out.update({"s_lo": lo, "s_hi": hi, "s_mid": math.sqrt(lo * hi), "validation_lo": vlo, "validation_hi": vhi,
+                    "label": "VALIDATED (not certified)" if ok else "NOT VALIDATED"})
+    pd.DataFrame(rows).to_csv(OUT / f"bracket_{name}_evals.csv", index=False)
+    (OUT / f"bracket_{name}.json").write_text(json.dumps(out, indent=1, default=float))
+    print(json.dumps(out, indent=1, default=float))
+    return out
+
+
+# ------------------------------------------------------------------------------------------ step 4: κ (Track 1's method)
+TRAIN_SEEDS = tuple(range(850_000, 850_040))
+CALIB_SEEDS = tuple(range(851_000, 851_010))
+BUDGET = 32_000
+MIN_CROSS = 30
+SENS_GAP = 1e-8
+LR, EPS, BETA2 = 1e-2, 1e-8, 0.999
+
+
+def _loss_t(z, s, X, Y, u):
+    import torch
+    return torch.nn.functional.binary_cross_entropy_with_logits(s * u(z[0] * X + z[1]) + z[2], Y)
+
+
+def branch_point(z0, s, x, y, act, iters=100):
+    """Damped Newton on the joint loss in z = (w₁, b₁, b₂) at w₂ = s (lag_law.branch_point for any activation)."""
+    import torch
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    u = torch_u(act)
+    f = lambda z: _loss_t(z, s, X, Y, u)
+    z = torch.tensor(np.asarray(z0, float), dtype=torch.float64)
+    mu, f0 = 1e-6, float(f(z))
+    for _ in range(iters):
+        zz = z.clone().requires_grad_(True)
+        g = torch.autograd.grad(f(zz), zz)[0]
+        if float(g.abs().max()) < 1e-13:
+            break
+        H = torch.autograd.functional.hessian(f, z)
+        ok = False
+        for _ in range(40):
+            d = torch.linalg.solve(H + mu * torch.eye(3, dtype=torch.float64), -g)
+            f1 = float(f(z + d))
+            if f1 <= f0:
+                z, f0, ok, mu = z + d, f1, True, max(mu / 10, 1e-14)
+                break
+            mu *= 10
+        if not ok:
+            break
+    zz = z.clone().requires_grad_(True)
+    g = torch.autograd.grad(f(zz), zz)[0]
+    return z.numpy(), float(g.abs().max())
+
+
+def hessian_and_tangent(z, s, x, y, act):
+    import torch
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    u = torch_u(act)
+    zt = torch.tensor(z, dtype=torch.float64)
+    H = torch.autograd.functional.hessian(lambda q: _loss_t(q, s, X, Y, u), zt).numpy()
+    st = torch.tensor(s, dtype=torch.float64, requires_grad=True)
+    zz = zt.clone().requires_grad_(True)
+    g = torch.autograd.grad(_loss_t(zz, st, X, Y, u), zz, create_graph=True)[0]
+    dgds = np.array([float(torch.autograd.grad(g[i], st, retain_graph=True)[0]) for i in range(3)])
+    return H, -np.linalg.solve(H, dgds)
+
+
+def gap_mid(w1, b1, act):
+    g = gplus(w1, b1, 1.0, act)
+    return 0.5 * (g[0] + g[1])
+
+
+def grad_gap(w1, b1, act, h=1e-6):
+    gw = (gap_mid(w1 + h, b1, act) - gap_mid(w1 - h, b1, act)) / (2 * h)
+    gb = (gap_mid(w1, b1 + h, act) - gap_mid(w1, b1 - h, act)) / (2 * h)
+    fw = (gap_mid(w1 + h, b1, act) - gap_mid(w1, b1, act)) / h
+    bw = (gap_mid(w1, b1, act) - gap_mid(w1 - h, b1, act)) / h
+    return np.array([gw, gb, 0.0]), abs(fw - bw) / max(abs(gw), 1e-12)
+
+
+def switch(name):
+    """s* = root of G(θ*(s)) on the tracked retained branch inside the validated bracket (w₂ = +s orientation, the
+    placing one; mirror-canonical w₁ > 0), and H, θ*′, ∇G there."""
+    from .width2_conditional import profile_b
+    act = GAct(name)
+    x, y = population()
+    br = json.loads((OUT / f"bracket_{name}.json").read_text())
+    v = br["validation_lo"]
+    if v["sigma"] < 0:
+        raise SystemExit("retained minimiser at the bracket's lower end is not in the w2 > 0 orientation")
+    w1, b1 = abs(v["w1"]), v["b1"]
+    z = np.array([w1, b1, profile_b(br["s_lo"] * act.u(w1 * x + b1), y)])
+    lo, hi = br["s_lo"] * 0.995, br["s_hi"] * 1.005
+    z_lo, _ = branch_point(z, lo, x, y, act); z_hi, _ = branch_point(z_lo, hi, x, y, act)
+    g_lo, g_hi = gap_mid(z_lo[0], z_lo[1], act), gap_mid(z_hi[0], z_hi[1], act)
+    if not (g_lo < 0 < g_hi):
+        raise SystemExit(f"{name}: gap does not change sign on the tracked branch ({g_lo}, {g_hi})")
+    zm = z_lo
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        zm, _ = branch_point(zm, mid, x, y, act)
+        if gap_mid(zm[0], zm[1], act) > 0:
+            hi = mid
+        else:
+            lo = mid
+        if hi - lo < 1e-11:
+            break
+    s_star = 0.5 * (lo + hi)
+    z_star, gres = branch_point(zm, s_star, x, y, act)
+    L_star = loss_w1(z_star[0], z_star[1], 1.0, s_star, x, y, act)
+    H, tan = hessian_and_tangent(z_star, s_star, x, y, act)
+    dG, asym = grad_gap(z_star[0], z_star[1], act)
+    return {"act": name, "s_star": s_star, "in_validated_bracket": bool(br["s_lo"] <= s_star <= br["s_hi"]),
+            "z_star": z_star.tolist(), "loss_star": L_star, "grad_residual": gres, "H": H.tolist(),
+            "tangent": tan.tolist(), "gradG": dG.tolist(), "gradG_onesided_rel_diff": asym,
+            "H_pd": bool(np.linalg.eigvalsh(H).min() > 0), "G_track_lo": g_lo, "G_track_hi": g_hi}
+
+
+def kappa(H, tan, dG, p):
+    from .lag_law import kappa as k
+    return k(H, tan, dG, p)
+
+
+# ------------------------------------------------------------------------------------------ step 4: training
+def branch_hessian(act, x, y, w1, b1, w2, b2):
+    """Damped Newton on the joint loss in (w₁, b₁, b₂) at w₂ fixed; returns (z*, H(z*), grad max, converged)
+    (residual_timescale.branch_hessian for any activation)."""
+    import torch
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    u = torch_u(act)
+
+    def L(z):
+        return torch.nn.functional.binary_cross_entropy_with_logits(w2 * u(z[0] * X + z[1]) + z[2], Y)
+    z = torch.tensor([w1, b1, b2], dtype=torch.float64)
+    mu, f0 = 1e-3, float(L(z))
+    for _ in range(200):
+        zz = z.clone().requires_grad_(True)
+        g = torch.autograd.grad(L(zz), zz)[0]
+        if float(g.abs().max()) < 1e-12:
+            break
+        H = torch.autograd.functional.hessian(L, z)
+        ok = False
+        for _ in range(30):
+            d = torch.linalg.solve(H + mu * torch.eye(3, dtype=torch.float64) * max(1.0, float(H.diag().abs().max())), -g)
+            f1 = float(L(z + d))
+            if f1 < f0:
+                z, f0, ok, mu = z + d, f1, True, max(mu / 3, 1e-12)
+                break
+            mu *= 10
+        if not ok:
+            break
+    zz = z.clone().requires_grad_(True)
+    g = torch.autograd.grad(L(zz), zz)[0]
+    H = torch.autograd.functional.hessian(L, z)
+    return z.numpy(), H.numpy(), float(g.abs().max()), float(g.abs().max()) < 1e-8
+
+
+def _at_crossing(th, opt, hist, step, act, x, y):
+    from .residual_timescale import relax_rate
+    win = min(100, step - 1)
+    growth = math.log(hist[step] / hist[step - win]) / win if win >= 1 else float("nan")
+    q = th.detach().numpy().copy()
+    st = opt.state[th]
+    vhat = st["exp_avg_sq"].numpy() / (1 - BETA2 ** int(st["step"]))
+    _, H, _, conv = branch_hessian(act, x, y, q[0], q[1], q[2], q[3])
+    lam = relax_rate(H, vhat[[0, 1, 3]])
+    return {"growth": growth, "relax": lam, "chi": growth / lam if lam > 0 else float("nan"), "branch_converged": conv,
+            "sqrt_v_w1": math.sqrt(vhat[0]), "sqrt_v_b1": math.sqrt(vhat[1]), "sqrt_v_b2": math.sqrt(vhat[3]),
+            "w1": float(q[0]), "b1": float(q[1]), "w2": float(q[2]), "b2": float(q[3])}
+
+
+def run_one(name, seed, budget=BUDGET, ghat=None):
+    """The standard protocol (phase2b_ordering.run): U(−1, 1)⁴ in float32 then double, Adam lr 0.01, full batch on
+    fold1d.make_data(200, seed); every-step crossing detection with phase2b_ordering.state (G > 0 in w₂'s
+    orientation on the dense windows).  Primary crossing: the first step with G > 0; sensitivity crossing: the first
+    step with G >= SENS_GAP."""
+    import torch
+    from torch.nn import functional as F
+    from .fold1d import make_data
+    from .phase2b_ordering import state
+    torch.set_num_threads(1)
+    act = GAct(name)
+    u = act.torch_u
+    ghat = ghat or 1.0
+    xt, yt = make_data(200, seed)
+    torch.manual_seed(seed)
+    th = torch.empty(4).uniform_(-1.0, 1.0).double().clone().requires_grad_(True)
+    opt = torch.optim.Adam([th], lr=LR)
+    X, Y = xt.double(), yt.double()
+    x, y = X.numpy().astype(float), Y.numpy().astype(float)
+    s0 = state(th.detach(), u, None, ghat)
+    row = {"act": name, "seed": seed, "placed_at_init": bool(s0["placement_ok"]), "crossed": False,
+           "step": float("nan"), "s_cross": float("nan"), "gap_at_cross": float("nan"),
+           "sens_crossed": False, "sens_step": float("nan"), "sens_s_cross": float("nan")}
+    hist = {}
+    for step in range(1, budget + 1):
+        opt.zero_grad(set_to_none=True)
+        F.binary_cross_entropy_with_logits(th[2] * u(th[0] * X + th[1]) + th[3], Y).backward()
+        opt.step()
+        w2 = abs(float(th.detach()[2]))
+        hist[step] = w2; hist.pop(step - 101, None)
+        st = state(th.detach(), u, None, ghat)
+        if not row["crossed"] and st["placement_ok"]:
+            row.update({"crossed": True, "step": step, "s_cross": w2, "gap_at_cross": st["gap"],
+                        **_at_crossing(th, opt, hist, step, act, x, y)})
+        if not row["sens_crossed"] and st["gap"] >= SENS_GAP:
+            c = _at_crossing(th, opt, hist, step, act, x, y)
+            row.update({"sens_crossed": True, "sens_step": step, "sens_s_cross": w2, "sens_chi": c["chi"]})
+        if row["crossed"] and row["sens_crossed"]:
+            break
+    row["w2_final"] = abs(float(th.detach()[2]))
+    return row
+
+
+def _run_job(args):
+    os.nice(15)
+    name, seed, ghat = args
+    r = run_one(name, seed, ghat=ghat)
+    print(json.dumps({"act": name, "seed": seed, "crossed": r["crossed"], "step": r["step"],
+                      "s_cross": r["s_cross"]}), flush=True)
+    return r
+
+
+def _run_many(name, seeds, path):
+    import pandas as pd
+    from multiprocessing import get_context
+    gh = json.loads((OUT / "ghat.json").read_text())[name]["Ghat_nm"]["G_lo"]
+    done = set() if not path.exists() else {int(r.seed) for r in pd.read_csv(path).itertuples()}
+    jobs = [(name, s, gh) for s in seeds if s not in done]
+    with get_context("spawn").Pool(1) as pool:                       # ONE worker
+        for r in pool.imap_unordered(_run_job, jobs):
+            pd.DataFrame([r]).to_csv(path, mode="a", header=not path.exists(), index=False)
+
+
+def calibrate(name):
+    """P from the calibration seeds (never the registered ones): median normalised Adam preconditioner at the
+    primary crossing; then κ at the switch; frozen with a SHA-256."""
+    import hashlib
+    import pandas as pd
+    path = OUT / f"calib_{name}.csv"
+    _run_many(name, CALIB_SEEDS, path)
+    d = pd.read_csv(path)
+    c = d[d.crossed & ~d.placed_at_init]
+    if len(c) == 0:
+        raise SystemExit(f"{name}: no calibration run crossed")
+    P = np.column_stack([1 / (c.sqrt_v_w1 + EPS), 1 / (c.sqrt_v_b1 + EPS), 1 / (c.sqrt_v_b2 + EPS)])
+    Pn = P / P.sum(axis=1, keepdims=True)
+    p_med = np.median(Pn, axis=0)
+    sw = switch(name)
+    k_adam, lam, num, den = kappa(sw["H"], sw["tangent"], sw["gradG"], p_med)
+    k_runs = [kappa(sw["H"], sw["tangent"], sw["gradG"], p)[0] for p in Pn]
+    k_sgd = kappa(sw["H"], sw["tangent"], sw["gradG"], np.ones(3))[0]
+    br = json.loads((OUT / f"bracket_{name}.json").read_text())
+    out = {"act": name, "s_lo": br["s_lo"], "s_hi": br["s_hi"], "s_glob": math.sqrt(br["s_lo"] * br["s_hi"]),
+           **{k: v for k, v in sw.items()}, "p_median": p_med.tolist(), "n_calib_crossing": int(len(c)),
+           "n_calib": int(len(d)), "kappa_adam": k_adam, "kappa_adam_calib_q25": float(np.percentile(k_runs, 25)),
+           "kappa_adam_calib_q75": float(np.percentile(k_runs, 75)), "kappa_sgd": k_sgd, "lambda_min_rel": lam,
+           "winding_k": 0}
+    f = OUT / f"kappa_{name}_frozen.json"
+    f.write_text(json.dumps(out, indent=1, default=float))
+    h = hashlib.sha256(f.read_bytes()).hexdigest()
+    (OUT / f"kappa_{name}_frozen.sha256").write_text(h + "\n")
+    print(json.dumps({k: out[k] for k in ("act", "s_star", "in_validated_bracket", "kappa_adam", "kappa_sgd",
+                                           "n_calib_crossing", "p_median", "gradG_onesided_rel_diff", "H_pd")},
+                     default=float), h)
+    return out
+
+
+def train(name):
+    if not (OUT / f"kappa_{name}_frozen.sha256").exists():
+        raise SystemExit("kappa not frozen")
+    _run_many(name, TRAIN_SEEDS, OUT / f"train_{name}.csv")
+
+
+# ------------------------------------------------------------------------------------------ step 4: scoring
+def score_runs(s_cross, chi, s_lo, s_glob, kap, tol_abs=0.01, tol_rel=0.25, min_cross=MIN_CROSS, frac=0.9):
+    """T-a: at least `frac` of the crossing runs cross at s >= s_lo.  T-b: median r = s_cross/s_glob − 1 within
+    max(tol_abs, tol_rel·|pred|) of pred = median over runs of κ·χ (finite, positive χ).  UNRESOLVED with fewer than
+    min_cross crossings (T-b: fewer than min_cross usable χ)."""
+    s_cross = np.asarray(s_cross, float); chi = np.asarray(chi, float)
+    n = int(len(s_cross))
+    if n < min_cross:
+        return {"n": n, "T-a": "UNRESOLVED", "T-b": "UNRESOLVED"}
+    fa = float(np.mean(s_cross >= s_lo))
+    use = np.isfinite(chi) & (chi > 0)
+    r = s_cross / s_glob - 1
+    obs = float(np.median(r))
+    if use.sum() < min_cross:
+        return {"n": n, "T-a": "PASS" if fa >= frac else "FAIL", "frac_at_or_above_lo": fa, "T-b": "UNRESOLVED",
+                "obs": obs}
+    pred = float(np.median(kap * chi[use]))
+    tol = max(tol_abs, tol_rel * abs(pred))
+    return {"n": n, "T-a": "PASS" if fa >= frac else "FAIL", "frac_at_or_above_lo": fa,
+            "T-b": "PASS" if abs(obs - pred) <= tol else "FAIL", "pred": pred, "obs": obs, "tol": tol,
+            "median_chi": float(np.median(chi[use])), "n_chi": int(use.sum())}

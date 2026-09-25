@@ -91,3 +91,7 @@ the last digit under the new bound. The decision rule, the scales and every vali
   minimiser's gap in arbitrary precision (mpmath, using that u is unimodal, checked in tests). **The registered
   verdict is the rule applied to the double-precision enclosure, as written above; the arbitrary-precision gap is
   reported beside it and does not replace it.**
+
+(Correction, appended: the clock times written in this file were estimates and are wrong by up to an hour; the
+commit times in `git log` are authoritative: registration b707e86, amendment a251e80, amendment 2 cf2d68b, result
+ca6d7e6, all on 2026-09-25 between about 19:15 and 19:25 EDT.)

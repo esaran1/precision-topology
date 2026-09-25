@@ -1,0 +1,194 @@
+{"phase": "scan", "s": 0.1, "status": "undecided", "loss": 0.4773508043490843, "G_lo": -2.913500225775254e-14, "G_hi": 1.2362284100907041e-154, "w1": 224.92041230962275, "b1": -180.33657113617193, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.4773508043490843, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -153.9079012799936}
+{"phase": "scan", "s": 0.1333521432163324, "status": "undecided", "loss": 0.4773203294605557, "G_lo": -1.0864213257890551e-13, "G_hi": 4.868427312820754e-107, "w1": 156.27686187212873, "b1": -125.29507085971645, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.4773203294605557, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -106.312611309765}
+{"phase": "scan", "s": 0.1778279410038923, "status": "undecided", "loss": 0.47726184641920893, "G_lo": -2.4689088334524595e-14, "G_hi": 1.5304038613975298e-73, "w1": 107.89998260272174, "b1": -86.49541804074434, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.47726184641920893, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -72.81519394720088}
+{"phase": "scan", "s": 0.23713737056616552, "status": "undecided", "loss": 0.47714892015939364, "G_lo": -8.68333985479364e-14, "G_hi": 4.926088880320833e-50, "w1": 73.88168902538412, "b1": -59.20264948610906, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.47714892015939364, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -49.307497756547946}
+{"phase": "scan", "s": 0.31622776601683794, "status": "undecided", "loss": 0.47692904324567104, "G_lo": -1.8263942844448427e-14, "G_hi": 1.3272932616980126e-33, "w1": 50.03383021196579, "b1": -40.058193963605774, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.47692904324567104, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -32.87703311039402}
+{"phase": "scan", "s": 0.4216965034285822, "status": "unplaced", "loss": 0.47649589978097145, "G_lo": -0.01564012924578817, "G_hi": -0.015640129245759273, "w1": 33.36661323613659, "b1": -26.6624847914743, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.47649589978097145, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.8057596623702787}
+{"phase": "scan", "s": 0.5623413251903491, "status": "unplaced", "loss": 0.47562731001424124, "G_lo": -0.05060886571387799, "G_hi": -0.05060886571379468, "w1": 21.73877211204072, "b1": -17.294458206320577, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.47562731001424124, "best_undecided_loss": 0.4773856262211234, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.2957733963359472}
+{"phase": "scan", "s": 0.7498942093324559, "status": "unplaced", "loss": 0.47383518700673266, "G_lo": -0.09549830278353685, "G_hi": -0.09549830278353685, "w1": 13.642262256591824, "b1": -10.738194123804156, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.47383518700673266, "best_undecided_loss": 0.5758702437815137, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.0200043467229993}
+{"phase": "scan", "s": 1.0, "status": "unplaced", "loss": 0.46998318748041357, "G_lo": -0.15962816763800158, "G_hi": -0.15962816763800158, "w1": 8.058528252192472, "b1": -6.1665826849085175, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.46998318748041357, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.7968904715668672}
+{"phase": "scan", "s": 1.333521432163324, "status": "unplaced", "loss": 0.46132673581766326, "G_lo": -0.2183587377713302, "G_hi": -0.2183587377713302, "w1": 4.520308282937359, "b1": -3.2491348030738507, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.46132673581766326, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.6608294248099791}
+{"phase": "scan", "s": 1.7782794100389228, "status": "unplaced", "loss": 0.44631678752679105, "G_lo": -0.15927865062152483, "G_hi": -0.15927865062152483, "w1": 3.31637080839185, "b1": -2.3905735926093, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.44631678752679105, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.7978424322254243}
+{"phase": "scan", "s": 2.371373705661655, "status": "unplaced", "loss": 0.4267999558335148, "G_lo": -0.08415582453792134, "G_hi": -0.08415582453792134, "w1": 2.805218019768913, "b1": -2.1276396046158217, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4267999558335148, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.0749158205421132}
+{"phase": "scan", "s": 3.1622776601683795, "status": "unplaced", "loss": 0.4029702166272861, "G_lo": -0.023672920534111783, "G_hi": -0.023672920534111783, "w1": 2.4967592137712757, "b1": -2.0165056201793354, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4029702166272861, "best_undecided_loss": 0.5857476300664356, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.6257481597470438}
+{"phase": "scan", "s": 4.216965034285822, "status": "placed", "loss": 0.3743039021185639, "G_lo": 0.021095679111580605, "G_hi": 0.021095679111580605, "w1": 2.2833269716452347, "b1": -1.9626350411926443, "sigma": 1.0, "best_placed_loss": 0.3743039021185639, "best_unplaced_loss": 0.6072738680095398, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.675806489259832}
+{"phase": "scan", "s": 5.623413251903491, "status": "placed", "loss": 0.3402290769377531, "G_lo": 0.04349823569114142, "G_hi": 0.04349823569114142, "w1": 2.1249038334668193, "b1": -1.9324039060010518, "sigma": 1.0, "best_placed_loss": 0.3402290769377531, "best_unplaced_loss": 0.5869439414477563, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3615283578761848}
+{"phase": "scan", "s": 7.498942093324558, "status": "placed", "loss": 0.30050810928333, "G_lo": 0.04475498908744865, "G_hi": 0.04475498908744865, "w1": -2.0016886057930603, "b1": -1.9099520286818996, "sigma": 1.0, "best_placed_loss": 0.30050810928333, "best_unplaced_loss": 0.5652420126869865, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.349158544429068}
+{"phase": "scan", "s": 10.0, "status": "placed", "loss": 0.25564039419272305, "G_lo": 0.04569606000994407, "G_hi": 0.04569606000994407, "w1": 1.9022222970594864, "b1": -1.886603766792938, "sigma": 1.0, "best_placed_loss": 0.25564039419272305, "best_unplaced_loss": 0.5441546039271282, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3401212439062011}
+{"phase": "scan", "s": 13.33521432163324, "status": "placed", "loss": 0.20726247901687078, "G_lo": 0.04654580691209413, "G_hi": 0.04654580691209413, "w1": 1.819466926089173, "b1": -1.8577733896344832, "sigma": 1.0, "best_placed_loss": 0.20726247901687078, "best_unplaced_loss": 0.5260179121767699, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.332119436421872}
+{"phase": "scan", "s": 17.78279410038923, "status": "placed", "loss": 0.15831185720433466, "G_lo": 0.04738526382042925, "G_hi": 0.04738526382042925, "w1": 1.7491231976934498, "b1": -1.8224376098800779, "sigma": 1.0, "best_placed_loss": 0.15831185720433466, "best_unplaced_loss": 0.512352311900296, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3243566970706633}
+{"phase": "scan", "s": 23.71373705661655, "status": "placed", "loss": 0.11261321258842864, "G_lo": 0.048180130041462876, "G_hi": 0.048180130041462876, "w1": 1.6886688858205037, "b1": -1.7831774582409687, "sigma": 1.0, "best_placed_loss": 0.11261321258842864, "best_unplaced_loss": 0.5030314415704984, "best_undecided_loss": 0.5255577478840658, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3171320321456141}
+{"phase": "scan", "s": 31.622776601683793, "status": "placed", "loss": 0.0737950345724291, "G_lo": 0.04884333673768196, "G_hi": 0.04884333673768196, "w1": 1.6378656807827554, "b1": -1.7449339386208869, "sigma": 1.0, "best_placed_loss": 0.0737950345724291, "best_unplaced_loss": 0.49683704171499954, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3111946748405232}
+{"phase": "scan", "s": 42.169650342858226, "status": "placed", "loss": 0.04405570058366614, "G_lo": 0.049330418426181744, "G_hi": 0.049330418426181744, "w1": -1.599560035056329, "b1": -1.7125749079686217, "sigma": 1.0, "best_placed_loss": 0.04405570058366614, "best_unplaced_loss": 0.4925671614987961, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3068852007873792}
+{"phase": "scan", "s": 56.23413251903491, "status": "placed", "loss": 0.02361481328618612, "G_lo": 0.04967433134337561, "G_hi": 0.04967433134337561, "w1": 1.5769943257863135, "b1": -1.6890074063054907, "sigma": 1.0, "best_placed_loss": 0.02361481328618612, "best_unplaced_loss": 0.48947451869902125, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.30386797013333}
+{"phase": "scan", "s": 74.98942093324558, "status": "placed", "loss": 0.01111270869479847, "G_lo": 0.049933427428043436, "G_hi": 0.049933427428043436, "w1": 1.569193142115943, "b1": -1.6741216554603218, "sigma": 1.0, "best_placed_loss": 0.01111270869479847, "best_unplaced_loss": 0.487150773466807, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3016086229695345}
+{"phase": "scan", "s": 100.0, "status": "placed", "loss": 0.004437214061765739, "G_lo": 0.050139841139292984, "G_hi": 0.050139841139292984, "w1": 1.5701757618436647, "b1": -1.6652211279425655, "sigma": 1.0, "best_placed_loss": 0.004437214061765739, "best_unplaced_loss": 0.4853594960629475, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2998170463737677}
+{"phase": "scan", "s": 133.3521432163324, "status": "placed", "loss": 0.001431329282231542, "G_lo": 0.05030442829635666, "G_hi": 0.05030442829635666, "w1": 1.573581174312518, "b1": -1.6592744579739993, "sigma": 1.0, "best_placed_loss": 0.001431329282231542, "best_unplaced_loss": 0.4839519320725272, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2983937823392906}
+{"phase": "scan", "s": 177.82794100389228, "status": "placed", "loss": 0.0003483767319458915, "G_lo": 0.050434423205541604, "G_hi": 0.050434423205541604, "w1": -1.5763305104821153, "b1": -1.6546096687748824, "sigma": 1.0, "best_placed_loss": 0.0003483767319458915, "best_unplaced_loss": 0.4828291601444711, "best_undecided_loss": 0.5747597995761905, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.297272941626314}
+{"phase": "scan", "s": 237.13737056616552, "status": "placed", "loss": 5.833221198750278e-05, "G_lo": 0.05053666864420073, "G_hi": 0.05053666864420073, "w1": 1.578042278946656, "b1": -1.6507469479018078, "sigma": 1.0, "best_placed_loss": 5.833221198750278e-05, "best_unplaced_loss": 0.48192279275123917, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.296393389980918}
+{"phase": "scan", "s": 316.22776601683796, "status": "placed", "loss": 5.9369312935965685e-06, "G_lo": 0.05061685896245191, "G_hi": 0.05061685896245191, "w1": 1.5791021238902596, "b1": -1.6475953574494158, "sigma": 1.0, "best_placed_loss": 5.9369312935965685e-06, "best_unplaced_loss": 0.48118409779068133, "best_undecided_loss": 0.5461043564851039, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.295704808557447}
+{"phase": "scan", "s": 421.6965034285823, "status": "placed", "loss": 3.1113947504875534e-07, "G_lo": 0.0506795083597405, "G_hi": 0.0506795083597405, "w1": 1.5798061947006983, "b1": -1.6450794286237351, "sigma": 1.0, "best_placed_loss": 3.1113947504875534e-07, "best_unplaced_loss": 0.48057744719218365, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2951676068447806}
+{"phase": "scan", "s": 562.341325190349, "status": "placed", "loss": 6.724617250949665e-09, "G_lo": 0.050728288475337294, "G_hi": 0.050728288475337294, "w1": 1.580309985962136, "b1": -1.6431011953919306, "sigma": 1.0, "best_placed_loss": 6.724617250949665e-09, "best_unplaced_loss": 0.48007615999105097, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2947497901220935}
+{"phase": "scan", "s": 749.8942093324558, "status": "placed", "loss": 4.456400797121766e-11, "G_lo": 0.05076627017859946, "G_hi": 0.05076627017859946, "w1": 1.5807148773571569, "b1": -1.64156661520877, "sigma": 1.0, "best_placed_loss": 4.456400797121766e-11, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.294424743240195}
+{"phase": "scan", "s": 1000.0, "status": "placed", "loss": 1.0541259812176099e-13, "G_lo": 0.04973162606627424, "G_hi": 0.04973162606627424, "w1": -1.7776936057641268, "b1": -1.7326384609820416, "sigma": 1.0, "best_placed_loss": 1.0541259812176099e-13, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3033673404849502}
+{"phase": "bisect", "s": 3.651741272548377, "status": "placed", "loss": 0.389280873771072, "G_lo": 0.0005350395631871785, "G_hi": 0.0005350395631871785, "w1": 2.3813867259864, "b1": -1.9851531888953957, "sigma": 1.0, "best_placed_loss": 0.389280873771072, "best_unplaced_loss": 0.6165345382714179, "best_undecided_loss": 0.5401553038476898, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -3.271614103140265}
+{"phase": "bisect", "s": 3.3982083289425598, "status": "unplaced", "loss": 0.3962816568363985, "G_lo": -0.011091579405332279, "G_hi": -0.011091579405332279, "w1": 2.436610812509874, "b1": -1.9994759436212681, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.3962816568363985, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.9550066073060886}
+{"phase": "bisect", "s": 3.5226946514731017, "status": "unplaced", "loss": 0.3928209172459768, "G_lo": -0.005161515856032604, "G_hi": -0.005161515856032604, "w1": 2.4084250403498144, "b1": -1.9920113785629547, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.3928209172459768, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -2.2872227341808142}
+{"phase": "bisect", "s": 3.586637624484769, "status": "unplaced", "loss": 0.3910608853683375, "G_lo": -0.0022843845368255844, "G_hi": -0.0022843845368255844, "w1": 2.394767230712078, "b1": -1.9885104876368067, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.3910608853683375, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -2.6412307882700174}
+{"phase": "bisect", "s": 3.6190430562520115, "status": "unplaced", "loss": 0.39017338654657335, "G_lo": -0.000867501475431541, "G_hi": -0.000867501475431541, "w1": 2.3880428876055593, "b1": -1.9868143671202914, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.39017338654657335, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -3.0617297778958843}
+{
+ "act": "silu",
+ "scan_changes": 2,
+ "scan_undecided": true,
+ "scan_bracket": [
+  3.1622776601683795,
+  4.216965034285822
+ ],
+ "s_lo": 3.6190430562520115,
+ "s_hi": 3.651741272548377,
+ "s_mid": 3.6353554015591225,
+ "validation_lo": {
+  "s": 3.6190430562520115,
+  "status": "unplaced",
+  "loss": 0.39017338654657335,
+  "G_lo": -0.0008675014754316243,
+  "G_hi": -0.0008675014754316243,
+  "w1": 2.3880428876055597,
+  "b1": -1.9868143671202916,
+  "sigma": 1.0,
+  "loss_ladder_small": 0.39017338654657346,
+  "status_ladder_small": "unplaced",
+  "ladder_ok": true,
+  "cma_loss": 0.39017338654657335,
+  "cma_q": "[2.3880429148984548, -1.986814383480605, 1.0388482300977184]",
+  "independent_ok": true,
+  "audit_ok": true,
+  "audit_n_other_within_tie": 0,
+  "audit_n_near_top": 180,
+  "n_converged": 793,
+  "validated": true,
+  "posthoc_mp_sign_G": -1,
+  "posthoc_mp_log10_absG": -3.0617297778958643
+ },
+ "validation_hi": {
+  "s": 3.651741272548377,
+  "status": "placed",
+  "loss": 0.389280873771072,
+  "G_lo": 0.0005350395631871091,
+  "G_hi": 0.0005350395631871091,
+  "w1": 2.3813867259864003,
+  "b1": -1.985153188895396,
+  "sigma": 1.0,
+  "loss_ladder_small": 0.389280873771072,
+  "status_ladder_small": "placed",
+  "ladder_ok": true,
+  "cma_loss": 0.3892808737710719,
+  "cma_q": "[-2.3813867246470295, -1.9851531795493882, 12.952495121498616]",
+  "independent_ok": true,
+  "audit_ok": true,
+  "audit_n_other_within_tie": 0,
+  "audit_n_near_top": 179,
+  "n_converged": 791,
+  "validated": true,
+  "posthoc_mp_sign_G": 1,
+  "posthoc_mp_log10_absG": -3.2716141031402963
+ },
+ "label": "VALIDATED (not certified)"
+}
+{"phase": "scan", "s": 0.1, "status": "undecided", "loss": 0.4773478461403184, "G_lo": -6.198600504702092e-14, "G_hi": 2.677706420742831e-153, "w1": 222.99563847661796, "b1": -178.79231239024418, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4773856262211095, "best_undecided_loss": 0.4773478461403184, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -152.5722370400352}
+{"phase": "scan", "s": 0.1333521432163324, "status": "undecided", "loss": 0.47731484631326426, "G_lo": -1.4393489551449876e-14, "G_hi": 5.149895317355558e-106, "w1": -154.79769203349423, "b1": -124.11010995263433, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.47738562622115505, "best_undecided_loss": 0.47731484631326426, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -105.28820159883394}
+{"phase": "scan", "s": 0.1778279410038923, "status": "undecided", "loss": 0.47725147871002577, "G_lo": -5.213960084892294e-14, "G_hi": 9.102125997770991e-73, "w1": 106.77876337566568, "b1": -85.59898525521818, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.47725147871002577, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -72.0408571569907}
+{"phase": "scan", "s": 0.23713737056616552, "status": "undecided", "loss": 0.4771290569616694, "G_lo": -1.8261251980222572e-13, "G_hi": 1.87501604162171e-49, "w1": 73.03745016778171, "b1": -58.52992320613427, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": 0.4771290569616694, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -48.726995012332}
+{"phase": "scan", "s": 0.31622776601683794, "status": "undecided", "loss": 0.4768905697964172, "G_lo": -3.822253987446963e-14, "G_hi": 3.584504891041372e-33, "w1": 49.401808892941, "b1": -39.55768967494967, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4773856262211302, "best_undecided_loss": 0.4768905697964172, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -32.4455708226846}
+{"phase": "scan", "s": 0.4216965034285822, "status": "unplaced", "loss": 0.47642050896080135, "G_lo": -0.013701988822164102, "G_hi": -0.013701988822103975, "w1": 32.89715011632755, "b1": -26.295154690733323, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.47642050896080135, "best_undecided_loss": 0.4773856262211287, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.8632163911080186}
+{"phase": "scan", "s": 0.5623413251903491, "status": "unplaced", "loss": 0.4754771495122896, "G_lo": -0.05270599895204857, "G_hi": -0.05270599895203782, "w1": 21.390782680198438, "b1": -17.028534546450576, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4754771495122896, "best_undecided_loss": 0.4773856262211217, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.2781399509450457}
+{"phase": "scan", "s": 0.7498942093324559, "status": "unplaced", "loss": 0.4735220350212455, "G_lo": -0.10243049623885173, "G_hi": -0.10243049623885173, "w1": 13.334943079358418, "b1": -10.51033550027969, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4735220350212455, "best_undecided_loss": 0.5341288988527855, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.9895707232775536}
+{"phase": "scan", "s": 1.0, "status": "unplaced", "loss": 0.4691723926455876, "G_lo": -0.17641625307360734, "G_hi": -0.17641625307360734, "w1": 7.557388471434763, "b1": -5.786874570597739, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4691723926455876, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.7534614061938841}
+{"phase": "scan", "s": 1.333521432163324, "status": "unplaced", "loss": 0.45857042658149894, "G_lo": -0.22528132685252833, "G_hi": -0.22528132685252833, "w1": 4.018730888687694, "b1": -2.8973984741912036, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.45857042658149894, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.6472748046409894}
+{"phase": "scan", "s": 1.7782794100389228, "status": "unplaced", "loss": 0.4411442150361055, "G_lo": -0.14414978643919005, "G_hi": -0.14414978643919005, "w1": 3.035724908984336, "b1": -2.235338823159715, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4411442150361055, "best_undecided_loss": 0.5413512397365239, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -0.8411859966913133}
+{"phase": "scan", "s": 2.371373705661655, "status": "unplaced", "loss": 0.4195646353531581, "G_lo": -0.06405951056266077, "G_hi": -0.06405951056266077, "w1": 2.598180050494413, "b1": -2.0233817100201392, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.4195646353531581, "best_undecided_loss": NaN, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -1.1934163838231133}
+{"phase": "scan", "s": 3.1622776601683795, "status": "unplaced", "loss": 0.39389656103912624, "G_lo": -0.0029351837641908365, "G_hi": -0.0029351837641908365, "w1": 2.3292423027233067, "b1": -1.9304236270304134, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.39389656103912624, "best_undecided_loss": 0.6429532555589945, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -2.5323647035217363}
+{"phase": "scan", "s": 4.216965034285822, "status": "placed", "loss": 0.36350798389433164, "G_lo": 0.04088484199311521, "G_hi": 0.04088484199311521, "w1": 2.142263024016725, "b1": -1.8831694194624833, "sigma": 1.0, "best_placed_loss": 0.36350798389433164, "best_unplaced_loss": 0.6012137401066834, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3884376763183996}
+{"phase": "scan", "s": 5.623413251903491, "status": "placed", "loss": 0.3278012300516565, "G_lo": 0.047458897760242806, "G_hi": 0.047458897760242806, "w1": 2.003254063559611, "b1": -1.8540581139778898, "sigma": 1.0, "best_placed_loss": 0.3278012300516565, "best_unplaced_loss": 0.5804018797039906, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.323682352553638}
+{"phase": "scan", "s": 7.498942093324558, "status": "placed", "loss": 0.2866449232479061, "G_lo": 0.04861473097196063, "G_hi": 0.04861473097196063, "w1": 1.894937094252517, "b1": -1.829649285554484, "sigma": 1.0, "best_placed_loss": 0.2866449232479061, "best_unplaced_loss": 0.5588158161204465, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3132321132385771}
+{"phase": "scan", "s": 10.0, "status": "placed", "loss": 0.2407918892680572, "G_lo": 0.04955703444448442, "G_hi": 0.04955703444448442, "w1": 1.8073198682825533, "b1": -1.8026509994351827, "sigma": 1.0, "best_placed_loss": 0.2407918892680572, "best_unplaced_loss": 0.5386244620834342, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.3048946902485756}
+{"phase": "scan", "s": 13.33521432163324, "status": "placed", "loss": 0.19222618458051927, "G_lo": 0.05046599288444631, "G_hi": 0.05046599288444631, "w1": -1.734197230600401, "b1": -1.7697609050072023, "sigma": 1.0, "best_placed_loss": 0.19222618458051927, "best_unplaced_loss": 0.5219872381908148, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2970011778750348}
+{"phase": "scan", "s": 17.78279410038923, "status": "placed", "loss": 0.14417374927063964, "G_lo": 0.05136972046737176, "G_hi": 0.05136972046737176, "w1": 1.6712333925878422, "b1": -1.7314717823321872, "sigma": 1.0, "best_placed_loss": 0.14417374927063964, "best_unplaced_loss": 0.5098672749434443, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2892927975189612}
+{"phase": "scan", "s": 23.71373705661655, "status": "placed", "loss": 0.1004745064041324, "G_lo": 0.05218697350193367, "G_hi": 0.05218697350193367, "w1": 1.6159059860067666, "b1": -1.6915131213513557, "sigma": 1.0, "best_placed_loss": 0.1004745064041324, "best_unplaced_loss": 0.5016600087927677, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2824378886115249}
+{"phase": "scan", "s": 31.622776601683793, "status": "placed", "loss": 0.0643840930519903, "G_lo": 0.052827114093669705, "G_hi": 0.052827114093669705, "w1": 1.569472362834744, "b1": -1.6548201349047957, "sigma": 1.0, "best_placed_loss": 0.0643840930519903, "best_unplaced_loss": 0.49609435621525977, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2771431138526828}
+{"phase": "scan", "s": 42.169650342858226, "status": "placed", "loss": 0.03749749161725268, "G_lo": 0.05327803266996757, "G_hi": 0.05327803266996757, "w1": 1.5361470907340593, "b1": -1.6254982833064486, "sigma": 1.0, "best_placed_loss": 0.03749749161725268, "best_unplaced_loss": 0.49214913750490114, "best_undecided_loss": 0.5230793245372801, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2734518201806915}
+{"phase": "scan", "s": 56.23413251903491, "status": "placed", "loss": 0.019522915773423445, "G_lo": 0.05359729423676482, "G_hi": 0.05359729423676482, "w1": 1.5185322267879426, "b1": -1.605389005002322, "sigma": 1.0, "best_placed_loss": 0.019522915773423445, "best_unplaced_loss": 0.48922968190954536, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2708571343315436}
+{"phase": "scan", "s": 74.98942093324558, "status": "placed", "loss": 0.008857978871218298, "G_lo": 0.05384262212136254, "G_hi": 0.05384262212136254, "w1": 1.5138686733768894, "b1": -1.5932825497561403, "sigma": 1.0, "best_placed_loss": 0.008857978871218298, "best_unplaced_loss": 0.48700353781757444, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.268873798243418}
+{"phase": "scan", "s": 100.0, "status": "placed", "loss": 0.0033727829682123804, "G_lo": 0.05403865804667851, "G_hi": 0.05403865804667851, "w1": 1.5156340028934177, "b1": -1.5860442467367954, "sigma": 1.0, "best_placed_loss": 0.0033727829682123804, "best_unplaced_loss": 0.4852692215386025, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2672954444419913}
+{"phase": "scan", "s": 133.3521432163324, "status": "placed", "loss": 0.0010214341236688949, "G_lo": 0.054194425799940174, "G_hi": 0.054194425799940174, "w1": 1.5185390635792286, "b1": -1.5809871315220554, "sigma": 1.0, "best_placed_loss": 0.0010214341236688949, "best_unplaced_loss": 0.4838956354396469, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2660453807830416}
+{"phase": "scan", "s": 177.82794100389228, "status": "placed", "loss": 0.00022850310356437058, "G_lo": 0.0543172476344697, "G_hi": 0.0543172476344697, "w1": 1.5206142596277785, "b1": -1.5769056546738227, "sigma": 1.0, "best_placed_loss": 0.00022850310356437058, "best_unplaced_loss": 0.4827934651859448, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2650622447556576}
+{"phase": "scan", "s": 237.13737056616552, "status": "placed", "loss": 3.418446453753837e-05, "G_lo": 0.054413785238616924, "G_hi": 0.054413785238616924, "w1": 1.5218577679452774, "b1": -1.5735227705174748, "sigma": 1.0, "best_placed_loss": 3.418446453753837e-05, "best_unplaced_loss": 0.4818997885196886, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2642910617973795}
+{"phase": "scan", "s": 316.22776601683796, "status": "placed", "loss": 2.993306849359192e-06, "G_lo": 0.054489459438004914, "G_hi": 0.054489459438004914, "w1": 1.522625115375245, "b1": -1.5707770436673547, "sigma": 1.0, "best_placed_loss": 2.993306849359192e-06, "best_unplaced_loss": 0.48116906683079874, "best_undecided_loss": 0.5813833414611121, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.26368750048745}
+{"phase": "scan", "s": 421.6965034285823, "status": "placed", "loss": 1.2831435883607464e-07, "G_lo": 0.05454857563100374, "G_hi": 0.05454857563100374, "w1": 1.5231389463144729, "b1": -1.568593203626774, "sigma": 1.0, "best_placed_loss": 1.2831435883607464e-07, "best_unplaced_loss": 0.4805675414515477, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.263216585197941}
+{"phase": "scan", "s": 562.341325190349, "status": "placed", "loss": 2.1205072269054417e-09, "G_lo": 0.054594664196286766, "G_hi": 0.054594664196286766, "w1": 1.523514676743461, "b1": -1.5668793603358413, "sigma": 1.0, "best_placed_loss": 2.1205072269054417e-09, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2628498009462974}
+{"phase": "scan", "s": 749.8942093324558, "status": "placed", "loss": 9.821135627145416e-12, "G_lo": 0.05463067552642609, "G_hi": 0.05463067552642609, "w1": -1.5239859376029077, "b1": -1.5656226595439233, "sigma": 1.0, "best_placed_loss": 9.821135627145416e-12, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2625634292568728}
+{"phase": "scan", "s": 1000.0, "status": "placed", "loss": 6.581480722513764e-14, "G_lo": 0.050640155818026555, "G_hi": 0.050640155818026555, "w1": -1.9049892994896425, "b1": -1.7592683194346612, "sigma": 1.0, "best_placed_loss": 6.581480722513764e-14, "best_unplaced_loss": 0.6931471805599453, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.2955049666793859}
+{"phase": "bisect", "s": 3.651741272548377, "status": "placed", "loss": 0.3793358088772132, "G_lo": 0.02092656993978649, "G_hi": 0.02092656993978649, "w1": 2.2282163854672787, "b1": -1.903304740258206, "sigma": 1.0, "best_placed_loss": 0.3793358088772132, "best_unplaced_loss": 0.6108497270192788, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -1.679301950748793}
+{"phase": "bisect", "s": 3.3982083289425598, "status": "placed", "loss": 0.3867694257174368, "G_lo": 0.009511022853680287, "G_hi": 0.009511022853680287, "w1": 2.276590396907229, "b1": -1.915785526581483, "sigma": 1.0, "best_placed_loss": 0.3867694257174368, "best_unplaced_loss": 0.6154242509888707, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -2.0217727747742904}
+{"phase": "bisect", "s": 3.2781211513934587, "status": "placed", "loss": 0.3903706151949475, "G_lo": 0.003420201478592552, "G_hi": 0.003420201478592552, "w1": 2.302344280624637, "b1": -1.9228045284093178, "sigma": 1.0, "best_placed_loss": 0.3903706151949475, "best_unplaced_loss": 0.6176468085471276, "best_undecided_loss": NaN, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -2.4659483095977635}
+{"phase": "bisect", "s": 3.2196784442513793, "status": "placed", "loss": 0.39214290568657956, "G_lo": 0.00027600804477573293, "G_hi": 0.00027600804477573293, "w1": 2.315645193938708, "b1": -1.9265349127599223, "sigma": 1.0, "best_placed_loss": 0.39214290568657956, "best_unplaced_loss": 0.6187415686415699, "best_undecided_loss": 0.5267919871692263, "posthoc_mp_sign_G": 1, "posthoc_mp_log10_absG": -3.559078259417413}
+{"phase": "bisect", "s": 3.1908489806291085, "status": "unplaced", "loss": 0.39302205168674803, "G_lo": -0.0013211597929120786, "G_hi": -0.0013211597929120786, "w1": 2.3224060602065504, "b1": -1.9284589349422419, "sigma": 1.0, "best_placed_loss": NaN, "best_unplaced_loss": 0.39302205168674803, "best_undecided_loss": 0.5066356767860789, "posthoc_mp_sign_G": -1, "posthoc_mp_log10_absG": -2.8790446517397217}
+{
+ "act": "mish",
+ "scan_changes": 2,
+ "scan_undecided": true,
+ "scan_bracket": [
+  3.1622776601683795,
+  4.216965034285822
+ ],
+ "s_lo": 3.1908489806291085,
+ "s_hi": 3.2196784442513793,
+ "s_mid": 3.205231299265784,
+ "validation_lo": {
+  "s": 3.1908489806291085,
+  "status": "unplaced",
+  "loss": 0.393022051686748,
+  "G_lo": -0.0013211597929121965,
+  "G_hi": -0.0013211597929121965,
+  "w1": 2.3224060602065486,
+  "b1": -1.9284589349422405,
+  "sigma": 1.0,
+  "loss_ladder_small": 0.39302205168674803,
+  "status_ladder_small": "unplaced",
+  "ladder_ok": true,
+  "cma_loss": 0.39302205168674786,
+  "cma_q": "[2.32240608480503, -1.9284589489930284, 0.37000116306173586]",
+  "independent_ok": true,
+  "audit_ok": true,
+  "audit_n_other_within_tie": 0,
+  "audit_n_near_top": 179,
+  "n_converged": 795,
+  "validated": true,
+  "posthoc_mp_sign_G": -1,
+  "posthoc_mp_log10_absG": -2.8790446517397004
+ },
+ "validation_hi": {
+  "s": 3.2196784442513793,
+  "status": "placed",
+  "loss": 0.39214290568657956,
+  "G_lo": 0.0002760080447755872,
+  "G_hi": 0.0002760080447755872,
+  "w1": 2.3156451939387077,
+  "b1": -1.9265349127599218,
+  "sigma": 1.0,
+  "loss_ladder_small": 0.39214290568657956,
+  "status_ladder_small": "placed",
+  "ladder_ok": true,
+  "cma_loss": 0.39214290568657945,
+  "cma_q": "[-2.3156451983076396, -1.9265349178339946, 5.929124316538141]",
+  "independent_ok": true,
+  "audit_ok": true,
+  "audit_n_other_within_tie": 0,
+  "audit_n_near_top": 174,
+  "n_converged": 788,
+  "validated": true,
+  "posthoc_mp_sign_G": 1,
+  "posthoc_mp_log10_absG": -3.559078259417541
+ },
+ "label": "VALIDATED (not certified)"
+}
