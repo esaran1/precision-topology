@@ -230,13 +230,26 @@ class Objective:
         gamma = r_lo + 1e-12 * max(1.0, abs(r_lo))
 
         def F(Zb, b):
-            acc = arb(0)
-            for z in Zb:
-                acc += 1 / (1 + (-(z + b)).exp())
-            return acc / self.n - self.ybar
+            return self._F_tails(Zb, b)
         Zhi = [arb(hi_(z)) for z in Z]; Zlo = [arb(lo_(z)) for z in Z]
         ok = (F(Zhi, arb(beta)) < 0) and (F(Zlo, arb(gamma)) > 0)
         return (ball(beta, gamma) if ok else None), Z
+
+    def _F_tails(self, Zb, b):
+        """F(b) = mean σ(z + b) − ȳ, computed so that it stays resolvable when every σ is saturated (|z| ~ 1e5 in the
+        limit problem): for u = z + b certainly > 0, σ(u) = 1 − σ(−u), and the whole units are counted exactly as an
+        integer; only the (tiny) tails are summed in Arb."""
+        k_pos = 0
+        tails = arb(0)
+        for z in Zb:
+            u = z + b
+            if u > 0:                                        # certain (Arb): use σ(u) = 1 − σ(−u)
+                k_pos += 1
+                tails -= 1 / (1 + u.exp())                   # σ(−u) = 1 / (1 + e^u)
+            else:
+                tails += 1 / (1 + (-u).exp())
+        k_y = sum(self.Y)                                    # n·ȳ, exact
+        return (arb(k_pos - k_y) + tails) / self.n
 
     def value_and_grad(self, W, B, Bb, Z=None):
         """Balls for L(w, b₁, b₂) and the envelope gradient over W × B × Bb."""
@@ -281,12 +294,8 @@ class Objective:
         return mv if lo_(mv) >= lo_(direct) else direct
 
     def F_at(self, W, B, b):
-        """F(b) = mean σ(z0 + b) − ȳ at a (w, b₁) ball."""
-        acc = arb(0)
-        for xi in self.X:
-            z = self.s * self.fa.f(W * xi + B) + b
-            acc += 1 / (1 + (-z).exp())
-        return acc / self.n - self.ybar
+        """F(b) = mean σ(z0 + b) − ȳ at a (w, b₁) ball (tail form, see _F_tails)."""
+        return self._F_tails([self.s * self.fa.f(W * xi + B) for xi in self.X], b)
 
     def upper_at(self, w, b1, b2):
         """An Arb ball containing L(w, b₁, b₂) ≥ L*(w, b₁); its upper end is a rigorous upper bound of L*."""

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 flint = pytest.importorskip("flint")
-from flint import arb
+from flint import arb, ctx
 
 import src.verify_certificates as vc
 
@@ -293,3 +293,27 @@ def test_range_is_conservative_when_a_candidate_is_not_finite():
     h = vc.HAct()
     mn, mx = h.range(arb("nan"), arb(1.0))
     assert not mn.is_finite() and not mx.is_finite()
+
+
+def test_F_tails_resolves_sign_when_every_sigmoid_is_saturated():
+    # 800 logits of size ~1e5 (the far-out limit-problem cells): the direct sum cannot resolve F's sign at 80 bits,
+    # the tail form can, and agrees with a high-precision direct evaluation
+    from src.limit_bnb import population
+    x, y = population()
+    obj = vc.Objective(x, y, 0.69, None, vc.HAct())
+    Z = [obj.s * obj.fa.f(arb(21.625) * xi + arb(-44.709)) for xi in obj.X]
+    zs = sorted(float(z.mid()) for z in Z)
+    b_mid = -0.5 * (zs[399] + zs[400])                      # between the two middle logits
+    for b in (b_mid - 1.0, b_mid + 1.0):
+        Ft = obj._F_tails(Z, arb(b))
+        assert Ft.is_finite() and (Ft < 0 or Ft > 0)       # sign decided
+        old = ctx.prec
+        try:
+            ctx.prec = 4000                                  # direct sum at very high precision decides it too
+            acc = arb(0)
+            for z in Z:
+                acc += 1 / (1 + (-(arb(z.mid()) + b)).exp())
+            Fd = acc / len(Z) - arb(1) / 2
+            assert (Fd < 0) == (Ft < 0)
+        finally:
+            ctx.prec = old
