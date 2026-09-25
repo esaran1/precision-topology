@@ -149,3 +149,24 @@ machinery that tested gating at width 1 (Blocks 4 and 5, and the approved W4 mac
   - for the extended replays, the fraction placed by 4H and by 16H ("escaped").
 - **Tests** (`tests/test_width2_nogating.py`): the classifier on constructed cases, and the tangent gradient against a
   finite difference along the sphere with its normal component removed.
+
+## Amendment (author, 2026-09-24, before any run): the single-unit local-minimum test
+
+**No registered prediction or criterion changes.** This amends the descriptive endpoint classification above.
+
+- **Scale-relative stationarity.** The gradient is divided by ‖w₂‖₁ before the comparison:
+  max |∇L| / ‖w₂‖₁ ≤ 1e−6, over the free directions (every coordinate of (θ, b), plus v tangent to the held ℓ₁
+  sphere).
+- **Second-order check.** The training-loss Hessian, restricted to the free directions, must have no negative
+  eigenvalue: λ_min / ‖w₂‖₁ ≥ −1e−6.
+  - With the signs of v fixed, the held sphere |v₁| + |v₂| = r is a hyperplane, so the constrained second-order
+    condition is the plain Hessian on an orthonormal basis of the complement of the normal (sign(v₁), sign(v₂))/√2.
+    There is no curvature term.
+  - **The −1e−6 is a numerical allowance, not a softening.** The idle unit's directions are flat up to rounding, so a
+    literal "≥ 0" would be decided by float error. The raw λ_min and λ_min/‖w₂‖₁ are recorded at every endpoint.
+- **A single-unit local minimum** is now: unplaced, the smaller weight share ≤ 0.01, the scale-relative gradient test,
+  and the second-order test. A stationary single unit with negative curvature is recorded as "other: unplaced single
+  unit, stationary with negative curvature".
+- **Tests**: the classifier on constructed cases, including the curvature allowance and a failing case; the free
+  basis orthonormal and orthogonal to the normal; the restricted λ_min bounding finite-difference curvature along
+  random free directions from below.

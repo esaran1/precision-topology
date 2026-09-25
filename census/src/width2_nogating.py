@@ -126,6 +126,7 @@ def breakdown(q, act):
 # ------------------------------------------------------------------------------------------ endpoint types (added 2026-09-24,
 # before any run, at the author's request; no registered prediction changes)
 SINGLE_SHARE, STATIONARY_TOL = 0.01, 1e-6
+HESS_TOL = 1e-6                    # amendment 2026-09-24: λ_min / ‖w₂‖₁ >= −HESS_TOL (numerical allowance, see design)
 EXTEND_FACTORS, EXTEND_MAX_PER_A = (4, 16), 80
 
 
@@ -134,6 +135,29 @@ def tangent_grad_max(q, act, x, y):
     along the held ℓ₁ sphere's normal (sign(v)/√2) removed."""
     g, gv = tangent_grad(q, act, x, y)
     return float(max(np.abs(g[[0, 1, 3, 4, 6]]).max(), np.abs(gv).max()))
+
+
+def free_basis(q):
+    """Orthonormal basis (7 x 6) of the replay's free directions: the complement of the held ℓ₁ sphere's normal
+    (sign(v₁), sign(v₂))/√2 in coordinates (2, 5).  With the signs fixed the sphere is a hyperplane, so the constrained
+    second-order condition is on the plain Hessian restricted to this basis."""
+    N = np.zeros(7)
+    N[2], N[5] = np.sign(q[2]) / math.sqrt(2), np.sign(q[5]) / math.sqrt(2)
+    P = np.eye(7) - np.outer(N, N)
+    w, V = np.linalg.eigh(P)
+    return V[:, w > 0.5]
+
+
+def tangent_hessian_min(q, act, x, y):
+    """Smallest eigenvalue of the training-loss Hessian restricted to the free directions."""
+    import torch
+    from .width2_train import logits
+    X, Y = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    f = lambda t: torch.nn.functional.binary_cross_entropy_with_logits(logits(t, X, act), Y)
+    H = torch.autograd.functional.hessian(f, torch.tensor(np.asarray(q, float), dtype=torch.float64)).numpy()
+    B = free_basis(q)
+    Ht = B.T @ H @ B
+    return float(np.linalg.eigvalsh(0.5 * (Ht + Ht.T)).min())
 
 
 def tangent_grad(q, act, x, y):
@@ -150,17 +174,20 @@ def tangent_grad(q, act, x, y):
     return g, gv
 
 
-def endpoint_type(placed_flag, bd, grad_max):
-    """'placed pair' | 'single-unit local minimum' | 'other: <subtype>'."""
+def endpoint_type(placed_flag, bd, grad_rel, lam_rel):
+    """'placed pair' | 'single-unit local minimum' | 'other: <subtype>'.  grad_rel = max|∇L| / ‖w₂‖₁ and
+    lam_rel = λ_min(free-direction Hessian) / ‖w₂‖₁ (amendment 2026-09-24: scale-relative; second-order check)."""
     if placed_flag and bd["pair"]:
         return "placed pair"
     small = min(bd["share1"], bd["share2"]) <= SINGLE_SHARE
-    if placed_flag is False and small and grad_max <= STATIONARY_TOL:
+    if placed_flag is False and small and grad_rel <= STATIONARY_TOL and lam_rel >= -HESS_TOL:
         return "single-unit local minimum"
     if placed_flag:
         return "other: placed, not the pair"
-    if small:
+    if small and grad_rel > STATIONARY_TOL:
         return "other: unplaced single unit, not stationary"
+    if small:
+        return "other: unplaced single unit, stationary with negative curvature"
     return "other: unplaced, two units" if placed_flag is False else "other: undecided"
 
 
@@ -200,9 +227,12 @@ def replay_ng(ck, radius, steps, x, y, act, variant, record, every=None):
             except RuntimeError:
                 pl, glo = None, None
             bd = breakdown(qn, act)
+            n1 = abs(qn[2]) + abs(qn[5])
             gm = tangent_grad_max(qn, act, x, y)
+            lm = tangent_hessian_min(qn, act, x, y)
             out[step] = {"placed": pl, "G_lo": glo, "sign_correct": sign_correct(th, v, b, act), **bd,
-                         "grad_max": gm, "endpoint_type": endpoint_type(pl, bd, gm)}
+                         "grad_max": gm, "grad_rel": gm / n1, "hess_min": lm, "hess_min_rel": lm / n1,
+                         "endpoint_type": endpoint_type(pl, bd, gm / n1, lm / n1)}
     return {"record": out, "trace": trace, "drift": drift, "k": k}
 
 

@@ -88,12 +88,38 @@ def test_endpoint_types():
     pair = {"pair": True, "share1": 0.5, "share2": 0.5}
     single = {"pair": False, "share1": 0.999, "share2": 0.001}
     two = {"pair": False, "share1": 0.6, "share2": 0.4}
-    assert endpoint_type(True, pair, 1e-3) == "placed pair"
-    assert endpoint_type(False, single, 1e-8) == "single-unit local minimum"
-    assert endpoint_type(False, single, 1e-3) == "other: unplaced single unit, not stationary"
-    assert endpoint_type(True, two, 1e-8) == "other: placed, not the pair"
-    assert endpoint_type(False, two, 1e-8) == "other: unplaced, two units"
-    assert endpoint_type(None, two, 1e-8) == "other: undecided"
+    assert endpoint_type(True, pair, 1e-3, -1.0) == "placed pair"
+    assert endpoint_type(False, single, 1e-8, 0.0) == "single-unit local minimum"
+    assert endpoint_type(False, single, 1e-8, -5e-7) == "single-unit local minimum"          # within the allowance
+    assert endpoint_type(False, single, 1e-8, -1e-4) == "other: unplaced single unit, stationary with negative curvature"
+    assert endpoint_type(False, single, 1e-3, 0.0) == "other: unplaced single unit, not stationary"
+    assert endpoint_type(True, two, 1e-8, 0.0) == "other: placed, not the pair"
+    assert endpoint_type(False, two, 1e-8, 0.0) == "other: unplaced, two units"
+    assert endpoint_type(None, two, 1e-8, 0.0) == "other: undecided"
+
+
+def test_free_basis_and_restricted_hessian():
+    import numpy as np
+    import torch
+    from src.width2_conditional import population
+    from src.width2_nogating import act_of, free_basis, tangent_hessian_min
+    from src.width2_train import logits
+    q = np.array([1.79, -1.2, 0.004, 2.3, 0.3, -0.002, 0.1])
+    B = free_basis(q)
+    N = np.zeros(7); N[2], N[5] = np.sign(q[2]) / np.sqrt(2), np.sign(q[5]) / np.sqrt(2)
+    assert B.shape == (7, 6) and np.allclose(B.T @ B, np.eye(6)) and np.abs(B.T @ N).max() < 1e-12
+    x, y = population()
+    act = act_of("f1.30")
+    lam = tangent_hessian_min(q, act, x, y)
+    # the smallest restricted eigenvalue bounds the second difference along every free direction from below
+    X, Y = torch.tensor(x), torch.tensor(y)
+    L = lambda qq: float(torch.nn.functional.binary_cross_entropy_with_logits(logits(torch.tensor(qq), X, act), Y))
+    h = 1e-4
+    rng = np.random.default_rng(0)
+    for _ in range(20):
+        d = B @ rng.standard_normal(6); d /= np.linalg.norm(d)
+        sd = (L(q + h * d) - 2 * L(q) + L(q - h * d)) / h ** 2
+        assert sd >= lam - 1e-5
 
 
 def test_tangent_gradient_matches_a_finite_difference_along_the_sphere():
