@@ -60,11 +60,14 @@ def _torch_fn(name):
 
 def _ndtr(t):
     import torch
-    return torch.special.ndtr(torch.as_tensor(np.asarray(t, float))).numpy()
+    return np.exp(torch.special.log_ndtr(torch.as_tensor(np.asarray(t, float))).numpy())   # tail-accurate
 
 
 def _sig(t):
-    return 0.5 * (1 + np.tanh(0.5 * np.asarray(t, float)))
+    """Logistic σ with full relative precision in both tails (0.5(1 + tanh) loses it for t << 0)."""
+    t = np.asarray(t, float)
+    e = np.exp(-np.abs(t))
+    return np.where(t >= 0, 1 / (1 + e), e / (1 + e))
 
 
 class GAct:
@@ -175,10 +178,73 @@ def torch_u(act):
 
 
 # ------------------------------------------------------------------------------------------ geometry (width 1)
-def gplus(w1, b1, sigma, act, tol=1e-9):
-    """Exact-extrema enclosure (lo, hi) of G₊(σ·u(w₁x + b₁)) on the continuous windows."""
-    from .width2_geometry import gaps
-    return gaps(np.array([w1, b1, 0.0, 0.0]), np.array([float(sigma), 0.0]), act, tol=tol)["G+"]
+MAX_CELLS = 4_000_000
+
+
+def gplus(w1, b1, sigma, act, tol=1e-9, max_cells=MAX_CELLS):
+    """Exact-extrema enclosure (lo, hi) of G₊(σ·u(w₁x + b₁)) on the continuous windows (width2_geometry.extrema; the
+    cell cap raised from 400,000 to MAX_CELLS, a resource limit).  If the cap is still reached the enclosure is
+    (−inf, +inf), i.e. undecided."""
+    from .width2_geometry import INNER, OUTER, extrema
+    th = np.array([w1, b1, 0.0, 0.0]); v = np.array([float(sigma), 0.0])
+    try:
+        i = extrema(th, v, act, *INNER, tol=tol, max_cells=max_cells)
+        oL = extrema(th, v, act, *OUTER[0], tol=tol, max_cells=max_cells)
+        oR = extrema(th, v, act, *OUTER[1], tol=tol, max_cells=max_cells)
+    except RuntimeError:
+        return (-math.inf, math.inf)
+    o_min_lo, o_min_hi = min(oL[0], oR[0]), min(oL[1], oR[1])
+    return (o_min_lo - i[3], o_min_hi - i[2])
+
+
+def mp_u(name, t):
+    import mpmath as mp
+    if name == "gelu":
+        return t * mp.ncdf(t)
+    if name == "silu":
+        return t / (1 + mp.exp(-t))
+    if name == "mish":
+        return t * mp.tanh(mp.log1p(mp.exp(t)))
+    raise ValueError(name)
+
+
+def mp_dip(name, dps=60):
+    """The unique critical point of u (its minimum), by mpmath root finding on u′."""
+    import mpmath as mp
+    with mp.workdps(dps):
+        t0 = {"gelu": -0.7518, "silu": -1.2785, "mish": -1.1924}[name]
+        return mp.findroot(lambda t: mp.diff(lambda q: mp_u(name, q), t), t0)
+
+
+def mp_gap(w1, b1, sigma, name, dps=60):
+    """POST HOC diagnostic: G₊(σ·u(w₁x + b₁)) in arbitrary precision (mpmath), using that u is unimodal (decreasing
+    then increasing, one critical point; checked in tests): on an interval, max u is at an end, min u is at the dip if
+    the dip is inside, else at an end.  Returns an mpf (no underflow)."""
+    import mpmath as mp
+    from .width2_geometry import INNER, OUTER
+    with mp.workdps(dps):
+        tm = mp_dip(name, dps)
+        w1, b1 = mp.mpf(w1), mp.mpf(b1)
+
+        def ext(lo, hi):
+            a, b = w1 * lo + b1, w1 * hi + b1
+            a, b = min(a, b), max(a, b)
+            ua, ub = mp_u(name, a), mp_u(name, b)
+            mn = mp_u(name, tm) if a <= tm <= b else min(ua, ub)
+            return mn, max(ua, ub)
+        iI = ext(*INNER); oL = ext(*OUTER[0]); oR = ext(*OUTER[1])
+        if sigma > 0:
+            return min(oL[0], oR[0]) - iI[1]
+        return iI[0] - max(oL[1], oR[1])
+
+
+def mp_log10_gap(w1, b1, sigma, name):
+    """(sign, log10|G|) of the arbitrary-precision gap (post hoc diagnostic)."""
+    import mpmath as mp
+    g = mp_gap(w1, b1, sigma, name)
+    if g == 0:
+        return 0, -math.inf
+    return (1 if g > 0 else -1), float(mp.log10(abs(g)))
 
 
 def dense_gplus(w1, b1, sigma, act):
@@ -533,12 +599,15 @@ def validate_point(s, x, y, act, seed, ladder=(200, 800), cma_starts=20):
     near = near_top_status(c_big, r_big, act) + [c for c in pol_big if c is not r_big]
     aud, n_other = audit_ok(r_big, near)
     n_conv = sum(1 for c in c_big if c["k"] >= 0 and eligible(c))
+    mp_sign, mp_l10 = (mp_log10_gap(r_big["w1"], r_big["b1"], r_big["sigma"], act.name)
+                       if isinstance(act, GAct) and r_big["k"] >= 0 else (0, -math.inf))
     return {"s": s, "status": r_big["status"], "loss": r_big["loss"], "G_lo": r_big["G_lo"], "G_hi": r_big["G_hi"],
             "w1": r_big["w1"], "b1": r_big["b1"], "sigma": r_big["sigma"],
             "loss_ladder_small": r_small["loss"], "status_ladder_small": r_small["status"], "ladder_ok": lad,
             "cma_loss": cm["loss"], "cma_q": json.dumps(cm["q"]), "independent_ok": ind,
             "audit_ok": aud, "audit_n_other_within_tie": n_other, "audit_n_near_top": len(near), "n_converged": n_conv,
-            "validated": bool(lad and ind and aud)}
+            "validated": bool(lad and ind and aud),
+            "posthoc_mp_sign_G": mp_sign, "posthoc_mp_log10_absG": mp_l10}
 
 
 def criterion():

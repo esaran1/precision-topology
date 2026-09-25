@@ -131,3 +131,40 @@ def test_near_top_status_sees_other_status_ties(acts):
     assert len(near) == 2
     assert not ag.audit_ok(ret, near)[0]
     assert ag.audit_ok(ret, ag.near_top_status([ret, far], ret, a))[0]
+
+
+def test_tail_relative_precision(acts):
+    import mpmath as mp
+    for n, a in acts.items():
+        for t in (-30.0, -80.0, -300.0):
+            ref = float(ag.mp_u(n, mp.mpf(t)))
+            got = float(a.u(np.array([t]))[0])
+            assert ref == 0.0 or abs(got - ref) <= 1e-12 * abs(ref)
+
+
+def test_unimodal(acts):
+    t = np.linspace(-60, 60, 1_200_001)
+    for n, a in acts.items():
+        d = a.du(t)
+        sgn = np.sign(d[np.abs(d) > 0])
+        assert (sgn[1:] != sgn[:-1]).sum() == 1 and sgn[0] < 0 and sgn[-1] > 0
+        assert abs(float(ag.mp_dip(n)) - t[np.argmin(a.u(t))]) < 1e-4
+
+
+def test_mp_gap_agrees_and_exposes_underflow(acts):
+    for n, a in acts.items():
+        for w1, b1, sg in ((0.9, -0.9, 1.0), (1.5, -1.6, 1.0), (3.0, 0.4, -1.0), (2.0, 1.0, 1.0)):
+            lo, hi = ag.gplus(w1, b1, sg, a)
+            g = float(ag.mp_gap(w1, b1, sg, n))
+            assert lo - 1e-12 <= g <= hi + 1e-12
+    # a one-sided ramp with the inner window in the far tail: G > 0 exactly, 0 to double precision
+    a = acts["gelu"]
+    lo, hi = ag.gplus(775.118729, -620.844791, 1.0, a)
+    assert hi <= 0 and ag.classify((lo, hi)) == "unplaced"
+    sg, l10 = ag.mp_log10_gap(775.118729, -620.844791, 1.0, "gelu")
+    assert sg == 1 and l10 < -1000
+
+
+def test_cap_gives_undecided(acts):
+    g = ag.gplus(775.118729, -620.844791, 1.0, acts["gelu"], max_cells=10)
+    assert ag.classify(g) == "undecided"

@@ -74,3 +74,20 @@ replaced by a sharper one that is still validated, not certified: max over the 9
 (h/2)·(max over the sub-grid of |u‴| + (h/2)·B4), B4 a validated global bound on |u⁗| (grid maximum on [−60, 60]
 at step 1e−4 plus 5%); u‴ is in closed form and tested against autograd. The Ĝ enclosures of step 1 are unchanged to
 the last digit under the new bound. The decision rule, the scales and every validation check are unchanged.
+
+## Amendment 2 (2026-09-25, about 20:15 EDT): implementation only; what was seen before it
+
+- The second `criterion` run also stopped at the cell cap at GELU, s = 0.05. **Disclosure:** while diagnosing it I
+  looked at that search's candidates. The lowest loss (0.4773820939) is a one-sided ramp: w₁ ≈ 775, b₁ ≈ −620.8,
+  σ = +1, i.e. the ReLU-like kink just right of x = 0.8 with the inner edge at the dip, the inner window and the left
+  outer window deep in the negative tail, and the right outer window on the ramp. With a larger cell cap its
+  exact-extrema G₊ enclosure is [−5.1e−14, 0], which the registered rule reads as unplaced. In exact arithmetic its
+  G₊ is positive but about 10^(−334,000) (the tail values underflow to −0.0 in double precision). Nothing else about
+  any activation's small-scale result was seen.
+- Changes (none to the decision rule, the scales or the checks): (i) the extrema cell cap is raised from 400,000 to
+  4,000,000 (a resource limit; if still reached, the status is recorded as **undecided**, which the rule already maps
+  to "undetermined"); (ii) the logistic σ and GELU's Φ are evaluated with full relative precision in the negative tail
+  (a stable σ and exp(log_ndtr)); (iii) a POST HOC diagnostic column is added: the sign and log₁₀|G₊| of the retained
+  minimiser's gap in arbitrary precision (mpmath, using that u is unimodal, checked in tests). **The registered
+  verdict is the rule applied to the double-precision enclosure, as written above; the arbitrary-precision gap is
+  reported beside it and does not replace it.**
