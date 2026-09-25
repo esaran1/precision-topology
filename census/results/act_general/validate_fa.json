@@ -1,0 +1,37 @@
+{
+ "act": "f_a, a = 1.30",
+ "scan": [
+  [
+   4.0,
+   "unplaced"
+  ],
+  [
+   4.5,
+   "unplaced"
+  ],
+  [
+   4.9,
+   "unplaced"
+  ],
+  [
+   5.0,
+   "placed"
+  ],
+  [
+   5.5,
+   "placed"
+  ],
+  [
+   6.0,
+   "placed"
+  ]
+ ],
+ "scan_changes": 1,
+ "bracket_lo": 4.957957254772301,
+ "bracket_hi": 4.958348536458761,
+ "certified_lo": 4.95,
+ "certified_hi": 4.9625,
+ "reproduced": true,
+ "restarts": 200,
+ "seconds": 2.649312973022461
+}
