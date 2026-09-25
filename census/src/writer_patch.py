@@ -826,8 +826,9 @@ The window-gap version of s₁ needs Ĝ > η (a Lipschitz correction). That hold
 
 **Width 2, in the same terms.** On symmetric windows, the second-order term selects the pair ṽ₁α₁ = −ṽ₂α₂. It
 cancels the ramp and leaves a pure cosine, which is placed. So the class-mean maximiser is already placed and there
-is no switch (WP-9). The same criterion predicts a switch on **asymmetric** windows, where the ramp enters Δμ; see
-WP-15 if Track 2 lands. Do not cite that prediction as tested unless WP-15 exists.
+is no switch (WP-9). The same criterion predicts a switch on **asymmetric** windows, where the ramp enters Δμ. That
+prediction was registered and passed: a validated width-2 threshold exists there. The registered training prediction
+failed: training crosses at about 3× the threshold scale (WP-15).
 
 **The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + 0.66215ε + O(ε²)), with ε = a − 1. A* ∈ [0.68125, 0.6875]
 is certified and independently checked (Krawczyk value 0.6854452); the correction A′(0)/A* comes from math note §8.

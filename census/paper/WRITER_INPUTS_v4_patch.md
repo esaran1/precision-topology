@@ -452,11 +452,11 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 461 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 462 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
-(`ghat_digit_stability.csv`). A further 12 checks compare two artifacts to 1e−12; they are
-not printed numbers. 5 of them move in their last digits under the blanket δ, and none of
+(`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
+not printed numbers. 6 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
 P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict
 checks on them keep reporting that they are not rigorous in the last one or two ulps.
@@ -679,8 +679,9 @@ The window-gap version of s₁ needs Ĝ > η (a Lipschitz correction). That hold
 
 **Width 2, in the same terms.** On symmetric windows, the second-order term selects the pair ṽ₁α₁ = −ṽ₂α₂. It
 cancels the ramp and leaves a pure cosine, which is placed. So the class-mean maximiser is already placed and there
-is no switch (WP-9). The same criterion predicts a switch on **asymmetric** windows, where the ramp enters Δμ; see
-WP-15 if Track 2 lands. Do not cite that prediction as tested unless WP-15 exists.
+is no switch (WP-9). The same criterion predicts a switch on **asymmetric** windows, where the ramp enters Δμ. That
+prediction was registered and passed: a validated width-2 threshold exists there. The registered training prediction
+failed: training crosses at about 3× the threshold scale (WP-15).
 
 **The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + 0.66215ε + O(ε²)), with ε = a − 1. A* ∈ [0.68125, 0.6875]
 is certified and independently checked (Krawczyk value 0.6854452); the correction A′(0)/A* comes from math note §8.

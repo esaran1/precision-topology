@@ -686,8 +686,11 @@ within the (ii) margin above s₁. The placement switch lies in [s₀, s₁]. Th
 - That pair is placed: G = +0.890 at a = 1.30 and +1.026 at a = 1.50. So the class-mean maximiser is already
   placed, and no switch is needed (the registered width-2 verdict).
 - The criterion predicts the opposite when the windows are asymmetric: there the ramp enters Δμ through
-  m = E_O x − E_I x ≠ 0. That prediction is being tested separately (Track 2, `asym_pilot_design.md`) and is not
-  claimed here.
+  m = E_O x − E_I x ≠ 0.
+  - Registered and tested (Track 2, `asym_registration.md`): at a = 1.30, Δ = 0.4, a validated width-2 switch exists at
+    s ∈ [0.4371, 0.4532] (T2-1 PASS).
+  - Width-2 training crosses above it, but at a median 3.29× the threshold scale, so the registered training
+    prediction fails (T2-3 FAIL; WP-15).
 
 ### 11.1 The scaling law and Adam's per-step bound (A2)
 
