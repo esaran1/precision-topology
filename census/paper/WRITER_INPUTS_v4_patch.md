@@ -143,14 +143,33 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 179 scored by their registered rules: 84 PASS, 55 FAIL, 8 PARTIAL,
+- **Headline**: 184 scored by their registered rules: 86 PASS, 58 FAIL, 8 PARTIAL,
   32 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
+- **Total**: 200 registered predictions.
+
+**Added in the 2026-09-25 round** (registrations through the current commit):
+- Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
+  are FAIL at both a (neither intervention removes half the residual; the registered competing outcome holds). Its
+  four validity gates pass; teleport + reset is reported with no criterion.
+- Width-1 consistency check (`scale_limits_prediction.md`): PASS.
+- Width-2 verdict (same file): no placement threshold for f_a. Recorded as PASS and marked NON-DIRECTIONAL: it is a
+  decision rule with two registered outcomes, and the outcome is decided by the second-order (Var) selection, which
+  the registration added.
+- tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
+  the author's decision; the E-stall convention).
+
+**Not in the headline.**
+- *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
+  the width-2 no-gating test (not run).
+- *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
+  with frozen thresholds at its step 5, which the small-scale verdict made moot. They are not applicable at width 2.
 
 **Row-level tables shipped in the supplementary**:
 - `results/registration_census.csv`: the headline, one row per prediction;
 - `results/registration_census_by_unit.csv`: the appendix view, per a;
-- `results/registration_census_v4_gates_and_reported.csv`: validity gates and no-criterion items;
+- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, pending registrations
+  and designed-but-unregistered predictions;
 - `results/registration_tally.csv`: the tallies.
 
 Source for the tables below: `writer_patch_census_by_block.csv`.
@@ -166,6 +185,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | Block 3 (held-out windows) | registered rule | 2 | 0 | 0 | 0 | 2 |
 | Block 4 (fixed scale) | registered rule | 2 | 1 | 0 | 0 | 3 |
 | Block 4 horizon extension | registered rule | 0 | 2 | 0 | 0 | 2 |
+| Block 4b (residual mechanism) | registered rule | 0 | 2 | 0 | 0 | 2 |
 | Block 5 (retention) | registered rule | 2 | 0 | 0 | 0 | 2 |
 | C | registered rule | 1 | 2 | 0 | 0 | 3 |
 | E | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
@@ -206,6 +226,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | prospective own-seed | registered rule | 8 | 0 | 0 | 0 | 8 |
 | sample size | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | sample size | registered rule | 1 | 1 | 0 | 0 | 2 |
+| scale limits (width 2) | registered rule | 2 | 1 | 0 | 0 | 3 |
 | scaling limit | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | scaling limit | registered rule | 3 | 0 | 0 | 0 | 3 |
 | search 08-22 | registered rule | 2 | 0 | 2 | 0 | 4 |
@@ -269,8 +290,11 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/prospective_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/r_collapse_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/r_collapse_prediction.md | registered rule | 0 | 1 | 1 | 0 | 2 |
+| results/residual_mechanism_design.md | registered rule | 0 | 2 | 0 | 0 | 2 |
 | results/sample_size_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/sample_size_prediction.md | registered rule | 1 | 1 | 0 | 0 | 2 |
+| results/scale_limits_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/scale_limits_tanh_prediction.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/scaling_limit_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/scaling_limit_prediction.md | registered rule | 3 | 0 | 0 | 0 | 3 |
 | results/search_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
@@ -420,10 +444,10 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 392 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 393 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
-(`ghat_digit_stability.csv`). A further 11 checks compare two artifacts to 1e−12; they are
+(`ghat_digit_stability.csv`). A further 12 checks compare two artifacts to 1e−12; they are
 not printed numbers. 5 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
 P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict

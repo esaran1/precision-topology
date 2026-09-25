@@ -7,6 +7,7 @@ block,Block 3 (held-out windows),post hoc (census),0,0,1,0,1
 block,Block 3 (held-out windows),registered rule,2,0,0,0,2
 block,Block 4 (fixed scale),registered rule,2,1,0,0,3
 block,Block 4 horizon extension,registered rule,0,2,0,0,2
+block,Block 4b (residual mechanism),registered rule,0,2,0,0,2
 block,Block 5 (retention),registered rule,2,0,0,0,2
 block,C,registered rule,1,2,0,0,3
 block,E,post hoc (census),1,0,0,0,1
@@ -47,6 +48,7 @@ block,precision,registered rule,0,0,0,1,1
 block,prospective own-seed,registered rule,8,0,0,0,8
 block,sample size,post hoc (census),0,0,1,0,1
 block,sample size,registered rule,1,1,0,0,2
+block,scale limits (width 2),registered rule,2,1,0,0,3
 block,scaling limit,post hoc (census),0,0,1,0,1
 block,scaling limit,registered rule,3,0,0,0,3
 block,search 08-22,registered rule,2,0,2,0,4
@@ -106,8 +108,11 @@ registration_file,results/prospective_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/prospective_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/r_collapse_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/r_collapse_prediction.md,registered rule,0,1,1,0,2
+registration_file,results/residual_mechanism_design.md,registered rule,0,2,0,0,2
 registration_file,results/sample_size_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/sample_size_prediction.md,registered rule,1,1,0,0,2
+registration_file,results/scale_limits_prediction.md,registered rule,2,0,0,0,2
+registration_file,results/scale_limits_tanh_prediction.md,registered rule,0,1,0,0,1
 registration_file,results/scaling_limit_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/scaling_limit_prediction.md,registered rule,3,0,0,0,3
 registration_file,results/search_prediction.md,registered rule,2,0,2,0,4

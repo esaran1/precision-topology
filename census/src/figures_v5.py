@@ -242,30 +242,32 @@ def fig_thresholds_appendix():
 
 # ------------------------------------------------------------------------------------------ the conditional minimiser's gap
 def fig_minimiser_gap(a=1.30):
-    """One message: along the conditional minimiser at a = 1.30, the class gap changes sign exactly once, at R_glob."""
+    """One message: along the conditional minimiser at a = 1.30, the class gap changes sign exactly once, at R_glob.
+    x = R/R_glob = |w2| / (midpoint of the certified R_glob bracket in |w2|), as in the fixed-scale figure."""
     d = read("cond_audit_candidates.csv")
     g = d[d.a.round(2) == round(a, 2)]
     ret = g[g.status == "RETAINED"].drop_duplicates("s").sort_values("s")
     scan = read("cond_scan_certified_a130.csv")
     br = read("cond_certified_brackets.csv")
     br = br[br.a.round(2) == round(a, 2)].set_index("kind")
+    w_glob = 0.5 * (br.loc["glob", "w2_lo"] + br.loc["glob", "w2_hi"])
+    xs = 0.5 * (br.loc["solve", "w2_lo"] + br.loc["solve", "w2_hi"]) / w_glob
     fig, ax = plt.subplots(figsize=(TEXT_W, 2.3))
     ax.axhline(0, color=GREY, lw=0.7, zorder=0)
-    wg = 0.5 * (br.loc["glob", "w2_lo"] + br.loc["glob", "w2_hi"])
-    ws = 0.5 * (br.loc["solve", "w2_lo"] + br.loc["solve", "w2_hi"])
-    ax.plot([wg, wg], [-0.5, 0.06], color=BLUE, lw=1.0, zorder=1)
-    ax.plot([ws, ws], [-0.5, 0.06], color=BLUE, lw=1.0, ls="--", zorder=1)
-    ax.text(wg + 0.12, -0.40, r"$R_{\mathrm{glob}}$", color=BLUE, va="center")
-    ax.text(ws + 0.12, -0.20, r"$R_{\mathrm{solve}}$", color=BLUE, va="center")
-    ax.plot(ret.s, ret.gap, color=BLUE, lw=1.2, zorder=2)
-    ax.plot(scan.s, scan.argmin_G, color=BLUE, marker="s", ms=3.4, mfc="white", ls="none", zorder=3)
-    ax.text(9.0, 0.10, "conditional minimiser", color=BLUE, ha="center", va="bottom")
-    ax.set_xlabel(f"output scale $|w_2|$ ($a={a:.2f}$)")
+    ax.plot([1.0, 1.0], [-0.5, 0.06], color=BLUE, lw=1.0, zorder=1)
+    ax.plot([xs, xs], [-0.5, 0.06], color=BLUE, lw=1.0, ls="--", zorder=1)
+    ax.text(1.0 + 0.025, -0.40, r"$R_{\mathrm{glob}}$", color=BLUE, va="center")
+    ax.text(xs + 0.025, -0.20, r"$R_{\mathrm{solve}}$", color=BLUE, va="center")
+    ax.plot(ret.s / w_glob, ret.gap, color=BLUE, lw=1.2, zorder=2)
+    ax.plot(scan.s / w_glob, scan.argmin_G, color=BLUE, marker="s", ms=3.4, mfc="white", ls="none", zorder=3)
+    ax.text(9.0 / w_glob, 0.10, "conditional minimiser", color=BLUE, ha="center", va="bottom")
+    ax.set_xlabel(r"output scale $R/R_{\mathrm{glob}}$" + f" ($a={a:.2f}$)")
     ax.set_ylabel("class gap $G$ of the minimiser")
     ax.set_ylim(-0.5, 0.16)
     _clean(ax)
     fig.tight_layout(pad=0.3)
     save(fig, "minimiser_gap")
+    return {"w2_glob_mid": w_glob, "R_solve_over_R_glob": xs, "x_range": (float(ret.s.min() / w_glob), float(ret.s.max() / w_glob))}
 
 
 def fig_candidates_appendix(a=1.30):
@@ -400,15 +402,201 @@ def fig_prospective_own():
             mean, lo, hi = V4.boot_mean(per_w.values)
             xp = i + (j - 1.5) * 0.2
             a2.errorbar([xp], [mean], yerr=[[mean - lo], [hi - mean]], color=BLUE, marker=mk, ms=4.6,
-                        mfc=BLUE if filled else "white", mec=BLUE, capsize=1.5, elinewidth=0.7, ls="none")
-            if i == 0:
-                a2.text(xp, hi + 0.006, lab, color=BLUE, ha="center", va="bottom", rotation=90)
+                        mfc=BLUE if filled else "white", mec=BLUE, capsize=1.5, elinewidth=0.7, ls="none",
+                        label=lab if i == 0 else None)
     a2.set_xticks([0, 1]); a2.set_xticklabels(["$a=1.30$", "$a=1.50$"])
     a2.set_xlim(-0.55, 1.55); a2.set_ylim(0, 0.30)
+    a2.legend(loc="upper right", ncol=2, columnspacing=0.8, handletextpad=0.2, borderaxespad=0.1)
     a2.set_ylabel("mean per-run |log error|")
     _clean(a1, a2)
     fig.tight_layout(pad=0.3, w_pad=1.2)
     save(fig, "prospective_own")
+
+
+# ------------------------------------------------------------------------------------------ captions (for the writer)
+def captions():
+    """results/figures/v5/captions.md: for each figure, its PDF path, one-sentence message, main text or appendix, the
+    population and n, what the uncertainty shows, and every number that moved from the image into the caption.  Every
+    number is computed here from the committed artifacts."""
+    f3 = lambda v: f"{v:.3f}"
+    E = []
+
+    def entry(name, where, message, population, uncertainty, numbers, note=None):
+        E.append(f"## {name}\n\n- **PDF**: `results/figures/v5/{name}.pdf` (PNG preview beside it)\n- **Placement**: {where}\n"
+                 f"- **Message**: {message}\n- **Population and n**: {population}\n- **Uncertainty shown**: {uncertainty}\n"
+                 "- **Numbers for the caption** (moved out of the image):\n" + "".join(f"  - {x}\n" for x in numbers)
+                 + (f"- **Note**: {note}\n" if note else "") + "\n")
+    # fixed scale
+    t4 = read("fixed_scale_block4_tests.csv").set_index("variant"); t5 = read("fixed_scale_block5_tests.csv").set_index("variant")
+    n4 = int(read("fixed_scale_block4_curve.csv").n.max()); n5 = int(read("fixed_scale_block5_curve.csv").n.max())
+    lv = sorted(read("fixed_scale_block4_curve.csv").level.unique())
+    entry("fixed_scale", "main text",
+          "Held at a fixed output scale, an unplaced network becomes placed, and a placed one stays placed, only above the "
+          "threshold from conditional minimisation; both transitions sit just above it.",
+          f"a = 1.30. Becomes placed: {n4} pre-placement checkpoints per held level, read after 4,000 steps. Stays placed: "
+          f"{n5} runs per level, read after 12,000 steps. Held levels R/R_glob = {', '.join(f'{v:g}' for v in lv)}; "
+          "R_glob is the certified threshold at a = 1.30 (midpoint of its bracket).",
+          "Clopper–Pearson 95% intervals on each fraction.",
+          [f"n = {n4} checkpoints per level (becomes placed); n = {n5} runs per level (stays placed)",
+           f"midpoints (50% crossing of the fraction): {t4.loc['preserved', 'x50']:.3f} (becomes placed), "
+           f"{t5.loc['preserved', 'x50']:.3f} (stays placed); shown rounded to 1.05 and 1.07 on the plot",
+           "the two curves are read at different horizons: 4,000 steps (becomes placed) and 12,000 steps (stays placed)",
+           "Adam's moments are preserved from the checkpoint in both curves (the reset variant is in the appendix figure)"])
+    # fixed scale appendix
+    hc = read("fixed_scale_horizons_curve.csv").set_index(["variant", "horizon"])
+    hz = read("fixed_scale_horizons.csv"); nh = int(hz[hz.variant == "preserved"].groupby("level").size().min())
+    br = read("cond_certified_brackets.csv"); r13 = br[(br.a.round(2) == 1.3) & (br.kind == "glob")].iloc[0]
+    e2_x = 1.15 * V4._block_e_rglob() / (0.5 * (r13.R_lo + r13.R_hi))
+    e2 = read("wi_e2_rescore.csv").set_index("arm").loc["hold_high"]
+    entry("app_fixed_scale", "appendix (companion to fixed_scale)",
+          "Resetting the optimiser's moments and running 4× or 16× longer leave both transitions where they are.",
+          f"As fixed_scale; (c): {nh} replays per level at held R/R_glob = 0.90–1.10, moments preserved.",
+          "Clopper–Pearson 95% intervals.",
+          [f"(a) midpoints {t4.loc['preserved', 'x50']:.3f} (moments kept) and {t4.loc['reset', 'x50']:.3f} (reset)",
+           f"(b) midpoints {t5.loc['preserved', 'x50']:.3f} (kept) and {t5.loc['reset', 'x50']:.3f} (reset)",
+           f"(b) earlier run: held at 1.15× an earlier estimate of R_glob = {e2_x:.3f} R_glob; {int(e2.kept)}/{int(e2.intervened)} "
+           "stayed placed against a criterion of at least 0.9",
+           "(c) midpoints " + ", ".join(f"{hc.loc[('preserved', H), 'x50']:.4f} ({H // 1000}k steps)" for H in (4000, 16000, 64000)),
+           f"(c) n = {nh} replays per level"])
+    # decomposition
+    d = read("phase1_decomposition.csv"); tot = d.failure.value_counts(); ns = d.groupby("a").size()
+    entry("decomposition", "main text",
+          "Training fails by not placing the hidden unit: below ε ≈ 0.25 every run fails this way, and bias failures "
+          "appear only in a narrow band around ε ≈ 0.4.",
+          f"{d.a.nunique()} values of a (ε = {min(d.a) - 1:.2f}–{max(d.a) - 1:.0f}); n = {int(ns.min())} runs per a (200 seeds × "
+          f"2 precisions); {len(d):,} runs in total.",
+          "Clopper–Pearson 95% intervals on each fraction.",
+          [f"n = {int(ns.min())} runs per a; {len(d):,} runs in total",
+           f"outcome counts: failed to place (G ≤ 0) {int(tot['placement']):,}; placed but output bias outside its interval "
+           f"{int(tot['bias']):,}; solved {int(tot['solved']):,}",
+           "0 disagreements between this classification and the independent solve check"])
+    # thresholds
+    runs = read("wi_crossing_runs.csv"); runs = runs[runs.budget == 32_000]; nr = runs.groupby(runs.a.round(2)).size()
+    c1 = read("first_order_c1.csv").iloc[0]; sl = read("mn2_solve_limit.csv").iloc[0]; kb = read("limit_K_base.csv").iloc[0]
+    bg = br[br.kind == "glob"].sort_values("a"); bs = br[br.kind == "solve"].sort_values("a")
+    entry("thresholds", "main text",
+          "At every a, free training places the hidden unit just above the conditional-minimisation threshold R_glob and "
+          "far below R_solve; both thresholds have certified limits as ε → 0.",
+          f"a = 1.30–1.60 (six values); free-training crossings at budget 32,000: n = {int(nr.min())} runs per a.",
+          "Violins: the distribution of crossing R; points: medians with bootstrap 95% intervals. The certified threshold "
+          "brackets are narrower than the markers (plotted at their midpoints).",
+          [f"n = {int(nr.min())} crossing runs per a (budget 32,000)",
+           f"certified R_glob brackets: widths ≤ {float((bg.R_hi - bg.R_lo).max()):.1e}; R_solve brackets: widths ≤ "
+           f"{float((bs.R_hi - bs.R_lo).max()):.1e}",
+           f"ε → 0 limits: R_glob^∞ ∈ [{c1.R_glob_inf_lo:.7f}, {c1.R_glob_inf_hi:.7f}] (sharp value); "
+           f"R_solve^∞ ∈ [{sl.R_solve_inf_lo:.4f}, {sl.R_solve_inf_hi:.4f}] (global)",
+           "R_glob^∞ rests on K = sup G₀, certified by branch and bound over a box with a domain lemma (math note §8); its "
+           "independent Arb check is pending (WP-11)"])
+    fs = read("first_order_scores.csv").set_index("quantity").loc["c1 (primary): R_glob"]
+    fo = read("first_order_finite.csv")
+    entry("app_thresholds_small_eps", "appendix (companion to thresholds)",
+          "At small ε the certified thresholds follow the certified first-order line R_glob^∞(1 + c₁ε).",
+          f"{len(fo)} certified brackets at a = {fo.eps.min() + 1:.2f}–{fo.eps.max() + 1:.2f} and the limit; no training runs.",
+          "Boxes are the certified brackets, to scale.",
+          [f"c₁ ∈ [{c1.c1_lo:.7f}, {c1.c1_hi:.7f}]; the first-order range is certified for |ε| ≤ 0.05",
+           f"R_glob^∞: sharp value [{c1.R_glob_inf_lo:.7f}, {c1.R_glob_inf_hi:.7f}] (line) inside the unconditional "
+           f"bracket [{kb.R_glob_inf_lo:.5f}, {kb.R_glob_inf_hi:.5f}] (grey box)",
+           f"the registered c₁ test was INCONCLUSIVE: feasible c₁ ∈ [{fs.feasible_lo:.3f}, {fs.feasible_hi:.3f}], width "
+           f"{fs.feasible_width:.3f} > 0.1"])
+    # minimiser gap
+    b = br[br.a.round(2) == 1.3].set_index("kind")
+    scan = read("cond_scan_certified_a130.csv")
+    cand = read("cond_audit_candidates.csv"); cg = cand[cand.a.round(2) == 1.3]
+    ret = cg[cg.status == "RETAINED"].drop_duplicates("s")
+    sep = float(max(b.loc["glob", "argmin_separation_lo"], b.loc["glob", "argmin_separation_hi"]))
+    wg = 0.5 * (b.loc["glob", "w2_lo"] + b.loc["glob", "w2_hi"])
+    entry("minimiser_gap", "main text",
+          "Along the conditional minimiser at a = 1.30, the class gap changes sign exactly once, at R_glob.",
+          f"a = 1.30, population objective (800 points); the conditional minimiser at {len(ret)} output scales (line) and "
+          f"the certified global minimiser at {len(scan)} scales (squares).",
+          f"None drawn: the certified values are exact to ≤ {float(np.maximum(scan.m_minus_hi - scan.m_minus_lo, scan.m_plus_hi - scan.m_plus_lo).max()):.0e} in loss.",
+          [f"x = R/R_glob = |w₂| / {wg:.5f} (midpoint of the certified R_glob bracket in |w₂|)",
+           f"certified brackets: R_glob at |w₂| ∈ ({b.loc['glob', 'w2_lo']:.4f}, {b.loc['glob', 'w2_hi']:.4f}]; R_solve at "
+           f"|w₂| ∈ ({b.loc['solve', 'w2_lo']:.4f}, {b.loc['solve', 'w2_hi']:.4f}] (R_solve/R_glob = "
+           f"{0.5 * (b.loc['solve', 'w2_lo'] + b.loc['solve', 'w2_hi']) / wg:.3f})",
+           f"the minimisers either side of the switch are at most {sep:.1e} apart (certified); other basins are at least "
+           f"+{float(scan.competitor_margin.min()):.4f} above (certified, radius 0.1)"])
+    st = read("cond_audit_strict.csv"); st = st[st.a.round(2) == 1.3]
+    nk = cg.groupby(["kind", "s"]).ngroups
+    counts = {k: int(cg.status.isin(v).sum()) for k, v in (("degenerate", ("degenerate",)),
+              ("screen", ("not carried (screen rank > 8)", "carried")), ("full", ("not lowest",)))}
+    entry("app_candidates", "appendix (companion to minimiser_gap)",
+          "No candidate of the conditional search lies below the retained minimiser at any scale.",
+          f"a = 1.30: {len(cg):,} candidates at {nk} evaluations.", "None.",
+          [f"{counts['degenerate']:,} discarded as degenerate; {counts['screen']:,} screening runs; {counts['full']:,} full runs "
+           f"that were not the lowest (they lie on the retained minimiser)",
+           f"frozen search result reproduced at {nk}/{nk} evaluations; {len(scan)} certified global minima; {len(st)} stricter-"
+           "optimisation points"])
+    # mirror branches
+    s3 = read("mirror_s3.csv").set_index(["a", "threshold"])
+    occ = read("mirror_occupancy.csv", float_precision="round_trip")
+    T = read("mirror_branch_thresholds.csv", float_precision="round_trip"); T = T[T.group == "cross"]
+    rhos, bcount = [], []
+    for a in (1.3, 1.5):
+        o = occ[occ.group == f"phase 2b crossing a={a:.2f}"].merge(T[T.a.round(2) == a][["seed", "T_plus", "T_minus"]], on="seed")
+        o["R_occ"] = np.where(o.branch > 0, o.T_plus, o.T_minus) * V4._ghat(a) / 2
+        lo, hi = V4.boot_spearman(o.R_occ, o.R_cross)
+        r = s3.loc[(a, "branch occupied at the crossing")]
+        rhos.append(f"a = {a:.2f}: ρ = {r.spearman_rho:.3f} [{lo:.4f}, {hi:.4f}] (n = {int(r.n)}); initialisation-selected branch "
+                    f"ρ = {s3.loc[(a, 'branch selected by initialisation')].spearman_rho:.2f}; own global threshold ρ = "
+                    f"{s3.loc[(a, 'registered: own global threshold')].spearman_rho:.2f}; median residual log(R/T) = "
+                    f"{r.residual_median_log:.3f}")
+        bcount.append(f"a = {a:.2f}: {int((o.branch > 0).sum())} runs on branch +, {int((o.branch < 0).sum())} on branch −")
+    entry("mirror_branches", "main text",
+          "A run crosses just above the own threshold of the mirror branch it occupies at the crossing, not that of the "
+          "branch its initialisation selects.",
+          "Free-training crossings at budget 32,000, a = 1.30 and 1.50, n = 38 runs each; thresholds in R units "
+          "(R = |w₂|Ĝ/2).",
+          "None drawn; the caption gives Spearman ρ with bootstrap 95% intervals.",
+          rhos + bcount + ["the caption must say this analysis is POST HOC (exploratory); the label is no longer in the image"])
+    # held-out settings
+    from .prospective import _cert_ghat
+    pr_ = read("prospective_runs.csv"); pr_ = pr_[pr_.cross_step.notna()]
+    nset = pr_.groupby(["window", pr_.a.round(2)]).size()
+    cal = read("prospective_calibration.csv").set_index("a")
+    entry("prospective", "main text",
+          "In eight held-out settings, the conditional threshold with one fitted lag factor predicts the median crossing "
+          "better than either baseline.",
+          f"8 held-out settings (4 window geometries × 2 a), 90 runs each; n = {int(nset.min())}–{int(nset.max())} crossings per setting.",
+          "Horizontal bars: bootstrap 95% intervals of the observed median crossing R.",
+          [f"n = {int(nset.min())}–{int(nset.max())} crossings of 90 per setting",
+           f"lag factor fitted on the base window: λ(1.30) = {cal.loc[1.3, 'lambda_fitted']:.3f}, λ(1.50) = {cal.loc[1.5, 'lambda_fitted']:.3f}",
+           f"baselines: the base window's median crossing |w₂| (triangles); the pooled median crossing R of earlier windows, "
+           f"{cal.loc[1.3, 'B2_pooled_median_cross_R']:.4f} (diamonds)",
+           "placement was checked every 50 steps; the detection-sensitivity analysis (WP-6: crossings interpolated between "
+           "checks, calibration and observations both) keeps every registered comparison's sign, each excluding 0"])
+    # own-seed test
+    prp = read("prospective_own_predictions.csv", float_precision="round_trip")
+    rn = read("prospective_own_runs.csv", float_precision="round_trip")
+    dd = rn.merge(prp, on=["window", "a", "seed"]); dd["R_cross"] = dd.cross_w2 * dd.Ghat_lo / 2
+    x = dd[dd.R_cross.notna()]
+    ss = read("prospective_own_settings_scored.csv")
+    rho_res = {a: float(np.median(x[x.a.round(2) == a].C_own / x[x.a.round(2) == a].U_own)) for a in (1.3, 1.5)}
+    wmax = float(((x.w2_own_hi - x.w2_own_lo) * x.Ghat_lo / 2).max())
+    ncr = {a: (int((x.a.round(2) == a).sum()), int((dd.a.round(2) == a).sum())) for a in (1.3, 1.5)}
+    s13, s15 = ss[ss.a.round(2) == 1.3].spearman_R_cross_vs_R_own, ss[ss.a.round(2) == 1.5].spearman_R_cross_vs_R_own
+    entry("prospective_own", "main text",
+          "A run's own threshold, fixed before training, predicts its crossing better than the population threshold, with "
+          "or without a fitted factor.",
+          f"16 never-trained settings (8 windows × 2 a), 60 runs each; n = {ncr[1.3][0]} of {ncr[1.3][1]} crossed at a = 1.30 "
+          f"and {ncr[1.5][0]} of {ncr[1.5][1]} at a = 1.50.",
+          "(b): window-level bootstrap 95% intervals (10,000 resamples, seed 0) of the mean per-run |log error|.",
+          [f"(a) the own thresholds' frozen brackets are at most {wmax:.1e} wide (no longer drawn)",
+           f"(a) per-setting Spearman ρ between crossing and own threshold: {s13.min():.2f}–{s13.max():.2f} (a = 1.30), "
+           f"{s15.min():.2f}–{s15.max():.2f} (a = 1.50)",
+           "(b) the four predictors: population = R_glob; population, fitted = λ(a)·R_glob (λ fitted on the base window); "
+           "own = R_own (the run's own threshold); own, fitted = ρ_res(a)·R_own",
+           f"(b) fitted ρ_res (C_own): {rho_res[1.3]:.4f} (a = 1.30), {rho_res[1.5]:.4f} (a = 1.50)",
+           "(b) the registered criteria (P1, P2a, P3, P4 at a = 1.30; P1, P2b, P3, P4 at a = 1.50) all passed",
+           "placement was checked every 50 steps; the detection-sensitivity analysis (WP-6) finds every registered criterion "
+           "passes with interpolated crossings too, but at a = 1.50 the reading 'C beats U_own' does not survive "
+           "(−0.003 [−0.013, 0.008])"])
+    head = ("# Figure captions (v5): inputs for the LaTeX captions\n\nGenerated by `python -m src.figures_v5` from the "
+            "committed artifacts. Figures are 5.5 in wide, at most 3 in tall, every glyph at least 8 pt (Times). Colours: "
+            "blue = conditional minimisation (thresholds and predictions built on it); vermillion = free training's placement "
+            "from an unplaced start; green = stays placed / solves; grey = context.\n\n")
+    (OUT / "captions.md").write_text(head + "".join(E))
+    return len(E)
 
 
 # ------------------------------------------------------------------------------------------ audit
@@ -439,11 +627,12 @@ def main():
     fig_fixed_scale_appendix()
     fig_decomposition()
     fig_thresholds(); fig_thresholds_appendix()
-    fig_minimiser_gap(); fig_candidates_appendix()
+    out.update(fig_minimiser_gap()); fig_candidates_appendix()
     fig_mirror_branches()
     fig_prospective()
     fig_prospective_own()
     print(out)
+    print("captions:", captions())
     audit()
 
 

@@ -331,11 +331,30 @@ certified R_glob and R_solve bracket):
 - **Headline**: {int(h.n)} scored by their registered rules: {int(h.PASS)} PASS, {int(h.FAIL)} FAIL, {int(h.PARTIAL)} PARTIAL,
   {int(h.UNRESOLVED)} UNRESOLVED.
 - **Post hoc**: {int(p_.n)} assigned post hoc: {int(p_.PASS)} / {int(p_.FAIL)} / {int(p_.PARTIAL)} / {int(p_.UNRESOLVED)}.
+- **Total**: {int(h.n) + int(p_.n)} registered predictions.
+
+**Added in the 2026-09-25 round** (registrations through the current commit):
+- Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
+  are FAIL at both a (neither intervention removes half the residual; the registered competing outcome holds). Its
+  four validity gates pass; teleport + reset is reported with no criterion.
+- Width-1 consistency check (`scale_limits_prediction.md`): PASS.
+- Width-2 verdict (same file): no placement threshold for f_a. Recorded as PASS and marked NON-DIRECTIONAL: it is a
+  decision rule with two registered outcomes, and the outcome is decided by the second-order (Var) selection, which
+  the registration added.
+- tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
+  the author's decision; the E-stall convention).
+
+**Not in the headline.**
+- *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
+  the width-2 no-gating test (not run).
+- *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
+  with frozen thresholds at its step 5, which the small-scale verdict made moot. They are not applicable at width 2.
 
 **Row-level tables shipped in the supplementary**:
 - `results/registration_census.csv`: the headline, one row per prediction;
 - `results/registration_census_by_unit.csv`: the appendix view, per a;
-- `results/registration_census_v4_gates_and_reported.csv`: validity gates and no-criterion items;
+- `results/registration_census_v4_gates_and_reported.csv`: validity gates, no-criterion items, pending registrations
+  and designed-but-unregistered predictions;
 - `results/registration_tally.csv`: the tallies.
 
 Source for the tables below: `writer_patch_census_by_block.csv`.

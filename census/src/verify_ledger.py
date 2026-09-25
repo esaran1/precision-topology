@@ -475,28 +475,29 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 195.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 200.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
+    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 5.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 209.0, 0)
-    for v, n in (("PASS", 97), ("FAIL", 67), ("PARTIAL", 13), ("UNRESOLVED", 32)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 216.0, 0)
+    for v, n in (("PASS", 99), ("FAIL", 72), ("PARTIAL", 13), ("UNRESOLVED", 32)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 87), ("FAIL", 61), ("PARTIAL", 15), ("UNRESOLVED", 32)):
+    for v, n in (("PASS", 89), ("FAIL", 64), ("PARTIAL", 15), ("UNRESOLVED", 32)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (179, 84, 55, 8, 32)),
+    for scope, want in (("scored by registered rules", (184, 86, 58, 8, 32)),
                         ("assigned post hoc in the census", (16, 3, 6, 7, 0)),
-                        ("since 2026-09-23: scored by registered rules", (28, 18, 8, 0, 2)),
+                        ("since 2026-09-23: scored by registered rules", (33, 20, 11, 0, 2)),
                         ("since 2026-09-23: assigned post hoc", (3, 0, 0, 3, 0)),
-                        ("by registered unit: scored by registered rules", (195, 94, 61, 8, 32)),
+                        ("by registered unit: scored by registered rules", (202, 96, 66, 8, 32)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (44, 28, 14, 0, 2)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (51, 30, 19, 0, 2)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
-                        ("since 2026-09-23: validity gates (not predictions; not in the headline)", (14, 14, 0, 0, 0))):
+                        ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
         chk(f"{scope}: n/PASS/FAIL/PARTIAL/UNRES",
             float(sum(int(got[k]) * 10 ** (3 * i) for i, k in enumerate(["n", "PASS", "FAIL", "PARTIAL", "UNRESOLVED"]))),
@@ -1171,8 +1172,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 195", float(wp4[wp4.by == "block"].n.sum()), 195.0, 0)
-    chk("WP-4: by-file rows sum to 195", float(wp4[wp4.by == "registration_file"].n.sum()), 195.0, 0)
+    chk("WP-4: by-block rows sum to 200", float(wp4[wp4.by == "block"].n.sum()), 200.0, 0)
+    chk("WP-4: by-file rows sum to 200", float(wp4[wp4.by == "registration_file"].n.sum()), 200.0, 0)
     wp5 = pd.read_csv(R / "writer_patch_figure_sizes.csv")
     chk("WP-5: 7 figures, all <= 5.5 in wide", float(len(wp5) == 7 and (wp5.width_in <= 5.5).all()), 1.0, 0)
     chk("WP-5: tallest figure height", float(wp5.height_in.max()), 3.123, 0.002)
