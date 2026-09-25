@@ -64,3 +64,13 @@ At each of s = 0.05 and s = 0.1 (`act_general.validate_point`, `act_general.crit
 - Where "no switch predicted": the same scan is run as a check of the prediction (placed at every scan scale is
   consistent with it); any unplaced scan point is reported as evidence against it.
 - Training predictions (step 4) are registered separately before any run.
+
+## Amendment before any criterion result (2026-09-25, about 19:50 EDT)
+
+The first `criterion` run stopped at its first exact-extrema evaluation ("extrema: cell cap reached"; nothing was
+recorded or printed except the traceback). Cause: the registered d2u_bound's margin B3·h/2 used a *global* |u‴|
+bound, so on the flat tails of these activations (|φ′| ≈ 0) cells never became provably monotone. The bound was
+replaced by a sharper one that is still validated, not certified: max over the 9-point sub-grid of |u″| plus
+(h/2)·(max over the sub-grid of |u‴| + (h/2)·B4), B4 a validated global bound on |u⁗| (grid maximum on [−60, 60]
+at step 1e−4 plus 5%); u‴ is in closed form and tested against autograd. The Ĝ enclosures of step 1 are unchanged to
+the last digit under the new bound. The decision rule, the scales and every validation check are unchanged.

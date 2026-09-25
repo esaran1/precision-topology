@@ -17,11 +17,13 @@ def test_derivatives_match_autograd(acts):
     for n, a in acts.items():
         f = a.torch_u(t)
         g1 = torch.autograd.grad(f.sum(), t, create_graph=True)[0]
-        g2 = torch.autograd.grad(g1.sum(), t)[0]
+        g2 = torch.autograd.grad(g1.sum(), t, create_graph=True)[0]
+        g3 = torch.autograd.grad(g2.sum(), t)[0]
         T = t.detach().numpy()
+        assert np.abs(a.d3u(T) - g3.numpy()).max() < 1e-12
         assert np.abs(a.u(T) - f.detach().numpy()).max() < 1e-12
         assert np.abs(a.du(T) - g1.detach().numpy()).max() < 1e-12
-        assert np.abs(a.d2u(T) - g2.numpy()).max() < 1e-12
+        assert np.abs(a.d2u(T) - g2.detach().numpy()).max() < 1e-12
 
 
 def test_d2u_bound_pass_and_fail(acts):
@@ -38,6 +40,13 @@ def test_gap_enclosure_placed_unplaced(acts):
     assert abs(lo - ag.dense_gplus(0.8642113, -0.9036362, 1.0, a)) < 1e-4
     assert ag.classify(ag.gplus(0.8642113, -0.9036362, -1.0, a)) == "unplaced"
     assert ag.classify(ag.gplus(20.0, 0.0, 1.0, a)) == "unplaced"            # relu-like kink at x = 0
+
+
+def test_flat_tail_extrema_terminate(acts):
+    for a in acts.values():
+        for w1, b1 in ((0.3, -9.0), (1e-9, 5.0), (30.0, 0.1), (2.0, -30.0)):
+            lo, hi = ag.gplus(w1, b1, 1.0, a)
+            assert hi - lo < 1e-8
 
 
 def test_classify():

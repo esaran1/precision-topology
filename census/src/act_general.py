@@ -5,8 +5,10 @@ Nothing here modifies an existing module.  The activation object below is Act-li
 periodic, tag), so `width2_geometry.gaps` / `extrema` work unchanged with θ = (w₁, b₁, 0, 0), v = (±1, 0).
 
 d2u_bound is VALIDATED, not certified: sup |u″| over [tlo, thi] is bounded by the maximum of |u″| on a 9-point
-sub-grid of the interval plus B3·h/2 (h the sub-grid spacing, B3 a validated global bound on |u‴|, grid maximum
-over [−60, 60] at step 1e−4 plus a 5% margin), capped by the validated global bound B2.
+sub-grid of the interval plus (h/2)·(max of |u‴| on the sub-grid + (h/2)·B4) (h the sub-grid spacing, B4 a validated
+global bound on |u⁗|, grid maximum over [−60, 60] at step 1e−4 plus a 5% margin), capped by the validated global
+bound B2.  (A first version used a global |u‴| margin; it made flat tails refine without end — the extrema cell cap
+stopped it at the first small-scale evaluation — and was replaced before any result was recorded.)
 
 Width 1 (task: I = [−0.8, 0.8] class 0, O = ±[1.2, 2.0] class 1): z = w₂·u(w₁x + b₁) + b₂, s = |w₂|, σ = sign w₂.
 The width-1 conditional search is the width-2 search with ṽ fixed at (σ, 0) (asym_pilot._width1_batch), written
@@ -76,6 +78,7 @@ class GAct:
             raise ValueError(name)
         self.name = name
         self.B3 = self._global_d3_bound()
+        self.B4 = self._global_d4_bound()
         grid = np.arange(-60.0, 60.0 + 1e-9, 1e-4)
         self.B2 = float(np.abs(self.d2u(grid)).max() + self.B3 * 0.5e-4) * 1.0001
 
@@ -111,6 +114,18 @@ class GAct:
         g = np.tanh(np.logaddexp(0, t)); s = _sig(t)
         return (1 - g * g) * s * (2 + t * (1 - s - 2 * g * s))
 
+    def d3u(self, t):
+        t = np.asarray(t, float)
+        if self.name == "gelu":
+            return np.exp(-0.5 * t * t) / math.sqrt(2 * math.pi) * (t ** 3 - 4 * t)
+        if self.name == "silu":
+            s = _sig(t); q = s * (1 - s); e = 1 - 2 * s
+            return q * (e * (3 + t * e) - 2 * t * q)
+        g = np.tanh(np.logaddexp(0, t)); s = _sig(t); q = s * (1 - s)
+        A = (1 - g * g) * s; E = 1 - s - 2 * g * s; C = 2 + t * E
+        Ep = -q - 2 * A * s - 2 * g * q
+        return A * (E * C + E + t * Ep)
+
     def torch_u(self, t):
         return _torch_fn(self.name)(t)
 
@@ -118,19 +133,30 @@ class GAct:
         """max |u‴| on [−60, 60] (step 1e−4) by autograd in double, plus a 5% margin (validated, not certified)."""
         import torch
         t = torch.arange(-60.0, 60.0 + 1e-9, 1e-4, dtype=torch.float64).requires_grad_(True)
-        f = _torch_fn(self.name)
-        g1 = torch.autograd.grad(f(t).sum(), t, create_graph=True)[0]
-        g2 = torch.autograd.grad(g1.sum(), t, create_graph=True)[0]
-        g3 = torch.autograd.grad(g2.sum(), t)[0]
-        return float(g3.abs().max()) * 1.05
+        g = _torch_fn(self.name)(t)
+        for _ in range(3):
+            g = torch.autograd.grad(g.sum(), t, create_graph=True)[0]
+        return float(g.detach().abs().max()) * 1.05
+
+    def _global_d4_bound(self):
+        """max |u⁗| on [−60, 60] (step 1e−4) by autograd in double, plus a 5% margin (validated, not certified)."""
+        import torch
+        t = torch.arange(-60.0, 60.0 + 1e-9, 1e-4, dtype=torch.float64).requires_grad_(True)
+        g = _torch_fn(self.name)(t)
+        for _ in range(4):
+            g = torch.autograd.grad(g.sum(), t, create_graph=True)[0]
+        return float(g.detach().abs().max()) * 1.05
 
     def d2u_bound(self, tlo, thi, k=9):
+        """sup |u″| on [tlo, thi] <= max_grid |u″| + (h/2)·(max_grid |u‴| + (h/2)·B4), h the sub-grid spacing (every
+        point is within h/2 of a grid point; |u‴| on the interval is bounded the same way from B4); capped by B2."""
         tlo, thi = np.minimum(tlo, thi), np.maximum(tlo, thi)
         tlo, thi = np.broadcast_arrays(np.asarray(tlo, float), np.asarray(thi, float))
         w = np.linspace(0.0, 1.0, k)
         G = tlo[..., None] + (thi - tlo)[..., None] * w
         h = (thi - tlo) / (k - 1)
-        return np.minimum(np.abs(self.d2u(G)).max(axis=-1) + self.B3 * h / 2, self.B2)
+        m2 = np.abs(self.d2u(G)).max(axis=-1); m3 = np.abs(self.d3u(G)).max(axis=-1)
+        return np.minimum(m2 + 0.5 * h * (m3 + 0.5 * h * self.B4), self.B2)
 
 
 def get_act(name):
