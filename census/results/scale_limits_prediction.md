@@ -122,5 +122,8 @@ Corollaries 1–2). Producer: `src/scale_limits.py`, committed with this file.
   - At every scale, the best unplaced configuration lies on the G = 0 boundary, above the placed minimiser by
     9.9e−8 (R₂ = 0.001) to 3.9e−5 (R₂ = 0.02), i.e. 99× to 38,946× the 1e−9 tie tolerance.
   - The lowest unplaced local minimum is a single unit at α*, 1.2e−6 to 6.3e−4 above.
-  - Every restart still improving at the first iteration cap was finished with Newton wherever that run has been
-    done (6 of 8 scales). None ends below the retained minimiser.
+  - Every restart still improving at the first iteration cap was finished with Newton at 6 of the 8 scales. None
+    ends below the retained minimiser.
+  - **Not run (author's decision, 2026-09-25): the finisher at a = 1.50, R₂ = 0.01 and 0.02.** At both scales no
+    restart was still improving at the final iteration cap, so the check the author asked for (finishing the
+    restarts the direct check left unfinished) has nothing to finish there.
