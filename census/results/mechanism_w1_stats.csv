@@ -1,0 +1,3 @@
+,w2_glob,n_cross,x_min,x_max,w1_at_smallest,w1_below_bound_above_switch,w1_above_bound_below_switch,cross_w1_below_bound
+1.3,4.956250000000001,38,0.0100882723833543,2.2194199243379567,1.751088335787397,True,False,1.0
+1.5,2.53125,38,0.019753086419753,4.345679012345679,1.7561106450315298,True,False,1.0

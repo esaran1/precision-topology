@@ -426,6 +426,30 @@ def captions():
                  f"- **Message**: {message}\n- **Population and n**: {population}\n- **Uncertainty shown**: {uncertainty}\n"
                  "- **Numbers for the caption** (moved out of the image):\n" + "".join(f"  - {x}\n" for x in numbers)
                  + (f"- **Note**: {note}\n" if note else "") + "\n")
+    # mechanism (width 1): |w1| of the conditional minimiser against R/R_glob (Task C, 2026-09-25)
+    if (RESULTS / "mechanism_w1_path.csv").exists():
+        mp_ = read("mechanism_w1_path.csv"); ms_ = read("mechanism_w1_stats.csv").set_index("Unnamed: 0")
+        def _cross_bound(a):
+            g = mp_[mp_.a.round(2) == a].sort_values("x")
+            i = int(np.argmax(g.w1.values < a / 1.4))
+            x0, x1, y0, y1 = g.x.values[i - 1], g.x.values[i], g.w1.values[i - 1], g.w1.values[i]
+            return float(np.exp(np.log(x0) + (a / 1.4 - y0) / (y1 - y0) * (np.log(x1) - np.log(x0))))
+        entry("mechanism_w1", "main text",
+              "As output scale grows, the conditional minimiser's first-layer weight moves from the class-mean optimum "
+              "α* toward the worst-case optimum, dropping below the placement bound a/1.4 before placement switches on at "
+              "R_glob, where free training crosses.",
+              "Width 1, a = 1.30 and 1.50, 800-point population. Minimiser: the conditional audit's retained minimiser "
+              "(s ≥ 1.5) and the same frozen search at s = 0.05–1.25 (a validated search, not a certificate). R_glob: the "
+              "certified bracket midpoint. Crossings: phase 2b, budget 32,000, "
+              f"{int(ms_.loc[1.3, 'n_cross'])} and {int(ms_.loc[1.5, 'n_cross'])} crossing runs.",
+              "None (point values; the bracket for R_glob is narrower than the line).",
+              [f"α* = 1.7913 (the class-mean optimum, independent of a); a/1.4 = {1.3 / 1.4:.3f} (a = 1.30), {1.5 / 1.4:.3f} (a = 1.50)",
+               f"|w1| at the smallest scale shown: {ms_.loc[1.3, 'w1_at_smallest']:.3f} (a = 1.30), {ms_.loc[1.5, 'w1_at_smallest']:.3f} (a = 1.50)",
+               f"the minimiser drops below a/1.4 at R/R_glob ≈ {_cross_bound(1.3):.2f} (a = 1.30) and {_cross_bound(1.5):.2f} (a = 1.50): "
+               "the bound is necessary for placement, not sufficient",
+               f"crossings with |w1| < a/1.4: {100 * ms_.loc[1.3, 'cross_w1_below_bound']:.0f}% and {100 * ms_.loc[1.5, 'cross_w1_below_bound']:.0f}%",
+               f"w2_glob = {ms_.loc[1.3, 'w2_glob']:.4f} (a = 1.30), {ms_.loc[1.5, 'w2_glob']:.4f} (a = 1.50)"],
+              note="Do not describe the minimiser path as certified; only R_glob is.")
     # fixed scale
     t4 = read("fixed_scale_block4_tests.csv").set_index("variant"); t5 = read("fixed_scale_block5_tests.csv").set_index("variant")
     n4 = int(read("fixed_scale_block4_curve.csv").n.max()); n5 = int(read("fixed_scale_block5_curve.csv").n.max())
@@ -631,6 +655,11 @@ def main():
     fig_mirror_branches()
     fig_prospective()
     fig_prospective_own()
+    if (RESULTS / "mechanism_w1_path.csv").exists():
+        from . import figures_v5 as _F
+        from .mechanism_w1_figure import figure as fig_mechanism_w1
+        fig_mechanism_w1()
+        LAYOUT.update(_F.LAYOUT)                      # the module copy the figure's save() recorded into
     print(out)
     print("captions:", captions())
     audit()
