@@ -1,0 +1,142 @@
+{"seed": 600480, "done": true}
+{"seed": 600481, "done": true}
+{"seed": 600482, "done": true}
+{"seed": 600483, "done": true}
+{"seed": 600484, "done": true}
+{"seed": 600486, "done": true}
+{"seed": 600485, "done": true}
+{"seed": 600487, "done": true}
+{"seed": 600488, "done": true}
+{"seed": 600490, "done": true}
+{"seed": 600491, "done": true}
+{"seed": 600492, "done": true}
+{"seed": 600489, "done": true}
+{"seed": 600494, "done": true}
+{"seed": 600493, "done": true}
+{"seed": 600496, "done": true}
+{"seed": 600497, "done": true}
+{"seed": 600498, "done": true}
+{"seed": 600495, "done": true}
+{"seed": 600499, "done": true}
+{"seed": 600501, "done": true}
+{"seed": 600500, "done": true}
+{"seed": 600502, "done": true}
+{"seed": 600503, "done": true}
+{"seed": 600504, "done": true}
+{"seed": 600505, "done": true}
+{"seed": 600506, "done": true}
+{"seed": 600508, "done": true}
+{"seed": 600509, "done": true}
+{"seed": 600507, "done": true}
+{"seed": 600511, "done": true}
+{"seed": 600512, "done": true}
+{"seed": 600513, "done": true}
+{"seed": 600514, "done": true}
+{"seed": 600510, "done": true}
+{"seed": 600515, "done": true}
+{"seed": 600517, "done": true}
+{"seed": 600518, "done": true}
+{"seed": 600519, "done": true}
+{"seed": 600520, "done": true}
+{"seed": 600521, "done": true}
+{"seed": 600522, "done": true}
+{"seed": 600516, "done": true}
+{"seed": 600524, "done": true}
+{"seed": 600523, "done": true}
+{"seed": 600525, "done": true}
+{"seed": 600527, "done": true}
+{"seed": 600526, "done": true}
+{"seed": 600529, "done": true}
+{"seed": 600530, "done": true}
+{"seed": 600531, "done": true}
+{"seed": 600528, "done": true}
+{"seed": 600533, "done": true}
+{"seed": 600532, "done": true}
+{"seed": 600534, "done": true}
+{"seed": 600536, "done": true}
+{"seed": 600537, "done": true}
+{"seed": 600538, "done": true}
+{"seed": 600539, "done": true}
+{"seed": 600535, "done": true}
+Process SpawnPoolWorker-2:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+{"seed": 600540, "done": true}
+Process SpawnPoolWorker-1:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+{"seed": 600551, "done": true}
+{"seed": 600535, "done": true}
+{"seed": 600540, "done": true}
+{"seed": 600553, "done": true}
+{"seed": 600554, "done": true}
+{"seed": 600552, "done": true}
+{"seed": 600556, "done": true}
+{"seed": 600558, "done": true}
+{"seed": 600559, "done": true}
+{"seed": 600555, "done": true}
+{"seed": 600557, "done": true}
