@@ -345,9 +345,10 @@ certified R_glob and R_solve bracket):
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
   registration stated a two-outcome rule (G > 0: no placement threshold; G <= 0: a threshold exists) rather than a
   predicted outcome. **Outcome: no placement threshold for f_a at width 2.** The outcome is decided by the
-  second-order (Var) selection, which the registration added; its direct check is pending (below).
-- *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
-  the width-2 no-gating test (not run).
+  second-order (Var) selection, which the registration added; its direct check confirms it (below).
+- *Registered check, scored*: the width-2 direct check. All 8 scales are placed (the cancelling pair), so the decision
+  rule's outcome is confirmed directly (2026-09-25).
+- *Pending (registered, not yet scored)*: the width-2 no-gating test (not run).
 - *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
   with frozen thresholds at its step 5, which the small-scale verdict made moot. They are not applicable at width 2.
 
@@ -387,8 +388,8 @@ def wp9():
     """WP-9: width 2 (rebuttal revision)."""
     w1 = pd.read_csv(RESULTS / "scale_limits_width1.csv")
     w2 = pd.read_csv(RESULTS / "scale_limits_width2.csv").set_index("a")
-    fs = pd.read_csv(RESULTS / "width2_finish_summary.csv")
-    landed = fs[fs.direct_check_landed.astype(bool)]
+    sm = [pd.read_csv(f) for f in sorted((RESULTS / "width2_w0_parts").glob("smallscale_f*.csv"))]
+    landed = pd.concat(sm) if sm else pd.DataFrame(columns=["act", "R2"])       # the direct check's own results
     land = ", ".join(f"a = {float(r.act[1:]):.2f} at R₂ = {r.R2:g}" for r in landed.itertuples()) or "none yet"
     n_pend = 8 - len(landed)
     return f"""
@@ -415,9 +416,10 @@ W1 and W4 were not run. IDs: {_id("width 2: validation (ladder, independent, pai
 pairs (placed). Δμ alone does not decide the verdict; the s² (Var) term does. That selection rule was added in the
 registration (committed before any maximiser was computed) and was not in the author's original rule. The direct
 check (WP-8) tests the verdict without the expansion: at each scale the validated W0 search finds the conditional
-minimiser itself. Landed so far: {land} (placed cancelling pair at each, every validation passed, the best unplaced
-configuration on the G = 0 boundary, at least 99× the tie tolerance above); **{n_pend} scale(s) PENDING** (table in WP-8, not
-repeated here). IDs: {_id("direct check: every landed scale placed, cancelling pair", "direct check: no finished restart below the retained minimiser (landed scales)", "min margin at R2 = 0.001", "all best-unplaced on the boundary")}.
+minimiser itself. {("Complete: all 8 scales" if n_pend == 0 else "Landed so far: " + land)} (placed cancelling pair at each,
+every validation passed, the best unplaced configuration on the G = 0 boundary, at least 99× the tie tolerance above)
+{"— the verdict is confirmed directly" if n_pend == 0 else f"; **{n_pend} scale(s) PENDING**"} (table in WP-8, not repeated
+here). IDs: {_id("direct check: every landed scale placed, cancelling pair", "direct check: no finished restart below the retained minimiser (landed scales)", "min margin at R2 = 0.001", "all best-unplaced on the boundary")}.
 
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
 size, the maxima are < 1 and rising, the first-order tie is present, the Var-selected symmetric pair is placed at every
@@ -436,7 +438,7 @@ IDs: {_id("tanh: registered outcome 'neither'", "tanh: validation passed at ever
 **Do not say**
 - "proved" or "certified" for the width-2 verdict (it is a registered, validated computation plus a lemma, not a
   certificate); or that Δμ alone decides it.
-- that the direct check is complete while any scale is PENDING.
+- that the direct check is complete while any scale is PENDING (it completed on 2026-09-25: all 8 scales placed).
 - that the unplaced region has no local minima, or that the boundary point is a competing minimum (WP-8 wording).
 - that tanh "confirmed" or "passed" the registered expectation.
 """

@@ -827,6 +827,7 @@ PRODUCERS = {
     "cadence_sensitivity.csv": ("cadence_sensitivity", "main", "full", ""),
     "width2_unplaced.csv": ("width2_unplaced", "save", "full", ""),
     "width2_finish_summary.csv": ("width2_finish", "summary", "full", ""),
+    "width2_direct_check.csv": ("width2_finish", "summary", "full", ""),
     "k_domain_check.csv": ("k_domain", "main", "full", ""),
     "width2_unplaced_localmin.csv": ("width2_unplaced", "save", "full", ""),
     "ghat_rigorous.csv": ("ghat_rigorous", "build", "full", ""),
@@ -1314,6 +1315,15 @@ def v4_checks() -> None:
     chk("K domain: excluded points checked", float(kd_.excluded_points_checked), 4035775.0, 0)
     chk("K domain: region inside the certified box", float(bool(kd_.region_inside_box)), 1.0, 0)
     chk("K domain: K argmax inside the region", float(bool(kd_.K_argmax_inside_region)), 1.0, 0)
+    print("Direct check (complete)")
+    dc_ = pd.read_csv(R / "width2_direct_check.csv")
+    chk("direct check: 8 scales", float(len(dc_)), 8.0, 0)
+    chk("direct check: placed and the cancelling pair at all 8", float(dc_.placed.astype(bool).all()
+                                                                        and (dc_.is_cancelling_pair.astype(str) == "True").all()), 1.0, 0)
+    chk("direct check: every validation passed at all 8", float((dc_.audit_ok & dc_.stall_local_ok & dc_.ladder_ok
+                                                                   & dc_.stricter_ok & dc_.independent_ok).astype(bool).all()), 1.0, 0)
+    chk("direct check: min G+ at a = 1.30", float(dc_[dc_.act == "f1.30"].Gplus_lo.min()), 0.8895, 0.00006)
+    chk("direct check: min G+ at a = 1.50", float(dc_[dc_.act == "f1.50"].Gplus_lo.min()), 1.0263, 0.00006)
     print("Block 2: finite-a certificates, independent checker")
     vcf_ = (R / "verify_certificates_finite.log").read_text()
     chk("Block 2: 12 finite-a certificates pass", float(vcf_.count('"pass": true') == 12

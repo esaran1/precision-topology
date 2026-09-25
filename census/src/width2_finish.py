@@ -144,6 +144,10 @@ def summary():
                          "n_below_retained": len(below)})
     s = pd.DataFrame(rows)
     s.to_csv(RESULTS / "width2_finish_summary.csv", index=False)
+    # committed copy of the direct check's own per-scale results (the parts directory is not committed)
+    sm = [pd.read_csv(f, float_precision="round_trip") for f in sorted(PARTS.glob("smallscale_f*.csv"))]
+    if sm:
+        pd.concat(sm).to_csv(RESULTS / "width2_direct_check.csv", index=False)
     return s
 
 

@@ -160,9 +160,10 @@ certified R_glob and R_solve bracket):
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
   registration stated a two-outcome rule (G > 0: no placement threshold; G <= 0: a threshold exists) rather than a
   predicted outcome. **Outcome: no placement threshold for f_a at width 2.** The outcome is decided by the
-  second-order (Var) selection, which the registration added; its direct check is pending (below).
-- *Pending (registered, not yet scored)*: the width-2 direct check (2 of 8 scales scored so far, both placed), and
-  the width-2 no-gating test (not run).
+  second-order (Var) selection, which the registration added; its direct check confirms it (below).
+- *Registered check, scored*: the width-2 direct check. All 8 scales are placed (the cancelling pair), so the decision
+  rule's outcome is confirmed directly (2026-09-25).
+- *Pending (registered, not yet scored)*: the width-2 no-gating test (not run).
 - *Designed but never registered*: W0–W4 and the tanh criterion of `width2_design.md`. The design registers them
   with frozen thresholds at its step 5, which the small-scale verdict made moot. They are not applicable at width 2.
 
@@ -477,7 +478,7 @@ every unplaced configuration, by at least 9.9e−8 at R₂ = 0.001 (about 99× t
 | a = 1.30, R₂ = 0.001 | 0.6922871697904 (placed, cancelling pair) | 0.6922872690039 (boundary, G₊ = -2.0e-10) | 9.92e-08 (99× 1e−9) | 1.61e-06 (single unit, G₊ = -3.65) |
 | a = 1.30, R₂ = 0.003 | 0.6905695256248 (placed, cancelling pair) | 0.6905704168112 (boundary, G₊ = -1.2e-11) | 8.91e-07 (891× 1e−9) | 1.45e-05 (single unit, G₊ = -3.64) |
 | a = 1.30, R₂ = 0.01 | 0.6845827328908 (placed, cancelling pair) | 0.6845925670975 (boundary, G₊ = -2.0e-12) | 9.83e-06 (9,834× 1e−9) | 1.60e-04 (single unit, G₊ = -3.59) |
-| a = 1.30, R₂ = 0.02 | PENDING | 0.6761364675950 (boundary, G₊ = -1.6e-13) | PENDING | 6.33e-04 (single unit, G₊ = -3.52) |
+| a = 1.30, R₂ = 0.02 | 0.6760975221489 (placed, cancelling pair) | 0.6761364675950 (boundary, G₊ = -1.6e-13) | 3.89e-05 (38,945× 1e−9) | 6.33e-04 (single unit, G₊ = -3.52) |
 | a = 1.50, R₂ = 0.001 | 0.6922871675820 (placed, cancelling pair) | 0.6922872667961 (boundary, G₊ = -1.7e-10) | 9.92e-08 (99× 1e−9) | 1.21e-06 (single unit, G₊ = -3.45) |
 | a = 1.50, R₂ = 0.003 | 0.6905695190120 (placed, cancelling pair) | 0.6905704102030 (boundary, G₊ = -1.9e-12) | 8.91e-07 (891× 1e−9) | 1.09e-05 (single unit, G₊ = -3.44) |
 | a = 1.50, R₂ = 0.01 | 0.6845827109908 (placed, cancelling pair) | 0.6845925452478 (boundary, G₊ = -4.4e-13) | 9.83e-06 (9,834× 1e−9) | 1.20e-04 (single unit, G₊ = -3.40) |
@@ -506,9 +507,10 @@ W1 and W4 were not run. IDs: `width 2: validation (ladder, independent, pair att
 pairs (placed). Δμ alone does not decide the verdict; the s² (Var) term does. That selection rule was added in the
 registration (committed before any maximiser was computed) and was not in the author's original rule. The direct
 check (WP-8) tests the verdict without the expansion: at each scale the validated W0 search finds the conditional
-minimiser itself. Landed so far: a = 1.30 at R₂ = 0.001, a = 1.30 at R₂ = 0.003, a = 1.30 at R₂ = 0.01, a = 1.50 at R₂ = 0.001, a = 1.50 at R₂ = 0.003 (placed cancelling pair at each, every validation passed, the best unplaced
-configuration on the G = 0 boundary, at least 99× the tie tolerance above); **3 scale(s) PENDING** (table in WP-8, not
-repeated here). IDs: `direct check: every landed scale placed, cancelling pair`; `direct check: no finished restart below the retained minimiser (landed scales)`; `min margin at R2 = 0.001`; `all best-unplaced on the boundary`.
+minimiser itself. Complete: all 8 scales (placed cancelling pair at each,
+every validation passed, the best unplaced configuration on the G = 0 boundary, at least 99× the tie tolerance above)
+— the verdict is confirmed directly (table in WP-8, not repeated
+here). IDs: `direct check: every landed scale placed, cancelling pair`; `direct check: no finished restart below the retained minimiser (landed scales)`; `min margin at R2 = 0.001`; `all best-unplaced on the boundary`.
 
 **tanh: registered outcome "neither".** Every registered expectation held except one: validation passed at every box
 size, the maxima are < 1 and rising, the first-order tie is present, the Var-selected symmetric pair is placed at every
@@ -527,7 +529,7 @@ IDs: `tanh: registered outcome 'neither'`; `tanh: validation passed at every A`;
 **Do not say**
 - "proved" or "certified" for the width-2 verdict (it is a registered, validated computation plus a lemma, not a
   certificate); or that Δμ alone decides it.
-- that the direct check is complete while any scale is PENDING.
+- that the direct check is complete while any scale is PENDING (it completed on 2026-09-25: all 8 scales placed).
 - that the unplaced region has no local minima, or that the boundary point is a competing minimum (WP-8 wording).
 - that tanh "confirmed" or "passed" the registered expectation.
 

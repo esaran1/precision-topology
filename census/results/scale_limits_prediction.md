@@ -106,3 +106,21 @@ Corollaries 1–2). Producer: `src/scale_limits.py`, committed with this file.
   reported, and whether it is the cancelling pair.
   - If it is placed at every scale, the verdict is confirmed directly.
   - If it is unplaced at any scale, that is reported immediately, and the verdict would be wrong.
+
+## Direct check: complete (2026-09-25 05:55 EDT) — the verdict is confirmed directly
+
+- **Run.** The validated W0 search found the conditional minimiser at R₂ ∈ {0.001, 0.003, 0.01, 0.02} at
+  a = 1.30 and 1.50 (`width2_w0 smallscale`): 4,000 restarts, the amended cap rule, local searches from stalls, the
+  restart ladder, the stricter search and the independent search.
+- **Result.** At all 8 scales the retained conditional minimiser is **placed and is the cancelling pair**:
+  G₊ = +0.8895 … +0.8896 at a = 1.30 and +1.0263 … +1.0265 at a = 1.50. Every validation check passed at every
+  scale.
+- **Registered outcome: confirmed.** The registered verdict (no placement threshold for f_a at width 2) holds
+  directly at finite small scale, independently of the s-expansion and its second-order selection.
+- **Resolution** (author's request; `width2_unplaced.csv`, `width2_unplaced_localmin.csv`, `width2_finish_summary.csv`,
+  WP-8).
+  - At every scale, the best unplaced configuration lies on the G = 0 boundary, above the placed minimiser by
+    9.9e−8 (R₂ = 0.001) to 3.9e−5 (R₂ = 0.02), i.e. 99× to 38,946× the 1e−9 tie tolerance.
+  - The lowest unplaced local minimum is a single unit at α*, 1.2e−6 to 6.3e−4 above.
+  - Every restart still improving at the first iteration cap was finished with Newton wherever that run has been
+    done (6 of 8 scales). None ends below the retained minimiser.
