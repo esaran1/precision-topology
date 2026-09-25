@@ -889,6 +889,11 @@ def run_one(name, seed, budget=BUDGET, ghat=None):
     return row
 
 
+RUN_COLUMNS = ["act", "seed", "placed_at_init", "crossed", "step", "s_cross", "gap_at_cross", "growth", "relax", "chi",
+               "branch_converged", "sqrt_v_w1", "sqrt_v_b1", "sqrt_v_b2", "w1", "b1", "w2", "b2", "sens_crossed",
+               "sens_step", "sens_s_cross", "sens_chi", "w2_final"]
+
+
 def _run_job(args):
     os.nice(15)
     name, seed, ghat = args
@@ -906,7 +911,7 @@ def _run_many(name, seeds, path):
     jobs = [(name, s, gh) for s in seeds if s not in done]
     with get_context("spawn").Pool(1) as pool:                       # ONE worker
         for r in pool.imap_unordered(_run_job, jobs):
-            pd.DataFrame([r]).to_csv(path, mode="a", header=not path.exists(), index=False)
+            pd.DataFrame([r]).reindex(columns=RUN_COLUMNS).to_csv(path, mode="a", header=not path.exists(), index=False)
 
 
 def calibrate(name):
@@ -970,3 +975,46 @@ def score_runs(s_cross, chi, s_lo, s_glob, kap, tol_abs=0.01, tol_rel=0.25, min_
     return {"n": n, "T-a": "PASS" if fa >= frac else "FAIL", "frac_at_or_above_lo": fa,
             "T-b": "PASS" if abs(obs - pred) <= tol else "FAIL", "pred": pred, "obs": obs, "tol": tol,
             "median_chi": float(np.median(chi[use])), "n_chi": int(use.sum())}
+
+
+EXT_SEEDS = tuple(range(850_040, 850_200))
+
+
+def train_ext(name):
+    if not (OUT / f"kappa_{name}_frozen.sha256").exists():
+        raise SystemExit("kappa not frozen")
+    _run_many(name, EXT_SEEDS, OUT / f"train_ext_{name}.csv")
+
+
+def score():
+    """Registered scoring (results/act_training_registration.md).  Primary: the 40 registered seeds.  Registered
+    sensitivity: crossing at G >= SENS_GAP.  Registered secondary: the 200 seeds of primary + extension pooled."""
+    import hashlib
+    import pandas as pd
+    rows = []
+    for name in NAMES:
+        f = OUT / f"kappa_{name}_frozen.json"
+        h = (OUT / f"kappa_{name}_frozen.sha256").read_text().strip()
+        if hashlib.sha256(f.read_bytes()).hexdigest() != h:
+            raise SystemExit(f"STOP: frozen kappa for {name} changed")
+        k = json.loads(f.read_text())
+        arms = {"primary": [OUT / f"train_{name}.csv"],
+                "secondary_pooled_200": [OUT / f"train_{name}.csv", OUT / f"train_ext_{name}.csv"]}
+        for arm, files in arms.items():
+            if not all(p.exists() for p in files):
+                continue
+            d = pd.concat([pd.read_csv(p) for p in files], ignore_index=True)
+            c = d[d.crossed.astype(bool) & ~d.placed_at_init.astype(bool)]
+            prim = score_runs(c.s_cross, c.chi, k["s_lo"], k["s_glob"], k["kappa_adam"])
+            cs = d[d.sens_crossed.astype(bool) & ~d.placed_at_init.astype(bool)]
+            sens = score_runs(cs.sens_s_cross, cs.sens_chi, k["s_lo"], k["s_glob"], k["kappa_adam"])
+            rows.append({"act": name, "arm": arm, "runs": len(d), "placed_at_init": int(d.placed_at_init.sum()),
+                         "crossing_runs": len(c), "kappa": k["kappa_adam"], "s_lo": k["s_lo"], "s_glob": k["s_glob"],
+                         **prim, **{f"sens_{kk}": v for kk, v in sens.items()},
+                         "median_s_cross": float(c.s_cross.median()) if len(c) else float("nan"),
+                         "n_below_s_lo": int((c.s_cross < k["s_lo"]).sum())})
+    out = pd.DataFrame(rows)
+    out.to_csv(OUT / "training_scores.csv", index=False)
+    pd.set_option("display.width", 250)
+    print(out.to_string(index=False))
+    return out

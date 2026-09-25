@@ -215,3 +215,22 @@ def test_kappa_scale_invariance():
     # P = I: kappa = lambda_min(H) * (dG.H^-1 tan)/(dG.tan)
     k = ag.kappa(H, tan, dG, np.ones(3))[0]
     assert abs(k - np.linalg.eigvalsh(H).min() * (dG @ np.linalg.solve(H, tan)) / (dG @ tan)) < 1e-12
+
+
+def test_run_rows_written_with_fixed_columns(tmp_path, monkeypatch):
+    import pandas as pd
+    crossed = {c: 1.0 for c in ag.RUN_COLUMNS}
+    crossed.update({"act": "gelu", "seed": 1, "crossed": True})
+    short = {"act": "gelu", "seed": 2, "placed_at_init": False, "crossed": False, "step": float("nan"),
+             "s_cross": float("nan"), "gap_at_cross": float("nan"), "sens_crossed": False, "sens_step": float("nan"),
+             "sens_s_cross": float("nan"), "w2_final": 3.25}
+    f = tmp_path / "r.csv"
+    for r in (crossed, short):
+        pd.DataFrame([r]).reindex(columns=ag.RUN_COLUMNS).to_csv(f, mode="a", header=not f.exists(), index=False)
+    d = pd.read_csv(f)
+    assert d.w2_final.tolist() == [1.0, 3.25] and d.growth.isna().tolist() == [False, True]
+    # the unaligned write (the bug this guards against) puts w2_final in the wrong column
+    g = tmp_path / "bad.csv"
+    for r in (crossed, short):
+        pd.DataFrame([r]).to_csv(g, mode="a", header=not g.exists(), index=False)
+    assert pd.read_csv(g).w2_final.isna().iloc[1]
