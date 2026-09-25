@@ -1,0 +1,595 @@
+# Math note v2: the conditional threshold in the scaling limit
+
+Supersedes `scaling_proposition.md` for the conditional-threshold claim. The earlier note's steps 1–5
+(series, remainder bounds, Ĝ = Kε^{3/2}(1 + O(ε))) are unchanged and are not repeated here. Checks:
+`src/limit_bnb.py`, `src/math_note_v2_checks.py`, `src/profiled_bnb.py`, `src/conditional_certified.py`.
+
+## Three objects
+
+The earlier statement blurred these. They are distinct and are treated separately.
+
+1. **The gap-maximising placement** — argmax of G over (w₁, b₁). It defines Ĝ, K and κ. The earlier
+   note's H1 localises this object only.
+2. **A local branch of the conditional loss** — a strict local minimiser of the profiled loss at fixed
+   output scale, followed continuously in the scale. H2′ (transversality) concerns this object.
+3. **The globally preferred conditional-loss solution** — the global minimiser of the profiled loss at
+   fixed output scale. The paper's threshold R_glob is where its gap changes sign.
+
+Objects 2 and 3 coincide near the switch exactly where a certificate says so (§4). Object 1 enters
+only through the unit R = |w₂|Ĝ/2.
+
+## 1. Setting: the profiled problem in rescaled coordinates
+
+- f_a(t) = t + a sin t, a = 1 + ε. Windows I = [−0.8, 0.8] (class 0), O = ±[1.2, 2.0] (class 1).
+- The objective is a **fixed finite point set**: the 800 quadrature points of the population objective
+  (`blockB_landscape.population_data`), or a run's own 400 training points where stated.
+  "Certified" below means exact for that objective, with floating-point rounding bounded (§6).
+- Rescaled coordinates: w₁ = √ε p, b₁ = π + √ε q, σ = px + q, A = sε^{3/2} with s = |w₂|.
+- With φ_ε(σ) = [f_a(π + √ε σ) − π]/ε^{3/2}, the logit is z = Aφ_ε(σ) + b, and
+  L_ε(p, q, b; A) = mean ℓ(z, y), with ℓ(z, y) = log(1 + eᶻ) − yz.
+- **Profiled loss**: L*_ε(p, q; A) = min_b L_ε. This is strictly convex in b whenever both classes
+  are present, so b*(p, q; A) is unique and C^∞.
+- **Limit problem**: φ_0 = h, h(σ) = −σ + σ³/6, giving L*_0(p, q; A). It does not depend on a.
+- **Limit gap**: G_0(p, q) = min_O h(σ) − max_I h(σ) in the A > 0 orientation. The finite gap is
+  ε^{3/2}(G_0 + O(ε)).
+- **Units**: R = sĜ(a)/2 = KA(1 + δ_ε)/2 with |δ_ε| = O(ε). K ∈ [0.5794558, 0.5794951] (exact-extrema
+  branch and bound, `limit_K_base.csv`; T58's 0.579454926 is a refinement estimate just below the
+  supremum). Certified R intervals use K_lo·A_lo/2 and K_hi·A_hi/2.
+
+## 2. Statement
+
+**Theorem (limit problem, certified).** For the base window, on the quadrature objective:
+
+- (a) **Localisation**, proved given computed bounds: for every A ∈ [0.66, 0.72], every global
+  minimiser of L*_0(·, ·; A) lies in K(24) = {|p| ≤ 24, |q| ≤ 2√2 + 48}.
+- (b) **Switch**: the global minimiser's gap changes sign at a unique A* ∈ (0.68125, 0.6875]. Hence
+  **R_glob^∞ = KA*/2 ∈ [0.19738, 0.19920]** (`limit_K_base.csv`). The solve switch is certified in the
+  same way at A_solve ∈ (1.05875, 1.06], giving **R_solve^∞ ∈ [0.30675, 0.30712]** (transversal, nondegenerate;
+  `mn2_solve_limit.csv`).
+  - **Global over the whole bracket** (§3(c), same four-link chain as (c)): for every A ∈ [1.05875, 1.06]
+    the global minimiser of L*_0(·; A) is unique (up to p → −p) and is the branch minimiser
+    (`certv2_solve_summary.csv`).
+- (c) **Single branch, global** (certified by a four-link chain, §3(c)):
+  - for every A ∈ [0.66, 0.71], L*_0(·; A) has a unique global minimiser (up to the reflection p → −p). It lies
+    in the box U = [p₀ ± 0.05] × [q₀ ± 0.05], with (p₀, q₀) = (1.66858, 1.36972);
+  - the (p, q, b) Hessian is positive definite on U × [0.66, 0.71], with λ_min ≥ 0.0473;
+  - so the global minimiser is the unique critical point in U, and it is C^∞ in A.
+- (d) **Transversality (H2′)**: dG_0/dA along the branch lies in **[1.666, 1.705]** at A = 0.68125, 0.684375
+  and 0.6875 (certified intervals, `mn2_h2prime.csv`). It is positive, so the crossing is transversal. The
+  earlier float 1.304 was a finite difference of coarse branch-and-bound argmins; it is superseded.
+
+**Corollary (finite a, local).** For all sufficiently small ε, L*_ε has a unique critical point in U for
+each A ∈ [0.66, 0.71]. It is a strict local minimum, and its gap changes sign transversally at
+A_ε = A* + O(ε). In R units: **R_ε = KA*/2 + O(ε)**.
+
+**Global preference at finite a is not claimed from the limit.**
+- The isotonic localisation argument uses h's monotonicity for |σ| ≥ 2√2. f_a has periodic folds, so
+  it does not transfer.
+- Global preference at finite a is established only where Block 1c's certificate covers it: a = 1.30,
+  1.35, 1.40, 1.45, 1.50 and 1.60 (§5).
+
+## 3. Proof
+
+**(a) Localisation.**
+- h is increasing on |σ| ≥ √2, with h(2√2) = h(−√2) = 2√2/3 and h(−2√2) = h(√2) = −2√2/3. So h
+  restricted to {|σ| ≥ 2√2} is increasing.
+- For |p| ≥ P, the points with |σ(x)| < 2√2 lie in an x-window of length 4√2/|p| ≤ 4√2/P.
+- On the remaining points the logit is monotone in x. So L*_0 ≥ (1/n) × (the best monotone logistic fit
+  to those points).
+- That best fit is the isotonic regression, for any Bregman loss, including log loss.
+- Minimising over window positions gives B(P) ≤ L*_0 for all |p| ≥ P. If |q| > 2√2 + 2|p|, no point
+  is in the window, and L*_0 ≥ B_full.
+- **Exact values** (`mn2_bounds.csv`: integer PAVA block sums, logs at 50 digits):
+  - B(24) = 0.38797358;
+  - B_full = ln3/4 + ln(3/2)/2 = 0.47738563 (closed form, agreeing with PAVA to 7e−52).
+- **Branch loss**: the certified upper bound on [0.66, 0.72] is 0.3768942 (`mn2_uniformity_summary.csv`),
+  below B(24) by 0.0111 and below B_full by 0.1005. So every global minimiser lies in K(24).
+- On the wider range [0.60, 0.76], the 0.02-grid bridge overshoots B(24) by 0.0032. It is not
+  certified there at that resolution, and it is not needed.
+- **Uniformity in A**: L*_0(θ; A) is convex in A (ℓ is convex and z is jointly linear in (A, b)).
+  |∂_A L*_0| ≤ mean|h(σ)|.
+
+**(b) Switch.**
+- Profiled branch and bound on K(24) (`limit_bnb.certify`), for the regions G_0 ≤ 0 and G_0 > 0.
+- **Cell lower bound**: L*(c) − |∂_p|h_p − |∂_q|h_q − ½A·mean(|σ|max·(|x|h_p + h_q)²).
+  - The gradient term is exact (envelope theorem).
+  - The profiled Hessian's Schur-complement correction is bounded by Cauchy–Schwarz, so the
+    full-variable curvature term bounds the profiled curvature from below.
+- **Gap step**: max|h′| over the cell × (2.8h_p + 2h_q).
+- At A = 0.68125, min_{G≤0} < min_{G>0} with disjoint certified intervals. At A = 0.6875 the order
+  is reversed. (`limit_switch.csv`, `limit_switch_evaluations.csv`.)
+- **Uniqueness of the sign change** on [0.66, 0.71] follows from (c)–(d).
+
+**(c) Single branch.**
+- `mn2_neighbourhood.csv`: U × [0.66, 0.71] is split into 500 sub-boxes. On each:
+  - b is enclosed by interval Newton (validated on all boxes);
+  - the interval (p, q, b) Hessian has eigenvalues ≥ λ_mid − ‖radius‖_F > 0;
+  - the minimum lower bound over all boxes is 0.0473.
+- A C² function with a PD Hessian on a convex box has at most one critical point there.
+- **Global uniqueness: the four-link chain** (`certificates_v2.py` → `certv2_annulus_parts.csv`,
+  `certv2_annulus_summary.csv`; solve bracket → `certv2_solve_parts.csv`, `certv2_solve_pd.csv`,
+  `certv2_solve_summary.csv`).
+  - A is carried as an interval, never sampled. The chain holds on each A-sub-interval: 40 sub-intervals of
+    width 0.00125 covering [0.66, 0.71], and the solve bracket [1.05875, 1.06] as one interval.
+  - θ_c is U's centre (p₀, q₀). For the solve bracket it is the centre of the certified argmin enclosure at
+    A = 1.06, with its own 0.05 box.
+  - **Link 1, localisation**: every global minimiser lies in K(24) (by (a)).
+    - For the solve bracket, the branch upper bound max(L*_0(θ_c; 1.05875), L*_0(θ_c; 1.06)) = 0.28117 is
+      below B(24) = 0.38797.
+  - **Link 2, outer exclusion**: for every θ ∈ K(24) outside the 0.15 box around θ_c, and every A in the
+    sub-interval, L*_0(θ; A) > L*_0(θ_c; A). The margin is certified at ≥ 1.00e−4 on every annulus
+    sub-interval and ≥ 1.48e−4 on the solve bracket.
+    - **Branch side**: L*_0(θ_c; ·) is convex, so over the sub-interval it is at most the larger of its two
+      endpoint values.
+    - **Competitor side**: the §3(b) cell bound at the midpoint A_c, with curvature taken at A_hi, minus
+      h_A·|∂_A L*_0| (convexity in A). By the envelope theorem, ∂_A L*_0 = mean((σ(z_i) − y_i)h(σ_i)).
+    - The profiled bias gives mean(σ(z_i) − y_i) = 0. So for any constant c,
+      |∂_A L*_0| ≤ mean|h(σ_i) − c| ≤ mean(|h(σ_i(θ_cell)) − c| + (1 + σmax_i²/2)(|x_i|h_p + h_q)),
+      taking c as the median over points at the cell centre.
+    - The cruder bound mean|h(σ)| reaches about 10⁴ near p = 0, |q| ≈ 36. There h(σ) is nearly constant
+      across points and b absorbs it, and with the crude bound the search does not close.
+    - A 1e−9 allowance covers float rounding in the profiled evaluations.
+    - The search stops at 7 refinement rounds with ≤ 39,072 live cells, against a cap of 1.5M.
+  - **Link 3, ring**: ∇_{(p,q)} L*_0(·; A) ≠ 0 on the ring 0.05 ≤ |θ − θ_c|_∞ ≤ 0.15, for every A in the
+    sub-interval.
+    - **Method**: vectorised interval arithmetic with outward rounding after every operation. exp and pow
+      are widened by ≥ 4 ulps, and the mean carries a summation error bound. The profiled b is enclosed by
+      certified sign changes of the monotone bounds mean σ(z_lo + b) − ȳ ≤ F(b) ≤ mean σ(z_hi + b) − ȳ.
+    - The gradient ∂_p L*_0 = mean((σ(z) − y)Ah′(σ)x), ∂_q L*_0 = mean((σ(z) − y)Ah′(σ)) is enclosed on
+      540 boxes of side 0.0125 covering the ring (padded by 1e−12). On every box, 0 is excluded from ∂_p
+      or from ∂_q, with no subdivision needed.
+    - The smallest certified |gradient component| is 3.28e−3 (annulus) and 8.47e−3 (solve bracket).
+  - **Link 4, PD**: the (p, q, b) Hessian is PD on the 0.05 box × the A range. For the annulus this is
+    `mn2_neighbourhood.csv` (λ_min ≥ 0.0473, 500 sub-boxes). For the solve bracket it is `certv2_solve_pd.csv`:
+    100 sub-boxes over the whole bracket, b validated by interval Newton, λ_min ≥ 0.0209.
+  - **Hence**:
+    - A global minimiser exists in K(24) (Link 1, continuity).
+    - It lies in the 0.15 box (Link 2).
+    - It is an unconstrained minimiser, so it is a critical point, and therefore it is not in the ring
+      (Link 3).
+    - So it lies in the 0.05 box, where the critical point is unique (Link 4).
+    - The global minimiser is therefore unique up to the reflection p → −p, and it is the branch minimiser.
+      The data and windows are x-symmetric, and the search covers p ≥ 0, as in `limit_bnb.certify`.
+  - **Tests**: `tests/test_certificates_v2.py`, 12 tests.
+    - The interval primitives are checked against 50-digit values, and the b and gradient enclosures
+      against float profiles at random interior points.
+    - **Constructed fail cases**, each correctly not certified:
+      - a centre shifted by 0.1, so the critical point is in the ring;
+      - the inner box removed;
+      - a centre shifted by 0.3, so the minimiser is outside the box;
+      - a box too small for the A-interval;
+      - the cell cap reached.
+    - The halving-tree coverage bookkeeping and the three-link conjunction are also tested.
+  - **Superseded first design** (`math_note_v2_checks.annulus`, `solve_competitor`; never produced an
+    artifact). It compared the competitor bound directly against the rise at the edge of the 0.05 box,
+    with a branch upper bound carrying h_A·mean|h|.
+    - Its slack (7.2e−3 annulus, 1.2e−3 solve) exceeded that rise (3.3e−4 and 6.8e−4), so it could not
+      close at any resolution.
+    - The redesign widens the exclusion to the 0.15 box and closes the gap between 0.05 and 0.15 with the
+      ring certificate instead.
+
+**(d) Transversality.**
+- Along the branch, G_0 is differentiable wherever its active set is unique: one extremal point of I
+  and one of O.
+- dG_0/dA = ∇G_0 · dθ/dA, with dθ/dA = −H⁻¹∂_A∇L_0 (implicit-function theorem on the full
+  (p, q, b) gradient system).
+- Evaluated in interval arithmetic over the certified argmin enclosure (`ift_limit`, `h2`, tolerance 1e−11).
+  At all six (A, region) evaluations:
+  - b is enclosed;
+  - the Hessian is PD (λ_min ≥ 0.1470);
+  - the active pair (outer −1.2, inner 0.8) is unique;
+  - dG_0/dA ∈ [1.666, 1.705].
+- The global minimiser's certified gap is [−0.00715, −0.00703] at A = 0.68125 and [0.00339, 0.00350] at
+  0.6875. That agrees with the Krawczyk switch A* = 0.685445 (§8): the slope ≈ 1.68 predicts −0.00707 and
+  +0.00346.
+
+**Corollary: C² convergence.** On U, |σ| ≤ S_U = 2(|p₀| + ρ) + |q₀| + ρ = 4.857 (since |x| ≤ 2). For
+ε ≤ 0.05 (`taylor_constants`, remainders derived in the docstring):
+
+  |φ_ε^{(k)} − h^{(k)}| ≤ εM_k on |σ| ≤ S_U, with M₀ = 5.217, M₁ = 13.507, M₂ = 16.375, M₃ = 13.384.
+
+- The remainder keeps the (1 + ε) factor, per the writer's correction.
+- ∂^k_{(p,q)}z carries factors x^k ≤ 2^k.
+- The logistic derivatives are bounded: |ℓ′| ≤ 1, ℓ″ ≤ ¼, |ℓ‴| ≤ 1/(6√3).
+- So ‖L_ε − L_0‖_{C²(U×[−B,B]×[0.66,0.71])} ≤ C·ε, with C explicit in A ≤ 0.71, S_U and M₀–M₂.
+- For ε with Cε below λ_min = 0.0473, the Hessian stays PD on U. The critical point persists, and it
+  moves by O(ε)/λ_min, staying inside U for small ε.
+- **The gap**: G is 2-Lipschitz in the sup norm of φ (writer's correction: each of its two terms
+  is a max or min, and there are two of them). Its derivative along the branch converges at O(ε)
+  under the unique active set.
+- So the sign change persists at A_ε = A* + O(ε), and it stays transversal.
+- **Units**: R = KA(1 + δ_ε)/2 with |δ_ε| = O(ε) (earlier note, step 4). ∎
+
+## 4. Checklist: proved, certified or assumed
+
+| Question | Status | Evidence | What would upgrade it |
+|---|---|---|---|
+| Loss-minimising branch (object 3) inside the rescaled region, limit problem | **Proved** given computed bounds, uniformly for A ∈ [0.66, 0.72] | isotonic bound; `mn2_bounds.csv`, `mn2_uniformity_summary.csv` | — |
+| Same, finite a | **Certified at the reported a only** (Block 1c, on the certified domain \|w₁\| ≤ W(s, a)) | `cond_certified_brackets.csv` | a monotone-fold argument for f_a; not available (periodic folds) |
+| Branch interior to where the expansion holds | **Certified**: U with S_U = 4.857, ε ≤ 0.05 | `mn2_neighbourhood.csv` | — |
+| Uniform C² derivative control | **Proved**, with explicit constants M₀–M₃ | `taylor_constants` | — |
+| Hessian PD on the neighbourhood (IFT) | **Certified**: λ_min ≥ 0.0473 on 500 sub-boxes | `mn2_neighbourhood.csv` | — |
+| No competitor outside U, uniform in A | **Certified** for every A ∈ [0.66, 0.71] (40 A-sub-intervals, A as an interval): outer exclusion outside the 0.15 box (margin ≥ 1.00e−4), no critical point in the ring 0.05–0.15 (\|gradient component\| ≥ 3.28e−3), PD on U | `certv2_annulus_parts.csv`, `certv2_annulus_summary.csv` | — |
+| Transversal crossing (H2′) at A* | **Certified**: dG₀/dA ∈ [1.666, 1.705] over the bracket | `mn2_h2prime.csv` | — |
+| Local branch or global minimiser? | **Global and unique** (up to p → −p) in the limit for A ∈ [0.66, 0.71] and over the solve bracket (localisation, four-link chain §3(c)); **global at finite a** only at a ∈ {1.30, …, 1.60} (Block 1c); **local** otherwise | as above | — |
+| Solve threshold: nondegeneracy and transversality | **Limit: certified** — A_solve ∈ (1.05875, 1.06]; the global minimiser's solve margin is certified negative then positive; Hessian PD (λ_min ≥ 0.1369); d(margin)/dA ∈ [0.532, 0.536]; localised (branch loss 0.281 < B(24) = 0.388). **Global over the whole bracket**: the four-link chain certifies a unique global minimiser for every A ∈ [1.05875, 1.06] (outer margin ≥ 1.48e−4; ring \|gradient component\| ≥ 8.47e−3; PD λ_min ≥ 0.0209; branch loss ≤ 0.28117 < B(24)) (`certv2_solve_summary.csv`). **Finite a: certified.** At a = 1.30–1.60, the global minimiser's solve margin over its certified enclosure (width ≤ 9e−6), with b validated, is certified negative at every lower bracket end and positive at every upper end. The smallest margin is [4.1e−6, 3.1e−4] at a = 1.45. | `mn2_solve_limit.csv`; `mn2_solve_finite.csv` | — |
+| Other window geometries (**for the rebuttal**; computed after the submission set was scored) | **Switch bracketed on K(24) for all 9 windows** (width 0.003125; H10 0.00625, stopped at a tied midpoint with both ends certified). **Localised (global) for 7 of 9**. For G1 and G4 the branch loss over the bracket exceeds B(24) (0.408 > 0.353; 0.426 > 0.388), so A* there is certified only for the minimiser over K(24). Base window: A* ∈ [0.68375, 0.686875], consistent with the sharp A* = 0.685445. R∞ intervals: base [0.1981, 0.1990]; G1 [0.1964, 0.1982]; G2 [0.1230, 0.1232]; G3 [0.1931, 0.1939]; G4 [0.1344, 0.1361]; H10 [0.1864, 0.1875]; H35 [0.1978, 0.1987]; H65 [0.1989, 0.2002]; H90 [0.1984, 0.1999] | `limit_windows.csv`, `limit_windows_evaluations.csv` | G1, G4: localisation with a larger P |
+
+## 5. Finite-a certificates (Block 1c)
+
+### 5.0 Localisation of the finite-a search: the bound W(s, a)
+
+The finite-a certificates (Block 1c: `conditional_certified.evaluate` → `profiled_bnb.certify`) search the
+compact domain |w₁| ≤ W(s, a), b₁ ∈ [0, 2π). The lemma below is what makes that domain sufficient.
+
+**Lemma (localisation of the finite-a conditional search).**
+
+- **Setting**:
+  - z(x) = s·f_a(w₁x + b₁) + b₂, with s = |w₂| > 0 in the orientation w₂ > 0, and f_a(t) = t + a sin t, so
+    t − a ≤ f_a(t) ≤ t + a.
+  - Class 1 lies on O = [−2, −1.2] ∪ [1.2, 2] and class 0 on I = [−0.8, 0.8], with n points in total and balanced
+    classes (ȳ = ½; true of the 800-point population and of every 400-point training set).
+  - L* is the profiled loss, minimised over b₂.
+- **Data**: the population objective has n = 800 points:
+  - 400 inner points x = linspace(−0.8, 0.8, 400), class 0;
+  - 200 outer points x = linspace(1.2, 2.0, 200), class 1, and their 200 negatives, class 1.
+  (`blockB_landscape.population_data`; a training set is `fold1d.make_data(200, seed)`.)
+- **Notation**: for a cut c ∈ [0, 0.8), let n_O⁻ = #{class 1: x ≤ −1.2} and n_I^{≥c} = #{class 0: x ≥ c}. Set
+  π(c) = min(n_O⁻, n_I^{≥c})/n and δ(π) = 2 log(2^{1/π} − 1).
+- **The cut grid**: C = {0.799·k/79 : k = 0, 1, …, 79}, the 80 cuts the certified code evaluates
+  (`np.linspace(0, 0.799, 80)`).
+- **Claim**: if w₁ > W₊(s, a) = min over c ∈ C of (2a + δ(π(c))/s)/(1.2 + c), then L*(w₁, b₁; s) > log 2 for every b₁.
+  (The argument holds for every single c; minimising over the grid C reproduces the code exactly.)
+  The case w₁ < 0 is the mirror image: use the right-outer class-1 points (x ≥ 1.2) against the class-0 points
+  with x ≤ −c, which gives W₋.
+- **Conclusion**: with W(s, a) = max(W₊, W₋), every global conditional minimiser has |w₁| ≤ W. The constant
+  predictor attains exactly log 2, so the global minimum is at most log 2.
+- **b₁**: it ranges over [0, 2π). A shift of b₁ by 2π adds 2πs to every logit, which the profiled b₂ absorbs.
+
+**Proof** (w₁ > 0).
+1. For x ≤ −1.2, w₁x + b₁ ≤ −1.2w₁ + b₁, so z ≤ A := s(−1.2w₁ + b₁ + a) + b₂.
+2. For x ≥ c, z ≥ s(cw₁ + b₁ − a) + b₂ = A + Δ, with Δ = s((1.2 + c)w₁ − 2a).
+3. Take Δ > 0 and let M = A + Δ/2.
+   - If M ≥ 0, every class-0 point with x ≥ c has z ≥ Δ/2, so its loss softplus(z) is at least softplus(Δ/2).
+   - If M < 0, every class-1 point with x ≤ −1.2 has z < −Δ/2, so its loss softplus(−z) exceeds softplus(Δ/2).
+4. All other losses are non-negative. So for every b₂, L ≥ π(c)·softplus(Δ/2), and hence
+   L* ≥ π(c)·softplus(Δ/2).
+5. π·softplus(Δ/2) > log 2 ⟺ Δ > δ(π) ⟺ w₁ > (2a + δ(π)/s)/(1.2 + c).
+6. Every c gives a valid bound, so the minimum over the grid C does too.
+   (For 1/π ≥ 1000 the code replaces δ by the larger 2 log 2/π, which is conservative; this never occurs here.) ∎
+
+**Illustration** (a = 1.30, s = 4.95, the lower end of the certified R_glob bracket; population data):
+- **With the cut c = 0.4**: n_O⁻ = 200, n_I^{≥0.4} = 100, π = 1/8, δ = 2 log 255 = 11.08. This gives
+  W₊ = (2.6 + 11.08/4.95)/1.6 = 3.024.
+- **With the grid-optimal cut c = 0.799·22/79 = 0.22251**: n_I^{≥c} = 145, π = 145/800 = 0.18125,
+  δ = 2 log(2^{1/0.18125} − 1) = 7.6045, W₊ = (2.6 + 7.6045/4.95)/(1.2 + 0.22251) = 2.9077.
+  W₋ is the same, because the data are x-symmetric, so **W = 2.908**: the value the certified search used.
+
+**Checked numerically at every certified a** (`writer_patch.w_bound_table` → `writer_patch_w_bound.csv`: both
+ends of all 12 certified R_glob and R_solve brackets, population objective):
+- the formula reproduces the W used by the search to 1e−12;
+- the profiled loss at |w₁| = W, 1.5W and 3W, over 720 values of b₁ and both signs of w₁, is at least 4.34 > log 2.
+- W ranges from 2.56 (a = 1.30, R_solve bracket) to 4.86 (a = 1.60, R_glob bracket).
+
+
+- Certified brackets for s = |w₂|, width 0.0125, at a = 1.30 … 1.60 (`cond_certified_brackets.csv`).
+  For example, R_glob(1.30) ∈ (0.21310, 0.21364] and R_solve(1.30) ∈ (0.30566, 0.30620].
+- The frozen Block B grid value is the first grid point above the bracket in every case.
+- **Convergence, refitted on certified intervals** (`rglob_refit.py` → `rglob_convergence_refit.csv`,
+  `rglob_convergence_points.csv`):
+  - finite-a values exceed R_glob^∞ by +7.6 to +13.5% (midpoints), positive at the worst corner, monotone in a;
+  - log-log slope 0.829 at midpoints, exact range [0.714, 0.955] over the certified box (the frozen-grid
+    fit gave 0.947);
+  - **no one-term law R_glob^∞(1 + c₁ε) passes through all certified intervals**; a two-term law does,
+    with c₁ ∈ [0.243, 0.321] and a strictly negative ε² coefficient;
+  - a straight line through the six finite a alone extrapolates to [0.2002, 0.2035], outside the
+    certified limit.
+- So the O(ε) rate is the corollary's, not the fit's. At ε = 0.30–0.60 the ε² term is not negligible,
+  and the measured points do not isolate the leading coefficient better than [0.243, 0.321].
+
+## 6. Chain table
+
+| Statement | Hypothesis discharged | Script → artifact | Rounding margin |
+|---|---|---|---|
+| (a) localisation | H1′ (limit) | `math_note_v2_checks bounds`, `uniform` → `mn2_bounds.csv`, `mn2_uniformity*.csv` | B(24): exact rational/50-digit. Branch bound: margin 0.0111 ≫ float error ≤ 1.1e−16 (`mn2_rounding.csv`) |
+| (b) switch at A* | global order at A = 0.68125, 0.6875 | `limit_bnb switch` → `limit_switch.csv` | certified interval gaps vs interval re-evaluation: \|float − interval\| ≤ 1.1e−16 (`mn2_rounding.csv`) |
+| (c) uniqueness in U | Hessian PD | `math_note_v2_checks neighbourhood` → `mn2_neighbourhood.csv` | interval arithmetic throughout (mpmath.iv, 30 digits) |
+| (c) competitors outside U | outer exclusion (0.15 box) + ring (no critical point, 0.05–0.15), uniform over 40 A-sub-intervals | `certificates_v2 annulus` → `certv2_annulus_parts.csv`, `certv2_annulus_summary.csv` | outer: float B&B with a 1e−9 rounding allowance against a certified margin ≥ 1.00e−4; ring: outward-rounded interval arithmetic |
+| (d) transversality | H2′ | `math_note_v2_checks h2` → `mn2_h2prime.csv` | interval arithmetic (mpmath.iv), argmin enclosure at tolerance 1e−11 |
+| C² convergence | derivative control | `taylor_constants` → `mn2_neighbourhood.csv` (M₀–M₃) | closed-form bounds, float max over 200,001 points of polynomials |
+| finite-a global preference | Block 1c | `conditional_certified brackets` → `cond_certified_brackets.csv` | `mn2_rounding.csv`, a = 1.30 rows: ≤ 1.1e−16 against certified gaps ≥ 1.8e−8 |
+| solve threshold (limit), branch | nondegeneracy, transversality | `math_note_v2_checks solve_limit` → `mn2_solve_limit.csv` | interval arithmetic over tolerance-1e−11 enclosures; b validated |
+| solve threshold (limit), competitors | the same chain over [1.05875, 1.06]; Hessian PD on the 0.05 box × bracket | `certificates_v2 solve` → `certv2_solve_parts.csv`, `certv2_solve_pd.csv`, `certv2_solve_summary.csv` | as (c); PD in mpmath.iv (30 digits) |
+| solve threshold (finite a) | sign of the solve margin at both bracket ends | `math_note_v2_checks solve_finite` → `mn2_solve_finite.csv` | interval arithmetic over the argmin enclosure (tolerance 1e−11); b validated by interval Newton |
+
+## 7. Limits
+
+- The corollary is asymptotic: "for all sufficiently small ε". No explicit ε₀ is claimed. The measured
+  finite-a thresholds (ε = 0.30–0.60) sit 7–14% above the limit.
+- Global preference at finite a rests on Block 1c at the six reported a, not on the limit.
+- Everything is exact for the stated finite objective. For another sample (for example a run's own 400
+  training points) the threshold differs; see `own_threshold_prediction.md`.
+
+## 8. The first-order coefficient c₁ (`src/first_order.py` → `first_order_c1.csv`)
+
+**Exact bookkeeping.** With A = sε^{3/2} and K(ε) := Ĝ(a)/ε^{3/2}, R = sĜ(a)/2 = A·K(ε)/2 exactly. So if the
+switch sits at A_ε = A* + A′(0)ε + O(ε²) and K(ε) = K(1 + k₁ε + O(ε²)), then
+
+  R_glob(ε) = R_glob^∞ (1 + c₁ε + O(ε²)),   **c₁ = A′(0)/A* + k₁**.
+
+**Expansion.** φ_ε(σ) = [f_a(π + √εσ) − π]/ε^{3/2} = h(σ) + ε r(σ) + O(ε²), with r(σ) = σ³/6 − σ⁵/120.
+Both terms come from the sine series, including the (1 + ε) factor.
+
+**Switch shift, A′(0).**
+- At the switch the gap's active pair is inner x = 0.8 and outer x = −1.2. On the box below, every other
+  candidate is strictly dominated (margins 0.625 inner and 0.108 outer), so near the switch G₀ = h(q − 1.2p) − h(q + 0.8p)
+  is smooth.
+- The switch is a zero of Φ(p, q, b, A; ε) = (∇_{p,q,b} L_ε, G_ε).
+- **At ε = 0**: a Krawczyk test on a box of radius 1e−9 certifies a unique zero, at
+  (p, q, b, A*) = (1.6680839, 1.3692319, −0.6141196, **0.68544523757565**). This is 800-point quadrature
+  objective, interval arithmetic at 30 digits. The Jacobian J = ∂_{(p,q,b,A)}Φ is invertible over the box.
+- **Implicit-function theorem**: d(p, q, b, A)/dε = −J⁻¹∂_εΦ, where
+  - ∂_ε∇_θL = mean[σ(z)(1 − σ(z))·A r(σ)·∂_θz + (σ(z) − y)·∂_θ(A r(σ))];
+  - ∂_εG = r(σ_O) − r(σ_I).
+  - The linear system is enclosed rigorously.
+- Result: **A′(0)/A* ∈ [0.6621547, 0.6621550]**.
+
+**Domain lemma for K = sup G₀ (added 2026-09-24).** The branch and bound for K searches (u, v) ∈ [0, 8] × [−12, 12];
+this lemma shows nothing outside that box can exceed K.
+- **Identity.** For h(σ) = −σ + σ³/6 and d ≥ 0: h(a) − h(a + d) = d·[1 − ((a + d/2)² + d²/12)/2].
+- **Bounds.** For u ≥ 0, σ = ux + v increases with x. Each orientation of G₀ is at most its value at one outer point
+  against one inner point (a minimum is at most any member of its set, a maximum at least any member):
+  - O over I: ≤ h(σ(−2)) − h(σ(−0.8)) (d = 1.2u), and ≤ h(σ(−2)) − h(σ(0.8)) (d = 2.8u, a + d/2 = v − 0.6u);
+  - I over O: ≤ h(σ(0.8)) − h(σ(2)) (d = 1.2u), and ≤ h(σ(−0.8)) − h(σ(2)) (d = 2.8u, a + d/2 = v + 0.6u).
+- **Lemma.** G₀(u, v) ≤ 0 if u ≥ √(50/3) ≈ 4.0825 (then d²/12 ≥ 2 for d = 1.2u), or if |v| ≥ √2 + 0.6u (then
+  (a + d/2)² ≥ 2 in both orientations). G₀(−u, v) = G₀(u, v) by x ↦ −x, since I and O are symmetric.
+- **Consequence.** K > 0, so sup G₀ over the whole plane equals sup over {|u| < 4.0825, |v| < 3.8637}. With u ≥ 0 by
+  the symmetry, that region lies inside the certified box. K's argmax (1.6056, 1.2042) lies inside the region.
+- **Check** (`src/k_domain.py` → `k_domain_check.csv`, numerical, not a certificate):
+  - the identity holds to 1.4e−12 relative at 100,000 random (a, d);
+  - G₀ ≤ 0 at 4.0 million points of the excluded region (a dense grid on u ∈ [0, 60], v ∈ [−80, 80] and random
+    points to 10⁴), with maximum exactly 0 at u = 0 and −1.19e−3 for u > 0;
+  - the symmetry holds exactly on 10,000 random points.
+
+**Gap-maximiser correction, k₁.**
+- K = sup G₀ is attained at a vertex of the max–min: I(−0.8) = I(0.8) and O(−2.0) = O(−1.2). The mirror
+  vertex is v ↦ −v.
+- Krawczyk in 2D gives (u, v) = (1.6055757, 1.2041818) and K = 0.57945588342 (±2e−11). This lies inside the
+  branch-and-bound enclosure [0.5794558833, 0.5794559217].
+- It is a strict local maximum: 0 is interior to the convex hull of the four piece-gradient differences
+  (largest angular gap 3.080 < π). The other pieces are dominated.
+- The vertex equations persist under ε. Differentiating them gives K′(0) = ∂_ε(O − I) + ∇(O − I)·θ′, with
+  J_Eθ′ = −∂_εE.
+- Result: **k₁ ∈ [−0.37692472, −0.37692472]**.
+- **Check against the exact φ_ε**: (K(ε)/K − 1)/ε = −0.3746, −0.3767, −0.3769 at ε = 10⁻², 10⁻³, 10⁻⁴.
+  These were computed **with the active set fixed** (Newton on the two tie equations). They check the
+  ε-dependence of that corner, not that the corner remains the maximiser. The free check below supplies
+  that.
+
+**Justification of the expansion at the tied corner** (`first_order corner` → `first_order_corner.csv`,
+`first_order_corner_free.csv`).
+- **Active edges** (the orientation min_O φ − max_I φ, v > 0):
+  - the inner maximum is a tie between the two inner edges, x = −0.8 and x = +0.8;
+  - the outer minimum is a tie between both edges of the negative outer window, x = −2.0 and x = −1.2.
+  - The mirror maximiser (v < 0) uses the positive outer window, by x ↦ −x.
+- **Uniform in ε**: φ_ε(σ) = −σ + (1 + ε)Σ_{k≥1}(−1)^{k+1}ε^{k−1}σ^{2k+1}/(2k+1)! is entire in ε. It is
+  evaluated in interval arithmetic with a rigorous tail bound, for either sign of ε. On ε ∈ [−0.05, 0.05],
+  split into 400 pieces, the following are certified on every piece:
+  - **(i) Unique corner**: a parametric Krawczyk test gives a unique corner θ(ε) in a box of width ≤ 3e−4
+    that serves every ε in the piece.
+  - **(ii) Active set unchanged**:
+    - φ_ε″ = (1 + ε)sin(√εσ)/√ε (the sinh form for ε < 0), and √|ε|·max|σ| < π. So φ_ε is concave for
+      σ < 0 and convex for σ > 0.
+    - φ_ε′ < 0 is certified on the inner window's negative σ-part. So the inner maximum sits at an edge.
+    - The negative outer window lies at σ < 0, so its minimum sits at an edge.
+    - φ_ε′ > 0 is certified on the positive outer window. Its minimum, the left edge, strictly exceeds
+      the active outer value.
+    - The other orientation is negative.
+  - **(iii) Strict (sharp) local maximum**: 0 is strictly inside the convex hull of the four piece-gradient
+    differences. The certified barycentric weights are ≥ 0.00434 on every piece (0.0047 at ε = 0).
+- **Why the expansion is two-sided.**
+  - At a non-smooth maximum of a min–max, the value function is in general only directionally
+    differentiable (Danskin).
+  - Its left and right derivatives differ when the active set changes at ε = 0.
+  - Here the active set is the same on both sides, and the corner stays a sharp maximum. The tie
+    equations E(θ, ε) = 0 are analytic, with J_E invertible.
+  - So θ(ε) and the local maximum value K_loc(ε) = G_ε(θ(ε)) are analytic on the neighbourhood.
+  - Hence k₁ = K_loc′(0)/K is an ordinary two-sided derivative.
+- **Thin margin**: the smallest weight belongs to the O(x = −2.0) piece. The corner is sharp but close to
+  degenerate in that direction. At some larger ε that tie could release; this is not tested here.
+- **Global maximiser (object 1)**: K(ε) = Ĝ(a)/ε^{3/2} is the global supremum, so K = K_loc needs the global
+  maximiser to be this corner.
+  - At ε = 0 this is certified by branch and bound.
+  - At ε = 0.005, 10⁻³ and 10⁻⁴, a **free** branch and bound (exact φ_ε extrema, no active set assumed,
+    (u, v) ∈ [0, 8] × [−12, 12]) finds the maximiser at the corner or its mirror, with every surviving
+    cell within 3e−6.
+  - Its value encloses the fixed-active value at each of those ε. The free slopes (K/K₀ − 1)/ε are
+    [−0.37576, −0.37574], [−0.37669, −0.37662] and [−0.37690, −0.37624].
+  - ε = 10⁻² is omitted, because K(0.01) belongs to the registered test. That run records the global
+    Ĝ(a) argmax at each test a.
+
+**Result: c₁ ∈ [0.2852300, 0.2852303].**
+
+**Chronology.**
+1. **Before v4** (`scaling_limit_results.md`, T58): c₁ ≈ 0.49 was predicted from an incomplete argument.
+   It used K(ε) with only the σ³/6 part of r and omitted the switch shift. It was set against the
+   frozen-grid fit c₁ = 0.231 ("a factor 2.4 too large"), and that note already called the argument
+   incomplete.
+2. **Certified refit** (`a023380`, `6dc47f2`, §5): on certified intervals no one-term law fits. Two-term
+   laws give c₁ ∈ [0.243, 0.321], so 0.49 is inconsistent with the data.
+3. **Full first-order calculation** (`f92b1b5`, this section): c₁ ∈ [0.2852300, 0.2852303]. It was done
+   after the refit had been seen. It has no fitted input, but it was not blind to the large-ε range.
+4. **Independent check**: the registered small-ε test at a = 1.01–1.04 (`first_order_prediction.md`,
+   registered in `f92b1b5` before any finite-a computation there).
+   - **Scored: INCONCLUSIVE.** The feasible set [0.2252, 0.3302] is 0.105 wide, against a registered limit
+     of 0.1. The prediction lies inside it, and all four competing values are excluded.
+   - The component k₁ test PASSED.
+   - A supplementary branch-root analysis, with no verdict attached, narrows the feasible set to
+     [0.28460, 0.28590], which contains the prediction (`first_order_prediction.md`, Result).
+
+**Why the earlier prediction (≈ 0.49, `scaling_limit_results.md`) was wrong.**
+- It used K(ε) alone, with only the σ³/6 part of r.
+- It omitted the switch shift, which is the larger term and has the opposite sign: the conditional
+  minimiser trades gap against loss, as that note itself suspected.
+- The complete first-order value, 0.285, lies inside the range [0.243, 0.321] allowed by the certified
+  large-ε values (§5). So the "factor 2.4" discrepancy came from an incomplete calculation.
+- Whether 0.285 is the actual first-order slope is tested prospectively at a = 1.01–1.04
+  (`first_order_prediction.md`).
+
+**Sharp limit threshold.**
+- The Krawczyk A* combined with the K enclosure gives **R_glob^∞ ∈ [0.1985926, 0.1985927]**.
+- This identifies the global switch given (c)'s competitor exclusion, which is now certified (§3(c)):
+  - for every A ∈ [0.66, 0.71] the global minimiser is the unique critical point in U;
+  - the Krawczyk switch point (p*, q*) = (1.66808, 1.36923) at A* = 0.685445 lies in U (5e−4 from its
+    centre).
+  - It lies inside the branch-and-bound bracket [0.19738, 0.19920].
+
+## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
+
+- **Method**: the global certified Ĝ(a) branch and bound (full placement domain, relative target 1e−8), with
+  no active set assumed. The maximiser's active edges and interior critical points are classified at every
+  ε from 0.05 to 2.0 in steps of 0.025 (79 values), and each change is bisected.
+- **Result: the active set never changes.** At every one of the 79 ε, the maximiser is the same four-piece
+  corner:
+  - an inner tie at x = ±0.8;
+  - an outer tie at x = −2.0 and −1.2.
+  - Every inactive candidate is separated by a relative margin ≥ 0.97 (`corner_tracking_changes.csv` is
+    empty).
+- **Confirmed directly**: the corner solved from its two tie equations with the exact f_a equals the
+  branch-and-bound supremum, within 1e−9, at ε = 0.05, 0.3, 0.6, 1.0, 1.5 and 2.0.
+- **Resolution caveat**: a change that reverses within 0.025 in ε would be missed.
+- **Conditional minimiser**: its active pair (inner x = +0.8, outer x = −1.2) is also unchanged at all six
+  certified switches, a = 1.30–1.60 (`corner_tracking_switch_active.csv`). The small multiplier on the
+  O(−2.0) piece (0.004 at ε = 0) does not release anywhere up to ε = 2.0.
+- **So the concave approach seen in the certified refit (§5) is not an active-set change.** It occurs where
+  the corner persists, and it reflects genuine higher-order terms.
+- **Decomposition** (`corner_tracking_decomposition.csv`): with α = A_ε/A* − 1 and κ = K(ε)/K − 1,
+  R/R∞ − 1 = α + κ + ακ. At a = 1.60 the excess over the first-order line c₁ε is −0.038. It is the sum of
+  three terms:
+
+  | term | size at a = 1.60 |
+  |---|---:|
+  | product term ακ (its leading part a₁k₁ε² has certified coefficient 0.662 × (−0.377) = −0.250) | −0.060 |
+  | the switch position's own curvature (α − a₁ε) | −0.037 |
+  | the gap maximiser's own curvature (κ − k₁ε, positive) | +0.059 |
+
+  The same signs hold at all six a. These use the sharp A* (certified once (c)'s chain closed) and are
+  exploratory.
+
+## 10. Small- and large-scale limits of the conditional minimiser (lemma; any width)
+
+**Setting.**
+- The hidden output is φ_θ(x): at width 1, f_a(w₁x + b₁); at width 2, Σᵢ ṽᵢu(αᵢx + βᵢ) with ‖ṽ‖₁ = 1.
+- The logits are z = s·φ_θ(x) + b, with s = ‖w₂‖₁ > 0.
+- The data have balanced classes: n_O = n_I = n/2 and ȳ = ½. This holds for the population and for every training
+  set.
+- L*(θ; s) = min_b mean ℓ(z, y), where ℓ is the logistic loss.
+- μ_O(θ) and μ_I(θ) are the means of φ_θ over the class-1 (outer) and class-0 (inner) points. Δμ(θ) = μ_O − μ_I.
+- Var(φ_θ) is the population variance of φ_θ over all n points.
+
+**Lemma 1 (small s).** L*(θ; s) = log 2 − (s/4)·Δμ(θ) + (s²/8)·Var(φ_θ) + R(θ; s). Here |R| ≤ K·s⁴·m₄(θ), with
+m₄ = mean |φ_θ − mean φ_θ|⁴ and K an absolute constant. The s³ term vanishes.
+- *Proof.* g(s) = L*(θ; s) is smooth, because b*(s) is the unique root of mean σ(z) = ȳ, and b* is smooth by the
+  implicit-function theorem.
+  1. At s = 0 the logits are constant, so b*(0) = logit(ȳ) = 0 and g(0) = log 2.
+  2. By the envelope theorem, g′(s) = mean((σ(z*) − y)·φ). At s = 0, σ = ½, so
+     g′(0) = mean((½ − y)φ) = ½·½(μ_O + μ_I) − ½μ_O = −Δμ/4.
+  3. Next, g″(s) = mean(σ′(z*)(φ + b*′)φ). Differentiating mean σ(z*) = ȳ gives b*′ = −mean(σ′φ)/mean(σ′).
+     At s = 0, σ′ ≡ ¼, so b*′(0) = −mean φ and g″(0) = ¼·mean((φ − mean φ)φ) = ¼·Var(φ).
+  4. For the third derivative, write z* = s·(φ − mean φ) + o(s) at s → 0. The integrand involves σ″(z*), which
+     is odd at z = 0, so g‴(0) = 0.
+  5. The fourth derivative is bounded by K·m₄, using |σ⁽ᵏ⁾| ≤ 1 and the same implicit differentiation. Taylor's
+     theorem with remainder then gives the result. ∎
+- *Numerical check* (random width-2 f_a configurations): the remainder is 1e−9 at s = 1e−2 and 1e−13 at s = 1e−3,
+  scaling as s⁴.
+
+**Corollary 1 (s → 0).** Let θ*(s) be conditional minimisers staying in a compact set as s → 0. Then:
+- (i) every limit point maximises Δμ.
+- (ii) If Δμ has quadratic growth away from its maximiser set M, the limit points minimise Var(φ_θ) over M.
+- *Proof.* L* = log 2 − (s/4)[Δμ − (s/2)Var(φ) + O(s³)]. For (i), a point with Δμ below its supremum by δ loses to
+  a maximiser once s·Var < δ. For (ii), inside a neighbourhood of M, moving a distance d away from M costs about
+  c·d² in Δμ and gains at most C·s·d in Var, so the optimum stays within O(s) of M. On M itself, the next-order
+  term −(s²/8)·(−Var) selects the minimum Var. ∎
+
+**Corollary 2 (a placement threshold needs an unplaced small-scale limit).** Suppose every Var-minimising
+Δμ-maximiser has G > 0. Then for all sufficiently small s the conditional minimiser is placed, and there is no
+threshold below which it is unplaced. A threshold, in the sense of unplaced below and placed above, therefore
+requires the selected Δμ-maximiser to have G ≤ 0.
+
+**Lemma 2 (s → ∞).** Here G_n(θ) is the gap over the **data points**: the minimum of φ over the class-1 points minus
+the maximum over the class-0 points. Let Γ_n = sup_θ G_n(θ) > 0, and suppose it is attained at some θ_Γ.
+- (a) L*(θ_Γ; s) ≤ log(1 + e^{−sΓ_n/2}).
+- (b) For every θ, L*(θ; s) ≥ (1/n)·log(1 + e^{−sG_n(θ)/2}).
+- *Proof.* (a) Place b at the midpoint of the gap: every point then has margin at least sΓ_n/2. (b) For any b, the
+  extreme class-1 and class-0 points cannot both have margin above sG_n(θ)/2. The one that doesn't contributes at
+  least (1/n)·softplus(−sG_n/2). ∎
+- **Consequence**: a θ with G_n(θ) ≤ Γ_n − δ cannot be a conditional minimiser once (1/n)·e^{−s(Γ_n−δ)/2}/2 >
+  e^{−sΓ_n/2}, i.e. once s > (2/δ)·log(2n). So limit points of the minimisers, if they stay in a compact set,
+  maximise the **data** gap G_n.
+- G_n ≥ G, where G is the gap over the continuous windows. They differ by at most the Lipschitz constant of φ times
+  the data's gap from the window edges; for the 800-point population that spacing is 0.004.
+- **The condition matters.** If Γ_n is not attained, the minimisers need not converge. That is tanh at width 2:
+  α diverges and the conditional infimum is not attained.
+
+**Structure of the Δμ-maximisers (f_a).**
+- The data are symmetric about 0 in both classes, so the linear part of f_a contributes nothing to Δμ. For one unit,
+  Δμ = a·sin β·D(α), with D(α) = mean_O cos(αx) − mean_I cos(αx) over the data points.
+- **Width 1**:
+  - M = {w₁ = ±α*, sin b₁ = sign D(α*)}, with α* = argmax_{α>0} |D(α)|. α* does not depend on a.
+  - Var is the same on all of M; the members are mirror images.
+- **Width 2 (‖ṽ‖₁ = 1)**:
+  - Δμ ≤ a·maxᵢ|D(αᵢ)| ≤ a·|D(α*)|, so M = {every unit with nonzero weight has αᵢ = ±α* and ṽᵢ sin βᵢ D(αᵢ) =
+    |ṽᵢ||D(α*)|}.
+  - On M, φ = c·x + const + a·sign(D(α*))·cos(α*x), with c = Σṽᵢαᵢ. Cov(x, cos α*x) = 0 by symmetry, so
+    Var(φ) = c²Var(x) + a²Var(cos α*x).
+  - The Var-minimising member has **c = 0**, which needs two units with ṽ₁α₁ = −ṽ₂α₂: the cosine pair. It is
+    unavailable at width 1.
+
+### 10.1 The second-order selection, in full (added at the author's request, 2026-09-24)
+
+**The expansion, with every constant.**
+- Let g(s) = L*(θ; s). The data are balanced (ȳ = ½), and b*(s) is the unique root of m(s, b) = mean σ(sφ + b) − ½.
+- **g(0) = log 2.** At s = 0, b* = 0.
+- **g′(0) = −Δμ/4.** By the envelope theorem, g′(s) = mean((σ(z*) − y)·φ), where ∂L/∂b = 0 at b*. At s = 0 this is
+  mean((½ − y)φ) = ¼(μ_O + μ_I) − ½μ_O = −Δμ/4.
+- **g″(0) = ¼·Var(φ).** g″(s) = mean(σ′(z*)·(φ + b*′)·φ).
+  - Differentiating m(s, b*(s)) = 0 gives mean(σ′(z*)(φ + b*′)) = 0, so b*′ = −mean(σ′φ)/mean(σ′).
+  - At s = 0, σ′ ≡ ¼, so b*′(0) = −φ̄ and g″(0) = ¼·mean((φ − φ̄)φ) = ¼·Var(φ).
+- **g‴(0) = 0.** g‴(s) = mean(σ″(z*)(φ + b*′)²φ) + mean(σ′(z*)·b*″·φ).
+  - Differentiating the identity mean(σ′(z*)(φ + b*′)) = 0 once more gives
+    mean(σ″(z*)(φ + b*′)²) + b*″·mean(σ′(z*)) = 0.
+  - At s = 0, z* ≡ 0 and σ″(0) = 0. So b*″(0) = 0, and both terms of g‴(0) vanish.
+- **Hence L*(θ; s) = log 2 − (s/4)·Δμ(θ) + (s²/8)·Var(φ_θ) + O(s⁴).**
+  - The remainder is bounded by K·s⁴·mean|φ − φ̄|⁴, with |σ⁽ᵏ⁾| ≤ 1.
+  - Checked numerically: 1e−9 at s = 1e−2 and 1e−13 at s = 1e−3.
+
+**Why the variance term favours the cancelling pair (f_a, width 2).**
+- On the first-order maximiser set M, every unit with nonzero weight has α = ±α* and sin β = ±1, aligned so that
+  the oscillatory part of φ is a·sign(D*)·cos(α*x) in every case. Δμ is the same on all of M.
+- The members differ only in the **linear part** c·x, with c = Σṽᵢαᵢ.
+  - The linear part contributes nothing to Δμ, because both classes are symmetric about 0.
+  - It adds c²·Var(x) to Var(φ), because Cov(x, cos α*x) = 0 by the same symmetry.
+- So on M, Var(φ) = c²·Var(x) + a²·Var(cos α*x). The s² term penalises the linear part and nothing else.
+- The minimum is at c = 0. That needs two units with ṽ₁α₁ = −ṽ₂α₂: the cancelling pair φ = const + a·sign(D*)·cos(α*x).
+  - A single unit has c = ±α* ≠ 0 and so has strictly larger Var.
+  - At width 1 no cancellation is possible.
+- **The second-order gap between the single unit and the pair is (s²/8)·α*²·Var(x).** It is small, which is why a
+  finite restart budget at very small s can retain a single unit; the validated search's independent check exists
+  for that reason.
+
+**The criterion.** Suppose Γ_n > 0 is attained (Lemma 2), so the minimisers are placed at large s. Then **output
+scale gates placement, meaning the conditional minimiser is unplaced below some scale and placed above it, if and
+only if the small-scale conditional minimiser is unplaced.** When the first-order maximisers tie, "the small-scale
+conditional minimiser" means the one the second-order term selects.
+- *If*: unplaced at small s and placed at large s implies a sign change of G along the minimisers.
+- *Only if*: Corollary 2.
+- The criterion concerns the conditional minimiser, the object of the paper's threshold. Whether training reaches
+  it is a separate question, tested by W4 at width 1 and by the fixed-scale design below at width 2.
+
+**The three cases, and how each was established.**
+
+| case | small-scale conditional minimiser | gating | evidence |
+|---|---|---|---|
+| width 1, f_a (a = 1.30–1.60) | unplaced (G = −3.66 … −3.35; `scale_limits_width1.csv`) | **yes**: certified thresholds | registered consistency check, passed |
+| width 2, f_a (a = 1.30, 1.50) | placed: the cancelling pair (G = +0.890, +1.026) | **none** | registered prediction (`scale_limits_prediction.md`); decided by the second-order selection; direct check at finite small scale below |
+| width 2, tanh | supremum Δμ = 1 **not attained** (proved: Δμ < 1 at every finite parameter); the Var-selected near-maximisers are the symmetric step pair, placed, with G₊ = 0.762, 0.964, 0.99933 and 0.9999998 at box sizes A = 5, 10, 20 and 40; single steps tie at first order and are unplaced | **none** in the limit sense; outside the criterion's attainment hypothesis | registered (`scale_limits_tanh_prediction.md`); **registered outcome "neither"**: every T1 number held, but the boundary condition failed at A = 40, where 9 of 1,107 near-maximisers inside the 1e−9 tie sit at 0.991–0.999·A (a criterion flaw, disclosed); recorded as "neither" by the author's decision, with no re-registration; non-attainment is proved analytically; earlier exploratory pilot scan (`width2_pilot_scan.csv`) |
