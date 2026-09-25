@@ -1,0 +1,19 @@
+{
+ "runs": 80,
+ "placed_at_init": 0,
+ "crossed": 71,
+ "median_ratio_at_cross": 6.8187242931004255e-06,
+ "validity_ratio_in_width1_range": false,
+ "criteria": {
+  "verdict": "FAIL",
+  "n": 71,
+  "frac_above_s_hi": 0.5633802816901409,
+  "median_ratio_s_hi": 10.069264605716437,
+  "ci_median_minus_1": [
+   -0.4120128792099834,
+   9.523740104106455
+  ],
+  "median_ratio_s_lo": 10.438131255437893
+ },
+ "T2-3b": "UNRESOLVED (median ratio 6.819e-06 outside (0.0014, 0.023))"
+}
