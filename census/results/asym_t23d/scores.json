@@ -1,0 +1,19 @@
+{
+ "runs": 80,
+ "placed_at_init": 1,
+ "crossed": 79,
+ "own_undefined": 0,
+ "criteria": {
+  "verdict": "FAIL",
+  "n": 79,
+  "median_abs_log_err": 0.019227810157313556,
+  "criterion_i": true,
+  "diff_mean": -0.5365903899477935,
+  "diff_lo": -1.0394709710192918,
+  "diff_hi": 0.006424760167217728,
+  "criterion_ii": false,
+  "median_cross_over_own": 0.9813646555651192,
+  "median_cross_over_pop": 10.679695347674597
+ },
+ "T2-3d": "FAIL"
+}

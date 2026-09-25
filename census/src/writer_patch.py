@@ -1083,6 +1083,8 @@ CENTRAL_FAILS = {
     "lag2-L2'": "deconfounded proportionality fails (0.974 / 0.958).",
     "4b-ID": "inherited displacement: neither teleport nor reset removes half the residual (the competing outcome held).",
     "4b-OM": "optimiser memory: likewise, neither arm removes half the residual.",
+    "T2-3d": "slowed regime, fresh seeds: the width-1 own-sample threshold has median |log err| 0.019 but does not beat "
+             "the population width-2 threshold (paired interval [-1.04, +0.006]); crossings bimodal.",
     "T2-3": "asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x "
             "the threshold scale, above the registered bound of 1.25.",
     "nogating": "width 2, symmetric windows, fixed-scale training: placement is gated at small held scale (placed "
@@ -1163,6 +1165,8 @@ def wp15():
     tb_f = json.loads((RESULTS / "asym_t23b_frozen.json").read_text())
     e2 = json.loads((RESULTS / "asym_posthoc" / "exploratory2.json").read_text())
     tc = json.loads((RESULTS / "asym_t23c" / "scores.json").read_text())
+    t3d = json.loads((RESULTS / "asym_t23d" / "scores.json").read_text())["criteria"]
+    t3dd = json.loads((RESULTS / "asym_t23d" / "descriptive.json").read_text())
     _ma = pd.read_csv(RESULTS / "width2_diagnosis" / "metrics_all.csv")
     dg_sel = dict(zip(_ma[_ma.predictor == "P5"].arm, _ma[_ma.predictor == "P5"].median_abs_log_err))
     dg_p3 = dict(zip(_ma[_ma.predictor == "P3"].arm, _ma[_ma.predictor == "P3"].median_abs_log_err))
@@ -1293,6 +1297,23 @@ The rules and the gate were committed before any result (`width2_diagnosis_gate.
 IDs: {_id("Item 2 gate STOP", "Item 2 selected P5", "Item 2 P5 T2-3 error", "Item 2 P3 T2-3b error", "Item 2 P3 T2-3c error")}.
 **Do not say** that any predictor explains where width-2 training crosses, or that width-2 crossings follow the
 width-1 threshold. This is a post hoc, 10-seed observation in the slowed arms only, and it failed the gate.
+
+**T2-3d (registered as designed after the item 2 diagnosis; amendment 4, 394ebcc): the slowed regime only.**
+- φ₂ = 0.01778 (T2-3c's), fresh seeds 600,480–600,559.
+- Each seed's width-1 own-sample threshold was frozen with a hash before any training (68323b2).
+- Criteria: (i) median |log error| ≤ 0.10, and (ii) it beats the population width-2 threshold (paired interval below 0).
+- **Result: FAIL.**
+  - (i) holds: {t3d["median_abs_log_err"]:.3f}. The median crossing is {t3d["median_cross_over_own"]:.2f}× the width-1 own
+    threshold.
+  - (ii) fails: [{t3d["diff_lo"]:.2f}, {t3d["diff_hi"]:+.4f}] contains 0.
+- The crossings are bimodal: {t3dd["n_near_own"]} of {t3dd["n"]} runs cross at their width-1 own threshold, and
+  {t3dd["n_pop_beats_own"]} cross early at small scale (s = {t3dd["early_small_scale_range"][0]:.3f}–{t3dd["early_small_scale_range"][1]:.2f}).
+- **Scope:** T2-3d covers the slowed regime only. The full-speed regime (T2-3) remains unexplained.
+IDs: {_id("Track 2 T2-3d FAIL", "Track 2 T2-3d median err", "Track 2 T2-3d diff hi", "Track 2 T2-3d bimodal")}.
+**Say (T2-3d):** "A registered test designed after the diagnosis found that, in the slowed regime, the median run crosses at
+its own width-1 threshold, but about 40% of runs cross early at small scale, so the registered comparison with the
+width-2 threshold fails. The full-speed regime remains unexplained."
+**Do not say** that the width-1 threshold predicts width-2 crossings, or that T2-3d rescues T2-3, T2-3b or T2-3c.
 
 **Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
 failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as

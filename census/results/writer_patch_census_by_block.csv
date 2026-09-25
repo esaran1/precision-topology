@@ -22,7 +22,7 @@ block,R-collapse 09-12,post hoc (census),0,0,1,0,1
 block,R-collapse 09-12,registered rule,0,1,1,0,2
 block,S2 (withdrawn),registered rule,1,1,0,0,2
 block,SGD own thresholds (Track 4),registered rule,3,0,0,0,3
-block,asymmetric windows (Track 2),registered rule,2,1,0,2,5
+block,asymmetric windows (Track 2),registered rule,2,2,0,2,6
 block,c1 first order,registered rule,1,0,0,2,3
 block,collapse 09-12,post hoc (census),0,1,0,0,1
 block,collapse 09-12,registered rule,1,2,0,0,3
@@ -67,6 +67,7 @@ registration_file,results/asym_registration.md,registered rule,2,0,0,0,2
 registration_file,results/asym_registration.md (amendment 1),registered rule,0,1,0,0,1
 registration_file,results/asym_registration.md (amendment 2),registered rule,0,0,0,1,1
 registration_file,results/asym_registration.md (amendment 3),registered rule,0,0,0,1,1
+registration_file,results/asym_registration.md (amendment 4),registered rule,0,1,0,0,1
 registration_file,results/basin_prediction.md,registered rule,1,4,0,0,5
 registration_file,results/blockA5d_k1_prediction.md,registered rule,2,1,0,2,5
 registration_file,results/blockA5d_prediction.md,registered rule,1,2,0,2,5

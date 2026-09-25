@@ -209,3 +209,4 @@ nogating,width 2 no-gating test (Track 7),registered rule,FAIL,central,width2
 T2-3c,asymmetric windows (Track 2),registered rule,UNRESOLVED,central,width2
 TS-1,timescale prospective test (Task B),registered rule,PASS,central,threshold
 TS-2,timescale prospective test (Task B),registered rule,PASS,central,threshold
+T2-3d,asymmetric windows (Track 2),registered rule,FAIL,central,width2

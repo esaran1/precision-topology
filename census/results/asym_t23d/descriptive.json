@@ -1,0 +1,11 @@
+{
+ "label": "descriptive, beside the registered verdict",
+ "n": 79,
+ "n_pop_beats_own": 31,
+ "n_near_own": 47,
+ "early_small_scale_range": [
+  0.0163958288960502,
+  0.4172814901435615
+ ],
+ "median_err_near_own_group": 0.011623268814352418
+}

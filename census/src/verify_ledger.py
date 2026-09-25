@@ -477,27 +477,27 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 210.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 211.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
-    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 15.0, 0)
+    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 16.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 232.0, 0)
-    for v, n in (("PASS", 110), ("FAIL", 75), ("PARTIAL", 13), ("UNRESOLVED", 34)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 233.0, 0)
+    for v, n in (("PASS", 110), ("FAIL", 76), ("PARTIAL", 13), ("UNRESOLVED", 34)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 95), ("FAIL", 66), ("PARTIAL", 15), ("UNRESOLVED", 34)):
+    for v, n in (("PASS", 95), ("FAIL", 67), ("PARTIAL", 15), ("UNRESOLVED", 34)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (194, 92, 60, 8, 34)),
+    for scope, want in (("scored by registered rules", (195, 92, 61, 8, 34)),
                         ("assigned post hoc in the census", (16, 3, 6, 7, 0)),
-                        ("since 2026-09-23: scored by registered rules", (43, 26, 13, 0, 4)),
+                        ("since 2026-09-23: scored by registered rules", (44, 26, 14, 0, 4)),
                         ("since 2026-09-23: assigned post hoc", (3, 0, 0, 3, 0)),
-                        ("by registered unit: scored by registered rules", (218, 107, 69, 8, 34)),
+                        ("by registered unit: scored by registered rules", (219, 107, 70, 8, 34)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (67, 41, 22, 0, 4)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (68, 41, 23, 0, 4)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
@@ -1178,8 +1178,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 210", float(wp4[wp4.by == "block"].n.sum()), 210.0, 0)
-    chk("WP-4: by-file rows sum to 210", float(wp4[wp4.by == "registration_file"].n.sum()), 210.0, 0)
+    chk("WP-4: by-block rows sum to 211", float(wp4[wp4.by == "block"].n.sum()), 211.0, 0)
+    chk("WP-4: by-file rows sum to 211", float(wp4[wp4.by == "registration_file"].n.sum()), 211.0, 0)
     oth_ = pd.read_csv(R / "registration_census_v4_gates_and_reported.csv")
     chk("width-2 verdict listed as a registered decision rule, not a prediction",
         float((oth_.id == "sl-width2").sum() == 1
@@ -1498,7 +1498,7 @@ def harsh_review_checks() -> None:
     print("WP-14 census by relevance (A4)")
     cr = pd.read_csv(R / "census_relevance.csv")
     n = lambda **k: float(len(cr.query(" and ".join(f"{a} == {b!r}" for a, b in k.items()))))
-    chk("A4 FAIL registered central", n(verdict="FAIL", scoring="registered rule", relevance="central"), 25.0, 0)
+    chk("A4 FAIL registered central", n(verdict="FAIL", scoring="registered rule", relevance="central"), 26.0, 0)
     chk("A4 FAIL registered peripheral", n(verdict="FAIL", scoring="registered rule", relevance="peripheral"), 35.0, 0)
     chk("A4 FAIL post hoc central", n(verdict="FAIL", scoring="post hoc (census)", relevance="central"), 2.0, 0)
     chk("A4 FAIL post hoc peripheral", n(verdict="FAIL", scoring="post hoc (census)", relevance="peripheral"), 4.0, 0)
@@ -1506,7 +1506,7 @@ def harsh_review_checks() -> None:
     chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
     chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 9.0, 0)
-    chk("A4 rows", float(len(cr)), 210.0, 0)
+    chk("A4 rows", float(len(cr)), 211.0, 0)
 
 
 def tracks_checks() -> None:
@@ -1632,6 +1632,11 @@ def tracks_checks() -> None:
     chk("Item 1 within-a slope a=1.50", s1_["slope_within_a_all"]["1.50"], 3.09, 0.006)
     chk("Item 1 partial Spearman", s1_["partial_spearman_all"], 0.51, 0.006)
     chk("Item 1 replays reproduce", float(pd.read_csv(R / "timescale_consistency" / "runs.csv").reproduced.all()), 1.0, 0)
+    t3d_ = json.loads((R / "asym_t23d" / "scores.json").read_text())
+    chk("Track 2 T2-3d FAIL", float(t3d_["T2-3d"] == "FAIL"), 1.0, 0)
+    chk("Track 2 T2-3d median err", t3d_["criteria"]["median_abs_log_err"], 0.019, 0.0006)
+    chk("Track 2 T2-3d diff hi", t3d_["criteria"]["diff_hi"], 0.0064, 0.00006)
+    chk("Track 2 T2-3d bimodal", float(json.loads((R / "asym_t23d" / "descriptive.json").read_text())["n_pop_beats_own"]), 31.0, 0)
     print("Block 4b correction and state audit")
     bc_ = pd.read_csv(R / "residual_mechanism_corrected" / "scores.csv")
     vv_ = bc_[bc_.arm == "VERDICT"]

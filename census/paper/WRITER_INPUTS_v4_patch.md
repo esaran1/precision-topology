@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 194 scored by their registered rules: 92 PASS, 60 FAIL, 8 PARTIAL,
+- **Headline**: 195 scored by their registered rules: 92 PASS, 61 FAIL, 8 PARTIAL,
   34 UNRESOLVED.
 - **Post hoc**: 16 assigned post hoc: 3 / 6 / 7 / 0.
-- **Total**: 210 registered predictions.
+- **Total**: 211 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -202,7 +202,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | R-collapse 09-12 | registered rule | 0 | 1 | 1 | 0 | 2 |
 | S2 (withdrawn) | registered rule | 1 | 1 | 0 | 0 | 2 |
 | SGD own thresholds (Track 4) | registered rule | 3 | 0 | 0 | 0 | 3 |
-| asymmetric windows (Track 2) | registered rule | 2 | 1 | 0 | 2 | 5 |
+| asymmetric windows (Track 2) | registered rule | 2 | 2 | 0 | 2 | 6 |
 | c1 first order | registered rule | 1 | 0 | 0 | 2 | 3 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -251,6 +251,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/asym_registration.md (amendment 1) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/asym_registration.md (amendment 2) | registered rule | 0 | 0 | 0 | 1 | 1 |
 | results/asym_registration.md (amendment 3) | registered rule | 0 | 0 | 0 | 1 | 1 |
+| results/asym_registration.md (amendment 4) | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/basin_prediction.md | registered rule | 1 | 4 | 0 | 0 | 5 |
 | results/blockA5d_k1_prediction.md | registered rule | 2 | 1 | 0 | 2 | 5 |
 | results/blockA5d_prediction.md | registered rule | 1 | 2 | 0 | 2 | 5 |
@@ -928,12 +929,12 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 7 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 45 | 25 | 1 | 9 |
+| registered rule | central | 45 | 26 | 1 | 9 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
 
-**Failed central predictions (27: 25 under the registered rule, 2 by post hoc scoring), with one line each:**
+**Failed central predictions (28: 26 under the registered rule, 2 by post hoc scoring), with one line each:**
 
 *threshold* (18):
 - `H-3`: growth-rate dose-response validity gate failed (m = 1 placed 0.500 vs control 0.925); block inconclusive.
@@ -965,10 +966,11 @@ IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL pos
 - `G-1`: training-free out-of-distribution windows: 6 of 10 within 15%, short of the registered count.
 - `G-3b`: sub-claim (far-outer window threshold >= base) was wrong by a provable inequality: a registration error.
 
-*width2* (3):
+*width2* (4):
 - `sl-tanh`: tanh at width 2: the boundary condition failed at A = 40 (criterion flaw); recorded 'neither'.
 - `T2-3`: asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x the threshold scale, above the registered bound of 1.25.
 - `nogating`: width 2, symmetric windows, fixed-scale training: placement is gated at small held scale (placed 0.46 at R2 = 0.003, rising to 0.98-0.99 at 0.1, both a), against the predicted no gating.
+- `T2-3d`: slowed regime, fresh seeds: the width-1 own-sample threshold has median |log err| 0.019 but does not beat the population width-2 threshold (paired interval [-1.04, +0.006]); crossings bimodal.
 
 **The pattern, stated plainly.** The central failures cluster in the **training-side** claims, and most of them
 concern the **residual**, i.e. where crossings sit relative to the threshold and why:
@@ -986,7 +988,7 @@ The rest are:
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
-**Say:** "Of 66 failed predictions (60 under the registered rule, 6 by post hoc scoring), 27 bear on a central
+**Say:** "Of 67 failed predictions (61 under the registered rule, 6 by post hoc scoring), 28 bear on a central
 claim; most of these concern the residual's mechanism, which the paper reports as open, and one is the width-2 training
 prediction on asymmetric windows (WP-15)." **Do not say** "the central claims never failed" or "the failures are
 peripheral". Do not present the relevance classification as registered;
@@ -1114,6 +1116,23 @@ The rules and the gate were committed before any result (`width2_diagnosis_gate.
 IDs: `Item 2 gate STOP`; `Item 2 selected P5`; `Item 2 P5 T2-3 error`; `Item 2 P3 T2-3b error`; `Item 2 P3 T2-3c error`.
 **Do not say** that any predictor explains where width-2 training crosses, or that width-2 crossings follow the
 width-1 threshold. This is a post hoc, 10-seed observation in the slowed arms only, and it failed the gate.
+
+**T2-3d (registered as designed after the item 2 diagnosis; amendment 4, 394ebcc): the slowed regime only.**
+- φ₂ = 0.01778 (T2-3c's), fresh seeds 600,480–600,559.
+- Each seed's width-1 own-sample threshold was frozen with a hash before any training (68323b2).
+- Criteria: (i) median |log error| ≤ 0.10, and (ii) it beats the population width-2 threshold (paired interval below 0).
+- **Result: FAIL.**
+  - (i) holds: 0.019. The median crossing is 0.98× the width-1 own
+    threshold.
+  - (ii) fails: [-1.04, +0.0064] contains 0.
+- The crossings are bimodal: 47 of 79 runs cross at their width-1 own threshold, and
+  31 cross early at small scale (s = 0.016–0.42).
+- **Scope:** T2-3d covers the slowed regime only. The full-speed regime (T2-3) remains unexplained.
+IDs: `Track 2 T2-3d FAIL`; `Track 2 T2-3d median err`; `Track 2 T2-3d diff hi`; `Track 2 T2-3d bimodal`.
+**Say (T2-3d):** "A registered test designed after the diagnosis found that, in the slowed regime, the median run crosses at
+its own width-1 threshold, but about 40% of runs cross early at small scale, so the registered comparison with the
+width-2 threshold fails. The full-speed regime remains unexplained."
+**Do not say** that the width-1 threshold predicts width-2 crossings, or that T2-3d rescues T2-3, T2-3b or T2-3c.
 
 **Say (T2-3, T2-3b and T2-3c, in order):** "The registered width-2 training prediction on asymmetric windows, T2-3,
 failed: runs crossed at a median 3.3× the threshold. Two follow-ups were registered after that failure, each labelled as
