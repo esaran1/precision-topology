@@ -1795,6 +1795,18 @@ def lag_law_checks() -> None:
     chk("1B Adam contrast free steps max", float(fe.steps_growth_to_cross.max()), 3265.5, 0.5)
     gr = [float(rp.loc[a, "growth_per_step"] / fe.loc[a, "growth_per_step"]) for a in (1.3, 1.5)]
     chk("1B Adam contrast growth ratio min", min(gr), 2.3, 0.06); chk("1B Adam contrast growth ratio max", max(gr), 2.7, 0.06)
+    sw2 = pd.read_csv(R / "ramp2" / "design_sweep.csv")
+    chk("ramp2 no admissible gamma", float(pd.read_csv(R / "ramp2" / "design.csv").cell.max()), -1.0, 0)
+    chk("ramp2 slow eta*lambda min", float(sw2[sw2.gamma <= 1.8e-4].median_eta_lambda.min()), 4.4, 0.06)
+    chk("ramp2 slow eta*lambda max", float(sw2[sw2.gamma <= 1.8e-4].median_eta_lambda.max()), 11.5, 0.06)
+    chk("ramp2 fast crossings max", float(sw2[sw2.median_eta_lambda <= 0.5].n_crossed.max()), 3.0, 0)
+    gf = json.loads((R / "act_general" / "gelu_rule_feasibility.json").read_text())
+    chk("GELU rule earliest crossing", gf["earliest_crossing_s"], 0.0043, 0.00006)
+    chk("GELU rule runs starting below", float(gf["runs_starting_below_earliest_crossing"]), 0.0, 0)
+    chk("GELU rule init median w2", gf["init_abs_w2_median"], 0.54, 0.006)
+    chk("GELU rule final at init", float(gf["final_at_init_n"]), 34.0, 0)
+    chk("GELU rule final at init pct", 100 * gf["final_at_init_frac"], 26.0, 0.6)
+    chk("GELU rule infeasible", float(gf["rule_feasible"]), 0.0, 0)
     for x in V["R4"]:
         a = round(x["a"], 2)
         chk(f"R4 a={a:.2f}", float(x["R4"] == "PASS"), 1.0, 0)

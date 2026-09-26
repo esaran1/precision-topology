@@ -1214,6 +1214,10 @@ Registration: `results/ramp_registration.md` (c4b4c6d). Own thresholds were froz
   - The frozen-P relaxation time is then 0.17–0.19 steps, against 7.8–15.0 steps in free training. So ηλ_min > 1, and the linearisation of §13.1 (small ηλ, P fixed over the relaxation) does not apply. This is case (iv)(c).
   - The growth rate is only 2.3–2.7× the free rate, and the branch and winding are the same, so neither explains the difference.
   - The law's Adam form therefore requires a stationary preconditioner with ηλ_min ≪ 1. Free training meets this; the ramp does not.
+- **The Adam ramp from initialisation (follow-up; not registered, infeasible by its design rules; `src/ramp2.py`).**
+  - A γ was admissible only if ≥ 6 of 8 pilot runs cross and the median ηλ_min at crossing is ≤ 0.5. No γ qualified.
+  - Slow ramps let v̂ collapse (ηλ_min 4.4–11.5). Where ηλ_min ≤ 0.5, at most 3 of 8 runs cross.
+  - The law's Adam form therefore has support only in free training, where growth is not imposed.
 - **R4 (free Adam at η = 0.01, 0.005, 0.0025): PASS at both a.**
   - a = 1.30: median residuals 0.0296, 0.0304, 0.0308 (tolerance ±0.0100; 39 of 40 crossed at each η).
   - a = 1.50: median residuals 0.0619, 0.0625, 0.0647 (tolerance ±0.0155; 39 of 40 crossed at each η).

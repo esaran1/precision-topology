@@ -1792,6 +1792,10 @@ def wp24():
     else:
         r4s = f"R4: {r4}."
     n_m = int(pr.mirror.sum())
+    sw2 = pd.read_csv(RESULTS / "ramp2" / "design_sweep.csv")
+    slow = sw2[sw2.gamma <= 1.8e-4]; fast = sw2[sw2.median_eta_lambda <= 0.5]
+    r2s = {"slow_el_min": float(slow.median_eta_lambda.min()), "slow_el_max": float(slow.median_eta_lambda.max()),
+           "fast_cross_max": int(fast.n_crossed.max())}
     ac = pd.read_csv(RESULTS / "ramp" / "adam_contrast.csv"); ac["a"] = ac.a.round(2)
     rp = ac[ac.source.str.startswith("ramp")].set_index("a"); fe = ac[ac.source.str.startswith("free")].set_index("a")
     vr = [float(fe.loc[a, c] / rp.loc[a, c]) for a in (1.3, 1.5) for c in ("sqrt_v_w1", "sqrt_v_b1", "sqrt_v_b2")]
@@ -1942,6 +1946,22 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
 
 {adam_par}
 
+### Follow-up requested after scoring: the Adam ramp from initialisation (NOT registered: infeasible by its design rules)
+
+- **Design, fixed before any registered run** (`src/ramp2.py`; `ramp2/design_sweep.csv`; pilot seeds 869,100–869,107,
+  predictions only):
+  - no warm-up; standard initialisation; s = 0.5·e^{{γt}};
+  - each run to be scored against its tracked-branch switch;
+  - γ admissible only if ≥ 6 of 8 pilot runs cross **and** the median ηλ_min(P^{{1/2}}HP^{{1/2}}) at crossing is ≤ 0.5,
+    so that the frozen-preconditioner law can apply.
+- **Outcome of the design sweep:** no admissible γ at either a.
+  - Where most runs cross (γ ≤ 1.8e-4), v̂ collapses during the slow ramp and ηλ_min is {r2s["slow_el_min"]:.1f}–{r2s["slow_el_max"]:.1f}.
+  - Where ηλ_min ≤ 0.5 (γ ≈ 1e-3), at most {r2s["fast_cross_max"]} of 8 runs cross.
+- So no forced exponential ramp at these rates gives a test in the law's Adam regime, and nothing was registered or
+  run. Free training meets the condition because its growth is not imposed (relaxation 7.8–15 steps; R4, 1A).
+- **Say:** "Adam's version of the law needs a stationary preconditioner. A forced ramp either lets it collapse (slow ramps)
+  or outruns the unit (fast ramps), so the law's Adam form is supported by free training only."
+
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
 {r4s}
@@ -2009,6 +2029,7 @@ def wp25():
     sec = ts[ts.arm == "secondary_pooled_200"].set_index("act")
     S2 = json.loads((D / "posthoc2_summary.json").read_text()); sw = S2["sine_width1"]
     A2 = {x["act"]: x for x in S2["acts"]}; ga, sa, ma = A2["gelu"], A2["silu"], A2["mish"]
+    gf = json.loads((D / "gelu_rule_feasibility.json").read_text())
     import re as _re
     notes = ga["no_switch_notes"]
     n_lost = sum(int(m) for m in _re.findall(r"continuation lost at s=[0-9.]+: (\d+)", notes))
@@ -2106,6 +2127,13 @@ from its crossing state, as for the ramp).
   - The other {ga["n_no_switch_on_branch"]} GELU crossings all happen early (s ≤ {ga["no_switch_s_cross_max"]:.2f}, against a population threshold of
     6.64), from states far from the retained branch. Continuing their branch from the crossing finds no switch:
     {ns}.
+- **Requested follow-up, a GELU prospective test with an early-scale branch rule: NOT registered (infeasible).**
+  - The rule scale had to lie below the earliest crossing observed, s = {gf["earliest_crossing_s"]:.4f}. None of the
+    {gf["n_runs"]} existing runs starts below it (median initial |w₂| is {gf["init_abs_w2_median"]:.2f}), so the only
+    admissible "early scale" is initialisation.
+  - There, the branch classification is final for only {gf["final_at_init_n"]} of {gf["n_crossing"]} crossing runs
+    ({100 * gf["final_at_init_frac"]:.0f}%), against the required 95% (`src/gelu_rule_feasibility.py`).
+  - Nothing was registered or trained.
 - **SiLU and Mish (condition not met):**
   - χ at crossing is about 10× beyond the largest χ at which the sine law was verified.
   - Against the tracked branch, the residual has the wrong sign for κχ, and only {100 * sa["frac_abs_rb_le_0.01"]:.0f}% and

@@ -1674,6 +1674,22 @@ Three things could differ between the Adam ramp and free Adam training, where th
 - **Branch.** The ramp runs sit on the same windings as free training (k = −1 at a = 1.30, k = 0 at a = 1.50). They are all on the non-mirror branch, where κ is the same. The post hoc scoring already uses each run's tracked branch, and SGD passes on the same branches.
 - **So:** the law's Adam form needs a preconditioner that is stationary and small enough that ηλ_min ≪ 1 over the relaxation. Free training satisfies this; the ramp, started at a stationary point, does not. This is a limit of the frozen-preconditioner linearisation (math note §13.3(iv)(c)), identified after scoring.
 
+### Follow-up requested after scoring: the Adam ramp from initialisation (NOT registered: infeasible by its design rules)
+
+- **Design, fixed before any registered run** (`src/ramp2.py`; `ramp2/design_sweep.csv`; pilot seeds 869,100–869,107,
+  predictions only):
+  - no warm-up; standard initialisation; s = 0.5·e^{γt};
+  - each run to be scored against its tracked-branch switch;
+  - γ admissible only if ≥ 6 of 8 pilot runs cross **and** the median ηλ_min(P^{1/2}HP^{1/2}) at crossing is ≤ 0.5,
+    so that the frozen-preconditioner law can apply.
+- **Outcome of the design sweep:** no admissible γ at either a.
+  - Where most runs cross (γ ≤ 1.8e-4), v̂ collapses during the slow ramp and ηλ_min is 4.4–11.5.
+  - Where ηλ_min ≤ 0.5 (γ ≈ 1e-3), at most 3 of 8 runs cross.
+- So no forced exponential ramp at these rates gives a test in the law's Adam regime, and nothing was registered or
+  run. Free training meets the condition because its growth is not imposed (relaxation 7.8–15 steps; R4, 1A).
+- **Say:** "Adam's version of the law needs a stationary preconditioner. A forced ramp either lets it collapse (slow ramps)
+  or outruns the unit (fast ramps), so the law's Adam form is supported by free training only."
+
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
 | a | crossed (η = 0.01 / 0.005 / 0.0025) | median residual | tolerance | R4 |
@@ -1816,6 +1832,13 @@ from its crossing state, as for the ramp).
   - The other 15 GELU crossings all happen early (s ≤ 0.45, against a population threshold of
     6.64), from states far from the retained branch. Continuing their branch from the crossing finds no switch:
     no sign change within 400 continuation steps in 3, continuation lost in 11, gap undecided at the cell cap in 1.
+- **Requested follow-up, a GELU prospective test with an early-scale branch rule: NOT registered (infeasible).**
+  - The rule scale had to lie below the earliest crossing observed, s = 0.0043. None of the
+    200 existing runs starts below it (median initial |w₂| is 0.54), so the only
+    admissible "early scale" is initialisation.
+  - There, the branch classification is final for only 34 of 132 crossing runs
+    (26%), against the required 95% (`src/gelu_rule_feasibility.py`).
+  - Nothing was registered or trained.
 - **SiLU and Mish (condition not met):**
   - χ at crossing is about 10× beyond the largest χ at which the sine law was verified.
   - Against the tracked branch, the residual has the wrong sign for κχ, and only 31% and

@@ -1,0 +1,13 @@
+{
+ "n_runs": 200,
+ "n_crossing": 132,
+ "earliest_crossing_s": 0.0042587489883689,
+ "crossings_below_0.05": 3,
+ "crossings_below_half_s_glob": 18,
+ "init_abs_w2_median": 0.5372717380523682,
+ "runs_starting_below_earliest_crossing": 0,
+ "frac_starting_below_earliest_crossing": 0.0,
+ "final_at_init_frac": 0.25757575757575757,
+ "final_at_init_n": 34,
+ "rule_feasible": false
+}
