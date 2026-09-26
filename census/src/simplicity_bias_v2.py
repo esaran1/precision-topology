@@ -369,6 +369,236 @@ def sha256_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+# ------------------------------------------------------------------------------------------ freeze (gate pass only)
+def _torch():
+    import torch
+    torch.set_num_threads(1)
+    return torch
+
+
+def _values(X):
+    return [np.unique(X[:, j]) for j in range(2)], [np.array([(X[:, j] == t).sum() for t in np.unique(X[:, j])], float)
+                                                     for j in range(2)]
+
+
+def rho2_torch(W, c, v, X, torch):
+    """ρ₂ of φ(x) = Σ vₖ tanh(wₖ·x + cₖ) (scale-invariant, identical to sb.feature_usage), differentiable."""
+    Xt = torch.as_tensor(X)
+    base = torch.tanh(Xt @ W.T + c) @ v
+    vals, cnts = _values(X)
+    V = []
+    for j in range(2):
+        Xr = Xt.unsqueeze(0).repeat(len(vals[j]), 1, 1)
+        Xr[:, :, j] = torch.as_tensor(vals[j])[:, None]
+        F = torch.tanh(Xr @ W.T + c) @ v
+        V.append((torch.as_tensor(cnts[j])[:, None] * (F - base[None]).abs()).sum() / len(X) ** 2)
+    return V[1] / (V[0] + V[1])
+
+
+def to_train(p, s, X, y):
+    W, c, eta = sb.unpack(p[None]); W, c = W[0], c[0]
+    v = s * sb.vtilde(eta)[0]
+    Z0 = s * sb.phi(p[None], X)
+    b = float(profile_b_batch(Z0, y)[0])
+    return W, c, v, b
+
+
+def refine(p0, s, X, y, lam, gtol=1e-11):
+    P, L, G, it = bfgs_batch(lambda Q, rows: loss_grad(Q, s, X, y, lam), np.asarray(p0, float)[None], gtol=gtol,
+                             maxit=5000)
+    return P[0], float(L[0]), float(np.abs(G[0]).max())
+
+
+def run_freeze():
+    torch = _torch()
+    X, y = data(); lam = chosen_lambda()
+    summ = json.loads((OUT / "pilot_summary.json").read_text())
+    g = summ["gate"]
+    if not g["pass"]:
+        raise SystemExit("gate did not pass: nothing is frozen")
+    s_q = g["s_q"]; q = summ["q_rule"]["q"]
+    ends = [r for fam in ("A", "B") for r in _rows(fam)
+            if r["s"] in g["per_set"][fam]["bracket"]]
+    best = None
+    for r in ends:
+        p, L, gn = refine(np.array(r["p"]), s_q, X, y, lam)
+        if best is None or L < best[1]:
+            best = (p, L, gn, r["set"], r["s"])
+    p, L, gn = best[:3]
+    th = {}
+    for sgn in (-1, 1):
+        sh = s_q * (1 + sgn * 1e-3)
+        ps, _, _ = refine(p, sh, X, y, lam)
+        W, c, v, b = to_train(ps, sh, X, y)
+        th[sgn] = np.concatenate([W.ravel(), c, [b]])
+    tan = (th[1] - th[-1]) / (2e-3 * s_q)
+    W, c, v, b = to_train(p, s_q, X, y)
+    theta = np.concatenate([W.ravel(), c, [b]])
+    Xt = torch.as_tensor(X); Yt = torch.as_tensor(y); vt = torch.as_tensor(v)
+
+    def loss_fn(t):
+        Wt = t[:8].reshape(4, 2); ct = t[8:12]; bt = t[12]
+        z = torch.tanh(Xt @ Wt.T + ct) @ vt + bt
+        return torch.nn.functional.binary_cross_entropy_with_logits(z, Yt) + 0.5 * lam * (t[:12] ** 2).sum()
+
+    def rho_fn(t):
+        return rho2_torch(t[:8].reshape(4, 2), t[8:12], vt, X, torch)
+    T = torch.tensor(theta, requires_grad=True)
+    H = torch.autograd.functional.hessian(loss_fn, T).numpy()
+    gl = torch.autograd.grad(loss_fn(T), T)[0].numpy()
+    dr = torch.autograd.grad(rho_fn(T), T)[0].numpy()
+    h = 1e-6
+    fdc = np.zeros(13); fdf = np.zeros(13)
+    r0 = float(rho_fn(torch.tensor(theta)))
+    for j in range(13):
+        e = np.zeros(13); e[j] = h
+        rp = float(rho_fn(torch.tensor(theta + e))); rm = float(rho_fn(torch.tensor(theta - e)))
+        fdc[j] = (rp - rm) / (2 * h); fdf[j] = (rp - r0) / h
+    scale = np.abs(dr).max()
+    chk = {"max_rel_autograd_vs_central": float(np.abs(dr - fdc).max() / scale),
+           "max_rel_central_vs_forward": float(np.abs(fdc - fdf).max() / scale)}
+    chk["ok"] = bool(chk["max_rel_autograd_vs_central"] <= 1e-3 and chk["max_rel_central_vs_forward"] <= 1e-3)
+    fr = {"lambda": lam, "q": q, "s_q": s_q, "s_q_per_set": {k: v_["s_q"] for k, v_ in g["per_set"].items()},
+          "source": {"set": best[3], "s": best[4]}, "loss_at_s_q": L, "gnorm_at_s_q": gn,
+          "rho2_at_s_q": r0, "grad_loss_theta_max": float(np.abs(gl).max()),
+          "theta": theta.tolist(), "v": v.tolist(), "H": H.tolist(), "H_min_eig": float(np.linalg.eigvalsh(H).min()),
+          "tangent": tan.tolist(), "grad_rho2": dr.tolist(), "grad_rho2_check": chk,
+          "dG_dot_tan": float(dr @ tan), "seeds": [SEEDS[0], SEEDS[-1]], "lr": LR, "budget": BUDGET,
+          "stop_factor": STOP_FACTOR, "t0_level": T0_LEVEL, "sdot_window": SDOT_WINDOW}
+    (OUT / "frozen.json").write_text(json.dumps(fr, indent=1))
+    (OUT / "frozen.sha256").write_text(sha256_file(OUT / "frozen.json") + "  frozen.json\n")
+    print(json.dumps({k: fr[k] for k in ("lambda", "q", "s_q", "loss_at_s_q", "gnorm_at_s_q", "rho2_at_s_q",
+                                         "H_min_eig", "grad_rho2_check", "dG_dot_tan", "grad_loss_theta_max")}))
+
+
+# ------------------------------------------------------------------------------------------ training (trajectories only)
+def train_run(seed, fr):
+    torch = _torch()
+    X, y = data()
+    Xt = torch.as_tensor(X); Yt = torch.as_tensor(y)
+    torch.manual_seed(seed)
+    hid = torch.nn.Linear(2, 4).double(); out = torch.nn.Linear(4, 1).double()
+    params = [hid.weight, hid.bias, out.weight, out.bias]
+    opt = torch.optim.Adam(params, lr=LR, betas=(0.9, 0.999), eps=1e-8)
+    lam, s_q = fr["lambda"], fr["s_q"]
+    S, PR, VH = [], [], []
+    for t in range(BUDGET + 1):
+        with torch.no_grad():
+            s = float(out.weight.abs().sum())
+            S.append(s)
+            PR.append(np.concatenate([p.detach().numpy().ravel() for p in params]))
+            if t == 0:
+                VH.append(np.full(13, np.nan))
+            else:
+                st = [opt.state[p]["exp_avg_sq"].numpy().ravel() for p in (hid.weight, hid.bias, out.bias)]
+                VH.append(np.concatenate(st) / (1 - 0.999 ** t))
+        if s >= STOP_FACTOR * s_q or t == BUDGET:
+            break
+        z = out(torch.tanh(hid(Xt))).squeeze(1)
+        loss = torch.nn.functional.binary_cross_entropy_with_logits(z, Yt) + 0.5 * lam * (
+            (hid.weight ** 2).sum() + (hid.bias ** 2).sum())
+        opt.zero_grad(); loss.backward(); opt.step()
+    RUNS.mkdir(parents=True, exist_ok=True)
+    f = RUNS / f"run_{seed}.npz"
+    tmp = RUNS / f"run_{seed}.tmp.npz"
+    np.savez_compressed(tmp, s=np.array(S), params=np.array(PR), vhat=np.array(VH))
+    tmp.replace(f)
+    return len(S) - 1, S[-1]
+
+
+def run_train(w, nw):
+    sb._init_worker()
+    fr = json.loads((OUT / "frozen.json").read_text())
+    for seed in SEEDS[w::nw]:
+        if (RUNS / f"run_{seed}.npz").exists():
+            continue
+        t0 = time.time()
+        steps, s_end = train_run(seed, fr)
+        print(json.dumps({"seed": seed, "steps": steps, "s_end": s_end, "seconds": time.time() - t0}), flush=True)
+
+
+# ------------------------------------------------------------------------------------------ predictions (pre-crossing)
+def block_p(vhat):
+    """Permutation- and sign-invariant P: within-block medians of 1/(√v̂ + ε) for W (8), c (4) and b (1)."""
+    p = 1 / (np.sqrt(vhat) + 1e-8)
+    return np.r_[np.full(8, np.median(p[:8])), np.full(4, np.median(p[8:12])), p[12:13]]
+
+
+def predict_one(s_traj, vhat, fr):
+    from .lag_law import kappa
+    s_q = fr["s_q"]
+    t0 = t0_step(s_traj, s_q)
+    if t0 is None or t0 < 1:
+        return {"t0": t0, "valid_prediction": False}
+    w = min(SDOT_WINDOW, t0)                              # amendment 1 (before the freeze): window min(100, t₀)
+    sdot = (s_traj[t0] - s_traj[t0 - w]) / w
+    p = block_p(vhat[t0])
+    k, lmin, num, den = kappa(np.array(fr["H"]), np.array(fr["tangent"]), np.array(fr["grad_rho2"]), p)
+    chi = (sdot / s_q) / (LR * lmin)
+    return {"t0": int(t0), "valid_prediction": True, "sdot": float(sdot), "kappa_q": float(k), "lambda_min": float(lmin),
+            "chi": float(chi), "pred": float(s_q * (1 + k * chi)), "baseline": float(s_q), "sdot_window": int(w)}
+
+
+def run_predict():
+    import pandas as pd
+    fr = json.loads((OUT / "frozen.json").read_text())
+    rows = []
+    for seed in SEEDS:
+        d = np.load(RUNS / f"run_{seed}.npz")                 # s and v̂ only; the parameters are not read here
+        rows.append({"seed": seed, "steps": len(d["s"]) - 1, "s_end": float(d["s"][-1]),
+                     **predict_one(d["s"], d["vhat"], fr)})
+    pd.DataFrame(rows).to_csv(OUT / "predictions.csv", index=False)
+    (OUT / "predictions.sha256").write_text(sha256_file(OUT / "predictions.csv") + "  predictions.csv\n")
+    print(pd.DataFrame(rows).describe().to_string())
+
+
+# ------------------------------------------------------------------------------------------ scoring (after the commit)
+def rho2_batch(P, X, torch, chunk=200):
+    """ρ₂ for every recorded parameter row (17 = W 8, c 4, v 4, b 1)."""
+    Xt = torch.as_tensor(X)
+    vals, cnts = _values(X)
+    out = []
+    for i in range(0, len(P), chunk):
+        Q = torch.as_tensor(P[i:i + chunk])
+        W = Q[:, :8].reshape(-1, 4, 2); c = Q[:, 8:12]; v = Q[:, 12:16]
+        base = torch.einsum("mnk,mk->mn", torch.tanh(torch.einsum("nj,mkj->mnk", Xt, W) + c[:, None, :]), v)
+        V = []
+        for j in range(2):
+            Xr = Xt.unsqueeze(0).repeat(len(vals[j]), 1, 1)
+            Xr[:, :, j] = torch.as_tensor(vals[j])[:, None]
+            F = torch.einsum("mrnk,mk->mrn", torch.tanh(torch.einsum("rnj,mkj->mrnk", Xr, W) + c[:, None, None, :]), v)
+            V.append((torch.as_tensor(cnts[j])[None, :, None] * (F - base[:, None, :]).abs()).sum(dim=(1, 2)) / len(X) ** 2)
+        out.append((V[1] / (V[0] + V[1])).numpy())
+    return np.concatenate(out)
+
+
+def run_score():
+    import pandas as pd
+    torch = _torch()
+    fr = json.loads((OUT / "frozen.json").read_text())
+    pr = pd.read_csv(OUT / "predictions.csv")
+    X, y = data()
+    rows = []
+    for _, r in pr.iterrows():
+        d = np.load(RUNS / f"run_{int(r.seed)}.npz")
+        rho = rho2_batch(d["params"], X, torch)
+        tc = crossing_step(rho, fr["q"])
+        ok = bool(r.valid_prediction) and tc is not None and tc > int(r.t0)
+        rows.append({"seed": int(r.seed), "crossing_step": tc, "t0": r.t0, "s_cross": None if tc is None else float(d["s"][tc]),
+                     "rho2_init": float(rho[0]), "rho2_min": float(rho.min()), "rho2_end": float(rho[-1]),
+                     "valid": ok, "pred": r.get("pred"), "chi": r.get("chi"), "kappa_q": r.get("kappa_q")})
+    sc = pd.DataFrame(rows)
+    sc.to_csv(OUT / "scores_per_run.csv", index=False)
+    v = sc[sc.valid]
+    res = score_rule(v.s_cross.values, v.pred.values, np.full(len(v), fr["s_q"]), len(sc))
+    res["chi_at_crossing_median"] = float(v.chi.median()) if len(v) else None
+    res["chi_range"] = [float(v.chi.min()), float(v.chi.max())] if len(v) else None
+    res["kappa_q_median"] = float(v.kappa_q.median()) if len(v) else None
+    res["median_observed_r"] = float(np.median(v.s_cross / fr["s_q"] - 1)) if len(v) else None
+    (OUT / "score.json").write_text(json.dumps(res, indent=1, default=float))
+    print(json.dumps(res, indent=1, default=float))
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "lambda":
@@ -379,3 +609,11 @@ if __name__ == "__main__":
         run_bisect(sys.argv[2])
     elif cmd == "summarise":
         summarise()
+    elif cmd == "freeze":
+        run_freeze()
+    elif cmd == "train":
+        run_train(int(sys.argv[2]), int(sys.argv[3]))
+    elif cmd == "predict":
+        run_predict()
+    elif cmd == "score":
+        run_score()

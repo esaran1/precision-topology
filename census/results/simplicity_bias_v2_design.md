@@ -117,3 +117,42 @@ All three conditions must hold:
 - **Validity:** at least 30 valid crossings of 40.
 - **PASS** means valid, T1 and T3.
 - χ at crossing is reported beside the width-1 range.
+
+## Amendment 1 (02:41 EDT, before the freeze, before any registered training, and with no ρ₂ from any training)
+
+**Change:** the ṡ window is **min(100, t₀)** steps, not 100. So ṡ = (s(t₀) − s(t₀ − w))/w with w = min(100, t₀), and a
+run is invalid only if t₀ is undefined.
+
+**Reason:**
+- The gated pilot's grid path puts s_q between 2.98 and 3.73, so 0.5·s_q is about 1.6.
+- Adam grows s = ‖v‖₁ by about 0.03 per step from about 1 at the default initialisation.
+- The last upward passage of 0.5·s_q therefore falls within the first ~30 steps, and the fixed 100-step window would
+  have made every run invalid.
+
+**Disclosure:** the growth rate was seen in a machinery test of `train_run`. It used seed 2,000,002, outside the
+registered range, with s_q set to 3.0 by hand. That test recorded s only; no ρ₂ and no crossing were computed.
+
+## Gate verdict (02:46 EDT): **PASS** (`simplicity_bias_v2/pilot_summary.json`, `pilot_scan.csv`)
+
+- **λ:** 1e−4 (`lambda.log`, `lambda_rule.json`). This is the smallest value on the grid, and it passed the attainment
+  check at s = 1, 4 and 16, with 184, 13 and 199 hits.
+- **Path:** 54 computed scales, all passing the attainment check.
+  - ‖(W, c)‖ ≤ 16.5, against B = 117.7.
+  - Every ladder passes and every audit passes.
+  - Sets A and B agree in retained loss to about 1e−15 at every grid scale.
+- **q:** ½(3.2e−9 + 0.7828) = **0.39141**.
+- **s_q:** both sets give the same bracket, [3.58512, 3.597642], so **s_q = 3.59138** and the agreement gap is 0.0%.
+  - The projected Hessian's smallest eigenvalue is 1.0e−4 at both ends. This equals λ, the direction of an idle hidden
+    unit, which is held only by the decay.
+  - CMA-ES found 0.149896 and 0.149875 at the lower end, against a retained 0.149834, and 0.149183 and 0.149224 at the
+    upper end, against a retained 0.149104. It finds nothing lower.
+
+**Caveat, recorded before the freeze and before any training.**
+- **ρ₂ jumps at s_q.** It goes from 0.182 to 0.448 across a 0.35% bracket, and G₊ goes from −0.153 to +0.071.
+  - The retained minimiser switches between two branches there. This is a first-order switch, like the paper's
+    width-1 switch.
+  - Along the path, ρ₂ is 0 up to s = 1.22, rises continuously on the lower branch from 0.085 to 0.182, jumps to 0.448,
+    and then rises continuously to 0.783.
+- **Consequence for κ_q.** The κ_q formula assumes ρ₂ reaches q continuously along one branch. Here q is crossed by the
+  jump, so κ_q, computed as registered on the branch that is lower in loss at s_q, is a formal application.
+- The registered test is run as designed. This caveat goes into the writer inputs whatever the outcome.

@@ -1,0 +1,47 @@
+{
+ "label": "Track T v2 pilot (gate computation)",
+ "lambda": 0.0001,
+ "q_rule": {
+  "rho2_small": 3.24966645558409e-09,
+  "rho2_large": 0.7828206708209657,
+  "q": 0.3914103370353161
+ },
+ "gate": {
+  "per_set": {
+   "A": {
+    "reached": true,
+    "bracket": [
+     3.58512,
+     3.597642
+    ],
+    "passages": 1,
+    "starts_below": true,
+    "s_q": 3.5913755424683727,
+    "attained": true,
+    "cma_ok": true,
+    "bracket_rel": 0.003492770116481525
+   },
+   "B": {
+    "reached": true,
+    "bracket": [
+     3.58512,
+     3.597642
+    ],
+    "passages": 1,
+    "starts_below": true,
+    "s_q": 3.5913755424683727,
+    "attained": true,
+    "cma_ok": true,
+    "bracket_rel": 0.003492770116481525
+   }
+  },
+  "A_attained": true,
+  "B_agreement": true,
+  "C_independent": true,
+  "agreement_rel": 0.0,
+  "s_q": 3.5913755424683727,
+  "pass": true
+ },
+ "n_points": 54,
+ "n_attained": 54
+}

@@ -137,3 +137,59 @@ def test_kappa_formula_reused_from_1a():
     H = 2.0 * np.eye(3); tan = np.array([1.0, 0.5, -0.2]); dG = np.array([0.3, -1.0, 0.4])
     assert kappa(H, tan, dG, np.ones(3))[0] == pytest.approx(1.0)
     assert kappa(H, tan, dG, np.full(3, 7.0))[0] == pytest.approx(1.0)       # invariant to rescaling P
+
+
+# ------------------------------------------------------------------ registration machinery (before any freeze)
+def test_rho2_torch_and_batch_match_the_landscape_measure():
+    import torch
+    X, y = sb.make_data(0.2)
+    rng = np.random.default_rng(4)
+    rows = []
+    for _ in range(3):
+        W = rng.normal(0, 2, (4, 2)); c = rng.normal(0, 1, 4); v = rng.normal(0, 1, 4)
+        sg = np.sign(v)
+        P = np.concatenate([(W * sg[:, None]).ravel(), c * sg, np.sqrt(np.abs(v))])
+        ref = sb.feature_usage(P, X)["rho2"]
+        got = float(v2.rho2_torch(torch.tensor(W), torch.tensor(c), torch.tensor(v), X, torch))
+        assert got == pytest.approx(ref, rel=1e-10)
+        rows.append(np.concatenate([W.ravel(), c, v, [0.3]]))
+        assert v2.rho2_batch(np.array(rows[-1:]), X, torch)[0] == pytest.approx(ref, rel=1e-10)
+    assert np.allclose(v2.rho2_batch(np.array(rows), X, torch, chunk=2),
+                       [v2.rho2_batch(np.array([r]), X, torch)[0] for r in rows])
+
+
+def test_block_p_is_permutation_invariant():
+    rng = np.random.default_rng(5)
+    vh = rng.uniform(1e-6, 1e-2, 13)
+    perm = np.r_[rng.permutation(8), 8 + rng.permutation(4), 12]
+    assert np.allclose(v2.block_p(vh), v2.block_p(vh[perm]))
+
+
+def test_predict_one_uses_only_pre_t0_information():
+    H = np.diag(np.arange(1.0, 14.0)); tan = np.ones(13); dr = np.linspace(-1, 1, 13) + 0.1
+    fr = {"s_q": 4.0, "H": H.tolist(), "tangent": tan.tolist(), "grad_rho2": dr.tolist()}
+    s = np.linspace(0.1, 12.0, 3000); vh = np.full((3000, 13), 1e-4)
+    a = v2.predict_one(s, vh, fr)
+    s2 = s.copy(); s2[a["t0"] + 1:] *= 1.7; vh2 = vh.copy(); vh2[a["t0"] + 1:] = 5.0   # change the future only
+    b = v2.predict_one(s2, vh2, fr)
+    assert a["valid_prediction"] and a["pred"] == b["pred"] and a["t0"] == b["t0"]
+    assert s[a["t0"]] >= 2.0 > s[a["t0"] - 1]
+    assert not v2.predict_one(np.linspace(0.1, 1.0, 50), vh[:50], fr)["valid_prediction"]
+
+
+def test_train_run_records_and_stops_on_s(tmp_path, monkeypatch):
+    monkeypatch.setattr(v2, "RUNS", tmp_path)
+    fr = {"lambda": 1e-4, "s_q": 0.35}
+    steps, s_end = v2.train_run(2_000_001, fr)                             # a test seed outside the registered range
+    d = np.load(tmp_path / "run_2000001.npz")
+    assert len(d["s"]) == steps + 1 and d["params"].shape == (steps + 1, 17) and d["vhat"].shape == (steps + 1, 13)
+    assert s_end >= 3 * 0.35 and (d["s"][:-1] < 3 * 0.35).all()
+    assert np.isclose(np.abs(d["params"][:, 12:16]).sum(axis=1), d["s"]).all()
+
+
+def test_amendment_short_window():
+    H = np.diag(np.arange(1.0, 14.0)); tan = np.ones(13); dr = np.linspace(-1, 1, 13) + 0.1
+    fr = {"s_q": 4.0, "H": H.tolist(), "tangent": tan.tolist(), "grad_rho2": dr.tolist()}
+    s = np.r_[1.0, 1.0 + 0.04 * np.arange(1, 200)]                         # passes 2.0 at step 25
+    a = v2.predict_one(s, np.full((200, 13), 1e-4), fr)
+    assert a["valid_prediction"] and a["t0"] == 25 and a["sdot_window"] == 25 and a["sdot"] == pytest.approx(0.04)
