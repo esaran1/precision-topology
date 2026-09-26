@@ -855,8 +855,10 @@ is no switch (WP-9). The same criterion predicts a switch on **asymmetric** wind
 prediction was registered and passed: a validated width-2 threshold exists there. The registered training prediction
 failed: training crosses at about 3× the threshold scale (WP-15).
 
-**The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + 0.66215ε + O(ε²)), with ε = a − 1. A* ∈ [0.68125, 0.6875]
-is certified and independently checked (Krawczyk value 0.6854452); the correction A′(0)/A* comes from math note §8.
+**The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + c_s ε + O(ε²)), with ε = a − 1 and c_s := A′(0)/A* = 0.66215
+(math note §8). A* ∈ [0.68125, 0.6875] is certified and independently checked (Krawczyk value 0.6854452).
+**Notation:** c_s is the first-order coefficient in s-units. It is distinct from c₁ = 0.28523, the coefficient of R_glob
+in R-units; the two differ by k₁ = −0.377, which comes from K(ε).
 
 | a | limit A*ε^(−3/2) | with first-order term | certified \\|w₂\\|_glob | first order vs certified |
 |---|---|---|---|---|
@@ -1358,6 +1360,8 @@ it is exploratory.
 
 def wp16():
     """WP-16: the conditional threshold under SGD (Track 4, registered) and the residual timescale (Track 3, post hoc)."""
+    _sc = pd.read_csv(RESULTS / "sgd_own_scores.csv"); _sn = pd.read_csv(RESULTS / "sgd_own_sensitivity.csv")
+    sc_ = {round(r.a, 2): r._asdict() for r in _sc.itertuples()}; sn_ = {round(r.a, 2): r._asdict() for r in _sn.itertuples()}
     sc = pd.read_csv(RESULTS / "sgd_own_scores.csv").set_index("a")
     ex = pd.read_csv(RESULTS / "sgd_own_extension_scores.csv").set_index("a")
     ts = json.loads((RESULTS / "residual_timescale_summary.json").read_text())
@@ -1464,6 +1468,15 @@ timescale account is supported by these two prospective tests; it is not establi
 carry over to width 2: WP-15's exploratory note). Do not quote
 the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
 noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
+
+**Exact wording for the SGD own-sample result (final round, D.4): a partial pass.**
+- Say: "With SGD, the registered own-sample predictions pass on the runs that crossed (30 of 40 at each a): each run's
+  own threshold predicts its crossing better than the population threshold, and the rank correlation between crossing
+  and own threshold is {sc_[1.3]["G2_spearman"]:.2f} and {sc_[1.5]["G2_spearman"]:.2f} (registered bound 0.6). When
+  the 10 non-crossing runs at each a are counted at their final scale, the first prediction still holds, but the rank
+  correlation falls to {sn_[1.3]["G2_spearman"]:.2f} and {sn_[1.5]["G2_spearman"]:.2f} and fails the bound. We
+  therefore report the SGD result as a partial pass: it holds for crossers only."
+- Do not say: "the SGD own-sample test passed" without "for the runs that crossed".
 """
 
 
@@ -2215,6 +2228,8 @@ list of symbol clashes) and `src/track4_populations.py` → `track4_populations.
 | R_own | R_glob computed on a run's own training set (400 points, 200 per class), before training | v4 Block 1 (1d) |
 | χ | timescale ratio (ṡ/s\\*)/(ηλ_min(P^{{1/2}}HP^{{1/2}})); the tests use each run's measured ratio at crossing (ṡ/s_c), a factor 1 + r apart | math note §13.1, §13.3(i); WP-24 |
 | κ(a) | lag constant in r = κ(a)·χ, with no free parameter; depends on the winding of b₁ | math note §13; WP-24 |
+| c₁ | first-order coefficient of R_glob in R-units: R_glob = R_glob^∞(1 + c₁ε + …), c₁ = 0.28523 | math note §8; WP-30 |
+| c_s | first-order coefficient of the switch in s-units: \|w₂\|_glob = A*ε^(−3/2)(1 + c_sε + …), c_s = A′(0)/A* = 0.66215 | math note §8 |
 
 - **Clashes to resolve in the main text.** κ₀ (the limiting-cubic constant in Block 3's window design) needs another
   symbol there, for example ν₀. "A\\*" is the limit switch in rescaled units, not R\\*.
@@ -2377,10 +2392,10 @@ def wp30():
 ## WP-30. A decisive test of the first-order coefficient c₁ (Track 3, final round; registered follow-up; for the submission)
 
 Producer: `src/c1_followup.py` → `c1_followup_*`. Registration: `results/c1_followup_registration.md` (e233ef5), committed
-before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check: 3
-of the 10 added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) pass; the other 7, and the rescaled Ĝ, are
-not independently checked. The decisive points are at ε = 0.08–0.12, not ε ≤ 0.04. The text below is the Track 3 writer
-input.
+before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check:
+all 10 added bracket-end certificates (a = 1.08–1.12, both ends) pass (`c1_followup_checks.json`; the last 7 checked on
+2026-09-26 with the checker's standard 3 workers). The rescaled Ĝ at the added a has no independent checker. **Author's wording (binding):** the coefficient is "confirmed with certified thresholds at
+ε = 0.08 to 0.12"; never call it a small-ε confirmation. The text below is the Track 3 writer input.
 {body}
 
 IDs: {_id("c1 follow-up PASS", "c1 follow-up width", "c1 follow-up contains derived")}.

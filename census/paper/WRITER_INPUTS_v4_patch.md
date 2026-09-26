@@ -725,8 +725,10 @@ is no switch (WP-9). The same criterion predicts a switch on **asymmetric** wind
 prediction was registered and passed: a validated width-2 threshold exists there. The registered training prediction
 failed: training crosses at about 3× the threshold scale (WP-15).
 
-**The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + 0.66215ε + O(ε²)), with ε = a − 1. A* ∈ [0.68125, 0.6875]
-is certified and independently checked (Krawczyk value 0.6854452); the correction A′(0)/A* comes from math note §8.
+**The scaling law (A2).** |w₂|_glob(a) = A*·ε^(−3/2)·(1 + c_s ε + O(ε²)), with ε = a − 1 and c_s := A′(0)/A* = 0.66215
+(math note §8). A* ∈ [0.68125, 0.6875] is certified and independently checked (Krawczyk value 0.6854452).
+**Notation:** c_s is the first-order coefficient in s-units. It is distinct from c₁ = 0.28523, the coefficient of R_glob
+in R-units; the two differ by k₁ = −0.377, which comes from K(ε).
 
 | a | limit A*ε^(−3/2) | with first-order term | certified \|w₂\|_glob | first order vs certified |
 |---|---|---|---|---|
@@ -1270,6 +1272,15 @@ timescale account is supported by these two prospective tests; it is not establi
 carry over to width 2: WP-15's exploratory note). Do not quote
 the pooled Spearman without the within-a values. Do not say that SGD crossings were universal. Do not report G2 without
 noting that it fails when the non-crossers are imputed. Do not merge these runs with Block F's a = 1.25 SGD arm.
+
+**Exact wording for the SGD own-sample result (final round, D.4): a partial pass.**
+- Say: "With SGD, the registered own-sample predictions pass on the runs that crossed (30 of 40 at each a): each run's
+  own threshold predicts its crossing better than the population threshold, and the rank correlation between crossing
+  and own threshold is 0.67 and 0.68 (registered bound 0.6). When
+  the 10 non-crossing runs at each a are counted at their final scale, the first prediction still holds, but the rank
+  correlation falls to 0.50 and 0.51 and fails the bound. We
+  therefore report the SGD result as a partial pass: it holds for crossers only."
+- Do not say: "the SGD own-sample test passed" without "for the runs that crossed".
 
 ## WP-17. Independent certificate checks: status after Track 5 (for the submission; replaces WP-11's "pending" list)
 
@@ -2022,6 +2033,8 @@ list of symbol clashes) and `src/track4_populations.py` → `track4_populations.
 | R_own | R_glob computed on a run's own training set (400 points, 200 per class), before training | v4 Block 1 (1d) |
 | χ | timescale ratio (ṡ/s\*)/(ηλ_min(P^{1/2}HP^{1/2})); the tests use each run's measured ratio at crossing (ṡ/s_c), a factor 1 + r apart | math note §13.1, §13.3(i); WP-24 |
 | κ(a) | lag constant in r = κ(a)·χ, with no free parameter; depends on the winding of b₁ | math note §13; WP-24 |
+| c₁ | first-order coefficient of R_glob in R-units: R_glob = R_glob^∞(1 + c₁ε + …), c₁ = 0.28523 | math note §8; WP-30 |
+| c_s | first-order coefficient of the switch in s-units: \|w₂\|_glob = A*ε^(−3/2)(1 + c_sε + …), c_s = A′(0)/A* = 0.66215 | math note §8 |
 
 - **Clashes to resolve in the main text.** κ₀ (the limiting-cubic constant in Block 3's window design) needs another
   symbol there, for example ν₀. "A\*" is the limit switch in rescaled units, not R\*.
@@ -2676,10 +2689,10 @@ IDs: `3B P1 d=2`; `3B P2a d=2`; `3B P2b d=2`; `3B d=4 UNRESOLVED`; `3B post hoc 
 ## WP-30. A decisive test of the first-order coefficient c₁ (Track 3, final round; registered follow-up; for the submission)
 
 Producer: `src/c1_followup.py` → `c1_followup_*`. Registration: `results/c1_followup_registration.md` (e233ef5), committed
-before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check: 3
-of the 10 added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) pass; the other 7, and the rescaled Ĝ, are
-not independently checked. The decisive points are at ε = 0.08–0.12, not ε ≤ 0.04. The text below is the Track 3 writer
-input.
+before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check:
+all 10 added bracket-end certificates (a = 1.08–1.12, both ends) pass (`c1_followup_checks.json`; the last 7 checked on
+2026-09-26 with the checker's standard 3 workers). The rescaled Ĝ at the added a has no independent checker. **Author's wording (binding):** the coefficient is "confirmed with certified thresholds at
+ε = 0.08 to 0.12"; never call it a small-ε confirmation. The text below is the Track 3 writer input.
 
 ### 1. What was committed before computing (`e233ef5`)
 
@@ -2756,7 +2769,7 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
   - The width is valid (≤ 0.1), and the design goal of < 0.05 is met.
 - **The derived c₁** ∈ [0.2852300, 0.2852303] lies inside C.
 - **Registered follow-up verdict: PASS.**
-- **Competing values**: 0.49 (the earlier incomplete prediction) and 0.662 (the switch shift alone) are
+- **Competing values**: 0.49 (the earlier incomplete prediction) and 0.662 (c_s, the switch shift alone, in s-units) are
   excluded above; −0.377 (the K correction alone) and 0 (no first-order term) are excluded below.
 - **The original test** (`first_order_prediction.md`) stays **INCONCLUSIVE** as registered (width 0.105).
   This is a follow-up registered after it.
@@ -2766,6 +2779,8 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
 ### 5. Say / Do not say
 
 **PASS (this outcome)**
+- **Author's wording (binding, 2026-09-26):** say that the coefficient is **confirmed with certified thresholds at
+  ε = 0.08 to 0.12**. Do **not** call it a small-ε confirmation anywhere.
 - Say: "In a follow-up registered after the original test was inconclusive, we added certified thresholds at
   a = 1.08–1.12 with the registered bracket procedure. The unchanged feasible-set estimator then gives
   c₁ ∈ [0.265, 0.307] (width 0.042 ≤ 0.1), which contains the derived c₁ = 0.28523 and excludes 0, 0.49,
@@ -2776,7 +2791,7 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
 - Do not say: "the original c₁ test passed"; "c₁ is measured to six digits" (the fitted interval is 0.042 wide;
   six digits is the derivation); "confirmed at small ε ≤ 0.04" (the decisive points are at ε = 0.08–0.12,
   within an O(ε³) allowance |c₃| ≤ 1).
-- Do not say "all certificates independently checked" unless §3 lists all ten as checked. Ĝ from the rescaled
+- All ten added bracket-end certificates are independently checked (2026-09-26; c1_followup_checks.json). You may say so; do not extend it to the rescaled Ĝ. Ĝ from the rescaled
   search is not independently checked.
 
 **FAIL** (not this outcome)

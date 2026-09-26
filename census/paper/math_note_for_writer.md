@@ -332,7 +332,7 @@ Both terms come from the sine series, including the (1 + ε) factor.
   - ∂_ε∇_θL = mean[σ(z)(1 − σ(z))·A r(σ)·∂_θz + (σ(z) − y)·∂_θ(A r(σ))];
   - ∂_εG = r(σ_O) − r(σ_I).
   - The linear system is enclosed rigorously.
-- Result: **A′(0)/A* ∈ [0.6621547, 0.6621550]**.
+- Result: **c_s := A′(0)/A* ∈ [0.6621547, 0.6621550]**. This is the first-order coefficient of the switch in s-units. The symbol c_s keeps it distinct from c₁ = 0.28523, the coefficient in R-units.
 
 **Domain lemma for K = sup G₀ (added 2026-09-24).** The branch and bound for K searches (u, v) ∈ [0, 8] × [−12, 12];
 this lemma shows nothing outside that box can exceed K.
@@ -446,7 +446,7 @@ this lemma shows nothing outside that box can exceed K.
 
 **Follow-up (final round, 2026-09-25; registered e233ef5; WP-30).** Five added certified brackets (a = 1.08–1.12) and the
 four original ones, with the registered estimator unchanged, give the feasible set C = [0.26531, 0.30687], of width
-0.042. It contains the derived c₁ ∈ [0.2852300, 0.2852303]: PASS. The original test stays INCONCLUSIVE as registered. The decisive points are at ε = 0.08–0.12, where the registered ±ε³ allowance is a leading part of the tolerance. Three of the ten added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) were independently checked in Arb and all pass; the other seven, and the rescaled Ĝ, rest on the certifying search alone.
+0.042. It contains the derived c₁ ∈ [0.2852300, 0.2852303]: PASS. The original test stays INCONCLUSIVE as registered. The coefficient is thus confirmed with certified thresholds at ε = 0.08 to 0.12. This is not a small-ε confirmation: at these ε the registered ±ε³ allowance is a leading part of the tolerance. All ten added bracket-end certificates (a = 1.08–1.12, both ends) were independently checked in Arb and pass. The rescaled Ĝ at these a has no independent checker.
 
 ## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
 
@@ -473,7 +473,7 @@ four original ones, with the registered estimator unchanged, give the feasible s
 
   | term | size at a = 1.60 |
   |---|---:|
-  | product term ακ (its leading part a₁k₁ε² has certified coefficient 0.662 × (−0.377) = −0.250) | −0.060 |
+  | product term ακ (its leading part c_s·k₁·ε² has certified coefficient 0.662 × (−0.377) = −0.250) | −0.060 |
   | the switch position's own curvature (α − a₁ε) | −0.037 |
   | the gap maximiser's own curvature (κ − k₁ε, positive) | +0.059 |
 
@@ -699,11 +699,11 @@ within the (ii) margin above s₁. The placement switch lies in [s₀, s₁]. Th
 ### 11.1 The scaling law and Adam's per-step bound (A2)
 
 **Required scale.**
-- From A = sε^{3/2} (§1) and the switch A_ε = A*(1 + (A′(0)/A*)ε + O(ε²)) (§8):
-  |w₂|_glob(a) = A*·ε^{−3/2}·(1 + 0.66215ε + O(ε²)), with ε = a − 1.
+- From A = sε^{3/2} (§1) and the switch A_ε = A*(1 + c_s ε + O(ε²)) (§8), with c_s := A′(0)/A*:
+  |w₂|_glob(a) = A*·ε^{−3/2}·(1 + c_s ε + O(ε²)), c_s = 0.66215, with ε = a − 1.
 - A* ∈ [0.68125, 0.6875] is certified and independently checked; the Krawczyk value is 0.6854452.
-  A′(0)/A* ∈ [0.6621547, 0.6621550].
-- (In R units the correction is c₁ = 0.28523. The difference is k₁ = −0.37692, from K(ε).)
+  c_s = A′(0)/A* ∈ [0.6621547, 0.6621550].
+- (In R units the correction is c₁ = 0.28523; c₁ = c_s + k₁ + O(ε) bookkeeping as in §8. The difference is k₁ = −0.37692, from K(ε).)
 
 | a | limit A*ε^{−3/2} | with first-order term | certified |w₂|_glob | first-order − certified (rel.) |
 |---|---|---|---|---|

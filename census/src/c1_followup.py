@@ -334,7 +334,7 @@ def score():
     return row
 
 
-def export_and_check(names_only=False):
+def export_and_check(names_only=False, workers=1):
     """Independent check (verify_certificates.check_finite, one worker): export the status certificate at each added
     a's bracket ends (s_lo: 'minus', s_hi: 'plus'), append their SHA-256 to certificates_manifest.csv, check them.
     Order: largest a first (those bind the feasible set).  Results: results/certificate_checks/<name>.json and
@@ -371,7 +371,7 @@ def export_and_check(names_only=False):
                                 "bytes": f.stat().st_size, "regenerate": meta.get("regenerate", "")})
         t1 = time.time()
         from .verify_certificates import check_finite
-        res = check_finite(name, verbose=False, workers=1)
+        res = check_finite(name, verbose=False, workers=workers)       # workers only parallelise the leaf checks
         done[name] = {"a": a, "s": sv, "status_exported": meta["status"], "status_expected": want,
                       "status_matches": meta["status"] == want, "checker_pass": bool(res["pass"]),
                       "checks": res["checks"], "export_seconds": t1 - t0, "check_seconds": time.time() - t1}
@@ -405,4 +405,4 @@ if __name__ == "__main__":
     elif cmd == "score":
         score()
     elif cmd == "check":
-        export_and_check()
+        export_and_check(workers=int(sys.argv[2]) if len(sys.argv) > 2 else 1)

@@ -217,7 +217,7 @@ Sources read:
 - **R_glob^∞, R_solve^∞** — the ε → 0 limits of the two thresholds.
 - **c₁** — the first-order coefficient of R_glob in ε, [0.2852300, 0.2852303].
 - **k₁** — the K(ε) contribution to c₁, −0.37692.
-- **a₁** — the first-order term of A (the product a₁k₁ = −0.250 in v4 Block 2).
+- **a₁** — the first-order term of A (the product a₁k₁ = −0.250 in v4 Block 2). It is the same quantity as c_s = A′(0)/A* = 0.66215 (final round notation; WP-26).
 - **C** — the compact set of WP-19. The name clashes with the predictor C and with WP-3's cut grid C.
 
 **Small- and large-scale limits (math note §10, §11)**

@@ -80,7 +80,7 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
   - The width is valid (≤ 0.1), and the design goal of < 0.05 is met.
 - **The derived c₁** ∈ [0.2852300, 0.2852303] lies inside C.
 - **Registered follow-up verdict: PASS.**
-- **Competing values**: 0.49 (the earlier incomplete prediction) and 0.662 (the switch shift alone) are
+- **Competing values**: 0.49 (the earlier incomplete prediction) and 0.662 (c_s, the switch shift alone, in s-units) are
   excluded above; −0.377 (the K correction alone) and 0 (no first-order term) are excluded below.
 - **The original test** (`first_order_prediction.md`) stays **INCONCLUSIVE** as registered (width 0.105).
   This is a follow-up registered after it.
@@ -90,6 +90,8 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
 ## 5. Say / Do not say
 
 **PASS (this outcome)**
+- **Author's wording (binding, 2026-09-26):** say that the coefficient is **confirmed with certified thresholds at
+  ε = 0.08 to 0.12**. Do **not** call it a small-ε confirmation anywhere.
 - Say: "In a follow-up registered after the original test was inconclusive, we added certified thresholds at
   a = 1.08–1.12 with the registered bracket procedure. The unchanged feasible-set estimator then gives
   c₁ ∈ [0.265, 0.307] (width 0.042 ≤ 0.1), which contains the derived c₁ = 0.28523 and excludes 0, 0.49,
@@ -100,7 +102,7 @@ certificate): **3 of the 10 bracket-end certificates were independently checked,
 - Do not say: "the original c₁ test passed"; "c₁ is measured to six digits" (the fitted interval is 0.042 wide;
   six digits is the derivation); "confirmed at small ε ≤ 0.04" (the decisive points are at ε = 0.08–0.12,
   within an O(ε³) allowance |c₃| ≤ 1).
-- Do not say "all certificates independently checked" unless §3 lists all ten as checked. Ĝ from the rescaled
+- All ten added bracket-end certificates are independently checked (2026-09-26; c1_followup_checks.json). You may say so; do not extend it to the rescaled Ĝ. Ĝ from the rescaled
   search is not independently checked.
 
 **FAIL** (not this outcome)

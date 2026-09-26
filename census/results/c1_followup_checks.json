@@ -58,5 +58,145 @@
   },
   "export_seconds": 2.640180826187134,
   "check_seconds": 1720.0455060005188
+ },
+ "c1f_a1.11_lo": {
+  "a": 1.11,
+  "s": 20.118496,
+  "status_exported": "minus",
+  "status_expected": "minus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "coverage_+": true,
+   "losing_claims_exceed_U": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 0.000308990478515625,
+  "check_seconds": 595.2925062179565
+ },
+ "c1f_a1.10_hi": {
+  "a": 1.1,
+  "s": 23.0954585,
+  "status_exported": "plus",
+  "status_expected": "plus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "losing_claims_exceed_U": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 2.750304937362671,
+  "check_seconds": 555.5906879901886
+ },
+ "c1f_a1.10_lo": {
+  "a": 1.1,
+  "s": 23.08107775,
+  "status_exported": "minus",
+  "status_expected": "minus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "coverage_+": true,
+   "losing_claims_exceed_U": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 1.9701900482177734,
+  "check_seconds": 527.9747762680054
+ },
+ "c1f_a1.09_hi": {
+  "a": 1.09,
+  "s": 26.8819595,
+  "status_exported": "plus",
+  "status_expected": "plus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "losing_claims_exceed_U": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 2.8508450984954834,
+  "check_seconds": 578.1531949043274
+ },
+ "c1f_a1.09_lo": {
+  "a": 1.09,
+  "s": 26.865283375,
+  "status_exported": "minus",
+  "status_expected": "minus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "coverage_+": true,
+   "losing_claims_exceed_U": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 2.707659959793091,
+  "check_seconds": 607.2673869132996
+ },
+ "c1f_a1.08_hi": {
+  "a": 1.08,
+  "s": 31.91751275,
+  "status_exported": "plus",
+  "status_expected": "plus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "losing_claims_exceed_U": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 5.476781845092773,
+  "check_seconds": 786.1928169727325
+ },
+ "c1f_a1.08_lo": {
+  "a": 1.08,
+  "s": 31.837918,
+  "status_exported": "minus",
+  "status_expected": "minus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "coverage_+": true,
+   "losing_claims_exceed_U": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 4.462228298187256,
+  "check_seconds": 673.885746717453
  }
 }
