@@ -580,6 +580,7 @@ def main() -> None:
     c1_followup_checks()
     linear_response_checks()
     track_b_checks()
+    theorem1_checks()
 
     provenance_check()
 
@@ -2065,6 +2066,24 @@ def track_b_checks() -> None:
         want = {(1.3, 400): 0.0297, (1.3, 1600): 0.0293, (1.3, 6400): 0.0306, (1.5, 400): 0.0620, (1.5, 1600): 0.0619, (1.5, 6400): 0.0635}[(round(r.a, 2), r.n)]
         chk(f"TB sample size dynamic a={r.a:.2f} n={r.n}", float(r.dynamic_median), want, 0.00006)
     chk("TB kappa inputs rows", float(len(pd.read_csv(D / "kappa_inputs.csv"))), 8.0, 0)
+
+
+def theorem1_checks() -> None:
+    """Track D.1 (final round): Theorem 1's hypotheses."""
+    print("Theorem 1 hypotheses (checked)")
+    d = json.loads((R / "theorem1_checks.json").read_text())
+    at = d["H-A1_data_gap_attainment"]
+    chk("D1 attainment", float(all(r["Gamma_n_positive"] and r["Gamma_n_ge_Ghat_lo"] for r in at)), 1.0, 0)
+    chk("D1 attainment a values", float(len(at)), 9.0, 0)
+    chk("D1 attainment margin min", float(min(r["argmax_interior_margin"] for r in at)), 0.098, 0.0006)
+    q = d["H-A2_classmean_attainment_and_H-Q_quadratic_growth"]
+    chk("D1 quadratic growth", float(q["continuous"]["quad_growth_ok"] and q["data"]["quad_growth_ok"]), 1.0, 0)
+    chk("D1 quadratic growth constant", q["data"]["quad_growth_c"], 2.454, 0.0006)
+    chk("D1 continuous alpha*", q["continuous"]["alpha_star"], 1.7922917, 6e-8)
+    chk("D1 alias", float(q["data"]["alpha_star_global_on_(0, pi/q)"] is False), 1.0, 0)
+    rr = d["H-R_uniform_remainder"]
+    chk("D1 remainder", float(max(r["max_ratio_all"] for r in rr)), 0.0052084, 6e-7)
+    chk("D1 alias excluded above s", d["H-C_compactness"]["s_where_W_reaches_alias_1.30"], 7.24e-6, 6e-8)
 
 
 def digit_stability() -> None:

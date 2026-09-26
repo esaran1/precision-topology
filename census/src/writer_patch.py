@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp34() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2524,6 +2524,36 @@ The lag is measured from the tracked-branch switch, as in the figure.
 - that κ's winding index and preconditioner were fixed before crossing data at a = 1.30–1.60 (they were not; Track A
   addresses this).
 - that the collapse is registered (the branch-conditioned points are post hoc).
+"""
+
+
+def wp34():
+    """WP-34: Theorem 1's hypotheses (Track D.1, final round), from the agent's deliverable."""
+    f = RESULTS / "theorem1_hypotheses.md"
+    if not f.exists():
+        return ""
+    t = f.read_text()
+    body = "\n" + t[t.index("## Which statement"):].rstrip()
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    return f"""
+## WP-34. Theorem 1's hypotheses: which are proved and which are checked (Track D.1, final round; for the submission)
+
+Producer: `src/theorem1_checks.py` → `theorem1_checks.json`; tests `tests/test_theorem1_checks.py`. The "checked"
+items are float64 Lipschitz-grid arguments, not interval arithmetic. The repo has no paper .tex source. "Theorem 1" was
+taken to be the small-scale criterion of math note §10.1; the author should confirm this.
+
+**Finding outside the four hypotheses (important for the writer).**
+- On the 800-point grid population, the class-mean gap D(α) is periodic: every point is a multiple of q = 0.4/79,401.
+  So α\\* = 1.7913244 is the class-mean maximiser only on (0, ≈6.2·10⁵). An aliased weight |w₁| ≈ π/q gives a larger
+  gap.
+- **Width 1: the conclusion is unchanged.** The alias wins only below s ≈ 2·10⁻¹² and is itself unplaced; the
+  localisation lemma excludes it for s > 7.2·10⁻⁶.
+- **Width 2:** the literal s → 0 statement on the data population needs the qualifier "on the continuous windows" or
+  "for s above about 10⁻¹¹". A cancelling pair of alias units is placed on the data gap but not on the window gap.
+  This width-2 consequence has not been checked numerically.
+{body}
+
+IDs: {_id("D1 attainment", "D1 remainder", "D1 quadratic growth", "D1 alias")}.
 """
 
 

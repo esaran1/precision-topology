@@ -620,6 +620,14 @@ s = |w₂|, balanced classes, and the 800-point population unless stated otherwi
 - The maximiser of |D| is α* = 1.7913244 on the data points (the ledger value) and 1.7922917 on the continuous
   windows. |D*| = 1.571067 on the data points and 1.573242 on the continuous windows.
 - α* does not depend on a, and the maximising bias is sin b₁ = ±1.
+- **Correction (final round, 2026-09-26; `src/theorem1_checks.py`, WP-34).**
+  - On the 800-point grid population every point is a multiple of q = 0.4/79,401, so D(α) is periodic.
+  - α* = 1.7913244 is the maximiser of |D| on the data points only for α ∈ (0, ≈6.2·10⁵). An aliased weight α ≈ π/q
+    gives |D| = 2.
+  - On the continuous windows, α* = 1.7922917 is the unique global maximiser (checked by computer).
+  - Width 1 is unaffected: the alias beats α* only for s ≲ 2·10⁻¹², the localisation lemma excludes it for
+    s > 7.2·10⁻⁶, and it is unplaced.
+  - At width 2, state the s → 0 selection on the continuous windows, or for s above about 10⁻¹¹.
 
 **Step 2: the domain lemma (placement needs a small first-layer weight).** For every θ,
   G(θ), G_n(θ) ≤ 2a − 2.8|w₁|, and more sharply ≤ 2a|sin(1.4w₁)| − 2.8|w₁|.
