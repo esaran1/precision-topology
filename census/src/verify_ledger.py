@@ -1767,6 +1767,18 @@ def lag_law_checks() -> None:
         chk(f"1B post hoc R1 {t}", float(ph[key]["R1"] == r1), 1.0, 0)
         chk(f"1B post hoc slope {t}", float(ph[key]["slope_obs_on_pred"]), sl, 0.006)
     chk("1B post hoc R1 SGD 1.50", float(ph[(1.50, 0, "sgd")]["R1"] == "PASS"), 1.0, 0)
+    rat = lambda x: np.array(x["cell_medians_obs"]) / np.array(x["cell_medians_pred"])
+    sg = np.concatenate([rat(x)[None, :] for x in PH if x["opt"] == "sgd"])
+    chk("1B post hoc SGD ratio 4 slowest min", float(sg[:, :4].min()), 0.99, 0.006)
+    chk("1B post hoc SGD ratio 4 slowest max", float(sg[:, :4].max()), 1.06, 0.006)
+    chk("1B post hoc SGD ratio fifth min", float(sg[:, 4].min()), 0.97, 0.006)
+    chk("1B post hoc SGD ratio fifth max", float(sg[:, 4].max()), 1.11, 0.006)
+    chk("1B post hoc SGD ratio fastest min", float(sg[:, 5].min()), 0.87, 0.006)
+    chk("1B post hoc SGD ratio fastest max", float(sg[:, 5].max()), 1.26, 0.006)
+    for key, (lo, hi) in {(1.30, -1): (0.35, 0.94), (1.30, 0): (1.40, 1.85), (1.50, 0): (-0.39, 0.67)}.items():
+        r_ = rat(ph[(key[0], key[1], "adam")])
+        chk(f"1B post hoc Adam ratio min {key}", float(r_.min()), lo, 0.006)
+        chk(f"1B post hoc Adam ratio max {key}", float(r_.max()), hi, 0.006)
     chk("1B branch off own a=1.30", float(ph[(1.30, -1, "sgd")]["frac_branch_off_own_1pct"]), 0.35, 0.0006)
     chk("1B branch off own a=1.50", float(ph[(1.50, 0, "sgd")]["frac_branch_off_own_1pct"]), 0.675, 0.0006)
     for x in V["R4"]:

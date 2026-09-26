@@ -1356,6 +1356,10 @@ def wp16():
     return f"""
 ## WP-16. Does the conditional threshold predict SGD crossings? (Track 4, registered; for the submission)
 
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
+
 Registration: `sgd_own_registration.md` (0506650); budget fixed before any registered run (988c1d7); amendment 1,
 the timescale extension (1df48d1, 13:13 EDT), registered before any SGD run was scored. Producer: `src/sgd_own.py` →
 `sgd_own_runs.csv`, `sgd_own_scores.csv`, `sgd_own_ratios.csv`, `sgd_own_extension_scores.csv`. This answers "does the
@@ -1625,6 +1629,10 @@ def wp21():
     return f"""
 ## WP-21. A second prospective test of the timescale account (Task B, registered; for the submission)
 
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
+
 Registration: `ts_test_registration.md` (db2a915), written before any run. The own thresholds for the fresh training
 sets were frozen with a hash before any Adam run (0da303c). Producer: `src/ts_test.py` → `ts_test/runs.csv`,
 `ts_test/scores.csv`.
@@ -1691,6 +1699,10 @@ def wp23():
                      f"{'yes' if r.within_tol else '**no**'} |" for r in t.itertuples())
     return f"""
 ## WP-23. Is the timescale relationship consistent with the within-a interventions? (Item 1; POST HOC; for the submission)
+
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
 
 Producer: `src/timescale_consistency.py` → `timescale_consistency/runs.csv`, `arms.csv`, `summary.json`.
 - **Frozen relationship:** residual = α + β·ratio, with α = {sm["frozen_fit"]["alpha"]:.4f} and
@@ -1780,6 +1792,14 @@ def wp24():
     else:
         r4s = f"R4: {r4}."
     n_m = int(pr.mirror.sum())
+
+    def rng(opt, sl, a=None, k=None):
+        v = []
+        for x in PH:
+            if x["opt"] != opt or (a is not None and (round(x["a"], 2) != a or int(x["winding"]) != k)):
+                continue
+            v += list((np.array(x["cell_medians_obs"]) / np.array(x["cell_medians_pred"]))[sl])
+        return f"{min(v):.2f} to {max(v):.2f}" if min(v) < 0 else f"{min(v):.2f}–{max(v):.2f}"
     return f"""
 ## WP-24. The lag law r = κ(a)·χ: a no-fit constant, and a registered ramp test (Tracks 1A and 1B; for the submission)
 
@@ -1879,11 +1899,16 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
 |---|---|---|---|---|
 {cm}
 
-- **SGD:** the law predicts the cell medians to within a few percent in every cell except the fastest (κχ = 0.1), where
-  observed/predicted is 1.14–1.26 (the nonlinear regime, math note §13.3(iv)).
+- **SGD:** observed/predicted cell medians are {rng("sgd", slice(0, 4))} in the four slowest cells,
+  {rng("sgd", slice(4, 5))} in the fifth (κχ = 0.04) and {rng("sgd", slice(5, 6))} in the fastest (κχ = 0.1, where the
+  linearisation starts to fail; math note §13.3(iv)).
   - The sign test holds: on the k = 0 copy at a = 1.30 the crossings come *early*, as predicted.
-- **Adam:** predicted lags are ≤ 0.006, and there the medians carry a small offset of order 0.001. R1 fails at a = 1.30
-  and passes at a = 1.50.
+- **Adam:** the predicted lags are ≤ 0.006, and the cell medians do not follow them. Observed/predicted is
+  {rng("adam", slice(0, 6), 1.3, -1)} (a = 1.30, k = −1), {rng("adam", slice(0, 6), 1.3, 0)} (k = 0) and
+  {rng("adam", slice(0, 6), 1.5, 0)} (a = 1.50).
+  - The post hoc R1 pass at a = 1.50 comes from the pooled per-run slope, not from agreement at the cell level.
+  - Adam's frozen-preconditioner linearisation is not supported at these small lags. Its v̂ adapts during the ramp
+    (math note §13.3(iv)(c)).
 
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
@@ -1919,12 +1944,13 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   pooled magnitude criterion (R1) passes only for SGD at a = 1.30 on the natural winding. The failures trace to seeds
   whose own-sample global threshold is not the switch of the branch the ramp forces."
 - **Say (ramp, post hoc, labelled):** "Measured against the switch of the branch each run actually tracks, SGD's
-  crossing lag matches κ(a)χ with no fitted parameter across two decades of rate, including the predicted *early*
-  crossing on the winding copy with negative κ."
+  crossing lag matches κ(a)χ with no fitted parameter across two decades of rate: within 6% in the four slowest rate
+  cells and within 30% in every cell, including the predicted *early* crossing on the winding copy with negative κ.
+  Adam's lags in the ramp do not follow the law."
 - **Do not say:**
   - that the ramp test passed as registered;
   - that κ was predicted before the fitted relationship was known;
-  - that the law holds for Adam at small predicted lags (R1 fails at a = 1.30 post hoc too);
+  - that the law holds for Adam in the ramp (its cell medians do not follow κχ, even post hoc);
   - that the law holds in the nonlinear regime κχ ≳ 0.1;
   - that the lag law explains width 2 (WP-15; Track 2 below).
 IDs: {_id("1A arms within tolerance", "1A slope/kappa a=1.30", "1A slope/kappa a=1.50", "1B registered R1 SGD 1.30 k=-1", "1B post hoc R1 SGD 1.50", "1B branch off own a=1.50")}.

@@ -1207,8 +1207,8 @@ Registration: `results/ramp_registration.md` (c4b4c6d). Own thresholds were froz
 | 1.50 | +0 | adam | 0.90 PASS | 0.94 PASS | -0.0002 PASS |
 | 1.50 | +0 | sgd | 1.14 PASS | 1.00 PASS | +0.0010 PASS |
 
-  - SGD's cell medians match κ_kχ to within a few percent over two decades of γ, except the fastest cell (κχ = 0.1; observed/predicted 1.14–1.26). The negative-κ copy crosses early, as predicted.
-  - Adam's predicted lags are ≤ 0.006, where the medians carry an offset of order 0.001.
+  - SGD's observed/predicted cell medians are 0.99–1.06 in the four slowest cells, 0.97–1.11 in the fifth (κχ = 0.04) and 0.87–1.26 in the fastest (κχ = 0.1, the edge of the linear regime). The negative-κ copy crosses early, as predicted.
+  - Adam's cell medians do not follow κχ (observed/predicted 0.35–0.94, 1.40–1.85 and −0.39 to 0.67 across the three settings), even post hoc. Its v̂ adapts during the ramp (§13.3(iv)(c)), and the post hoc R1 pass at a = 1.50 comes from the pooled slope only.
 - **R4 (free Adam at η = 0.01, 0.005, 0.0025): PASS at both a.**
   - a = 1.30: median residuals 0.0296, 0.0304, 0.0308 (tolerance ±0.0100; 39 of 40 crossed at each η).
   - a = 1.50: median residuals 0.0619, 0.0625, 0.0647 (tolerance ±0.0155; 39 of 40 crossed at each η).

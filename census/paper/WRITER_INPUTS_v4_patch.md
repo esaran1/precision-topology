@@ -459,7 +459,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 577 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 589 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -1154,6 +1154,10 @@ it is exploratory.
 
 ## WP-16. Does the conditional threshold predict SGD crossings? (Track 4, registered; for the submission)
 
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
+
 Registration: `sgd_own_registration.md` (0506650); budget fixed before any registered run (988c1d7); amendment 1,
 the timescale extension (1df48d1, 13:13 EDT), registered before any SGD run was scored. Producer: `src/sgd_own.py` →
 `sgd_own_runs.csv`, `sgd_own_scores.csv`, `sgd_own_ratios.csv`, `sgd_own_extension_scores.csv`. This answers "does the
@@ -1382,6 +1386,10 @@ prediction failed.
 
 ## WP-21. A second prospective test of the timescale account (Task B, registered; for the submission)
 
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
+
 Registration: `ts_test_registration.md` (db2a915), written before any run. The own thresholds for the fresh training
 sets were frozen with a hash before any Adam run (0da303c). Producer: `src/ts_test.py` → `ts_test/runs.csv`,
 `ts_test/scores.csv`.
@@ -1432,6 +1440,10 @@ crosses below the placement bound; placement switches on at R_glob, where traini
 crossing the bound a/1.4 is the switch (the bound is necessary, not sufficient).
 
 ## WP-23. Is the timescale relationship consistent with the within-a interventions? (Item 1; POST HOC; for the submission)
+
+**Update (WP-24).** The no-fit law r = κ(a)·χ (math note §13; derived after the fitted relationship used here was known)
+accounts for the same residuals with no intercept and no fitted parameter. The verdicts in this section were scored
+with the fitted line and stand as registered. Where the paper states the account, use κ(a)·χ (WP-24).
 
 Producer: `src/timescale_consistency.py` → `timescale_consistency/runs.csv`, `arms.csv`, `summary.json`.
 - **Frozen relationship:** residual = α + β·ratio, with α = 0.0157 and
@@ -1640,11 +1652,16 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
 | 1.50 | +0 | adam | -0.0002 / -0.0003 / +0.0001 / +0.0010 / +0.0014 / +0.0043 | +0.0005 / +0.0008 / +0.0014 / +0.0023 / +0.0038 / +0.0065 |
 | 1.50 | +0 | sgd | +0.0010 / +0.0025 / +0.0063 / +0.0160 / +0.0414 / +0.1136 | +0.0010 / +0.0025 / +0.0063 / +0.0158 / +0.0398 / +0.1000 |
 
-- **SGD:** the law predicts the cell medians to within a few percent in every cell except the fastest (κχ = 0.1), where
-  observed/predicted is 1.14–1.26 (the nonlinear regime, math note §13.3(iv)).
+- **SGD:** observed/predicted cell medians are 0.99–1.06 in the four slowest cells,
+  0.97–1.11 in the fifth (κχ = 0.04) and 0.87–1.26 in the fastest (κχ = 0.1, where the
+  linearisation starts to fail; math note §13.3(iv)).
   - The sign test holds: on the k = 0 copy at a = 1.30 the crossings come *early*, as predicted.
-- **Adam:** predicted lags are ≤ 0.006, and there the medians carry a small offset of order 0.001. R1 fails at a = 1.30
-  and passes at a = 1.50.
+- **Adam:** the predicted lags are ≤ 0.006, and the cell medians do not follow them. Observed/predicted is
+  0.35–0.94 (a = 1.30, k = −1), 1.40–1.85 (k = 0) and
+  -0.39 to 0.67 (a = 1.50).
+  - The post hoc R1 pass at a = 1.50 comes from the pooled per-run slope, not from agreement at the cell level.
+  - Adam's frozen-preconditioner linearisation is not supported at these small lags. Its v̂ adapts during the ramp
+    (math note §13.3(iv)(c)).
 
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
@@ -1683,12 +1700,13 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   pooled magnitude criterion (R1) passes only for SGD at a = 1.30 on the natural winding. The failures trace to seeds
   whose own-sample global threshold is not the switch of the branch the ramp forces."
 - **Say (ramp, post hoc, labelled):** "Measured against the switch of the branch each run actually tracks, SGD's
-  crossing lag matches κ(a)χ with no fitted parameter across two decades of rate, including the predicted *early*
-  crossing on the winding copy with negative κ."
+  crossing lag matches κ(a)χ with no fitted parameter across two decades of rate: within 6% in the four slowest rate
+  cells and within 30% in every cell, including the predicted *early* crossing on the winding copy with negative κ.
+  Adam's lags in the ramp do not follow the law."
 - **Do not say:**
   - that the ramp test passed as registered;
   - that κ was predicted before the fitted relationship was known;
-  - that the law holds for Adam at small predicted lags (R1 fails at a = 1.30 post hoc too);
+  - that the law holds for Adam in the ramp (its cell medians do not follow κχ, even post hoc);
   - that the law holds in the nonlinear regime κχ ≳ 0.1;
   - that the lag law explains width 2 (WP-15; Track 2 below).
 IDs: `1A arms within tolerance`; `1A slope/kappa a=1.30`; `1A slope/kappa a=1.50`; `1B registered R1 SGD 1.30 k=-1`; `1B post hoc R1 SGD 1.50`; `1B branch off own a=1.50`.
