@@ -1,7 +1,7 @@
 # WP-38. The validity boundary (registered) and the Adam ordering diagnostic (post hoc) (final night; for the submission)
 
-This is a separate file. The main patch is unchanged, except that `collapse.pdf` and its captions.md entry were
-regenerated to include the boundary test's points, at the author's request.
+This is a separate file. The boundary test's census rows are folded into the main census (WP-14 of the main patch), and
+`collapse.pdf` and its captions.md entry include the boundary test's points.
 
 ## 1. Registered boundary test: width-1 SGD forced ramps at χ = 0.03–0.4
 
@@ -44,6 +44,13 @@ within 30% of target). In every cell χ_own was within 3% of target; the invalid
 > unresolved because most fast-ramp runs outran the tracked branch; descriptively, the lag stayed within 25% of κ(a)χ only
 > where the predicted lag κχ was about 0.1 and exceeded it by a factor of 1.7 at κχ ≈ 0.23, so the account's range of
 > validity is set by the predicted lag, κχ ≲ 0.1, rather than by χ alone."
+
+**Where the free-training arms sit (for the paper):**
+> "Across the 36 free-training arms, the predicted lag κχ has arm medians from 0.007 to 0.082, with 95% of runs between
+> 0.010 and 0.081, so every arm lies below κχ ≈ 0.1, where the lag law held within 25% in the boundary test."
+
+(Producer: `src/track_b.py` → `results/track_b/kappa_chi_range.json`. κχ is the committed κ_k times each run's χ. The
+single largest run is at 0.21.)
 
 **Say:**
 - the sentence above;
@@ -88,12 +95,12 @@ The observed lags span 0.079–0.106 (q10–q90).
   is a candidate for a new registration.
 - that P at the crossing is a prediction (it uses crossing-time information).
 
-## 3. Census rows (not folded into the main census; the main patch is unchanged)
+## 3. Census rows (folded into the main census on 2026-09-26, at the author's request; WP-14)
 
 | id | block | verdict |
 |---|---|---|
 | boundary-B1 | boundary test (final night) | UNRESOLVED |
 | boundary-B2 | boundary test (final night) | UNRESOLVED |
 
-Folding these in would make the headline 236 predictions: 214 scored by a registered rule (100 / 66 / 8 / 40) and 22
-post hoc. That would change WP-14 in the main patch, so it was not done.
+With these rows the census headline is 236 predictions: 214 scored by a registered rule (100 / 66 / 8 / 40) and 22
+assigned post hoc (WP-14).

@@ -1169,6 +1169,8 @@ The final round added:
   registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
 - the registered simplicity-bias transfer test (Track T v3, WP-37), with C1 and C2 both UNRESOLVED on its validity
   conditions: 22 of 40 runs crossed, and the median χ at crossing was 7.4.
+- the registered boundary test (SGD forced ramps at χ = 0.03–0.4, WP-38), with B1 and B2 both UNRESOLVED: only 3 of 10
+  cells had at least 30 crossings.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
 and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
@@ -2694,6 +2696,23 @@ linear-plus-slab task of WP-36 (λ = 1e−4), with the attained, reproducible fi
 registered prediction is that training's slab share first reaches q = 0.3914 just above the switch. It uses no κ.
 Everything was frozen before any training. The text below is the Track T writer input.
 {body}
+
+## Paper sentence (main.tex line 185), checked against the Say / Do not say lines above
+
+The author proposed a sentence, and it was corrected against WP-36 and WP-37 in three places:
+1. Without weight decay the minimizer is not attained, so the sentence cannot speak of "the minimizer" there.
+2. With weight decay the minimizer becomes slab-dominant through one discontinuous switch after a mixed branch, not a
+   direct linear-to-slab switch.
+3. The Say line "the transfer is not established" is added, with both validity thresholds.
+
+Use as written:
+
+> In an exploratory extension to a linear-plus-slab benchmark \citep{{shah2020pitfalls}} with a width-four tanh network, the
+> fixed-scale minimizer was not attained without weight decay (its hidden weights diverged and the slab feature entered
+> gradually); with weight decay it was attained and became slab-dominant through a single discontinuous switch at a
+> reproducible output scale. A registered training test of that switch was unresolved on its validity conditions: only
+> 22 of 40 runs crossed (30 were required), and the growth-to-relaxation ratio at crossing (median 7.4) lay far outside
+> the validity bound of 0.06, so the transfer to this benchmark is not established.
 
 ## Census rows for this registration (folded into the main census on 2026-09-26, at the author's request; WP-14)
 

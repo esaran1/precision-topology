@@ -171,6 +171,16 @@ def kappa_inputs():
     return d
 
 
+def kappa_chi_range(m):
+    """The predicted lag κχ (committed κ_k times each run's χ) across the 36 free-training arms: arm medians and runs."""
+    arm = m.groupby(["set", "a", "arm"]).pred_r.median()
+    out = {"arm_median_min": float(arm.min()), "arm_median_max": float(arm.max()),
+           "run_q05": float(m.pred_r.quantile(0.05)), "run_q95": float(m.pred_r.quantile(0.95)), "run_max": float(m.pred_r.max()),
+           "arms": int(len(arm)), "runs": int(len(m)), "arm_of_max": " ".join(map(str, arm.idxmax())), "arm_of_min": " ".join(map(str, arm.idxmin()))}
+    (OUT / "kappa_chi_range.json").write_text(json.dumps(out, indent=1))
+    return out
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     m = runs()
@@ -179,6 +189,7 @@ def main():
     c = collapse(m)
     ss = sample_size()
     kappa_inputs()
+    print("kappa*chi range:", kappa_chi_range(m))
     summ = {"bootstrap": {"B": B, "seed": SEED}, "within": S,
             "collapse": {"points": int(len(c)), "resolved": int(c.resolved.sum()),
                          "resolved_ratio_range_chi_le_0.06": [float(c[c.resolved & (c.chi <= 0.06) & c.branch_conditioned_post_hoc].ratio.min()),

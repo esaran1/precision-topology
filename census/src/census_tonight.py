@@ -15,7 +15,7 @@ import pandas as pd
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 ENUM = RESULTS / "registration_census_enumeration.csv"
-PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-", "trackT-")
+PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-", "trackT-", "boundary-")
 ROUND = "2026-09-25"
 
 
@@ -145,6 +145,22 @@ def track_t_rows():
                  f"{S['median_ratio']:.2f}, FAIL).", "results/simplicity_bias_v3/score.json")]
 
 
+def boundary_rows():
+    f = RESULTS / "ramp_boundary" / "verdicts.json"
+    if not f.exists():
+        return []
+    V = json.loads(f.read_text())
+    blk, reg, com = "boundary test (SGD forced ramps)", "results/ramp_boundary_registration.md", "a22e1aa"
+    nvalid = sum(c["valid"] for c in V["cells"])
+    return [_row("boundary-B1", blk, reg, com, V["B1"],
+                 f"B1: median obs/pred in [0.75, 1.25] in the chi = 0.03 and 0.06 cells at a = 1.30 and 1.50. Scored: "
+                 f"{nvalid} of 10 cells valid; the chi = 0.06 cell at a = 1.30 has fewer than 30 crossings: {V['B1']} (the valid "
+                 f"cell chi = 0.03 at a = 1.30 is out of band).", "results/ramp_boundary/verdicts.json"),
+            _row("boundary-B2", blk, reg, com, V["B2"],
+                 f"B2: median obs/pred outside [0.75, 1.25] in the chi = 0.4 cells. Scored: both cells have fewer than 30 "
+                 f"crossings: {V['B2']}.", "results/ramp_boundary/verdicts.json")]
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -157,7 +173,7 @@ def extra_rows():
 def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
-    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + track_t_rows() + extra_rows())
+    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + track_t_rows() + boundary_rows() + extra_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

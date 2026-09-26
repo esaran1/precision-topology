@@ -233,3 +233,5 @@ trackA-L3-adam,lag law at an unseen a (Track A),registered rule,FAIL,central,thr
 trackA-L3-sgd,lag law at an unseen a (Track A),registered rule,PASS,central,threshold
 trackT-C1,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,threshold
 trackT-C2,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,threshold
+boundary-B1,boundary test (SGD forced ramps),registered rule,UNRESOLVED,central,threshold
+boundary-B2,boundary test (SGD forced ramps),registered rule,UNRESOLVED,central,threshold

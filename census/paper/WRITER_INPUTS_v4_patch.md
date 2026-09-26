@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 212 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
-  38 UNRESOLVED.
+- **Headline**: 214 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
+  40 UNRESOLVED.
 - **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
-- **Total**: 234 registered predictions.
+- **Total**: 236 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -205,6 +205,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | asymmetric windows (Track 2) | registered rule | 2 | 2 | 0 | 2 | 6 |
 | band task in R^d (Track 3B) | post hoc (census) | 0 | 0 | 3 | 0 | 3 |
 | band task in R^d (Track 3B) | registered rule | 1 | 1 | 0 | 0 | 2 |
+| boundary test (SGD forced ramps) | registered rule | 0 | 0 | 0 | 2 | 2 |
 | c1 first order | registered rule | 2 | 0 | 0 | 2 | 4 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | collapse 09-12 | registered rule | 1 | 2 | 0 | 0 | 3 |
@@ -312,6 +313,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/prospective_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/r_collapse_prediction.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | results/r_collapse_prediction.md | registered rule | 0 | 1 | 1 | 0 | 2 |
+| results/ramp_boundary_registration.md | registered rule | 0 | 0 | 0 | 2 | 2 |
 | results/ramp_registration.md | post hoc (census) | 0 | 0 | 3 | 0 | 3 |
 | results/ramp_registration.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/residual_mechanism_design.md | registered rule | 0 | 2 | 0 | 0 | 2 |
@@ -474,7 +476,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 747 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 765 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -946,7 +948,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 13 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 53 | 31 | 1 | 13 |
+| registered rule | central | 53 | 31 | 1 | 15 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1019,6 +1021,8 @@ The final round added:
   registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
 - the registered simplicity-bias transfer test (Track T v3, WP-37), with C1 and C2 both UNRESOLVED on its validity
   conditions: 22 of 40 runs crossed, and the median χ at crossing was 7.4.
+- the registered boundary test (SGD forced ramps at χ = 0.03–0.4, WP-38), with B1 and B2 both UNRESOLVED: only 3 of 10
+  cells had at least 30 crossings.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
 and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
@@ -3657,6 +3661,49 @@ The text below is the Track A writer input.
   - `predictions.csv`, `predictions.sha256`, `train_*.log`
   - `observed_runs.csv`, `scores.json`, `scores_descriptive.json`
 - Parameter paths `paths/*.npz` (160 MB) are untracked. Their SHA-256 hashes are in `predictions.csv`.
+
+### 5. POST HOC diagnostic: Adam ordering (author-approved, after the registered score)
+
+**Label: POST HOC.**
+- Freezing P at the observed crossing uses crossing-time information. It is a diagnostic, never a prediction. **The
+  registered Adam L3 FAIL stands.**
+- Producer: `src/track_a_diag.py`, outputs `results/track_a/diag_p_at_crossing.csv` and `.json`.
+
+**Method.** The registered pipeline (`track_a.predict_one`) is re-run unchanged with only the step at which P is frozen
+changed.
+- Rule point, branch, δ₀, m₀, H and θ\* path, s path and stability rule are all identical.
+- Adam's moments come from deterministic retraining. Each retrained path equals its saved, hashed path bit for bit.
+- The registered predictions are reproduced to round-trip precision (74 of 74).
+
+All 74 Adam runs that crossed and have a prediction:
+
+| P frozen at | Spearman (traj.) | within 10% (traj.) | median obs/pred (traj.) | predicted r, q10–q90 (traj.) | Spearman (closed form) | within 10% (closed form) |
+|---|---|---|---|---|---|---|
+| rule point (registered) | 0.25 | 0.22 | 1.065 | 0.054–0.129 | 0.55 | 0.30 |
+| observed crossing (diagnostic) | **0.99** | **1.00** | 1.057 | 0.074–0.102 | 0.71 | 0.45 |
+| occupied branch's switch t_sw (candidate rule) | **0.95** | **0.91** | 1.042 | 0.074–0.102 | 0.74 | 0.50 |
+
+- The observed r spans 0.079–0.106 (q10–q90).
+- t_sw is the first step with |w₂| ≥ s\*_run. It came before the crossing in 74 of 74 runs.
+- **Outcome: the failure is a measurement-point artifact.** With P taken near the crossing, the same linear-response
+  model ranks the Adam runs almost perfectly, and every run falls within 10%. Frozen at the half-switch point, P is
+  stale: Adam's v̂ keeps evolving over its ~1,000-step memory between the rule point and the crossing.
+
+**Corrected rule for a future registered test (pre-crossing information only).**
+- Freeze Adam's preconditioner at t_sw, the first step at which |w₂| reaches the switch s\*_run of the branch occupied at
+  the rule point. s\*_run is known at the rule point, and t_sw is read from the output-scale trajectory in real time.
+- It precedes the crossing whenever the lag is positive: 74 of 74 here.
+- This rule was examined post hoc on these runs. It is a candidate for a new registration, not a validated one.
+
+**Paper wording (the author's, 2026-09-26; use as written):**
+> "The registered Adam test of per-run ordering failed (Spearman 0.25). Post hoc, the failure traces to when the
+> preconditioner was measured: freezing it at the observed crossing instead of at half the switch scale raises the
+> per-run Spearman to 0.99, with every run within 10%, showing that the rule-point preconditioner was stale by the
+> crossing. A pre-crossing rule chosen after seeing these runs, taking the preconditioner at the first step the output
+> scale reaches the occupied branch's switch, gives 0.95 (91% within 10%); we name it as the rule for a future
+> registered test."
+
+- Do not say: that L3 passes, or that this diagnostic is registered.
 
 ## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
 

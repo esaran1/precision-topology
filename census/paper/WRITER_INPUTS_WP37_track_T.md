@@ -74,6 +74,23 @@ switch.
   - *Do not say:* a C1 or C2 verdict.
 - **Not scored by 04:15.** Did not occur: the test was scored at 03:03 EDT.
 
+## Paper sentence (main.tex line 185), checked against the Say / Do not say lines above
+
+The author proposed a sentence, and it was corrected against WP-36 and WP-37 in three places:
+1. Without weight decay the minimizer is not attained, so the sentence cannot speak of "the minimizer" there.
+2. With weight decay the minimizer becomes slab-dominant through one discontinuous switch after a mixed branch, not a
+   direct linear-to-slab switch.
+3. The Say line "the transfer is not established" is added, with both validity thresholds.
+
+Use as written:
+
+> In an exploratory extension to a linear-plus-slab benchmark \citep{shah2020pitfalls} with a width-four tanh network, the
+> fixed-scale minimizer was not attained without weight decay (its hidden weights diverged and the slab feature entered
+> gradually); with weight decay it was attained and became slab-dominant through a single discontinuous switch at a
+> reproducible output scale. A registered training test of that switch was unresolved on its validity conditions: only
+> 22 of 40 runs crossed (30 were required), and the growth-to-relaxation ratio at crossing (median 7.4) lay far outside
+> the validity bound of 0.06, so the transfer to this benchmark is not established.
+
 ## Census rows for this registration (folded into the main census on 2026-09-26, at the author's request; WP-14)
 
 | id | block | registration | verdict | scored |
