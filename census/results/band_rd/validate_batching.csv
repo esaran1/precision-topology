@@ -1,0 +1,5 @@
+d,a,seed,steps,max_abs_diff,bitwise_equal,cross_step_batched,cross_step_single,s_cross_equal
+2,1.3,889000,3000,3.552713678800501e-15,False,,,True
+2,1.5,889000,3000,1.3877787807814457e-17,False,1856.0,1856.0,True
+4,1.3,889000,3000,7.105427357601002e-15,False,,,True
+4,1.5,889000,3000,4.440892098500626e-16,False,2273.0,2273.0,True

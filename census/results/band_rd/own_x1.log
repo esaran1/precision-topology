@@ -1,0 +1,117 @@
+{'a': 1.3, 'seed': 880000, 'w2_lo': np.float64(5.3125), 'w2_hi': np.float64(5.31875), 'evals': 9, 'note': ''}
+{'a': 1.3, 'seed': 880001, 'w2_lo': np.float64(4.99375), 'w2_hi': np.float64(5.0), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880002, 'w2_lo': np.float64(4.6375), 'w2_hi': np.float64(4.64375), 'evals': 9, 'note': ''}
+{'a': 1.3, 'seed': 880003, 'w2_lo': np.float64(5.43125), 'w2_hi': np.float64(5.4375), 'evals': 10, 'note': ''}
+{'a': 1.3, 'seed': 880004, 'w2_lo': np.float64(6.00625), 'w2_hi': np.float64(6.0125), 'evals': 16, 'note': ''}
+{'a': 1.3, 'seed': 880005, 'w2_lo': np.float64(5.00625), 'w2_hi': np.float64(5.0125), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880006, 'w2_lo': np.float64(5.08125), 'w2_hi': np.float64(5.0875), 'evals': 7, 'note': ''}
+Process SpawnPoolWorker-1:
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 131, in worker
+    put((job, i, result))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/pool.py", line 136, in worker
+    put((job, i, (False, wrapped)))
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/queues.py", line 377, in put
+    self._writer.send_bytes(obj)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 200, in send_bytes
+    self._send_bytes(m[offset:offset + size])
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+/Users/Evan/.platformio/python3/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+{'a': 1.3, 'seed': 880007, 'w2_lo': np.float64(5.6625), 'w2_hi': np.float64(5.66875), 'evals': 13, 'note': ''}
+{'a': 1.3, 'seed': 880008, 'w2_lo': np.float64(4.9625), 'w2_hi': np.float64(4.96875), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880009, 'w2_lo': np.float64(4.6875), 'w2_hi': np.float64(4.69375), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880010, 'w2_lo': np.float64(4.85625), 'w2_hi': np.float64(4.8625), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880011, 'w2_lo': np.float64(5.34375), 'w2_hi': np.float64(5.35), 'evals': 9, 'note': ''}
+{'a': 1.3, 'seed': 880012, 'w2_lo': np.float64(4.84375), 'w2_hi': np.float64(4.85), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880013, 'w2_lo': np.float64(5.51875), 'w2_hi': np.float64(5.525), 'evals': 11, 'note': ''}
+{'a': 1.3, 'seed': 880014, 'w2_lo': np.float64(5.64375), 'w2_hi': np.float64(5.65), 'evals': 12, 'note': ''}
+{'a': 1.3, 'seed': 880015, 'w2_lo': np.float64(5.06875), 'w2_hi': np.float64(5.075), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880016, 'w2_lo': np.float64(5.49375), 'w2_hi': np.float64(5.5), 'evals': 11, 'note': ''}
+{'a': 1.3, 'seed': 880017, 'w2_lo': np.float64(5.23125), 'w2_hi': np.float64(5.2375), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880018, 'w2_lo': np.float64(5.375), 'w2_hi': np.float64(5.38125), 'evals': 10, 'note': ''}
+{'a': 1.3, 'seed': 880019, 'w2_lo': np.float64(4.7375), 'w2_hi': np.float64(4.74375), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880020, 'w2_lo': np.float64(5.06875), 'w2_hi': np.float64(5.075), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880021, 'w2_lo': np.float64(4.7375), 'w2_hi': np.float64(4.74375), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880022, 'w2_lo': np.float64(4.81875), 'w2_hi': np.float64(4.825), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880023, 'w2_lo': np.float64(4.925), 'w2_hi': np.float64(4.93125), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880024, 'w2_lo': np.float64(5.10625), 'w2_hi': np.float64(5.1125), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880025, 'w2_lo': np.float64(5.5125), 'w2_hi': np.float64(5.51875), 'evals': 11, 'note': ''}
+{'a': 1.3, 'seed': 880026, 'w2_lo': np.float64(5.4625), 'w2_hi': np.float64(5.46875), 'evals': 11, 'note': ''}
+{'a': 1.3, 'seed': 880027, 'w2_lo': np.float64(5.6375), 'w2_hi': np.float64(5.64375), 'evals': 12, 'note': ''}
+{'a': 1.3, 'seed': 880028, 'w2_lo': np.float64(4.6625), 'w2_hi': np.float64(4.66875), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880029, 'w2_lo': np.float64(5.1375), 'w2_hi': np.float64(5.14375), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880030, 'w2_lo': np.float64(4.95625), 'w2_hi': np.float64(4.9625), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880031, 'w2_lo': np.float64(4.94375), 'w2_hi': np.float64(4.95), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880032, 'w2_lo': np.float64(4.83125), 'w2_hi': np.float64(4.8375), 'evals': 7, 'note': ''}
+{'a': 1.3, 'seed': 880033, 'w2_lo': np.float64(5.2), 'w2_hi': np.float64(5.20625), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880034, 'w2_lo': np.float64(5.24375), 'w2_hi': np.float64(5.25), 'evals': 8, 'note': ''}
+{'a': 1.3, 'seed': 880035, 'w2_lo': np.float64(5.05), 'w2_hi': np.float64(5.05625), 'evals': 6, 'note': ''}
+{'a': 1.3, 'seed': 880036, 'w2_lo': np.float64(5.43125), 'w2_hi': np.float64(5.4375), 'evals': 10, 'note': ''}
+{'a': 1.3, 'seed': 880037, 'w2_lo': np.float64(5.3), 'w2_hi': np.float64(5.30625), 'evals': 9, 'note': ''}
+{'a': 1.3, 'seed': 880038, 'w2_lo': np.float64(5.65), 'w2_hi': np.float64(5.65625), 'evals': 12, 'note': ''}
+{'a': 1.3, 'seed': 880039, 'w2_lo': np.float64(4.85), 'w2_hi': np.float64(4.85625), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880000, 'w2_lo': np.float64(2.70625), 'w2_hi': np.float64(2.7125), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880001, 'w2_lo': np.float64(2.54375), 'w2_hi': np.float64(2.55), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880002, 'w2_lo': np.float64(2.3625), 'w2_hi': np.float64(2.36875), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880003, 'w2_lo': np.float64(2.7625), 'w2_hi': np.float64(2.76875), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880004, 'w2_lo': np.float64(3.05625), 'w2_hi': np.float64(3.0625), 'evals': 11, 'note': ''}
+{'a': 1.5, 'seed': 880005, 'w2_lo': np.float64(2.55625), 'w2_hi': np.float64(2.5625), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880006, 'w2_lo': np.float64(2.59375), 'w2_hi': np.float64(2.6), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880007, 'w2_lo': np.float64(2.88125), 'w2_hi': np.float64(2.8875), 'evals': 9, 'note': ''}
+{'a': 1.5, 'seed': 880008, 'w2_lo': np.float64(2.53125), 'w2_hi': np.float64(2.5375), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880009, 'w2_lo': np.float64(2.4125), 'w2_hi': np.float64(2.41875), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880010, 'w2_lo': np.float64(2.4875), 'w2_hi': np.float64(2.49375), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880011, 'w2_lo': np.float64(2.71875), 'w2_hi': np.float64(2.725), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880012, 'w2_lo': np.float64(2.46875), 'w2_hi': np.float64(2.475), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880013, 'w2_lo': np.float64(2.8125), 'w2_hi': np.float64(2.81875), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880014, 'w2_lo': np.float64(2.88125), 'w2_hi': np.float64(2.8875), 'evals': 9, 'note': ''}
+{'a': 1.5, 'seed': 880015, 'w2_lo': np.float64(2.575), 'w2_hi': np.float64(2.58125), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880016, 'w2_lo': np.float64(2.80625), 'w2_hi': np.float64(2.8125), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880017, 'w2_lo': np.float64(2.66875), 'w2_hi': np.float64(2.675), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880018, 'w2_lo': np.float64(2.74375), 'w2_hi': np.float64(2.75), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880019, 'w2_lo': np.float64(2.41875), 'w2_hi': np.float64(2.425), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880020, 'w2_lo': np.float64(2.59375), 'w2_hi': np.float64(2.6), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880021, 'w2_lo': np.float64(2.4125), 'w2_hi': np.float64(2.41875), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880022, 'w2_lo': np.float64(2.45625), 'w2_hi': np.float64(2.4625), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880023, 'w2_lo': np.float64(2.5125), 'w2_hi': np.float64(2.51875), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880024, 'w2_lo': np.float64(2.61875), 'w2_hi': np.float64(2.625), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880025, 'w2_lo': np.float64(2.825), 'w2_hi': np.float64(2.83125), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880026, 'w2_lo': np.float64(2.78125), 'w2_hi': np.float64(2.7875), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880027, 'w2_lo': np.float64(2.86875), 'w2_hi': np.float64(2.875), 'evals': 9, 'note': ''}
+{'a': 1.5, 'seed': 880028, 'w2_lo': np.float64(2.38125), 'w2_hi': np.float64(2.3875), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880029, 'w2_lo': np.float64(2.6125), 'w2_hi': np.float64(2.61875), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880030, 'w2_lo': np.float64(2.525), 'w2_hi': np.float64(2.53125), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880031, 'w2_lo': np.float64(2.5125), 'w2_hi': np.float64(2.51875), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880032, 'w2_lo': np.float64(2.46875), 'w2_hi': np.float64(2.475), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880033, 'w2_lo': np.float64(2.6625), 'w2_hi': np.float64(2.66875), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880034, 'w2_lo': np.float64(2.675), 'w2_hi': np.float64(2.68125), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880035, 'w2_lo': np.float64(2.575), 'w2_hi': np.float64(2.58125), 'evals': 6, 'note': ''}
+{'a': 1.5, 'seed': 880036, 'w2_lo': np.float64(2.76875), 'w2_hi': np.float64(2.775), 'evals': 8, 'note': ''}
+{'a': 1.5, 'seed': 880037, 'w2_lo': np.float64(2.71875), 'w2_hi': np.float64(2.725), 'evals': 7, 'note': ''}
+{'a': 1.5, 'seed': 880038, 'w2_lo': np.float64(2.875), 'w2_hi': np.float64(2.88125), 'evals': 9, 'note': ''}
+{'a': 1.5, 'seed': 880039, 'w2_lo': np.float64(2.4625), 'w2_hi': np.float64(2.46875), 'evals': 6, 'note': ''}
+80 0 b4c9abcb13116674b260f0fe0caa8e0fb3e20ca08dfcf7c106b3ee47a188fd2d
