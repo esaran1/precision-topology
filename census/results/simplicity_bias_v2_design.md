@@ -156,3 +156,38 @@ registered range, with s_q set to 3.0 by hand. That test recorded s only; no ρ�
 - **Consequence for κ_q.** The κ_q formula assumes ρ₂ reaches q continuously along one branch. Here q is crossed by the
   jump, so κ_q, computed as registered on the branch that is lower in loss at s_q, is a formal application.
 - The registered test is run as designed. This caveat goes into the writer inputs whatever the outcome.
+
+## Freeze attempt (02:48 EDT): the registered ∇ρ₂ check FAILS, so nothing is registered and nothing is trained
+
+`simplicity_bias_v2 freeze` → `simplicity_bias_v2/frozen.json` (SHA-256 deb8853e…). This file is kept as the record
+and is **not** a registration.
+
+**What the freeze found:**
+- The refined path minimiser at s_q = 3.59138 is the **upper, slab-using branch**:
+  - loss 0.1494850;
+  - gradient 1.7e−10;
+  - ρ₂ = 0.4474, already above q = 0.3914, because the path jumps;
+  - smallest eigenvalue of H in (W, c, b) = 1.0e−4, which equals λ and is the idle unit;
+  - ∇ρ₂·θ*′ = 0.00587.
+- **The ∇ρ₂ check fails:**
+
+  | Comparison | Maximum relative disagreement | Registered requirement |
+  |---|---|---|
+  | autograd vs central differences | 0.033 | ≤ 1e−3 |
+  | central vs one-sided differences | 0.055 | ≤ 1e−3 |
+
+**Cause, verified.**
+- The minimiser is mirror-symmetric in x₂. Two slab units, (1.994, ±8.021) with c = −3.097 and equal output weights
+  1.2207, satisfy φ(x₁, −x₂) = φ(x₁, x₂) to 2e−8.
+- So 308 of the 31,200 replacement pairs for x₂ have |φ(x′) − φ(x)| < 1e−9, and the |·| in V₂ has a kink at each of
+  them.
+- ρ₂ is therefore not differentiable at the path minimiser on any scale above ~1e−8. This comes from the data's
+  x₂ → −x₂ symmetry, not from numerics.
+- κ_q = λ_min[∇ρ₂·(PH)⁻¹θ*′]/[∇ρ₂·θ*′] is **not defined** by the registered construction.
+- The branch jump recorded above is a second, independent reason the continuous linear-response lag does not apply at
+  this s_q.
+
+**Decision:**
+- The registration cannot be made as designed, and no prediction, training run or comparison exists.
+- Replacing the measure with a smooth one, such as squared differences, would be a second redesign. It would move q
+  and s_q, and it would still leave the branch jump. It is not done.
