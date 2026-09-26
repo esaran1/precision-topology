@@ -477,27 +477,27 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 211.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 227.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
-    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 16.0, 0)
+    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 32.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 233.0, 0)
-    for v, n in (("PASS", 110), ("FAIL", 76), ("PARTIAL", 13), ("UNRESOLVED", 34)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 285.0, 0)
+    for v, n in (("PASS", 128), ("FAIL", 98), ("PARTIAL", 13), ("UNRESOLVED", 46)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 95), ("FAIL", 67), ("PARTIAL", 15), ("UNRESOLVED", 34)):
+    for v, n in (("PASS", 99), ("FAIL", 71), ("PARTIAL", 21), ("UNRESOLVED", 36)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (195, 92, 61, 8, 34)),
-                        ("assigned post hoc in the census", (16, 3, 6, 7, 0)),
-                        ("since 2026-09-23: scored by registered rules", (44, 26, 14, 0, 4)),
-                        ("since 2026-09-23: assigned post hoc", (3, 0, 0, 3, 0)),
-                        ("by registered unit: scored by registered rules", (219, 107, 70, 8, 34)),
+    for scope, want in (("scored by registered rules", (205, 96, 65, 8, 36)),
+                        ("assigned post hoc in the census", (22, 3, 6, 13, 0)),
+                        ("since 2026-09-23: scored by registered rules", (54, 30, 18, 0, 6)),
+                        ("since 2026-09-23: assigned post hoc", (9, 0, 0, 9, 0)),
+                        ("by registered unit: scored by registered rules", (271, 125, 92, 8, 46)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (68, 41, 23, 0, 4)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (120, 59, 45, 0, 16)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
@@ -576,6 +576,7 @@ def main() -> None:
     act_checks()
     track4_checks()
     band_checks()
+    track2_checks()
 
     provenance_check()
 
@@ -1183,8 +1184,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 211", float(wp4[wp4.by == "block"].n.sum()), 211.0, 0)
-    chk("WP-4: by-file rows sum to 211", float(wp4[wp4.by == "registration_file"].n.sum()), 211.0, 0)
+    chk("WP-4: by-block rows sum to 227", float(wp4[wp4.by == "block"].n.sum()), 227.0, 0)
+    chk("WP-4: by-file rows sum to 227", float(wp4[wp4.by == "registration_file"].n.sum()), 227.0, 0)
     oth_ = pd.read_csv(R / "registration_census_v4_gates_and_reported.csv")
     chk("width-2 verdict listed as a registered decision rule, not a prediction",
         float((oth_.id == "sl-width2").sum() == 1
@@ -1503,15 +1504,15 @@ def harsh_review_checks() -> None:
     print("WP-14 census by relevance (A4)")
     cr = pd.read_csv(R / "census_relevance.csv")
     n = lambda **k: float(len(cr.query(" and ".join(f"{a} == {b!r}" for a, b in k.items()))))
-    chk("A4 FAIL registered central", n(verdict="FAIL", scoring="registered rule", relevance="central"), 26.0, 0)
+    chk("A4 FAIL registered central", n(verdict="FAIL", scoring="registered rule", relevance="central"), 30.0, 0)
     chk("A4 FAIL registered peripheral", n(verdict="FAIL", scoring="registered rule", relevance="peripheral"), 35.0, 0)
     chk("A4 FAIL post hoc central", n(verdict="FAIL", scoring="post hoc (census)", relevance="central"), 2.0, 0)
     chk("A4 FAIL post hoc peripheral", n(verdict="FAIL", scoring="post hoc (census)", relevance="peripheral"), 4.0, 0)
-    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 45.0, 0)
+    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 49.0, 0)
     chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
-    chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 9.0, 0)
-    chk("A4 rows", float(len(cr)), 211.0, 0)
+    chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 11.0, 0)
+    chk("A4 rows", float(len(cr)), 227.0, 0)
 
 
 def tracks_checks() -> None:
@@ -1922,6 +1923,40 @@ def band_checks() -> None:
     for d, (lo, hi) in {2: (1.118, 1.120), 4: (1.401, 1.412)}.items():
         chk(f"3B post hoc branch/own d={d} min", float(q[q.d == d].median_branch_over_own_x1.min()), lo, 0.0006)
         chk(f"3B post hoc branch/own d={d} max", float(q[q.d == d].median_branch_over_own_x1.max()), hi, 0.0006)
+
+
+def track2_checks() -> None:
+    """Track 2 (width 2; POST HOC): the numbers WP-27 prints."""
+    print("Track 2 (width 2, post hoc)")
+    sm = pd.read_csv(R / "width2_lag" / "summary.csv"); J = json.loads((R / "width2_lag" / "summary.json").read_text())
+    g = lambda arm, sub: sm[(sm.arm == arm) & (sm.subset == sub)].iloc[0]
+    n_w = 0; n = 0
+    for arm, (nn, fr, obs) in {"T2-3b": (53, 0.66, -0.0049), "T2-3c": (54, 0.83, 0.00005), "T2-3d": (58, 0.81, -0.0012)}.items():
+        r = g(arm, "chi <= width-1 max")
+        chk(f"T2 2B {arm} n", float(r.n_scored), nn, 0); chk(f"T2 2B {arm} within", float(r.frac_runs_within), fr, 0.006)
+        chk(f"T2 2B {arm} median obs", float(r.median_obs), obs, 0.00006)
+        n += int(r.n_scored); n_w += int(round(r.frac_runs_within * r.n_scored))
+    chk("T2 2B slowed within", n_w / n, 0.77, 0.006); chk("T2 2B slowed n", float(n), 165.0, 0)
+    t = g("T2-3", "chi <= width-1 max")
+    chk("T2 2B T2-3 three runs obs/pred", float(t.obs_over_pred), 1.04, 0.006); chk("T2 2B T2-3 three runs n", float(t.n_scored), 3.0, 0)
+    chk("T2 2B T2-3 three runs dist", float(t.median_dist_c), 0.066, 0.0006)
+    chk("T2 2B T2-3 chi_c median", J["T2-3"]["chi_c_min_median_max"][1], 0.99, 0.006)
+    chk("T2 2B T2-3 chi_c max", J["T2-3"]["chi_c_min_median_max"][2], 3.05, 0.006)
+    chk("T2 2B slowed branch defined", float(J["slowed"]["status_counts"]["ok"]), 191.0, 0)
+    chk("T2 2B slowed crossers", float(J["slowed"]["n"]), 230.0, 0)
+    b = pd.read_csv(R / "width2_basins" / "summary.csv").set_index("act")
+    f = b.loc["f_a pooled"]
+    chk("T2 2A Morse-Bott", float(f.morse_bott_min), 265.0, 0); chk("T2 2A strict", float(f.strict_min), 0.0, 0)
+    chk("T2 2A placed found", float(f.n_placed_min_found), 58.0, 0); chk("T2 2A stuck lowest", float(f.n_stuck_is_lowest_found), 108.0, 0)
+    chk("T2 2A lowest is placed", float(f.n_lowest_found_is_placed), 18.0, 0)
+    chk("T2 2A gap median", float(f.gap_to_placed_median), -0.0027, 0.00006)
+    chk("T2 2A stuck lower", float(f.n_placed_min_found - f.n_gap_to_placed_positive), 37.0, 0)
+    chk("T2 2A tanh saddles", float(b.loc["tanh", "saddle"]), 9.0, 0)
+    c = json.loads((R / "t2c" / "calibration.json").read_text())
+    chk("T2 2C STOP", float(c["decision"] == "STOP"), 1.0, 0)
+    chk("T2 2C earliest crossing", c["earliest_crossing"], 0.0164, 0.00006)
+    chk("T2 2C max available", c["max_frac_available"], 0.778, 0.0006)
+    chk("T2 2C max available below earliest", c["max_frac_available_below_earliest"], 0.075, 0.0006)
 
 
 def digit_stability() -> None:

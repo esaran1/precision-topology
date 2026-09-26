@@ -39,6 +39,9 @@ BLOCKS = {
     "asymmetric windows (Track 2)": ("central", "width2"),
     "width 2 no-gating test (Track 7)": ("central", "width2"),
     "timescale prospective test (Task B)": ("central", "threshold"),
+    "ramp (Track 1B)": ("central", "threshold"),
+    "non-sine activations (Track 3A)": ("central", "threshold"),
+    "band task in R^d (Track 3B)": ("central", "threshold"),
     # peripheral
     "Arrhenius 08-27": ("peripheral", "budget law / barriers"), "MNIST budget law 09-11": ("peripheral", "budget law"),
     "collapse 09-12": ("peripheral", "budget law"), "nu": ("peripheral", "budget law"),

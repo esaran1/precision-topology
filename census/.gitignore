@@ -28,3 +28,4 @@ results/residual_mechanism_parts.csv
 results/width2_nogating_parts/
 results/crossing_audit_full_parts.csv
 results/width2_lag/states/
+results/band_rd/traces_*.npz

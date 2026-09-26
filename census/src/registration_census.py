@@ -122,7 +122,7 @@ def collapse(d: pd.DataFrame) -> pd.DataFrame:
         else:
             r["verdict"] = "PARTIAL"
             r["scoring"] = "post hoc (census)"
-            r["verdict_status"] = (f"SCORED IN CENSUS 2026-09-24 (merged across a: {units}; different verdicts at "
+            r["verdict_status"] = (f"SCORED IN CENSUS {r['census_round']} (merged across a: {units}; different verdicts at "
                                    f"different a, so PARTIAL, assigned post hoc as S-3 was)")
         out.append(r)
     p = pd.DataFrame(out)

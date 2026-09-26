@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp28()
+    text += wp24() + wp25() + wp26() + wp27() + wp28()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1084,6 +1084,13 @@ CENTRAL_FAILS = {
     "lag2-L2'": "deconfounded proportionality fails (0.974 / 0.958).",
     "4b-ID": "inherited displacement: neither teleport nor reset removes half the residual (the competing outcome held).",
     "4b-OM": "optimiser memory: likewise, neither arm removes half the residual.",
+    "ramp-R5-R1": "Track 1B ramp, winding sign test (a = 1.30, k = 0): the pooled through-origin slope of r on kappa*chi is "
+                  "1.3003 (SGD; bound 1.3) and 9.1 (Adam); R2 and R3 pass and the crossings do come early as predicted.",
+    "act-Ta-200": "GELU/SiLU/Mish, 200 seeds: fewer than 90% of crossings at or above the validated switch (0.48 / 0.62 / 0.70).",
+    "act-Tb-200": "GELU/SiLU/Mish, 200 seeds: the median residual against the population threshold is not within tolerance of "
+                  "kappa*chi (wrong sign or size).",
+    "band-P2a-120": "band task in R^d, 120 seeds: the median residual against the population threshold lies above the width-1 "
+                    "range at d = 2 and d = 4 (0.19-0.55).",
     "T2-3d": "slowed regime, fresh seeds: the width-1 own-sample threshold has median |log err| 0.019 but does not beat "
              "the population width-2 threshold (paired interval [-1.04, +0.006]); crossings bimodal.",
     "T2-3": "asymmetric windows, width 2: training crosses above the validated threshold (93.7%) but at a median 3.29x "
@@ -1146,12 +1153,22 @@ The rest are:
 - the solve-threshold transfer (X1);
 - tanh at width 2.
 
+Tonight's program (2026-09-25) added four central failures, all training-side:
+- the ramp's winding sign test (R5-R1; pooled slope 1.3003 against a bound of 1.3);
+- the two 200-seed training tests for GELU, SiLU and Mish;
+- the R^d band task's width-1 lag range (120 seeds).
+
+It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
+and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
+registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
+census.
+
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
 **Say:** "Of {int((cr.verdict == "FAIL").sum())} failed predictions ({int(((cr.verdict == "FAIL") & (cr.scoring == "registered rule")).sum())} under the registered rule, {int(((cr.verdict == "FAIL") & (cr.scoring != "registered rule")).sum())} by post hoc scoring), {len(f)} bear on a central
-claim; most of these concern the residual's mechanism, which the paper reports as open, and one is the width-2 training
-prediction on asymmetric windows (WP-15)." **Do not say** "the central claims never failed" or "the failures are
+claim. Most of these concern the residual and training's tracking of the threshold (lag tests, Block 4b, the ramp's sign
+test, training outside the sine family, the lag in R^d); others are the width-2 training predictions (WP-15, WP-20)." **Do not say** "the central claims never failed" or "the failures are
 peripheral". Do not present the relevance classification as registered;
 it is post hoc.
 """
@@ -2262,6 +2279,33 @@ input, sections 1–6.
 {body}
 
 IDs: {_id("3B P1 d=2", "3B P2a d=2", "3B P2b d=2", "3B d=4 UNRESOLVED", "3B post hoc obs/pred range")}.
+"""
+
+
+def wp27():
+    """WP-27: width 2 (Track 2): 2B lag law, 2A stuck states, 2C validity condition (from the agent's writer inputs)."""
+    t = (RESULTS / "track2_writer_inputs.md").read_text()
+    body = t[t.index("## 2B. Does the lag law"):].rstrip()
+    body = "\n" + body
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    sm = pd.read_csv(RESULTS / "width2_lag" / "summary.csv")
+    tr = sm[(sm.arm == "T2-3") & (sm.subset == "chi <= width-1 max")].iloc[0]
+    return f"""
+## WP-27. Width 2: the lag law where the account applies, the stuck states, and the validity condition (Track 2; POST HOC; for the submission)
+
+Producers: `src/width2_lag.py` → `width2_lag/`; `src/width2_basins.py` → `width2_basins/`; `src/t2c.py` → `t2c/`
+(commit 764c9dc). **Everything here is POST HOC, and no verdict changes: T2-3 FAIL, T2-3b UNRESOLVED, T2-3c UNRESOLVED,
+T2-3d FAIL.** 2C was not registered: the author's calibration rule found no admissible rule scale.
+
+**Coordinator note (checked against `width2_lag/summary.csv`).** The three full-speed runs called "tracking" below have
+crossing states {tr.median_dist_c:.3f} from their branch (median). That is just above the module's 0.05 on-branch
+threshold, so the summary files list them as "off branch". Describe them as "the three full-speed runs with χ in width 1's
+range", not as on-branch.
+
+The text below is the Track 2 writer input.
+{body}
+
+IDs: {_id("T2 2B slowed within", "T2 2B T2-3 three runs obs/pred", "T2 2A Morse-Bott", "T2 2C STOP")}.
 """
 
 

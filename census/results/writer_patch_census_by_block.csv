@@ -23,6 +23,8 @@ block,R-collapse 09-12,registered rule,0,1,1,0,2
 block,S2 (withdrawn),registered rule,1,1,0,0,2
 block,SGD own thresholds (Track 4),registered rule,3,0,0,0,3
 block,asymmetric windows (Track 2),registered rule,2,2,0,2,6
+block,band task in R^d (Track 3B),post hoc (census),0,0,3,0,3
+block,band task in R^d (Track 3B),registered rule,1,1,0,0,2
 block,c1 first order,registered rule,1,0,0,2,3
 block,collapse 09-12,post hoc (census),0,1,0,0,1
 block,collapse 09-12,registered rule,1,2,0,0,3
@@ -40,6 +42,7 @@ block,lag test 2 (deconfounded),registered rule,0,2,0,0,2
 block,localization 08-22,post hoc (census),0,1,0,0,1
 block,localization 08-22,registered rule,1,0,1,0,2
 block,metric artifact 09-12,post hoc (census),0,0,2,0,2
+block,non-sine activations (Track 3A),registered rule,0,2,0,2,4
 block,nu,registered rule,0,1,0,0,1
 block,own-seed thresholds,post hoc (census),0,0,1,0,1
 block,own-seed thresholds,registered rule,1,1,0,0,2
@@ -48,6 +51,8 @@ block,phase2b,registered rule,0,1,0,0,1
 block,phase2b across a,registered rule,2,1,0,1,4
 block,precision,registered rule,0,0,0,1,1
 block,prospective own-seed,registered rule,8,0,0,0,8
+block,ramp (Track 1B),post hoc (census),0,0,3,0,3
+block,ramp (Track 1B),registered rule,3,1,0,0,4
 block,sample size,post hoc (census),0,0,1,0,1
 block,sample size,registered rule,1,1,0,0,2
 block,scale limits (width 2),registered rule,1,1,0,0,2
@@ -60,6 +65,7 @@ block,threshold 08-22,registered rule,2,1,1,0,4
 block,timescale prospective test (Task B),registered rule,2,0,0,0,2
 block,width 2 no-gating test (Track 7),registered rule,0,1,0,0,1
 block,winding 08-22,registered rule,4,0,0,0,4
+registration_file,results/act_training_registration.md,registered rule,0,2,0,2,4
 registration_file,results/amplification_prediction.md,post hoc (census),0,1,0,0,1
 registration_file,results/amplification_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/arrhenius_prediction.md,registered rule,15,11,1,15,42
@@ -68,6 +74,8 @@ registration_file,results/asym_registration.md (amendment 1),registered rule,0,1
 registration_file,results/asym_registration.md (amendment 2),registered rule,0,0,0,1,1
 registration_file,results/asym_registration.md (amendment 3),registered rule,0,0,0,1,1
 registration_file,results/asym_registration.md (amendment 4),registered rule,0,1,0,0,1
+registration_file,results/band_rd_registration.md,post hoc (census),0,0,3,0,3
+registration_file,results/band_rd_registration.md,registered rule,1,1,0,0,2
 registration_file,results/basin_prediction.md,registered rule,1,4,0,0,5
 registration_file,results/blockA5d_k1_prediction.md,registered rule,2,1,0,2,5
 registration_file,results/blockA5d_prediction.md,registered rule,1,2,0,2,5
@@ -117,6 +125,8 @@ registration_file,results/prospective_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/prospective_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/r_collapse_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/r_collapse_prediction.md,registered rule,0,1,1,0,2
+registration_file,results/ramp_registration.md,post hoc (census),0,0,3,0,3
+registration_file,results/ramp_registration.md,registered rule,3,1,0,0,4
 registration_file,results/residual_mechanism_design.md,registered rule,0,2,0,0,2
 registration_file,results/sample_size_prediction.md,post hoc (census),0,0,1,0,1
 registration_file,results/sample_size_prediction.md,registered rule,1,1,0,0,2

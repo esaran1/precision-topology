@@ -210,3 +210,19 @@ T2-3c,asymmetric windows (Track 2),registered rule,UNRESOLVED,central,width2
 TS-1,timescale prospective test (Task B),registered rule,PASS,central,threshold
 TS-2,timescale prospective test (Task B),registered rule,PASS,central,threshold
 T2-3d,asymmetric windows (Track 2),registered rule,FAIL,central,width2
+ramp-R1,ramp (Track 1B),post hoc (census),PARTIAL,central,threshold
+ramp-R2,ramp (Track 1B),post hoc (census),PARTIAL,central,threshold
+ramp-R3,ramp (Track 1B),post hoc (census),PARTIAL,central,threshold
+ramp-R5-R1,ramp (Track 1B),registered rule,FAIL,central,threshold
+ramp-R5-R2,ramp (Track 1B),registered rule,PASS,central,threshold
+ramp-R5-R3,ramp (Track 1B),registered rule,PASS,central,threshold
+ramp-R4,ramp (Track 1B),registered rule,PASS,central,threshold
+act-Ta,non-sine activations (Track 3A),registered rule,UNRESOLVED,central,threshold
+act-Tb,non-sine activations (Track 3A),registered rule,UNRESOLVED,central,threshold
+act-Ta-200,non-sine activations (Track 3A),registered rule,FAIL,central,threshold
+act-Tb-200,non-sine activations (Track 3A),registered rule,FAIL,central,threshold
+band-P1,band task in R^d (Track 3B),post hoc (census),PARTIAL,central,threshold
+band-P2a,band task in R^d (Track 3B),post hoc (census),PARTIAL,central,threshold
+band-P2b,band task in R^d (Track 3B),post hoc (census),PARTIAL,central,threshold
+band-P1-120,band task in R^d (Track 3B),registered rule,PASS,central,threshold
+band-P2a-120,band task in R^d (Track 3B),registered rule,FAIL,central,threshold
