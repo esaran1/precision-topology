@@ -637,7 +637,8 @@ def fig_scoreboard():
 
 
 COL_MARK = {"width 1, free training": "o", "width 1, free training (registered reference)": "o", "forced ramp (sgd)": "s",
-            "forced ramp (adam)": "s", "R^d band task": "^", "GELU/SiLU/Mish": "v", "width 2": "D"}
+            "forced ramp (adam)": "s", "R^d band task": "^", "GELU/SiLU/Mish": "v", "width 2": "D",
+            "forced ramp, boundary test (sgd)": "P"}
 
 
 def fig_collapse():
@@ -724,7 +725,9 @@ def captions():
     _cd = read("track_b/collapse.csv"); _cr = _cd[_cd.resolved]
     _lo = _cr[(_cr.chi <= 0.06) & _cr.branch_conditioned_post_hoc]
     entry("collapse", "appendix (or main text beside the lag figure)",
-          "Observed over predicted lag is close to 1 below χ ≈ 0.06 in every setting with data, and departs from 1 above it.",
+          "Observed over predicted lag is close to 1 for small ratios in every setting with data. It departs from 1 as the "
+          "predicted lag κχ grows: in the registered SGD boundary test it is 1.22 at κχ ≈ 0.12 and 1.67 at κχ ≈ 0.23, "
+          "already at χ = 0.03–0.06.",
           "Each point is a median over the runs of one arm or cell: width-1 free training (circles; filled = lag from the "
           "global own threshold, the committed comparison; open = lag from the tracked-branch switch, post hoc), the forced ramp "
           "(squares; SGD and Adam cells), the single unit in R^d (upward triangles), SiLU and Mish (downward triangles), "
@@ -734,7 +737,10 @@ def captions():
           [f"{len(_cr)} resolved points of {len(_cd)}",
            f"branch-conditioned points with χ ≤ 0.06: observed/predicted {_lo.ratio.min():.2f}–{_lo.ratio.max():.2f}",
            "width 2 above χ ≈ 0.3: ratio up to " + f"{_cr[_cr.setting == 'width 2'].ratio.max():.1f}",
-           "SiLU and Mish (χ ≈ 0.22–0.26): wrong sign"],
+           "SiLU and Mish (χ ≈ 0.22–0.26): wrong sign",
+           "registered boundary test (filled plus signs; SGD forced ramps, lag from the forced-branch switch frozen before "
+           "any run): only cells with at least 30 of 40 crossings are drawn; the other six cells (χ ≥ 0.06 at a = 1.30, "
+           "χ ≥ 0.1 at a = 1.50) mostly failed to cross within the ramp and are omitted"],
           note="New figure (final round, Track B).")
     # lag law and scoreboard (final round, 2026-09-25)
     _A, _kap, _lr = lag_data()

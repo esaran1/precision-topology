@@ -117,6 +117,17 @@ def collapse(m):
                 rows.append({"setting": "width 2", "label": f"{arm} chi in ({lo:g}, {hi:g}]", "chi": float(g.chi.median()),
                              "obs": float(g.r_obs.median()), "pred": float(g.r_pred.median()),
                              "branch_conditioned_post_hoc": True, "reference": "tracked-branch switch along the path (post hoc)"})
+    bd = RESULTS / "ramp_boundary" / "scored_runs.csv"
+    if bd.exists():                              # registered boundary test (final night): valid-crossing cells only
+        V = json.loads((RESULTS / "ramp_boundary" / "verdicts.json").read_text())
+        ok = {(round(c["a"], 2), c["chi_target"]) for c in V["cells"] if c["n_cross"] >= 30}
+        b = pd.read_csv(bd)
+        for (a, c), g in b.groupby([b.a.round(2), "chi_target"]):
+            if (a, c) not in ok:
+                continue
+            rows.append({"setting": "forced ramp, boundary test (sgd)", "label": f"a={a:.2f} chi_target={c}",
+                         "chi": float(g.chi_own.median()), "obs": float(g.obs_r.median()), "pred": float(g.pred_r.median()),
+                         "branch_conditioned_post_hoc": False, "reference": "forced-branch switch frozen before any run (registered)"})
     d = pd.DataFrame(rows)
     d["ratio"] = d.obs / d.pred
     d["resolved"] = d.pred.abs() >= 0.005

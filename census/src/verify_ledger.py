@@ -585,6 +585,7 @@ def main() -> None:
     track_a_checks()
     track_t_v2_checks()
     track_t_v3_checks()
+    final_checks_boundary_adam()
 
     provenance_check()
 
@@ -2067,7 +2068,7 @@ def track_b_checks() -> None:
     chk("TB collapse low-chi ratio min", float(lo.ratio.min()), 0.67, 0.006)
     chk("TB collapse low-chi ratio max", float(lo.ratio.max()), 1.40, 0.006)
     chk("TB collapse width2 max", float(cr[cr.setting == "width 2"].ratio.max()), 34.0, 0.6)
-    chk("TB collapse resolved", float(len(cr)), 99.0, 0)
+    chk("TB collapse resolved", float(len(cr)), 102.0, 0)
     ss = pd.read_csv(D / "sample_size_decomposition.csv")
     for r in ss.itertuples():
         want = {(1.3, 400): 0.0297, (1.3, 1600): 0.0293, (1.3, 6400): 0.0306, (1.5, 400): 0.0620, (1.5, 1600): 0.0619, (1.5, 6400): 0.0635}[(round(r.a, 2), r.n)]
@@ -2169,6 +2170,34 @@ def track_t_v3_checks() -> None:
     rc_ = pd.read_csv(R / "registration_census.csv").set_index("id")
     chk("TT3 census rows UNRESOLVED registered", float(all(rc_.loc[i, "verdict"] == "UNRESOLVED" and rc_.loc[i, "scoring"] == "registered rule"
                                                          for i in ("trackT-C1", "trackT-C2"))), 1.0, 0)
+
+
+def final_checks_boundary_adam() -> None:
+    """Final night: the registered boundary test and the post hoc Adam ordering diagnostic (WP-38, separate file)."""
+    print("Boundary test (registered) and Adam diagnostic (post hoc)")
+    V = json.loads((R / "ramp_boundary" / "verdicts.json").read_text())
+    chk("BT B1 UNRESOLVED", float(V["B1"] == "UNRESOLVED"), 1.0, 0)
+    chk("BT B2 UNRESOLVED", float(V["B2"] == "UNRESOLVED"), 1.0, 0)
+    cells = {(round(c["a"], 2), c["chi_target"]): c for c in V["cells"]}
+    for key, (n, ratio, valid) in {(1.3, 0.03): (40, 1.674, True), (1.3, 0.06): (28, 3.891, False), (1.5, 0.03): (40, 1.219, True),
+                                   (1.5, 0.06): (40, 1.671, True), (1.3, 0.4): (15, 1.543, False), (1.5, 0.4): (6, 3.253, False),
+                                   (1.5, 0.2): (0, float("nan"), False)}.items():
+        c = cells[key]
+        chk(f"BT cell {key} crossings", float(c["n_cross"]), float(n), 0)
+        chk(f"BT cell {key} valid", float(c["valid"]), float(valid), 0)
+        if n:
+            chk(f"BT cell {key} median ratio", c["median_ratio"], ratio, 0.0006)
+    chk("BT valid cells", float(sum(c["valid"] for c in V["cells"])), 3.0, 0)
+    D = json.loads((R / "track_a" / "diag_p_at_crossing.json").read_text())
+    chk("AD registered reproduced", float(D["registered_reproduced_exactly"]), 1.0, 0)
+    chk("AD p_cross spearman", D["p_cross"]["traj"]["spearman"], 0.99, 0.006)
+    chk("AD p_cross within10", 100 * D["p_cross"]["traj"]["frac_within_10pct"], 100.0, 0.06)
+    chk("AD p_switch spearman", D["p_switch"]["traj"]["spearman"], 0.95, 0.006)
+    chk("AD p_switch within10", 100 * D["p_switch"]["traj"]["frac_within_10pct"], 90.5, 0.06)
+    chk("AD p_switch before crossing", float(D["n_p_switch_before_crossing"]), 74.0, 0)
+    chk("AD registered within10", 100 * D["registered"]["traj"]["frac_within_10pct"], 21.6, 0.06)
+    chk("AD p_cross ratio q10", D["p_cross"]["traj"]["ratio_q10"], 1.02, 0.006)
+    chk("AD p_cross ratio q90", D["p_cross"]["traj"]["ratio_q90"], 1.07, 0.006)
 
 
 def digit_stability() -> None:

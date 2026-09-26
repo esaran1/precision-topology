@@ -1,0 +1,120 @@
+{
+ "B1": "UNRESOLVED",
+ "B2": "UNRESOLVED",
+ "chi_star": {
+  "1.3": 0.03,
+  "1.5": 0.06
+ },
+ "cells": [
+  {
+   "a": 1.3,
+   "chi_target": 0.03,
+   "n_cross": 40,
+   "n_runs": 40,
+   "chi_own_median": 0.029977446572077446,
+   "n_warmup_placed": 0,
+   "valid": true,
+   "median_ratio": 1.674145595791964,
+   "in_band": false
+  },
+  {
+   "a": 1.3,
+   "chi_target": 0.06,
+   "n_cross": 28,
+   "n_runs": 40,
+   "chi_own_median": 0.059433306339964326,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": 3.8913494373442807,
+   "in_band": false
+  },
+  {
+   "a": 1.3,
+   "chi_target": 0.1,
+   "n_cross": 27,
+   "n_runs": 40,
+   "chi_own_median": 0.09822794199151128,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": 2.945635435107947,
+   "in_band": false
+  },
+  {
+   "a": 1.3,
+   "chi_target": 0.2,
+   "n_cross": 20,
+   "n_runs": 40,
+   "chi_own_median": 0.19856754122881964,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": -2.025069020345573,
+   "in_band": false
+  },
+  {
+   "a": 1.3,
+   "chi_target": 0.4,
+   "n_cross": 15,
+   "n_runs": 40,
+   "chi_own_median": 0.38914833442960545,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": 1.5431428492046804,
+   "in_band": false
+  },
+  {
+   "a": 1.5,
+   "chi_target": 0.03,
+   "n_cross": 40,
+   "n_runs": 40,
+   "chi_own_median": 0.030339196971081957,
+   "n_warmup_placed": 0,
+   "valid": true,
+   "median_ratio": 1.2190912852422828,
+   "in_band": true
+  },
+  {
+   "a": 1.5,
+   "chi_target": 0.06,
+   "n_cross": 40,
+   "n_runs": 40,
+   "chi_own_median": 0.06067839394216391,
+   "n_warmup_placed": 0,
+   "valid": true,
+   "median_ratio": 1.670599136189045,
+   "in_band": false
+  },
+  {
+   "a": 1.5,
+   "chi_target": 0.1,
+   "n_cross": 3,
+   "n_runs": 40,
+   "chi_own_median": 0.09393861579148798,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": 2.5882134556631913,
+   "in_band": false
+  },
+  {
+   "a": 1.5,
+   "chi_target": 0.2,
+   "n_cross": 0,
+   "n_runs": 40,
+   "chi_own_median": NaN,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": NaN,
+   "in_band": null
+  },
+  {
+   "a": 1.5,
+   "chi_target": 0.4,
+   "n_cross": 6,
+   "n_runs": 40,
+   "chi_own_median": 0.4027366298522195,
+   "n_warmup_placed": 0,
+   "valid": false,
+   "median_ratio": 3.2533761149302185,
+   "in_band": false
+  }
+ ]
+}

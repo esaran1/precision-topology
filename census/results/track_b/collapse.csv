@@ -130,3 +130,6 @@ width 2,"T2-3d chi in (0, 0.0001]",1.1146715883613658e-05,-0.0037618032602957504
 width 2,"T2-3d chi in (0.01, 0.0637]",0.025586528370292,0.0021993627535439,0.0008962761851822,True,tracked-branch switch along the path (post hoc),2.4538895375166097,False
 width 2,"T2-3d chi in (0.0637, 0.3]",0.0882259233549781,0.0276296691110564,0.002303356115698,True,tracked-branch switch along the path (post hoc),11.995396162474691,False
 width 2,"T2-3d chi in (0.3, 3]",0.510452176935267,1.1826538767926449,-0.0026193854899448,True,tracked-branch switch along the path (post hoc),-451.50050702066295,False
+"forced ramp, boundary test (sgd)",a=1.30 chi_target=0.03,0.029977446572077397,0.3826920243867392,0.2285894520456595,False,forced-branch switch frozen before any run (registered),1.674145595791964,True
+"forced ramp, boundary test (sgd)",a=1.50 chi_target=0.03,0.0303391969710819,0.1490116308319148,0.122231725085542,False,forced-branch switch frozen before any run (registered),1.2190912852422828,True
+"forced ramp, boundary test (sgd)",a=1.50 chi_target=0.06,0.060678393942163844,0.40840042868560666,0.244463450171084,False,forced-branch switch frozen before any run (registered),1.6705991361890453,True
