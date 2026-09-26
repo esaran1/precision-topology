@@ -383,11 +383,39 @@ def _check_hash(name):
     return h
 
 
+def read_runs(path=None):
+    """runs.csv was appended cell by cell with the first cell's (SGD) header, and Adam rows carry three extra v̂ fields,
+    so rows are parsed by their field count (each record's key order is fixed by batch_ramp):
+      14 fields: not crossed; 17: crossed, SGD; 20: crossed, Adam.  Every row must match one schema exactly."""
+    import csv
+    head = ["a", "winding", "opt", "cell", "gamma", "crossed", "step", "s_cross", "placed_in_warmup"]
+    tail = ["seed", "w1_end", "b1_end", "b2_end", "steps_run"]
+    schema = {14: head + tail, 17: head + ["w1", "b1", "b2"] + tail,
+              20: head + ["w1", "b1", "b2", "vhat_w1", "vhat_b1", "vhat_b2"] + tail}
+    rows = []
+    with open(path or OUT / "runs.csv") as f:
+        r = csv.reader(f)
+        hdr = next(r)
+        assert hdr == schema[17], hdr
+        for line in r:
+            cols = schema[len(line)]
+            rec = dict(zip(cols, line))
+            assert (len(line) == 20) == (rec["opt"] == "adam" and rec["crossed"] == "True"), line
+            assert (len(line) == 14) == (rec["crossed"] == "False"), line
+            rows.append(rec)
+    d = pd.DataFrame(rows)
+    for c in d.columns:
+        if c == "opt":
+            continue
+        d[c] = d[c].map({"True": True, "False": False}) if c in ("crossed", "placed_in_warmup") else pd.to_numeric(d[c])
+    return d
+
+
 def score():
     _check_hash("own_frozen.csv"); _check_hash("own_free_frozen.csv")
     L = _landscape()
     own = pd.read_csv(OUT / "own_frozen.csv"); own["a"] = own.a.round(2)
-    d = pd.read_csv(OUT / "runs.csv"); d["a"] = d.a.round(2)
+    d = read_runs(); d["a"] = d.a.round(2)
     d = d.merge(own[["a", "seed", "w2_own"]], on=["a", "seed"], how="left")
     rows = []
     for r in d.itertuples():
@@ -411,8 +439,15 @@ def score():
                          "winding_changed": int((P[(P.a == a) & (P.init_winding == kw) & (P.opt == opt)].winding_k != kw).sum()),
                          **sc})
     V = pd.DataFrame(verdicts)
+    ff = OUT / "free_runs.csv"
+    if not ff.exists() or len(pd.read_csv(ff)) < len(A_VALUES) * len(FREE_ETAS) * len(FREE_SEEDS):
+        out = {"settings": V.to_dict("records"), "R4": "pending (free runs incomplete)"}
+        (OUT / "verdicts.json").write_text(json.dumps(out, indent=1, default=float))
+        pd.set_option("display.width", 250)
+        print(V.drop(columns=["cell_medians_obs", "cell_medians_pred"], errors="ignore").to_string(index=False))
+        return out
     fo = pd.read_csv(OUT / "own_free_frozen.csv"); fo["a"] = fo.a.round(2)
-    fr = pd.read_csv(OUT / "free_runs.csv"); fr["a"] = fr.a.round(2)
+    fr = pd.read_csv(ff); fr["a"] = fr.a.round(2)
     fr = fr.merge(fo[["a", "seed", "w2_own"]], on=["a", "seed"], how="left")
     fr["obs_r"] = fr.w2_cross / fr.w2_own - 1
     fr.to_csv(OUT / "free_scored.csv", index=False)
@@ -429,8 +464,80 @@ def score():
     return out
 
 
+# ------------------------------------------------------------------------------------------ POST HOC (after the registered score)
+def _branch_switch_job(args):
+    """POST HOC: the switch of the branch the ramp actually tracks, on the seed's own sample.  Newton continuation
+    (lag_law.branch_point) from the population branch point θ*(s₀) on winding k, relaxed on the own sample at s₀, then
+    stepped up in s (1%) until its gap G(θ_b(s)) > 0, then bisected to 1e-6 relative."""
+    os.nice(15)
+    import torch
+    torch.set_num_threads(1)
+    from .lag_law import branch_point, gap
+    a, k, seed = args
+    X, Y = _data([seed]); x, y = X[0].numpy(), Y[0].numpy()
+    sp = _s_star_pop(a); s = S0_FRAC * sp
+    z, gr = branch_point(branch_init(a, k), s, a, x, y)
+    G = lambda z_: gap(z_[0], z_[1], a)
+    out = {"a": a, "winding": k, "seed": seed, "grad_s0": gr}
+    if G(z) > 0:
+        return {**out, "note": "placed at s0", "s_branch": np.nan}
+    lo, zlo = s, z
+    while s < END_FRAC * sp:
+        s_new = s * 1.01
+        z_new, gr = branch_point(zlo, s_new, a, x, y)
+        if gr > 1e-8 or np.linalg.norm(z_new - zlo) > 0.5:
+            return {**out, "note": f"continuation lost at s={s_new:.4f} (grad {gr:.1e})", "s_branch": np.nan}
+        if G(z_new) > 0:
+            hi, zhi = s_new, z_new
+            while (hi - lo) / lo > 1e-6:
+                mid = 0.5 * (lo + hi)
+                zm, _ = branch_point(zlo, mid, a, x, y)
+                if G(zm) > 0:
+                    hi, zhi = mid, zm
+                else:
+                    lo, zlo = mid, zm
+            return {**out, "note": "", "s_branch": 0.5 * (lo + hi), "w1": float(zhi[0]), "b1": float(zhi[1])}
+        s, lo, zlo = s_new, s_new, z_new
+    return {**out, "note": "not placed by 3 s*", "s_branch": np.nan}
+
+
+def posthoc_branch(workers=1):
+    """POST HOC (labelled; after the registered score): residuals against the tracked branch's own-sample switch."""
+    from multiprocessing import get_context
+    f = OUT / "posthoc_branch_switch.csv"
+    jobs = [(a, k, sd) for a, k in SETTINGS for sd in SEEDS]
+    if not f.exists():
+        with get_context("spawn").Pool(workers) as pool:
+            rows = list(pool.imap(_branch_switch_job, jobs))
+        pd.DataFrame(rows).to_csv(f, index=False)
+    b = pd.read_csv(f); b["a"] = b.a.round(2)
+    own = pd.read_csv(OUT / "own_frozen.csv"); own["a"] = own.a.round(2)
+    b = b.merge(own[["a", "seed", "w2_own"]], on=["a", "seed"])
+    b["branch_over_own"] = b.s_branch / b.w2_own
+    P = pd.read_csv(OUT / "scored_runs.csv"); P["a"] = P.a.round(2)
+    P = P.merge(b[["a", "winding", "seed", "s_branch", "branch_over_own"]], left_on=["a", "init_winding", "seed"],
+                right_on=["a", "winding", "seed"], suffixes=("", "_b"))
+    P["obs_r_branch"] = P.s_cross / P.s_branch - 1
+    P.to_csv(OUT / "posthoc_scored_runs.csv", index=False)
+    rows = []
+    for (a, kw, opt), g in P.groupby(["a", "init_winding", "opt"]):
+        ok = g[np.isfinite(g.obs_r_branch)]
+        cells = [{"gamma": gm, "obs_r": gc.obs_r_branch.to_numpy(), "pred_r": gc.pred_r.to_numpy(), "n_runs": len(gc),
+                  "n_warmup_placed": 0} for gm, gc in ok.groupby("gamma")]
+        sc = score_setting(cells)
+        rows.append({"a": a, "winding": kw, "opt": opt, "n_with_branch_switch": len(ok) // N_GAMMA,
+                     "frac_branch_off_own_1pct": float((np.abs(b[(b.a == a) & (b.winding == kw)].branch_over_own - 1) > 0.01).mean()),
+                     **{k_: v for k_, v in sc.items()}})
+    d = pd.DataFrame(rows); d.to_json(OUT / "posthoc_branch.json", orient="records", indent=1)
+    pd.set_option("display.width", 250)
+    print(d.drop(columns=["cell_medians_obs", "cell_medians_pred"]).to_string(index=False))
+    for r in rows:
+        print(r["a"], r["winding"], r["opt"], np.round(r.get("cell_medians_obs", []), 4), np.round(r.get("cell_medians_pred", []), 4))
+    return d
+
+
 
 if __name__ == "__main__":
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     {"own": lambda: own(w), "own_free": lambda: own(w, FREE_SEEDS, "own_free_frozen.csv"), "design": design,
-     "run": lambda: run(), "free": lambda: free(), "score": lambda: score()}[sys.argv[1]]()
+     "run": lambda: run(), "free": lambda: free(), "score": lambda: score(), "posthoc": lambda: posthoc_branch(w)}[sys.argv[1]]()

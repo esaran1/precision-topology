@@ -64,3 +64,20 @@ def test_batch_equals_single_and_branch_init():
         assert all(not x["placed_in_warmup"] for x in res)
         got = np.array([res[1]["w1_end"], res[1]["b1_end"], res[1]["b2_end"]])
         assert np.max(np.abs(got - ref)) < 1e-12, (opt, steps, got, ref)
+
+
+def test_read_runs_parses_mixed_schemas(tmp_path):
+    head = "a,winding,opt,cell,gamma,crossed,step,s_cross,placed_in_warmup,w1,b1,b2,seed,w1_end,b1_end,b2_end,steps_run\n"
+    sgd = "1.3,-1,sgd,0,1e-05,True,10,5.0,False,0.9,-2.4,8.0,860000,0.9,-2.4,8.0,4010\n"
+    adam = "1.3,-1,adam,0,1e-03,True,11,5.1,False,0.9,-2.4,8.0,1e-9,2e-9,3e-9,860001,0.9,-2.4,8.0,4011\n"
+    nox = "1.3,-1,adam,0,1e-03,False,,,False,860002,0.9,-2.4,8.0,9000\n"
+    f = tmp_path / "runs.csv"
+    f.write_text(head + sgd + adam + nox)
+    d = R.read_runs(f)
+    assert list(d.seed) == [860000, 860001, 860002]
+    assert d.vhat_b1.iloc[1] == 2e-9 and d.b2.iloc[1] == 8.0 and d.steps_run.iloc[1] == 4011
+    assert not d.crossed.iloc[2] and d.steps_run.iloc[2] == 9000
+    import pytest
+    f.write_text(head + "1.3,-1,sgd,0,1e-05,True,10,5.0,False,0.9,-2.4,8.0,1,2,3,860000,0.9,-2.4,8.0,4010\n")
+    with pytest.raises(AssertionError):                     # 20 fields on an SGD row: rejected
+        R.read_runs(f)

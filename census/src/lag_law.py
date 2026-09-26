@@ -441,7 +441,24 @@ def winding_check():
     pd.DataFrame(rows).to_csv(OUT / "winding_check.csv", index=False)
 
 
+def relaxation_rates():
+    """Math note §13.3(iii): the relaxation rate ηλ_min(P^{1/2}HP^{1/2}) per step with Adam's median ABSOLUTE crossing
+    preconditioner (preconditioner_runs.csv) and η = 0.01, against the momentum time constant 1/(1 − β₁) = 10 steps."""
+    k = pd.read_csv(OUT / "kappa.csv"); pr = pd.read_csv(OUT / "preconditioner_runs.csv")
+    rows = []
+    for r in k.itertuples():
+        g = pr[pr.a.round(2) == round(r.a, 2)]
+        if not len(g):
+            continue
+        p = np.array([np.median(1 / (g.sqrt_v_w1 + 1e-8)), np.median(1 / (g.sqrt_v_b1 + 1e-8)), np.median(1 / (g.sqrt_v_b2 + 1e-8))])
+        H = np.array(json.loads(r.H))
+        lam = float(np.linalg.eigvalsh((np.sqrt(p)[:, None] * H) * np.sqrt(p)[None, :]).min())
+        rows.append({"a": round(r.a, 2), "n_runs": len(g), "eta_lambda_min": 0.01 * lam, "relaxation_steps": 1 / (0.01 * lam),
+                     "momentum_steps": 10.0})
+    d = pd.DataFrame(rows); d.to_csv(OUT / "relaxation.csv", index=False); print(d.to_string(index=False))
+
+
 if __name__ == "__main__":
     {"kappa": lambda: run_kappa(int(sys.argv[2]) if len(sys.argv) > 2 else 3),
      "commit": lambda: commit_predictions(int(sys.argv[2]) if len(sys.argv) > 2 else 3), "compare": compare,
-     "winding_check": winding_check}[sys.argv[1]]()
+     "winding_check": winding_check, "relaxation": relaxation_rates}[sys.argv[1]]()
