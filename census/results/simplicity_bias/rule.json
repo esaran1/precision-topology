@@ -1,0 +1,27 @@
+{
+ "delta_lin": 1.6,
+ "delta_slab": 1.0,
+ "delta_all": 1.6,
+ "ratio_lin_slab": 1.6,
+ "n_maximising_directions": 99,
+ "max_tilt_from_x1_deg_among_maximisers": 1.2249999999999999,
+ "pure_x1_attains_sup": true,
+ "n_dir": 7200,
+ "best_x1_error_rate": 0.1,
+ "p": 0.2,
+ "n_per_class": 400,
+ "rule_min_ratio": 1.2,
+ "rule_ok": true,
+ "slab_levels_mid": [
+  -0.25333333333333335,
+  0.25333333333333335
+ ],
+ "slab_levels_outer": [
+  -0.9733333333333333,
+  -0.49333333333333335,
+  0.49333333333333335,
+  0.9733333333333333
+ ],
+ "first_order_slope_lin": 0.4,
+ "first_order_slope_slab": 0.25
+}
