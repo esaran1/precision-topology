@@ -2377,8 +2377,10 @@ def wp30():
 ## WP-30. A decisive test of the first-order coefficient c₁ (Track 3, final round; registered follow-up; for the submission)
 
 Producer: `src/c1_followup.py` → `c1_followup_*`. Registration: `results/c1_followup_registration.md` (e233ef5), committed
-before any added certificate was computed. The original test stays INCONCLUSIVE as registered. The text below is the
-Track 3 writer input.
+before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check: 3
+of the 10 added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) pass; the other 7, and the rescaled Ĝ, are
+not independently checked. The decisive points are at ε = 0.08–0.12, not ε ≤ 0.04. The text below is the Track 3 writer
+input.
 {body}
 
 IDs: {_id("c1 follow-up PASS", "c1 follow-up width", "c1 follow-up contains derived")}.

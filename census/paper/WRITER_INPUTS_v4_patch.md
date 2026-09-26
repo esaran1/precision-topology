@@ -470,7 +470,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 681 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 705 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -2676,8 +2676,10 @@ IDs: `3B P1 d=2`; `3B P2a d=2`; `3B P2b d=2`; `3B d=4 UNRESOLVED`; `3B post hoc 
 ## WP-30. A decisive test of the first-order coefficient c₁ (Track 3, final round; registered follow-up; for the submission)
 
 Producer: `src/c1_followup.py` → `c1_followup_*`. Registration: `results/c1_followup_registration.md` (e233ef5), committed
-before any added certificate was computed. The original test stays INCONCLUSIVE as registered. The text below is the
-Track 3 writer input.
+before any added certificate was computed. The original test stays INCONCLUSIVE as registered. Independent Arb check: 3
+of the 10 added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) pass; the other 7, and the rescaled Ĝ, are
+not independently checked. The decisive points are at ε = 0.08–0.12, not ε ≤ 0.04. The text below is the Track 3 writer
+input.
 
 ### 1. What was committed before computing (`e233ef5`)
 
@@ -2735,7 +2737,16 @@ All five added a certified, so none was dropped.
 - **Compute**: one process at nice 15, peak memory below 1 GB, about 5 min in total.
 
 **Independent check** (`verify_certificates.check_finite`, Arb, one worker, largest a first; about 23 min per
-certificate): CHECKS_TBD
+certificate): **3 of the 10 bracket-end certificates were independently checked, and all 3 pass.**
+- **Passed**: `c1f_a1.12_hi` ('plus'), `c1f_a1.12_lo` ('minus') and `c1f_a1.11_hi` ('plus').
+  - Every sub-check is true: hashes, lemma W, tiling/coverage, the winning point in its region, the losing
+    claims above U, and every leaf claim verified.
+  - Check times were 1375 s, 1305 s and 1720 s.
+- **Not checked** (stopped at 23:59 EDT on the coordinator's wrap-up instruction):
+  - `c1f_a1.11_lo` was exported and hashed in the manifest; its check was interrupted.
+  - `c1f_a1.10_hi/lo`, `c1f_a1.09_hi/lo` and `c1f_a1.08_hi/lo` were not exported.
+  - These are search-certified only.
+- **No a was excluded by the checker rule.**
 
 **Ĝ(a)** from the rescaled search has no independent checker. It is search-certified only.
 

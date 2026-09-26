@@ -2004,6 +2004,9 @@ def c1_followup_checks() -> None:
     chk("c1 follow-up contains derived", float(S["feasible_lo"] <= S["pred_lo"] and S["pred_hi"] <= S["feasible_hi"]), 1.0, 0)
     chk("c1 follow-up added certified", float(S["n_added_certified"]), 5.0, 0)
     chk("c1 follow-up original n", float(S["n_original"]), 4.0, 0)
+    chk("c1 follow-up independently checked", float(sum(S["independently_checked"].values())), 3.0, 0)
+    chk("c1 follow-up not checked", float(len(S["not_checked"])), 7.0, 0)
+    chk("c1 follow-up excluded by checker", float(len(S["excluded_by_checker"])), 0.0, 0)
 
 
 def linear_response_checks() -> None:

@@ -446,7 +446,7 @@ this lemma shows nothing outside that box can exceed K.
 
 **Follow-up (final round, 2026-09-25; registered e233ef5; WP-30).** Five added certified brackets (a = 1.08–1.12) and the
 four original ones, with the registered estimator unchanged, give the feasible set C = [0.26531, 0.30687], of width
-0.042. It contains the derived c₁ ∈ [0.2852300, 0.2852303]: PASS. The original test stays INCONCLUSIVE as registered.
+0.042. It contains the derived c₁ ∈ [0.2852300, 0.2852303]: PASS. The original test stays INCONCLUSIVE as registered. The decisive points are at ε = 0.08–0.12, where the registered ±ε³ allowance is a leading part of the tolerance. Three of the ten added bracket-end certificates (a = 1.12 both ends, a = 1.11 upper) were independently checked in Arb and all pass; the other seven, and the rescaled Ĝ, rest on the certifying search alone.
 
 ## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
 
