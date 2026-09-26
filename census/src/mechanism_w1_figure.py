@@ -1,9 +1,9 @@
-"""Task C: the mechanism figure (width 1).  The conditional minimiser's |w₁| against held R/R_glob at a = 1.30 and 1.50,
+"""Task C: the mechanism figure (width 1).  The conditional minimizer's |w₁| against held R/R_glob at a = 1.30 and 1.50,
 with the class-mean optimum α* (horizontal), the placement bound a/1.4 (horizontal; placement needs |w₁| < a/1.4), R_glob
 (vertical) and the free-training crossings (phase 2b, budget 32,000) overlaid.
 
 Data (existing search machinery only):
-  s ≥ 1.5   the conditional audit's retained minimiser (cond_audit_candidates.csv, status RETAINED)
+  s ≥ 1.5   the conditional audit's retained minimizer (cond_audit_candidates.csv, status RETAINED)
   s < 1.5   the same frozen conditional search (blockB_landscape.best_conditional) at s = 0.05 ... 1.25 (added here)
   R_glob    the certified glob bracket midpoint (cond_certified_brackets.csv); x = |w₂| / w₂,glob
   crossings phase2b_checkpoints.csv crossing rows at budget 32,000 (|w₁|, |w₂| at the first placed step)
@@ -86,7 +86,7 @@ def figure():
                     "w1_below_bound_above_switch": bool((g[g.x > 1.02].w1 < a / 1.4).all()),
                     "w1_above_bound_below_switch": bool((g[g.x < 0.98].w1 > a / 1.4).all()),
                     "cross_w1_below_bound": float((c.w1.abs() < a / 1.4).mean())}
-    axes[0].set_ylabel(r"$|w_1|$ of the minimiser")
+    axes[0].set_ylabel(r"$|w_1|$ of the minimizer")
     fig.tight_layout(pad=0.3)
     F.save(fig, "mechanism_w1")
     pd.DataFrame(stats).T.to_csv(RESULTS / "mechanism_w1_stats.csv")

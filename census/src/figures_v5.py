@@ -59,12 +59,12 @@ def _errbar(ax, g, color, filled=True, marker="o", ls="-", dx=0.0, label=None, m
 # ------------------------------------------------------------------------------------------ fixed scale (main)
 def fig_fixed_scale():
     """One message: held at a fixed output scale, an unplaced network becomes placed, and a placed one stays placed,
-    only above the threshold from conditional minimisation; both transitions sit just above it."""
+    only above the threshold from conditional minimization; both transitions sit just above it."""
     g4, x4 = _curve(4)
     g5, x5 = _curve(5)
     fig, ax = plt.subplots(figsize=(TEXT_W, 2.35))
     ax.axvline(1.0, color=BLUE, lw=1.1, zorder=1)
-    ax.text(0.985, 0.97, "threshold from\nconditional minimisation", color=BLUE, ha="right", va="top",
+    ax.text(0.985, 0.97, "threshold from\nconditional minimization", color=BLUE, ha="right", va="top",
             transform=ax.get_xaxis_transform())
     _errbar(ax, g4, VERM, label="starting unplaced: becomes placed")
     _errbar(ax, g5, GREEN, marker="s", label="starting placed: stays placed")
@@ -182,7 +182,7 @@ def fig_decomposition(precision=None, name="decomposition"):
 
 # ------------------------------------------------------------------------------------------ thresholds against crossings
 def fig_thresholds():
-    """One message: at every a, free training places the hidden unit just above the conditional-minimisation threshold
+    """One message: at every a, free training places the hidden unit just above the conditional-minimization threshold
     R_glob and far below R_solve; both thresholds have certified limits as ε -> 0."""
     br = read("cond_certified_brackets.csv")
     c1 = read("first_order_c1.csv").iloc[0]
@@ -209,8 +209,8 @@ def fig_thresholds():
     ax.plot([0], [Rs0], color=BLUE, marker="s", ms=4.2, ls="none", mfc="white", zorder=4)
     ax.text(0.02, Rg0, r"$\varepsilon\to0$ limit", color=BLUE, va="center")
     ax.text(0.02, Rs0, r"$\varepsilon\to0$ limit", color=BLUE, va="center")
-    ax.text(0.62, 0.314, r"$R_{\mathrm{solve}}$ (conditional minimisation)", color=BLUE, ha="right", va="bottom")
-    ax.text(0.28, 0.2135, r"$R_{\mathrm{glob}}$ (conditional minimisation)", color=BLUE, ha="right", va="center")
+    ax.text(0.62, 0.314, r"$R_{\mathrm{solve}}$ (conditional minimization)", color=BLUE, ha="right", va="bottom")
+    ax.text(0.28, 0.2135, r"$R_{\mathrm{glob}}$ (conditional minimization)", color=BLUE, ha="right", va="center")
     ax.text(0.27, 0.262, "free-training\ncrossings", color=VERM, ha="right", va="center")
     ax.set_xlim(-0.03, 0.64); ax.set_ylim(0.185, 0.325)
     ax.set_xlabel(r"$\varepsilon=a-1$")
@@ -245,7 +245,7 @@ def fig_thresholds_appendix():
 
 # ------------------------------------------------------------------------------------------ the conditional minimiser's gap
 def fig_minimiser_gap(a=1.30):
-    """One message: along the conditional minimiser at a = 1.30, the class gap changes sign exactly once, at R_glob.
+    """One message: along the conditional minimizer at a = 1.30, the class gap changes sign exactly once, at R_glob.
     x = R/R_glob = |w2| / (midpoint of the certified R_glob bracket in |w2|), as in the fixed-scale figure."""
     d = read("cond_audit_candidates.csv")
     g = d[d.a.round(2) == round(a, 2)]
@@ -263,9 +263,9 @@ def fig_minimiser_gap(a=1.30):
     ax.text(xs + 0.025, -0.20, r"$R_{\mathrm{solve}}$", color=BLUE, va="center")
     ax.plot(ret.s / w_glob, ret.gap, color=BLUE, lw=1.2, zorder=2)
     ax.plot(scan.s / w_glob, scan.argmin_G, color=BLUE, marker="s", ms=3.4, mfc="white", ls="none", zorder=3)
-    ax.text(9.0 / w_glob, 0.10, "conditional minimiser", color=BLUE, ha="center", va="bottom")
+    ax.text(9.0 / w_glob, 0.10, "conditional minimizer", color=BLUE, ha="center", va="bottom")
     ax.set_xlabel(r"output scale $R/R_{\mathrm{glob}}$" + f" ($a={a:.2f}$)")
-    ax.set_ylabel("class gap $G$ of the minimiser")
+    ax.set_ylabel("class gap $G$ of the minimizer")
     ax.set_ylim(-0.5, 0.16)
     _clean(ax)
     fig.tight_layout(pad=0.3)
@@ -287,7 +287,7 @@ def fig_candidates_appendix(a=1.30):
         h = g[g.status.isin(sts)]
         ax.plot(h.s, h.loss, color=col, marker=mk, ls="none", ms=ms, mfc="none" if mk == "o" else col, mew=0.5,
                 zorder=1, label=lab)
-    ax.plot(ret.s, ret.loss, color=BLUE, lw=1.1, zorder=3, label="conditional minimiser (retained)")
+    ax.plot(ret.s, ret.loss, color=BLUE, lw=1.1, zorder=3, label="conditional minimizer (retained)")
     ax.plot(scan.s, np.minimum(scan.m_minus_lo, scan.m_plus_lo), color="k", marker="s", ms=3.0, mfc="white", ls="none",
             zorder=4, label="certified global minimum")
     ax.plot(st.s, st.loss, color="k", marker="D", ms=3.0, mfc="white", ls="none", zorder=5,
@@ -723,28 +723,28 @@ def captions():
             x0, x1, y0, y1 = g.x.values[i - 1], g.x.values[i], g.w1.values[i - 1], g.w1.values[i]
             return float(np.exp(np.log(x0) + (a / 1.4 - y0) / (y1 - y0) * (np.log(x1) - np.log(x0))))
         entry("mechanism_w1", "main text",
-              "As output scale grows, the conditional minimiser's first-layer weight moves from the class-mean optimum "
+              "As output scale grows, the conditional minimizer's first-layer weight moves from the class-mean optimum "
               "α* toward the worst-case optimum, dropping below the placement bound a/1.4 before placement switches on at "
               "R_glob, where free training crosses.",
-              "Width 1, a = 1.30 and 1.50, 800-point population. Minimiser: the conditional audit's retained minimiser "
+              "Width 1, a = 1.30 and 1.50, 800-point population. Minimizer: the conditional audit's retained minimizer "
               "(s ≥ 1.5) and the same frozen search at s = 0.05–1.25 (a validated search, not a certificate). R_glob: the "
               "certified bracket midpoint. Crossings: phase 2b, budget 32,000, "
               f"{int(ms_.loc[1.3, 'n_cross'])} and {int(ms_.loc[1.5, 'n_cross'])} crossing runs.",
               "None (point values; the bracket for R_glob is narrower than the line).",
               [f"α* = 1.7913 (the class-mean optimum, independent of a); a/1.4 = {1.3 / 1.4:.3f} (a = 1.30), {1.5 / 1.4:.3f} (a = 1.50)",
                f"|w1| at the smallest scale shown: {ms_.loc[1.3, 'w1_at_smallest']:.3f} (a = 1.30), {ms_.loc[1.5, 'w1_at_smallest']:.3f} (a = 1.50)",
-               f"the minimiser drops below a/1.4 at R/R_glob ≈ {_cross_bound(1.3):.2f} (a = 1.30) and {_cross_bound(1.5):.2f} (a = 1.50): "
+               f"the minimizer drops below a/1.4 at R/R_glob ≈ {_cross_bound(1.3):.2f} (a = 1.30) and {_cross_bound(1.5):.2f} (a = 1.50): "
                "the bound is necessary for placement, not sufficient",
                f"crossings with |w1| < a/1.4: {100 * ms_.loc[1.3, 'cross_w1_below_bound']:.0f}% and {100 * ms_.loc[1.5, 'cross_w1_below_bound']:.0f}%",
                f"w2_glob = {ms_.loc[1.3, 'w2_glob']:.4f} (a = 1.30), {ms_.loc[1.5, 'w2_glob']:.4f} (a = 1.50)"],
-              note="Do not describe the minimiser path as certified; only R_glob is.")
+              note="Do not describe the minimizer path as certified; only R_glob is.")
     # fixed scale
     t4 = read("fixed_scale_block4_tests.csv").set_index("variant"); t5 = read("fixed_scale_block5_tests.csv").set_index("variant")
     n4 = int(read("fixed_scale_block4_curve.csv").n.max()); n5 = int(read("fixed_scale_block5_curve.csv").n.max())
     lv = sorted(read("fixed_scale_block4_curve.csv").level.unique())
     entry("fixed_scale", "main text",
           "Held at a fixed output scale, an unplaced network becomes placed, and a placed one stays placed, only above the "
-          "threshold from conditional minimisation; both transitions sit just above it.",
+          "threshold from conditional minimization; both transitions sit just above it.",
           f"a = 1.30. Becomes placed: {n4} pre-placement checkpoints per held level, read after 4,000 steps. Stays placed: "
           f"{n5} runs per level, read after 12,000 steps. Held levels R/R_glob = {', '.join(f'{v:g}' for v in lv)}; "
           "R_glob is the certified threshold at a = 1.30 (midpoint of its bracket).",
@@ -787,7 +787,7 @@ def captions():
     c1 = read("first_order_c1.csv").iloc[0]; sl = read("mn2_solve_limit.csv").iloc[0]; kb = read("limit_K_base.csv").iloc[0]
     bg = br[br.kind == "glob"].sort_values("a"); bs = br[br.kind == "solve"].sort_values("a")
     entry("thresholds", "main text",
-          "At every a, free training places the hidden unit just above the conditional-minimisation threshold R_glob and "
+          "At every a, free training places the hidden unit just above the conditional-minimization threshold R_glob and "
           "far below R_solve; both thresholds have certified limits as ε → 0.",
           f"a = 1.30–1.60 (six values); free-training crossings at budget 32,000: n = {int(nr.min())} runs per a.",
           "Violins: the distribution of crossing R; points: medians with bootstrap 95% intervals. The certified threshold "
@@ -818,25 +818,25 @@ def captions():
     sep = float(max(b.loc["glob", "argmin_separation_lo"], b.loc["glob", "argmin_separation_hi"]))
     wg = 0.5 * (b.loc["glob", "w2_lo"] + b.loc["glob", "w2_hi"])
     entry("minimiser_gap", "main text",
-          "Along the conditional minimiser at a = 1.30, the class gap changes sign exactly once, at R_glob.",
-          f"a = 1.30, population objective (800 points); the conditional minimiser at {len(ret)} output scales (line) and "
-          f"the certified global minimiser at {len(scan)} scales (squares).",
+          "Along the conditional minimizer at a = 1.30, the class gap changes sign exactly once, at R_glob.",
+          f"a = 1.30, population objective (800 points); the conditional minimizer at {len(ret)} output scales (line) and "
+          f"the certified global minimizer at {len(scan)} scales (squares).",
           f"None drawn: the certified values are exact to ≤ {float(np.maximum(scan.m_minus_hi - scan.m_minus_lo, scan.m_plus_hi - scan.m_plus_lo).max()):.0e} in loss.",
           [f"x = R/R_glob = |w₂| / {wg:.5f} (midpoint of the certified R_glob bracket in |w₂|)",
            f"certified brackets: R_glob at |w₂| ∈ ({b.loc['glob', 'w2_lo']:.4f}, {b.loc['glob', 'w2_hi']:.4f}]; R_solve at "
            f"|w₂| ∈ ({b.loc['solve', 'w2_lo']:.4f}, {b.loc['solve', 'w2_hi']:.4f}] (R_solve/R_glob = "
            f"{0.5 * (b.loc['solve', 'w2_lo'] + b.loc['solve', 'w2_hi']) / wg:.3f})",
-           f"the minimisers either side of the switch are at most {sep:.1e} apart (certified); other basins are at least "
+           f"the minimizers either side of the switch are at most {sep:.1e} apart (certified); other basins are at least "
            f"+{float(scan.competitor_margin.min()):.4f} above (certified, radius 0.1)"])
     st = read("cond_audit_strict.csv"); st = st[st.a.round(2) == 1.3]
     nk = cg.groupby(["kind", "s"]).ngroups
     counts = {k: int(cg.status.isin(v).sum()) for k, v in (("degenerate", ("degenerate",)),
               ("screen", ("not carried (screen rank > 8)", "carried")), ("full", ("not lowest",)))}
     entry("app_candidates", "appendix (companion to minimiser_gap)",
-          "No candidate of the conditional search lies below the retained minimiser at any scale.",
+          "No candidate of the conditional search lies below the retained minimizer at any scale.",
           f"a = 1.30: {len(cg):,} candidates at {nk} evaluations.", "None.",
           [f"{counts['degenerate']:,} discarded as degenerate; {counts['screen']:,} screening runs; {counts['full']:,} full runs "
-           f"that were not the lowest (they lie on the retained minimiser)",
+           f"that were not the lowest (they lie on the retained minimizer)",
            f"frozen search result reproduced at {nk}/{nk} evaluations; {len(scan)} certified global minima; {len(st)} stricter-"
            "optimisation points"])
     # mirror branches
@@ -905,7 +905,7 @@ def captions():
            "(−0.003 [−0.013, 0.008])"])
     head = ("# Figure captions (v5): inputs for the LaTeX captions\n\nGenerated by `python -m src.figures_v5` from the "
             "committed artifacts. Figures are 5.5 in wide, at most 3 in tall, every glyph at least 8 pt (Times). Colours: "
-            "blue = conditional minimisation (thresholds and predictions built on it); vermillion = free training's placement "
+            "blue = conditional minimization (thresholds and predictions built on it); vermillion = free training's placement "
             "from an unplaced start; green = stays placed / solves; grey = context.\n\n")
     (OUT / "captions.md").write_text(head + "".join(E))
     return len(E)
