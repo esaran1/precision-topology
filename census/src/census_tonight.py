@@ -75,6 +75,26 @@ def act_rows():
     return rows
 
 
+def band_rows():
+    v = pd.read_csv(RESULTS / "band_rd" / "verdicts.csv")
+    blk, reg, com = "band task in R^d (Track 3B)", "results/band_rd_registration.md", "f19535b"
+    rule = {"P1": ">= 90% of crossing runs at s_c >= s_lo of the certified width-1 bracket",
+            "P2a": "median residual vs the population threshold inside the width-1 phase2b IQR",
+            "P2b": "median residual vs the frozen x1-sample own threshold within max(0.01, 0.25|pred|) of median kappa_k*chi"}
+    rows = []
+    for r in v[v.d > 1].itertuples():
+        sec = r.arm == "secondary"
+        for R in (("P1", "P2a") if sec else ("P1", "P2a", "P2b")):
+            verdict = getattr(r, R)
+            detail = {"P1": f"fraction {r.frac_at_or_above_s_lo:.3f}", "P2a": f"median r_pop {r.median_r_pop:.3f} vs [{r.ref_q1:.3f}, {r.ref_q3:.3f}]",
+                      "P2b": f"obs {r.median_obs_r_own:.3f} vs pred {r.median_pred_r:.3f}"}[R] if verdict != "UNRESOLVED" else f"{r.n_crossing} crossing (< 30)"
+            rows.append(_row(f"band-{R}{'-120' if sec else ''}@d{r.d} {r.a:.2f}", blk, reg, com, verdict,
+                             f"{R} ({'secondary, 120 seeds pooled' if sec else 'primary, 40 seeds'}): {rule[R]}. Scored d = {r.d}, "
+                             f"a = {r.a:.2f}: {detail}: {verdict}.", "results/band_rd/verdicts.csv",
+                             "POST HOC beside it: against each run's own R^d branch switch the lag law holds in every cell (obs/pred 0.84-1.10)."))
+    return rows
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -87,7 +107,7 @@ def extra_rows():
 def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
-    new = pd.DataFrame(ramp_rows() + act_rows() + extra_rows())
+    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + extra_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

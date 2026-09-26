@@ -575,6 +575,7 @@ def main() -> None:
     lag_law_checks()
     act_checks()
     track4_checks()
+    band_checks()
 
     provenance_check()
 
@@ -1886,6 +1887,41 @@ def track4_checks() -> None:
     chk("T4 a=1.02 float32 max w2", P["a1.02_float32"]["max_abs_w2"], 3.92, 0.006)
     chk("T4 a=1.02 float64 median w2", P["a1.02_float64"]["median_abs_w2"], 1.92, 0.006)
     chk("T4 a=1.02 float64 max w2", P["a1.02_float64"]["max_abs_w2"], 3.94, 0.006)
+
+
+def band_checks() -> None:
+    """Track 3B (band task in R^d): registered verdicts and the numbers WP-28 prints."""
+    print("Track 3B (band task in R^d)")
+    B = R / "band_rd"
+    v = pd.read_csv(B / "verdicts.csv"); v["a"] = v.a.round(2)
+    g = lambda arm, d, a: v[(v.arm == arm) & (v.d == d) & (v.a == a)].iloc[0]
+    for a, (p1, rp, ro, pr) in {1.30: (0.972, 0.182, 0.147, 0.024), 1.50: (0.972, 0.207, 0.187, 0.049)}.items():
+        r = g("primary", 2, a)
+        chk(f"3B d=2 a={a:.2f} crossings", float(r.n_crossing), 36.0, 0)
+        chk(f"3B d=2 a={a:.2f} P1", float(r.P1 == "PASS"), 1.0, 0); chk(f"3B d=2 a={a:.2f} P1 frac", float(r.frac_at_or_above_s_lo), p1, 0.0006)
+        chk(f"3B d=2 a={a:.2f} P2a FAIL", float(r.P2a == "FAIL"), 1.0, 0); chk(f"3B d=2 a={a:.2f} median r_pop", float(r.median_r_pop), rp, 0.0006)
+        chk(f"3B d=2 a={a:.2f} P2b FAIL", float(r.P2b == "FAIL"), 1.0, 0); chk(f"3B d=2 a={a:.2f} r_own", float(r.median_obs_r_own), ro, 0.0006)
+        chk(f"3B d=2 a={a:.2f} pred", float(r.median_pred_r), pr, 0.0006)
+        r4 = g("primary", 4, a)
+        chk(f"3B d=4 a={a:.2f} UNRESOLVED", float(r4.P1 == "UNRESOLVED" and r4.P2a == "UNRESOLVED" and r4.P2b == "UNRESOLVED"), 1.0, 0)
+        chk(f"3B d=4 a={a:.2f} crossings", float(r4.n_crossing), 29.0, 0)
+    chk("3B P1 d=2", float((v[(v.arm == "primary") & (v.d == 2)].P1 == "PASS").all()), 1.0, 0)
+    chk("3B P2a d=2", float((v[(v.arm == "primary") & (v.d == 2)].P2a == "FAIL").all()), 1.0, 0)
+    chk("3B P2b d=2", float((v[(v.arm == "primary") & (v.d == 2)].P2b == "FAIL").all()), 1.0, 0)
+    chk("3B d=4 UNRESOLVED", float((v[(v.arm == "primary") & (v.d == 4)].P1 == "UNRESOLVED").all()), 1.0, 0)
+    for (d, a), (n, p1, rp) in {(2, 1.30): (112, 0.946, 0.189), (2, 1.50): (112, 0.964, 0.226), (4, 1.30): (90, 1.0, 0.528), (4, 1.50): (93, 1.0, 0.553)}.items():
+        r = g("secondary", d, a)
+        chk(f"3B secondary d={d} a={a:.2f} crossings", float(r.n_crossing), n, 0)
+        chk(f"3B secondary d={d} a={a:.2f} P1 frac", float(r.frac_at_or_above_s_lo), p1, 0.0006)
+        chk(f"3B secondary d={d} a={a:.2f} median r_pop", float(r.median_r_pop), rp, 0.0006)
+    ph = pd.read_csv(B / "posthoc_summary.csv"); ph["a"] = ph.a.round(2)
+    q = ph[ph.d > 1]
+    chk("3B post hoc obs/pred range", float(q.obs_over_pred.min()), 0.84, 0.006)
+    chk("3B post hoc obs/pred max", float(q.obs_over_pred.max()), 1.10, 0.006)
+    chk("3B post hoc all within tol", float(q.within_tol.all()), 1.0, 0)
+    for d, (lo, hi) in {2: (1.118, 1.120), 4: (1.401, 1.412)}.items():
+        chk(f"3B post hoc branch/own d={d} min", float(q[q.d == d].median_branch_over_own_x1.min()), lo, 0.0006)
+        chk(f"3B post hoc branch/own d={d} max", float(q[q.d == d].median_branch_over_own_x1.max()), hi, 0.0006)
 
 
 def digit_stability() -> None:
