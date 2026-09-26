@@ -88,3 +88,44 @@
   - `predictions.csv`, `predictions.sha256`, `train_*.log`
   - `observed_runs.csv`, `scores.json`, `scores_descriptive.json`
 - Parameter paths `paths/*.npz` (160 MB) are untracked. Their SHA-256 hashes are in `predictions.csv`.
+
+## 5. POST HOC diagnostic: Adam ordering (author-approved, after the registered score)
+
+**Label: POST HOC.**
+- Freezing P at the observed crossing uses crossing-time information. It is a diagnostic, never a prediction. **The
+  registered Adam L3 FAIL stands.**
+- Producer: `src/track_a_diag.py`, outputs `results/track_a/diag_p_at_crossing.csv` and `.json`.
+
+**Method.** The registered pipeline (`track_a.predict_one`) is re-run unchanged with only the step at which P is frozen
+changed.
+- Rule point, branch, δ₀, m₀, H and θ\* path, s path and stability rule are all identical.
+- Adam's moments come from deterministic retraining. Each retrained path equals its saved, hashed path bit for bit.
+- The registered predictions are reproduced to round-trip precision (74 of 74).
+
+All 74 Adam runs that crossed and have a prediction:
+
+| P frozen at | Spearman (traj.) | within 10% (traj.) | median obs/pred (traj.) | predicted r, q10–q90 (traj.) | Spearman (closed form) | within 10% (closed form) |
+|---|---|---|---|---|---|---|
+| rule point (registered) | 0.25 | 0.22 | 1.065 | 0.054–0.129 | 0.55 | 0.30 |
+| observed crossing (diagnostic) | **0.99** | **1.00** | 1.057 | 0.074–0.102 | 0.71 | 0.45 |
+| occupied branch's switch t_sw (candidate rule) | **0.95** | **0.91** | 1.042 | 0.074–0.102 | 0.74 | 0.50 |
+
+- The observed r spans 0.079–0.106 (q10–q90).
+- t_sw is the first step with |w₂| ≥ s\*_run. It came before the crossing in 74 of 74 runs.
+- **Outcome: the failure is a measurement-point artifact.** With P taken near the crossing, the same linear-response
+  model ranks the Adam runs almost perfectly, and every run falls within 10%. Frozen at the half-switch point, P is
+  stale: Adam's v̂ keeps evolving over its ~1,000-step memory between the rule point and the crossing.
+
+**Corrected rule for a future registered test (pre-crossing information only).**
+- Freeze Adam's preconditioner at t_sw, the first step at which |w₂| reaches the switch s\*_run of the branch occupied at
+  the rule point. s\*_run is known at the rule point, and t_sw is read from the output-scale trajectory in real time.
+- It precedes the crossing whenever the lag is positive: 74 of 74 here.
+- This rule was examined post hoc on these runs. It is a candidate for a new registration, not a validated one.
+
+**Paper sentence:**
+"The registered Adam failure of per-run ordering (Spearman 0.25) is a measurement-point artifact. Post hoc, freezing
+the preconditioner at the crossing instead of at half the switch scale raises the per-run Spearman to 0.99, with every
+run within 10%. The pre-crossing rule 'preconditioner at the first step the output scale reaches the occupied branch's
+switch' gives 0.95 (91% within 10%), and we name it as the rule for a future registered test."
+
+- Do not say: that L3 passes, or that this diagnostic is registered.

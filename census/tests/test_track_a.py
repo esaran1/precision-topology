@@ -107,3 +107,17 @@ def test_missing_predictions_and_rule_after_crossing_are_excluded_and_counted():
 def test_spearman_helper():
     assert T.spearman([1, 2, 3, 4], [10, 20, 30, 40]) == pytest.approx(1.0)
     assert T.spearman([1, 2, 3, 4], [4, 3, 2, 1]) == pytest.approx(-1.0)
+
+
+def test_diag_metrics_on_constructed_cases():
+    from src import track_a_diag as D
+    pred = np.array([0.05, 0.06, 0.07, 0.08, 0.09, 0.10])
+    m = D.metrics(pred * 1.05, pred)
+    assert m["spearman"] == pytest.approx(1.0) and m["frac_within_10pct"] == 1.0
+    assert m["median_obs_over_pred"] == pytest.approx(1.05)
+    m = D.metrics(pred[::-1] * 1.0, pred)
+    assert m["spearman"] == pytest.approx(-1.0)
+    m = D.metrics(np.array([0.1, np.nan, 0.2, 0.3]), np.array([0.1, 0.2, np.nan, 0.5]))
+    assert m["n"] == 2
+    m = D.metrics(pred * np.array([1.0, 1.2, 0.8, 1.0, 1.09, 0.95]), pred)
+    assert m["frac_within_10pct"] == pytest.approx(4 / 6)
