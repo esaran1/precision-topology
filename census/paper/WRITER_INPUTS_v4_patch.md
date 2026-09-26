@@ -459,7 +459,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 547 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 577 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -1692,3 +1692,265 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   - that the law holds in the nonlinear regime κχ ≳ 0.1;
   - that the lag law explains width 2 (WP-15; Track 2 below).
 IDs: `1A arms within tolerance`; `1A slope/kappa a=1.30`; `1A slope/kappa a=1.50`; `1B registered R1 SGD 1.30 k=-1`; `1B post hoc R1 SGD 1.50`; `1B branch off own a=1.50`.
+
+## WP-25. Outside the sine family: GELU, SiLU and Mish at width 1 (Track 3A; for the submission)
+
+Producers: `src/act_general.py` (steps 0–4) and `src/act_posthoc.py` → `act_general/`. Summary: `results/act_summary.md`.
+Registrations: criterion `act_criterion_registration.md` (b707e86, amendments a251e80 and cf2d68b, both implementation
+only and made before any criterion result); training `act_training_registration.md` (ad99053; κ frozen with SHA-256
+before any run). Labels: registered, validated (not certified), post hoc.
+
+**Step 0 (validated).** The generalised machinery reproduces the certified f_a bracket at a = 1.30: the switch is in
+[4.95796, 4.95835], inside [4.95, 4.9625].
+
+**Steps 1–3 (validated; the criterion registered).**
+- A single unit places and solves for all three activations. The dip sits under the inner window (σ = +1). A midpoint
+  output bias is sign-correct and a wrong bias is not.
+- Differences from the sine case:
+  - the dip has a fixed size, so there is no winding;
+  - the ramp is not odd, so the class-mean maximiser is not attained.
+- The registered criterion: a switch is predicted iff the validated conditional minimiser is unplaced at s = 0.05 and
+  at s = 0.1.
+
+| activation | Ĝ | maximiser (w₁, b₁) | status at s = 0.05 / 0.1 | criterion (registered) | validated switch bracket in s | s\* (tracked branch) | κ_Adam |
+|---|---|---|---|---|---|---|---|
+| GELU | 0.037547 | (0.864, -0.904) | unplaced / unplaced | **switch predicted** | [6.6117, 6.6714] | 6.6456 | +0.1473 |
+| SiLU | 0.050912 | (1.583, -1.636) | unplaced / undecided | **undetermined** | [3.6190, 3.6517] | 3.6392 | -0.1444 |
+| Mish | 0.054772 | (1.526, -1.561) | unplaced / undecided | **undetermined** | [3.1908, 3.2197] | 3.2147 | -0.1539 |
+
+- **Post hoc, disclosed:** every small-scale minimiser is a one-sided ramp. It is "placed" in exact arithmetic by a
+  margin of 10⁻¹⁵³ or smaller, and its gap is 0 in double precision. SiLU and Mish are "undetermined" because of this.
+- Brackets are validated (restart ladder, independent CMA-ES, audit), not certified.
+
+**Step 4: training (registered).**
+- Adam lr 0.01, budget 32,000, fresh seeds.
+- T-a: ≥ 90% of crossing runs at s ≥ s_lo.
+- T-b: median residual within max(0.01, 0.25|pred|) of median κχ.
+- A cell with < 30 crossings is UNRESOLVED.
+- The 200-seed arm was registered before any run, after calibration showed crossing rates near 50%.
+
+| activation | arm | runs | crossing | T-a | T-b |
+|---|---|---|---|---|---|
+| GELU | primary | 40 | 23 | **UNRESOLVED** | **UNRESOLVED** |
+| GELU | secondary pooled 200 | 200 | 132 | **FAIL** (0.477) | **FAIL** (obs -0.0183, pred +0.0023, median χ 0.015) |
+| SiLU | primary | 40 | 25 | **UNRESOLVED** | **UNRESOLVED** |
+| SiLU | secondary pooled 200 | 200 | 135 | **FAIL** (0.622) | **FAIL** (obs +0.0353, pred -0.0324, median χ 0.225) |
+| Mish | primary | 40 | 25 | **UNRESOLVED** | **UNRESOLVED** |
+| Mish | secondary pooled 200 | 200 | 135 | **FAIL** (0.704) | **FAIL** (obs +0.0658, pred -0.0393, median χ 0.256) |
+
+**Post hoc** (`posthoc_training.csv`). The residual is measured against the *population* threshold.
+
+| activation | IQR of r | fraction with \|r\| ≤ 0.10 | crossings below ½·s_glob | Spearman(r, χ) | final \|w₂\| of non-crossing runs (median) |
+|---|---|---|---|---|---|
+| GELU | [-0.110, +0.079] | 0.52 | 18 | -0.35 | 0.16 |
+| SiLU | [-0.044, +0.144] | 0.53 | 1 | -0.29 | 0.07 |
+| Mish | [-0.022, +0.162] | 0.50 | 1 | -0.23 | 0.11 |
+
+- About a third of runs never cross (60 (GELU), 65 (SiLU), 65 (Mish), of 200). They stall near a trivial point with small |w₂|.
+- SiLU's and Mish's crossings happen at χ ≈ 0.2, which is outside the regime where the linear lag law applies (math note
+  §13.3(iv)).
+- Own-sample thresholds were not computed. Each training set has 400 points (200 per class); `act_summary.md` says
+  "200 points per run", which means 200 per class.
+
+**Say:**
+- "For GELU, SiLU and Mish a single unit can solve the task, and the loss at fixed output scale has a validated
+  unplaced-to-placed switch."
+- "Free Adam training does not track it. Registered tests on 200 seeds per activation fail: 48–70% of crossings lie
+  above the switch, and the median residual has the wrong sign or size for the lag law. About a third of runs never
+  cross."
+- "The scale-gating account is therefore specific to activations whose non-monotone part scales with the pre-activation
+  (the sine family here). Its extension to practical activations is not supported."
+
+**Do not say:**
+- that the switch for these activations is certified;
+- that the criterion predicted the switch for SiLU or Mish (it was undetermined);
+- that training confirms scale gating outside the sine family;
+- that the failure is caused by training-set sampling. That is plausible but untested.
+IDs: `3A GELU T-a`; `3A SiLU T-b`; `3A Mish crossing`; `3A GELU bracket lo`.
+
+## WP-26. Citations, main-text notation, the checker paragraph, and run populations (Track 4; for the submission)
+
+Sources: `results/track4_writer_inputs.md` (the full Track 4 report, including the appendix-only symbol list and the
+list of symbol clashes) and `src/track4_populations.py` → `track4_populations.json` (every population number below).
+
+### 1. Six citations: verified against the proceedings or iclr.cc pages
+
+**Result: all six are INCLUDED. None is excluded.**
+
+| key | venue | official page | arXiv | differences to note |
+|---|---|---|---|---|
+| `lyu2024dichotomy` | ICLR 2024 | proceedings.iclr.cc (pp. 33897–33936) | 2311.18817 ("Published as a conference paper at ICLR 2024") | The proceedings give "Du, Simon" and "Lee, Jason"; arXiv gives "Du, Simon S." and "Lee, Jason D.". The entry uses the proceedings form, following WP-13's rule. Note that `references.bib` (`jin…`, line 203) spells the same authors "Simon Shaolei Du" and "Jason D. Lee", so choose one form for the whole bibliography. |
+| `kunin2024getrich` | NeurIPS 2024 (vol. 37) | proceedings.neurips.cc (pp. 81157–81203, DOI 10.52202/079017-2580) | 2406.06158 ("NeurIPS 2024") | none |
+| `glasgow2024sgd` | ICLR 2024 | proceedings.iclr.cc (pp. 52419–52430) | 2309.15111 | The title's "near-Optimal" and "the XOR problem" are lower-case on both pages, exactly as written. |
+| `zhu2023minimalist` | ICLR 2023 | iclr.cc/virtual/2023/poster/11908 | 2210.03294 | No proceedings volume, so there are no pages. |
+| `rubin2024grokking` | ICLR 2024 | proceedings.iclr.cc (pp. 23881–23904) | 2310.03789 | none |
+| `nanda2023progress` | ICLR 2023 | iclr.cc/virtual/2023/poster/11385 (also listed as oral 12572) | 2301.05217 | The current arXiv abstract differs from the one on iclr.cc. The sentence uses only content that appears in both. iclr.cc labels it "top 25% paper"; per WP-13, do not cite any presentation label. |
+
+**BibTeX conventions (the same as WP-13).**
+- Fields are read from the proceedings page.
+- `editor` and `url` are left out.
+- The ICLR proceedings BibTeX has `volume = {2024}`, which is only the year repeated. WP-13's ICLR entries leave it
+  out, so these do too.
+- ICLR 2023 entries have no pages because there is no volume.
+
+```bibtex
+% verified: https://proceedings.iclr.cc/paper_files/paper/2024/hash/909c8fef63e1cede406ce9e6794f99a2-Abstract-Conference.html
+@inproceedings{lyu2024dichotomy,
+  title     = {Dichotomy of Early and Late Phase Implicit Biases Can Provably Induce Grokking},
+  author    = {Lyu, Kaifeng and Jin, Jikai and Li, Zhiyuan and Du, Simon and Lee, Jason and Hu, Wei},
+  booktitle = {International Conference on Learning Representations},
+  pages     = {33897--33936},
+  year      = {2024}
+}
+
+% verified: https://proceedings.neurips.cc/paper_files/paper/2024/hash/94074dd5a072d28ff75a76dabed43767-Abstract-Conference.html
+@inproceedings{kunin2024getrich,
+  title     = {Get rich quick: exact solutions reveal how unbalanced initializations promote rapid feature learning},
+  author    = {Kunin, Daniel and Ravent{\'o}s, Allan and Domin{\'e}, Cl{\'e}mentine and Chen, Feng and Klindt, David and Saxe, Andrew and Ganguli, Surya},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {37},
+  pages     = {81157--81203},
+  publisher = {Curran Associates, Inc.},
+  doi       = {10.52202/079017-2580},
+  year      = {2024}
+}
+
+% verified: https://proceedings.iclr.cc/paper_files/paper/2024/hash/e6d37cc5723e810b793c834bcb6647cf-Abstract-Conference.html
+@inproceedings{glasgow2024sgd,
+  title     = {{SGD} Finds then Tunes Features in Two-Layer Neural Networks with near-Optimal Sample Complexity: A Case Study in the {XOR} problem},
+  author    = {Glasgow, Margalit},
+  booktitle = {International Conference on Learning Representations},
+  pages     = {52419--52430},
+  year      = {2024}
+}
+
+% verified: https://iclr.cc/virtual/2023/poster/11908 (proceedings.iclr.cc has no 2023 volume; arXiv 2210.03294 agrees)
+@inproceedings{zhu2023minimalist,
+  title     = {Understanding Edge-of-Stability Training Dynamics with a Minimalist Example},
+  author    = {Zhu, Xingyu and Wang, Zixuan and Wang, Xiang and Zhou, Mo and Ge, Rong},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+
+% verified: https://proceedings.iclr.cc/paper_files/paper/2024/hash/682f87a8c306098ec8be29019bd76aa4-Abstract-Conference.html
+@inproceedings{rubin2024grokking,
+  title     = {Grokking as a First Order Phase Transition in Two Layer Networks},
+  author    = {Rubin, Noa and Seroussi, Inbar and Ringel, Zohar},
+  booktitle = {International Conference on Learning Representations},
+  pages     = {23881--23904},
+  year      = {2024}
+}
+
+% verified: https://iclr.cc/virtual/2023/poster/11385 (proceedings.iclr.cc has no 2023 volume; arXiv 2301.05217 agrees)
+@inproceedings{nanda2023progress,
+  title     = {Progress measures for grokking via mechanistic interpretability},
+  author    = {Nanda, Neel and Chan, Lawrence and Lieberum, Tom and Smith, Jess and Steinhardt, Jacob},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+```
+
+**One sentence each, in writer wording.** Each is based on the abstract on the official page.
+
+- **Lyu et al. (2024).** They prove that homogeneous networks trained from large initialisation with small weight
+  decay stay near a kernel predictor for a long time, then move sharply to a min-norm or max-margin predictor, which
+  changes test accuracy abruptly. Their transition happens along a training trajectory. Ours is a static property of
+  the training loss minimised at fixed output scale, certified by interval arithmetic, and training enters it only
+  through a computable lag.
+- **Kunin et al. (2024).** They derive exact solutions for a minimal model that moves between lazy and rich learning.
+  These show that unbalanced layer-wise initialisation variances and learning rates set the degree of feature
+  learning, through conserved quantities that shape the learning trajectory. Their solutions describe a training
+  trajectory. Our threshold is a static, certified property of the loss at fixed output scale, and training enters it
+  only through a computable lag.
+- **Glasgow (2024).** For minibatch SGD on a two-layer ReLU network learning XOR, they prove two phases. First, a small
+  network's neurons find features independently. Then SGD maintains and balances those features, and the few neurons
+  that found them are amplified as their second-layer weights grow. We share the role of output-weight growth in making
+  a hidden unit's feature pay off. We differ in locating the output scale at which correct placement becomes the loss's
+  preferred solution, as a certified property of the loss rather than through an analysis of SGD's trajectory.
+- **Zhu et al. (2023).** They build a simple objective that shows edge-of-stability behaviour and analyse its training
+  dynamics rigorously in a large local region. As they do, we use a minimal model to make a training phenomenon exactly
+  analysable. Our object, though, is a threshold of the training loss at fixed output scale, not the dynamics of
+  gradient descent at large step size.
+- **Rubin et al. (2024).** Using the adaptive-kernel theory of feature learning on teacher–student models, they show
+  that after grokking the network is analogous to the mixed phase that follows a first-order phase transition, with
+  internal representations sharply different from those before it. Our threshold is also a switch between two kinds
+  of solution. Here it is between minimisers of a fixed-scale training loss for a single hidden unit, located by
+  certified computation rather than by a kernel-limit theory.
+- **Nanda et al. (2023).** They reverse-engineer the algorithm that small transformers learn for modular addition, and
+  use it to define progress measures that change continuously before the grokking transition. We share the aim of
+  explaining an abrupt change by a quantity that moves continuously before it: here, output scale relative to a
+  certified threshold. In our case that quantity is computed from the loss, not read off trained weights.
+
+**Do not say** that any of these papers studies a conditional threshold in output scale (the same rule as WP-13).
+
+### 2. Main-text notation
+
+| symbol | meaning | where defined |
+|---|---|---|
+| s | output scale: \|w₂\| at width 1; ‖w₂‖₁ at width 2 | math note §1, §10 |
+| R | output scale in gap units, R = sĜ(a)/2 (certified Ĝ_cert) | math note §1; WP-7 |
+| Ĝ(a) | certified maximum class gap over first-layer parameters | math note "Three objects"; WP-7 |
+| G | worst-case class gap of the hidden unit on the continuous windows (G > 0: placed) | math note §10–§11; WP-12 |
+| R\* ≡ R_glob | the conditional placement threshold: where the global minimiser of the loss at fixed output scale becomes placed (certified brackets) | math note "Three objects"; v4 Block 1 |
+| R_solve | where that minimiser becomes sign-correct everywhere (certified brackets) | v4 Block 1; math note §2(b) |
+| R_own | R_glob computed on a run's own training set (400 points, 200 per class), before training | v4 Block 1 (1d) |
+| χ | timescale ratio (ṡ/s\*)/(ηλ_min(P^{1/2}HP^{1/2})); the tests use each run's measured ratio at crossing (ṡ/s_c), a factor 1 + r apart | math note §13.1, §13.3(i); WP-24 |
+| κ(a) | lag constant in r = κ(a)·χ, with no free parameter; depends on the winding of b₁ | math note §13; WP-24 |
+
+- **Clashes to resolve in the main text.** κ₀ (the limiting-cubic constant in Block 3's window design) needs another
+  symbol there, for example ν₀. "A\*" is the limit switch in rescaled units, not R\*.
+- Every other symbol is appendix only. The full list and all clashes (α, β, U, C, K, D, φ, σ, λ, ε) are in the Track 4
+  report, §2.
+- That report's notes 1–3 predate Track 1A's commit: κ(a) and χ are now defined in math note §13 and WP-24.
+
+### 3. AI Use Statement: the independent checker (one paragraph, under 150 words)
+
+> An independent checker, `verify_certificates.py`, re-verifies the certificates and shares no code with the
+> certifying searches. It imports nothing from the project's source tree. It re-implements every objective
+> (the profiled loss, the class gap and the limit problem) from its mathematical definition in ball arithmetic
+> (python-flint/Arb, 80-bit), whereas the searches used float Lipschitz bounds, numpy outward rounding or mpmath
+> intervals. Every decision is an Arb comparison, so rounding is enclosed. For exported certificates it reads only
+> the certificate data files, each checked against a committed SHA-256 hash. Its tests include constructed cases it
+> must reject. It verifies the finite-a placement brackets, the Ĝ(a) enclosures, the limit-switch bracket and its
+> localisation, K = sup G₀ with its domain lemma, the Krawczyk boxes of the first-order calculation, and the
+> positive-definite and ring certificates. The outer-exclusion certificates and the solve brackets (finite-a and
+> limit) were not run; only the original searches support them.
+
+- Every statement comes from the checker's docstring, `PREC = 80`, the manifest hash check, `certificate_audit.md` and
+  WP-17's table.
+- Keep "for exported certificates": the K, Krawczyk, positive-definite and ring checks take their inputs differently
+  (Track 4 report, §3).
+- The files do not say who wrote the checker or whether AI tools were used. The author adds that.
+
+### 4. Run populations (a report, not a choice)
+
+| population | runs | solved | placement failures | bias failures |
+|---|---|---|---|---|
+| 2,400 float32 | 2,400 | 430 | 1,664 | 306 |
+| 2,400 float64 | 2,400 | 440 | 1,633 | 327 |
+| 4,800 pooled | 4,800 | 870 | 3,297 | 633 |
+
+- The float32 half is the width-1 sweep plus the refinement, run for run: 2,400
+  matched, solve outcomes identical, and |w₂| identical (maximum difference 0.0).
+- **The float64 half is not a re-run of the float32 runs at higher precision.** At the same (a, seed):
+  - the sign of w₁ agrees in 48.6% of 2,400 pairs;
+  - the failure class agrees in 72.8%;
+  - the solve outcome agrees in 85.25%;
+  - the median relative difference in |w₂| is 0.44 (relative to float32; the Track 4
+    report's 0.50 used another denominator).
+
+  These are two independent initialisation draws labelled by precision (the per-dtype RNG problem recorded in the
+  retraction, commit 1abaf09).
+- **Which main-text number uses which population:**
+  - The decomposition figure and its caption use the 4,800 pooled, labelled "(200 seeds × 2 precisions)". That label
+    describes the tags, not two precisions of the same runs.
+  - The metric check (`metric_check.py`; caption and VERIFIED_NUMBERS §6) uses the 2,400 float32.
+  - The a = 1.02 numbers in WP-12 (A2) and math note §11.1 use the 2,400 float32: 0/200 solved,
+    median terminal |w₂| 1.85, maximum 3.92.
+    - The float64 half gives 0/200, median 1.92, maximum
+      3.94.
+  - WP-12's onset values (1.60 at 2,000 steps; 1.18, 1.06 and 1.03 at 8k, 32k and 128k) are constants in
+    `harsh_review_a.py` taken from the onset analyses, not from either population.
+- **So the main text currently mixes the two populations.** Whichever is chosen, the decomposition caption should not
+  say "2 precisions" as if the runs were paired.
+IDs: `T4 pooled counts`; `T4 sign agreement`; `T4 a=1.02 float32`.

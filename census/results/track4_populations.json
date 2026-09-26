@@ -1,0 +1,44 @@
+{
+ "float32": {
+  "runs": 2400,
+  "solved": 430,
+  "placement": 1664,
+  "bias": 306
+ },
+ "float64": {
+  "runs": 2400,
+  "solved": 440,
+  "placement": 1633,
+  "bias": 327
+ },
+ "pooled": {
+  "runs": 4800,
+  "solved": 870,
+  "placement": 3297,
+  "bias": 633
+ },
+ "paired": {
+  "pairs": 2400,
+  "sign_w1_agree": 0.48583333333333334,
+  "failure_class_agree": 0.7283333333333334,
+  "solve_agree": 0.8525,
+  "median_rel_diff_abs_w2": 0.44198158211694916
+ },
+ "float32_equals_sweep": {
+  "matched": 2400,
+  "solved_agree": 1.0,
+  "max_abs_diff_abs_w2": 0.0
+ },
+ "a1.02_float32": {
+  "runs": 200,
+  "solved": 0,
+  "median_abs_w2": 1.8538510203361511,
+  "max_abs_w2": 3.916680812835694
+ },
+ "a1.02_float64": {
+  "runs": 200,
+  "solved": 0,
+  "median_abs_w2": 1.9151785009612499,
+  "max_abs_w2": 3.940096115893667
+ }
+}

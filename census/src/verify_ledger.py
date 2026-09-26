@@ -573,6 +573,8 @@ def main() -> None:
     harsh_review_checks()
     tracks_checks()
     lag_law_checks()
+    act_checks()
+    track4_checks()
 
     provenance_check()
 
@@ -599,6 +601,7 @@ def main() -> None:
 # ---------------------------------------------------------------------------
 PRODUCERS = {
     # artifact: (module, function, status, note)
+    "track4_populations.json": ("track4_populations", "main", "full", ""),
     "alpha_of_eps.csv": ("session_artifacts", "main", "full", ""),
     "beta_law_points.csv": ("beta_law_figure", "main", "full", ""),
     "blockA_crossings.csv": ("blockA_score", "main", "full", ""),
@@ -1772,6 +1775,60 @@ def lag_law_checks() -> None:
         for e, v in ((0.01, {1.3: 0.0296, 1.5: 0.0619}), (0.005, {1.3: 0.0304, 1.5: 0.0625}), (0.0025, {1.3: 0.0308, 1.5: 0.0647})):
             chk(f"R4 median a={a:.2f} eta={e}", float(x[f"median_{e}"]), v[a], 0.00006)
             chk(f"R4 crossed a={a:.2f} eta={e}", float(x[f"n_crossed_{e}"]), 39.0, 0)
+
+
+def act_checks() -> None:
+    """Track 3A (GELU, SiLU, Mish at width 1): registered verdicts and the numbers WP-25 prints."""
+    print("Track 3A (non-sine activations)")
+    D = R / "act_general"
+    ts = pd.read_csv(D / "training_scores.csv").set_index(["act", "arm"])
+    for a, (fr, obs, pred, cr, nc) in {"gelu": (0.477, -0.0183, 0.0023, 132, 60), "silu": (0.622, 0.0353, -0.0324, 135, 65),
+                                       "mish": (0.704, 0.0658, -0.0393, 135, 65)}.items():
+        r = ts.loc[(a, "secondary_pooled_200")]
+        chk(f"3A {a} T-a FAIL", float(r["T-a"] == "FAIL"), 1.0, 0)
+        chk(f"3A {a} T-b FAIL", float(r["T-b"] == "FAIL"), 1.0, 0)
+        chk(f"3A {a} primary UNRESOLVED", float(ts.loc[(a, "primary"), "T-a"] == "UNRESOLVED"), 1.0, 0)
+        chk(f"3A {a} frac at or above s_lo", float(r.frac_at_or_above_lo), fr, 0.0006)
+        chk(f"3A {a} T-b obs", float(r.obs), obs, 0.00006)
+        chk(f"3A {a} T-b pred", float(r.pred), pred, 0.00006)
+        chk(f"3A {a} crossing", float(r.crossing_runs), cr, 0)
+        chk(f"3A {a} never cross", float(r.runs - r.placed_at_init - r.crossing_runs), nc, 0)
+    chk("3A GELU T-a", float(ts.loc[("gelu", "secondary_pooled_200"), "T-a"] == "FAIL"), 1.0, 0)
+    chk("3A SiLU T-b", float(ts.loc[("silu", "secondary_pooled_200"), "T-b"] == "FAIL"), 1.0, 0)
+    chk("3A Mish crossing", float(ts.loc[("mish", "secondary_pooled_200"), "crossing_runs"]), 135.0, 0)
+    for a, (lo, hi, k) in {"gelu": (6.6117, 6.6714, 0.1473), "silu": (3.6190, 3.6517, -0.1444), "mish": (3.1908, 3.2197, -0.1539)}.items():
+        b = json.loads((D / f"bracket_{a}.json").read_text()); kp = json.loads((D / f"kappa_{a}_frozen.json").read_text())
+        chk(f"3A {a} bracket lo", float(b["s_lo"]), lo, 0.00006)
+        chk(f"3A {a} bracket hi", float(b["s_hi"]), hi, 0.00006)
+        chk(f"3A {a} kappa", float(kp["kappa_adam"]), k, 0.00006)
+        chk(f"3A {a} validated both ends", float(b["validation_lo"]["validated"] and b.get("validation_hi", {"validated": True})["validated"]), 1.0, 0)
+    chk("3A GELU bracket lo", float(json.loads((D / "bracket_gelu.json").read_text())["s_lo"]), 6.6117, 0.00006)
+    cv = json.loads((D / "criterion_verdicts.json").read_text())
+    chk("3A criterion verdicts", float([cv[a]["verdict"] for a in ("gelu", "silu", "mish")] == ["switch predicted", "undetermined", "undetermined"]), 1.0, 0)
+    gh = json.loads((D / "ghat.json").read_text())
+    for a, v in {"gelu": 0.037547, "silu": 0.050912, "mish": 0.054772}.items():
+        chk(f"3A {a} Ghat", float(gh[a]["Ghat_nm"]["G_lo"]), v, 6e-7)
+
+
+def track4_checks() -> None:
+    """Track 4 writer inputs: run-population numbers printed in WP-26 (producer: track4_populations)."""
+    print("Track 4 (run populations)")
+    P = json.loads((R / "track4_populations.json").read_text())
+    for k, (n, sv, pl, bi) in {"float32": (2400, 430, 1664, 306), "float64": (2400, 440, 1633, 327), "pooled": (4800, 870, 3297, 633)}.items():
+        chk(f"T4 {k} runs", float(P[k]["runs"]), n, 0); chk(f"T4 {k} solved", float(P[k]["solved"]), sv, 0)
+        chk(f"T4 {k} placement", float(P[k]["placement"]), pl, 0); chk(f"T4 {k} bias", float(P[k]["bias"]), bi, 0)
+    chk("T4 pooled counts", float(P["pooled"]["solved"] + P["pooled"]["placement"] + P["pooled"]["bias"]), 4800.0, 0)
+    chk("T4 sign agreement", 100 * P["paired"]["sign_w1_agree"], 48.6, 0.06)
+    chk("T4 failure class agreement", 100 * P["paired"]["failure_class_agree"], 72.8, 0.06)
+    chk("T4 solve agreement", 100 * P["paired"]["solve_agree"], 85.25, 0.006)
+    chk("T4 median rel diff w2", P["paired"]["median_rel_diff_abs_w2"], 0.44, 0.006)
+    chk("T4 float32 equals sweep", float(P["float32_equals_sweep"]["matched"] == 2400 and P["float32_equals_sweep"]["solved_agree"] == 1.0
+                                          and P["float32_equals_sweep"]["max_abs_diff_abs_w2"] == 0.0), 1.0, 0)
+    chk("T4 a=1.02 float32", float(P["a1.02_float32"]["solved"]), 0.0, 0)
+    chk("T4 a=1.02 float32 median w2", P["a1.02_float32"]["median_abs_w2"], 1.85, 0.006)
+    chk("T4 a=1.02 float32 max w2", P["a1.02_float32"]["max_abs_w2"], 3.92, 0.006)
+    chk("T4 a=1.02 float64 median w2", P["a1.02_float64"]["median_abs_w2"], 1.92, 0.006)
+    chk("T4 a=1.02 float64 max w2", P["a1.02_float64"]["max_abs_w2"], 3.94, 0.006)
 
 
 def digit_stability() -> None:

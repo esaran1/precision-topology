@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24()
+    text += wp24() + wp25() + wp26()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1928,6 +1928,177 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   - that the law holds in the nonlinear regime κχ ≳ 0.1;
   - that the lag law explains width 2 (WP-15; Track 2 below).
 IDs: {_id("1A arms within tolerance", "1A slope/kappa a=1.30", "1A slope/kappa a=1.50", "1B registered R1 SGD 1.30 k=-1", "1B post hoc R1 SGD 1.50", "1B branch off own a=1.50")}.
+"""
+
+
+def wp25():
+    """WP-25: GELU, SiLU and Mish at width 1 (Track 3A)."""
+    D = RESULTS / "act_general"
+    gh = json.loads((D / "ghat.json").read_text()); cv = json.loads((D / "criterion_verdicts.json").read_text())
+    ts = pd.read_csv(D / "training_scores.csv"); ph = pd.read_csv(D / "posthoc_training.csv").set_index("act")
+    names = {"gelu": "GELU", "silu": "SiLU", "mish": "Mish"}
+    br = {a: json.loads((D / f"bracket_{a}.json").read_text()) for a in names}
+    kp = {a: json.loads((D / f"kappa_{a}_frozen.json").read_text()) for a in names}
+    t1 = "\n".join(f"| {names[a]} | {gh[a]['Ghat_nm']['G_lo']:.6f} | ({gh[a]['Ghat_nm']['w1']:.3f}, {gh[a]['Ghat_nm']['b1']:.3f}) | "
+                   f"{cv[a]['statuses']['0.05']} / {cv[a]['statuses']['0.1']} | **{cv[a]['verdict']}** | [{br[a]['s_lo']:.4f}, {br[a]['s_hi']:.4f}] | "
+                   f"{kp[a]['s_star']:.4f} | {kp[a]['kappa_adam']:+.4f} |" for a in names)
+    tt = "\n".join(f"| {names[r.act]} | {r.arm.replace('_', ' ')} | {r.runs} | {r.crossing_runs} | **{r['T-a']}**"
+                   + (f" ({r.frac_at_or_above_lo:.3f})" if r['T-a'] != "UNRESOLVED" else "") + f" | **{r['T-b']}**"
+                   + (f" (obs {r.obs:+.4f}, pred {r.pred:+.4f}, median χ {r.median_chi:.3f})" if r['T-b'] != "UNRESOLVED" else "") + " |"
+                   for _, r in ts.iterrows())
+    pt = "\n".join(f"| {names[a]} | [{ph.loc[a, 'r_q25']:+.3f}, {ph.loc[a, 'r_q75']:+.3f}] | {ph.loc[a, 'frac_abs_r_le_0.10']:.2f} | "
+                   f"{int(ph.loc[a, 'n_early_below_half_s_glob'])} | {ph.loc[a, 'spearman_r_chi']:+.2f} | {ph.loc[a, 'noncross_median_w2_final']:.2f} |" for a in names)
+    sec = ts[ts.arm == "secondary_pooled_200"].set_index("act")
+    nc = ", ".join(f"{int(sec.loc[a, 'runs'] - sec.loc[a, 'placed_at_init'] - sec.loc[a, 'crossing_runs'])} ({names[a]})" for a in names)
+    return f"""
+## WP-25. Outside the sine family: GELU, SiLU and Mish at width 1 (Track 3A; for the submission)
+
+Producers: `src/act_general.py` (steps 0–4) and `src/act_posthoc.py` → `act_general/`. Summary: `results/act_summary.md`.
+Registrations: criterion `act_criterion_registration.md` (b707e86, amendments a251e80 and cf2d68b, both implementation
+only and made before any criterion result); training `act_training_registration.md` (ad99053; κ frozen with SHA-256
+before any run). Labels: registered, validated (not certified), post hoc.
+
+**Step 0 (validated).** The generalised machinery reproduces the certified f_a bracket at a = 1.30: the switch is in
+[4.95796, 4.95835], inside [4.95, 4.9625].
+
+**Steps 1–3 (validated; the criterion registered).**
+- A single unit places and solves for all three activations. The dip sits under the inner window (σ = +1). A midpoint
+  output bias is sign-correct and a wrong bias is not.
+- Differences from the sine case:
+  - the dip has a fixed size, so there is no winding;
+  - the ramp is not odd, so the class-mean maximiser is not attained.
+- The registered criterion: a switch is predicted iff the validated conditional minimiser is unplaced at s = 0.05 and
+  at s = 0.1.
+
+| activation | Ĝ | maximiser (w₁, b₁) | status at s = 0.05 / 0.1 | criterion (registered) | validated switch bracket in s | s\\* (tracked branch) | κ_Adam |
+|---|---|---|---|---|---|---|---|
+{t1}
+
+- **Post hoc, disclosed:** every small-scale minimiser is a one-sided ramp. It is "placed" in exact arithmetic by a
+  margin of 10⁻¹⁵³ or smaller, and its gap is 0 in double precision. SiLU and Mish are "undetermined" because of this.
+- Brackets are validated (restart ladder, independent CMA-ES, audit), not certified.
+
+**Step 4: training (registered).**
+- Adam lr 0.01, budget 32,000, fresh seeds.
+- T-a: ≥ 90% of crossing runs at s ≥ s_lo.
+- T-b: median residual within max(0.01, 0.25|pred|) of median κχ.
+- A cell with < 30 crossings is UNRESOLVED.
+- The 200-seed arm was registered before any run, after calibration showed crossing rates near 50%.
+
+| activation | arm | runs | crossing | T-a | T-b |
+|---|---|---|---|---|---|
+{tt}
+
+**Post hoc** (`posthoc_training.csv`). The residual is measured against the *population* threshold.
+
+| activation | IQR of r | fraction with \\|r\\| ≤ 0.10 | crossings below ½·s_glob | Spearman(r, χ) | final \\|w₂\\| of non-crossing runs (median) |
+|---|---|---|---|---|---|
+{pt}
+
+- About a third of runs never cross ({nc}, of 200). They stall near a trivial point with small |w₂|.
+- SiLU's and Mish's crossings happen at χ ≈ 0.2, which is outside the regime where the linear lag law applies (math note
+  §13.3(iv)).
+- Own-sample thresholds were not computed. Each training set has 400 points (200 per class); `act_summary.md` says
+  "200 points per run", which means 200 per class.
+
+**Say:**
+- "For GELU, SiLU and Mish a single unit can solve the task, and the loss at fixed output scale has a validated
+  unplaced-to-placed switch."
+- "Free Adam training does not track it. Registered tests on 200 seeds per activation fail: 48–70% of crossings lie
+  above the switch, and the median residual has the wrong sign or size for the lag law. About a third of runs never
+  cross."
+- "The scale-gating account is therefore specific to activations whose non-monotone part scales with the pre-activation
+  (the sine family here). Its extension to practical activations is not supported."
+
+**Do not say:**
+- that the switch for these activations is certified;
+- that the criterion predicted the switch for SiLU or Mish (it was undetermined);
+- that training confirms scale gating outside the sine family;
+- that the failure is caused by training-set sampling. That is plausible but untested.
+IDs: {_id("3A GELU T-a", "3A SiLU T-b", "3A Mish crossing", "3A GELU bracket lo")}.
+"""
+
+
+def wp26():
+    """WP-26: Track 4 writer inputs: citations, main-text notation, the checker paragraph, run populations."""
+    t4 = (RESULTS / "track4_writer_inputs.md").read_text()
+    cit = t4[t4.index("**Result: all six are INCLUDED."):t4.index("## 2. Notation")].rstrip().rstrip("-").rstrip()
+    chk_par = t4[t4.index("> An independent checker"):t4.index("**Where each statement comes from:**")].rstrip()
+    P = json.loads((RESULTS / "track4_populations.json").read_text())
+    f32, f64, pl, pr = P["float32"], P["float64"], P["pooled"], P["paired"]
+    a32, a64 = P["a1.02_float32"], P["a1.02_float64"]
+    return f"""
+## WP-26. Citations, main-text notation, the checker paragraph, and run populations (Track 4; for the submission)
+
+Sources: `results/track4_writer_inputs.md` (the full Track 4 report, including the appendix-only symbol list and the
+list of symbol clashes) and `src/track4_populations.py` → `track4_populations.json` (every population number below).
+
+### 1. Six citations: verified against the proceedings or iclr.cc pages
+
+{cit}
+
+### 2. Main-text notation
+
+| symbol | meaning | where defined |
+|---|---|---|
+| s | output scale: \\|w₂\\| at width 1; ‖w₂‖₁ at width 2 | math note §1, §10 |
+| R | output scale in gap units, R = sĜ(a)/2 (certified Ĝ_cert) | math note §1; WP-7 |
+| Ĝ(a) | certified maximum class gap over first-layer parameters | math note "Three objects"; WP-7 |
+| G | worst-case class gap of the hidden unit on the continuous windows (G > 0: placed) | math note §10–§11; WP-12 |
+| R\\* ≡ R_glob | the conditional placement threshold: where the global minimiser of the loss at fixed output scale becomes placed (certified brackets) | math note "Three objects"; v4 Block 1 |
+| R_solve | where that minimiser becomes sign-correct everywhere (certified brackets) | v4 Block 1; math note §2(b) |
+| R_own | R_glob computed on a run's own training set (400 points, 200 per class), before training | v4 Block 1 (1d) |
+| χ | timescale ratio (ṡ/s\\*)/(ηλ_min(P^{{1/2}}HP^{{1/2}})); the tests use each run's measured ratio at crossing (ṡ/s_c), a factor 1 + r apart | math note §13.1, §13.3(i); WP-24 |
+| κ(a) | lag constant in r = κ(a)·χ, with no free parameter; depends on the winding of b₁ | math note §13; WP-24 |
+
+- **Clashes to resolve in the main text.** κ₀ (the limiting-cubic constant in Block 3's window design) needs another
+  symbol there, for example ν₀. "A\\*" is the limit switch in rescaled units, not R\\*.
+- Every other symbol is appendix only. The full list and all clashes (α, β, U, C, K, D, φ, σ, λ, ε) are in the Track 4
+  report, §2.
+- That report's notes 1–3 predate Track 1A's commit: κ(a) and χ are now defined in math note §13 and WP-24.
+
+### 3. AI Use Statement: the independent checker (one paragraph, under 150 words)
+
+{chk_par}
+
+- Every statement comes from the checker's docstring, `PREC = 80`, the manifest hash check, `certificate_audit.md` and
+  WP-17's table.
+- Keep "for exported certificates": the K, Krawczyk, positive-definite and ring checks take their inputs differently
+  (Track 4 report, §3).
+- The files do not say who wrote the checker or whether AI tools were used. The author adds that.
+
+### 4. Run populations (a report, not a choice)
+
+| population | runs | solved | placement failures | bias failures |
+|---|---|---|---|---|
+| 2,400 float32 | {f32["runs"]:,} | {f32["solved"]} | {f32["placement"]:,} | {f32["bias"]} |
+| 2,400 float64 | {f64["runs"]:,} | {f64["solved"]} | {f64["placement"]:,} | {f64["bias"]} |
+| 4,800 pooled | {pl["runs"]:,} | {pl["solved"]} | {pl["placement"]:,} | {pl["bias"]} |
+
+- The float32 half is the width-1 sweep plus the refinement, run for run: {P["float32_equals_sweep"]["matched"]:,}
+  matched, solve outcomes identical, and |w₂| identical (maximum difference {P["float32_equals_sweep"]["max_abs_diff_abs_w2"]:.1f}).
+- **The float64 half is not a re-run of the float32 runs at higher precision.** At the same (a, seed):
+  - the sign of w₁ agrees in {100 * pr["sign_w1_agree"]:.1f}% of {pr["pairs"]:,} pairs;
+  - the failure class agrees in {100 * pr["failure_class_agree"]:.1f}%;
+  - the solve outcome agrees in {100 * pr["solve_agree"]:.2f}%;
+  - the median relative difference in |w₂| is {pr["median_rel_diff_abs_w2"]:.2f} (relative to float32; the Track 4
+    report's 0.50 used another denominator).
+
+  These are two independent initialisation draws labelled by precision (the per-dtype RNG problem recorded in the
+  retraction, commit 1abaf09).
+- **Which main-text number uses which population:**
+  - The decomposition figure and its caption use the 4,800 pooled, labelled "(200 seeds × 2 precisions)". That label
+    describes the tags, not two precisions of the same runs.
+  - The metric check (`metric_check.py`; caption and VERIFIED_NUMBERS §6) uses the 2,400 float32.
+  - The a = 1.02 numbers in WP-12 (A2) and math note §11.1 use the 2,400 float32: {a32["solved"]}/{a32["runs"]} solved,
+    median terminal |w₂| {a32["median_abs_w2"]:.2f}, maximum {a32["max_abs_w2"]:.2f}.
+    - The float64 half gives {a64["solved"]}/{a64["runs"]}, median {a64["median_abs_w2"]:.2f}, maximum
+      {a64["max_abs_w2"]:.2f}.
+  - WP-12's onset values (1.60 at 2,000 steps; 1.18, 1.06 and 1.03 at 8k, 32k and 128k) are constants in
+    `harsh_review_a.py` taken from the onset analyses, not from either population.
+- **So the main text currently mixes the two populations.** Whichever is chosen, the decomposition caption should not
+  say "2 precisions" as if the runs were paired.
+IDs: {_id("T4 pooled counts", "T4 sign agreement", "T4 a=1.02 float32")}.
 """
 
 
