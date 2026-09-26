@@ -1,0 +1,31 @@
+{
+ "s_switch": 3.5913755424683727,
+ "q": 0.3914103370353161,
+ "lambda": 0.0001,
+ "v2_frozen_sha256": "deb8853e9c68901afc8c81bd2d649c728218ad16bd3078bff0e43ac1a806e959",
+ "H_min_eig": 9.999999999999223e-05,
+ "seeds": [
+  2720000,
+  2720039
+ ],
+ "n_seeds": 40,
+ "lr": 0.01,
+ "betas": [
+  0.9,
+  0.999
+ ],
+ "eps": 1e-08,
+ "budget": 40000,
+ "stop_factor": 3.0,
+ "init_cap": 1.7956877712341863,
+ "chi_window": 100,
+ "criteria": {
+  "C1_min_fraction_at_or_above_switch": 0.9,
+  "C2_median_ratio_range": [
+   1.0,
+   1.25
+  ],
+  "validity_min_crossings": 30,
+  "validity_max_median_chi": 0.06
+ }
+}
