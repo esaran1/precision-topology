@@ -1,0 +1,13 @@
+{
+ "label": "Track 2C calibration (existing slowed runs T2-3b, T2-3c, T2-3d; author's binding amendment)",
+ "n_runs": 239,
+ "earliest_crossing": 0.0163958288960502,
+ "need": 0.95,
+ "rule_scale": null,
+ "earliest_final_scale_any": null,
+ "decision": "STOP",
+ "max_frac_available": 0.7782426778242678,
+ "s_r_at_max_available": 0.0749894209332455,
+ "max_frac_available_below_earliest": 0.0753138075313807,
+ "scales_needing_finality_check": []
+}

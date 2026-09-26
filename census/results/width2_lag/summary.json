@@ -1,0 +1,72 @@
+{
+ "label": "POST HOC (Track 2B); no verdict changes: T2-3 FAIL, T2-3b/T2-3c UNRESOLVED, T2-3d FAIL",
+ "width1": {
+  "arms_held": 36,
+  "arms_total": 36,
+  "max_arm_median_chi": 0.0248597716032564,
+  "max_run_chi": 0.0637163178704653,
+  "min_run_chi": 0.000102624099267,
+  "p95_run_chi": 0.021399583284705204
+ },
+ "on_branch_threshold": 0.05,
+ "T2-3": {
+  "n": 79,
+  "status_counts": {
+   "ok": 75,
+   "placed_back_to_init": 2,
+   "no_branch_at_crossing": 2
+  },
+  "chi_c_min_median_max": [
+   0.0031026734576631273,
+   0.9946262629382497,
+   3.0481306909975077
+  ],
+  "chi_min_median_max_(branch_defined)": [
+   0.0031648624088411164,
+   1.7317473973569846,
+   104844.20545028632
+  ],
+  "dist_c_min_median_max": [
+   0.06067103704148025,
+   1.754863363205616,
+   23.599385551998086
+  ],
+  "n_on_branch": 0,
+  "relax_times_c_median": 1.0165305214036753
+ },
+ "slowed": {
+  "n": 230,
+  "status_counts": {
+   "ok": 191,
+   "placed_back_to_init": 12,
+   "no_branch_at_crossing": 8,
+   "jump": 8,
+   "branch_lost": 6,
+   "no_switch_in_range": 5
+  },
+  "dist_c_on_branch_max": 0.04052611277120932,
+  "dist_c_off_branch_min": 0.06034420081143166,
+  "chi_on_branch_max": 0.10475103353418079,
+  "chi_c_all_min_median_max": [
+   -12.027156740761644,
+   1.2384565710488054e-05,
+   6.488465281261844
+  ],
+  "relax_times_c_on_branch_min": 6.760333761721334,
+  "relax_times_c_off_branch_max": 59.39958086506415,
+  "relax_times_c_not_ok_median": 0.5033434741616127
+ },
+ "branch_undefined": {
+  "n": 43,
+  "by_arm": {
+   "T2-3b": 17,
+   "T2-3c": 13,
+   "T2-3d": 9,
+   "T2-3": 4
+  },
+  "s_cross_max": 5.229609808004751,
+  "step_median": 48.0,
+  "relax_times_c_median": 0.5033434741616127,
+  "chi_c_median": 0.10738971683722867
+ }
+}
