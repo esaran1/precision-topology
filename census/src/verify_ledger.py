@@ -586,6 +586,7 @@ def main() -> None:
     track_t_v2_checks()
     track_t_v3_checks()
     final_checks_boundary_adam()
+    final_checks_numbers()
 
     provenance_check()
 
@@ -2205,6 +2206,31 @@ def final_checks_boundary_adam() -> None:
     chk("AD registered within10", 100 * D["registered"]["traj"]["frac_within_10pct"], 21.6, 0.06)
     chk("AD p_cross ratio q10", D["p_cross"]["traj"]["ratio_q10"], 1.02, 0.006)
     chk("AD p_cross ratio q90", D["p_cross"]["traj"]["ratio_q90"], 1.07, 0.006)
+
+
+def final_checks_numbers() -> None:
+    """Final checks (2026-09-26): Appendix numbers at a = 1.65 and the post hoc predictor comparison."""
+    print("Final checks (a = 1.65 appendix numbers; post hoc predictor comparison)")
+    S = json.loads((R / "final_checks" / "summary.json").read_text())
+    A = S["appendix"]
+    for opt, m, want in (("adam", "trajectory", (0.0938, 0.0799, 1.065, 0.216, 0.0229, 0.25)),
+                         ("adam", "closed_form", (0.0938, 0.0887, 1.045, 0.297, 0.0146, 0.55)),
+                         ("sgd", "trajectory", (0.0938, 0.0899, 1.056, 1.0, 0.0047, 0.995)),
+                         ("sgd", "closed_form", (0.0938, 0.0884, 1.024, 0.619, 0.0070, 0.808))):
+        x = A[opt][m]
+        for k, w, tol in zip(("median_obs", "median_pred", "median_ratio", "frac_within_10", "median_abs_err", "spearman"), want,
+                             (0.00006, 0.00006, 0.0006, 0.0006, 0.00006, 0.006 if opt == "adam" else 0.0006)):
+            chk(f"FC {opt} {m} {k}", x[k], w, tol)
+    C = S["comparison"]
+    for opt, want in (("adam", (0.0104, 0.446, 0.50, 0.0595)), ("sgd", (0.0058, 0.746, 0.808, 0.0516))):
+        f = C[opt]["frozen fitted relationship"]; c = C[opt]["constant lag from a = 1.30–1.60"]
+        chk(f"FC {opt} fit mae", f["median_abs_err"], want[0], 0.00006)
+        chk(f"FC {opt} fit within10", f["frac_within_10"], want[1], 0.0006)
+        chk(f"FC {opt} fit spearman", f["spearman"], want[2], 0.006)
+        chk(f"FC {opt} constant mae", c["median_abs_err"], want[3], 0.00006)
+        chk(f"FC {opt} constant within10", c["frac_within_10"], 0.0, 0)
+    chk("FC adam constant ratio", C["adam"]["constant lag from a = 1.30–1.60"]["median_ratio"], 2.74, 0.006)
+    chk("FC sgd constant ratio", C["sgd"]["constant lag from a = 1.30–1.60"]["median_ratio"], 2.22, 0.006)
 
 
 def digit_stability() -> None:
