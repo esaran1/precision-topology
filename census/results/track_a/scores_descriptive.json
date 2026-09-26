@@ -1,0 +1,44 @@
+{
+ "adam": {
+  "r_obs_q10_q90": [
+   0.07938870037493273,
+   0.10573320179189462
+  ],
+  "r_traj_q10_q90": [
+   0.05365643402251824,
+   0.12930372293031206
+  ],
+  "ratio_q10_q90": [
+   0.7361676440942384,
+   1.7473909955390428
+  ],
+  "frac_ratio_within_10pct": 0.21621621621621623,
+  "median_abs_diff_r": 0.022898084505106452,
+  "n_crossed_without_prediction": 2,
+  "n_noncross_with_prediction": 0,
+  "median_r_obs_vs_global_own": 0.0892794428324237,
+  "median_step_obs_minus_traj": 3.5,
+  "mirror_frac": 0.4594594594594595
+ },
+ "sgd": {
+  "r_obs_q10_q90": [
+   0.07923667615820486,
+   0.10709728678794188
+  ],
+  "r_traj_q10_q90": [
+   0.07494610030053772,
+   0.10307779843313213
+  ],
+  "ratio_q10_q90": [
+   1.0416933555846595,
+   1.0617537119366796
+  ],
+  "frac_ratio_within_10pct": 1.0,
+  "median_abs_diff_r": 0.004731581323971293,
+  "n_crossed_without_prediction": 1,
+  "n_noncross_with_prediction": 0,
+  "median_r_obs_vs_global_own": 0.09085580647675626,
+  "median_step_obs_minus_traj": 4.0,
+  "mirror_frac": 0.5079365079365079
+ }
+}

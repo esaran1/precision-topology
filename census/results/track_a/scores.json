@@ -1,0 +1,73 @@
+{
+ "adam": {
+  "n_runs": 80,
+  "n_crossed": 76,
+  "n_rule_not_before_crossing": 0,
+  "valid": true,
+  "L1": {
+   "n": 74,
+   "median_ratio": 1.0650932556464947,
+   "verdict": "PASS"
+  },
+  "L2": {
+   "n": 74,
+   "median_ratio": 1.0454504462626704,
+   "verdict": "PASS"
+  },
+  "L3": {
+   "n": 74,
+   "spearman": 0.2484561273602369,
+   "verdict": "FAIL"
+  },
+  "L3_closed_form_secondary": 0.5518104405775638,
+  "descriptive": {
+   "median_r_obs": 0.09377924670497806,
+   "median_r_traj": 0.07989672847059315,
+   "median_r_cf": 0.08865653271671844,
+   "n_winding_rule_agrees": 74,
+   "n_status_ok": 74,
+   "n_traj_pred": 74,
+   "n_cf_pred": 74,
+   "median_s_run_over_s_frozen": 1.0000000000002247,
+   "frac_s_run_off_frozen_1pct": 0.4,
+   "slope_obs_on_traj": 0.9582905576770607,
+   "median_ratio_ts_obs_over_traj_step": 1.001164507400751
+  }
+ },
+ "sgd": {
+  "n_runs": 80,
+  "n_crossed": 64,
+  "n_rule_not_before_crossing": 0,
+  "valid": true,
+  "L1": {
+   "n": 63,
+   "median_ratio": 1.0555267302534392,
+   "verdict": "PASS"
+  },
+  "L2": {
+   "n": 63,
+   "median_ratio": 1.0237915919988754,
+   "verdict": "PASS"
+  },
+  "L3": {
+   "n": 63,
+   "spearman": 0.9945276497695852,
+   "verdict": "PASS"
+  },
+  "L3_closed_form_secondary": 0.8081317204301075,
+  "descriptive": {
+   "median_r_obs": 0.09376229083175813,
+   "median_r_traj": 0.0898602457473596,
+   "median_r_cf": 0.0884126701611265,
+   "n_winding_rule_agrees": 63,
+   "n_status_ok": 63,
+   "n_traj_pred": 63,
+   "n_cf_pred": 63,
+   "median_s_run_over_s_frozen": 1.000000000000239,
+   "frac_s_run_off_frozen_1pct": 0.375,
+   "slope_obs_on_traj": 1.0505636345393696,
+   "median_ratio_ts_obs_over_traj_step": 1.0052910052910053
+  }
+ },
+ "predictions_sha256": "b30167c61116972298dc434494918dced800b83a56164374ef338167070e3d82"
+}
