@@ -1,0 +1,144 @@
+{
+ "bootstrap": {
+  "B": 10000,
+  "seed": 20260926
+ },
+ "within": {
+  "closed form (committed \u03ba\u03c7), tracked-branch lag": {
+   "arms": 36,
+   "runs": 1750,
+   "pooled_frac_within_10": 0.8822857142857143,
+   "pooled_frac_within_20": 0.9777142857142858,
+   "arms_median_within_10": 36,
+   "arms_median_within_20": 36,
+   "per_arm_frac10_min": 0.6041666666666666,
+   "per_arm_frac10_max": 1.0,
+   "per_arm_frac20_min": 0.7875,
+   "per_arm_frac20_max": 1.0
+  },
+  "closed form (committed \u03ba\u03c7), registered reference (global own threshold)": {
+   "arms": 36,
+   "runs": 1750,
+   "pooled_frac_within_10": 0.6365714285714286,
+   "pooled_frac_within_20": 0.7537142857142857,
+   "arms_median_within_10": 31,
+   "arms_median_within_20": 32,
+   "per_arm_frac10_min": 0.3333333333333333,
+   "per_arm_frac10_max": 0.8125,
+   "per_arm_frac20_min": 0.6041666666666666,
+   "per_arm_frac20_max": 0.8125
+  },
+  "trajectory-integrated (full model, 0.7 s*), tracked-branch lag": {
+   "arms": 36,
+   "runs": 1708,
+   "pooled_frac_within_10": 0.9988290398126464,
+   "pooled_frac_within_20": 1.0,
+   "arms_median_within_10": 36,
+   "arms_median_within_20": 36,
+   "per_arm_frac10_min": 0.9777777777777777,
+   "per_arm_frac10_max": 1.0,
+   "per_arm_frac20_min": 1.0,
+   "per_arm_frac20_max": 1.0
+  }
+ },
+ "collapse": {
+  "points": 131,
+  "resolved": 99,
+  "resolved_ratio_range_chi_le_0.06": [
+   0.6709215486844468,
+   1.3995637877033256
+  ]
+ },
+ "sample_size": [
+  {
+   "a": 1.3,
+   "n": 400,
+   "runs": 49,
+   "total_median": 0.06822667815568971,
+   "total_lo": 0.03622450041191065,
+   "total_hi": 0.09354993005728744,
+   "static_median": 0.043793615231769445,
+   "static_lo": 0.01811983346196358,
+   "static_hi": 0.07234998752282366,
+   "dynamic_median": 0.02968421638681602,
+   "dynamic_lo": 0.02728420419375006,
+   "dynamic_hi": 0.03134057087947748,
+   "static_share_of_total_median": 0.6418840315196749
+  },
+  {
+   "a": 1.3,
+   "n": 1600,
+   "runs": 48,
+   "total_median": 0.054366002441881084,
+   "total_lo": 0.031131931935335862,
+   "total_hi": 0.07069825861020967,
+   "static_median": 0.03955998104506997,
+   "static_lo": 0.015639980982180977,
+   "static_hi": 0.05220426131018696,
+   "dynamic_median": 0.029309193793415463,
+   "dynamic_lo": 0.027836175459310428,
+   "dynamic_hi": 0.03134738669028504,
+   "static_share_of_total_median": 0.7276602889344457
+  },
+  {
+   "a": 1.3,
+   "n": 6400,
+   "runs": 48,
+   "total_median": 0.04128296938152614,
+   "total_lo": 0.031589767158281275,
+   "total_hi": 0.05094356631172914,
+   "static_median": 0.012531298456020922,
+   "static_lo": 0.005658613024151479,
+   "static_hi": 0.0230611653197978,
+   "dynamic_median": 0.030580659972206513,
+   "dynamic_lo": 0.029377916676829034,
+   "dynamic_hi": 0.03116476350761841,
+   "static_share_of_total_median": 0.3035464416381976
+  },
+  {
+   "a": 1.5,
+   "n": 400,
+   "runs": 49,
+   "total_median": 0.10093075828021877,
+   "total_lo": 0.08001610178109403,
+   "total_hi": 0.12880662494568992,
+   "static_median": 0.04466644698556988,
+   "static_lo": 0.018349138668196617,
+   "static_hi": 0.07260772918601832,
+   "dynamic_median": 0.062036588316163266,
+   "dynamic_lo": 0.05707385697365914,
+   "dynamic_hi": 0.06542618152874621,
+   "static_share_of_total_median": 0.4425454415150666
+  },
+  {
+   "a": 1.5,
+   "n": 1600,
+   "runs": 48,
+   "total_median": 0.0818613033595742,
+   "total_lo": 0.06704254908618794,
+   "total_hi": 0.10470302856754085,
+   "static_median": 0.036366935553592716,
+   "static_lo": 0.0134888617859437,
+   "static_hi": 0.05055159036604214,
+   "dynamic_median": 0.061869901891774645,
+   "dynamic_lo": 0.057815693386863265,
+   "dynamic_hi": 0.06578676318166138,
+   "static_share_of_total_median": 0.4442506295538889
+  },
+  {
+   "a": 1.5,
+   "n": 6400,
+   "runs": 48,
+   "total_median": 0.07212612663784737,
+   "total_lo": 0.062191565840203245,
+   "total_hi": 0.08009950280093904,
+   "static_median": 0.011049836186584935,
+   "static_lo": 0.0036968618813262026,
+   "static_hi": 0.020770447357206696,
+   "dynamic_median": 0.06353253311215298,
+   "dynamic_lo": 0.060246535504303526,
+   "dynamic_hi": 0.06599818917868391,
+   "static_share_of_total_median": 0.15320157481999952
+  }
+ ]
+}

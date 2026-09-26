@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2440,6 +2440,90 @@ new, and the text says so. For the novelty claims, keep the labels from WP-24 an
 derived after a fitted relationship was known; the exact linear response (1.00–1.05) is post hoc; the learning-rate
 invariance (R4) is registered; the validity boundary χ ≲ 0.06 comes from the data and is not registered.
 {body}
+"""
+
+
+def wp33():
+    """WP-33: statistics (Track B, final round; existing data)."""
+    D = RESULTS / "track_b"
+    if not (D / "summary.json").exists():
+        return ""
+    S = json.loads((D / "summary.json").read_text()); W = S["within"]
+    ss = pd.read_csv(D / "sample_size_decomposition.csv")
+    ki = pd.read_csv(D / "kappa_inputs.csv")
+    col = pd.read_csv(D / "collapse.csv"); cr = col[col.resolved]
+    lo = cr[(cr.chi <= 0.06) & cr.branch_conditioned_post_hoc]
+    names = list(W)
+    wt = "\n".join(f"| {k} | {v['runs']:,} | {100 * v['pooled_frac_within_10']:.1f}% | {100 * v['pooled_frac_within_20']:.1f}% | "
+                   f"{v['arms_median_within_10']} / {v['arms']} | {v['arms_median_within_20']} / {v['arms']} |" for k, v in W.items())
+    st = "\n".join(f"| {r.a:.2f} | {r.n:,} | {r.runs} | {r.total_median:.4f} [{r.total_lo:.4f}, {r.total_hi:.4f}] | "
+                   f"{r.static_median:.4f} [{r.static_lo:.4f}, {r.static_hi:.4f}] | {r.dynamic_median:.4f} [{r.dynamic_lo:.4f}, {r.dynamic_hi:.4f}] |"
+                   for r in ss.itertuples())
+    kt = "\n".join(f"| {r.input} | {r.origin} | {r.detail} |" for r in ki.itertuples())
+    return f"""
+## WP-33. Statistics for the lag law (Track B, final round; existing data; for the submission)
+
+Producer: `src/track_b.py` → `track_b/` (bootstrap: run-level, {S["bootstrap"]["B"]:,} resamples, seed {S["bootstrap"]["seed"]}).
+Figures: `lag.pdf` (now with bootstrap 95% intervals on every arm median) and `collapse.pdf` (new); captions in `captions.md`.
+
+**1. Bootstrap intervals** (`arm_ci.csv`): every arm median in the lag figure carries a run-level bootstrap 95% interval.
+The lag is measured from the tracked-branch switch, as in the figure.
+
+**2. Fraction within ±10% and ±20% (relative, no absolute floor)** (`within.csv`, `within_summary.json`)
+
+| model | runs | runs within ±10% | runs within ±20% | arm medians within ±10% | arm medians within ±20% |
+|---|---|---|---|---|---|
+{wt}
+
+- The committed closed form κχ, measured from the tracked-branch switch, has every arm median within ±10%. Per run, 88%
+  are within ±10% and 98% within ±20%.
+- Measured from the registered reference, the global own-sample threshold (the committed 1A comparison), fewer runs
+  are within: this is the reference effect identified in WP-31.
+- The trajectory-integrated model (post hoc) has essentially every run within ±10%.
+
+**3. Collapse across settings** (`collapse.csv`, `collapse.pdf`)
+- Branch-conditioned points (post hoc) with χ ≤ 0.06 have observed/predicted lag {lo.ratio.min():.2f}–{lo.ratio.max():.2f}. That
+  covers width-1 free training, the SGD and Adam ramp cells, the R^d band task, and the three width-2 runs in width 1's range.
+- Above χ ≈ 0.06 the ratio departs from 1: SiLU and Mish (χ ≈ 0.2) have the wrong sign, and width 2 at χ ≳ 0.3 reaches
+  up to {cr[cr.setting == "width 2"].ratio.max():.0f}.
+- Points with |predicted lag| < 0.005 are omitted as below resolution. This excludes GELU and most slowed width-2 runs.
+
+**4. Sample size: the free-training offset splits into a static threshold shift and a dynamic lag**
+(`sample_size_decomposition.csv`). Per run, log(s_cross/s_pop) = log(s_own/s_pop) [static] + log(s_cross/s_own)
+[dynamic]. Medians are shown with bootstrap 95% intervals.
+
+| a | n (training points) | runs | total offset | static shift | dynamic lag |
+|---|---|---|---|---|---|
+{st}
+
+- The dynamic lag does not depend on n: about 0.030 at a = 1.30 and 0.062 at a = 1.50 at every n.
+- The static finite-sample shift shrinks as n grows.
+- So the free-training offset above the population threshold is a finite-sample threshold shift plus an n-independent
+  lag.
+
+**5. What κ is built from** (`kappa_inputs.csv`)
+
+| input | origin | detail |
+|---|---|---|
+{kt}
+
+- The landscape supplies H, θ\\*′, ∇G and s\\*.
+- Two inputs to the committed κ came from measured runs: the winding index k, read from each run's crossing state, and
+  Adam's preconditioner shape, the median at crossing over existing runs. Track A fixes both before any crossing at an
+  unseen a.
+
+**Say:**
+- "Every arm median of the lag lies within 10% of the no-fit prediction κ(a)χ when the lag is measured from the branch
+  each run tracks (bootstrap 95% intervals shown)."
+- "Across settings, observed/predicted lag stays near 1 below χ ≈ 0.06 and departs above it."
+- "With more training data the finite-sample threshold shift shrinks, while the lag behind the own threshold is
+  unchanged."
+
+**Do not say:**
+- "within 10%" for the registered reference: there it is 31 of 36 arm medians, and 64% of runs.
+- that κ's winding index and preconditioner were fixed before crossing data at a = 1.30–1.60 (they were not; Track A
+  addresses this).
+- that the collapse is registered (the branch-conditioned points are post hoc).
 """
 
 

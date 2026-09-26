@@ -1,0 +1,109 @@
+model,set,a,arm,n,frac_within_10,frac_within_20,arm_median_ratio
+"closed form (committed κχ), tracked-branch lag",4b,1.3,control,48,1.0,1.0,1.0265025683108666
+"closed form (committed κχ), tracked-branch lag",4b,1.3,reset,48,1.0,1.0,1.0156902804375463
+"closed form (committed κχ), tracked-branch lag",4b,1.3,teleport,48,1.0,1.0,1.0145239653497138
+"closed form (committed κχ), tracked-branch lag",4b,1.3,teleport_reset,48,1.0,1.0,1.0120441154973583
+"closed form (committed κχ), tracked-branch lag",4b,1.5,control,48,0.8333333333333334,1.0,1.0424462864038564
+"closed form (committed κχ), tracked-branch lag",4b,1.5,reset,48,1.0,1.0,1.0236723815212039
+"closed form (committed κχ), tracked-branch lag",4b,1.5,teleport,48,0.9791666666666666,1.0,1.0315244686699632
+"closed form (committed κχ), tracked-branch lag",4b,1.5,teleport_reset,48,1.0,1.0,1.0183456908539152
+"closed form (committed κχ), tracked-branch lag",SGD,1.3,sgd,30,0.7,0.9666666666666667,1.0683603157309092
+"closed form (committed κχ), tracked-branch lag",SGD,1.5,sgd,30,0.6333333333333333,0.9666666666666667,1.0886014561195496
+"closed form (committed κχ), tracked-branch lag",TaskB,1.45,adam,80,0.75,0.9875,1.038929183777359
+"closed form (committed κχ), tracked-branch lag",TaskB,1.6,adam,80,0.6125,0.7875,0.9953550452342623
+"closed form (committed κχ), tracked-branch lag",lag1,1.3,0.25,49,0.9387755102040817,1.0,0.9915382038791813
+"closed form (committed κχ), tracked-branch lag",lag1,1.3,0.5,48,1.0,1.0,0.99839162446684
+"closed form (committed κχ), tracked-branch lag",lag1,1.3,1.0,48,1.0,1.0,1.0265025683108666
+"closed form (committed κχ), tracked-branch lag",lag1,1.3,2.0,44,1.0,1.0,1.02764000093538
+"closed form (committed κχ), tracked-branch lag",lag1,1.5,0.25,49,0.673469387755102,0.7959183673469388,0.9201205147330525
+"closed form (committed κχ), tracked-branch lag",lag1,1.5,0.5,48,0.6041666666666666,0.9583333333333334,0.9125482847435495
+"closed form (committed κχ), tracked-branch lag",lag1,1.5,1.0,48,0.8333333333333334,1.0,1.0424462864038564
+"closed form (committed κχ), tracked-branch lag",lag1,1.5,2.0,44,0.8181818181818182,1.0,1.0501583920153805
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.3,0.25,48,1.0,1.0,1.015474275233005
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.3,0.5,48,1.0,1.0,1.0177592344472466
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.3,1.0,48,1.0,1.0,1.0265025683108666
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.3,2.0,48,1.0,1.0,1.0204360283374285
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.5,0.25,48,0.8541666666666666,1.0,0.9782519088083946
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.5,0.5,48,0.8333333333333334,1.0,1.0326148090297524
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.5,1.0,48,0.8333333333333334,1.0,1.0424462864038564
+"closed form (committed κχ), tracked-branch lag",lag2-prim,1.5,2.0,48,0.8125,1.0,1.0274582092955638
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.3,0.25,48,0.8958333333333334,0.9583333333333334,0.9914658815732864
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.3,0.5,48,1.0,1.0,1.009957023188112
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.3,1.0,48,1.0,1.0,1.0265025683108666
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.3,2.0,48,1.0,1.0,1.018413478781829
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.5,0.25,48,0.8958333333333334,0.9583333333333334,0.9812390896007749
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.5,0.5,48,0.7291666666666666,0.9375,0.9334102405772324
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.5,1.0,48,0.8333333333333334,1.0,1.0424462864038564
+"closed form (committed κχ), tracked-branch lag",lag2-tstar,1.5,2.0,48,0.8125,1.0,1.0315433670129623
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.3,control,48,0.75,0.75,1.0222810520271728
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.3,reset,48,0.75,0.75,1.009268322986985
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.3,teleport,48,0.75,0.75,1.00899415156448
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.3,teleport_reset,48,0.75,0.75,1.0034470231989234
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.5,control,48,0.5833333333333334,0.8125,1.0345449114769698
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.5,reset,48,0.75,0.7916666666666666,1.019110922029224
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.5,teleport,48,0.7083333333333334,0.8125,1.0258966938696725
+"closed form (committed κχ), registered reference (global own threshold)",4b,1.5,teleport_reset,48,0.75,0.7916666666666666,1.0135256010061704
+"closed form (committed κχ), registered reference (global own threshold)",SGD,1.3,sgd,30,0.5,0.7666666666666667,1.093760125795086
+"closed form (committed κχ), registered reference (global own threshold)",SGD,1.5,sgd,30,0.3333333333333333,0.7666666666666667,1.124977625052057
+"closed form (committed κχ), registered reference (global own threshold)",TaskB,1.45,adam,80,0.6,0.8125,1.031591272704089
+"closed form (committed κχ), registered reference (global own threshold)",TaskB,1.6,adam,80,0.4625,0.65,0.9877242643819543
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.3,0.25,49,0.5306122448979592,0.6530612244897959,0.6962680838124188
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.3,0.5,48,0.8125,0.8125,1.005354556279486
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.3,1.0,48,0.75,0.75,1.0222810520271728
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.3,2.0,44,0.6818181818181818,0.7045454545454546,1.0175775772354871
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.5,0.25,49,0.5306122448979592,0.673469387755102,0.7611658168139956
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.5,0.5,48,0.4166666666666667,0.75,0.9051987523508553
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.5,1.0,48,0.5833333333333334,0.8125,1.0345449114769698
+"closed form (committed κχ), registered reference (global own threshold)",lag1,1.5,2.0,44,0.5,0.7272727272727273,1.041661938550672
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.3,0.25,48,0.75,0.75,1.0725330026158306
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.3,0.5,48,0.75,0.75,1.0340495385475945
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.3,1.0,48,0.75,0.75,1.0222810520271728
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.3,2.0,48,0.75,0.75,1.0229440830427494
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.5,0.25,48,0.6041666666666666,0.75,1.034620499929664
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.5,0.5,48,0.5833333333333334,0.7916666666666666,1.0358431413281621
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.5,1.0,48,0.5833333333333334,0.8125,1.0345449114769698
+"closed form (committed κχ), registered reference (global own threshold)",lag2-prim,1.5,2.0,48,0.5833333333333334,0.8125,1.019556272178066
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.3,0.25,48,0.5625,0.6041666666666666,0.7099795546201069
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.3,0.5,48,0.7708333333333334,0.7708333333333334,1.011938564417833
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.3,1.0,48,0.75,0.75,1.0222810520271728
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.3,2.0,48,0.75,0.75,1.0164854346259782
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.5,0.25,48,0.5416666666666666,0.7083333333333334,0.7531379945078301
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.5,0.5,48,0.5,0.7083333333333334,0.9456025877812891
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.5,1.0,48,0.5833333333333334,0.8125,1.0345449114769698
+"closed form (committed κχ), registered reference (global own threshold)",lag2-tstar,1.5,2.0,48,0.5833333333333334,0.8125,1.029014596700641
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.3,control,47,1.0,1.0,1.0151861884203488
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.3,reset,30,1.0,1.0,1.0195353845061348
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.3,teleport,46,1.0,1.0,1.018838045325571
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.3,teleport_reset,48,1.0,1.0,1.020215393807535
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.5,control,48,1.0,1.0,1.0361521944249086
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.5,reset,42,1.0,1.0,1.0464643724432896
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.5,teleport,48,1.0,1.0,1.0419716387931446
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",4b,1.5,teleport_reset,48,1.0,1.0,1.0428495077918778
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",SGD,1.3,sgd,30,1.0,1.0,1.0167257142615818
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",SGD,1.5,sgd,30,1.0,1.0,1.0388986710211747
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",TaskB,1.45,adam,80,1.0,1.0,1.032016605055566
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",TaskB,1.6,adam,80,1.0,1.0,1.0458063783822968
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.3,0.25,48,0.9791666666666666,1.0,1.0245141176979573
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.3,0.5,47,1.0,1.0,1.0215424844570398
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.3,1.0,47,1.0,1.0,1.0151861884203488
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.3,2.0,43,1.0,1.0,1.0263842665067753
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.5,0.25,49,1.0,1.0,1.0
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.5,0.5,48,1.0,1.0,1.0311881741784437
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.5,1.0,48,1.0,1.0,1.0361521944249086
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag1,1.5,2.0,44,1.0,1.0,1.041927243507261
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.3,0.25,46,1.0,1.0,1.0077707144937385
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.3,0.5,47,1.0,1.0,1.018200499241174
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.3,1.0,47,1.0,1.0,1.0151861884203488
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.3,2.0,47,1.0,1.0,1.0163895641157645
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.5,0.25,48,1.0,1.0,1.0242996294358884
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.5,0.5,48,1.0,1.0,1.0376997540310393
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.5,1.0,48,1.0,1.0,1.0361521944249086
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-prim,1.5,2.0,48,1.0,1.0,1.040806947843062
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.3,0.25,45,0.9777777777777777,1.0,1.0
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.3,0.5,47,1.0,1.0,1.023619108101964
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.3,1.0,47,1.0,1.0,1.0151861884203488
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.3,2.0,47,1.0,1.0,1.0190193643119454
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.5,0.25,48,1.0,1.0,1.0062975735692021
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.5,0.5,48,1.0,1.0,1.0349745887847521
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.5,1.0,48,1.0,1.0,1.0361521944249086
+"trajectory-integrated (full model, 0.7 s*), tracked-branch lag",lag2-tstar,1.5,2.0,48,1.0,1.0,1.0438844335756163

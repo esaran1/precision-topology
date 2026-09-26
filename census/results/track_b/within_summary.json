@@ -1,0 +1,38 @@
+{
+ "closed form (committed \u03ba\u03c7), tracked-branch lag": {
+  "arms": 36,
+  "runs": 1750,
+  "pooled_frac_within_10": 0.8822857142857143,
+  "pooled_frac_within_20": 0.9777142857142858,
+  "arms_median_within_10": 36,
+  "arms_median_within_20": 36,
+  "per_arm_frac10_min": 0.6041666666666666,
+  "per_arm_frac10_max": 1.0,
+  "per_arm_frac20_min": 0.7875,
+  "per_arm_frac20_max": 1.0
+ },
+ "closed form (committed \u03ba\u03c7), registered reference (global own threshold)": {
+  "arms": 36,
+  "runs": 1750,
+  "pooled_frac_within_10": 0.6365714285714286,
+  "pooled_frac_within_20": 0.7537142857142857,
+  "arms_median_within_10": 31,
+  "arms_median_within_20": 32,
+  "per_arm_frac10_min": 0.3333333333333333,
+  "per_arm_frac10_max": 0.8125,
+  "per_arm_frac20_min": 0.6041666666666666,
+  "per_arm_frac20_max": 0.8125
+ },
+ "trajectory-integrated (full model, 0.7 s*), tracked-branch lag": {
+  "arms": 36,
+  "runs": 1708,
+  "pooled_frac_within_10": 0.9988290398126464,
+  "pooled_frac_within_20": 1.0,
+  "arms_median_within_10": 36,
+  "arms_median_within_20": 36,
+  "per_arm_frac10_min": 0.9777777777777777,
+  "per_arm_frac10_max": 1.0,
+  "per_arm_frac20_min": 1.0,
+  "per_arm_frac20_max": 1.0
+ }
+}

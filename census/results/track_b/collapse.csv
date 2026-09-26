@@ -1,0 +1,132 @@
+setting,label,chi,obs,pred,branch_conditioned_post_hoc,reference,ratio,resolved
+"width 1, free training",4b a=1.30 control,0.003991336243666,0.0311812855662603,0.03037623726316615,True,tracked-branch switch (post hoc),1.0265025683108666,True
+"width 1, free training (registered reference)",4b a=1.30 control,0.003991336243666,0.0310530517860165,0.03037623726316615,False,global own threshold (committed comparison),1.0222810520271728,True
+"width 1, free training",4b a=1.30 reset,0.0040988758643487,0.03168412535665005,0.03119467220164885,True,tracked-branch switch (post hoc),1.0156902804375463,True
+"width 1, free training (registered reference)",4b a=1.30 reset,0.0040988758643487,0.03148379449908685,0.03119467220164885,False,global own threshold (committed comparison),1.009268322986985,True
+"width 1, free training",4b a=1.30 teleport,0.00400928097824165,0.03095597338595565,0.0305128064424628,True,tracked-branch switch (post hoc),1.0145239653497138,True
+"width 1, free training (registered reference)",4b a=1.30 teleport,0.00400928097824165,0.03078724324826395,0.0305128064424628,False,global own threshold (committed comparison),1.00899415156448,True
+"width 1, free training",4b a=1.30 teleport_reset,0.004088420102139,0.031489852006812896,0.03111509817073295,True,tracked-branch switch (post hoc),1.0120441154973583,True
+"width 1, free training (registered reference)",4b a=1.30 teleport_reset,0.004088420102139,0.03122235263596425,0.03111509817073295,False,global own threshold (committed comparison),1.0034470231989234,True
+"width 1, free training",4b a=1.50 control,0.0156705637722791,0.06609514144774135,0.0634038821086416,True,tracked-branch switch (post hoc),1.0424462864038564,True
+"width 1, free training (registered reference)",4b a=1.50 control,0.0156705637722791,0.06559416360338086,0.0634038821086416,False,global own threshold (committed comparison),1.0345449114769698,True
+"width 1, free training",4b a=1.50 reset,0.0163019186806736,0.0675197673675965,0.06595837553735734,True,tracked-branch switch (post hoc),1.0236723815212039,True
+"width 1, free training (registered reference)",4b a=1.50 reset,0.0163019186806736,0.06721890090942605,0.06595837553735734,False,global own threshold (committed comparison),1.019110922029224,True
+"width 1, free training",4b a=1.50 teleport,0.0157733204166198,0.06583152087450955,0.06381964061346215,True,tracked-branch switch (post hoc),1.0315244686699632,True
+"width 1, free training (registered reference)",4b a=1.50 teleport,0.0157733204166198,0.0654723583093015,0.06381964061346215,False,global own threshold (committed comparison),1.0258966938696725,True
+"width 1, free training",4b a=1.50 teleport_reset,0.016097362914049652,0.06632560099706855,0.06513073270968764,True,tracked-branch switch (post hoc),1.0183456908539152,True
+"width 1, free training (registered reference)",4b a=1.50 teleport_reset,0.016097362914049652,0.0660116650135584,0.06513073270968764,False,global own threshold (committed comparison),1.0135256010061704,True
+"width 1, free training",SGD a=1.30 sgd,0.0035418534444108503,0.0288325641206889,0.0269876779361309,True,tracked-branch switch (post hoc),1.0683603157309092,True
+"width 1, free training (registered reference)",SGD a=1.30 sgd,0.0035418534444108503,0.0295180460143398,0.0269876779361309,False,global own threshold (committed comparison),1.093760125795086,True
+"width 1, free training",SGD a=1.50 sgd,0.01403531295133275,0.0622520557924133,0.057185350471896504,True,tracked-branch switch (post hoc),1.0886014561195496,True
+"width 1, free training (registered reference)",SGD a=1.50 sgd,0.01403531295133275,0.06433223976164365,0.057185350471896504,False,global own threshold (committed comparison),1.124977625052057,True
+"width 1, free training",TaskB a=1.45 adam,0.011249265828270849,0.05362033618241175,0.05161115600531875,True,tracked-branch switch (post hoc),1.038929183777359,True
+"width 1, free training (registered reference)",TaskB a=1.45 adam,0.011249265828270849,0.05324161810925605,0.05161115600531875,False,global own threshold (committed comparison),1.031591272704089,True
+"width 1, free training",TaskB a=1.60 adam,0.0248597716032564,0.08150071395994155,0.0818810477227851,True,tracked-branch switch (post hoc),0.9953550452342623,True
+"width 1, free training (registered reference)",TaskB a=1.60 adam,0.0248597716032564,0.0808758976288116,0.0818810477227851,False,global own threshold (committed comparison),0.9877242643819543,True
+"width 1, free training",lag1 a=1.30 0.25,0.0008928935279568,0.0067379035165633,0.0067954048469365,True,tracked-branch switch (post hoc),0.9915382038791813,True
+"width 1, free training (registered reference)",lag1 a=1.30 0.25,0.0008928935279568,0.0047314235115061,0.0067954048469365,False,global own threshold (committed comparison),0.6962680838124188,True
+"width 1, free training",lag1 a=1.30 0.5,0.003480328811352,0.026444591725276752,0.026487193078566403,True,tracked-branch switch (post hoc),0.99839162446684,True
+"width 1, free training (registered reference)",lag1 a=1.30 0.5,0.003480328811352,0.026629020244591198,0.026487193078566403,False,global own threshold (committed comparison),1.005354556279486,True
+"width 1, free training",lag1 a=1.30 1.0,0.003991336243666,0.0311812855662603,0.03037623726316615,True,tracked-branch switch (post hoc),1.0265025683108666,True
+"width 1, free training (registered reference)",lag1 a=1.30 1.0,0.003991336243666,0.0310530517860165,0.03037623726316615,False,global own threshold (committed comparison),1.0222810520271728,True
+"width 1, free training",lag1 a=1.30 2.0,0.0040319227777754,0.0315332596618974,0.030685122837954097,True,tracked-branch switch (post hoc),1.02764000093538,True
+"width 1, free training (registered reference)",lag1 a=1.30 2.0,0.0040319227777754,0.031224492954618648,0.030685122837954097,False,global own threshold (committed comparison),1.0175775772354871,True
+"width 1, free training",lag1 a=1.50 0.25,0.0034709699846424,0.0129219126350663,0.014043717565427,True,tracked-branch switch (post hoc),0.9201205147330525,True
+"width 1, free training (registered reference)",lag1 a=1.50 0.25,0.0034709699846424,0.0106895977517933,0.014043717565427,False,global own threshold (committed comparison),0.7611658168139956,True
+"width 1, free training",lag1 a=1.50 0.5,0.0145903214352062,0.0538706159906511,0.059033167769078854,True,tracked-branch switch (post hoc),0.9125482847435495,True
+"width 1, free training (registered reference)",lag1 a=1.50 0.5,0.0145903214352062,0.0534367498118889,0.059033167769078854,False,global own threshold (committed comparison),0.9051987523508553,True
+"width 1, free training",lag1 a=1.50 1.0,0.0156705637722791,0.06609514144774135,0.0634038821086416,True,tracked-branch switch (post hoc),1.0424462864038564,True
+"width 1, free training (registered reference)",lag1 a=1.50 1.0,0.0156705637722791,0.06559416360338086,0.0634038821086416,False,global own threshold (committed comparison),1.0345449114769698,True
+"width 1, free training",lag1 a=1.50 2.0,0.015766157445518597,0.0669902957501439,0.06379065887535446,True,tracked-branch switch (post hoc),1.0501583920153805,True
+"width 1, free training (registered reference)",lag1 a=1.50 2.0,0.015766157445518597,0.06644830138552635,0.06379065887535446,False,global own threshold (committed comparison),1.041661938550672,True
+"width 1, free training",lag2-prim a=1.30 0.25,0.00339984925853145,0.0262750921866712,0.02587469995795045,True,tracked-branch switch (post hoc),1.015474275233005,True
+"width 1, free training (registered reference)",lag2-prim a=1.30 0.25,0.00339984925853145,0.027751469637684302,0.02587469995795045,False,global own threshold (committed comparison),1.0725330026158306,True
+"width 1, free training",lag2-prim a=1.30 0.5,0.0038429783333169,0.0297665600106021,0.02924715296419645,True,tracked-branch switch (post hoc),1.0177592344472466,True
+"width 1, free training (registered reference)",lag2-prim a=1.30 0.5,0.0038429783333169,0.03024300502645825,0.02924715296419645,False,global own threshold (committed comparison),1.0340495385475945,True
+"width 1, free training",lag2-prim a=1.30 1.0,0.003991336243666,0.0311812855662603,0.03037623726316615,True,tracked-branch switch (post hoc),1.0265025683108666,True
+"width 1, free training (registered reference)",lag2-prim a=1.30 1.0,0.003991336243666,0.0310530517860165,0.03037623726316615,False,global own threshold (committed comparison),1.0222810520271728,True
+"width 1, free training",lag2-prim a=1.30 2.0,0.004057183270269349,0.0315083796956008,0.0308773689095794,True,tracked-branch switch (post hoc),1.0204360283374285,True
+"width 1, free training (registered reference)",lag2-prim a=1.30 2.0,0.004057183270269349,0.0315858218259824,0.0308773689095794,False,global own threshold (committed comparison),1.0229440830427494,True
+"width 1, free training",lag2-prim a=1.50 0.25,0.0134587691942514,0.053270561935518004,0.0544548510009111,True,tracked-branch switch (post hoc),0.9782519088083946,True
+"width 1, free training (registered reference)",lag2-prim a=1.50 0.25,0.0134587691942514,0.056340105166158005,0.0544548510009111,False,global own threshold (committed comparison),1.034620499929664,True
+"width 1, free training",lag2-prim a=1.50 0.5,0.01499795472997575,0.06266161964656256,0.06068247239785335,True,tracked-branch switch (post hoc),1.0326148090297524,True
+"width 1, free training (registered reference)",lag2-prim a=1.50 0.5,0.01499795472997575,0.0628575228321519,0.06068247239785335,False,global own threshold (committed comparison),1.0358431413281621,True
+"width 1, free training",lag2-prim a=1.50 1.0,0.0156705637722791,0.06609514144774135,0.0634038821086416,True,tracked-branch switch (post hoc),1.0424462864038564,True
+"width 1, free training (registered reference)",lag2-prim a=1.50 1.0,0.0156705637722791,0.06559416360338086,0.0634038821086416,False,global own threshold (committed comparison),1.0345449114769698,True
+"width 1, free training",lag2-prim a=1.50 2.0,0.01618100561968335,0.0672668210334731,0.06546915526578151,True,tracked-branch switch (post hoc),1.0274582092955638,True
+"width 1, free training (registered reference)",lag2-prim a=1.50 2.0,0.01618100561968335,0.0667494878854272,0.06546915526578151,False,global own threshold (committed comparison),1.019556272178066,True
+"width 1, free training",lag2-tstar a=1.30 0.25,0.0013153399020485001,0.009925020887626649,0.01001045126422035,True,tracked-branch switch (post hoc),0.9914658815732864,True
+"width 1, free training (registered reference)",lag2-tstar a=1.30 0.25,0.0013153399020485001,0.00710721573011745,0.01001045126422035,False,global own threshold (committed comparison),0.7099795546201069,True
+"width 1, free training",lag2-tstar a=1.30 0.5,0.003523411910657,0.02708207723295725,0.02681507887084915,True,tracked-branch switch (post hoc),1.009957023188112,True
+"width 1, free training (registered reference)",lag2-tstar a=1.30 0.5,0.003523411910657,0.02713521241731805,0.02681507887084915,False,global own threshold (committed comparison),1.011938564417833,True
+"width 1, free training",lag2-tstar a=1.30 1.0,0.003991336243666,0.0311812855662603,0.03037623726316615,True,tracked-branch switch (post hoc),1.0265025683108666,True
+"width 1, free training (registered reference)",lag2-tstar a=1.30 1.0,0.003991336243666,0.0310530517860165,0.03037623726316615,False,global own threshold (committed comparison),1.0222810520271728,True
+"width 1, free training",lag2-tstar a=1.30 2.0,0.004072015681388,0.03156088995706095,0.0309902516164774,True,tracked-branch switch (post hoc),1.018413478781829,True
+"width 1, free training (registered reference)",lag2-tstar a=1.30 2.0,0.004072015681388,0.03150113938354345,0.0309902516164774,False,global own threshold (committed comparison),1.0164854346259782,True
+"width 1, free training",lag2-tstar a=1.50 0.25,0.005376295581843099,0.02134465832160495,0.021752759901044298,True,tracked-branch switch (post hoc),0.9812390896007749,True
+"width 1, free training (registered reference)",lag2-tstar a=1.50 0.25,0.005376295581843099,0.01638282996688285,0.021752759901044298,False,global own threshold (committed comparison),0.7531379945078301,True
+"width 1, free training",lag2-tstar a=1.50 0.5,0.0145633824640549,0.05500042495473125,0.05892417134905045,True,tracked-branch switch (post hoc),0.9334102405772324,True
+"width 1, free training (registered reference)",lag2-tstar a=1.50 0.5,0.0145633824640549,0.0557188489105302,0.05892417134905045,False,global own threshold (committed comparison),0.9456025877812891,True
+"width 1, free training",lag2-tstar a=1.50 1.0,0.0156705637722791,0.06609514144774135,0.0634038821086416,True,tracked-branch switch (post hoc),1.0424462864038564,True
+"width 1, free training (registered reference)",lag2-tstar a=1.50 1.0,0.0156705637722791,0.06559416360338086,0.0634038821086416,False,global own threshold (committed comparison),1.0345449114769698,True
+"width 1, free training",lag2-tstar a=1.50 2.0,0.0161809599584778,0.06753408228328645,0.0654689705182679,True,tracked-branch switch (post hoc),1.0315433670129623,True
+"width 1, free training (registered reference)",lag2-tstar a=1.50 2.0,0.0161809599584778,0.0673685262942616,0.0654689705182679,False,global own threshold (committed comparison),1.029014596700641,True
+forced ramp (adam),a=1.30 k=-1 cell 0,6.6561177994651e-05,0.00017716114617780001,0.0005028906305430999,True,tracked-branch switch (post hoc),0.3522856371105457,False
+forced ramp (adam),a=1.30 k=-1 cell 1,0.00010584076308324999,0.0002817144769139,0.0008023160336121499,True,tracked-branch switch (post hoc),0.3511265699696642,False
+forced ramp (adam),a=1.30 k=-1 cell 2,0.0001677846969834,0.00070481037051045,0.00127404256990875,True,tracked-branch switch (post hoc),0.5532078653862643,False
+forced ramp (adam),a=1.30 k=-1 cell 3,0.0002778301501871,0.0012667774794429,0.0021121852368153,True,tracked-branch switch (post hoc),0.5997473409827044,False
+forced ramp (adam),a=1.30 k=-1 cell 4,0.00041600198102415,0.0029857649872695,0.00316403710940665,True,tracked-branch switch (post hoc),0.9436567537064755,False
+forced ramp (adam),a=1.30 k=-1 cell 5,0.00065019353896225,0.0036452182501716997,0.00494710694447585,True,tracked-branch switch (post hoc),0.7368383766682274,False
+forced ramp (sgd),a=1.30 k=-1 cell 0,0.0001312396513991,0.0010352087308549,0.001,True,tracked-branch switch (post hoc),1.0352087308548998,False
+forced ramp (sgd),a=1.30 k=-1 cell 1,0.0003296590996256,0.0026098367634602,0.0025118864315095,True,tracked-branch switch (post hoc),1.0389947295076702,False
+forced ramp (sgd),a=1.30 k=-1 cell 2,0.0008280662193732,0.006584534963165601,0.0063095734448019,True,tracked-branch switch (post hoc),1.0435784638643404,True
+forced ramp (sgd),a=1.30 k=-1 cell 3,0.0020800083008351,0.0168233045073421,0.0158489319246111,True,tracked-branch switch (post hoc),1.061478753733426,True
+forced ramp (sgd),a=1.30 k=-1 cell 4,0.0052247446282931,0.0442496309847155,0.0398107170553354,True,tracked-branch switch (post hoc),1.1115004766985277,True
+forced ramp (sgd),a=1.30 k=-1 cell 5,0.013123965139915,0.1261848005023526,0.0999999999999861,True,tracked-branch switch (post hoc),1.2618480050237013,True
+forced ramp (adam),a=1.30 k=0 cell 0,7.111469280152998e-05,-0.0009280777636612,-0.00050034148594025,True,tracked-branch switch (post hoc),1.8548886905053272,False
+forced ramp (adam),a=1.30 k=0 cell 1,0.0001173000263711,-0.0012596876833633002,-0.0008327524470221001,True,tracked-branch switch (post hoc),1.5126796539210527,False
+forced ramp (adam),a=1.30 k=0 cell 2,0.00018070286182019998,-0.0019288061706737999,-0.00130072711732065,True,tracked-branch switch (post hoc),1.482867655321065,False
+forced ramp (adam),a=1.30 k=0 cell 3,0.00029177281611885,-0.00340896330534075,-0.00212055764638425,True,tracked-branch switch (post hoc),1.607578700420313,False
+forced ramp (adam),a=1.30 k=0 cell 4,0.0004335610752377,-0.004679061497976851,-0.0031874793050674,True,tracked-branch switch (post hoc),1.4679503928192283,False
+forced ramp (adam),a=1.30 k=0 cell 5,0.0006960375728973,-0.0072171113687901495,-0.00515668627053675,True,tracked-branch switch (post hoc),1.3995637877033256,True
+forced ramp (sgd),a=1.30 k=0 cell 0,0.0001344337503024,-0.0010398924068372,-0.001,True,tracked-branch switch (post hoc),1.0398924068372,False
+forced ramp (sgd),a=1.30 k=0 cell 1,0.0003376823133217,-0.00260836211996045,-0.0025118864315095,True,tracked-branch switch (post hoc),1.0384076633564097,False
+forced ramp (sgd),a=1.30 k=0 cell 2,0.0008482196209935,-0.00650795400513925,-0.0063095734448019,True,tracked-branch switch (post hoc),1.031441199959529,True
+forced ramp (sgd),a=1.30 k=0 cell 3,0.0021306313569139,-0.016061875828570348,-0.0158489319246111,True,tracked-branch switch (post hoc),1.0134358520165372,True
+forced ramp (sgd),a=1.30 k=0 cell 4,0.0053519039959792,-0.0385538067228197,-0.0398107170553365,True,tracked-branch switch (post hoc),0.9684278399012581,True
+forced ramp (sgd),a=1.30 k=0 cell 5,0.0134433750302456,-0.08748876479742455,-0.0999999999999923,True,tracked-branch switch (post hoc),0.8748876479743128,True
+forced ramp (adam),a=1.50 k=0 cell 0,0.00012371257498069999,-0.0002000545275991,0.0005071051238940999,True,tracked-branch switch (post hoc),-0.39450306883682346,False
+forced ramp (adam),a=1.50 k=0 cell 1,0.000202256937837,-0.00028385333148355,0.00082972449275735,True,tracked-branch switch (post hoc),-0.3421055229311664,False
+forced ramp (adam),a=1.50 k=0 cell 2,0.00033329186320135,6.766832341930298e-05,0.0013655887900144502,True,tracked-branch switch (post hoc),0.04955248894404511,False
+forced ramp (adam),a=1.50 k=0 cell 3,0.000568770362691,0.00100265501385915,0.0023219691660055497,True,tracked-branch switch (post hoc),0.4318123722478206,False
+forced ramp (adam),a=1.50 k=0 cell 4,0.00093219487770035,0.0013972209354318,0.0037915024614987,True,tracked-branch switch (post hoc),0.36851378829898174,False
+forced ramp (adam),a=1.50 k=0 cell 5,0.0015978831937046999,0.00434799988174745,0.006480638295599649,True,tracked-branch switch (post hoc),0.6709215486844468,True
+forced ramp (sgd),a=1.50 k=0 cell 0,0.0002454354626755,0.00098863214285325,0.001,True,tracked-branch switch (post hoc),0.98863214285325,False
+forced ramp (sgd),a=1.50 k=0 cell 1,0.0006165060085059,0.0024834310132475,0.0025118864315095,True,tracked-branch switch (post hoc),0.9886716939487984,False
+forced ramp (sgd),a=1.50 k=0 cell 2,0.0015485930777102,0.00630570426201745,0.0063095734448019,True,tracked-branch switch (post hoc),0.9993867758544538,True
+forced ramp (sgd),a=1.50 k=0 cell 3,0.0038898899398281,0.01601054717217905,0.0158489319246034,True,tracked-branch switch (post hoc),1.010197232743789,True
+forced ramp (sgd),a=1.50 k=0 cell 4,0.0097709617599233,0.041408764615595,0.039810717055344,True,tracked-branch switch (post hoc),1.0401411398350204,True
+forced ramp (sgd),a=1.50 k=0 cell 5,0.0245435462675535,0.11356705702082545,0.0999999999999987,True,tracked-branch switch (post hoc),1.1356705702082692,True
+GELU/SiLU/Mish,gelu,0.0141941700592746,0.00168159498719,0.0020905208863954,True,tracked-branch switch (post hoc),0.804390426392489,False
+GELU/SiLU/Mish,silu,0.22455460938007316,0.0142458380686658,-0.03242631799534265,True,tracked-branch switch (post hoc),-0.4393294999053519,True
+GELU/SiLU/Mish,mish,0.255530280902751,0.03419362921759955,-0.03932035937501175,True,tracked-branch switch (post hoc),-0.8696163962155886,True
+R^d band task,primary d=2 a=1.30,0.0031871026790901997,0.0251690296533675,0.0238241951322219,True,own R^d branch switch (post hoc),1.0564482667171715,True
+R^d band task,primary d=2 a=1.50,0.012303798818360849,0.0539638228157519,0.0490487604682079,True,own R^d branch switch (post hoc),1.1002076770264115,True
+R^d band task,primary d=4 a=1.30,0.0022988871438078,0.0190735722448194,0.0174957801243553,True,own R^d branch switch (post hoc),1.0901812956752759,True
+R^d band task,primary d=4 a=1.50,0.0088508313679923,0.0383550359890234,0.0358109048771023,True,own R^d branch switch (post hoc),1.0710434746246202,True
+R^d band task,secondary d=2 a=1.30,0.0031003832063303,0.0247821767103598,0.0236406079762463,True,own R^d branch switch (post hoc),1.048288467676488,True
+R^d band task,secondary d=2 a=1.50,0.01232020600831895,0.0514619287120857,0.0493723830232422,True,own R^d branch switch (post hoc),1.0423221558469205,True
+R^d band task,secondary d=4 a=1.30,0.0020684443664967,0.0138730217886634,0.0166084650409535,True,own R^d branch switch (post hoc),0.8352982502871285,True
+R^d band task,secondary d=4 a=1.50,0.008066529368677699,0.0325427035201764,0.0337331540106487,True,own R^d branch switch (post hoc),0.9647097780985288,True
+width 2,"T2-3 chi in (0.0001, 0.01]",0.0041449421221685,0.0355996097863231,0.0341789352269616,True,tracked-branch switch along the path (post hoc),1.0415657933732476,True
+width 2,"T2-3 chi in (0.3, 3]",1.0868195298603442,0.7756001189966365,0.24303675235402789,True,tracked-branch switch along the path (post hoc),3.1912873731411278,True
+width 2,"T2-3 chi in (3, inf]",28.953543839801547,12.453048971611079,0.3704548055071601,True,tracked-branch switch along the path (post hoc),33.61556871846379,True
+width 2,"T2-3b chi in (0, 0.0001]",6.2318800474559084e-06,-0.00656965764062125,2.4417466709208288e-05,True,tracked-branch switch along the path (post hoc),-269.05566080463655,False
+width 2,"T2-3b chi in (0.01, 0.0637]",0.02284121817520615,0.00103244394527695,0.00015160827894920002,True,tracked-branch switch along the path (post hoc),6.809944367371225,False
+width 2,"T2-3c chi in (0, 0.0001]",1.178016863979791e-05,-0.0005454945804935,4.875254165086175e-05,True,tracked-branch switch along the path (post hoc),-11.189049063329355,False
+width 2,"T2-3c chi in (0.01, 0.0637]",0.0206881594577962,0.001591715849015,0.0012281213194131,True,tracked-branch switch along the path (post hoc),1.2960575016934452,False
+width 2,"T2-3c chi in (0.0637, 0.3]",0.1647801168727468,0.0197832180442441,0.0004944143146805,True,tracked-branch switch along the path (post hoc),40.01344106921418,False
+width 2,"T2-3d chi in (0, 0.0001]",1.1146715883613658e-05,-0.0037618032602957504,4.5751998679520066e-05,True,tracked-branch switch along the path (post hoc),-82.22161586089666,False
+width 2,"T2-3d chi in (0.01, 0.0637]",0.025586528370292,0.0021993627535439,0.0008962761851822,True,tracked-branch switch along the path (post hoc),2.4538895375166097,False
+width 2,"T2-3d chi in (0.0637, 0.3]",0.0882259233549781,0.0276296691110564,0.002303356115698,True,tracked-branch switch along the path (post hoc),11.995396162474691,False
+width 2,"T2-3d chi in (0.3, 3]",0.510452176935267,1.1826538767926449,-0.0026193854899448,True,tracked-branch switch along the path (post hoc),-451.50050702066295,False

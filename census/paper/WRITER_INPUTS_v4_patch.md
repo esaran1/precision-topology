@@ -3362,6 +3362,84 @@ Precision notes for the writer. These come from existing writer inputs, not from
 - Do not cite presentation labels (for example "Spotlight" for Morwani et al.), per WP-13.
 - Do not quote any abstract. Every sentence above is a paraphrase.
 
+## WP-33. Statistics for the lag law (Track B, final round; existing data; for the submission)
+
+Producer: `src/track_b.py` → `track_b/` (bootstrap: run-level, 10,000 resamples, seed 20260926).
+Figures: `lag.pdf` (now with bootstrap 95% intervals on every arm median) and `collapse.pdf` (new); captions in `captions.md`.
+
+**1. Bootstrap intervals** (`arm_ci.csv`): every arm median in the lag figure carries a run-level bootstrap 95% interval.
+The lag is measured from the tracked-branch switch, as in the figure.
+
+**2. Fraction within ±10% and ±20% (relative, no absolute floor)** (`within.csv`, `within_summary.json`)
+
+| model | runs | runs within ±10% | runs within ±20% | arm medians within ±10% | arm medians within ±20% |
+|---|---|---|---|---|---|
+| closed form (committed κχ), tracked-branch lag | 1,750 | 88.2% | 97.8% | 36 / 36 | 36 / 36 |
+| closed form (committed κχ), registered reference (global own threshold) | 1,750 | 63.7% | 75.4% | 31 / 36 | 32 / 36 |
+| trajectory-integrated (full model, 0.7 s*), tracked-branch lag | 1,708 | 99.9% | 100.0% | 36 / 36 | 36 / 36 |
+
+- The committed closed form κχ, measured from the tracked-branch switch, has every arm median within ±10%. Per run, 88%
+  are within ±10% and 98% within ±20%.
+- Measured from the registered reference, the global own-sample threshold (the committed 1A comparison), fewer runs
+  are within: this is the reference effect identified in WP-31.
+- The trajectory-integrated model (post hoc) has essentially every run within ±10%.
+
+**3. Collapse across settings** (`collapse.csv`, `collapse.pdf`)
+- Branch-conditioned points (post hoc) with χ ≤ 0.06 have observed/predicted lag 0.67–1.40. That
+  covers width-1 free training, the SGD and Adam ramp cells, the R^d band task, and the three width-2 runs in width 1's range.
+- Above χ ≈ 0.06 the ratio departs from 1: SiLU and Mish (χ ≈ 0.2) have the wrong sign, and width 2 at χ ≳ 0.3 reaches
+  up to 34.
+- Points with |predicted lag| < 0.005 are omitted as below resolution. This excludes GELU and most slowed width-2 runs.
+
+**4. Sample size: the free-training offset splits into a static threshold shift and a dynamic lag**
+(`sample_size_decomposition.csv`). Per run, log(s_cross/s_pop) = log(s_own/s_pop) [static] + log(s_cross/s_own)
+[dynamic]. Medians are shown with bootstrap 95% intervals.
+
+| a | n (training points) | runs | total offset | static shift | dynamic lag |
+|---|---|---|---|---|---|
+| 1.30 | 400 | 49 | 0.0682 [0.0362, 0.0935] | 0.0438 [0.0181, 0.0723] | 0.0297 [0.0273, 0.0313] |
+| 1.30 | 1,600 | 48 | 0.0544 [0.0311, 0.0707] | 0.0396 [0.0156, 0.0522] | 0.0293 [0.0278, 0.0313] |
+| 1.30 | 6,400 | 48 | 0.0413 [0.0316, 0.0509] | 0.0125 [0.0057, 0.0231] | 0.0306 [0.0294, 0.0312] |
+| 1.50 | 400 | 49 | 0.1009 [0.0800, 0.1288] | 0.0447 [0.0183, 0.0726] | 0.0620 [0.0571, 0.0654] |
+| 1.50 | 1,600 | 48 | 0.0819 [0.0670, 0.1047] | 0.0364 [0.0135, 0.0506] | 0.0619 [0.0578, 0.0658] |
+| 1.50 | 6,400 | 48 | 0.0721 [0.0622, 0.0801] | 0.0110 [0.0037, 0.0208] | 0.0635 [0.0602, 0.0660] |
+
+- The dynamic lag does not depend on n: about 0.030 at a = 1.30 and 0.062 at a = 1.50 at every n.
+- The static finite-sample shift shrinks as n grows.
+- So the free-training offset above the population threshold is a finite-sample threshold shift plus an n-independent
+  lag.
+
+**5. What κ is built from** (`kappa_inputs.csv`)
+
+| input | origin | detail |
+|---|---|---|
+| H (Hessian in w₁, b₁, b₂ at the switch) | landscape | population objective, branch point θ*(s*) (lag_law.switch) |
+| θ*′ (branch tangent) | landscape | −H⁻¹∂ₛ∇L at s* |
+| ∇G (gap gradient on the active pair) | landscape | central differences of the exact-extrema gap at θ*(s*) |
+| s* (switch) | landscape | root of G(θ*(s)) on the certified branch, inside the certified bracket |
+| winding k | measured runs (1A) | each run's b₁ at its crossing, relative to b₁*; every run was k = −1 at a = 1.30, 0 elsewhere |
+| P shape for Adam | measured runs (1A) | per-coordinate median of 1/(√v̂+ε) at crossing over existing runs (48–80 per a) |
+| P for SGD | fixed | P = I |
+| χ (per run) | measured runs | growth rate of s and the run's own v̂ at crossing (residual_timescale); not part of κ |
+
+- The landscape supplies H, θ\*′, ∇G and s\*.
+- Two inputs to the committed κ came from measured runs: the winding index k, read from each run's crossing state, and
+  Adam's preconditioner shape, the median at crossing over existing runs. Track A fixes both before any crossing at an
+  unseen a.
+
+**Say:**
+- "Every arm median of the lag lies within 10% of the no-fit prediction κ(a)χ when the lag is measured from the branch
+  each run tracks (bootstrap 95% intervals shown)."
+- "Across settings, observed/predicted lag stays near 1 below χ ≈ 0.06 and departs above it."
+- "With more training data the finite-sample threshold shift shrinks, while the lag behind the own threshold is
+  unchanged."
+
+**Do not say:**
+- "within 10%" for the registered reference: there it is 31 of 36 arm medians, and 64% of runs.
+- that κ's winding index and preconditioner were fixed before crossing data at a = 1.30–1.60 (they were not; Track A
+  addresses this).
+- that the collapse is registered (the branch-conditioned points are post hoc).
+
 ## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
 
 These were out of scope for the final round. The paper may list them as open; it must not state results for them.

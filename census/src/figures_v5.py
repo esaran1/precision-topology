@@ -526,6 +526,12 @@ def lag_data():
                                                     on=["set", "a", "arm"], how="inner")
     assert len(M) == len(A) == 36
     M["obs"] = M.median_r_obs                     # lag from each run's tracked-branch switch (Track 1, final round)
+    ci = RESULTS / "track_b" / "arm_ci.csv"
+    if ci.exists():                               # run-level bootstrap 95% intervals (Track B)
+        C = pd.read_csv(ci); C["a"] = C.a.round(2); C["arm"] = C.arm.map(norm)
+        M = M.merge(C[["set", "a", "arm", "ci_lo", "ci_hi", "median_r_obs"]].rename(columns={"median_r_obs": "ci_med"}),
+                    on=["set", "a", "arm"], how="left")
+        assert np.allclose(M.ci_med, M.obs)
     return M, kap, M
 
 
@@ -540,6 +546,9 @@ def fig_lag():
         ax.plot(xs, kap[a] * xs, color=BLUE, lw=1.0, zorder=1)
         g = A[A.a == a]
         sgd = g["set"] == "SGD"
+        if "ci_lo" in g:
+            ax.errorbar(g.median_chi, g.obs, yerr=[g.obs - g.ci_lo, g.ci_hi - g.obs], ls="none", ecolor="0.35",
+                        elinewidth=0.7, capsize=1.5, zorder=2)
         ax.plot(g[~sgd].median_chi, g[~sgd].obs, ls="none", marker=m, ms=4.2, mfc="k", mec="k", zorder=3)
         ax.plot(g[sgd].median_chi, g[sgd].obs, ls="none", marker=m, ms=4.8, mfc="white", mec="k", mew=0.9, zorder=3)
         xe = min(0.09 / kap[a], xmax)                       # where the line leaves the plot
@@ -627,6 +636,41 @@ def fig_scoreboard():
     d.to_csv(OUT / "scoreboard_data.csv", index=False)
 
 
+COL_MARK = {"width 1, free training": "o", "width 1, free training (registered reference)": "o", "forced ramp (sgd)": "s",
+            "forced ramp (adam)": "s", "R^d band task": "^", "GELU/SiLU/Mish": "v", "width 2": "D"}
+
+
+def fig_collapse():
+    """One message: observed/predicted lag is near 1 below χ ≈ 0.06 in every setting with data, and departs above it."""
+    d = read("track_b/collapse.csv"); d = d[d.resolved]
+    fig, ax = plt.subplots(figsize=(TEXT_W, 2.6))
+    ax.axhline(1.0, color=GREY, lw=0.7, zorder=0)
+    ax.axvline(0.06, color=BLUE, lw=1.0, ls="--", zorder=0)
+    ax.text(0.062, 2.85, r"$\chi \approx 0.06$", color=BLUE, ha="left", va="top")
+    top = 3.0
+    for st, g in d.groupby("setting", sort=False):
+        m = COL_MARK[st]
+        filled = not bool(g.branch_conditioned_post_hoc.iloc[0])
+        y = g.ratio.clip(upper=top)
+        ax.plot(g.chi, y, ls="none", marker=m, ms=4.3, mfc="k" if filled else "white", mec="k", mew=0.8, zorder=3)
+        over = g[g.ratio > top]
+        for x in over.chi:
+            ax.annotate("", xy=(x, top + 0.18), xytext=(x, top), arrowprops=dict(arrowstyle="->", lw=0.7, color="k"),
+                        annotation_clip=False)
+    ax.set_xscale("log")
+    from matplotlib.ticker import FixedLocator, NullLocator
+    ticks = [1e-3, 1e-2, 1e-1, 1, 10]
+    ax.xaxis.set_major_locator(FixedLocator(ticks)); ax.xaxis.set_minor_locator(NullLocator())
+    ax.set_xticklabels(["0.001", "0.01", "0.1", "1", "10"])
+    ax.set_xlim(3e-4, 80)
+    ax.set_ylim(-1.1, top + 0.25)
+    ax.set_xlabel(r"growth-to-relaxation ratio $\chi$ (median per point)")
+    ax.set_ylabel("observed / predicted lag")
+    _clean(ax)
+    fig.tight_layout(pad=0.3)
+    save(fig, "collapse")
+
+
 
 def captions():
     """results/figures/v5/captions.md: for each figure, its PDF path, one-sentence message, main text or appendix, the
@@ -677,6 +721,21 @@ def captions():
           [f"totals: {int(_p32.solved.sum())} solved, {int(_p32.placement.sum()):,} placement failures, {int(_p32.bias.sum())} bias failures",
            "the same runs as the width-1 sweep and refinement (and the metric check)"],
           note="Final round: same design as 'decomposition', restricted to the float32 draw.")
+    _cd = read("track_b/collapse.csv"); _cr = _cd[_cd.resolved]
+    _lo = _cr[(_cr.chi <= 0.06) & _cr.branch_conditioned_post_hoc]
+    entry("collapse", "appendix (or main text beside the lag figure)",
+          "Observed over predicted lag is close to 1 below χ ≈ 0.06 in every setting with data, and departs from 1 above it.",
+          "Each point is a median over the runs of one arm or cell: width-1 free training (circles; filled = lag from the "
+          "global own threshold, the committed comparison; open = lag from the tracked-branch switch, post hoc), the forced ramp "
+          "(squares; SGD and Adam cells), the single unit in R^d (upward triangles), SiLU and Mish (downward triangles), "
+          "and width 2 by χ bin (diamonds). Open markers are branch-conditioned post hoc. Points whose median predicted lag "
+          "is below 0.005 in magnitude are omitted as below resolution. Ratios above 3 are drawn at 3 with an arrow.",
+          "None (medians).",
+          [f"{len(_cr)} resolved points of {len(_cd)}",
+           f"branch-conditioned points with χ ≤ 0.06: observed/predicted {_lo.ratio.min():.2f}–{_lo.ratio.max():.2f}",
+           "width 2 above χ ≈ 0.3: ratio up to " + f"{_cr[_cr.setting == 'width 2'].ratio.max():.1f}",
+           "SiLU and Mish (χ ≈ 0.22–0.26): wrong sign"],
+          note="New figure (final round, Track B).")
     # lag law and scoreboard (final round, 2026-09-25)
     _A, _kap, _lr = lag_data()
     _L = read("linear_response/compare_arms.csv")
@@ -689,7 +748,8 @@ def captions():
           "open markers: SGD. Marker shape: a = 1.30 circles, 1.45 squares, 1.50 triangles, 1.60 diamond. Grey crosses: the "
           "exact linear response along each run's own trajectory, started at 0.7 s* (arm medians; post hoc, predictions "
           "committed before the comparison).",
-          "None drawn (arm medians); lines and crosses are predictions, not fits.",
+          "Bars: run-level bootstrap 95% intervals of each arm median (10,000 resamples, seed 20260926; Track B). "
+          "Lines and crosses are predictions, not fits.",
           [", ".join(f"κ({a:.2f}) = {_kap[a]:.2f}" for a in _kap) + " (lines r = κ(a)χ)",
            "measured from each sample's global own threshold instead (Track 1A, registered tolerance: 36 of 36 arms within), "
            "the observed/predicted through-origin slope per a is "
@@ -948,6 +1008,7 @@ def main():
     fig_lag()
     fig_scoreboard()
     fig_decomposition("float32", "decomposition_float32")
+    fig_collapse()
     if (RESULTS / "mechanism_w1_path.csv").exists():
         from . import figures_v5 as _F
         from .mechanism_w1_figure import figure as fig_mechanism_w1

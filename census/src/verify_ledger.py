@@ -579,6 +579,7 @@ def main() -> None:
     track2_checks()
     c1_followup_checks()
     linear_response_checks()
+    track_b_checks()
 
     provenance_check()
 
@@ -2036,6 +2037,34 @@ def linear_response_checks() -> None:
     d = S["diagnostic_exact_grad"]["pooled"]
     for r in d:
         chk(f"LR exact gradient reproduces start {r['start']}", float(r["n_exact_step_equals_observed"] == r["n"]), 1.0, 0)
+
+
+def track_b_checks() -> None:
+    """Track B (final round): the numbers WP-33 prints."""
+    print("Track B (statistics)")
+    D = R / "track_b"
+    S = json.loads((D / "summary.json").read_text()); W = S["within"]
+    k = list(W)
+    cf, reg, tr = W[k[0]], W[k[1]], W[k[2]]
+    chk("TB closed form within10 arms", float(cf["arms_median_within_10"]), 36.0, 0)
+    chk("TB closed form runs within10", 100 * cf["pooled_frac_within_10"], 88.2, 0.06)
+    chk("TB closed form runs within20", 100 * cf["pooled_frac_within_20"], 97.8, 0.06)
+    chk("TB registered ref arms within10", float(reg["arms_median_within_10"]), 31.0, 0)
+    chk("TB registered ref runs within10", 100 * reg["pooled_frac_within_10"], 63.7, 0.06)
+    chk("TB registered ref arms within20", float(reg["arms_median_within_20"]), 32.0, 0)
+    chk("TB traj runs within10", 100 * tr["pooled_frac_within_10"], 99.9, 0.06)
+    chk("TB traj runs within20", 100 * tr["pooled_frac_within_20"], 100.0, 0.06)
+    col = pd.read_csv(D / "collapse.csv"); cr = col[col.resolved]
+    lo = cr[(cr.chi <= 0.06) & cr.branch_conditioned_post_hoc]
+    chk("TB collapse low-chi ratio min", float(lo.ratio.min()), 0.67, 0.006)
+    chk("TB collapse low-chi ratio max", float(lo.ratio.max()), 1.40, 0.006)
+    chk("TB collapse width2 max", float(cr[cr.setting == "width 2"].ratio.max()), 34.0, 0.6)
+    chk("TB collapse resolved", float(len(cr)), 99.0, 0)
+    ss = pd.read_csv(D / "sample_size_decomposition.csv")
+    for r in ss.itertuples():
+        want = {(1.3, 400): 0.0297, (1.3, 1600): 0.0293, (1.3, 6400): 0.0306, (1.5, 400): 0.0620, (1.5, 1600): 0.0619, (1.5, 6400): 0.0635}[(round(r.a, 2), r.n)]
+        chk(f"TB sample size dynamic a={r.a:.2f} n={r.n}", float(r.dynamic_median), want, 0.00006)
+    chk("TB kappa inputs rows", float(len(pd.read_csv(D / "kappa_inputs.csv"))), 8.0, 0)
 
 
 def digit_stability() -> None:

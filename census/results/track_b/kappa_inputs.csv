@@ -1,0 +1,9 @@
+input,origin,detail
+"H (Hessian in w₁, b₁, b₂ at the switch)",landscape,"population objective, branch point θ*(s*) (lag_law.switch)"
+θ*′ (branch tangent),landscape,−H⁻¹∂ₛ∇L at s*
+∇G (gap gradient on the active pair),landscape,central differences of the exact-extrema gap at θ*(s*)
+s* (switch),landscape,"root of G(θ*(s)) on the certified branch, inside the certified bracket"
+winding k,measured runs (1A),"each run's b₁ at its crossing, relative to b₁*; every run was k = −1 at a = 1.30, 0 elsewhere"
+P shape for Adam,measured runs (1A),per-coordinate median of 1/(√v̂+ε) at crossing over existing runs (48–80 per a)
+P for SGD,fixed,P = I
+χ (per run),measured runs,growth rate of s and the run's own v̂ at crossing (residual_timescale); not part of κ
