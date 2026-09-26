@@ -59,3 +59,5 @@ results/certificates/c1f_a1.12_lo.json,688f2cda341183f190e4571c31ba6037679fe8f1e
 results/certificates/c1f_a1.12_lo.npz,2325680b1114478de208515cf01b1e4b694392b5050f553782ef4115172603df,345042,python -m src.cert_export finite 1.12 17.7671015 c1f_a1.12_lo
 results/certificates/c1f_a1.11_hi.json,938836ade3c48cc794bc53b9d4c0284b2909540251ffb84d29b6da6e66f276d7,1088,python -m src.cert_export finite 1.11 20.143426 c1f_a1.11_hi
 results/certificates/c1f_a1.11_hi.npz,9f88a6bc7fe1adde47dbf8fe7e4e3ffcace6130b3aa896fd99607c56d2e167cd,476790,python -m src.cert_export finite 1.11 20.143426 c1f_a1.11_hi
+results/certificates/c1f_a1.11_lo.json,2871d63b4e1d6be570e08d761cb97924deab3789f839739aec884ada5f072574,1091,python -m src.cert_export finite 1.11 20.118496 c1f_a1.11_lo
+results/certificates/c1f_a1.11_lo.npz,a4db7a0afd62bbaa6d7d65c73b0acadb450ce30d5cd09d95d9ff9fb37ad5b6f6,450250,python -m src.cert_export finite 1.11 20.118496 c1f_a1.11_lo

@@ -38,11 +38,11 @@
   5.698200323869305e-07
  ],
  "independently_checked": {
+  "c1f_a1.11_hi": true,
   "c1f_a1.12_hi": true,
   "c1f_a1.12_lo": true
  },
  "not_checked": [
-  "c1f_a1.11_hi",
   "c1f_a1.11_lo",
   "c1f_a1.10_hi",
   "c1f_a1.10_lo",
