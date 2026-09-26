@@ -229,4 +229,5 @@ band-P2a-120,band task in R^d (Track 3B),registered rule,FAIL,central,threshold
 c1-followup,c1 first order,registered rule,PASS,central,scaling
 trackA-L1,lag law at an unseen a (Track A),registered rule,PASS,central,threshold
 trackA-L2,lag law at an unseen a (Track A),registered rule,PASS,central,threshold
-trackA-L3,lag law at an unseen a (Track A),post hoc (census),PARTIAL,central,threshold
+trackA-L3-adam,lag law at an unseen a (Track A),registered rule,FAIL,central,threshold
+trackA-L3-sgd,lag law at an unseen a (Track A),registered rule,PASS,central,threshold

@@ -1091,6 +1091,8 @@ CENTRAL_FAILS = {
     "act-Ta-200": "GELU/SiLU/Mish, 200 seeds: fewer than 90% of crossings at or above the validated switch (0.48 / 0.62 / 0.70).",
     "act-Tb-200": "GELU/SiLU/Mish, 200 seeds: the median residual against the population threshold is not within tolerance of "
                   "kappa*chi (wrong sign or size).",
+    "trackA-L3-adam": "lag law at the unseen a = 1.65, Adam (registered per optimiser): the per-run Spearman between predicted "
+                      "and observed lag is 0.25 < 0.5; the median lag is predicted (L1, L2 PASS) but not which runs lag more.",
     "band-P2a-120": "band task in R^d, 120 seeds: the median residual against the population threshold lies above the width-1 "
                     "range at d = 2 and d = 4 (0.19-0.55).",
     "T2-3d": "slowed regime, fresh seeds: the width-1 own-sample threshold has median |log err| 0.019 but does not beat "
@@ -1163,11 +1165,11 @@ Tonight's program (2026-09-25) added four central failures, all training-side:
 The final round added:
 - one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains the derived c₁. The
   original c₁ test stays INCONCLUSIVE.
-- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers; L3 FAIL
-  for Adam and PASS for SGD, merged as PARTIAL.
+- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers. L3 was
+  registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
 
-It also added eight PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser), the band task's primary P1, P2a and P2b (across d), and Track A's L3 (across optimisers). Designs that failed their own rules before
+It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
+and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
 registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
 census.
 
@@ -2578,7 +2580,13 @@ def wp35():
 
 Producer: `src/track_a.py` → `track_a/`; registration `results/track_a_registration.md`, with everything (κ, the winding
 rule, the preconditioner rule, the branch rule, own thresholds, the prediction pipeline) frozen and hashed before any
-run. The text below is the Track A writer input.
+run.
+
+**Census:** each registered criterion is scored as registered.
+- L1 and L2 pass for both optimisers.
+- L3 was registered per optimiser, so it is two rows: SGD PASS and Adam FAIL. It is not merged into a PARTIAL.
+
+The text below is the Track A writer input.
 {body}
 """
 

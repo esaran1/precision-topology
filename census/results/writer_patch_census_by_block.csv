@@ -37,8 +37,7 @@ block,early census 08-23 (basin),registered rule,1,4,0,0,5
 block,early census 08-23 (width),registered rule,3,1,0,0,4
 block,interleaved 08-05,registered rule,0,0,0,2,2
 block,kappa,registered rule,3,1,0,0,4
-block,lag law at an unseen a (Track A),post hoc (census),0,0,1,0,1
-block,lag law at an unseen a (Track A),registered rule,2,0,0,0,2
+block,lag law at an unseen a (Track A),registered rule,3,1,0,0,4
 block,lag test,registered rule,1,1,0,0,2
 block,lag test 2 (deconfounded),registered rule,0,2,0,0,2
 block,localization 08-22,post hoc (census),0,1,0,0,1
@@ -143,8 +142,7 @@ registration_file,results/sgd_own_registration.md (amendment 1),registered rule,
 registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
 registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4
-registration_file,results/track_a_registration.md,post hoc (census),0,0,1,0,1
-registration_file,results/track_a_registration.md,registered rule,2,0,0,0,2
+registration_file,results/track_a_registration.md,registered rule,3,1,0,0,4
 registration_file,results/ts_test_registration.md,registered rule,2,0,0,0,2
 registration_file,results/width2_nogating_design.md,registered rule,0,1,0,0,1
 registration_file,results/width_prediction.md,registered rule,3,1,0,0,4

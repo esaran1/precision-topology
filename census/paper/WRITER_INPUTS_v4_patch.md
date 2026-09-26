@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 208 scored by their registered rules: 99 PASS, 65 FAIL, 8 PARTIAL,
+- **Headline**: 210 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
   36 UNRESOLVED.
-- **Post hoc**: 23 assigned post hoc: 3 / 6 / 14 / 0.
-- **Total**: 231 registered predictions.
+- **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
+- **Total**: 232 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -217,8 +217,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | early census 08-23 (width) | registered rule | 3 | 1 | 0 | 0 | 4 |
 | interleaved 08-05 | registered rule | 0 | 0 | 0 | 2 | 2 |
 | kappa | registered rule | 3 | 1 | 0 | 0 | 4 |
-| lag law at an unseen a (Track A) | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
-| lag law at an unseen a (Track A) | registered rule | 2 | 0 | 0 | 0 | 2 |
+| lag law at an unseen a (Track A) | registered rule | 3 | 1 | 0 | 0 | 4 |
 | lag test | registered rule | 1 | 1 | 0 | 0 | 2 |
 | lag test 2 (deconfounded) | registered rule | 0 | 2 | 0 | 0 | 2 |
 | localization 08-22 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
@@ -327,8 +326,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
-| results/track_a_registration.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
-| results/track_a_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/track_a_registration.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/ts_test_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
@@ -944,16 +942,16 @@ peripheral.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
-| post hoc (census) | central | 1 | 2 | 14 | 0 |
+| post hoc (census) | central | 1 | 2 | 13 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 52 | 30 | 1 | 11 |
+| registered rule | central | 53 | 31 | 1 | 11 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
 
-**Failed central predictions (32: 30 under the registered rule, 2 by post hoc scoring), with one line each:**
+**Failed central predictions (33: 31 under the registered rule, 2 by post hoc scoring), with one line each:**
 
-*threshold* (22):
+*threshold* (23):
 - `H-3`: growth-rate dose-response validity gate failed (m = 1 placed 0.500 vs control 0.925); block inconclusive.
 - `F-2`: offsets scaling with the optimiser's rate ratio: SGD misses by 6.19 pp.
 - `rc-H`: 'R is the controlling variable' fails across activation families (2 of 4 failure conditions): R is a correlate there.
@@ -976,6 +974,7 @@ IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL pos
 - `act-Ta-200`: GELU/SiLU/Mish, 200 seeds: fewer than 90% of crossings at or above the validated switch (0.48 / 0.62 / 0.70).
 - `act-Tb-200`: GELU/SiLU/Mish, 200 seeds: the median residual against the population threshold is not within tolerance of kappa*chi (wrong sign or size).
 - `band-P2a-120`: band task in R^d, 120 seeds: the median residual against the population threshold lies above the width-1 range at d = 2 and d = 4 (0.19-0.55).
+- `trackA-L3-adam`: lag law at the unseen a = 1.65, Adam (registered per optimiser): the per-run Spearman between predicted and observed lag is 0.25 < 0.5; the median lag is predicted (L1, L2 PASS) but not which runs lag more.
 
 *scaling* (4):
 - `X1`: cross-family: q2 matches family A on R_glob at 6/6 a but on R_solve at 0/6, so the joint prediction fails (the solve threshold does not transfer).
@@ -1014,18 +1013,18 @@ Tonight's program (2026-09-25) added four central failures, all training-side:
 The final round added:
 - one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains the derived c₁. The
   original c₁ test stays INCONCLUSIVE.
-- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers; L3 FAIL
-  for Adam and PASS for SGD, merged as PARTIAL.
+- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers. L3 was
+  registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
 
-It also added eight PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser), the band task's primary P1, P2a and P2b (across d), and Track A's L3 (across optimisers). Designs that failed their own rules before
+It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
+and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
 registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
 census.
 
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
 
-**Say:** "Of 71 failed predictions (65 under the registered rule, 6 by post hoc scoring), 32 bear on a central
+**Say:** "Of 72 failed predictions (66 under the registered rule, 6 by post hoc scoring), 33 bear on a central
 claim. Most of these concern the residual and training's tracking of the threshold (lag tests, Block 4b, the ramp's sign
 test, training outside the sine family, the lag in R^d); others are the width-2 training predictions (WP-15, WP-20)." **Do not say** "the central claims never failed" or "the failures are
 peripheral". Do not present the relevance classification as registered;
@@ -3560,7 +3559,13 @@ IDs: `D1 attainment`; `D1 remainder`; `D1 quadratic growth`; `D1 alias`.
 
 Producer: `src/track_a.py` → `track_a/`; registration `results/track_a_registration.md`, with everything (κ, the winding
 rule, the preconditioner rule, the branch rule, own thresholds, the prediction pipeline) frozen and hashed before any
-run. The text below is the Track A writer input.
+run.
+
+**Census:** each registered criterion is scored as registered.
+- L1 and L2 pass for both optimisers.
+- L3 was registered per optimiser, so it is two rows: SGD PASS and Adam FAIL. It is not merged into a PARTIAL.
+
+The text below is the Track A writer input.
 
 ### 1. Frozen before any run or comparison
 

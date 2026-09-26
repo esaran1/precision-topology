@@ -122,7 +122,8 @@ def track_a_rows():
         for L in ("L1", "L2", "L3"):
             x = S[opt][L]; v = x["verdict"]
             val = f"median ratio {x['median_ratio']:.3f}" if L != "L3" else f"Spearman {x['spearman']:.3f}"
-            rows.append(_row(f"trackA-{L}@{opt}", "lag law at an unseen a (Track A)", "results/track_a_registration.md", "fcd2e46", v,
+            pid = f"trackA-{L}-{opt}" if L == "L3" else f"trackA-{L}@{opt}"      # L3 registered per optimiser: one row each
+            rows.append(_row(pid, "lag law at an unseen a (Track A)", "results/track_a_registration.md", "fcd2e46", v,
                              f"{L}: {rule[L]}, per optimiser, a = 1.65, 80 fresh seeds; everything frozen and hashed before any run. "
                              f"Scored {opt}: {S[opt]['n_crossed']} crossed, {val}: {v}.", "results/track_a/scores.json"))
     return rows
