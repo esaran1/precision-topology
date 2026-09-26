@@ -42,6 +42,12 @@ def main():
     for prec, g in d[d.a.round(2) == 1.02].groupby("precision"):
         out[f"a1.02_{prec}"] = {"runs": int(len(g)), "solved": int(g.solved.sum()),
                                 "median_abs_w2": float(g.w2.abs().median()), "max_abs_w2": float(g.w2.abs().max())}
+    f = d[d.precision == "float32"]
+    per_a = f.groupby(f.a.round(2)).agg(runs=("solved", "size"), solved=("solved", "sum"),
+                                         placement=("failure", lambda v: int((v == "placement").sum())),
+                                         bias=("failure", lambda v: int((v == "bias").sum()))).reset_index()
+    per_a.to_csv(RESULTS / "track4_float32_decomposition.csv", index=False)
+    out["float32_per_a"] = per_a.to_dict("records")
     (RESULTS / "track4_populations.json").write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
     return out

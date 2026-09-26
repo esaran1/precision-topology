@@ -2188,6 +2188,7 @@ def wp26():
     P = json.loads((RESULTS / "track4_populations.json").read_text())
     f32, f64, pl, pr = P["float32"], P["float64"], P["pooled"], P["paired"]
     a32, a64 = P["a1.02_float32"], P["a1.02_float64"]
+    p32t = "\n".join(f"| {r['a']:.2f} | {int(r['solved'])} | {int(r['placement'])} | {int(r['bias'])} |" for r in P["float32_per_a"])
     return f"""
 ## WP-26. Citations, main-text notation, the checker paragraph, and run populations (Track 4; for the submission)
 
@@ -2259,6 +2260,21 @@ list of symbol clashes) and `src/track4_populations.py` → `track4_populations.
     `harsh_review_a.py` taken from the onset analyses, not from either population.
 - **So the main text currently mixes the two populations.** Whichever is chosen, the decomposition caption should not
   say "2 precisions" as if the runs were paired.
+
+**The population the main text should use (final round): the 2,400 float32 runs.**
+- **Why:**
+  - They are one initialisation draw per seed at one precision, so they have no hidden pairing.
+  - They are exactly the width-1 sweep plus refinement.
+  - The metric check, the a = 1.02 numbers and VERIFIED_NUMBERS §6 already use them.
+- **What changes:** only the decomposition figure and caption. Use `results/figures/v5/decomposition_float32.pdf`
+  (captions.md entry "decomposition_float32") in place of `decomposition.pdf`.
+- The pooled 4,800 can appear once, as a robustness line: "an independent second draw of 2,400 runs gives 440 / 1,633 / 327".
+- **Decomposition** (`track4_float32_decomposition.csv`): {f32["solved"]} solved, {f32["placement"]:,} placement failures and {f32["bias"]}
+  bias failures in {f32["runs"]:,} runs (200 per a):
+
+| a | solved | placement failure | bias failure |
+|---|---|---|---|
+{p32t}
 IDs: {_id("T4 pooled counts", "T4 sign agreement", "T4 a=1.02 float32")}.
 """
 
@@ -2290,6 +2306,7 @@ def wp27():
     body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
     sm = pd.read_csv(RESULTS / "width2_lag" / "summary.csv")
     tr = sm[(sm.arm == "T2-3") & (sm.subset == "chi <= width-1 max")].iloc[0]
+    rc = json.loads((RESULTS / "width2_basins" / "reconcile_summary.json").read_text())
     return f"""
 ## WP-27. Width 2: the lag law where the account applies, the stuck states, and the validity condition (Track 2; POST HOC; for the submission)
 
@@ -2301,6 +2318,22 @@ T2-3d FAIL.** 2C was not registered: the author's calibration rule found no admi
 crossing states {tr.median_dist_c:.3f} from their branch (median). That is just above the module's 0.05 on-branch
 threshold, so the summary files list them as "off branch". Describe them as "the three full-speed runs with χ in width 1's
 range", not as on-branch.
+
+**Reconciliation of the two loss statements (coordinator, final round; `src/width2_reconcile.py` →
+`width2_basins/reconcile.csv`, `reconcile_summary.json`; POST HOC).** Both statements below are exactly true. They are about
+different objectives.
+- **Population objective (symmetric windows, 800 points).** At R₂ = 0.003 and 0.01 the validated global conditional
+  minimiser is placed (a cancelling pair; direct check). Every f_a stuck configuration, evaluated on the population
+  objective at the same scale, lies above it: {rc["n_stuck_above_pop_global"]} of {rc["n_compared"]}, by
+  {rc["pop_gap_min"]:.1e} to {rc["pop_gap_max"]:.1e} (median {rc["pop_gap_median"]:.1e}).
+- **Each run's own 400-point training set (search, not validated).** A placed minimiser was found for 58 of 265 stuck
+  states, and in 37 of those 58 the stuck state has the lower loss.
+- There is no validated population minimiser at R₂ = 0.03 and 0.1, so {rc["n_not_comparable"]} stuck states have no
+  population comparison.
+- **Wording:** do not write "the stuck states are often lower in loss than any placed state" without "on the run's own
+  training set". Write: "On the population objective the global minimiser at the same scale is placed and every stuck
+  state lies above it (by 10⁻⁵–10⁻⁴); on the finite training sets the placed and stuck minima are nearly degenerate, and
+  the stuck one is often lower."
 
 The text below is the Track 2 writer input.
 {body}

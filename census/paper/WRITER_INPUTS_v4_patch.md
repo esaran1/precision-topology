@@ -2075,6 +2075,32 @@ list of symbol clashes) and `src/track4_populations.py` → `track4_populations.
     `harsh_review_a.py` taken from the onset analyses, not from either population.
 - **So the main text currently mixes the two populations.** Whichever is chosen, the decomposition caption should not
   say "2 precisions" as if the runs were paired.
+
+**The population the main text should use (final round): the 2,400 float32 runs.**
+- **Why:**
+  - They are one initialisation draw per seed at one precision, so they have no hidden pairing.
+  - They are exactly the width-1 sweep plus refinement.
+  - The metric check, the a = 1.02 numbers and VERIFIED_NUMBERS §6 already use them.
+- **What changes:** only the decomposition figure and caption. Use `results/figures/v5/decomposition_float32.pdf`
+  (captions.md entry "decomposition_float32") in place of `decomposition.pdf`.
+- The pooled 4,800 can appear once, as a robustness line: "an independent second draw of 2,400 runs gives 440 / 1,633 / 327".
+- **Decomposition** (`track4_float32_decomposition.csv`): 430 solved, 1,664 placement failures and 306
+  bias failures in 2,400 runs (200 per a):
+
+| a | solved | placement failure | bias failure |
+|---|---|---|---|
+| 1.02 | 0 | 200 | 0 |
+| 1.05 | 0 | 200 | 0 |
+| 1.10 | 0 | 200 | 0 |
+| 1.15 | 0 | 200 | 0 |
+| 1.25 | 0 | 199 | 1 |
+| 1.30 | 0 | 175 | 25 |
+| 1.35 | 2 | 135 | 63 |
+| 1.40 | 15 | 98 | 87 |
+| 1.45 | 50 | 77 | 73 |
+| 1.50 | 81 | 66 | 53 |
+| 2.00 | 143 | 54 | 3 |
+| 3.00 | 139 | 60 | 1 |
 IDs: `T4 pooled counts`; `T4 sign agreement`; `T4 a=1.02 float32`.
 
 ## WP-27. Width 2: the lag law where the account applies, the stuck states, and the validity condition (Track 2; POST HOC; for the submission)
@@ -2087,6 +2113,22 @@ T2-3d FAIL.** 2C was not registered: the author's calibration rule found no admi
 crossing states 0.066 from their branch (median). That is just above the module's 0.05 on-branch
 threshold, so the summary files list them as "off branch". Describe them as "the three full-speed runs with χ in width 1's
 range", not as on-branch.
+
+**Reconciliation of the two loss statements (coordinator, final round; `src/width2_reconcile.py` →
+`width2_basins/reconcile.csv`, `reconcile_summary.json`; POST HOC).** Both statements below are exactly true. They are about
+different objectives.
+- **Population objective (symmetric windows, 800 points).** At R₂ = 0.003 and 0.01 the validated global conditional
+  minimiser is placed (a cancelling pair; direct check). Every f_a stuck configuration, evaluated on the population
+  objective at the same scale, lies above it: 190 of 190, by
+  1.1e-05 to 2.8e-04 (median 3.5e-05).
+- **Each run's own 400-point training set (search, not validated).** A placed minimiser was found for 58 of 265 stuck
+  states, and in 37 of those 58 the stuck state has the lower loss.
+- There is no validated population minimiser at R₂ = 0.03 and 0.1, so 75 stuck states have no
+  population comparison.
+- **Wording:** do not write "the stuck states are often lower in loss than any placed state" without "on the run's own
+  training set". Write: "On the population objective the global minimiser at the same scale is placed and every stuck
+  state lies above it (by 10⁻⁵–10⁻⁴); on the finite training sets the placed and stuck minima are nearly degenerate, and
+  the stuck one is often lower."
 
 The text below is the Track 2 writer input.
 

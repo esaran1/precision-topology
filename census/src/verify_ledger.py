@@ -1884,6 +1884,16 @@ def track4_checks() -> None:
     chk("T4 float32 equals sweep", float(P["float32_equals_sweep"]["matched"] == 2400 and P["float32_equals_sweep"]["solved_agree"] == 1.0
                                           and P["float32_equals_sweep"]["max_abs_diff_abs_w2"] == 0.0), 1.0, 0)
     chk("T4 a=1.02 float32", float(P["a1.02_float32"]["solved"]), 0.0, 0)
+    sb = pd.read_csv(R / "figures" / "v5" / "scoreboard_data.csv")
+    for fam, (k, n) in {"Task B": (2, 2), "SGD": (2, 2), "learning rate": (4, 4), "other activations": (0, 3), "R^2": (0, 2),
+                        "own-sample threshold": (2, 2), "early branch": (2, 2), "early branch, lag-corrected": (2, 2),
+                        "held-out windows": (7, 8)}.items():
+        g = sb[sb.family == fam]
+        chk(f"scoreboard {fam} within/total", float(g.passed.sum() * 100 + len(g)), float(k * 100 + n), 0)
+    pa = pd.DataFrame(P["float32_per_a"])
+    chk("T4 float32 per-a rows", float(len(pa)), 12.0, 0)
+    chk("T4 float32 per-a sums", float(pa.solved.sum() * 1e6 + pa.placement.sum() * 1e3 + pa.bias.sum()), 430.0e6 + 1664.0e3 + 306.0, 0)
+    chk("T4 float32 200 per a", float((pa.runs == 200).all()), 1.0, 0)
     chk("T4 a=1.02 float32 median w2", P["a1.02_float32"]["median_abs_w2"], 1.85, 0.006)
     chk("T4 a=1.02 float32 max w2", P["a1.02_float32"]["max_abs_w2"], 3.92, 0.006)
     chk("T4 a=1.02 float64 median w2", P["a1.02_float64"]["median_abs_w2"], 1.92, 0.006)
@@ -1952,6 +1962,15 @@ def track2_checks() -> None:
     chk("T2 2A gap median", float(f.gap_to_placed_median), -0.0027, 0.00006)
     chk("T2 2A stuck lower", float(f.n_placed_min_found - f.n_gap_to_placed_positive), 37.0, 0)
     chk("T2 2A tanh saddles", float(b.loc["tanh", "saddle"]), 9.0, 0)
+    rc = json.loads((R / "width2_basins" / "reconcile_summary.json").read_text())
+    chk("T2 reconcile own loss matched", float(rc["own_loss_matched"]), 265.0, 0)
+    chk("T2 reconcile compared", float(rc["n_compared"]), 190.0, 0)
+    chk("T2 reconcile all above population global", float(rc["n_stuck_above_pop_global"]), 190.0, 0)
+    chk("T2 reconcile same s and placed", float(rc["same_s_all"] and rc["direct_placed_all"]), 1.0, 0)
+    chk("T2 reconcile gap min", rc["pop_gap_min"], 1.1e-5, 6e-7)
+    chk("T2 reconcile gap max", rc["pop_gap_max"], 2.8e-4, 6e-6)
+    chk("T2 reconcile gap median", rc["pop_gap_median"], 3.5e-5, 6e-7)
+    chk("T2 reconcile not comparable", float(rc["n_not_comparable"]), 75.0, 0)
     c = json.loads((R / "t2c" / "calibration.json").read_text())
     chk("T2 2C STOP", float(c["decision"] == "STOP"), 1.0, 0)
     chk("T2 2C earliest crossing", c["earliest_crossing"], 0.0164, 0.00006)

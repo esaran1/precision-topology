@@ -146,10 +146,13 @@ def _clean(*axes):
 
 
 # ------------------------------------------------------------------------------------------ outcome decomposition
-def fig_decomposition():
+def fig_decomposition(precision=None, name="decomposition"):
     """One message: training fails by not placing the hidden unit; below ε ≈ 0.25 every run fails this way, and bias
-    failures appear only in a narrow band around ε ≈ 0.4."""
+    failures appear only in a narrow band around ε ≈ 0.4.  precision="float32": the single-draw 2,400-run population
+    (final round: the population the main text should use; WP-26)."""
     d = read("phase1_decomposition.csv")
+    if precision is not None:
+        d = d[d.precision == precision]
     g = d.groupby("a")
     eps = np.array(sorted(d.a.unique())) - 1
     ns = g.size().values
@@ -173,7 +176,7 @@ def fig_decomposition():
     ax.set_ylim(-0.03, 1.03); ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
     _clean(ax)
     fig.tight_layout(pad=0.3)
-    save(fig, "decomposition")
+    save(fig, name)
     return {"n_per_a": int(ns.min())}
 
 
@@ -505,7 +508,117 @@ def fig_metric_check():
     return m
 
 
-# ------------------------------------------------------------------------------------------ captions (for the writer)
+# ------------------------------------------------------------------------------------------ captions (for the writer)# ------------------------------------------------------------------------------------------ lag law (2026-09-25, final round)
+LAG_A = {1.30: ("o", -1), 1.45: ("s", 0), 1.50: ("^", 0), 1.60: ("D", 0)}
+
+
+def lag_data():
+    A = read("lag_law/compare_arms.csv"); A["a"] = A.a.round(2)
+    kb = read("lag_law/kappa_by_winding.csv"); kb["a"] = kb.a.round(2)
+    kap = {a: float(kb[(kb.a == a) & (kb.k == k)].kappa_adam.iloc[0]) for a, (_, k) in LAG_A.items()}
+    lr = RESULTS / "linear_response" / "arm_predictions_for_figure.csv"
+    return A, kap, (pd.read_csv(lr) if lr.exists() else None)
+
+
+def fig_lag():
+    """One message: the crossing lag grows linearly with the growth-to-relaxation ratio, with the slope κ(a) predicted
+    with no fitted parameter.  Median lag against median χ for all 36 free-training arms and tests; κ(a)χ lines."""
+    A, kap, lr = lag_data()
+    fig, ax = plt.subplots(figsize=(TEXT_W, 2.6))
+    xmax = float(A.median_chi.max()) * 1.12
+    for a, (m, _) in LAG_A.items():
+        xs = np.array([0.0, xmax])
+        ax.plot(xs, kap[a] * xs, color=BLUE, lw=1.0, zorder=1)
+        g = A[A.a == a]
+        sgd = g["set"] == "SGD"
+        ax.plot(g[~sgd].median_chi, g[~sgd].obs, ls="none", marker=m, ms=4.2, mfc="k", mec="k", zorder=3)
+        ax.plot(g[sgd].median_chi, g[sgd].obs, ls="none", marker=m, ms=4.8, mfc="white", mec="k", mew=0.9, zorder=3)
+        xe = min(0.09 / kap[a], xmax)                       # where the line leaves the plot
+        ax.text(xe, 0.0915 if xe < xmax else kap[a] * xmax, (f"$a = {a:.2f}$" if a == 1.30 else f"${a:.2f}$"), color=BLUE,
+                ha="center" if xe < xmax else "left", va="bottom" if xe < xmax else "center", clip_on=False)
+    if lr is not None:
+        ax.plot(lr.median_chi, lr.pred_full, ls="none", marker="x", ms=4.0, color=VERM, mew=0.9, zorder=4)
+    ax.set_xlim(0, xmax); ax.set_ylim(0, 0.09)
+    ax.set_xlabel(r"growth-to-relaxation ratio $\chi$ (median per arm)")
+    ax.set_ylabel("crossing lag $r$ (median)")
+    _clean(ax)
+    fig.tight_layout(pad=0.3)
+    save(fig, "lag")
+
+
+def scoreboard_data():
+    """Every registered prospective width-1 test with a point or range prediction: (panel, family, label, pred, lo, hi,
+    obs, pass).  Range predictions are drawn at their centre with the range as the bar."""
+    rows = []
+    ts = read("ts_test/scores.csv")
+    for r in ts.itertuples():
+        rows.append(("lag", "Task B", f"a={r.a:.2f}", r.pred, r.pred - r.tol, r.pred + r.tol, r.obs, abs(r.obs - r.pred) <= r.tol))
+    ex = read("sgd_own_extension_scores.csv")
+    for r in ex.itertuples():
+        rows.append(("lag", "SGD", f"a={r.a:.2f}", r.pred, r.pred - r.tol, r.pred + r.tol, r.obs, abs(r.obs - r.pred) <= r.tol))
+    import json as _j
+    V = _j.loads((RESULTS / "ramp" / "verdicts.json").read_text())
+    for x in V["R4"]:
+        for e in (0.005, 0.0025):
+            p_, t_, o_ = x["median_0.01"], x["tol"], x[f"median_{e}"]
+            rows.append(("lag", "learning rate", f"a={x['a']:.2f} eta={e}", p_, p_ - t_, p_ + t_, o_, abs(o_ - p_) <= t_))
+    ta = read("act_general/training_scores.csv"); ta = ta[ta.arm == "secondary_pooled_200"]
+    for r in ta.itertuples():
+        rows.append(("lag", "other activations", r.act, r.pred, r.pred - r.tol, r.pred + r.tol, r.obs, abs(r.obs - r.pred) <= r.tol))
+    bd = read("band_rd/verdicts.csv"); bd = bd[(bd.arm == "primary") & (bd.d == 2)]
+    for r in bd.itertuples():
+        rows.append(("lag", "R^2", f"a={r.a:.2f}", r.median_pred_r, r.median_pred_r - r.tol, r.median_pred_r + r.tol,
+                     r.median_obs_r_own, abs(r.median_obs_r_own - r.median_pred_r) <= r.tol))
+    po = read("prospective_own_scores.csv"); po = po[(po.analysis == "primary (crossers)") & (po.comparison == "P4")]
+    for r in po.itertuples():
+        rows.append(("err", "own-sample threshold", f"a={r.a:.2f}", 0.5 * (r.lo + r.hi), r.lo, r.hi, r.stat, r.lo <= r.stat <= r.hi))
+    es = read("prospective_own_early_scores.csv")
+    # registered ranges (results/prospective_own_prediction.md:288-290)
+    RU = {1.3: (0.029, 0.053), 1.5: (0.065, 0.124)}; RF = {1.3: (0.004, 0.023), 1.5: (0.005, 0.063)}
+    for r in es.itertuples():
+        a = round(r.a, 2)
+        for fam, R_, v in (("early branch", RU, r.err_unfitted_median), ("early branch, lag-corrected", RF, r.err_fitted_median)):
+            lo, hi = R_[a]
+            rows.append(("err", fam, f"a={a:.2f}", 0.5 * (lo + hi), lo, hi, v, lo <= v <= hi))
+    b3 = read("prospective_scores.csv")                   # registered range [0.0801, 0.1824] (Block 3 registration)
+    for r in b3.itertuples():
+        rows.append(("err", "held-out windows", f"{r.window} a={r.a:.2f}", 0.5 * (0.0801 + 0.1824), 0.0801, 0.1824,
+                     r.abslogerr_U, bool(r.U_in_expected_range)))
+    return pd.DataFrame(rows, columns=["panel", "family", "label", "pred", "lo", "hi", "obs", "passed"])
+
+
+SB_MARK = {"Task B": "o", "SGD": "s", "learning rate": "^", "other activations": "v", "R^2": "P",
+           "own-sample threshold": "o", "early branch": "s", "early branch, lag-corrected": "^", "held-out windows": "D"}
+
+
+def fig_scoreboard():
+    """One message: every registered prospective width-1 prediction with a stated value or range, observed against
+    predicted; passes filled, failures open."""
+    d = scoreboard_data()
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT_W, 2.7))
+    for ax, (panel, lim, lab) in zip(axes, (("lag", (-0.06, 0.22), "lag"), ("err", (0.0, 0.2), "|log error|"))):
+        g = d[d.panel == panel]
+        ax.plot(lim, lim, color=GREY, lw=0.7, zorder=0)
+        fams = list(dict.fromkeys(g.family))
+        for i, fam in enumerate(fams):
+            q = g[g.family == fam].reset_index(drop=True)
+            dx = (np.arange(len(q)) - (len(q) - 1) / 2) * 0.0025 if fam == "held-out windows" else np.zeros(len(q))
+            for j, r in q.iterrows():
+                x = r.pred + dx[j]
+                ax.plot([x, x], [r.lo, r.hi], color=GREY, lw=1.6, alpha=0.55, zorder=1, solid_capstyle="butt")
+                ax.plot([x], [r.obs], ls="none", marker=SB_MARK[fam], ms=4.4, mec="k", mew=0.8,
+                        mfc="k" if r.passed else "white", zorder=3)
+        ax.set_xlim(*lim); ax.set_ylim(*lim)
+        ax.set_xlabel(f"predicted {lab}"); ax.set_ylabel(f"observed {lab}")
+        _clean(ax)
+    for ax, lab in zip(axes, ("(a)", "(b)")):
+        ax.text(0.02, 0.98, lab, transform=ax.transAxes, ha="left", va="top")
+    fig.tight_layout(pad=0.3)
+    save(fig, "scoreboard")
+    d.to_csv(OUT / "scoreboard_data.csv", index=False)
+
+
+
 def captions():
     """results/figures/v5/captions.md: for each figure, its PDF path, one-sentence message, main text or appendix, the
     population and n, what the uncertainty shows, and every number that moved from the image into the caption.  Every
@@ -545,6 +658,47 @@ def captions():
            f"{_mm['improvement_at_zero_rate_pct']:.0f}% of the error improvement occurs in bins where no run solves "
            f"({_mm['runs_in_zero_rate_bins']:,} runs, R < {_mm['last_zero_rate_bin_right']:.2f})"],
           note="Replaces paper/figures/fig4_metric_check.pdf (v4 styling, twin axis).")
+    _p32 = read("track4_float32_decomposition.csv")
+    entry("decomposition_float32", "main text (replaces decomposition if the main text uses the float32 population; WP-26)",
+          "Training fails by not placing the hidden unit; below ε ≈ 0.25 every run fails this way, and bias failures appear "
+          "only in a narrow band around ε ≈ 0.4.",
+          f"Width 1, the single-draw float32 population: {int(_p32.runs.sum()):,} runs, {int(_p32.runs.min())} per a at "
+          f"{len(_p32)} values of a (Adam lr 0.01, 2,000 steps).",
+          "Clopper–Pearson 95% intervals per a.",
+          [f"totals: {int(_p32.solved.sum())} solved, {int(_p32.placement.sum()):,} placement failures, {int(_p32.bias.sum())} bias failures",
+           "the same runs as the width-1 sweep and refinement (and the metric check)"],
+          note="Final round: same design as 'decomposition', restricted to the float32 draw.")
+    # lag law and scoreboard (final round, 2026-09-25)
+    _A, _kap, _lr = lag_data()
+    entry("lag", "main text",
+          "The crossing lag grows linearly with the ratio of output growth to branch relaxation, with a slope κ(a) "
+          "computed from the landscape with no fitted parameter (derived after a fitted relationship was known).",
+          f"Width 1, all {len(_A)} free-training arms and tests (the four intervention experiments, SGD, and the fresh-sample "
+          "test at a = 1.45 and 1.60); each point is an arm's median lag against its median ratio. Filled markers: Adam; "
+          "open markers: SGD. Marker shape: a = 1.30 circles, 1.45 squares, 1.50 triangles, 1.60 diamond."
+          + (" Crosses: the exact linear-response prediction along each run's trajectory (arm medians)." if _lr is not None else ""),
+          "None drawn (arm medians); lines are predictions, not fits.",
+          [", ".join(f"κ({a:.2f}) = {_kap[a]:.2f}" for a in _kap) + " (lines r = κ(a)χ)",
+           f"{int(_A.within.sum())} of {len(_A)} arms within the registered tolerance max(0.01, 0.25·pred)",
+           "observed/predicted through-origin slope per a: "
+           + ", ".join(f"{r.ratio_obs_to_pred:.2f} ({r.a:.2f})" for r in read("lag_law/compare_per_a.csv").itertuples())],
+          note="New figure (final round).")
+    _sb = scoreboard_data()
+    _fam = _sb.groupby(["panel", "family"], sort=False).passed.agg(["sum", "size"]).reset_index()
+    entry("scoreboard", "main text or appendix",
+          "Every registered prospective width-1 prediction that states a value or a range, observed against predicted: "
+          "the timescale and threshold predictions hold, and the tests outside the sine family and in R² fail.",
+          "(a) Lag predictions: fresh-sample timescale test (circles, a = 1.45, 1.60), SGD extension (squares), learning-rate "
+          "invariance (upward triangles; η = 0.005 and 0.0025 against η = 0.01), GELU/SiLU/Mish (downward triangles, 200 "
+          "seeds), single unit in R² (plus signs). (b) Threshold-error predictions: own-sample threshold (circles), early "
+          "branch (squares) and lag-corrected early branch (triangles), held-out windows (diamonds, 8 settings, spread "
+          "horizontally for visibility). Filled: within the registered tolerance or range; open: outside it.",
+          "Grey bars: the registered tolerance (prediction ± tolerance) or registered range.",
+          [f"{r['family']}: {int(r['sum'])} of {int(r['size'])} within" for _, r in _fam.iterrows()]
+          + ["Not plotted (no stated predicted value; registered as paired comparisons, all PASS): own-threshold vs "
+             "population (Task B, SGD, own-seed P1), own-seed P2a/P2b/P3, held-out windows C vs B1/B2/B3",
+           "Not plotted (not a point prediction): the forced ramp (slopes and rank correlations; WP-24)"],
+          note="New figure (final round).")
     # mechanism (width 1): |w1| of the conditional minimiser against R/R_glob (Task C, 2026-09-25)
     if (RESULTS / "mechanism_w1_path.csv").exists():
         mp_ = read("mechanism_w1_path.csv"); ms_ = read("mechanism_w1_stats.csv").set_index("Unnamed: 0")
@@ -776,6 +930,9 @@ def main():
     fig_prospective_own()
     fig_setting()
     fig_metric_check()
+    fig_lag()
+    fig_scoreboard()
+    fig_decomposition("float32", "decomposition_float32")
     if (RESULTS / "mechanism_w1_path.csv").exists():
         from . import figures_v5 as _F
         from .mechanism_w1_figure import figure as fig_mechanism_w1

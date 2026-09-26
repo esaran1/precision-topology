@@ -1,0 +1,28 @@
+{
+ "n_fa_endpoints": 265,
+ "own_loss_matched": 265,
+ "n_compared": 190,
+ "same_s_all": true,
+ "direct_placed_all": true,
+ "n_stuck_above_pop_global": 190,
+ "pop_gap_min": 1.0901619691749964e-05,
+ "pop_gap_median": 3.502465258775622e-05,
+ "pop_gap_max": 0.00027916619647927465,
+ "by_R2": {
+  "0.003": {
+   "n": 101,
+   "above": 101,
+   "gap_median": 1.708316241322283e-05,
+   "gap_min": 1.0901619691749964e-05
+  },
+  "0.01": {
+   "n": 89,
+   "above": 89,
+   "gap_median": 0.00016393695203897884,
+   "gap_min": 0.00012030083443914652
+  }
+ },
+ "n_not_comparable": 75,
+ "own_lower_than_placed_found_in_compared": 9,
+ "own_placed_found_in_compared": 17
+}
