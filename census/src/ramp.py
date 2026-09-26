@@ -536,8 +536,45 @@ def posthoc_branch(workers=1):
     return d
 
 
+def adam_contrast():
+    """POST HOC (author's request): what differs between the Adam ramp and free Adam training (where the lag law held,
+    Track 1A)?  Per a: the measured preconditioner at crossing (√v̂ per coordinate), the growth rate d log s/dt, the
+    relaxation time 1/(ηλ_min(P^{1/2}HP^{1/2})), χ, the number of steps from the start of growth to the crossing against
+    Adam's v̂ memory 1/(1 − β₂) = 1,000 steps, and the branch (winding, mirror).  Free: the deconfounded lag test's
+    φ = 1 primary runs (residual_timescale_runs.csv; preconditioner_runs.csv); ramp: all crossing Adam ramp runs on the
+    natural winding.  Written to adam_contrast.csv."""
+    d = read_runs(); d["a"] = d.a.round(2)
+    P = pd.read_csv(OUT / "scored_runs.csv"); P["a"] = P.a.round(2)
+    ft = pd.read_csv(RESULTS / "residual_timescale_runs.csv"); ft["a"] = ft.a.round(2)
+    fp = pd.read_csv(RESULTS / "lag_law" / "preconditioner_runs.csv"); fp["a"] = fp.a.round(2)
+    pr = pd.read_csv(RESULTS / "lag_law" / "predictions.csv"); pr["a"] = pr.a.round(2)
+    rows = []
+    for a, k in ((1.30, -1), (1.50, 0)):
+        g = d[(d.a == a) & (d.opt == "adam") & (d.winding == k) & d.crossed]
+        q = P[(P.a == a) & (P.opt == "adam") & (P.winding == k)]
+        f = ft[(ft.a == a) & (ft.factor == 1.0)]; fpa = fp[fp.a == a]
+        fr = pr[(pr.a == a) & (pr["set"] == "lag2-prim") & (pr.arm.astype(str) == "1.0")]
+        rows.append({"a": a, "source": "ramp (Adam)", "n": len(g),
+                     "sqrt_v_w1": float(np.sqrt(g.vhat_w1).median()), "sqrt_v_b1": float(np.sqrt(g.vhat_b1).median()),
+                     "sqrt_v_b2": float(np.sqrt(g.vhat_b2).median()),
+                     "growth_per_step": float(g.gamma.median()), "growth_min": float(g.gamma.min()), "growth_max": float(g.gamma.max()),
+                     "relax_steps": float((q.chi / q.gamma).median()), "chi": float(q.chi.median()),
+                     "steps_growth_to_cross": float(g.step.median()), "winding": k, "mirror_frac": float(q.mirror.mean()),
+                     "pred_r_median": float(q.pred_r.median())})
+        rows.append({"a": a, "source": "free Adam (lag test 2, phi = 1)", "n": len(f),
+                     "sqrt_v_w1": float(fpa.sqrt_v_w1.median()), "sqrt_v_b1": float(fpa.sqrt_v_b1.median()),
+                     "sqrt_v_b2": float(fpa.sqrt_v_b2.median()),
+                     "growth_per_step": float(f.growth.median()), "growth_min": float(f.growth.min()), "growth_max": float(f.growth.max()),
+                     "relax_steps": float((1 / f.relax).median()), "chi": float(f.ratio.median()),
+                     "steps_growth_to_cross": float(f.cross_step.median()), "winding": int(fr.winding_k.median()),
+                     "mirror_frac": float(fr.mirror.mean()), "pred_r_median": float(fr.pred_r.median())})
+    out = pd.DataFrame(rows); out.to_csv(OUT / "adam_contrast.csv", index=False)
+    pd.set_option("display.width", 250); print(out.T.to_string())
+    return out
+
+
 
 if __name__ == "__main__":
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     {"own": lambda: own(w), "own_free": lambda: own(w, FREE_SEEDS, "own_free_frozen.csv"), "design": design,
-     "run": lambda: run(), "free": lambda: free(), "score": lambda: score(), "posthoc": lambda: posthoc_branch(w)}[sys.argv[1]]()
+     "run": lambda: run(), "free": lambda: free(), "score": lambda: score(), "posthoc": lambda: posthoc_branch(w), "adam_contrast": adam_contrast}[sys.argv[1]]()

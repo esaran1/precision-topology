@@ -1209,7 +1209,23 @@ Registration: `results/ramp_registration.md` (c4b4c6d). Own thresholds were froz
 
   - SGD's observed/predicted cell medians are 0.99–1.06 in the four slowest cells, 0.97–1.11 in the fifth (κχ = 0.04) and 0.87–1.26 in the fastest (κχ = 0.1, the edge of the linear regime). The negative-κ copy crosses early, as predicted.
   - Adam's cell medians do not follow κχ (observed/predicted 0.35–0.94, 1.40–1.85 and −0.39 to 0.67 across the three settings), even post hoc. Its v̂ adapts during the ramp (§13.3(iv)(c)), and the post hoc R1 pass at a = 1.50 comes from the pooled slope only.
+- **Why Adam differs in the ramp (POST HOC; `ramp.adam_contrast`).**
+  - At crossing, √v̂ is 8–88× smaller than in free training, because the warm-up holds the run at a stationary point and v̂ decays.
+  - The frozen-P relaxation time is then 0.17–0.19 steps, against 7.8–15.0 steps in free training. So ηλ_min > 1, and the linearisation of §13.1 (small ηλ, P fixed over the relaxation) does not apply. This is case (iv)(c).
+  - The growth rate is only 2.3–2.7× the free rate, and the branch and winding are the same, so neither explains the difference.
+  - The law's Adam form therefore requires a stationary preconditioner with ηλ_min ≪ 1. Free training meets this; the ramp does not.
 - **R4 (free Adam at η = 0.01, 0.005, 0.0025): PASS at both a.**
   - a = 1.30: median residuals 0.0296, 0.0304, 0.0308 (tolerance ±0.0100; 39 of 40 crossed at each η).
   - a = 1.50: median residuals 0.0619, 0.0625, 0.0647 (tolerance ±0.0155; 39 of 40 crossed at each η).
   - As the law predicts, χ is η-invariant in free training, so the lag does not vanish in the gradient-flow limit.
+
+### 13.7 The validity condition across activations (POST HOC; `src/act_posthoc2.py`)
+
+- The linear lag law was verified at width 1 on runs with χ ≤ 0.064; the largest arm median χ at which it held is 0.0249.
+- The Track 3A runs, scored against each run's tracked-branch switch on its own sample:
+  - **GELU** (median χ 0.0137, inside the range): 96% of runs with a branch switch cross within 1% of it. The median
+    residual is +0.0017, against κχ = +0.0021.
+  - **SiLU and Mish** (median χ 0.22 and 0.26, about 10× beyond the range): the residual has the wrong sign for κχ.
+- This is consistent with (iv)(a): the law needs χ small. It is not a test of the law outside that regime.
+- GELU's 15 early crossings (s ≤ 0.45) lie on the tail-placed one-sided-ramp branch, where the continuation finds no
+  switch.

@@ -459,7 +459,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 589 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 631 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -1663,6 +1663,17 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   - Adam's frozen-preconditioner linearisation is not supported at these small lags. Its v̂ adapts during the ramp
     (math note §13.3(iv)(c)).
 
+### Why Adam differs in the ramp (POST HOC; `ramp.adam_contrast` → `ramp/adam_contrast.csv`)
+
+Three things could differ between the Adam ramp and free Adam training, where the law held (Track 1A): the measured preconditioner, the growth rate and the branch. The data single out the **preconditioner**.
+- **Preconditioner.** At crossing, Adam's √v̂ is 8–88× smaller in the ramp than in free training, per coordinate and at both a. The 4,000-step warm-up holds the hidden coordinates at a stationary point, where the gradient vanishes, so v̂ decays; in free training v̂ still carries the larger gradients of the approach.
+  - With P = 1/(√v̂ + ε), the frozen-P relaxation time 1/(ηλ_min(P^{1/2}HP^{1/2})) is 0.17–0.19 steps in the ramp, against 7.8–15.0 steps in free training.
+  - A relaxation time below one step means ηλ_min > 1. The linear update with that P would overshoot, so the linearisation behind the law (small ηλ, P fixed over the relaxation) does not describe the ramp. Adam there is in its self-normalising regime: steps of about η per coordinate, with v̂ adapting to the ramp's own gradients.
+  - Consistently, the ramp reaches its crossing 238–624 steps after growth starts (median), within v̂'s 1,000-step memory. Free training takes 1680–3266 steps.
+- **Growth rate.** The ramp's rate is 2.3–2.7× the free-training rate at crossing (medians), the same order. SGD in the ramp covers far wider rates and follows the law, so the rate alone does not explain Adam's failure.
+- **Branch.** The ramp runs sit on the same windings as free training (k = −1 at a = 1.30, k = 0 at a = 1.50). They are all on the non-mirror branch, where κ is the same. The post hoc scoring already uses each run's tracked branch, and SGD passes on the same branches.
+- **So:** the law's Adam form needs a preconditioner that is stationary and small enough that ηλ_min ≪ 1 over the relaxation. Free training satisfies this; the ramp, started at a stationary point, does not. This is a limit of the frozen-preconditioner linearisation (math note §13.3(iv)(c)), identified after scoring.
+
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
 | a | crossed (η = 0.01 / 0.005 / 0.0025) | median residual | tolerance | R4 |
@@ -1770,20 +1781,66 @@ before any run). Labels: registered, validated (not certified), post hoc.
 - Own-sample thresholds were not computed. Each training set has 400 points (200 per class); `act_summary.md` says
   "200 points per run", which means 200 per class.
 
+**POST HOC checks on the same runs (author's request; `src/act_posthoc2.py` → `act_general/posthoc2_*`; no new runs;
+the registered verdicts above stand as scored).**
+
+*(1) Validity: χ at crossing against the width-1 sine range.*
+- The quantity is the same growth-to-relaxation ratio as for the sine runs, with each run's own Adam preconditioner.
+- The width-1 lag law was verified (Track 1A) on runs with χ = 0.0001–0.064 (95% of runs
+  ≤ 0.021). The largest arm-median χ at which it held is 0.0249.
+- **The validity condition used here:** the median χ at crossing is ≤ 0.0249.
+
+| activation | median χ [IQR] | runs with χ ≤ 0.0249 | runs with χ ≤ 0.064 | condition met |
+|---|---|---|---|---|
+| GELU | 0.0137 [0.0079, 0.0215] | 81% | 94% | yes |
+| SiLU | 0.2242 [0.1422, 0.3475] | 1% | 5% | **no** |
+| Mish | 0.2556 [0.1721, 0.4209] | 0% | 2% | **no** |
+
+*(2) Crossings scored against each run's tracked-branch switch* (Newton continuation on the run's own 400-point sample
+from its crossing state, as for the ramp).
+
+| activation | runs with a branch switch | median r vs branch | median κχ | tolerance | within | at or above the branch switch | \|r\| ≤ 0.01 | branch switch / population threshold, 10–90% |
+|---|---|---|---|---|---|---|---|---|
+| GELU | 117 of 132 | +0.0017 | +0.0021 | ±0.01 | yes | 93% | 96% | 0.88–1.17 |
+| SiLU | 134 of 135 | +0.0142 | -0.0324 | ±0.01 | **no** | 66% | 31% | 0.83–1.19 |
+| Mish | 134 of 135 | +0.0342 | -0.0393 | ±0.01 | **no** | 75% | 28% | 0.84–1.20 |
+
+- **GELU (condition met):**
+  - Against its tracked branch, the crossing follows the lag law: median r +0.0017 against
+    κχ +0.0021.
+  - 93% of runs cross at or above their branch switch, and
+    96% within 1% of it.
+  - The registered tests compared crossings with the population threshold. Each run's own branch switch (on its own
+    400-point sample) lies 0.88–1.17× the population threshold (10–90%).
+    Since the crossings sit within 1% of those switches, that spread is what the registered tests measured.
+  - The other 15 GELU crossings all happen early (s ≤ 0.45, against a population threshold of
+    6.64), from states far from the retained branch. Continuing their branch from the crossing finds no switch:
+    no sign change within 400 continuation steps in 3, continuation lost in 11, gap undecided at the cell cap in 1.
+- **SiLU and Mish (condition not met):**
+  - χ at crossing is about 10× beyond the largest χ at which the sine law was verified.
+  - Against the tracked branch, the residual has the wrong sign for κχ, and only 31% and
+    28% of runs cross within 1% of their branch switch.
+  - This is outside the regime of the linear lag law (math note §13.3(iv)(a)), so these runs neither test nor
+    contradict it.
+
 **Say:**
 - "For GELU, SiLU and Mish a single unit can solve the task, and the loss at fixed output scale has a validated
   unplaced-to-placed switch."
+- "(Post hoc) For GELU, whose runs cross in the timescale regime where the sine lag law was verified, crossings track
+  within 1% of each run's own branch switch and follow the lag law; the registered tests, which used the population
+  threshold, measured the spread of those switches. For SiLU and Mish, output growth at crossing is about ten times too fast for the law to apply."
 - "Free Adam training does not track it. Registered tests on 200 seeds per activation fail: 48–70% of crossings lie
   above the switch, and the median residual has the wrong sign or size for the lag law. About a third of runs never
   cross."
 - "The scale-gating account is therefore specific to activations whose non-monotone part scales with the pre-activation
-  (the sine family here). Its extension to practical activations is not supported."
+  (the sine family here). Its extension to practical activations is not supported by the registered tests."
 
 **Do not say:**
 - that the switch for these activations is certified;
 - that the criterion predicted the switch for SiLU or Mish (it was undetermined);
 - that training confirms scale gating outside the sine family;
-- that the failure is caused by training-set sampling. That is plausible but untested.
+- that the registered tests passed, or that the post hoc branch scoring was registered;
+- that the lag law holds for SiLU or Mish (their runs are outside its validity condition).
 IDs: `3A GELU T-a`; `3A SiLU T-b`; `3A Mish crossing`; `3A GELU bracket lo`.
 
 ## WP-26. Citations, main-text notation, the checker paragraph, and run populations (Track 4; for the submission)

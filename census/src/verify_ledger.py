@@ -1781,6 +1781,20 @@ def lag_law_checks() -> None:
         chk(f"1B post hoc Adam ratio max {key}", float(r_.max()), hi, 0.006)
     chk("1B branch off own a=1.30", float(ph[(1.30, -1, "sgd")]["frac_branch_off_own_1pct"]), 0.35, 0.0006)
     chk("1B branch off own a=1.50", float(ph[(1.50, 0, "sgd")]["frac_branch_off_own_1pct"]), 0.675, 0.0006)
+    ac = pd.read_csv(R / "ramp" / "adam_contrast.csv"); ac["a"] = ac.a.round(2)
+    rp = ac[ac.source.str.startswith("ramp")].set_index("a"); fe = ac[ac.source.str.startswith("free")].set_index("a")
+    vr = [float(fe.loc[a, c] / rp.loc[a, c]) for a in (1.3, 1.5) for c in ("sqrt_v_w1", "sqrt_v_b1", "sqrt_v_b2")]
+    chk("1B Adam contrast v ratio min", min(vr), 8.0, 0.5); chk("1B Adam contrast v ratio max", max(vr), 88.0, 0.5)
+    chk("1B Adam contrast ramp relax min", float(rp.relax_steps.min()), 0.17, 0.006)
+    chk("1B Adam contrast ramp relax max", float(rp.relax_steps.max()), 0.19, 0.006)
+    chk("1B Adam contrast free relax min", float(fe.relax_steps.min()), 7.8, 0.06)
+    chk("1B Adam contrast free relax max", float(fe.relax_steps.max()), 15.0, 0.06)
+    chk("1B Adam contrast ramp steps min", float(rp.steps_growth_to_cross.min()), 238.5, 0.5)
+    chk("1B Adam contrast ramp steps max", float(rp.steps_growth_to_cross.max()), 623.5, 0.5)
+    chk("1B Adam contrast free steps min", float(fe.steps_growth_to_cross.min()), 1679.5, 0.5)
+    chk("1B Adam contrast free steps max", float(fe.steps_growth_to_cross.max()), 3265.5, 0.5)
+    gr = [float(rp.loc[a, "growth_per_step"] / fe.loc[a, "growth_per_step"]) for a in (1.3, 1.5)]
+    chk("1B Adam contrast growth ratio min", min(gr), 2.3, 0.06); chk("1B Adam contrast growth ratio max", max(gr), 2.7, 0.06)
     for x in V["R4"]:
         a = round(x["a"], 2)
         chk(f"R4 a={a:.2f}", float(x["R4"] == "PASS"), 1.0, 0)
@@ -1817,6 +1831,25 @@ def act_checks() -> None:
     chk("3A GELU bracket lo", float(json.loads((D / "bracket_gelu.json").read_text())["s_lo"]), 6.6117, 0.00006)
     cv = json.loads((D / "criterion_verdicts.json").read_text())
     chk("3A criterion verdicts", float([cv[a]["verdict"] for a in ("gelu", "silu", "mish")] == ["switch predicted", "undetermined", "undetermined"]), 1.0, 0)
+    S2 = json.loads((D / "posthoc2_summary.json").read_text()); A2 = {x["act"]: x for x in S2["acts"]}; sw = S2["sine_width1"]
+    chk("3A post hoc sine chi arm-median max", sw["chi_arm_median_max"], 0.0249, 0.00006)
+    chk("3A post hoc sine chi run max", sw["chi_run_max"], 0.064, 0.0006)
+    chk("3A post hoc sine chi run min", sw["chi_run_min"], 0.0001, 0.00006)
+    chk("3A post hoc sine chi run q95", sw["chi_run_q95"], 0.021, 0.0006)
+    for a, v in {"gelu": dict(chi_median=0.0137, with_branch_switch=117, obs_branch_median=0.0017, pred_median=0.0021, frac_at_or_above_branch=0.93,
+                              n_no_switch_on_branch=15, no_switch_s_cross_max=0.45, branch_over_pop_q10=0.88, branch_over_pop_q90=1.17, validity_met=1.0, within=1.0),
+                 "silu": dict(chi_median=0.2242, with_branch_switch=134, obs_branch_median=0.0142, pred_median=-0.0324, validity_met=0.0, within=0.0,
+                              branch_over_pop_q10=0.83, branch_over_pop_q90=1.19),
+                 "mish": dict(chi_median=0.2556, with_branch_switch=134, obs_branch_median=0.0342, pred_median=-0.0393, validity_met=0.0, within=0.0,
+                              branch_over_pop_q10=0.84, branch_over_pop_q90=1.20)}.items():
+        for k, want in v.items():
+            got = float(A2[a][k])
+            tol = 0 if k in ("with_branch_switch", "n_no_switch_on_branch", "validity_met", "within") else (0.006 if want >= 0.3 or k.startswith("frac") or k.startswith("branch") or k.startswith("no_switch") else 0.00006)
+            chk(f"3A post hoc {a} {k}", got, want, tol)
+    for a, (f1, f2, f3) in {"gelu": (0.81, 0.94, 0.96), "silu": (0.01, 0.05, 0.31), "mish": (0.0, 0.02, 0.28)}.items():
+        chk(f"3A post hoc {a} frac chi <= arm max", round(A2[a]["frac_chi_le_sine_arm_median_max"], 2), f1, 0.006)
+        chk(f"3A post hoc {a} frac chi <= run max", round(A2[a]["frac_chi_le_sine_run_max"], 2), f2, 0.006)
+        chk(f"3A post hoc {a} frac |rb| <= 0.01", round(A2[a]["frac_abs_rb_le_0.01"], 2), f3, 0.006)
     gh = json.loads((D / "ghat.json").read_text())
     for a, v in {"gelu": 0.037547, "silu": 0.050912, "mish": 0.054772}.items():
         chk(f"3A {a} Ghat", float(gh[a]["Ghat_nm"]["G_lo"]), v, 6e-7)

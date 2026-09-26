@@ -1792,6 +1792,34 @@ def wp24():
     else:
         r4s = f"R4: {r4}."
     n_m = int(pr.mirror.sum())
+    ac = pd.read_csv(RESULTS / "ramp" / "adam_contrast.csv"); ac["a"] = ac.a.round(2)
+    rp = ac[ac.source.str.startswith("ramp")].set_index("a"); fe = ac[ac.source.str.startswith("free")].set_index("a")
+    vr = [float(fe.loc[a, c] / rp.loc[a, c]) for a in (1.3, 1.5) for c in ("sqrt_v_w1", "sqrt_v_b1", "sqrt_v_b2")]
+    gr = [float(rp.loc[a, "growth_per_step"] / fe.loc[a, "growth_per_step"]) for a in (1.3, 1.5)]
+    adam_par = (
+        "Three things could differ between the Adam ramp and free Adam training, where the law held (Track 1A): the "
+        "measured preconditioner, the growth rate and the branch. The data single out the **preconditioner**.\n"
+        f"- **Preconditioner.** At crossing, Adam's √v̂ is {min(vr):.0f}–{max(vr):.0f}× smaller in the ramp than in free "
+        "training, per coordinate and at both a. The 4,000-step warm-up holds the hidden coordinates at a stationary point, "
+        "where the gradient vanishes, so v̂ decays; in free training v̂ still carries the larger gradients of the approach.\n"
+        "  - With P = 1/(√v̂ + ε), the frozen-P relaxation time 1/(ηλ_min(P^{1/2}HP^{1/2})) is "
+        f"{rp.relax_steps.min():.2f}–{rp.relax_steps.max():.2f} steps in the ramp, against "
+        f"{fe.relax_steps.min():.1f}–{fe.relax_steps.max():.1f} steps in free training.\n"
+        "  - A relaxation time below one step means ηλ_min > 1. The linear update with that P would overshoot, so the "
+        "linearisation behind the law (small ηλ, P fixed over the relaxation) does not describe the ramp. Adam there is in "
+        "its self-normalising regime: steps of about η per coordinate, with v̂ adapting to the ramp's own gradients.\n"
+        f"  - Consistently, the ramp reaches its crossing {rp.steps_growth_to_cross.min():.0f}–"
+        f"{rp.steps_growth_to_cross.max():.0f} steps after growth starts (median), within v̂'s 1,000-step memory. Free "
+        f"training takes {fe.steps_growth_to_cross.min():.0f}–{fe.steps_growth_to_cross.max():.0f} steps.\n"
+        f"- **Growth rate.** The ramp's rate is {min(gr):.1f}–{max(gr):.1f}× the free-training rate at crossing (medians), "
+        "the same order. SGD in the ramp covers far wider rates and follows the law, so the rate alone does not explain "
+        "Adam's failure.\n"
+        "- **Branch.** The ramp runs sit on the same windings as free training (k = −1 at a = 1.30, k = 0 at a = 1.50). "
+        "They are all on the non-mirror branch, where κ is the same. The post hoc scoring already uses each run's tracked "
+        "branch, and SGD passes on the same branches.\n"
+        "- **So:** the law's Adam form needs a preconditioner that is stationary and small enough that ηλ_min ≪ 1 over the "
+        "relaxation. Free training satisfies this; the ramp, started at a stationary point, does not. This is a "
+        "limit of the frozen-preconditioner linearisation (math note §13.3(iv)(c)), identified after scoring.")
 
     def rng(opt, sl, a=None, k=None):
         v = []
@@ -1910,6 +1938,10 @@ Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
   - Adam's frozen-preconditioner linearisation is not supported at these small lags. Its v̂ adapts during the ramp
     (math note §13.3(iv)(c)).
 
+### Why Adam differs in the ramp (POST HOC; `ramp.adam_contrast` → `ramp/adam_contrast.csv`)
+
+{adam_par}
+
 ### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
 
 {r4s}
@@ -1975,6 +2007,22 @@ def wp25():
     pt = "\n".join(f"| {names[a]} | [{ph.loc[a, 'r_q25']:+.3f}, {ph.loc[a, 'r_q75']:+.3f}] | {ph.loc[a, 'frac_abs_r_le_0.10']:.2f} | "
                    f"{int(ph.loc[a, 'n_early_below_half_s_glob'])} | {ph.loc[a, 'spearman_r_chi']:+.2f} | {ph.loc[a, 'noncross_median_w2_final']:.2f} |" for a in names)
     sec = ts[ts.arm == "secondary_pooled_200"].set_index("act")
+    S2 = json.loads((D / "posthoc2_summary.json").read_text()); sw = S2["sine_width1"]
+    A2 = {x["act"]: x for x in S2["acts"]}; ga, sa, ma = A2["gelu"], A2["silu"], A2["mish"]
+    import re as _re
+    notes = ga["no_switch_notes"]
+    n_lost = sum(int(m) for m in _re.findall(r"continuation lost at s=[0-9.]+: (\d+)", notes))
+    n_nosign = sum(int(m) for m in _re.findall(r"no sign change within 400 steps: (\d+)", notes))
+    n_und = sum(int(m) for m in _re.findall(r"gap undecided at the cell cap: (\d+)", notes))
+    assert n_lost + n_nosign + n_und == ga["n_no_switch_on_branch"]
+    ns = f"no sign change within 400 continuation steps in {n_nosign}, continuation lost in {n_lost}, gap undecided at the cell cap in {n_und}"
+    vt = "\n".join(f"| {names[a]} | {A2[a]['chi_median']:.4f} [{A2[a]['chi_q25']:.4f}, {A2[a]['chi_q75']:.4f}] | "
+                   f"{100 * A2[a]['frac_chi_le_sine_arm_median_max']:.0f}% | {100 * A2[a]['frac_chi_le_sine_run_max']:.0f}% | "
+                   f"{'yes' if A2[a]['validity_met'] else '**no**'} |" for a in names)
+    bt = "\n".join(f"| {names[a]} | {A2[a]['with_branch_switch']} of {A2[a]['crossing_runs']} | {A2[a]['obs_branch_median']:+.4f} | "
+                   f"{A2[a]['pred_median']:+.4f} | ±{A2[a]['tol']:.2f} | {'yes' if A2[a]['within'] else '**no**'} | "
+                   f"{100 * A2[a]['frac_at_or_above_branch']:.0f}% | {100 * A2[a]['frac_abs_rb_le_0.01']:.0f}% | "
+                   f"{A2[a]['branch_over_pop_q10']:.2f}–{A2[a]['branch_over_pop_q90']:.2f} |" for a in names)
     nc = ", ".join(f"{int(sec.loc[a, 'runs'] - sec.loc[a, 'placed_at_init'] - sec.loc[a, 'crossing_runs'])} ({names[a]})" for a in names)
     return f"""
 ## WP-25. Outside the sine family: GELU, SiLU and Mish at width 1 (Track 3A; for the submission)
@@ -2027,20 +2075,62 @@ before any run). Labels: registered, validated (not certified), post hoc.
 - Own-sample thresholds were not computed. Each training set has 400 points (200 per class); `act_summary.md` says
   "200 points per run", which means 200 per class.
 
+**POST HOC checks on the same runs (author's request; `src/act_posthoc2.py` → `act_general/posthoc2_*`; no new runs;
+the registered verdicts above stand as scored).**
+
+*(1) Validity: χ at crossing against the width-1 sine range.*
+- The quantity is the same growth-to-relaxation ratio as for the sine runs, with each run's own Adam preconditioner.
+- The width-1 lag law was verified (Track 1A) on runs with χ = {sw["chi_run_min"]:.4f}–{sw["chi_run_max"]:.3f} (95% of runs
+  ≤ {sw["chi_run_q95"]:.3f}). The largest arm-median χ at which it held is {sw["chi_arm_median_max"]:.4f}.
+- **The validity condition used here:** the median χ at crossing is ≤ {sw["chi_arm_median_max"]:.4f}.
+
+| activation | median χ [IQR] | runs with χ ≤ {sw["chi_arm_median_max"]:.4f} | runs with χ ≤ {sw["chi_run_max"]:.3f} | condition met |
+|---|---|---|---|---|
+{vt}
+
+*(2) Crossings scored against each run's tracked-branch switch* (Newton continuation on the run's own 400-point sample
+from its crossing state, as for the ramp).
+
+| activation | runs with a branch switch | median r vs branch | median κχ | tolerance | within | at or above the branch switch | \|r\| ≤ 0.01 | branch switch / population threshold, 10–90% |
+|---|---|---|---|---|---|---|---|---|
+{bt}
+
+- **GELU (condition met):**
+  - Against its tracked branch, the crossing follows the lag law: median r {ga["obs_branch_median"]:+.4f} against
+    κχ {ga["pred_median"]:+.4f}.
+  - {100 * ga["frac_at_or_above_branch"]:.0f}% of runs cross at or above their branch switch, and
+    {100 * ga["frac_abs_rb_le_0.01"]:.0f}% within 1% of it.
+  - The registered tests compared crossings with the population threshold. Each run's own branch switch (on its own
+    400-point sample) lies {ga["branch_over_pop_q10"]:.2f}–{ga["branch_over_pop_q90"]:.2f}× the population threshold (10–90%).
+    Since the crossings sit within 1% of those switches, that spread is what the registered tests measured.
+  - The other {ga["n_no_switch_on_branch"]} GELU crossings all happen early (s ≤ {ga["no_switch_s_cross_max"]:.2f}, against a population threshold of
+    6.64), from states far from the retained branch. Continuing their branch from the crossing finds no switch:
+    {ns}.
+- **SiLU and Mish (condition not met):**
+  - χ at crossing is about 10× beyond the largest χ at which the sine law was verified.
+  - Against the tracked branch, the residual has the wrong sign for κχ, and only {100 * sa["frac_abs_rb_le_0.01"]:.0f}% and
+    {100 * ma["frac_abs_rb_le_0.01"]:.0f}% of runs cross within 1% of their branch switch.
+  - This is outside the regime of the linear lag law (math note §13.3(iv)(a)), so these runs neither test nor
+    contradict it.
+
 **Say:**
 - "For GELU, SiLU and Mish a single unit can solve the task, and the loss at fixed output scale has a validated
   unplaced-to-placed switch."
+- "(Post hoc) For GELU, whose runs cross in the timescale regime where the sine lag law was verified, crossings track
+  within 1% of each run's own branch switch and follow the lag law; the registered tests, which used the population
+  threshold, measured the spread of those switches. For SiLU and Mish, output growth at crossing is about ten times too fast for the law to apply."
 - "Free Adam training does not track it. Registered tests on 200 seeds per activation fail: 48–70% of crossings lie
   above the switch, and the median residual has the wrong sign or size for the lag law. About a third of runs never
   cross."
 - "The scale-gating account is therefore specific to activations whose non-monotone part scales with the pre-activation
-  (the sine family here). Its extension to practical activations is not supported."
+  (the sine family here). Its extension to practical activations is not supported by the registered tests."
 
 **Do not say:**
 - that the switch for these activations is certified;
 - that the criterion predicted the switch for SiLU or Mish (it was undetermined);
 - that training confirms scale gating outside the sine family;
-- that the failure is caused by training-set sampling. That is plausible but untested.
+- that the registered tests passed, or that the post hoc branch scoring was registered;
+- that the lag law holds for SiLU or Mish (their runs are outside its validity condition).
 IDs: {_id("3A GELU T-a", "3A SiLU T-b", "3A Mish crossing", "3A GELU bracket lo")}.
 """
 
