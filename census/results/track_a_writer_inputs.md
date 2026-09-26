@@ -122,10 +122,12 @@ All 74 Adam runs that crossed and have a prediction:
 - It precedes the crossing whenever the lag is positive: 74 of 74 here.
 - This rule was examined post hoc on these runs. It is a candidate for a new registration, not a validated one.
 
-**Paper sentence:**
-"The registered Adam failure of per-run ordering (Spearman 0.25) is a measurement-point artifact. Post hoc, freezing
-the preconditioner at the crossing instead of at half the switch scale raises the per-run Spearman to 0.99, with every
-run within 10%. The pre-crossing rule 'preconditioner at the first step the output scale reaches the occupied branch's
-switch' gives 0.95 (91% within 10%), and we name it as the rule for a future registered test."
+**Paper wording (the author's, 2026-09-26; use as written):**
+> "The registered Adam test of per-run ordering failed (Spearman 0.25). Post hoc, the failure traces to when the
+> preconditioner was measured: freezing it at the observed crossing instead of at half the switch scale raises the
+> per-run Spearman to 0.99, with every run within 10%, showing that the rule-point preconditioner was stale by the
+> crossing. A pre-crossing rule chosen after seeing these runs, taking the preconditioner at the first step the output
+> scale reaches the occupied branch's switch, gives 0.95 (91% within 10%); we name it as the rule for a future
+> registered test."
 
 - Do not say: that L3 passes, or that this diagnostic is registered.

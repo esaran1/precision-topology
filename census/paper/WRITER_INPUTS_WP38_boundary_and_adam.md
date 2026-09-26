@@ -74,11 +74,13 @@ The observed lags span 0.079–0.106 (q10–q90).
 - Freezing P at the run's own branch switch uses only pre-crossing information and recovers the per-run ordering.
 - The registered rule point, at half the switch, is too early: Adam's preconditioner is still changing there.
 
-**Sentence for the paper:**
-> "Adam's failed per-run ranking at a = 1.65 is a measurement-point artifact: post hoc, freezing the preconditioner at
-> the first step at which the output scale reaches the occupied branch's switch, which is still before the crossing in
-> all 74 runs, gives a per-run rank correlation of 0.95 and 91% of runs within 10% of the prediction; we name this
-> rule, chosen after seeing these runs, for a future registered test."
+**Paper wording (the author's, 2026-09-26; use as written):**
+> "The registered Adam test of per-run ordering failed (Spearman 0.25). Post hoc, the failure traces to when the
+> preconditioner was measured: freezing it at the observed crossing instead of at half the switch scale raises the
+> per-run Spearman to 0.99, with every run within 10%, showing that the rule-point preconditioner was stale by the
+> crossing. A pre-crossing rule chosen after seeing these runs, taking the preconditioner at the first step the output
+> scale reaches the occupied branch's switch, gives 0.95 (91% within 10%); we name it as the rule for a future
+> registered test."
 
 **Do not say:**
 - that L3 passed;
