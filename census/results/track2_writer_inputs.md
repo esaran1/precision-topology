@@ -309,3 +309,88 @@ with per-run χ up to **0.064** (arm medians up to 0.025).
 - Had 2C been registered and PASSED: "a fresh-seed test predicted each run's crossing from its early basin". This
   **did not happen**, so do not use it.
 - Had it FAILED: the FAIL would have been reported beside T2-3's FAIL. **Not applicable.**
+
+---------------------------------------------------------------------------------------------------------------------
+
+## Track 2, final round: two-class prospective predictor (GATED). The gate FAILED, so nothing was registered.
+
+**Label:** a new predictor, designed from the diagnosis of earlier failures. T2-3 stays FAIL, T2-3b and T2-3c stay
+UNRESOLVED, and T2-3d stays FAIL.
+
+**Producer:** `src/t2g.py`, with tests in `tests/test_t2g.py`. The tests exercise every gate and criterion on
+constructed pass and fail cases.
+
+**Outputs:**
+- `results/t2g/classify_<arm>.csv`, `own_<arm>.csv`, `gate_runs.csv`;
+- `results/t2g/gate.json` (the gate);
+- `results/t2g/gate_misses.json` (descriptive only, written after the gate).
+
+### Committed before the classifier was evaluated
+
+Commit `7b8195a`, with `results/t2g_registration.md`.
+
+**Classifier.** It uses only the initial state and a pre-computation, never training.
+- A 2,000-step fixed-v Adam relaxation of the hidden coordinates from the initial state.
+- If it is placed at any step, the class is EARLY and the predicted crossing is s₀, the initial ‖v‖₁.
+- Otherwise the relaxed basin is followed by Newton continuation along the initial output-weight ray up to s = 1.0.
+  If it turns placed at s_sw, the class is EARLY and the predicted crossing is s_sw.
+- Otherwise the class is LATE and the predicted crossing is the width-1 own-sample threshold (T2-3d's method).
+
+**Ground truth.** A run is EARLY iff it crossed at s_cross < 1.0.
+
+**Gate.** Accuracy ≥ 0.95, and median |log error| ≤ 0.10 over the predicted-LATE runs.
+
+**Step 2 was fully specified in advance:** fresh seeds 870,000–870,079, criteria (i)–(iii) and validity.
+
+### Gate result (POST HOC, 239 existing slowed runs; `results/t2g/gate.json`): **FAIL**
+
+**Accuracy is 0.812, against ≥ 0.95 required.** Per arm: T2-3b 0.825, T2-3c 0.863, T2-3d 0.747.
+
+| | true EARLY | true LATE |
+|---|---|---|
+| predicted EARLY | 54 | 3 |
+| predicted LATE | 42 | 140 |
+
+**The late-class criterion passes on its own.** Over the 174 predicted-LATE crossing runs, the median
+|log(s_cross/s_w1,own)| is **0.014**, against ≤ 0.10 required.
+
+**The gate fails on accuracy alone.** Following the rule, step 2 was not registered, the fresh seeds were not
+touched, and no fresh-seed run was trained.
+
+### Descriptive, after the gate (`results/t2g/gate_misses.json`; no rule was changed)
+
+**The 42 missed early crossers:**
+- They crossed at s = 0.016–0.49 (median 0.13), at step 17–1,904 (median 347).
+- The classifier found each one's initial basin unplaced all the way up to s = 1 along the initial ray.
+- In Track 2B, 35 of them have a branch switch along their own recorded v-path, and 24 were on that branch at the
+  crossing (dist_c ≤ 0.05).
+- So most are branch-trackers whose switch comes from how v grows and rotates during training. The initial ray does
+  not see this.
+
+**The 54 caught early crossers:**
+- 42 were placed during the fixed-v relaxation, and 12 had a ray switch below 1.
+- They crossed at s = 0.018–0.32 (median 0.061).
+- Their predicted early scale (s₀ or s_sw) has median |log error| 0.37.
+
+**False EARLY: 3 runs.** One never crossed; two crossed late, at 5.84 and 5.70.
+
+### Writer section
+
+**Say:**
+- (POST HOC gate) A two-class predictor computed entirely before training was designed from the diagnosis of earlier
+  failures.
+  - Its late class predicts the late crossers to a median |log error| of 0.014.
+  - But it identifies the early crossers with only 81% accuracy (54 of 96 found), below the pre-set 95% gate.
+  - So no prospective width-2 test was registered.
+- Whether a width-2 run crosses early is only partly set by its initial basin:
+  - about 44% of early crossers (42 of 96) are missed from the initial state;
+  - most of those track a branch whose switch is driven by how the output weights grow and rotate during training.
+
+**Do not say:**
+- that a prospective width-2 prediction was registered, run or passed;
+- that the early crossers "are identifiable before training";
+- that the late-class accuracy (0.014) is a prospective result. It is post hoc on existing runs, and the gate failed;
+- anything that changes T2-3 (FAIL), T2-3b / T2-3c (UNRESOLVED) or T2-3d (FAIL).
+
+**If the gate had passed** (it did not), step 2's registered PASS or FAIL would have been reported beside T2-3d's FAIL.
+**Not applicable.**

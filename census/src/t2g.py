@@ -251,6 +251,29 @@ def gate():
     return out
 
 
+def describe_misses():
+    """DESCRIPTIVE, after the gate result (no rule changes): who the misclassified runs are, joined with Track 2B's per-run
+    status (width2_lag parts) where available."""
+    d = pd.read_csv(OUT / "gate_runs.csv")
+    lag = pd.concat([pd.read_csv(RESULTS / "width2_lag" / f"parts_{a}.csv") for a in EXISTING], ignore_index=True)
+    m = d.merge(lag[["arm", "seed", "status", "dist_c", "relax_times_c"]], on=["arm", "seed"], how="left")
+    miss = m[(m.class_pred == "LATE") & (m.truth == "EARLY")]
+    fa = m[(m.class_pred == "EARLY") & (m.truth == "LATE")]
+    hit = m[(m.class_pred == "EARLY") & (m.truth == "EARLY")]
+    q = lambda v: [float(v.min()), float(v.median()), float(v.max())] if len(v) else None
+    out = {"label": "DESCRIPTIVE, after the gate FAIL; no rule changes",
+           "missed_early": {"n": int(len(miss)), "s_cross_min_median_max": q(miss.s_cross), "step_min_median_max": q(miss.step),
+                            "classifier_status": miss.branch_status.value_counts().to_dict(),
+                            "track2B_status": miss.status.fillna("not crossed").value_counts().to_dict(),
+                            "n_track2B_on_branch_dist_le_0.05": int((miss.dist_c <= 0.05).sum())},
+           "false_early": {"n": int(len(fa)), "s_cross": [float(v) for v in fa.s_cross], "crossed": [bool(v) for v in fa.crossed]},
+           "hit_early": {"n": int(len(hit)), "s_cross_min_median_max": q(hit.s_cross), "step_min_median_max": q(hit.step),
+                         "classifier_status": hit.branch_status.value_counts().to_dict(),
+                         "median_abs_log_err_at_s_pred_early": float(np.median(np.abs(np.log(hit.s_cross / hit.s_pred_early))))}}
+    (OUT / "gate_misses.json").write_text(json.dumps(out, indent=1, default=float))
+    print(json.dumps(out, indent=1, default=float))
+
+
 # ------------------------------------------------------------------------------------------ step 2
 FROZEN = OUT / "fresh_frozen.csv"
 
@@ -308,5 +331,5 @@ def score():
 if __name__ == "__main__":
     cmd = sys.argv[1]
     arg = sys.argv[2] if len(sys.argv) > 2 else None
-    {"classify": lambda: run_classify(arg), "own": lambda: run_own(arg), "gate": gate, "freeze": lambda: freeze(arg or "fresh"),
+    {"classify": lambda: run_classify(arg), "describe": describe_misses, "own": lambda: run_own(arg), "gate": gate, "freeze": lambda: freeze(arg or "fresh"),
      "train": lambda: train(FRESH if arg != "ext" else FRESH_EXT), "score": score}[cmd]()

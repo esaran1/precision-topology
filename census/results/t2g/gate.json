@@ -1,0 +1,56 @@
+{
+ "label": "Step 1 gate, POST HOC on existing slowed runs (T2-3b, T2-3c, T2-3d); new predictor designed from the diagnosis of earlier failures",
+ "n_runs": 239,
+ "accuracy": 0.8117154811715481,
+ "n_pred_late_scored": 174,
+ "median_abs_log_err_pred_late": 0.01392085316993011,
+ "confusion": {
+  "pred EARLY / true EARLY": 54,
+  "pred EARLY / true LATE": 3,
+  "pred LATE / true EARLY": 42,
+  "pred LATE / true LATE": 140
+ },
+ "gate": "FAIL",
+ "per_arm": {
+  "T2-3b": {
+   "n_runs": 80,
+   "accuracy": 0.825,
+   "n_pred_late_scored": 53,
+   "median_abs_log_err_pred_late": 0.012121126867055309,
+   "confusion": {
+    "pred EARLY / true EARLY": 18,
+    "pred EARLY / true LATE": 1,
+    "pred LATE / true EARLY": 13,
+    "pred LATE / true LATE": 48
+   },
+   "gate": "FAIL"
+  },
+  "T2-3c": {
+   "n_runs": 80,
+   "accuracy": 0.8625,
+   "n_pred_late_scored": 57,
+   "median_abs_log_err_pred_late": 0.011567031963668213,
+   "confusion": {
+    "pred EARLY / true EARLY": 23,
+    "pred EARLY / true LATE": 0,
+    "pred LATE / true EARLY": 11,
+    "pred LATE / true LATE": 46
+   },
+   "gate": "FAIL"
+  },
+  "T2-3d": {
+   "n_runs": 79,
+   "accuracy": 0.7468354430379747,
+   "n_pred_late_scored": 64,
+   "median_abs_log_err_pred_late": 0.01684990168874717,
+   "confusion": {
+    "pred EARLY / true EARLY": 13,
+    "pred EARLY / true LATE": 2,
+    "pred LATE / true EARLY": 18,
+    "pred LATE / true LATE": 46
+   },
+   "gate": "FAIL"
+  }
+ },
+ "excluded_mismatch": 0
+}
