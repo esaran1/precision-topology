@@ -37,6 +37,21 @@
   5.666319229669532e-07,
   5.698200323869305e-07
  ],
+ "independently_checked": {
+  "c1f_a1.12_hi": true,
+  "c1f_a1.12_lo": true
+ },
+ "not_checked": [
+  "c1f_a1.11_hi",
+  "c1f_a1.11_lo",
+  "c1f_a1.10_hi",
+  "c1f_a1.10_lo",
+  "c1f_a1.09_hi",
+  "c1f_a1.09_lo",
+  "c1f_a1.08_hi",
+  "c1f_a1.08_lo"
+ ],
+ "excluded_by_checker": [],
  "original_test_verdict_unchanged": "INCONCLUSIVE (first_order_scores.csv)",
  "supplementary_branch_root_set_for_reference": [
   0.2845957216374172,

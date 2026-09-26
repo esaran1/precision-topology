@@ -301,6 +301,10 @@ def score():
     add = pd.read_csv(RESULTS / "c1_followup_finite.csv", float_precision="round_trip")
     c = pd.read_csv(RESULTS / "first_order_c1.csv", float_precision="round_trip").iloc[0]
     ok = add[add.all_converged.astype(bool)]
+    chk_path = RESULTS / "c1_followup_checks.json"
+    chk = json.loads(chk_path.read_text()) if chk_path.exists() else {}
+    failed_a = sorted({round(v["a"], 4) for v in chk.values() if not (v["checker_pass"] and v["status_matches"])})
+    ok = ok[~ok.a.round(4).isin(failed_a)]           # registered: a checked certificate that fails removes its a
     eps = np.concatenate([orig.eps.values, ok.eps.values])
     lo = np.concatenate([orig.R_lo.values, ok.R_lo.values])
     hi = np.concatenate([orig.R_hi.values, ok.R_hi.values])
@@ -317,6 +321,9 @@ def score():
                ~add.all_converged.astype(bool)]] + [float(a) for a in A_ADD if a not in set(add.a.round(4))],
            "added_s_rel_widths": [float(x) for x in ok.s_rel_width], "added_stopped_unresolved": [bool(x) for x in ok.stopped_unresolved],
            "added_Ghat_rel_widths": [float(x) for x in ok.Ghat_rel_width],
+           "independently_checked": {k: bool(v["checker_pass"] and v["status_matches"]) for k, v in sorted(chk.items())},
+           "not_checked": [n for n, *_ in export_and_check(names_only=True) if n not in chk],
+           "excluded_by_checker": failed_a,
            "original_test_verdict_unchanged": "INCONCLUSIVE (first_order_scores.csv)",
            "supplementary_branch_root_set_for_reference": [float(ref.feasible_lo), float(ref.feasible_hi)],
            "frozen_sha256": {p: sha256(p) for p in FROZEN}, **comp}

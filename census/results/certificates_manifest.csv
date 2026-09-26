@@ -53,3 +53,9 @@ results/certificates/limit_A_hi.json,8901ab67da73aa47a70b628c9ec64e7df0402fc4756
 results/certificates/limit_A_hi.npz,f8a698a9026da4e601d4a8aa1810fda1ad36c241d24b2fca6e33011b871f862b,2126333,python -m src.cert_export limit 0.6875 limit_A_hi
 results/certificates/limit_A_lo.json,112981c8de17cefdc3cf3e0cef79fcb88e8edefeffe66ecb6dec21d4523dc15d,1097,python -m src.cert_export limit 0.6812499999999999 limit_A_lo
 results/certificates/limit_A_lo.npz,c29a80d3a8a084dc6e76da6328d8b9c69905043bc1ab9e12c9cdb5d92a76bc56,2164456,python -m src.cert_export limit 0.6812499999999999 limit_A_lo
+results/certificates/c1f_a1.12_hi.json,9b65c1cbabd31e4188d51ea08804e5e63abc7f20cc49a10ad35f31571614683e,1092,python -m src.cert_export finite 1.12 17.778150688 c1f_a1.12_hi
+results/certificates/c1f_a1.12_hi.npz,2623ac53c7512a3cd84307c2a98f627b8b70af8f947bf8f5f11f0a398e6f4c34,370782,python -m src.cert_export finite 1.12 17.778150688 c1f_a1.12_hi
+results/certificates/c1f_a1.12_lo.json,688f2cda341183f190e4571c31ba6037679fe8f1efb86b35c0e420ab0c1cbb73,1093,python -m src.cert_export finite 1.12 17.7671015 c1f_a1.12_lo
+results/certificates/c1f_a1.12_lo.npz,2325680b1114478de208515cf01b1e4b694392b5050f553782ef4115172603df,345042,python -m src.cert_export finite 1.12 17.7671015 c1f_a1.12_lo
+results/certificates/c1f_a1.11_hi.json,938836ade3c48cc794bc53b9d4c0284b2909540251ffb84d29b6da6e66f276d7,1088,python -m src.cert_export finite 1.11 20.143426 c1f_a1.11_hi
+results/certificates/c1f_a1.11_hi.npz,9f88a6bc7fe1adde47dbf8fe7e4e3ffcace6130b3aa896fd99607c56d2e167cd,476790,python -m src.cert_export finite 1.11 20.143426 c1f_a1.11_hi

@@ -1,0 +1,42 @@
+{
+ "c1f_a1.12_hi": {
+  "a": 1.12,
+  "s": 17.778150688,
+  "status_exported": "plus",
+  "status_expected": "plus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "losing_claims_exceed_U": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 2.9423351287841797,
+  "check_seconds": 1375.4589738845825
+ },
+ "c1f_a1.12_lo": {
+  "a": 1.12,
+  "s": 17.7671015,
+  "status_exported": "minus",
+  "status_expected": "minus",
+  "status_matches": true,
+  "checker_pass": true,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_-": true,
+   "coverage_+": true,
+   "losing_claims_exceed_U": true,
+   "every_leaf_claim_verified": true
+  },
+  "export_seconds": 2.1110639572143555,
+  "check_seconds": 1305.0406520366669
+ }
+}
