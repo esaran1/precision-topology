@@ -2675,6 +2675,40 @@ is the Track T writer input.
     return out
 
 
+def wp37_v3():
+    """WP-37 (separate file; the main patch the writer uses is unchanged): the registered Track T training test at the
+    attained switch (v3), from the agent's writer inputs.  Written to paper/WRITER_INPUTS_WP37_track_T.md."""
+    f = RESULTS / "simplicity_bias_v3_writer_inputs.md"
+    if not f.exists():
+        return None
+    t = f.read_text()
+    sc = json.loads((RESULTS / "simplicity_bias_v3" / "score.json").read_text())
+    body = "\n" + (t[t.index("\n## ") + 1:] if "\n## " in t else t).rstrip()
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    text = f"""# WP-37. Does training acquire the slab feature just above the attained fixed-scale switch? (Track T v3; registered)
+
+A separate file: the main patch (`WRITER_INPUTS_v4_patch.md`) and WP-36 are unchanged. Setting: the weight-decayed
+linear-plus-slab task of WP-36 (λ = 1e−4), with the attained, reproducible fixed-scale switch at s = 3.5914. The
+registered prediction is that training's slab share first reaches q = 0.3914 just above the switch. It uses no κ.
+Everything was frozen before any training. The text below is the Track T writer input.
+{body}
+
+## Census rows for this registration (not folded into the main census; the main patch is unchanged)
+
+| id | block | registration | verdict | scored |
+|---|---|---|---|---|
+| trackT-C1 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | fraction of crossing runs at s ≥ 3.5914: {sc["fraction_at_or_above_switch"]:.3f} (would be FAIL); validity failed: {sc["n_cross"]} crossings < 30 and median χ {sc["median_chi"]:.2f} > 0.06 |
+| trackT-C2 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | median crossing/switch {sc["median_ratio"]:.2f} (would be FAIL); same validity failure |
+
+Folding these two rows into the main census would change the census headline to 234 predictions: 212 scored by a
+registered rule (100 / 66 / 8 / 38) and 22 assigned post hoc. It would also change WP-14 in the main patch, so it was
+not done.
+"""
+    out = RESULTS.parent / "paper" / "WRITER_INPUTS_WP37_track_T.md"
+    out.write_text(text)
+    return out
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "render":
         print(render())
@@ -2682,3 +2716,4 @@ if __name__ == "__main__":
         main()
         print(render())
         wp36_v2()
+        wp37_v3()

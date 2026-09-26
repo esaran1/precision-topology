@@ -584,6 +584,7 @@ def main() -> None:
     track_t_checks()
     track_a_checks()
     track_t_v2_checks()
+    track_t_v3_checks()
 
     provenance_check()
 
@@ -2146,6 +2147,25 @@ def track_t_v2_checks() -> None:
     chk("TT2 gradient check failed", float(g["ok"] is False), 1.0, 0)
     chk("TT2 gradient autograd vs central", g["max_rel_autograd_vs_central"], 0.033, 0.0006)
     chk("TT2 gradient central vs one-sided", g["max_rel_central_vs_forward"], 0.055, 0.0006)
+
+
+def track_t_v3_checks() -> None:
+    """Track T v3 (final night; registered training test at the attained switch): UNRESOLVED."""
+    import hashlib as _h
+    print("Track T v3 (registered; UNRESOLVED)")
+    D = R / "simplicity_bias_v3"
+    S = json.loads((D / "score.json").read_text())
+    want = (D / "frozen_inputs.sha256").read_text().split()[0]
+    chk("TT3 frozen inputs hash", float(_h.sha256((D / "frozen_inputs.json").read_bytes()).hexdigest() == want), 1.0, 0)
+    chk("TT3 C1 UNRESOLVED", float(S["C1"] == "UNRESOLVED"), 1.0, 0)
+    chk("TT3 C2 UNRESOLVED", float(S["C2"] == "UNRESOLVED"), 1.0, 0)
+    chk("TT3 unresolved by both", float(sorted(S["unresolved_by"]) == ["chi", "crossings"]), 1.0, 0)
+    chk("TT3 runs", float(S["n_runs"]), 40.0, 0)
+    chk("TT3 crossings", float(S["n_cross"]), 22.0, 0)
+    chk("TT3 median chi", S["median_chi"], 7.43, 0.006)
+    chk("TT3 would-be C1 fraction", S["fraction_at_or_above_switch"], 0.727, 0.0006)
+    chk("TT3 would-be C2 ratio", S["median_ratio"], 2.86, 0.006)
+    chk("TT3 rho2 init >= q", float(S["n_rho2_init_ge_q"]), 31.0, 0)
 
 
 def digit_stability() -> None:
