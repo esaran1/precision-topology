@@ -162,3 +162,55 @@ All four conditions must hold:
 - 40 fresh seeds per geometry, Adam with standard settings, detection at every step.
 - The author's T1–T3 and the validity conditions.
 - The details (κ's P, χ's estimator, the baseline for T3, the seed range) are fixed in the Step 2 registration.
+
+---
+
+## Pilot result (EXPLORATORY, 2026-09-26 01:28–01:45 EDT) and gate verdict: **FAIL; nothing registered**
+
+The producers are `simplicity_bias pilot A|B` and `summarise`. The outputs are `simplicity_bias/pilot_scan.csv`
+(60 scales), `pilot_summary.json` and `pilot_parts/`. Compute: two workers, about 17 minutes.
+
+**Gate:**
+- **G1 passes as computed.** Each set has exactly one G₊ sign change.
+  - Set A: bracket [4.6926, 4.7060], switch 4.699.
+  - Set B: bracket [4.3825, 4.3950], switch 4.389.
+- **G2 fails.**
+  - Just above the switch the retained minimiser separates every point (G₊ > 0, and all points correct with the
+    profiled bias), but it is **linear-dominant**: ρ₂ = 0.32 (A) and 0.30 (B).
+  - The slab share is > ½ only intermittently from s ≈ 9 up to 33.1. The feature class changes 3 times (A) and 7
+    times (B) above the switch.
+- **G3 fails.** The two sets' switches differ by **7.1%** (the limit is 2%).
+- **G4 fails.**
+  - At B's upper bracket end, CMA-ES found a lower loss: 0.081928 against 0.082051.
+  - At A's lower bracket end, the ladder is not converged.
+
+**What the landscape does instead:**
+1. **The hidden weights diverge.**
+   - The median max|w| of the retained minimisers is 6.9·10⁴. The fixed-scale infimum is approached by hard-threshold
+     units and is not attained. The width-4 problem is effectively combinatorial in the threshold placements.
+   - The validated search does not converge. At 51 of 60 scales the retained minimum is hit by a single restart out
+     of 800, and the ladder fails at 29 of 60 scales.
+   - Sets A and B differ in retained loss by up to 8.9·10⁻⁴ at the same scale.
+2. **At small s the minimiser is the "hedged" linear function** ½[sign(x₁ − t₋) + sign(x₁ − t₊)], with thresholds at
+   the noise-band edges.
+   - It puts the whole overlap band (20% of each class) at a common level. The loss matches the closed form
+     0.8·log(1 + e⁻ˢ) + 0.2·log 2 to 1e−7 at s = 0.5 and 0.72.
+   - Its G₊ is 0⁻ (about −2·10⁻⁸): the linear minimiser already sits on the separation boundary, so any x₂ component
+     separates.
+3. **x₂ enters continuously, through oblique units** that sort the overlap points by x₂. ρ₂ rises from 0 to about
+   0.25 before the switch. There is no jump from a linear to a slab configuration.
+4. **Hard-unit hull diagnostic** (`simplicity_bias hull` → `hull_diagnostic.csv`).
+   - This is the infimum over the whole ℓ₁ hull of hard halfspace units, at any width, computed by fully corrective
+     Frank–Wolfe with Frank–Wolfe gap ≤ 7·10⁻⁶.
+   - It lies 1.4·10⁻⁸ to 8·10⁻³ below the width-4 retained losses (the hull infimum, within the Frank–Wolfe gap, bounds every width-4 loss from below).
+   - It is smooth. G₊ crosses 0 once, between s = 3.72 (−0.001) and 4.46 (+0.109).
+   - ρ₂ rises monotonically from 0.012 to 0.378 over s ∈ [0.5, 33.1] and **never reaches ½**. The separating
+     minimiser keeps the linear feature dominant and adds x₂ as a correction.
+
+**Conclusion for Track T as designed.**
+- The fixed-scale minimiser does become separating at a single scale. In the hull limit this happens at s ≈ 3.7–4.5,
+  and at width 4 at s ≈ 4.4–4.7 (unvalidated).
+- It does so by **adding** the slab coordinate continuously to a hedged linear solution, not by switching from the
+  linear to the slab feature.
+- The separation event therefore does not mark "abandoning the simple feature", and at width 4 the switch location
+  cannot be validated to 2% with this search.

@@ -469,11 +469,58 @@ def summarise():
                           "grid": r["s"] in PILOT_GRID})
     import pandas as pd
     pd.DataFrame(table).to_csv(OUT / "pilot_scan.csv", index=False)
+    allrows = [r for v in sets.values() for r in v["rows"]]
+    hedge = [{"set": r["set"], "s": r["s"], "loss": r["loss"], "hedge_closed_form": hedge_loss(r["s"]),
+              "diff": r["loss"] - hedge_loss(r["s"])} for r in allrows if r["s"] <= 1.0]
+    cross = []
+    for s_ in PILOT_GRID:
+        a = [r for r in sets["A"]["rows"] if r["s"] == s_]; b = [r for r in sets["B"]["rows"] if r["s"] == s_]
+        if a and b:
+            cross.append({"s": s_, "loss_A_minus_B": a[0]["loss"] - b[0]["loss"]})
+    diag = {"n_points": len(allrows), "n_ladder_fail": sum(not r["ladder_ok"] for r in allrows),
+            "n_audit_fail": sum(not r["audit"]["ok"] for r in allrows),
+            "hits_within_tol_median": float(np.median([r["hits_within_tol"] for r in allrows])),
+            "n_points_single_hit": sum(r["hits_within_tol"] == 1 for r in allrows),
+            "max_abs_hidden_weight_median": float(np.median([np.abs(np.array(r["p"])[:8]).max() for r in allrows])),
+            "cma": {f'{r["set"]}_{r["s"]}': r["cma"] for r in allrows if "cma" in r},
+            "small_s_hedge_check": hedge, "cross_set_loss_difference_on_grid": cross,
+            "max_abs_cross_set_loss_difference": max(abs(c["loss_A_minus_B"]) for c in cross),
+            "rho2_at_first_separating_point": {k: min((r for r in v["rows"] if r["gplus"] > 0), key=lambda r: r["s"])["rho2"]
+                                               for k, v in sets.items()},
+            "feature_class_changes_above_switch": {k: _changes([r["feature"] for r in sorted(v["rows"], key=lambda r: r["s"])
+                                                                if r["gplus"] > 0]) for k, v in sets.items()}}
     summ = {"label": "EXPLORATORY (Step 1 pilot; nothing registered)", "p": PILOT_P, "n_per_class": N1 * N2,
             "grid": list(PILOT_GRID), "gate": verdict,
-            "switch": {k: v["switch"] for k, v in sets.items()}}
+            "switch": {k: v["switch"] for k, v in sets.items()}, "diagnostics": diag}
     (OUT / "pilot_summary.json").write_text(json.dumps(summ, indent=1, default=float))
     print(json.dumps(summ, indent=1, default=float))
+
+
+def run_hull(iters=80):
+    """EXPLORATORY diagnostic (added after the pilot showed saturated units): the hard-unit hull minimum (any width)
+    at every pilot grid scale, with its G₊ and feature share, beside the width-4 retained losses."""
+    _init_worker()
+    import pandas as pd
+    X, y = make_data(PILOT_P)
+    scan = pd.read_csv(OUT / "pilot_scan.csv")
+    rows = []
+    for s in PILOT_GRID:
+        r = hard_hull_minimum(s, X, y, iters=iters)
+        w4 = scan[np.isclose(scan.s, s)].loss.min()
+        rows.append({k: r[k] for k in ("s", "loss", "fw_gap", "iters", "n_active", "gplus", "V1", "V2", "rho2")} |
+                    {"width4_best_retained_loss": float(w4), "width4_minus_hull": float(w4 - r["loss"])})
+        print(json.dumps(rows[-1]), flush=True)
+    pd.DataFrame(rows).to_csv(OUT / "hull_diagnostic.csv", index=False)
+
+
+def hedge_loss(s):
+    """Closed-form loss of the hard 'hedged' linear function ½[sign(x₁ − t₋) + sign(x₁ − t₊)] (t± at the noise-band
+    edges): class-clean points at ±1, the whole noise band (20% of each class) at 0, b = 0 by symmetry."""
+    return (1 - PILOT_P) * math.log1p(math.exp(-s)) + PILOT_P * math.log(2)
+
+
+def _changes(seq):
+    return int(sum(a != b for a, b in zip(seq[:-1], seq[1:])))
 
 
 def run_rule():
@@ -489,6 +536,83 @@ def run_rule():
     print(json.dumps(r, indent=1))
 
 
+# ------------------------------------------------------------------------------------------ diagnostic (EXPLORATORY, added after the
+# first pilot points showed saturated units, |w| ~ 1e4): the infimum over the whole ℓ₁ hull of HARD halfspace units
+def _halfspace_oracle(X, r, n_dir=1440):
+    """argmax over halfspaces h(x) = sign(x·d − τ) of |Σ r_i h(x_i)| (exact per direction on the finite set).
+    Returns (value, d, τ, sign) with the maximiser oriented so that Σ r_i h(x_i) is minimised (negative)."""
+    best = (-1.0, None, None, 1)
+    tot = r.sum()
+    for t in np.pi * np.arange(n_dir) / n_dir:
+        d = np.array([math.cos(t), math.sin(t)])
+        u = X @ d; o = np.argsort(u, kind="stable"); us = u[o]; rs = r[o]
+        above = tot - np.r_[0.0, np.cumsum(rs)]                              # Σ r over u ≥ us[i] (i = 0..n)
+        first = np.r_[True, us[1:] != us[:-1], True]
+        val = 2 * above[first] - tot                                          # Σ r_i sign(u_i − τ) for τ just below
+        k = int(np.argmax(np.abs(val)))
+        if abs(val[k]) > best[0]:
+            idx = np.flatnonzero(first)[k]
+            tau = us[idx] - 1e-9 if idx < len(us) else us[-1] + 1e-9
+            best = (abs(val[k]), d, tau, -1.0 if val[k] > 0 else 1.0)
+    return best
+
+
+def hard_hull_minimum(s, X, y, iters=200, n_dir=1440, tol=1e-10):
+    """Fully corrective Frank–Wolfe over the convex hull of hard units ±sign(x·d − τ) (unit ℓ₁ output, any width),
+    b profiled.  Returns the loss (an upper bound on the hull infimum that the duality gap brackets), the gap, the
+    active units with weights, G₊ and the feature share of the hull minimiser."""
+    cols = []                                                                  # each column: h(x_i) values
+    meta = []
+    w = np.zeros(0)
+
+    def fg(wv):
+        F = (np.array(cols).T @ wv) if cols else np.zeros(len(y))
+        Z0 = s * F; b = profile_b_batch(Z0[None], y)[0]; Z = Z0 + b
+        L = float((_softplus(Z) - y * Z).mean()); R = s * (_sig(Z) - y) / len(y)
+        return L, R, F
+    L, R, F = fg(w)
+    gap = math.inf
+    for it in range(iters):
+        val, d, tau, sg = _halfspace_oracle(X, R, n_dir)
+        h = sg * np.sign(X @ d - tau)
+        gap = float((R * F).sum() - (R * h).sum()) if cols else math.inf     # FW duality gap ⟨∇, φ − h⟩
+        if cols and gap <= tol:
+            break
+        cols.append(h); meta.append((float(d[0]), float(d[1]), float(tau), float(sg)))
+        w = np.r_[w * (1 - 1e-3), 1e-3] if len(w) else np.array([1.0])
+        w = w / w.sum()
+        eta = 1.0
+        L, R, F = fg(w)
+        for _ in range(600):                                                   # exponentiated gradient, backtracking
+            gw = np.array(cols) @ R
+            while True:
+                w2 = w * np.exp(-eta * (gw - gw.min()) / (np.abs(gw).max() + 1e-300)); w2 /= w2.sum()
+                L2, R2, F2 = fg(w2)
+                if L2 <= L or eta < 1e-12:
+                    break
+                eta *= 0.5
+            done = np.abs(w2 - w).max() < 1e-13
+            w, L, R, F = w2, L2, R2, F2
+            eta = min(eta * 2, 1e3)
+            if done:
+                break
+    keep = w > 1e-6
+    G = 0.5 * (F[y == 1].min() - F[y == 0].max())
+    # feature share of the hull minimiser (V_j as in feature_usage, on the hard function)
+    V = []
+    for j in range(2):
+        vals, cnt = np.unique(X[:, j], return_counts=True)
+        tot = 0.0
+        for t, c in zip(vals, cnt):
+            Xr = X.copy(); Xr[:, j] = t
+            Fr = np.array([sg * np.sign(Xr @ np.array([a, b]) - tau) for a, b, tau, sg in meta]).T @ w
+            tot += c * np.abs(Fr - F).sum()
+        V.append(tot / len(X) ** 2)
+    return {"s": s, "loss": L, "fw_gap": gap, "iters": it + 1, "n_active": int(keep.sum()), "gplus": float(G),
+            "V1": V[0], "V2": V[1], "rho2": V[1] / (V[0] + V[1]) if V[0] + V[1] > 0 else float("nan"),
+            "units": [dict(zip(("d1", "d2", "tau", "sign"), m), weight=float(wt)) for m, wt in zip(meta, w) if wt > 1e-6]}
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "rule":
@@ -497,3 +621,5 @@ if __name__ == "__main__":
         run_pilot(sys.argv[2])
     elif cmd == "summarise":
         summarise()
+    elif cmd == "hull":
+        run_hull()

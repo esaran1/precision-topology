@@ -225,3 +225,28 @@ def test_switch_from_sequence():
     assert r["sign_changes"] == 1 and r["bracket"] == (2.0, 3.0)
     r = sb.switch_from_sequence([4, 1, 3, 2], [1, -1, 1, -1])              # order-independent
     assert r["bracket"] == (2.0, 3.0)
+
+
+# ------------------------------------------------------------------ diagnostics added after the first pilot points
+def test_hedge_closed_form_matches_network_loss():
+    X, y = sb.make_data(0.2)
+    lo = 0.5 * (X[y == 0, 0][X[y == 0, 0] < -0.1].max() + X[:, 0][(X[:, 0] > -0.1)].min())
+    hi = 0.5 * (X[:, 0][X[:, 0] < 0.1].max() + X[y == 1, 0][X[y == 1, 0] > 0.1].min())
+    P = np.zeros(16); P[0] = 3000.0; P[8] = -3000.0 * lo; P[2] = 3000.0; P[9] = -3000.0 * hi; P[12:14] = 1.0
+    for s in (0.5, 2.0):
+        assert sb.loss_grad_batch(P[None], s, X, y)[0][0] == pytest.approx(sb.hedge_loss(s), abs=1e-9)
+    assert abs(sb.gplus(P[None], X, y)[0]) < 1e-9                       # on the separation boundary
+
+
+def test_halfspace_oracle_matches_brute_force():
+    rng = np.random.default_rng(8)
+    X = rng.uniform(-1, 1, (40, 2)); r = rng.normal(size=40)
+    val, d, tau, sg = sb._halfspace_oracle(X, r, n_dir=360)
+    h = sg * np.sign(X @ d - tau)
+    assert (r * h).sum() == pytest.approx(-val)
+    best = 0.0
+    for t in np.pi * np.arange(360) / 360:
+        u = X @ np.array([math.cos(t), math.sin(t)])
+        for tt in np.r_[u - 1e-9, u.max() + 1e-9]:
+            best = max(best, abs((r * np.sign(u - tt)).sum()))
+    assert val == pytest.approx(best)
