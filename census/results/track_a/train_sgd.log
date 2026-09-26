@@ -1,0 +1,80 @@
+{"opt": "sgd", "seed": 1650000, "status": "ok", "r_traj": 0.08524966991349858, "r_cf": 0.09142417963719146}
+{"opt": "sgd", "seed": 1650001, "status": "ok", "r_traj": 0.07973433504153737, "r_cf": 0.06535145905729627}
+{"opt": "sgd", "seed": 1650002, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650003, "status": "ok", "r_traj": 0.09303611779319554, "r_cf": 0.10564051941507147}
+{"opt": "sgd", "seed": 1650004, "status": "ok", "r_traj": 0.07785976061506061, "r_cf": 0.08720008412615174}
+{"opt": "sgd", "seed": 1650005, "status": "ok", "r_traj": 0.09583998761943269, "r_cf": 0.08877695331023522}
+{"opt": "sgd", "seed": 1650006, "status": "ok", "r_traj": 0.09042215179870694, "r_cf": 0.10059650864846986}
+{"opt": "sgd", "seed": 1650007, "status": "ok", "r_traj": 0.09869816640427942, "r_cf": 0.07951671421332308}
+{"opt": "sgd", "seed": 1650008, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650009, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650010, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650011, "status": "ok", "r_traj": 0.10028580855319036, "r_cf": 0.11123246244790566}
+{"opt": "sgd", "seed": 1650012, "status": "ok", "r_traj": 0.09500696563083366, "r_cf": 0.09417664066710522}
+{"opt": "sgd", "seed": 1650013, "status": "ok", "r_traj": 0.08565069672114412, "r_cf": 0.07496343995272796}
+{"opt": "sgd", "seed": 1650014, "status": "ok", "r_traj": 0.07976723966176036, "r_cf": 0.08475874344330436}
+{"opt": "sgd", "seed": 1650015, "status": "ok", "r_traj": 0.06630091661888482, "r_cf": 0.0666147472643266}
+{"opt": "sgd", "seed": 1650016, "status": "ok", "r_traj": 0.0885325786323381, "r_cf": 0.07627813237558106}
+{"opt": "sgd", "seed": 1650017, "status": "ok", "r_traj": 0.09306558614469229, "r_cf": 0.10690526107483839}
+{"opt": "sgd", "seed": 1650018, "status": "ok", "r_traj": 0.08302353037950105, "r_cf": 0.0752773294512579}
+{"opt": "sgd", "seed": 1650019, "status": "ok", "r_traj": 0.10166078912442189, "r_cf": 0.10640636697691759}
+{"opt": "sgd", "seed": 1650020, "status": "ok", "r_traj": 0.1002469272849007, "r_cf": 0.1259899492698532}
+{"opt": "sgd", "seed": 1650021, "status": "ok", "r_traj": 0.07796365915260206, "r_cf": 0.07096649028298466}
+{"opt": "sgd", "seed": 1650022, "status": "ok", "r_traj": 0.07984576971375512, "r_cf": 0.07759443435852789}
+{"opt": "sgd", "seed": 1650023, "status": "ok", "r_traj": 0.09494402032540838, "r_cf": 0.08672933751775473}
+{"opt": "sgd", "seed": 1650024, "status": "ok", "r_traj": 0.0760418913568186, "r_cf": 0.07895947991277888}
+{"opt": "sgd", "seed": 1650025, "status": "ok", "r_traj": 0.08928113346939681, "r_cf": 0.09605148321308647}
+{"opt": "sgd", "seed": 1650026, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650027, "status": "ok", "r_traj": 0.08188366608145126, "r_cf": 0.0780256383141665}
+{"opt": "sgd", "seed": 1650028, "status": "ok", "r_traj": 0.08434004221585223, "r_cf": 0.08769520046431079}
+{"opt": "sgd", "seed": 1650029, "status": "ok", "r_traj": 0.09896484605034939, "r_cf": 0.08536871894310831}
+{"opt": "sgd", "seed": 1650030, "status": "ok", "r_traj": 0.08355065124662864, "r_cf": 0.08079750819930262}
+{"opt": "sgd", "seed": 1650031, "status": "ok", "r_traj": 0.08571412291370151, "r_cf": 0.08573280483114319}
+{"opt": "sgd", "seed": 1650032, "status": "ok", "r_traj": 0.08139714916431684, "r_cf": 0.08584770953319472}
+{"opt": "sgd", "seed": 1650033, "status": "ok", "r_traj": 0.07273601086968173, "r_cf": 0.07180658462741614}
+{"opt": "sgd", "seed": 1650034, "status": "ok", "r_traj": 0.08454714214673342, "r_cf": 0.09559607913215268}
+{"opt": "sgd", "seed": 1650035, "status": "ok", "r_traj": 0.08392262589330679, "r_cf": 0.07137444506242413}
+{"opt": "sgd", "seed": 1650036, "status": "ok", "r_traj": 0.09324095292173307, "r_cf": 0.0969921976663023}
+{"opt": "sgd", "seed": 1650037, "status": "ok", "r_traj": 0.11719716785682821, "r_cf": 0.13755321233107198}
+{"opt": "sgd", "seed": 1650038, "status": "ok", "r_traj": 0.10560298493783415, "r_cf": 0.10358084196258342}
+{"opt": "sgd", "seed": 1650039, "status": "ok", "r_traj": 0.11322485317178543, "r_cf": 0.11504680303586008}
+{"opt": "sgd", "seed": 1650040, "status": "ok", "r_traj": 0.09185640272109863, "r_cf": 0.08791690214735634}
+{"opt": "sgd", "seed": 1650041, "status": "ok", "r_traj": 0.07435523711469316, "r_cf": 0.08246664649040748}
+{"opt": "sgd", "seed": 1650042, "status": "branch rule: occupied branch has no switch", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650043, "status": "ok", "r_traj": 0.10383817528019335, "r_cf": 0.11405597402952385}
+{"opt": "sgd", "seed": 1650044, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650045, "status": "ok", "r_traj": 0.0913516904129743, "r_cf": 0.09386543253581797}
+{"opt": "sgd", "seed": 1650046, "status": "ok", "r_traj": 0.10443831092599343, "r_cf": 0.11124170039361041}
+{"opt": "sgd", "seed": 1650047, "status": "ok", "r_traj": 0.08639916462733566, "r_cf": 0.09149901380731655}
+{"opt": "sgd", "seed": 1650048, "status": "ok", "r_traj": 0.0889579565855021, "r_cf": 0.08957706512319914}
+{"opt": "sgd", "seed": 1650049, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650050, "status": "ok", "r_traj": 0.08944761167280957, "r_cf": 0.10106367581010432}
+{"opt": "sgd", "seed": 1650051, "status": "ok", "r_traj": 0.06753350608392439, "r_cf": 0.061597392342351794}
+{"opt": "sgd", "seed": 1650052, "status": "ok", "r_traj": 0.0923724287104839, "r_cf": 0.08648915443564979}
+{"opt": "sgd", "seed": 1650053, "status": "ok", "r_traj": 0.08986024574735962, "r_cf": 0.09534463102740705}
+{"opt": "sgd", "seed": 1650054, "status": "ok", "r_traj": 0.09028843376002871, "r_cf": 0.10060170527408917}
+{"opt": "sgd", "seed": 1650055, "status": "ok", "r_traj": 0.06501149299299924, "r_cf": 0.06642935008110434}
+{"opt": "sgd", "seed": 1650056, "status": "ok", "r_traj": 0.08647986293033805, "r_cf": 0.08113655649351986}
+{"opt": "sgd", "seed": 1650057, "status": "ok", "r_traj": 0.09571565089519463, "r_cf": 0.08706153243937567}
+{"opt": "sgd", "seed": 1650058, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650059, "status": "ok", "r_traj": 0.09103184291360855, "r_cf": 0.0855078367125986}
+{"opt": "sgd", "seed": 1650060, "status": "ok", "r_traj": 0.07066914807145475, "r_cf": 0.06764406729784725}
+{"opt": "sgd", "seed": 1650061, "status": "ok", "r_traj": 0.07467215253646753, "r_cf": 0.07923372015037497}
+{"opt": "sgd", "seed": 1650062, "status": "ok", "r_traj": 0.1034320507603097, "r_cf": 0.1229342020403863}
+{"opt": "sgd", "seed": 1650063, "status": "ok", "r_traj": 0.09518297461403002, "r_cf": 0.10894329536666635}
+{"opt": "sgd", "seed": 1650064, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650065, "status": "ok", "r_traj": 0.09363020007671219, "r_cf": 0.08841267016112656}
+{"opt": "sgd", "seed": 1650066, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650067, "status": "ok", "r_traj": 0.09272121125396571, "r_cf": 0.09942727040697363}
+{"opt": "sgd", "seed": 1650068, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650069, "status": "ok", "r_traj": 0.0994643121456511, "r_cf": 0.09922832251070209}
+{"opt": "sgd", "seed": 1650070, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650071, "status": "ok", "r_traj": 0.10748695605308978, "r_cf": 0.13316170156395496}
+{"opt": "sgd", "seed": 1650072, "status": "ok", "r_traj": 0.0989763047696024, "r_cf": 0.1019324645840855}
+{"opt": "sgd", "seed": 1650073, "status": "ok", "r_traj": 0.08754299356328898, "r_cf": 0.08130894199339819}
+{"opt": "sgd", "seed": 1650074, "status": "ok", "r_traj": 0.08483389671740316, "r_cf": 0.10033123500797131}
+{"opt": "sgd", "seed": 1650075, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650076, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650077, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
+{"opt": "sgd", "seed": 1650078, "status": "ok", "r_traj": 0.0920494440812436, "r_cf": 0.09846384222850008}
+{"opt": "sgd", "seed": 1650079, "status": "never reaches the rule point", "r_traj": null, "r_cf": null}
