@@ -1,0 +1,55 @@
+{
+ "verdict": "PASS",
+ "feasible_lo": 0.2653108379516405,
+ "feasible_hi": 0.3068692996638286,
+ "feasible_width": 0.04155846171218808,
+ "pred_lo": 0.28522998612017775,
+ "pred_hi": 0.2852302997512185,
+ "n_original": 4,
+ "n_added_registered": 5,
+ "n_added_certified": 5,
+ "added_a": [
+  1.08,
+  1.09,
+  1.1,
+  1.11,
+  1.12
+ ],
+ "dropped_a": [],
+ "added_s_rel_widths": [
+  0.0024999985865910524,
+  0.000620731401460605,
+  0.0006230536613482372,
+  0.0012391582352876292,
+  0.000621890295386741
+ ],
+ "added_stopped_unresolved": [
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "added_Ghat_rel_widths": [
+  5.56983662235918e-07,
+  5.602159094172574e-07,
+  5.634305975589132e-07,
+  5.666319229669532e-07,
+  5.698200323869305e-07
+ ],
+ "original_test_verdict_unchanged": "INCONCLUSIVE (first_order_scores.csv)",
+ "supplementary_branch_root_set_for_reference": [
+  0.2845957216374172,
+  0.2858950355987757
+ ],
+ "frozen_sha256": {
+  "results/first_order_finite.csv": "ff68d364027fbdd1aee5a6f67edf7c76d1a18ac602e6edaf4cf2b10ef5b9c5bb",
+  "results/first_order_c1.csv": "e7fb2f5a1373b6182848c8e1b36ad68dbd72dcaa2a83447a7da45c6b154c2397",
+  "results/c1_followup_model.json": "f8bb88aa1e5101cf5111b6870457a540069e1f3c919d1a774a64d578d6ee0926",
+  "results/c1_followup_timing_a1.0550.json": "5bf17f20d0cbeff242f2cebc1feb2a02e573e8496b19785555ab531930849f60"
+ },
+ "competing_0.49_earlier": "above",
+ "competing_-0.377_K_only": "below",
+ "competing_0.662_switch_only": "above",
+ "competing_0_no_first_order": "below"
+}
