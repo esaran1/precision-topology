@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp34() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp34() + wp35() + wp36() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2370,6 +2370,9 @@ These were out of scope for the final round. The paper may list them as open; it
   supports the outer-exclusion certificates (WP-17).
 - **Further activation families** beyond GELU, SiLU and Mish (WP-25).
 - **Any other width-2 variant** (WP-15, WP-20, WP-27).
+- **Transfer to simplicity bias** (Track T, WP-36). The pilot's gate failed: the width-4 fixed-scale minimiser is not
+  attained, and it adds the slab gradually rather than switching. A redesign with bounded hidden weights or gap-free
+  data, and an onset-of-slab-use event, is open for the rebuttal and is not started.
 - **Designs that failed their own rules before registration** (tonight; recorded, not run):
   - the width-2 early-basin prospective test (2C, WP-27);
   - the GELU early-scale prospective test (WP-25);
@@ -2554,6 +2557,80 @@ note §10.1 (confirmed by the author, 2026-09-26).
 {body}
 
 IDs: {_id("D1 attainment", "D1 remainder", "D1 quadratic growth", "D1 alias")}.
+"""
+
+
+def wp35():
+    """WP-35: registered lag-law test at an unseen activation value (Track A, final round), from the agent's writer inputs."""
+    f = RESULTS / "track_a_writer_inputs.md"
+    if not f.exists():
+        return ""
+    t = f.read_text()
+    body = "\n" + (t[t.index("\n## ") + 1:] if "\n## " in t else t).rstrip()
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    return f"""
+## WP-35. A registered test of the lag law at an unseen activation value (Track A, final round; for the submission)
+
+Producer: `src/track_a.py` → `track_a/`; registration `results/track_a_registration.md`, with everything (κ, the winding
+rule, the preconditioner rule, the branch rule, own thresholds, the prediction pipeline) frozen and hashed before any
+run. The text below is the Track A writer input.
+{body}
+"""
+
+
+def wp36():
+    """WP-36: Track T (simplicity-bias transfer), final round: pilot and gate verdict (EXPLORATORY; nothing registered)."""
+    f = RESULTS / "simplicity_bias" / "pilot_summary.json"
+    if not f.exists():
+        return ""
+    P = json.loads(f.read_text()); g = P["gate"]; dg = P["diagnostics"]
+    h = pd.read_csv(RESULTS / "simplicity_bias" / "hull_diagnostic.csv") if (RESULTS / "simplicity_bias" / "hull_diagnostic.csv").exists() else None
+    return f"""
+## WP-36. Transfer to simplicity bias (Track T, final round): pilot result and gate verdict (EXPLORATORY; nothing registered)
+
+Producer: `src/simplicity_bias.py` → `simplicity_bias/`; design and gate `results/simplicity_bias_design.md`, committed
+before any landscape computation (efde241); pilot and verdict d9dfb96.
+
+**Setting.**
+- The linear-plus-slab benchmark of Shah et al. (NeurIPS 2020; verified on the proceedings page), in 2D.
+  - x₁ is noisy-linear with p = {P["p"]}: the best threshold misclassifies 10% of each class.
+  - x₂ is a 3-slab coordinate that separates every point.
+  - {P["n_per_class"]} points per class.
+- The small-scale minimiser is predicted to use the linear feature: the class-mean gap per unit scale is 1.6 for the
+  linear feature and 1.0 for the slab, computed from the objective.
+- The network is two-layer tanh, width 4, with s = ‖w₂‖₁ and the output bias profiled.
+- The feature event is "every training point correct with positive margin". The feature-usage measure is a
+  deterministic randomisation test, ρ₂ = V₂/(V₁ + V₂).
+
+**Gate (committed before the pilot): FAIL.**
+- **One switch:** passes as computed. Set A switches at s = {P["switch"]["A"]:.3f}, set B at {P["switch"]["B"]:.3f}.
+- **Linear below and slab above the switch, by feature usage:** fails. Just above the switch the minimiser is still
+  linear-dominant (ρ₂ ≈ 0.3), and further up the feature class flips several times.
+- **Two restart sets within 2%:** fails; they are {100 * g["agreement_rel"]:.1f}% apart.
+- **Validation at the bracket ends:** fails. An independent CMA-ES found a lower loss at one end, and the restart
+  ladder failed at {dg["n_ladder_fail"]} of {dg["n_points"]} scales.
+- So Step 2 (the registered training test) was not registered and no training was run.
+
+**What the landscape does instead (EXPLORATORY).**
+- The hidden weights diverge (median largest weight {dg["max_abs_hidden_weight_median"]:.1e}), so the fixed-scale
+  minimum is not attained and restarts cannot validate it.
+- At small scale the minimiser is a "hedged" linear function: it matches the closed form 0.8·log(1 + e⁻ˢ) + 0.2·log 2
+  to 1e−7.
+- The slab coordinate enters gradually. A convex diagnostic over any number of hard units (exploratory, added after the
+  pilot) shows the slab share rising smoothly and never reaching ½. The minimiser becomes separating at a single scale,
+  s ≈ 3.7–4.7, by adding the slab to a hedged linear solution, not by switching from linear to slab.
+
+**Say (if anything):** "In a pilot on a linear-plus-slab task (exploratory), the fixed-scale minimizer becomes
+separating at a single output scale, but it does so by adding the slab feature gradually to a linear solution, not by
+switching features, and the width-4 minimizer could not be validated (its weights diverge). We did not run a
+registered training test there."
+
+**Do not say:**
+- that the account transfers to simplicity bias;
+- that a registered test was run or is ongoing;
+- that the fixed-scale minimizer switches from the linear to the slab feature. The pilot did not show that.
+- Any redesign (bounded hidden weights, or data without gaps; an onset-of-slab-use event) would be new work for the
+  rebuttal and is not started.
 """
 
 

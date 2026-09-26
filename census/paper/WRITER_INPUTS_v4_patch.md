@@ -470,7 +470,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 724 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 728 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -3549,6 +3549,52 @@ note §10.1 (confirmed by the author, 2026-09-26).
 
 IDs: `D1 attainment`; `D1 remainder`; `D1 quadratic growth`; `D1 alias`.
 
+## WP-36. Transfer to simplicity bias (Track T, final round): pilot result and gate verdict (EXPLORATORY; nothing registered)
+
+Producer: `src/simplicity_bias.py` → `simplicity_bias/`; design and gate `results/simplicity_bias_design.md`, committed
+before any landscape computation (efde241); pilot and verdict d9dfb96.
+
+**Setting.**
+- The linear-plus-slab benchmark of Shah et al. (NeurIPS 2020; verified on the proceedings page), in 2D.
+  - x₁ is noisy-linear with p = 0.2: the best threshold misclassifies 10% of each class.
+  - x₂ is a 3-slab coordinate that separates every point.
+  - 400 points per class.
+- The small-scale minimiser is predicted to use the linear feature: the class-mean gap per unit scale is 1.6 for the
+  linear feature and 1.0 for the slab, computed from the objective.
+- The network is two-layer tanh, width 4, with s = ‖w₂‖₁ and the output bias profiled.
+- The feature event is "every training point correct with positive margin". The feature-usage measure is a
+  deterministic randomisation test, ρ₂ = V₂/(V₁ + V₂).
+
+**Gate (committed before the pilot): FAIL.**
+- **One switch:** passes as computed. Set A switches at s = 4.699, set B at 4.389.
+- **Linear below and slab above the switch, by feature usage:** fails. Just above the switch the minimiser is still
+  linear-dominant (ρ₂ ≈ 0.3), and further up the feature class flips several times.
+- **Two restart sets within 2%:** fails; they are 7.1% apart.
+- **Validation at the bracket ends:** fails. An independent CMA-ES found a lower loss at one end, and the restart
+  ladder failed at 29 of 60 scales.
+- So Step 2 (the registered training test) was not registered and no training was run.
+
+**What the landscape does instead (EXPLORATORY).**
+- The hidden weights diverge (median largest weight 6.9e+04), so the fixed-scale
+  minimum is not attained and restarts cannot validate it.
+- At small scale the minimiser is a "hedged" linear function: it matches the closed form 0.8·log(1 + e⁻ˢ) + 0.2·log 2
+  to 1e−7.
+- The slab coordinate enters gradually. A convex diagnostic over any number of hard units (exploratory, added after the
+  pilot) shows the slab share rising smoothly and never reaching ½. The minimiser becomes separating at a single scale,
+  s ≈ 3.7–4.7, by adding the slab to a hedged linear solution, not by switching from linear to slab.
+
+**Say (if anything):** "In a pilot on a linear-plus-slab task (exploratory), the fixed-scale minimizer becomes
+separating at a single output scale, but it does so by adding the slab feature gradually to a linear solution, not by
+switching features, and the width-4 minimizer could not be validated (its weights diverge). We did not run a
+registered training test there."
+
+**Do not say:**
+- that the account transfers to simplicity bias;
+- that a registered test was run or is ongoing;
+- that the fixed-scale minimizer switches from the linear to the slab feature. The pilot did not show that.
+- Any redesign (bounded hidden weights, or data without gaps; an onset-of-slab-use event) would be new work for the
+  rebuttal and is not started.
+
 ## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
 
 These were out of scope for the final round. The paper may list them as open; it must not state results for them.
@@ -3556,6 +3602,9 @@ These were out of scope for the final round. The paper may list them as open; it
   supports the outer-exclusion certificates (WP-17).
 - **Further activation families** beyond GELU, SiLU and Mish (WP-25).
 - **Any other width-2 variant** (WP-15, WP-20, WP-27).
+- **Transfer to simplicity bias** (Track T, WP-36). The pilot's gate failed: the width-4 fixed-scale minimiser is not
+  attained, and it adds the slab gradually rather than switching. A redesign with bounded hidden weights or gap-free
+  data, and an onset-of-slab-use event, is open for the rebuttal and is not started.
 - **Designs that failed their own rules before registration** (tonight; recorded, not run):
   - the width-2 early-basin prospective test (2C, WP-27);
   - the GELU early-scale prospective test (WP-25);

@@ -581,6 +581,7 @@ def main() -> None:
     linear_response_checks()
     track_b_checks()
     theorem1_checks()
+    track_t_checks()
 
     provenance_check()
 
@@ -2084,6 +2085,20 @@ def theorem1_checks() -> None:
     rr = d["H-R_uniform_remainder"]
     chk("D1 remainder", float(max(r["max_ratio_all"] for r in rr)), 0.0052084, 6e-7)
     chk("D1 alias excluded above s", d["H-C_compactness"]["s_where_W_reaches_alias_1.30"], 7.24e-6, 6e-8)
+
+
+def track_t_checks() -> None:
+    """Track T (final round): pilot and gate (exploratory)."""
+    print("Track T (pilot, exploratory)")
+    P = json.loads((R / "simplicity_bias" / "pilot_summary.json").read_text())
+    chk("TT gate FAIL", float(P["gate"]["pass"] is False), 1.0, 0)
+    chk("TT G1", float(P["gate"]["G1"]), 1.0, 0); chk("TT G2", float(P["gate"]["G2"]), 0.0, 0)
+    chk("TT G3", float(P["gate"]["G3"]), 0.0, 0); chk("TT G4", float(P["gate"]["G4"]), 0.0, 0)
+    chk("TT switch A", P["switch"]["A"], 4.699, 0.0006); chk("TT switch B", P["switch"]["B"], 4.389, 0.0006)
+    chk("TT agreement", 100 * P["gate"]["agreement_rel"], 7.1, 0.06)
+    chk("TT ladder fail", float(P["diagnostics"]["n_ladder_fail"]), 29.0, 0)
+    chk("TT points", float(P["diagnostics"]["n_points"]), 60.0, 0)
+    chk("TT hidden weight median", P["diagnostics"]["max_abs_hidden_weight_median"], 6.9e4, 600)
 
 
 def digit_stability() -> None:
