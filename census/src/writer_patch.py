@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2420,6 +2420,26 @@ input.
 {body}
 
 IDs: {_id("LR predictions hash", "LR full model ratio")}.
+"""
+
+
+def wp32():
+    """WP-32: verified positioning (Track C, final round), from the agent's writer inputs."""
+    f = RESULTS / "track_c_writer_inputs.md"
+    if not f.exists():
+        return ""
+    t = f.read_text()
+    body = "\n" + t[t.index("## 1. Verification table"):].rstrip()
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    return f"""
+## WP-32. Positioning against the implicit-bias, simplicity-bias and slow-manifold literature (Track C, final round; for the submission)
+
+Source: `results/track_c_writer_inputs.md`. Ten citations were verified on their official pages (Fenichel on the DOI
+record) and all are included. None is in `references.bib` yet; add the BibTeX below. The tracking concept itself is not
+new, and the text says so. For the novelty claims, keep the labels from WP-24 and WP-31: the within-30% κ result was
+derived after a fitted relationship was known; the exact linear response (1.00–1.05) is post hoc; the learning-rate
+invariance (R4) is registered; the validity boundary χ ≲ 0.06 comes from the data and is not registered.
+{body}
 """
 
 
