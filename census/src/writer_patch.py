@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp34() + wp35() + wp36() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp32() + wp33() + wp34() + wp35() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2370,9 +2370,11 @@ These were out of scope for the final round. The paper may list them as open; it
   supports the outer-exclusion certificates (WP-17).
 - **Further activation families** beyond GELU, SiLU and Mish (WP-25).
 - **Any other width-2 variant** (WP-15, WP-20, WP-27).
-- **Transfer to simplicity bias** (Track T, WP-36). The pilot's gate failed: the width-4 fixed-scale minimiser is not
-  attained, and it adds the slab gradually rather than switching. A redesign with bounded hidden weights or gap-free
-  data, and an onset-of-slab-use event, is open for the rebuttal and is not started.
+- **Transfer to simplicity bias (scope; the only sentence the paper may use, exploratory, never as a result):** "In an
+  exploratory pilot on a linear-plus-slab task, the fixed-scale minimizer became separating at a single output scale by
+  adding the slab feature gradually rather than by switching features; no training test was registered, and a
+  redesign is left for future work." (Source: `results/simplicity_bias_design.md`; pilot gate FAIL; nothing
+  registered.)
 - **Designs that failed their own rules before registration** (tonight; recorded, not run):
   - the width-2 early-basin prospective test (2C, WP-27);
   - the GELU early-scale prospective test (WP-25);
