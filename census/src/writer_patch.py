@@ -1160,11 +1160,14 @@ Tonight's program (2026-09-25) added four central failures, all training-side:
 - the two 200-seed training tests for GELU, SiLU and Mish;
 - the R^d band task's width-1 lag range (120 seeds).
 
-The final round added one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains
-the derived c₁. The original c₁ test stays INCONCLUSIVE.
+The final round added:
+- one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains the derived c₁. The
+  original c₁ test stays INCONCLUSIVE.
+- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers; L3 FAIL
+  for Adam and PASS for SGD, merged as PARTIAL.
 
-It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
+It also added eight PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
+and optimiser), the band task's primary P1, P2a and P2b (across d), and Track A's L3 (across optimisers). Designs that failed their own rules before
 registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
 census.
 

@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 206 scored by their registered rules: 97 PASS, 65 FAIL, 8 PARTIAL,
+- **Headline**: 208 scored by their registered rules: 99 PASS, 65 FAIL, 8 PARTIAL,
   36 UNRESOLVED.
-- **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
-- **Total**: 228 registered predictions.
+- **Post hoc**: 23 assigned post hoc: 3 / 6 / 14 / 0.
+- **Total**: 231 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -217,6 +217,8 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | early census 08-23 (width) | registered rule | 3 | 1 | 0 | 0 | 4 |
 | interleaved 08-05 | registered rule | 0 | 0 | 0 | 2 | 2 |
 | kappa | registered rule | 3 | 1 | 0 | 0 | 4 |
+| lag law at an unseen a (Track A) | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| lag law at an unseen a (Track A) | registered rule | 2 | 0 | 0 | 0 | 2 |
 | lag test | registered rule | 1 | 1 | 0 | 0 | 2 |
 | lag test 2 (deconfounded) | registered rule | 0 | 2 | 0 | 0 | 2 |
 | localization 08-22 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
@@ -325,6 +327,8 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
+| results/track_a_registration.md | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
+| results/track_a_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/ts_test_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
@@ -940,9 +944,9 @@ peripheral.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
-| post hoc (census) | central | 1 | 2 | 13 | 0 |
+| post hoc (census) | central | 1 | 2 | 14 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 50 | 30 | 1 | 11 |
+| registered rule | central | 52 | 30 | 1 | 11 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1007,11 +1011,14 @@ Tonight's program (2026-09-25) added four central failures, all training-side:
 - the two 200-seed training tests for GELU, SiLU and Mish;
 - the R^d band task's width-1 lag range (120 seeds).
 
-The final round added one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains
-the derived c₁. The original c₁ test stays INCONCLUSIVE.
+The final round added:
+- one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains the derived c₁. The
+  original c₁ test stays INCONCLUSIVE.
+- the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers; L3 FAIL
+  for Adam and PASS for SGD, merged as PARTIAL.
 
-It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
+It also added eight PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
+and optimiser), the band task's primary P1, P2a and P2b (across d), and Track A's L3 (across optimisers). Designs that failed their own rules before
 registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
 census.
 
@@ -3548,6 +3555,99 @@ note §10.1 (confirmed by the author, 2026-09-26).
   certificate. Attainment itself is proved, and Γ_n ≥ Ĝ_cert holds by containment.
 
 IDs: `D1 attainment`; `D1 remainder`; `D1 quadratic growth`; `D1 alias`.
+
+## WP-35. A registered test of the lag law at an unseen activation value (Track A, final round; for the submission)
+
+Producer: `src/track_a.py` → `track_a/`; registration `results/track_a_registration.md`, with everything (κ, the winding
+rule, the preconditioner rule, the branch rule, own thresholds, the prediction pipeline) frozen and hashed before any
+run. The text below is the Track A writer input.
+
+### 1. Frozen before any run or comparison
+
+| commit | content |
+|---|---|
+| `fcd2e46` | Registration: md, code, tests, landscape and per-seed frozen inputs. SHA-256 in `results/track_a/registration.sha256`. No registered run had been trained. Gate: 516 + 27 tests passed. |
+| `406b32c` | All 160 registered runs trained to budget with no gap or placement evaluated. Predictions (trajectory-integrated and closed form) committed; `predictions.csv` SHA-256 `b30167c61116972298dc434494918dced800b83a56164374ef338167070e3d82`. Each run's saved parameter path is hashed in that file. |
+| this commit | `observe`: asserts the committed hashes, then runs every-step detection on the saved paths; scores. |
+
+- **a = 1.65**, the author's decision: no existing crossing data.
+  - 1.35 and 1.40 have width-1 crossing data.
+  - 1.55 and 1.70 appear in the onset placement-rate files.
+  - 1.65 appears only in a landscape table and in a depth-3 annealing search.
+- **Seeds.** 80 fresh seeds (1,650,000–1,650,079) per optimiser.
+- **Landscape.** No certified bracket exists at 1.65, so the landscape was validated by continuation plus the existing
+  conditional search. The global minimiser is unplaced at 0.995·s\*_pop and placed at 1.005·s\*_pop, on the same branch.
+  s\*_pop = 1.81002.
+- **Winding rule.** Canonical b₁ ∈ (−π, π]. The rule was defined from existing crossings at other a (all 1,750 at
+  1.30–1.60 obey it).
+- **Per-run rules.** Rule point, branch rule, preconditioner rule, trajectory-integrated model with P frozen at the rule
+  point, and closed form. They use only information up to the rule point plus the run's s_t trajectory.
+- **Deviation from the literal spec (stated in the registration before any run).** The rule point is the last upward
+  passage of 0.5·s\*_frozen before s\*_frozen, not the first. At 1.65, 0.5·s\* ≈ 0.9 lies inside the initial |w₂| range.
+
+### 2. Verdicts (per optimiser; relative only)
+
+| | crossings (valid ≥ 60) | runs with prediction | **L1** median r_obs/r_traj ∈ [0.90, 1.10] | **L2** median r_obs/r_cf ∈ [0.80, 1.20] | **L3** Spearman(r_traj, r_obs) ≥ 0.5 |
+|---|---|---|---|---|---|
+| Adam | 76 / 80 (valid) | 74 | **1.065 PASS** | **1.045 PASS** | **0.25 FAIL** |
+| SGD | 64 / 80 (valid) | 63 | **1.056 PASS** | **1.024 PASS** | **0.995 PASS** |
+
+- No run had its rule point at or after its crossing.
+- Runs without a prediction were not replaced:
+  - Adam: 4 never reach s\*_frozen, and the branch rule failed in 2.
+  - SGD: 16 never reach s\*_frozen (the known small-|w₂| plateau), and the branch rule failed in 1.
+- Crossing runs without a prediction: 2 Adam, 1 SGD.
+- Secondary (registered as reported, not scored): the Spearman of the closed form r_cf with r_obs is 0.55 (Adam) and
+  0.81 (SGD).
+
+**Descriptive** (`scores.json`, `scores_descriptive.json`):
+- Median lags: r_obs 0.094 for both optimisers; r_traj 0.080 (Adam), 0.090 (SGD); r_cf 0.089 (Adam), 0.088 (SGD).
+- The winding rule agreed with the occupied branch in every run with a prediction (74 of 74 Adam, 63 of 63 SGD).
+- About half the runs occupy the mirror branch.
+- s\*_run differs from s\*_frozen by more than 1% in 40% (Adam) and 38% (SGD) of runs, mostly mirror-branch runs. The
+  lag is measured against s\*_run, as registered.
+- Per-run observed/predicted (trajectory-integrated), 10th–90th percentile:
+  - SGD: 1.04–1.06. Every run is within 10%, and the median |r_obs − r_traj| is 0.005.
+  - Adam: 0.74–1.75. Only 22% of runs are within 10%, and the median |r_obs − r_traj| is 0.023.
+- The observed r_obs spread for Adam is narrow (0.079–0.106), narrower than the prediction spread (0.054–0.129). The
+  per-run Adam predictions are therefore noisier than the lags they rank.
+- **Interpretation (POST HOC, not tested here).** The registered Adam model freezes P at the rule point, about 0.5·s\*.
+  In Track 1 (post hoc, existing runs), the same recursion with the run's actual time-varying P_t matched per run.
+  Adam's v̂ memory is 1,000 steps, so P at the rule point need not equal P near the crossing. This is the likely source
+  of the Adam per-run scatter. It is not demonstrated in this track.
+
+### 3. Writer section
+
+**Outcome for SGD: all three pass.**
+- Say: "In a registered test at an activation value with no prior crossing data (a = 1.65, 80 fresh seeds), everything
+  was frozen before training: the winding index, the branch rule and the preconditioner rule. For plain SGD the lag law
+  predicts the crossing lag with median observed/predicted 1.06 (trajectory-integrated) and 1.02 (closed form κχ). The
+  per-run rank correlation is 0.99."
+- Do not say: that the rules were chosen without any data. The winding rule was defined from existing crossings at other
+  a, and the rule point was adapted to the initial transient before any run; say both. Do not say that the test covers
+  other widths or activations.
+
+**Outcome for Adam: L1 and L2 pass, L3 fails.**
+- Say: "For Adam, with the preconditioner frozen at the half-switch point, the median observed/predicted lag is 1.07
+  (trajectory-integrated) and 1.05 (closed form). Both are inside the registered bands. The per-run ranking fails
+  (Spearman 0.25 < 0.5): with only pre-crossing information, the law predicts Adam's typical lag but not which runs lag
+  more."
+- Do not say: "the lag law predicts each Adam run's lag". Do not say that the L3 failure is explained by the
+  preconditioner drift. That is a post hoc hypothesis, supported only indirectly by Track 1, and untested here. Do not
+  report the closed-form Spearman (0.55) as passing L3: L3 was registered on the trajectory-integrated prediction.
+
+**Overall.**
+- Say: "5 of 6 registered criteria pass; the one failure is Adam's per-run rank correlation."
+- Do not say: "the lag law passed its registered test" without the Adam L3 qualification.
+
+### 4. Files
+
+- `results/track_a_registration.md`
+- `results/track_a/`:
+  - `registration.sha256`, `landscape.json`, `frozen_seeds.csv`, `freeze.log`
+  - `predictions.csv`, `predictions.sha256`, `train_*.log`
+  - `observed_runs.csv`, `scores.json`, `scores_descriptive.json`
+- Parameter paths `paths/*.npz` (160 MB) are untracked. Their SHA-256 hashes are in `predictions.csv`.
 
 ## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
 

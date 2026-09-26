@@ -15,7 +15,7 @@ import pandas as pd
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 ENUM = RESULTS / "registration_census_enumeration.csv"
-PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup")
+PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-")
 ROUND = "2026-09-25"
 
 
@@ -109,6 +109,25 @@ def c1_rows():
                  "results/c1_followup_summary.json", "c1-primary stays UNRESOLVED (INCONCLUSIVE) as registered.")]
 
 
+def track_a_rows():
+    f = RESULTS / "track_a" / "scores.json"
+    if not f.exists():
+        return []
+    S = json.loads(f.read_text())
+    rule = {"L1": "median observed/predicted lag (trajectory-integrated) in [0.90, 1.10]",
+            "L2": "median observed/predicted lag (closed form) in [0.80, 1.20]",
+            "L3": "per-run Spearman(predicted, observed lag) >= 0.5"}
+    rows = []
+    for opt in ("adam", "sgd"):
+        for L in ("L1", "L2", "L3"):
+            x = S[opt][L]; v = x["verdict"]
+            val = f"median ratio {x['median_ratio']:.3f}" if L != "L3" else f"Spearman {x['spearman']:.3f}"
+            rows.append(_row(f"trackA-{L}@{opt}", "lag law at an unseen a (Track A)", "results/track_a_registration.md", "fcd2e46", v,
+                             f"{L}: {rule[L]}, per optimiser, a = 1.65, 80 fresh seeds; everything frozen and hashed before any run. "
+                             f"Scored {opt}: {S[opt]['n_crossed']} crossed, {val}: {v}.", "results/track_a/scores.json"))
+    return rows
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -121,7 +140,7 @@ def extra_rows():
 def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
-    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + extra_rows())
+    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + extra_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

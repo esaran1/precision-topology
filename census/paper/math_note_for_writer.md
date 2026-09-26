@@ -1269,3 +1269,18 @@ Results:
   - Time-varying coefficients move the slope by at most 0.01. Momentum does not change the lag.
 - The remaining +2–5% is the linearisation of the gradient in δ. With the exact gradient, the observed crossing step
   is reproduced in every run checked (the first 12 seeds of each arm).
+
+### 13.9 A registered test at an unseen activation value (final round; Track A, WP-35)
+
+Setup:
+- At a = 1.65, which had no prior crossing data, everything was frozen and hashed before any run (fcd2e46): the
+  validated switch (s\*_pop = 1.81002), κ, the winding rule (canonical b₁ in (−π, π], defined from crossings at other
+  a), the branch and preconditioner rules (taken at the last upward passage of 0.5·s\*), and the own-sample thresholds.
+- 80 fresh seeds per optimiser.
+
+Results:
+- **SGD:** L1 (trajectory-integrated median ratio 1.056), L2 (closed form 1.024) and L3 (per-run Spearman 0.995) all
+  PASS.
+- **Adam:** L1 (1.065) and L2 (1.045) PASS. L3 (Spearman 0.25 < 0.5) FAILS: with P frozen at the rule point, the law
+  predicts Adam's typical lag but not which runs lag more.
+- 5 of 6 registered criteria pass. That P drifts after the rule point is a post hoc hypothesis and is untested here.
