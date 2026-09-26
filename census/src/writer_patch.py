@@ -2434,8 +2434,8 @@ def wp32():
     return f"""
 ## WP-32. Positioning against the implicit-bias, simplicity-bias and slow-manifold literature (Track C, final round; for the submission)
 
-Source: `results/track_c_writer_inputs.md`. Ten citations were verified on their official pages (Fenichel on the DOI
-record) and all are included. None is in `references.bib` yet; add the BibTeX below. The tracking concept itself is not
+Source: `results/track_c_writer_inputs.md`. Ten citations were verified on their official pages and all are included.
+Fenichel was verified on the DOI record, which the author accepted (2026-09-26). None is in `references.bib` yet; add the BibTeX below. The tracking concept itself is not
 new, and the text says so. For the novelty claims, keep the labels from WP-24 and WP-31: the within-30% κ result was
 derived after a fitted relationship was known; the exact linear response (1.00–1.05) is post hoc; the learning-rate
 invariance (R4) is registered; the validity boundary χ ≲ 0.06 comes from the data and is not registered.
@@ -2539,8 +2539,8 @@ def wp34():
 ## WP-34. Theorem 1's hypotheses: which are proved and which are checked (Track D.1, final round; for the submission)
 
 Producer: `src/theorem1_checks.py` → `theorem1_checks.json`; tests `tests/test_theorem1_checks.py`. The "checked"
-items are float64 Lipschitz-grid arguments, not interval arithmetic. The repo has no paper .tex source. "Theorem 1" was
-taken to be the small-scale criterion of math note §10.1; the author should confirm this.
+items are float64 Lipschitz-grid arguments, not interval arithmetic. "Theorem 1" is the small-scale criterion of math
+note §10.1 (confirmed by the author, 2026-09-26).
 
 **Finding outside the four hypotheses (important for the writer).**
 - On the 800-point grid population, the class-mean gap D(α) is periodic: every point is a multiple of q = 0.4/79,401.
