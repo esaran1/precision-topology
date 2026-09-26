@@ -1971,6 +1971,19 @@ def track2_checks() -> None:
     chk("T2 reconcile gap max", rc["pop_gap_max"], 2.8e-4, 6e-6)
     chk("T2 reconcile gap median", rc["pop_gap_median"], 3.5e-5, 6e-7)
     chk("T2 reconcile not comparable", float(rc["n_not_comparable"]), 75.0, 0)
+    gg = json.loads((R / "t2g" / "gate.json").read_text())
+    chk("T2 final gate FAIL", float(gg["gate"] == "FAIL"), 1.0, 0)
+    chk("T2 final gate accuracy", gg["accuracy"], 0.812, 0.0006)
+    chk("T2 final gate runs", float(gg["n_runs"]), 239.0, 0)
+    chk("T2 final gate late median |log err|", gg["median_abs_log_err_pred_late"], 0.014, 0.0006)
+    chk("T2 final gate late n", float(gg["n_pred_late_scored"]), 174.0, 0)
+    cf = gg["confusion"]
+    chk("T2 final gate confusion", float(cf["pred EARLY / true EARLY"] * 1e9 + cf["pred EARLY / true LATE"] * 1e6
+                                         + cf["pred LATE / true EARLY"] * 1e3 + cf["pred LATE / true LATE"]), 54e9 + 3e6 + 42e3 + 140, 0)
+    for arm, (k, n) in {"T2-3b": (66, 80), "T2-3c": (69, 80), "T2-3d": (59, 79)}.items():
+        pa_ = gg["per_arm"][arm]; c_ = pa_["confusion"]
+        chk(f"T2 final gate correct {arm}", float(c_["pred EARLY / true EARLY"] + c_["pred LATE / true LATE"]), float(k), 0)
+        chk(f"T2 final gate runs {arm}", float(pa_["n_runs"]), float(n), 0)
     c = json.loads((R / "t2c" / "calibration.json").read_text())
     chk("T2 2C STOP", float(c["decision"] == "STOP"), 1.0, 0)
     chk("T2 2C earliest crossing", c["earliest_crossing"], 0.0164, 0.00006)

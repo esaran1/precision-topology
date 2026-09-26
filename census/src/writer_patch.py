@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2339,6 +2339,25 @@ The text below is the Track 2 writer input.
 {body}
 
 IDs: {_id("T2 2B slowed within", "T2 2B T2-3 three runs obs/pred", "T2 2A Morse-Bott", "T2 2C STOP")}.
+"""
+
+
+def wp29():
+    """WP-29: open items for the rebuttal (final round, not in scope)."""
+    return """
+## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
+
+These were out of scope for the final round. The paper may list them as open; it must not state results for them.
+- **The outer-exclusion certificate check** by the independent checker (over 10 CPU-hours). Only the original search
+  supports the outer-exclusion certificates (WP-17).
+- **Further activation families** beyond GELU, SiLU and Mish (WP-25).
+- **Any other width-2 variant** (WP-15, WP-20, WP-27).
+- **Designs that failed their own rules before registration** (tonight; recorded, not run):
+  - the width-2 early-basin prospective test (2C, WP-27);
+  - the GELU early-scale prospective test (WP-25);
+  - the Adam ramp from initialisation (WP-24).
+
+**Do not say** that any of these was tested.
 """
 
 

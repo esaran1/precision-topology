@@ -469,9 +469,9 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 673 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 681 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
-scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
+scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 1 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
 not printed numbers. 6 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
@@ -2423,6 +2423,91 @@ with per-run χ up to **0.064** (arm medians up to 0.025).
   **did not happen**, so do not use it.
 - Had it FAILED: the FAIL would have been reported beside T2-3's FAIL. **Not applicable.**
 
+---------------------------------------------------------------------------------------------------------------------
+
+### Track 2, final round: two-class prospective predictor (GATED). The gate FAILED, so nothing was registered.
+
+**Label:** a new predictor, designed from the diagnosis of earlier failures. T2-3 stays FAIL, T2-3b and T2-3c stay
+UNRESOLVED, and T2-3d stays FAIL.
+
+**Producer:** `src/t2g.py`, with tests in `tests/test_t2g.py`. The tests exercise every gate and criterion on
+constructed pass and fail cases.
+
+**Outputs:**
+- `results/t2g/classify_<arm>.csv`, `own_<arm>.csv`, `gate_runs.csv`;
+- `results/t2g/gate.json` (the gate);
+- `results/t2g/gate_misses.json` (descriptive only, written after the gate).
+
+#### Committed before the classifier was evaluated
+
+Commit `7b8195a`, with `results/t2g_registration.md`.
+
+**Classifier.** It uses only the initial state and a pre-computation, never training.
+- A 2,000-step fixed-v Adam relaxation of the hidden coordinates from the initial state.
+- If it is placed at any step, the class is EARLY and the predicted crossing is s₀, the initial ‖v‖₁.
+- Otherwise the relaxed basin is followed by Newton continuation along the initial output-weight ray up to s = 1.0.
+  If it turns placed at s_sw, the class is EARLY and the predicted crossing is s_sw.
+- Otherwise the class is LATE and the predicted crossing is the width-1 own-sample threshold (T2-3d's method).
+
+**Ground truth.** A run is EARLY iff it crossed at s_cross < 1.0.
+
+**Gate.** Accuracy ≥ 0.95, and median |log error| ≤ 0.10 over the predicted-LATE runs.
+
+**Step 2 was fully specified in advance:** fresh seeds 870,000–870,079, criteria (i)–(iii) and validity.
+
+#### Gate result (POST HOC, 239 existing slowed runs; `results/t2g/gate.json`): **FAIL**
+
+**Accuracy is 0.812, against ≥ 0.95 required.** Per arm: T2-3b 0.825 (66 of 80), T2-3c 0.8625 (69 of 80), T2-3d 0.747 (59 of 79).
+
+| | true EARLY | true LATE |
+|---|---|---|
+| predicted EARLY | 54 | 3 |
+| predicted LATE | 42 | 140 |
+
+**The late-class criterion passes on its own.** Over the 174 predicted-LATE crossing runs, the median
+|log(s_cross/s_w1,own)| is **0.014**, against ≤ 0.10 required.
+
+**The gate fails on accuracy alone.** Following the rule, step 2 was not registered, the fresh seeds were not
+touched, and no fresh-seed run was trained.
+
+#### Descriptive, after the gate (`results/t2g/gate_misses.json`; no rule was changed)
+
+**The 42 missed early crossers:**
+- They crossed at s = 0.016–0.49 (median 0.13), at step 17–1,904 (median 347).
+- The classifier found each one's initial basin unplaced all the way up to s = 1 along the initial ray.
+- In Track 2B, 35 of them have a branch switch along their own recorded v-path, and 24 were on that branch at the
+  crossing (dist_c ≤ 0.05).
+- So most are branch-trackers whose switch comes from how v grows and rotates during training. The initial ray does
+  not see this.
+
+**The 54 caught early crossers:**
+- 42 were placed during the fixed-v relaxation, and 12 had a ray switch below 1.
+- They crossed at s = 0.018–0.32 (median 0.061).
+- Their predicted early scale (s₀ or s_sw) has median |log error| 0.37.
+
+**False EARLY: 3 runs.** One never crossed; two crossed late, at 5.84 and 5.70.
+
+#### Writer section
+
+**Say:**
+- (POST HOC gate) A two-class predictor computed entirely before training was designed from the diagnosis of earlier
+  failures.
+  - Its late class predicts the late crossers to a median |log error| of 0.014.
+  - But it identifies the early crossers with only 81% accuracy (54 of 96 found), below the pre-set 95% gate.
+  - So no prospective width-2 test was registered.
+- Whether a width-2 run crosses early is only partly set by its initial basin:
+  - about 44% of early crossers (42 of 96) are missed from the initial state;
+  - most of those track a branch whose switch is driven by how the output weights grow and rotate during training.
+
+**Do not say:**
+- that a prospective width-2 prediction was registered, run or passed;
+- that the early crossers "are identifiable before training";
+- that the late-class accuracy (0.014) is a prospective result. It is post hoc on existing runs, and the gate failed;
+- anything that changes T2-3 (FAIL), T2-3b / T2-3c (UNRESOLVED) or T2-3d (FAIL).
+
+**If the gate had passed** (it did not), step 2's registered PASS or FAIL would have been reported beside T2-3d's FAIL.
+**Not applicable.**
+
 IDs: `T2 2B slowed within`; `T2 2B T2-3 three runs obs/pred`; `T2 2A Morse-Bott`; `T2 2C STOP`.
 
 ## WP-28. Higher input dimension: the band task in R^d, d = 2 and 4 (Track 3B; for the submission)
@@ -2583,3 +2668,17 @@ using the R^d gap.
   cannot solve inner-ball-versus-shell: projections of the shell cover the ball's interval.
 
 IDs: `3B P1 d=2`; `3B P2a d=2`; `3B P2b d=2`; `3B d=4 UNRESOLVED`; `3B post hoc obs/pred range`.
+
+## WP-29. Open items for the rebuttal (final round; not run, not in the paper's results)
+
+These were out of scope for the final round. The paper may list them as open; it must not state results for them.
+- **The outer-exclusion certificate check** by the independent checker (over 10 CPU-hours). Only the original search
+  supports the outer-exclusion certificates (WP-17).
+- **Further activation families** beyond GELU, SiLU and Mish (WP-25).
+- **Any other width-2 variant** (WP-15, WP-20, WP-27).
+- **Designs that failed their own rules before registration** (tonight; recorded, not run):
+  - the width-2 early-basin prospective test (2C, WP-27);
+  - the GELU early-scale prospective test (WP-25);
+  - the Adam ramp from initialisation (WP-24).
+
+**Do not say** that any of these was tested.

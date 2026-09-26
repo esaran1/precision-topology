@@ -344,7 +344,7 @@ Commit `7b8195a`, with `results/t2g_registration.md`.
 
 ### Gate result (POST HOC, 239 existing slowed runs; `results/t2g/gate.json`): **FAIL**
 
-**Accuracy is 0.812, against ≥ 0.95 required.** Per arm: T2-3b 0.825, T2-3c 0.863, T2-3d 0.747.
+**Accuracy is 0.812, against ≥ 0.95 required.** Per arm: T2-3b 0.825 (66 of 80), T2-3c 0.8625 (69 of 80), T2-3d 0.747 (59 of 79).
 
 | | true EARLY | true LATE |
 |---|---|---|
