@@ -578,6 +578,7 @@ def main() -> None:
     band_checks()
     track2_checks()
     c1_followup_checks()
+    linear_response_checks()
 
     provenance_check()
 
@@ -2003,6 +2004,35 @@ def c1_followup_checks() -> None:
     chk("c1 follow-up contains derived", float(S["feasible_lo"] <= S["pred_lo"] and S["pred_hi"] <= S["feasible_hi"]), 1.0, 0)
     chk("c1 follow-up added certified", float(S["n_added_certified"]), 5.0, 0)
     chk("c1 follow-up original n", float(S["n_original"]), 4.0, 0)
+
+
+def linear_response_checks() -> None:
+    """Track 1 (final round; POST HOC): exact linear response along the trajectory."""
+    import hashlib as _h
+    print("Linear response (post hoc)")
+    L = R / "linear_response"
+    S = json.loads((L / "summary.json").read_text())
+    chk("LR predictions hash", float(_h.sha256((L / "predictions.csv").read_bytes()).hexdigest() == S["predictions_sha256"]
+                                     == "e86ca102bcf87f6ec44565d189d4c50fd0e4204db338309d6240527b1c39faa2"), 1.0, 0)
+    chk("LR runs", float(S["n_runs"]), 1750.0, 0)
+    chk("LR predicted full 0.7", float(S["n_pred_full_7"]), 1708.0, 0)
+    chk("LR diff branch 0.7", float(S["n_diff_branch_start7"]), 0.0, 0)
+    chk("LR diff branch 0.5", float(S["n_diff_branch_start5"]), 0.0, 0)
+    chk("LR s* off global own > 1%", S["frac_s_star_off_global_own_1pct_all"], 0.228, 0.0006)
+    chk("LR no-momentum unstable (Adam)", float(S["n_unstable_d_7"]), 1240.0, 0)
+    a = pd.read_csv(L / "attribution.csv").pivot(index="step", columns="a", values="slope")
+    for step, want in {"full_7": (1.02, 1.03, 1.04, 1.05), "full_5": (1.02, 1.03, 1.04, 1.05),
+                       "1A_global_ref": (0.89, 0.83, 0.91, 0.82), "kchi_branch_ref": (1.02, 1.01, 0.98, 0.90),
+                       "slaved_own": (1.01, 0.99, 0.96, 0.90)}.items():
+        for av, w in zip((1.3, 1.45, 1.5, 1.6), want):
+            chk(f"LR {step} slope a={av:.2f}", float(a.loc[step, av]), w, 0.006)
+    chk("LR full model ratio", float(a.loc["full_7"].min()), 1.02, 0.006)
+    c = pd.read_csv(L / "compare_arms.csv")
+    chk("LR arm ratio min", float(c.full_7_ratio_of_medians.min()), 1.00, 0.006)
+    chk("LR arm ratio max", float(c.full_7_ratio_of_medians.max()), 1.05, 0.006)
+    d = S["diagnostic_exact_grad"]["pooled"]
+    for r in d:
+        chk(f"LR exact gradient reproduces start {r['start']}", float(r["n_exact_step_equals_observed"] == r["n"]), 1.0, 0)
 
 
 def digit_stability() -> None:

@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp31() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -2382,6 +2382,27 @@ Track 3 writer input.
 {body}
 
 IDs: {_id("c1 follow-up PASS", "c1 follow-up width", "c1 follow-up contains derived")}.
+"""
+
+
+def wp31():
+    """WP-31: exact linear response along the trajectory (Track 1, final round; POST HOC), from the agent's writer inputs."""
+    f = RESULTS / "linear_response_writer_inputs.md"
+    if not f.exists():
+        return ""
+    t = f.read_text()
+    body = t[t.index("\n## ") + 1:] if "\n## " in t else t
+    body = "\n" + body
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    return f"""
+## WP-31. Exact linear response along the trajectory: what accounts for the 0.82–0.91 shortfall (Track 1, final round; POST HOC; for the submission)
+
+Producer: `src/linear_response.py` → `linear_response/`. Every prediction was committed and hashed before any observed
+crossing was read. Everything here is POST HOC and changes no registered verdict. The text below is the Track 1 writer
+input.
+{body}
+
+IDs: {_id("LR predictions hash", "LR full model ratio")}.
 """
 
 

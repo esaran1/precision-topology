@@ -516,8 +516,17 @@ def lag_data():
     A = read("lag_law/compare_arms.csv"); A["a"] = A.a.round(2)
     kb = read("lag_law/kappa_by_winding.csv"); kb["a"] = kb.a.round(2)
     kap = {a: float(kb[(kb.a == a) & (kb.k == k)].kappa_adam.iloc[0]) for a, (_, k) in LAG_A.items()}
-    lr = RESULTS / "linear_response" / "arm_predictions_for_figure.csv"
-    return A, kap, (pd.read_csv(lr) if lr.exists() else None)
+    lr = RESULTS / "linear_response" / "compare_arms.csv"
+    if not lr.exists():
+        return A, kap, None
+    L = pd.read_csv(lr); L["a"] = L.a.round(2)
+    norm = lambda v: str(float(v)) if str(v).replace(".", "", 1).isdigit() else str(v)
+    L["arm"] = L.arm.map(norm); A["arm"] = A.arm.map(norm)
+    M = A[["set", "a", "arm", "median_chi"]].merge(L[["set", "a", "arm", "median_r_obs", "full_7_median_pred"]],
+                                                    on=["set", "a", "arm"], how="inner")
+    assert len(M) == len(A) == 36
+    M["obs"] = M.median_r_obs                     # lag from each run's tracked-branch switch (Track 1, final round)
+    return M, kap, M
 
 
 def fig_lag():
@@ -537,7 +546,7 @@ def fig_lag():
         ax.text(xe, 0.0915 if xe < xmax else kap[a] * xmax, (f"$a = {a:.2f}$" if a == 1.30 else f"${a:.2f}$"), color=BLUE,
                 ha="center" if xe < xmax else "left", va="bottom" if xe < xmax else "center", clip_on=False)
     if lr is not None:
-        ax.plot(lr.median_chi, lr.pred_full, ls="none", marker="x", ms=4.0, color=VERM, mew=0.9, zorder=4)
+        ax.plot(lr.median_chi, lr.full_7_median_pred, ls="none", marker="x", ms=4.6, color="0.45", mew=0.9, zorder=4)
     ax.set_xlim(0, xmax); ax.set_ylim(0, 0.09)
     ax.set_xlabel(r"growth-to-relaxation ratio $\chi$ (median per arm)")
     ax.set_ylabel("crossing lag $r$ (median)")
@@ -670,18 +679,24 @@ def captions():
           note="Final round: same design as 'decomposition', restricted to the float32 draw.")
     # lag law and scoreboard (final round, 2026-09-25)
     _A, _kap, _lr = lag_data()
+    _L = read("linear_response/compare_arms.csv")
     entry("lag", "main text",
           "The crossing lag grows linearly with the ratio of output growth to branch relaxation, with a slope κ(a) "
           "computed from the landscape with no fitted parameter (derived after a fitted relationship was known).",
           f"Width 1, all {len(_A)} free-training arms and tests (the four intervention experiments, SGD, and the fresh-sample "
-          "test at a = 1.45 and 1.60); each point is an arm's median lag against its median ratio. Filled markers: Adam; "
-          "open markers: SGD. Marker shape: a = 1.30 circles, 1.45 squares, 1.50 triangles, 1.60 diamond."
-          + (" Crosses: the exact linear-response prediction along each run's trajectory (arm medians)." if _lr is not None else ""),
-          "None drawn (arm medians); lines are predictions, not fits.",
+          "test at a = 1.45 and 1.60); each point is an arm's median lag against its median ratio. The lag is measured from "
+          "the switch of the branch each run tracks, on its own training sample (math note §13; WP-31). Filled markers: Adam; "
+          "open markers: SGD. Marker shape: a = 1.30 circles, 1.45 squares, 1.50 triangles, 1.60 diamond. Grey crosses: the "
+          "exact linear response along each run's own trajectory, started at 0.7 s* (arm medians; post hoc, predictions "
+          "committed before the comparison).",
+          "None drawn (arm medians); lines and crosses are predictions, not fits.",
           [", ".join(f"κ({a:.2f}) = {_kap[a]:.2f}" for a in _kap) + " (lines r = κ(a)χ)",
-           f"{int(_A.within.sum())} of {len(_A)} arms within the registered tolerance max(0.01, 0.25·pred)",
-           "observed/predicted through-origin slope per a: "
-           + ", ".join(f"{r.ratio_obs_to_pred:.2f} ({r.a:.2f})" for r in read("lag_law/compare_per_a.csv").itertuples())],
+           "measured from each sample's global own threshold instead (Track 1A, registered tolerance: 36 of 36 arms within), "
+           "the observed/predicted through-origin slope per a is "
+           + ", ".join(f"{r.ratio_obs_to_pred:.2f} ({r.a:.2f})" for r in read("lag_law/compare_per_a.csv").itertuples()),
+           "exact linear response, observed/predicted lag per arm (ratio of arm medians over the runs with a prediction, "
+           f"{int(_L.full_7_n.sum()):,} of {int(_L.n_runs.sum()):,} runs; tracked-branch reference): "
+           f"{_L.full_7_ratio_of_medians.min():.2f}–{_L.full_7_ratio_of_medians.max():.2f}"],
           note="New figure (final round).")
     _sb = scoreboard_data()
     _fam = _sb.groupby(["panel", "family"], sort=False).passed.agg(["sum", "size"]).reset_index()
