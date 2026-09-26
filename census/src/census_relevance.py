@@ -43,6 +43,7 @@ BLOCKS = {
     "non-sine activations (Track 3A)": ("central", "threshold"),
     "band task in R^d (Track 3B)": ("central", "threshold"),
     "lag law at an unseen a (Track A)": ("central", "threshold"),
+    "simplicity-bias transfer (Track T)": ("central", "threshold"),
     # peripheral
     "Arrhenius 08-27": ("peripheral", "budget law / barriers"), "MNIST budget law 09-11": ("peripheral", "budget law"),
     "collapse 09-12": ("peripheral", "budget law"), "nu": ("peripheral", "budget law"),

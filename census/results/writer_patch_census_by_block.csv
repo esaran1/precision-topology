@@ -60,6 +60,7 @@ block,scale limits (width 2),registered rule,1,1,0,0,2
 block,scaling limit,post hoc (census),0,0,1,0,1
 block,scaling limit,registered rule,3,0,0,0,3
 block,search 08-22,registered rule,2,0,2,0,4
+block,simplicity-bias transfer (Track T),registered rule,0,0,0,2,2
 block,third optimizer 09-14,registered rule,2,0,0,0,2
 block,threshold 08-22,post hoc (census),1,0,0,0,1
 block,threshold 08-22,registered rule,2,1,1,0,4
@@ -139,6 +140,7 @@ registration_file,results/scaling_limit_prediction.md,registered rule,3,0,0,0,3
 registration_file,results/search_prediction.md,registered rule,2,0,2,0,4
 registration_file,results/sgd_own_registration.md,registered rule,2,0,0,0,2
 registration_file,results/sgd_own_registration.md (amendment 1),registered rule,1,0,0,0,1
+registration_file,results/simplicity_bias_v3_registration.md,registered rule,0,0,0,2,2
 registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
 registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4

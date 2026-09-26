@@ -15,7 +15,7 @@ import pandas as pd
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 ENUM = RESULTS / "registration_census_enumeration.csv"
-PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-")
+PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-", "trackT-")
 ROUND = "2026-09-25"
 
 
@@ -129,6 +129,22 @@ def track_a_rows():
     return rows
 
 
+def track_t_rows():
+    f = RESULTS / "simplicity_bias_v3" / "score.json"
+    if not f.exists():
+        return []
+    S = json.loads(f.read_text())
+    blk, reg, com = "simplicity-bias transfer (Track T)", "results/simplicity_bias_v3_registration.md", "91ef9cf"
+    why = (f"validity failed: {S['n_cross']} of {S['n_runs']} crossed (< 30) and median chi at crossing "
+           f"{S['median_chi']:.2f} (> 0.06)")
+    return [_row("trackT-C1", blk, reg, com, S["C1"],
+                 f"C1: >= 90% of crossing runs at s >= 3.5914 (the attained weight-decayed switch). Scored: {why}: "
+                 f"{S['C1']} (would-be {S['fraction_at_or_above_switch']:.3f}, FAIL).", "results/simplicity_bias_v3/score.json"),
+            _row("trackT-C2", blk, reg, com, S["C2"],
+                 f"C2: median crossing/switch in [1.00, 1.25]. Scored: {why}: {S['C2']} (would-be "
+                 f"{S['median_ratio']:.2f}, FAIL).", "results/simplicity_bias_v3/score.json")]
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -141,7 +157,7 @@ def extra_rows():
 def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
-    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + extra_rows())
+    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + track_t_rows() + extra_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

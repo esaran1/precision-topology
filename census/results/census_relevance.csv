@@ -231,3 +231,5 @@ trackA-L1,lag law at an unseen a (Track A),registered rule,PASS,central,threshol
 trackA-L2,lag law at an unseen a (Track A),registered rule,PASS,central,threshold
 trackA-L3-adam,lag law at an unseen a (Track A),registered rule,FAIL,central,threshold
 trackA-L3-sgd,lag law at an unseen a (Track A),registered rule,PASS,central,threshold
+trackT-C1,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,threshold
+trackT-C2,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,threshold

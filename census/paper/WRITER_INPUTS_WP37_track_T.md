@@ -74,13 +74,12 @@ switch.
   - *Do not say:* a C1 or C2 verdict.
 - **Not scored by 04:15.** Did not occur: the test was scored at 03:03 EDT.
 
-## Census rows for this registration (not folded into the main census; the main patch is unchanged)
+## Census rows for this registration (folded into the main census on 2026-09-26, at the author's request; WP-14)
 
 | id | block | registration | verdict | scored |
 |---|---|---|---|---|
 | trackT-C1 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | fraction of crossing runs at s ≥ 3.5914: 0.727 (would be FAIL); validity failed: 22 crossings < 30 and median χ 7.43 > 0.06 |
 | trackT-C2 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | median crossing/switch 2.86 (would be FAIL); same validity failure |
 
-Folding these two rows into the main census would change the census headline to 234 predictions: 212 scored by a
-registered rule (100 / 66 / 8 / 38) and 22 assigned post hoc. It would also change WP-14 in the main patch, so it was
-not done.
+With these two rows the census headline is 234 predictions: 212 scored by a registered rule (100 / 66 / 8 / 38) and 22
+assigned post hoc (WP-14).

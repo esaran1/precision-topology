@@ -1167,6 +1167,8 @@ The final round added:
   original c₁ test stays INCONCLUSIVE.
 - the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers. L3 was
   registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
+- the registered simplicity-bias transfer test (Track T v3, WP-37), with C1 and C2 both UNRESOLVED on its validity
+  conditions: 22 of 40 runs crossed, and the median χ at crossing was 7.4.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
 and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
@@ -2693,16 +2695,15 @@ registered prediction is that training's slab share first reaches q = 0.3914 jus
 Everything was frozen before any training. The text below is the Track T writer input.
 {body}
 
-## Census rows for this registration (not folded into the main census; the main patch is unchanged)
+## Census rows for this registration (folded into the main census on 2026-09-26, at the author's request; WP-14)
 
 | id | block | registration | verdict | scored |
 |---|---|---|---|---|
 | trackT-C1 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | fraction of crossing runs at s ≥ 3.5914: {sc["fraction_at_or_above_switch"]:.3f} (would be FAIL); validity failed: {sc["n_cross"]} crossings < 30 and median χ {sc["median_chi"]:.2f} > 0.06 |
 | trackT-C2 | simplicity-bias transfer (Track T v3) | results/simplicity_bias_v3_registration.md (91ef9cf) | UNRESOLVED | median crossing/switch {sc["median_ratio"]:.2f} (would be FAIL); same validity failure |
 
-Folding these two rows into the main census would change the census headline to 234 predictions: 212 scored by a
-registered rule (100 / 66 / 8 / 38) and 22 assigned post hoc. It would also change WP-14 in the main patch, so it was
-not done.
+With these two rows the census headline is 234 predictions: 212 scored by a registered rule (100 / 66 / 8 / 38) and 22
+assigned post hoc (WP-14).
 """
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_WP37_track_T.md"
     out.write_text(text)

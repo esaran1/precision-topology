@@ -143,10 +143,10 @@ certified R_glob and R_solve bracket):
 ## WP-4. Registration census by block and by registration file
 
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 210 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
-  36 UNRESOLVED.
+- **Headline**: 212 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
+  38 UNRESOLVED.
 - **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
-- **Total**: 232 registered predictions.
+- **Total**: 234 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -240,6 +240,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | scaling limit | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
 | scaling limit | registered rule | 3 | 0 | 0 | 0 | 3 |
 | search 08-22 | registered rule | 2 | 0 | 2 | 0 | 4 |
+| simplicity-bias transfer (Track T) | registered rule | 0 | 0 | 0 | 2 | 2 |
 | third optimizer 09-14 | registered rule | 2 | 0 | 0 | 0 | 2 |
 | threshold 08-22 | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | threshold 08-22 | registered rule | 2 | 1 | 1 | 0 | 4 |
@@ -323,6 +324,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/search_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
 | results/sgd_own_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/sgd_own_registration.md (amendment 1) | registered rule | 1 | 0 | 0 | 0 | 1 |
+| results/simplicity_bias_v3_registration.md | registered rule | 0 | 0 | 0 | 2 | 2 |
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
@@ -472,7 +474,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 734 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 747 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -944,7 +946,7 @@ peripheral.
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 13 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 53 | 31 | 1 | 11 |
+| registered rule | central | 53 | 31 | 1 | 13 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1015,6 +1017,8 @@ The final round added:
   original c₁ test stays INCONCLUSIVE.
 - the registered lag-law test at the unseen a = 1.65 (Track A, WP-35): L1 and L2 PASS for both optimisers. L3 was
   registered per optimiser and is scored as registered, one row each: SGD PASS, and Adam FAIL (a central failure).
+- the registered simplicity-bias transfer test (Track T v3, WP-37), with C1 and C2 both UNRESOLVED on its validity
+  conditions: 22 of 40 runs crossed, and the median χ at crossing was 7.4.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
 and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
