@@ -1,0 +1,27 @@
+{
+ "n_runs": 40,
+ "n_cross": 22,
+ "fraction_at_or_above_switch": 0.7272727272727273,
+ "median_ratio": 2.85952308041271,
+ "median_chi": 7.426658095868612,
+ "valid": false,
+ "unresolved_by": [
+  "crossings",
+  "chi"
+ ],
+ "C1": "UNRESOLVED",
+ "C2": "UNRESOLVED",
+ "C1_would_be": "FAIL",
+ "C2_would_be": "FAIL",
+ "s_cross_quartiles": [
+  2.9460111597211016,
+  10.269621254118029,
+  10.46631576777888
+ ],
+ "chi_quartiles": [
+  -107.76847987776753,
+  7.426658095868612,
+  10.083918441420117
+ ],
+ "n_rho2_init_ge_q": 31
+}
