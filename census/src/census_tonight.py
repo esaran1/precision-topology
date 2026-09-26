@@ -15,7 +15,7 @@ import pandas as pd
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 ENUM = RESULTS / "registration_census_enumeration.csv"
-PREFIXES = ("ramp-", "act-", "t2c-", "band-")
+PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup")
 ROUND = "2026-09-25"
 
 
@@ -95,6 +95,20 @@ def band_rows():
     return rows
 
 
+def c1_rows():
+    import json as _j
+    f = RESULTS / "c1_followup_summary.json"
+    if not f.exists():
+        return []
+    S = _j.loads(f.read_text())
+    return [_row("c1-followup", "c1 first order", "results/c1_followup_registration.md", "e233ef5", S["verdict"],
+                 f"Follow-up (registered after c1-primary's INCONCLUSIVE): the registered feasible-set estimator unchanged, on the "
+                 f"four original brackets plus five added certified brackets (a = 1.08-1.12); validity width <= 0.1; PASS iff the "
+                 f"interval contains the derived c1. Scored: C = [{S['feasible_lo']:.5f}, {S['feasible_hi']:.5f}], width "
+                 f"{S['feasible_width']:.4f}, contains [0.2852300, 0.2852303]: {S['verdict']}.",
+                 "results/c1_followup_summary.json", "c1-primary stays UNRESOLVED (INCONCLUSIVE) as registered.")]
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -107,7 +121,7 @@ def extra_rows():
 def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
-    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + extra_rows())
+    new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + extra_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

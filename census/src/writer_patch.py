@@ -378,7 +378,7 @@ Producer: `src/figures_v4.py`. Sizes are read from the PDFs (`writer_patch_figur
     text += wp8()
     text += wp9() + wp10() + wp11() + wp12() + wp13() + wp14()
     text += wp15() + wp16() + wp17() + wp18() + wp19() + wp20() + wp21() + wp22() + wp23()
-    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp29()
+    text += wp24() + wp25() + wp26() + wp27() + wp28() + wp30() + wp29()
     out = RESULTS.parent / "paper" / "WRITER_INPUTS_v4_patch.md"
     out.write_text(text)
     return out
@@ -1157,6 +1157,9 @@ Tonight's program (2026-09-25) added four central failures, all training-side:
 - the ramp's winding sign test (R5-R1; pooled slope 1.3003 against a bound of 1.3);
 - the two 200-seed training tests for GELU, SiLU and Mish;
 - the R^d band task's width-1 lag range (120 seeds).
+
+The final round added one central PASS: the registered c₁ follow-up (WP-30), whose interval of width 0.042 contains
+the derived c₁. The original c₁ test stays INCONCLUSIVE.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
 and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
@@ -2358,6 +2361,27 @@ These were out of scope for the final round. The paper may list them as open; it
   - the Adam ramp from initialisation (WP-24).
 
 **Do not say** that any of these was tested.
+"""
+
+
+def wp30():
+    """WP-30: the registered c1 follow-up (Track 3, final round), from the agent's writer inputs."""
+    f = RESULTS / "c1_followup_writer_inputs.md"
+    if not f.exists():
+        return ""
+    t = f.read_text()
+    body = t[t.index("\n## ") + 1:] if "\n## " in t else t
+    body = "\n" + body
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    return f"""
+## WP-30. A decisive test of the first-order coefficient c₁ (Track 3, final round; registered follow-up; for the submission)
+
+Producer: `src/c1_followup.py` → `c1_followup_*`. Registration: `results/c1_followup_registration.md` (e233ef5), committed
+before any added certificate was computed. The original test stays INCONCLUSIVE as registered. The text below is the
+Track 3 writer input.
+{body}
+
+IDs: {_id("c1 follow-up PASS", "c1 follow-up width", "c1 follow-up contains derived")}.
 """
 
 

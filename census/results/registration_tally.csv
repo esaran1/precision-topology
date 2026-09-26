@@ -1,13 +1,13 @@
 scope,n,PASS,FAIL,PARTIAL,UNRESOLVED
-scored by registered rules,205,96,65,8,36
+scored by registered rules,206,97,65,8,36
 assigned post hoc in the census,22,3,6,13,0
-all,227,99,71,21,36
-since 2026-09-23: scored by registered rules,54,30,18,0,6
+all,228,100,71,21,36
+since 2026-09-23: scored by registered rules,55,31,18,0,6
 since 2026-09-23: assigned post hoc,9,0,0,9,0
-by registered unit: scored by registered rules,271,125,92,8,46
+by registered unit: scored by registered rules,272,126,92,8,46
 by registered unit: assigned post hoc in the census,14,3,6,5,0
-by registered unit: all,285,128,98,13,46
-by registered unit: since 2026-09-23: scored by registered rules,120,59,45,0,16
+by registered unit: all,286,129,98,13,46
+by registered unit: since 2026-09-23: scored by registered rules,121,60,45,0,16
 by registered unit: since 2026-09-23: assigned post hoc,1,0,0,1,0
 since 2026-09-23: validity gates (not predictions; not in the headline),20,20,0,0,0
 "pending: registered, not yet scored (not in the headline)",0,0,0,0,0

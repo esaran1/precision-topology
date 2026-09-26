@@ -477,27 +477,27 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 227.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 228.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
-    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 32.0, 0)
+    chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 33.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 285.0, 0)
-    for v, n in (("PASS", 128), ("FAIL", 98), ("PARTIAL", 13), ("UNRESOLVED", 46)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 286.0, 0)
+    for v, n in (("PASS", 129), ("FAIL", 98), ("PARTIAL", 13), ("UNRESOLVED", 46)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 99), ("FAIL", 71), ("PARTIAL", 21), ("UNRESOLVED", 36)):
+    for v, n in (("PASS", 100), ("FAIL", 71), ("PARTIAL", 21), ("UNRESOLVED", 36)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (205, 96, 65, 8, 36)),
+    for scope, want in (("scored by registered rules", (206, 97, 65, 8, 36)),
                         ("assigned post hoc in the census", (22, 3, 6, 13, 0)),
-                        ("since 2026-09-23: scored by registered rules", (54, 30, 18, 0, 6)),
+                        ("since 2026-09-23: scored by registered rules", (55, 31, 18, 0, 6)),
                         ("since 2026-09-23: assigned post hoc", (9, 0, 0, 9, 0)),
-                        ("by registered unit: scored by registered rules", (271, 125, 92, 8, 46)),
+                        ("by registered unit: scored by registered rules", (272, 126, 92, 8, 46)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (120, 59, 45, 0, 16)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (121, 60, 45, 0, 16)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
@@ -577,6 +577,7 @@ def main() -> None:
     track4_checks()
     band_checks()
     track2_checks()
+    c1_followup_checks()
 
     provenance_check()
 
@@ -1184,8 +1185,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 227", float(wp4[wp4.by == "block"].n.sum()), 227.0, 0)
-    chk("WP-4: by-file rows sum to 227", float(wp4[wp4.by == "registration_file"].n.sum()), 227.0, 0)
+    chk("WP-4: by-block rows sum to 228", float(wp4[wp4.by == "block"].n.sum()), 228.0, 0)
+    chk("WP-4: by-file rows sum to 228", float(wp4[wp4.by == "registration_file"].n.sum()), 228.0, 0)
     oth_ = pd.read_csv(R / "registration_census_v4_gates_and_reported.csv")
     chk("width-2 verdict listed as a registered decision rule, not a prediction",
         float((oth_.id == "sl-width2").sum() == 1
@@ -1508,11 +1509,11 @@ def harsh_review_checks() -> None:
     chk("A4 FAIL registered peripheral", n(verdict="FAIL", scoring="registered rule", relevance="peripheral"), 35.0, 0)
     chk("A4 FAIL post hoc central", n(verdict="FAIL", scoring="post hoc (census)", relevance="central"), 2.0, 0)
     chk("A4 FAIL post hoc peripheral", n(verdict="FAIL", scoring="post hoc (census)", relevance="peripheral"), 4.0, 0)
-    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 49.0, 0)
+    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 50.0, 0)
     chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
     chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 11.0, 0)
-    chk("A4 rows", float(len(cr)), 227.0, 0)
+    chk("A4 rows", float(len(cr)), 228.0, 0)
 
 
 def tracks_checks() -> None:
@@ -1989,6 +1990,19 @@ def track2_checks() -> None:
     chk("T2 2C earliest crossing", c["earliest_crossing"], 0.0164, 0.00006)
     chk("T2 2C max available", c["max_frac_available"], 0.778, 0.0006)
     chk("T2 2C max available below earliest", c["max_frac_available_below_earliest"], 0.075, 0.0006)
+
+
+def c1_followup_checks() -> None:
+    """Track 3 (final round): the registered c1 follow-up."""
+    print("c1 follow-up (registered)")
+    S = json.loads((R / "c1_followup_summary.json").read_text())
+    chk("c1 follow-up PASS", float(S["verdict"] == "PASS"), 1.0, 0)
+    chk("c1 follow-up lo", S["feasible_lo"], 0.26531, 0.000006)
+    chk("c1 follow-up hi", S["feasible_hi"], 0.30687, 0.000006)
+    chk("c1 follow-up width", S["feasible_width"], 0.0416, 0.00006)
+    chk("c1 follow-up contains derived", float(S["feasible_lo"] <= S["pred_lo"] and S["pred_hi"] <= S["feasible_hi"]), 1.0, 0)
+    chk("c1 follow-up added certified", float(S["n_added_certified"]), 5.0, 0)
+    chk("c1 follow-up original n", float(S["n_original"]), 4.0, 0)
 
 
 def digit_stability() -> None:

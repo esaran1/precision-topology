@@ -226,3 +226,4 @@ band-P2a,band task in R^d (Track 3B),post hoc (census),PARTIAL,central,threshold
 band-P2b,band task in R^d (Track 3B),post hoc (census),PARTIAL,central,threshold
 band-P1-120,band task in R^d (Track 3B),registered rule,PASS,central,threshold
 band-P2a-120,band task in R^d (Track 3B),registered rule,FAIL,central,threshold
+c1-followup,c1 first order,registered rule,PASS,central,scaling

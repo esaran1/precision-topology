@@ -25,7 +25,7 @@ block,SGD own thresholds (Track 4),registered rule,3,0,0,0,3
 block,asymmetric windows (Track 2),registered rule,2,2,0,2,6
 block,band task in R^d (Track 3B),post hoc (census),0,0,3,0,3
 block,band task in R^d (Track 3B),registered rule,1,1,0,0,2
-block,c1 first order,registered rule,1,0,0,2,3
+block,c1 first order,registered rule,2,0,0,2,4
 block,collapse 09-12,post hoc (census),0,1,0,0,1
 block,collapse 09-12,registered rule,1,2,0,0,3
 block,corrugation 08-06,registered rule,0,2,0,0,2
@@ -91,6 +91,7 @@ registration_file,results/blockH_rate_prediction.md,registered rule,0,1,0,2,3
 registration_file,results/blockK_prediction.md,registered rule,3,2,0,0,5
 registration_file,results/blockS2_prediction.md,registered rule,1,1,0,0,2
 registration_file,results/bottleneck_prediction.md,registered rule,0,1,0,1,2
+registration_file,results/c1_followup_registration.md,registered rule,1,0,0,0,1
 registration_file,results/collapse_prediction.md,post hoc (census),0,1,0,0,1
 registration_file,results/collapse_prediction.md,registered rule,1,2,0,0,3
 registration_file,results/corrugation_prediction.md,registered rule,0,2,0,0,2
