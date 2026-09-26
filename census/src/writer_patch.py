@@ -2647,9 +2647,38 @@ registered training test there."
 """
 
 
+def wp36_v2():
+    """WP-36 (separate file, so the main patch the writer uses is unchanged): the gated Track T redesign (weight decay,
+    slab-usage path), from the agent's writer inputs.  Written to paper/WRITER_INPUTS_WP36_track_T.md."""
+    f = RESULTS / "simplicity_bias_v2_writer_inputs.md"
+    if not f.exists():
+        return None
+    t = f.read_text()
+    body = "\n" + (t[t.index("\n## ") + 1:] if "\n## " in t else t).rstrip()
+    body = body.replace("\n### ", "\n#### ").replace("\n## ", "\n### ")
+    text = f"""# WP-36. Transfer to simplicity bias, redesigned and gated (Track T v2; final night)
+
+A separate file: the main patch (`WRITER_INPUTS_v4_patch.md`) is unchanged. There, WP-29 keeps its one-sentence scope
+note about the first pilot. Producer: `src/simplicity_bias*.py` → `results/simplicity_bias*/`.
+
+This attempt:
+- adds weight decay on the hidden weights (the same λ in the fixed-scale objective and in training);
+- replaces the switch with the scale s_q at which the minimizer's slab usage reaches a level q fixed in advance;
+- predicts the training crossing as s_q(1 + κ_q·χ).
+
+The gate, and the registration if the gate passed, were committed before the corresponding computation. The text below
+is the Track T writer input.
+{body}
+"""
+    out = RESULTS.parent / "paper" / "WRITER_INPUTS_WP36_track_T.md"
+    out.write_text(text)
+    return out
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "render":
         print(render())
     else:
         main()
         print(render())
+        wp36_v2()

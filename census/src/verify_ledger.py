@@ -583,6 +583,7 @@ def main() -> None:
     theorem1_checks()
     track_t_checks()
     track_a_checks()
+    track_t_v2_checks()
 
     provenance_check()
 
@@ -2120,6 +2121,31 @@ def track_a_checks() -> None:
         chk(f"TA {opt} L1", float(x["L1"]["verdict"] == v1), 1.0, 0); chk(f"TA {opt} L1 ratio", x["L1"]["median_ratio"], l1, 0.0006)
         chk(f"TA {opt} L2", float(x["L2"]["verdict"] == v2), 1.0, 0); chk(f"TA {opt} L2 ratio", x["L2"]["median_ratio"], l2, 0.0006)
         chk(f"TA {opt} L3", float(x["L3"]["verdict"] == v3), 1.0, 0); chk(f"TA {opt} L3 spearman", x["L3"]["spearman"], l3, 0.006 if opt == "adam" else 0.0006)
+
+
+def track_t_v2_checks() -> None:
+    """Track T v2 (final night; gated redesign): gate and the pre-registration check that stopped it."""
+    print("Track T v2 (gate PASS; registration stopped at its gradient check)")
+    D = R / "simplicity_bias_v2"
+    P = json.loads((D / "pilot_summary.json").read_text()); F = json.loads((D / "frozen.json").read_text())
+    L = json.loads((D / "lambda_rule.json").read_text()); sc = pd.read_csv(D / "pilot_scan.csv")
+    chk("TT2 gate PASS", float(P["gate"]["pass"]), 1.0, 0)
+    chk("TT2 lambda", L["chosen_lambda"], 1e-4, 0)
+    chk("TT2 q", P["q_rule"]["q"], 0.3914, 0.00006)
+    chk("TT2 s_q", P["gate"]["s_q"], 3.5914, 0.00006)
+    chk("TT2 agreement", P["gate"]["agreement_rel"], 0.0, 0)
+    chk("TT2 all attained", float(sc.attained.all() and len(sc) == 54), 1.0, 0)
+    chk("TT2 max norm", float(sc[sc.attained].norm.max()), 16.5, 0.06)
+    chk("TT2 bound", float(L["rows"][0]["bound"]), 117.7, 0.06)
+    a = sc[sc.set == "A"].set_index("s")
+    chk("TT2 rho2 below jump", float(a.loc[3.58512, "rho2"]), 0.182, 0.0006)
+    chk("TT2 rho2 above jump", float(a.loc[3.597642, "rho2"]), 0.448, 0.0006)
+    chk("TT2 rho2 at 1.53", float(a.loc[1.525879, "rho2"]), 0.085, 0.0006)
+    chk("TT2 rho2 large s", P["q_rule"]["rho2_large"], 0.783, 0.0006)
+    g = F["grad_rho2_check"]
+    chk("TT2 gradient check failed", float(g["ok"] is False), 1.0, 0)
+    chk("TT2 gradient autograd vs central", g["max_rel_autograd_vs_central"], 0.033, 0.0006)
+    chk("TT2 gradient central vs one-sided", g["max_rel_central_vs_forward"], 0.055, 0.0006)
 
 
 def digit_stability() -> None:
