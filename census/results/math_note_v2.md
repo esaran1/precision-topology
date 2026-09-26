@@ -444,6 +444,10 @@ this lemma shows nothing outside that box can exceed K.
     centre).
   - It lies inside the branch-and-bound bracket [0.19738, 0.19920].
 
+**Follow-up (final round, 2026-09-25; registered e233ef5; WP-30).** Five added certified brackets (a = 1.08–1.12) and the
+four original ones, with the registered estimator unchanged, give the feasible set C = [0.26531, 0.30687], of width
+0.042. It contains the derived c₁ ∈ [0.2852300, 0.2852303]: PASS. The original test stays INCONCLUSIVE as registered.
+
 ## 9. Where the corner structure breaks (EXPLORATORY; `corner_tracking.py`)
 
 - **Method**: the global certified Ĝ(a) branch and bound (full placement domain, relative target 1e−8), with
@@ -1233,3 +1237,27 @@ Registration: `results/ramp_registration.md` (c4b4c6d). Own thresholds were froz
 - This is consistent with (iv)(a): the law needs χ small. It is not a test of the law outside that regime.
 - GELU's 15 early crossings (s ≤ 0.45) lie on the tail-placed one-sided-ramp branch, where the continuation finds no
   switch.
+
+### 13.8 Exact linear response along the trajectory (final round; POST HOC; `src/linear_response.py`, WP-31)
+
+Setup:
+- The three simplifications of §13.1 are removed: coefficients frozen at the switch, the slaved displacement and no
+  momentum.
+- The recursion δ_{t+1} = (I − ηP_tH_t)δ_t − Δθ\*_t, with Adam's first moment as a state, is iterated along each run's
+  actual s_t and v̂_t.
+- The start is at 0.7·s\* (and 0.5·s\*), with s\* the switch of the branch the run tracks on its own sample.
+- All 1,750 runs were predicted, and the predictions were hashed (e86ca102…) before any observed crossing was read.
+
+Results:
+- **Full model:** observed/predicted lag is 1.02, 1.03, 1.04 and 1.05 at a = 1.30, 1.45, 1.50 and 1.60, and 1.00–1.05
+  per arm.
+- The two starting points give identical crossings. No run is on a different branch at either start.
+- **What the 0.82–0.91 of §13.5 comes from:**
+  - Mainly the reference. §13.5 measured the lag from each sample's global threshold. In 22.8% of runs that threshold
+    differs by more than 1% from the switch of the tracked branch. Against the tracked switch, κχ gives 1.02 (a = 1.30)
+    and 1.01 (a = 1.45).
+  - Secondly the slaved approximation at the largest κχ: 0.96 and 0.90 at a = 1.50 and 1.60 with each run's own
+    coefficients.
+  - Time-varying coefficients move the slope by at most 0.01. Momentum does not change the lag.
+- The remaining +2–5% is the linearisation of the gradient in δ. With the exact gradient, the observed crossing step
+  is reproduced in every run checked (the first 12 seeds of each arm).
