@@ -276,3 +276,18 @@ def test_score_end_to_end(tmp_path, monkeypatch):
         B.score()
     with pytest.raises(AssertionError):
         B.run()
+
+
+# ------------------------------------------------------------------------------------------ POST HOC helper
+def test_branch_switch_job_constructed():
+    p = _p0(1, 0.0, 2)[0, :4]                                         # d = 1: the R^d and G1 switches coincide
+    r = B._branch_switch_job(("t", 1, 1.30, 889_700, json.dumps(list(p))))
+    assert np.isfinite(r["s_branch"]) and r["s_branch"] == r["s_branch_G1"] and r["s_branch_note"] == ""
+    X, Y = B.make_data_rd(889_700, 1)
+    for f, sign in ((1.001, 1), (0.999, -1)):                         # placed just above the switch, unplaced below
+        s = r["s_branch"] * f
+        h, _, g, conv = B.branch_rd(1.30, X, Y, np.r_[p[0], p[1], s, p[3]])
+        assert conv and np.sign(B.gap_rd(h[0], h[1], h[3:], 1.0, 1.30)) == sign
+    p2 = _p0(1, 0.02, 2)[0]                                           # d = 2: noise widening raises the switch
+    r2 = B._branch_switch_job(("t", 2, 1.30, 889_700, json.dumps(list(p2))))
+    assert r2["s_branch"] > r2["s_branch_G1"]

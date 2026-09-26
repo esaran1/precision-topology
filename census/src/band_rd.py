@@ -762,6 +762,101 @@ def describe_cell(g, c, d, a):
     return out
 
 
+# ------------------------------------------------------------------------------------------ POST HOC (after the registered score, ca62e36)
+def _branch_switch_job(args):
+    """POST HOC: the switch of the run's own-sample R^d branch.  From the crossing state, damped Newton in all hidden
+    coordinates at w₂ = ±s (branch_rd); continuation in s in 1% steps (down if the branch is placed at s_c, up if not)
+    until the branch's R^d gap changes sign, then bisection to 1e-6 relative.  Also the branch's G1 switch (the switch
+    of the x₁-direction gap on the same branch).  Continuation is abandoned if a solve does not converge (grad > 1e-8)
+    or the branch jumps (> 0.5 in any coordinate)."""
+    os.nice(15)
+    import torch
+    torch.set_num_threads(1)
+    arm, d, a, seed, pc = args
+    p = np.array(json.loads(pc)); sg = float(np.sign(p[2]))
+    X, Y = make_data_rd(int(seed), d)
+    out = {"arm": arm, "d": d, "a": a, "seed": seed}
+
+    def br(h, s):
+        q = np.r_[h[0], h[1], sg * s, h[2], h[3:]]
+        hh, _, g, conv = branch_rd(a, X, Y, q)
+        return hh, g
+
+    def G(h, s, noise=True):
+        return float(gap_rd(h[0], h[1], h[3:] if noise else h[3:3], sg, a))
+    s_c = abs(p[2])
+    for key, noise in (("s_branch", True), ("s_branch_G1", False)):
+        h, g = br(np.r_[p[0], p[1], p[3], p[4:]], s_c)
+        if g > 1e-8:
+            out[key] = np.nan; out[key + "_note"] = "no converged branch at s_c"; continue
+        placed = G(h, s_c, noise) > 0
+        s, note, res = s_c, "", np.nan
+        for _ in range(200):
+            s_new = s * (0.99 if placed else 1.01)
+            h_new, g = br(h, s_new)
+            if g > 1e-8 or np.abs(h_new - h).max() > 0.5:
+                note = f"continuation lost at s={s_new:.4f}"; break
+            if (G(h_new, s_new, noise) > 0) != placed:
+                lo, hi, hlo = (s_new, s, h_new) if placed else (s, s_new, h)
+                while (hi - lo) / lo > 1e-6:
+                    mid = 0.5 * (lo + hi)
+                    hm, _ = br(hlo, mid)
+                    if G(hm, mid, noise) > 0:
+                        hi = mid
+                    else:
+                        lo, hlo = mid, hm
+                res = 0.5 * (lo + hi); break
+            s, h = s_new, h_new
+        else:
+            note = "no sign change within 200 steps"
+        out[key] = res; out[key + "_note"] = note
+        if noise:
+            out["branch_placed_at_s_c"] = bool(placed)
+    return out
+
+
+def posthoc(workers=1):
+    """POST HOC (labelled; after the registered score): residual against the run's own R^d branch switch, and the
+    registered lag-law prediction compared with it using the registered tolerance (NOT a registered test)."""
+    from multiprocessing import get_context
+    P = pd.read_csv(OUT / "scored_runs.csv")
+    R = load_runs().set_index(["arm", "d", "a", "seed"])
+    c = P[P.crossed.astype(bool)]
+    f = OUT / "posthoc_branch_switch.csv"
+    if not f.exists():
+        jobs = [(r.arm, int(r.d), round(r.a, 2), int(r.seed), R.loc[(r.arm, r.d, round(r.a, 2), r.seed), "p_cross"])
+                for r in c.itertuples()]
+        with get_context("spawn").Pool(workers) as pool:
+            rows = list(pool.imap(_branch_switch_job, jobs))
+        pd.DataFrame(rows).to_csv(f, index=False)
+    b = pd.read_csv(f); b["a"] = b.a.round(2); c = c.copy(); c["a"] = c.a.round(2)
+    m = c.merge(b, on=["arm", "d", "a", "seed"])
+    m["r_branch"] = m.s_cross / m.s_branch - 1
+    m["branch_over_own_x1"] = m.s_branch / m.w2_own
+    m["G1switch_over_own_x1"] = m.s_branch_G1 / m.w2_own
+    m.to_csv(OUT / "posthoc_scored_runs.csv", index=False)
+    rows = []
+    for arm in ("primary", "secondary"):
+        Pa = m[m.arm == "primary"] if arm == "primary" else m[m.d > 1]
+        for (d, a), g in Pa.groupby(["d", "a"]):
+            ok = g[np.isfinite(g.r_branch) & np.isfinite(g.pred_r) & (g.chi > 0)]
+            pm, om = float(ok.pred_r.median()), float(ok.r_branch.median())
+            tol = max(LAG_TOL_ABS, LAG_TOL_REL * abs(pm))
+            lo, hi, mid = s_bracket(a)
+            rows.append({"label": "POST HOC", "arm": arm, "d": int(d), "a": a, "n_crossing": len(g),
+                         "n_branch_switch": int(np.isfinite(g.s_branch).sum()), "n_used": len(ok),
+                         "median_branch_over_pop": float((g.s_branch / mid).median()),
+                         "median_branch_over_own_x1": float(g.branch_over_own_x1.median()),
+                         "median_G1switch_over_own_x1": float(g.G1switch_over_own_x1.median()),
+                         "median_r_branch": om, "median_pred_r": pm, "tol_as_registered": tol,
+                         "within_tol": abs(om - pm) <= tol, "obs_over_pred": om / pm,
+                         "frac_s_branch_ge_s_lo": float((g.s_branch >= lo).mean())})
+    S = pd.DataFrame(rows); S.to_csv(OUT / "posthoc_summary.csv", index=False)
+    pd.set_option("display.width", 250)
+    print(S.to_string(index=False))
+    return S
+
+
 if __name__ == "__main__":
     {"popcheck": popcheck, "reference": width1_reference, "own": own_x1, "pilot": pilot, "pilot_diag": pilot_diag, "validate": validate,
-     "run": run, "score": score}[sys.argv[1]]()
+     "run": run, "score": score, "posthoc": posthoc}[sys.argv[1]]()
