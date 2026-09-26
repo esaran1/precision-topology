@@ -1,0 +1,3 @@
+start,n,n_exact_step_equals_observed,n_exact_step_within_1_of_observed,max_abs_rel_s_exact_vs_obs,median_r_obs,median_r_exact_grad,median_r_full,slope_obs_on_exact_grad,slope_obs_on_full,slope_exact_grad_on_full
+0.7,426,426,426,0.0,0.03415121003827126,0.034275934811260234,0.03356332317767108,1.0,1.0339073308739866,1.0339073308739866
+0.5,430,430,430,0.0,0.03415121003827126,0.03415121003827126,0.03343104804725483,1.0,1.0338867086977295,1.0338867086977295

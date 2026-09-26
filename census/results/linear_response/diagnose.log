@@ -1,0 +1,10 @@
+ start   n  n_exact_step_equals_observed  n_exact_step_within_1_of_observed  max_abs_rel_s_exact_vs_obs  median_r_obs  median_r_exact_grad  median_r_full  slope_obs_on_exact_grad  slope_obs_on_full  slope_exact_grad_on_full
+   0.7 426                           426                                426                         0.0      0.034151             0.034276       0.033563                      1.0           1.033907                  1.033907
+   0.5 430                           430                                430                         0.0      0.034151             0.034151       0.033431                      1.0           1.033887                  1.033887
+   a  opt   n  n_exact_step_equals_observed  slope_obs_on_full  median_run_ratio_obs_over_full
+1.30 adam 187                           187           1.018349                        1.017279
+1.30  sgd  12                            12           1.014894                        1.016862
+1.45 adam  12                            12           1.030282                        1.032206
+1.50 adam 191                           191           1.036776                        1.034151
+1.50  sgd  12                            12           1.031321                        1.036917
+1.60 adam  12                            12           1.045236                        1.046443

@@ -944,6 +944,84 @@ def compare():
     print(Pa[[c for c in showp if c in Pa]].round(3).to_string(index=False))
 
 
+def attribution():
+    """After compare: per a (pooled over optimisers, as 1A's 0.82-0.91 was) the through-origin slope and the median
+    per-run ratio of r_obs to each prediction, in the order in which the approximations are removed: 1A reference
+    (global own-sample threshold) → tracked-branch reference with κχ → own coefficients (slaved) → non-steady recursion
+    with frozen coefficients (a) → time-varying P (b) / H and path (c) → full; and the same by κχ tercile within a.
+    Written to attribution.csv / attribution_tercile.csv and merged into summary.json."""
+    m = pd.read_csv(OUT / "compare_runs.csv", low_memory=False); m["a"] = m.a.round(2)
+    steps = [("1A_global_ref", "pred_r_1A", "obs_r_1A"), ("kchi_branch_ref", "pred_r_1A", "r_obs"),
+             ("slaved_own", "r_slaved", "r_obs"), ("a_7", "a_7_r_pred", "r_obs"), ("b_7", "b_7_r_pred", "r_obs"),
+             ("c_7", "c_7_r_pred", "r_obs"), ("c_path_7", "c_path_7_r_pred", "r_obs"), ("d_7", "d_7_r_pred", "r_obs"),
+             ("full_7", "full_7_r_pred", "r_obs"), ("full_5", "full_5_r_pred", "r_obs")]
+    rows, trows = [], []
+    for a, g in m.groupby("a"):
+        for name, pc, oc in steps:
+            ok = g[np.isfinite(g[pc]) & np.isfinite(g[oc])]
+            sl, n = _slope(ok[pc].to_numpy(), ok[oc].to_numpy())
+            rows.append({"a": a, "step": name, "n": n, "slope": sl, "median_run_ratio": float((ok[oc] / ok[pc]).median()),
+                         "slope_excl_4b_reset": _slope(ok[ok.arm != "reset"][pc].to_numpy(), ok[ok.arm != "reset"][oc].to_numpy())[0]})
+        q = pd.qcut(g.pred_r_1A, 3, labels=False)
+        for qi in range(3):
+            h = g[q == qi]
+            row = {"a": a, "kchi_tercile": qi + 1, "n": len(h), "median_kchi": float(h.pred_r_1A.median()),
+                   "median_chi": float(h.chi_1A.median())}
+            for name, pc, oc in steps:
+                ok = h[np.isfinite(h[pc]) & np.isfinite(h[oc])]
+                row[name] = float((ok[oc] / ok[pc]).median()) if len(ok) else float("nan")
+            trows.append(row)
+    R = pd.DataFrame(rows); T = pd.DataFrame(trows)
+    R.to_csv(OUT / "attribution.csv", index=False); T.to_csv(OUT / "attribution_tercile.csv", index=False)
+    sm = json.loads((OUT / "summary.json").read_text())
+    sm["attribution"] = R.to_dict(orient="records"); sm["attribution_tercile"] = T.to_dict(orient="records")
+    sm["frac_s_star_off_global_own_1pct_all"] = float(((m.s_star / m.w2_own_global - 1).abs() > 0.01).mean())
+    sm["n_4b_reset_runs"] = int((m.arm == "reset").sum())
+    (OUT / "summary.json").write_text(json.dumps(sm, indent=1, default=float))
+    pd.set_option("display.width", 250)
+    print(R.pivot(index="step", columns="a", values="slope").loc[[x[0] for x in steps]].round(3).to_string())
+    print(R.pivot(index="step", columns="a", values="median_run_ratio").loc[[x[0] for x in steps]].round(3).to_string())
+    print(R.pivot(index="step", columns="a", values="slope_excl_4b_reset").loc[[x[0] for x in steps]].round(3).to_string())
+    print(T.round(3).to_string(index=False))
+
+
+def extras():
+    """Numbers quoted in the writer inputs that are not in the tables: arm-level ranges, start-point identity, stability
+    of the no-momentum linear map, the machinery check of ablation (a) against κχ.  Merged into summary.json."""
+    m = pd.read_csv(OUT / "compare_runs.csv", low_memory=False); A = pd.read_csv(OUT / "compare_arms.csv")
+    ad = m[m["set"] != "SGD"]
+    ex = {}
+    for k in ("1A", "slaved", "full_7", "full_5", "a_7", "b_7", "c_7", "c_path_7", "d_7", "a_5", "b_5", "c_5"):
+        c = A[f"{k}_ratio_of_medians"]; cx = A[A.arm != "reset"][f"{k}_ratio_of_medians"]
+        ex[f"arm_ratio_of_medians_range_{k}"] = [float(c.min()), float(c.max())]
+        ex[f"arm_ratio_of_medians_range_excl_reset_{k}"] = [float(cx.min()), float(cx.max())]
+        ex[f"arm_n_finite_{k}"] = int(c.notna().sum())
+    for k in ("slaved", "full_7", "a_7", "c_7"):
+        c = A[f"{k}_median_pred_over_median_1A"]; cx = A[A.arm != "reset"][f"{k}_median_pred_over_median_1A"]
+        ex[f"arm_pred_over_kchi_range_{k}"] = [float(c.min()), float(c.max())]
+        ex[f"arm_pred_over_kchi_range_excl_reset_{k}"] = [float(cx.min()), float(cx.max())]
+    both = m.full_7_s_pred.notna() & m.full_5_s_pred.notna()
+    ex["n_full_both_starts"] = int(both.sum())
+    ex["n_full_7_equals_full_5"] = int((m.full_7_s_pred[both] == m.full_5_s_pred[both]).sum())
+    ex["frac_adam_rho_sw_nomom_gt1"] = float((ad.rho_sw_nomom > 1).mean())
+    ex["adam_rho_sw_nomom_median"] = float(ad.rho_sw_nomom.median()); ex["adam_rho_sw_nomom_max"] = float(ad.rho_sw_nomom.max())
+    ex["n_adam_runs"] = int(len(ad)); ex["n_adam_d7_unstable"] = int(ad.d_7_unstable.fillna(False).astype(bool).sum())
+    ex["adam_relax_steps_median"] = float((1 / ad.eta_lam_min_sw).median())
+    ex["n_full7_nopred_by_arm"] = {f"{k[0]}|{k[1]}": int(v) for k, v in
+                                   m[m.full_7_r_pred.isna()].groupby(["set", "arm"]).size().items()}
+    ex["full_minus_d_median_abs_rel"] = float(((m.full_7_r_pred - m.d_7_r_pred).abs() / m.full_7_r_pred.abs()).median())
+    ex["full_minus_d_max_abs_rel"] = float(((m.full_7_r_pred - m.d_7_r_pred).abs() / m.full_7_r_pred.abs()).max())
+    ex["n_full_and_d"] = int((m.full_7_r_pred.notna() & m.d_7_r_pred.notna()).sum())
+    ex["start7_s0_over_sstar_max"] = float(m.start7_s0_over_sstar.max()); ex["start5_s0_over_sstar_max"] = float(m.start5_s0_over_sstar.max())
+    ex["n_intervention_in_window_7"] = int(m.start7_intervention_in_window.fillna(False).astype(bool).sum())
+    ex["n_intervention_in_window_5"] = int(m.start5_intervention_in_window.fillna(False).astype(bool).sum())
+    ex["kappa_own_over_kappa_1A_median"] = float((m.kappa_own / m.kappa_1A).median())
+    ex["chi_sw_over_chi_1A_median"] = float((m.chi_sw / m.chi_1A).median())
+    sm = json.loads((OUT / "summary.json").read_text()); sm["extras"] = ex
+    (OUT / "summary.json").write_text(json.dumps(sm, indent=1, default=float))
+    print(json.dumps(ex, indent=1))
+
+
 def tables():
     """Markdown tables (results/linear_response/tables.md) from compare_arms.csv / compare_per_a.csv; every number in the
     writer inputs comes from here or summary.json."""
@@ -1035,7 +1113,20 @@ def diagnose(n_seeds=4):
                      "slope_exact_grad_on_full": _slope((fu / d.s_star - 1).to_numpy(), (e / d.s_star - 1).to_numpy())[0]})
     out = pd.DataFrame(rows)
     out.to_csv(OUT / "diagnostic_exact_grad.csv", index=False)
-    print(out.to_string(index=False))
+    per_a = []
+    for (a, opt), h in d.assign(opt=np.where(d["set"] == "SGD", "sgd", "adam")).groupby(["a", "opt"]):
+        e = h.exact_grad_7_s_pred.astype(float) / h.s_star - 1; fu = h.full_7_s_pred.astype(float) / h.s_star - 1
+        r_obs = h.s_obs / h.s_star - 1
+        per_a.append({"a": a, "opt": opt, "n": int(np.isfinite(fu).sum()),
+                      "n_exact_step_equals_observed": int(((h.start7_t0 + h.exact_grad_7_step_rel.astype(float)) == h.step_obs).sum()),
+                      "slope_obs_on_full": _slope(fu.to_numpy(), r_obs.to_numpy())[0],
+                      "median_run_ratio_obs_over_full": float((r_obs / fu).median())})
+    pa = pd.DataFrame(per_a); pa.to_csv(OUT / "diagnostic_exact_grad_per_a.csv", index=False)
+    sm = json.loads((OUT / "summary.json").read_text())
+    sm["diagnostic_exact_grad"] = {"n_seeds_per_arm": n_seeds, "pooled": out.to_dict(orient="records"),
+                                   "per_a": pa.to_dict(orient="records")}
+    (OUT / "summary.json").write_text(json.dumps(sm, indent=1, default=float))
+    print(out.to_string(index=False)); print(pa.to_string(index=False))
     return out
 
 
@@ -1049,6 +1140,10 @@ if __name__ == "__main__":
         finalize()
     elif cmd == "compare":
         compare()
+    elif cmd == "extras":
+        extras()
+    elif cmd == "attribution":
+        attribution()
     elif cmd == "tables":
         tables()
     elif cmd == "diagnose":
