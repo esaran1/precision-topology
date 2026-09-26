@@ -572,6 +572,7 @@ def main() -> None:
     v4_checks()
     harsh_review_checks()
     tracks_checks()
+    lag_law_checks()
 
     provenance_check()
 
@@ -1699,6 +1700,78 @@ def _decimals(v) -> int:
         m, e = t.lower().split("e")
         return max(0, (len(m.split(".")[1]) if "." in m else 0) - int(e))
     return len(t.split(".")[1]) if "." in t else 0
+
+
+def lag_law_checks() -> None:
+    """Track 1A (κ, derived after the fitted relationship was known) and Track 1B (registered ramp, R4, post hoc)."""
+    import hashlib as _h
+    print("Track 1A (lag law, no refit)")
+    L = R / "lag_law"
+    A = pd.read_csv(L / "compare_arms.csv"); Pa = pd.read_csv(L / "compare_per_a.csv").set_index("a")
+    chk("1A arms within tolerance", float(A.within.sum()), 36.0, 0)
+    chk("1A arms", float(len(A)), 36.0, 0)
+    for a, v in ((1.30, 0.89), (1.45, 0.83), (1.50, 0.91), (1.60, 0.82)):
+        chk(f"1A slope/kappa a={a:.2f}", float(Pa.loc[a, "ratio_obs_to_pred"]), v, 0.006)
+    for a, v in ((1.30, 7.61), (1.45, 4.59), (1.50, 4.05), (1.60, 3.29)):
+        kb = pd.read_csv(L / "kappa_by_winding.csv")
+        k = -1 if a == 1.30 else 0
+        chk(f"1A kappa_Adam a={a:.2f}", float(kb[(kb.a.round(2) == a) & (kb.k == k)].kappa_adam.iloc[0]), v, 0.006)
+    want = {l.split()[1].split("/")[-1]: l.split()[0] for l in (L / "committed.sha256").read_text().splitlines()}
+    chk("1A committed predictions hash", float(_h.sha256((L / "predictions.csv").read_bytes()).hexdigest() == want["predictions.csv"]), 1.0, 0)
+    p_ = pd.read_csv(L / "predictions.csv")
+    chk("1A predicted runs", float(len(p_)), 1750.0, 0)
+    chk("1A mirror runs", float(p_.mirror.sum()), 875.0, 0)
+    low = A.arm.astype(str).eq("0.25") & A["set"].isin(["lag1", "lag2-tstar"])
+    q = A[~low]; q25 = A[low]
+    chk("1A low arms are the four early-slowed phi=0.25 arms", float(low.sum()), 4.0, 0)
+    chk("1A obs/pred min (other 32 arms)", float(q.obs_over_pred.min()), 0.91, 0.006)
+    chk("1A obs/pred max (other 32 arms)", float(q.obs_over_pred.max()), 1.13, 0.006)
+    chk("1A obs/pred min (four low arms)", float(q25.obs_over_pred.min()), 0.70, 0.006)
+    chk("1A obs/pred max (four low arms)", float(q25.obs_over_pred.max()), 0.76, 0.006)
+    pp = A[A.arm.astype(str).eq("0.25") & A["set"].eq("lag2-prim")]
+    chk("1A obs/pred min (primary-rule phi=0.25)", float(pp.obs_over_pred.min()), 1.03, 0.006)
+    chk("1A obs/pred max (primary-rule phi=0.25)", float(pp.obs_over_pred.max()), 1.07, 0.006)
+    w = pd.read_csv(L / "winding_check.csv")
+    for (a, k, chi), (pv, mv) in {(1.30, 0, 0.003): (-0.0223, -0.0215), (1.30, -1, 0.003): (0.0229, 0.0236),
+                                  (1.30, 1, 0.003): (-0.0675, -0.0607), (1.50, 0, 0.002): (0.0081, 0.0082),
+                                  (1.50, 0, 0.005): (0.0204, 0.0207)}.items():
+        r_ = w[(w.a.round(2) == a) & (w.k == k) & (w.chi.round(4) == chi)].iloc[0]
+        chk(f"1A winding check a={a:.2f} k={k} chi={chi} predicted", float(r_.predicted_r), pv, 0.00006)
+        chk(f"1A winding check a={a:.2f} k={k} chi={chi} measured", float(r_.measured_r), mv, 0.00006)
+    rx = pd.read_csv(L / "relaxation.csv")
+    chk("1A relaxation steps min", float(rx.relaxation_steps.min()), 7.8, 0.06)
+    chk("1A relaxation steps max", float(rx.relaxation_steps.max()), 16.2, 0.06)
+    print("Track 1B (ramp, registered) and R4")
+    V = json.loads((R / "ramp" / "verdicts.json").read_text())
+    reg = {(1.30, -1, "sgd"): ("PASS", "PASS", "PASS", 0.78), (1.30, 0, "sgd"): ("FAIL", "PASS", "PASS", 1.30),
+           (1.50, 0, "sgd"): ("FAIL", "PASS", "FAIL", -0.10), (1.30, -1, "adam"): ("FAIL", "PASS", "PASS", -7.12),
+           (1.30, 0, "adam"): ("FAIL", "PASS", "PASS", 9.10), (1.50, 0, "adam"): ("FAIL", "FAIL", "FAIL", -9.99)}
+    for x in V["settings"]:
+        key = (round(x["a"], 2), int(x["winding"]), x["opt"]); r1, r2, r3, sl = reg[key]
+        t = f"{key[2]} {key[0]:.2f} k={key[1]}"
+        chk(f"1B registered R1 {t}", float(x["R1"] == r1), 1.0, 0)
+        chk(f"1B registered R2 {t}", float(x["R2"] == r2), 1.0, 0)
+        chk(f"1B registered R3 {t}", float(x["R3"] == r3), 1.0, 0)
+        chk(f"1B registered slope {t}", float(x["slope_obs_on_pred"]), sl, 0.006)
+        chk(f"1B crossed {t}", float(x["n_crossed"]), 240.0, 0)
+    chk("1B registered R1 SGD 1.30 k=-1", float([x for x in V["settings"] if x["opt"] == "sgd" and x["winding"] == -1][0]["R1"] == "PASS"), 1.0, 0)
+    chk("1B slowest median SGD 1.50", float([x for x in V["settings"] if x["opt"] == "sgd" and round(x["a"], 2) == 1.5][0]["slowest_median_r"]), -0.0233, 0.00006)
+    PH = json.loads((R / "ramp" / "posthoc_branch.json").read_text())
+    ph = {(round(x["a"], 2), int(x["winding"]), x["opt"]): x for x in PH}
+    for key, (r1, sl) in {(1.30, -1, "sgd"): ("PASS", 1.24), (1.30, 0, "sgd"): ("PASS", 0.90), (1.50, 0, "sgd"): ("PASS", 1.14),
+                          (1.30, -1, "adam"): ("FAIL", 0.52), (1.30, 0, "adam"): ("FAIL", 1.49), (1.50, 0, "adam"): ("PASS", 0.90)}.items():
+        t = f"{key[2]} {key[0]:.2f} k={key[1]}"
+        chk(f"1B post hoc R1 {t}", float(ph[key]["R1"] == r1), 1.0, 0)
+        chk(f"1B post hoc slope {t}", float(ph[key]["slope_obs_on_pred"]), sl, 0.006)
+    chk("1B post hoc R1 SGD 1.50", float(ph[(1.50, 0, "sgd")]["R1"] == "PASS"), 1.0, 0)
+    chk("1B branch off own a=1.30", float(ph[(1.30, -1, "sgd")]["frac_branch_off_own_1pct"]), 0.35, 0.0006)
+    chk("1B branch off own a=1.50", float(ph[(1.50, 0, "sgd")]["frac_branch_off_own_1pct"]), 0.675, 0.0006)
+    for x in V["R4"]:
+        a = round(x["a"], 2)
+        chk(f"R4 a={a:.2f}", float(x["R4"] == "PASS"), 1.0, 0)
+        for e, v in ((0.01, {1.3: 0.0296, 1.5: 0.0619}), (0.005, {1.3: 0.0304, 1.5: 0.0625}), (0.0025, {1.3: 0.0308, 1.5: 0.0647})):
+            chk(f"R4 median a={a:.2f} eta={e}", float(x[f"median_{e}"]), v[a], 0.00006)
+            chk(f"R4 crossed a={a:.2f} eta={e}", float(x[f"n_crossed_{e}"]), 39.0, 0)
 
 
 def digit_stability() -> None:

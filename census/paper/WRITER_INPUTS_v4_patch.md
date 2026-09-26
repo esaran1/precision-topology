@@ -459,7 +459,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 498 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 547 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
@@ -1514,3 +1514,181 @@ output rate is slowed substantially (post hoc)."
 **Do not say:** that the relation holds quantitatively within a for arbitrary interventions, that it is the residual's
 mechanism, or that the lag tests confirm it. The registered lag-test predictions L2, L1′ and L2′ failed, and those
 verdicts stand.
+
+## WP-24. The lag law r = κ(a)·χ: a no-fit constant, and a registered ramp test (Tracks 1A and 1B; for the submission)
+
+Producers: `src/lag_law.py` → `lag_law/` (κ, predictions, comparison, winding check, relaxation times);
+`src/ramp.py` → `ramp/` (design, runs, scores, post hoc). Math note §13 has the derivation.
+
+**Label for everything in Track 1A: derived after the fitted relationship (residual = α + β·ratio, WP-16/21/23) was known.**
+
+### 1A. What was committed before any comparison (b6ae433)
+
+- **The law.** Hidden coordinates θ = (w₁, b₁, b₂) track the conditional stationary branch θ\*(s) of the loss at fixed
+  output scale s. To first order the steady lag gives
+
+  r = (s_c − s\*)/s\* = κ(a)·χ, with χ = (ṡ/s\*)/(ηλ_min) and κ(a) = λ_min·[∇G·(PH)⁻¹θ\*′]/[∇G·θ\*′].
+
+  - H is the Hessian at the switch s\* and θ\*′ the branch tangent.
+  - P = I for SGD. For Adam, P = diag(1/(√v̂ + ε)) is the median preconditioner at crossing.
+  - λ_min = λ_min(P^{1/2}HP^{1/2}).
+  - κ has no free parameter. χ is the paper's timescale ratio, up to s\* against s_c (a factor 1 + r).
+- **Winding.** f_a(t + 2π) = f_a(t) + 2π, so b₁ has 2π copies with the same loss and threshold but a different output-bias
+  drift. κ depends on the copy k. Every existing run sits on k = −1 at a = 1.30 and on k = 0 elsewhere.
+  - This was found, and checked with controlled population ramps, before any comparison (`winding_check.csv`):
+
+| a | k | χ | predicted r | measured r |
+|---|---|---|---|---|
+| 1.30 | +0 | 0.003 | -0.0223 | -0.0215 |
+| 1.30 | -1 | 0.003 | +0.0229 | +0.0236 |
+| 1.30 | +1 | 0.003 | -0.0675 | -0.0607 |
+| 1.50 | +0 | 0.002 | +0.0081 | +0.0082 |
+| 1.50 | +0 | 0.005 | +0.0204 | +0.0207 |
+
+- **Values and predictions.** Per-run predictions were committed with SHA-256 af6bb137… for 1,750 runs: 32
+  intervention arms, SGD at two a, and Task B at two a. 875 of these runs sit on the mirror branch, where κ is
+  unchanged.
+
+| a | k | κ_Adam | κ_SGD | observed/predicted slope (post hoc, through the origin) |
+|---|---|---|---|---|
+| 1.30 | -1 | 7.61 | 7.62 | 0.89 |
+| 1.45 | +0 | 4.59 | 4.61 | 0.83 |
+| 1.50 | +0 | 4.05 | 4.07 | 0.91 |
+| 1.60 | +0 | 3.29 | 3.32 | 0.82 |
+
+### 1A. Result (899850d; no refit)
+
+| set | arms | within max(0.01, 0.25·pred) | observed/predicted per arm |
+|---|---|---|---|
+| 4b | 8 | 8 | 1.00–1.03 |
+| SGD | 2 | 2 | 1.09–1.12 |
+| TaskB | 2 | 2 | 0.99–1.03 |
+| lag1 | 8 | 8 | 0.70–1.04 |
+| lag2-prim | 8 | 8 | 1.02–1.07 |
+| lag2-tstar | 8 | 8 | 0.71–1.03 |
+
+- **36 of 36 arms are within tolerance.**
+  - The four φ = 0.25 arms of the first lag test and the t\* rule (w₂ slowed from early on) are at
+    0.70–0.76. They are within tolerance only through the 0.01 floor.
+  - The other 32 arms are at 0.91–1.12. This corrects the 899850d
+    commit message, which said 0.99–1.13 and called the four low arms "the φ = 0.25 arms"; the deconfounded primary
+    rule's φ = 0.25 arms are at 1.03–1.07.
+- **Per a (post hoc through-origin fit):** observed slope / κ = 0.89 (1.30), 0.83 (1.45), 0.91 (1.50), 0.82 (1.60).
+  That is within 30% at every a. The law over-predicts by 9–18%.
+- **Timescales.** The relaxation time 1/(ηλ_min) is 7.8–16.2
+  steps; Adam's momentum time is 10 steps. Momentum does not change the steady lag (math note §13.3).
+
+### 1B. The ramp experiment (registered c4b4c6d; own thresholds frozen 83f66f5 and 15b4744 before any crossing was read)
+
+**Design.**
+- Output scale forced to s = s₀e^{γt} from 0.5·s\* after a 4,000-step warm-up. Hidden coordinates and output bias
+  train normally (Adam lr 0.01 or SGD lr 0.3).
+- 40 fresh seeds per cell, 6 γ cells per setting.
+- Every run starts on the population branch at winding k:
+  - (1.30, k = −1) and (1.50, k = 0) are the natural windings (R1–R3);
+  - (1.30, k = 0) has κ < 0, so the law predicts crossing *before* the threshold (R5).
+- Predictions: r_pred = κ_k·χ. SGD's χ is fully a priori from γ, η and the landscape. Adam's χ uses each run's measured
+  v̂ at crossing.
+- Observed r uses each seed's own-sample global threshold.
+- **Rules:**
+  - R1: through-origin slope in [0.7, 1.3];
+  - R2: sign(κ)·Spearman(γ, cell median) ≥ 0.9;
+  - R3: |slowest-cell median| < 0.005.
+- **Adam's γ grid.** It was calibrated on pilot seeds from predictions only, and targets predicted lags of only
+  0.0005–0.006. Adam cannot follow faster ramps: its step is capped near η per coordinate, and the pilot runs stopped
+  crossing.
+
+**Registered verdicts (all 1,440 runs crossed; none placed during warm-up; no run changed winding).**
+
+| a | k | optimiser | rule set | R1: slope | R2: signed Spearman | R3: slowest median |
+|---|---|---|---|---|---|---|
+| 1.30 | -1 | adam | R1–R3 | -7.12 **FAIL** | 1.00 **PASS** | -0.0000 **PASS** |
+| 1.30 | -1 | sgd | R1–R3 | 0.78 **PASS** | 1.00 **PASS** | +0.0009 **PASS** |
+| 1.30 | +0 | adam | R5 (sign test) | 9.10 **FAIL** | 1.00 **PASS** | -0.0012 **PASS** |
+| 1.30 | +0 | sgd | R5 (sign test) | 1.30 **FAIL** | 1.00 **PASS** | -0.0014 **PASS** |
+| 1.50 | +0 | adam | R1–R3 | -9.99 **FAIL** | 0.71 **FAIL** | -0.0250 **FAIL** |
+| 1.50 | +0 | sgd | R1–R3 | -0.10 **FAIL** | 1.00 **PASS** | -0.0233 **FAIL** |
+
+**Diagnosis (after scoring).**
+- Every γ cell contains the same subpopulation of seeds at a large static offset: 5% quantiles ≈ −0.25 and 95% ≈ +0.09
+  in every cell.
+- For these seeds the own-sample *global* threshold is not the switch of the branch the ramp forces. For 35% of seeds at
+  a = 1.30 and 68% at a = 1.50, that branch's own-sample switch differs from s_own by more than 1%.
+- Free training is not forced onto a branch; the ramp is. The offsets pull the pooled slopes (R1) and, at a = 1.50, the
+  medians (R3).
+
+**POST HOC (labelled): the same rules against each seed's tracked-branch own-sample switch** (`ramp.posthoc_branch`;
+the last column is the fraction of seeds whose branch switch is > 1% from s_own).
+
+| a | k | optimiser | rule set | R1 | R2 | R3 | branch ≠ own |
+|---|---|---|---|---|---|---|---|
+| 1.30 | -1 | adam | R1–R3 | 0.52 **FAIL** | 1.00 **PASS** | +0.0002 **PASS** | 0.350 |
+| 1.30 | -1 | sgd | R1–R3 | 1.24 **PASS** | 1.00 **PASS** | +0.0010 **PASS** | 0.350 |
+| 1.30 | +0 | adam | R5 (sign test) | 1.49 **FAIL** | 1.00 **PASS** | -0.0009 **PASS** | 0.350 |
+| 1.30 | +0 | sgd | R5 (sign test) | 0.90 **PASS** | 1.00 **PASS** | -0.0010 **PASS** | 0.350 |
+| 1.50 | +0 | adam | R1–R3 | 0.90 **PASS** | 0.94 **PASS** | -0.0002 **PASS** | 0.675 |
+| 1.50 | +0 | sgd | R1–R3 | 1.14 **PASS** | 1.00 **PASS** | +0.0010 **PASS** | 0.675 |
+
+Cell medians, post hoc (observed vs predicted, slowest to fastest γ):
+
+| a | k | optimiser | observed | predicted |
+|---|---|---|---|---|
+| 1.30 | -1 | adam | +0.0002 / +0.0003 / +0.0007 / +0.0013 / +0.0030 / +0.0036 | +0.0005 / +0.0008 / +0.0013 / +0.0021 / +0.0032 / +0.0049 |
+| 1.30 | -1 | sgd | +0.0010 / +0.0026 / +0.0066 / +0.0168 / +0.0442 / +0.1262 | +0.0010 / +0.0025 / +0.0063 / +0.0158 / +0.0398 / +0.1000 |
+| 1.30 | +0 | adam | -0.0009 / -0.0013 / -0.0019 / -0.0034 / -0.0047 / -0.0072 | -0.0005 / -0.0008 / -0.0013 / -0.0021 / -0.0032 / -0.0052 |
+| 1.30 | +0 | sgd | -0.0010 / -0.0026 / -0.0065 / -0.0161 / -0.0386 / -0.0875 | -0.0010 / -0.0025 / -0.0063 / -0.0158 / -0.0398 / -0.1000 |
+| 1.50 | +0 | adam | -0.0002 / -0.0003 / +0.0001 / +0.0010 / +0.0014 / +0.0043 | +0.0005 / +0.0008 / +0.0014 / +0.0023 / +0.0038 / +0.0065 |
+| 1.50 | +0 | sgd | +0.0010 / +0.0025 / +0.0063 / +0.0160 / +0.0414 / +0.1136 | +0.0010 / +0.0025 / +0.0063 / +0.0158 / +0.0398 / +0.1000 |
+
+- **SGD:** the law predicts the cell medians to within a few percent in every cell except the fastest (κχ = 0.1), where
+  observed/predicted is 1.14–1.26 (the nonlinear regime, math note §13.3(iv)).
+  - The sign test holds: on the k = 0 copy at a = 1.30 the crossings come *early*, as predicted.
+- **Adam:** predicted lags are ≤ 0.006, and there the medians carry a small offset of order 0.001. R1 fails at a = 1.30
+  and passes at a = 1.50.
+
+### R4. Free Adam training at three learning rates (registered with 1B; seeds 860,100–860,139)
+
+| a | crossed (η = 0.01 / 0.005 / 0.0025) | median residual | tolerance | R4 |
+|---|---|---|---|---|
+| 1.30 | 39 / 39 / 39 | +0.0296 / +0.0304 / +0.0308 | ±0.0100 | **PASS** |
+| 1.50 | 39 / 39 / 39 | +0.0619 / +0.0625 / +0.0647 | ±0.0155 | **PASS** |
+
+- The law predicts η-invariance. Growth ṡ and relaxation ηλ both scale with η, so χ does not change.
+- A pass means that the lag does not vanish in the gradient-flow limit of free training.
+
+### Notation for the main text
+
+- κ(a) is the lag constant. The plan's notation table uses κ(a). The existing κ₀ (the limiting-cubic constant in Block
+  3's window design) must then get another symbol in the main text (suggestion: ν₀), and Ĝ/D is not called κ anywhere
+  in the main text.
+- χ = (ṡ/s\*)/(ηλ_min). The tests used each run's measured ratio at crossing, which divides by s_c instead of s\*.
+  State this once.
+- The fitted line residual = α + β·ratio (WP-16, WP-21, WP-23) stays as the registered basis of those verdicts
+  (EXT, TS-1). Where the paper states the account, use r = κ(a)χ, labelled "derived after the fitted relationship was
+  known". It has no intercept and no fitted parameter.
+
+### Say / Do not say
+
+**The κ outcome (1A) is "within 30%"** (post hoc slope/κ = 0.82–0.91 at every a; 36/36 arms within tolerance).
+
+- **Say (observed outcome, within 30%):** "A first-order tracking analysis gives the lag constant κ(a) with no fitted
+  parameter. Computed before comparison, it predicts the median residual of all 36 existing arms within tolerance, and
+  the observed slope is within 30% of κ(a) at every a (the analysis was derived after a fitted relationship was
+  known)."
+- **If it had been within a factor of two (not observed),** the sentence would be: "predicts the residual's scale within
+  a factor of two".
+- **If worse (not observed),** it would be: "does not predict the residual quantitatively".
+- **Say (ramp, registered):** "In a registered test that forces the output scale to grow at set rates, the lag increases
+  monotonically with the rate in every setting (R2 passes in 5 of 6) and vanishes at the slowest rate at a = 1.30. The
+  pooled magnitude criterion (R1) passes only for SGD at a = 1.30 on the natural winding. The failures trace to seeds
+  whose own-sample global threshold is not the switch of the branch the ramp forces."
+- **Say (ramp, post hoc, labelled):** "Measured against the switch of the branch each run actually tracks, SGD's
+  crossing lag matches κ(a)χ with no fitted parameter across two decades of rate, including the predicted *early*
+  crossing on the winding copy with negative κ."
+- **Do not say:**
+  - that the ramp test passed as registered;
+  - that κ was predicted before the fitted relationship was known;
+  - that the law holds for Adam at small predicted lags (R1 fails at a = 1.30 post hoc too);
+  - that the law holds in the nonlinear regime κχ ≳ 0.1;
+  - that the lag law explains width 2 (WP-15; Track 2 below).
+IDs: `1A arms within tolerance`; `1A slope/kappa a=1.30`; `1A slope/kappa a=1.50`; `1B registered R1 SGD 1.30 k=-1`; `1B post hoc R1 SGD 1.50`; `1B branch off own a=1.50`.

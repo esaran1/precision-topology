@@ -1058,3 +1058,158 @@ many-period argument for w₁ = O(1). It is unnecessary.
 - The many-period regime is the single inequality |sin y|/y ≤ 1/π < 1/a for y = 1.4w₁ ≥ π.
 - As a by-product, the finite-a branch-and-bound domain w₁ ∈ (0, a/1.4] (`ghat_bnb.py`) could be shrunk to
   w₁ < x_a/1.4. At a = 1.30, for example, that is 0.873 against 0.929.
+
+## 13. The lag law: a no-fit constant κ(a) (Track 1A; derived after the fitted relationship was known; 2026-09-25)
+
+**Status.** A first-order (linear, slaved) derivation, checked step by step. It is not a theorem about training: it
+assumes that training tracks one conditional stationary branch and that the linearisation holds (§13.3(iv)). κ was computed
+and every prediction committed (b6ae433) before any comparison. The comparison (899850d) used no refit. **Label
+throughout: derived after the fitted relationship residual = α + β·ratio was known.** Code: `src/lag_law.py`; outputs:
+`results/lag_law/`.
+
+### 13.1 Setting and derivation
+
+- Hidden coordinates θ = (w₁, b₁, b₂) at output scale s = |w₂|. The output bias b₂ is a trained coordinate in every
+  protocol (its own gradient step each iteration; §13.3(ii)).
+- Update: θ ← θ − ηP∇_θL(θ; s). P = I for SGD. For Adam, P = diag(1/(√v̂ + ε)), treated as fixed over the relaxation
+  time.
+- θ\*(s) is the tracked conditional stationary point (∇_θL(θ\*(s); s) = 0) with Hessian H (positive definite at every
+  switch computed). Its tangent is θ\*′ = −H⁻¹∂ₛ∇_θL.
+- Write θ = θ\*(s) + δ. To first order, with s advancing by ṡ per step:
+  δ_{t+1} − δ_t = −ηPHδ_t − θ\*′ṡ.
+- The slaved (steady) solution, valid when ṡ changes slowly on the relaxation time 1/(ηλ_min), is
+  δ = −(ηPH)⁻¹θ\*′ṡ.
+- The placement gap G depends on (w₁, b₁) only (∂G/∂b₂ = 0). Along the branch, g(s) = G(θ\*(s)) with g′(s\*) = ∇G·θ\*′,
+  where s\* is the switch, g(s\*) = 0.
+- The crossing G(θ\*(s_c) + δ) = 0 gives, to first order, g′(s\*)(s_c − s\*) + ∇G·δ = 0, i.e.
+  g′(s\*)(s_c − s\*) = ∇G·(ηPH)⁻¹θ\*′ṡ.
+- Dividing by s\*:
+
+  **r = (s_c − s\*)/s\* = κ·χ,  χ = (ṡ/s\*)/(ηλ_min),  κ = λ_min·[∇G·(PH)⁻¹θ\*′]/[∇G·θ\*′],**
+
+  with λ_min = λ_min(P^{1/2}HP^{1/2}), the slowest relaxation rate of the preconditioned dynamics.
+- κ is dimensionless and invariant to rescaling P → cP (both λ_min and (PH)⁻¹ scale). So only P's relative shape
+  enters κ, while P's absolute size enters χ.
+
+### 13.2 Computation (`lag_law.run_kappa`, `kappa.csv`)
+
+- Landscape: width 1, the 800-point population objective, at a = 1.30, 1.45, 1.50 and 1.60.
+- Switch: s\* is the root of G(θ\*(s)) on the branch that is the certified global conditional minimiser. The search
+  starts from the retained conditional-audit minimiser nearest the certified bracket, with Newton continuation and
+  bisection in s. Every s\* lies inside its certified glob bracket.
+- ∇G uses central differences (step 1e-6) of the exact-extrema gap. The one-sided differences agree to ≤ 5e-6
+  relative, so the active extremal pair is unique.
+- P: SGD uses I. Adam uses the per-coordinate median of the normalised 1/(√v̂ + ε) at the crossing over existing runs
+  (48–80 runs per a). The interquartile range of κ over those runs' own P lies within 0.9% of the median.
+- **The winding k.** f_a(t + 2π) = f_a(t) + 2π, so (w₁, b₁ + 2πk, b₂ − 2πk·s) has identical logits, loss, H, s\* and ∇G.
+  The b₂ drift, however, changes: θ\*′ → θ\*′ − 2πk·e_{b₂}, and κ depends on k through (PH)⁻¹θ\*′ (`kappa_k`).
+  - Each run's k is measured at its crossing as round((b₁ − b₁\*)/2π), with b₁ in w₂'s orientation.
+  - All 1,750 predicted runs sit on k = −1 at a = 1.30 and on k = 0 at the other a. The largest |b₁ offset| from the
+    copy is 0.039.
+- Mirror branch: x → −x maps (w₁, b₁) → (−w₁, b₁). On the symmetric population it leaves G, s\*, H's spectrum and κ
+  unchanged. 875 of the 1,750 runs sit on the mirror branch.
+
+| a | s\* | k used | κ_Adam | κ_SGD |
+|---|---|---|---|---|
+| 1.30 | 4.9580 | −1 | 7.61 | 7.62 |
+| 1.45 | 2.8962 | 0 | 4.59 | 4.61 |
+| 1.50 | 2.5270 | 0 | 4.05 | 4.07 |
+| 1.60 | 2.0022 | 0 | 3.29 | 3.32 |
+
+(`kappa_by_winding.csv` gives κ for k = −1, 0, +1 at every a. At a = 1.30, κ = −7.53 for k = 0 and −22.7 for k = +1:
+the sign itself depends on the winding.)
+
+### 13.3 The four stated points
+
+- **(i) χ against the paper's existing timescale ratio.**
+  - The existing ratio (`residual_timescale.py`) is (d log s/dt at the crossing)/(lr·λ_min(D^{−1/2}HD^{−1/2})), with
+    D = diag(√v̂ + ε), i.e. D⁻¹ = P, and each run's own D.
+  - It equals χ except that it divides ṡ by s_c instead of s\*: ratio = χ·s\*/s_c = χ/(1 + r). The per-arm median r
+    is at most 0.081, so the difference is second order in r.
+  - The committed predictions use each run's measured ratio as χ.
+- **(ii) The output bias is a trained coordinate, not profiled.**
+  - If b₂ were profiled (always at its conditional optimum), θ = (w₁, b₁) with the Schur-complement Hessian, and b₂'s
+    drift would not enter. κ would then be independent of the winding k.
+  - The dynamics trains b₂ like any other coordinate. The controlled ramps below confirm the winding dependence, which
+    exists only if b₂ is trained. So the trained-coordinate form is the one the dynamics implies.
+- **(iii) Adam's momentum (β₁ = 0.9).**
+  - In steady tracking δ is constant, so the gradient Hδ is constant and the momentum average equals it (m = Hδ).
+    The steady lag is therefore unchanged by momentum.
+  - Momentum only shapes the approach to the steady state. Its time constant is 1/(1 − β₁) = 10 steps.
+  - With Adam's median absolute crossing preconditioner, the relaxation time 1/(ηλ_min(P^{1/2}HP^{1/2})) is 7.8, 12.1,
+    14.7 and 16.2 steps at a = 1.30, 1.45, 1.50 and 1.60 (`lag_law.relaxation_rates`, `relaxation.csv`), so the two
+    time scales are comparable. Momentum therefore affects
+    transients but not the steady lag, and is not included.
+  - A drift that changes on the momentum time scale adds a correction of relative order (β₁/(1 − β₁))·d log ṡ/dt.
+    It is not computed here.
+- **(iv) Where the linearisation should break down.**
+  - (a) χ is not small, so δ is not small against the scale on which G is linear in θ. This is κχ ≳ 0.1 in practice.
+  - (b) Near a fold of the branch, λ_min → 0 and the slaved solution does not exist.
+  - (c) When P is not stationary on the relaxation time. For Adam this includes v̂ collapsing when gradients vanish, and
+    Adam's per-step speed limit of about η per coordinate, which the ramp pilot hit (§13.6).
+  - (d) Multiple branches, when a run is not tracking the branch whose switch is used. At width 2 this is the case in
+    T2-3 (WP-15).
+
+### 13.4 Winding verification by controlled ramps (before any comparison; `lag_law.winding_check`, `winding_check.csv`)
+
+Population GD ramps (η = 0.3, P = I) on winding copy k, from 0.9·s\*, with s = s₀e^{γt} and γ = χηλ_min(H):
+
+| a | k | χ | b₁ at crossing | κ_k (SGD) | predicted r | measured r |
+|---|---|---|---|---|---|---|
+| 1.30 | +0 | 0.003 | +3.832 | -7.44 | -0.0223 | -0.0215 |
+| 1.30 | -1 | 0.003 | -2.452 | +7.62 | +0.0229 | +0.0236 |
+| 1.30 | +1 | 0.003 | +10.115 | -22.50 | -0.0675 | -0.0607 |
+| 1.50 | +0 | 0.002 | -2.291 | +4.07 | +0.0081 | +0.0082 |
+| 1.50 | +0 | 0.005 | -2.291 | +4.07 | +0.0204 | +0.0207 |
+
+The sign and size follow κ_k on every copy. The largest miss is k = +1 at a = 1.30 (−0.0607 measured, −0.0675 predicted), where |κχ| = 0.067 is closest to the nonlinear regime. This check was run before any comparison. It was quoted in the b6ae433 commit message and its producer was committed later (lag_law.winding_check, f08dc0d); the numbers reproduce exactly.
+
+### 13.5 Comparison with existing runs (no refit; `compare_arms.csv`, `compare_per_a.csv`)
+
+- **Arms:** 36/36 within the registered tolerance max(0.01, 0.25|pred|). The arms are the 32 intervention arms, SGD at
+  two a and Task B at two a.
+  - The four φ = 0.25 arms of the first lag test and the t\* rule, where w₂ is slowed from early on, are at
+    0.70–0.76. They are within tolerance only through the 0.01 floor.
+  - The other 32 arms are at 0.91–1.13. (The 899850d commit message said 0.99–1.13 and "the four φ = 0.25 arms"; the
+    deconfounded primary rule's φ = 0.25 arms are at 1.03–1.07.)
+- **Per a (post hoc, through the origin):** observed slope / committed κ = 0.89 (1.30), 0.83 (1.45), 0.91 (1.50),
+  0.82 (1.60). This is within 30% at every a, with the law over-predicting by 9–18%.
+
+### 13.6 The registered ramp test (Track 1B)
+
+Registration: `results/ramp_registration.md` (c4b4c6d). Own thresholds were frozen before any crossing was read (83f66f5, 15b4744). Code: `src/ramp.py`.
+
+- **Design.** s = s₀e^{γt} from 0.5·s\* after a 4,000-step warm-up. The hidden coordinates start on the population branch on winding k. 6 γ cells × 40 seeds per setting.
+  - Settings: (1.30, −1) and (1.50, 0) are the natural windings; (1.30, 0) is the sign test, with κ < 0. Each is run with Adam and with SGD.
+  - SGD's χ is a priori. Adam's χ uses the run's measured v̂ at crossing.
+- **Registered verdicts.** All 1,440 runs crossed; none placed during warm-up; no run changed winding.
+
+| a | k | opt | R1 slope | R2 signed Spearman | R3 slowest median |
+|---|---|---|---|---|---|
+| 1.30 | -1 | adam | -7.12 FAIL | 1.00 PASS | -0.0000 PASS |
+| 1.30 | -1 | sgd | 0.78 PASS | 1.00 PASS | +0.0009 PASS |
+| 1.30 | +0 | adam | 9.10 FAIL | 1.00 PASS | -0.0012 PASS |
+| 1.30 | +0 | sgd | 1.30 FAIL | 1.00 PASS | -0.0014 PASS |
+| 1.50 | +0 | adam | -9.99 FAIL | 0.71 FAIL | -0.0250 FAIL |
+| 1.50 | +0 | sgd | -0.10 FAIL | 1.00 PASS | -0.0233 FAIL |
+
+- **Why the registered R1 and R3 fail.** The observed residual was measured against each seed's own-sample *global* threshold, but the ramp forces one branch. For 35% of seeds at a = 1.30 and 68% at a = 1.50, that branch's own-sample switch lies more than 1% from the global threshold. Those seeds carry static offsets (5% quantile ≈ −0.25, 95% ≈ +0.09) in every γ cell.
+  - This is a limit of the registered reference, not of the tracking law.
+  - It is also a caution for §13.3(iv)(d): a residual is a lag only relative to the switch of the branch actually tracked.
+- **POST HOC, against each seed's tracked-branch own-sample switch** (`ramp.posthoc_branch`):
+
+| a | k | opt | R1 slope | R2 | R3 slowest median |
+|---|---|---|---|---|---|
+| 1.30 | -1 | adam | 0.52 FAIL | 1.00 PASS | +0.0002 PASS |
+| 1.30 | -1 | sgd | 1.24 PASS | 1.00 PASS | +0.0010 PASS |
+| 1.30 | +0 | adam | 1.49 FAIL | 1.00 PASS | -0.0009 PASS |
+| 1.30 | +0 | sgd | 0.90 PASS | 1.00 PASS | -0.0010 PASS |
+| 1.50 | +0 | adam | 0.90 PASS | 0.94 PASS | -0.0002 PASS |
+| 1.50 | +0 | sgd | 1.14 PASS | 1.00 PASS | +0.0010 PASS |
+
+  - SGD's cell medians match κ_kχ to within a few percent over two decades of γ, except the fastest cell (κχ = 0.1; observed/predicted 1.14–1.26). The negative-κ copy crosses early, as predicted.
+  - Adam's predicted lags are ≤ 0.006, where the medians carry an offset of order 0.001.
+- **R4 (free Adam at η = 0.01, 0.005, 0.0025): PASS at both a.**
+  - a = 1.30: median residuals 0.0296, 0.0304, 0.0308 (tolerance ±0.0100; 39 of 40 crossed at each η).
+  - a = 1.50: median residuals 0.0619, 0.0625, 0.0647 (tolerance ±0.0155; 39 of 40 crossed at each η).
+  - As the law predicts, χ is η-invariant in free training, so the lag does not vanish in the gradient-flow limit.
