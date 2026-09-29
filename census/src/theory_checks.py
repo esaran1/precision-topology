@@ -173,10 +173,153 @@ def fold_checks():
     return out
 
 
+# ------------------------------------------------------------------ §15: the lag law as a theorem (Theorem L)
+
+def lag_toy(k3=0.3, rho=0.4):
+    """Toy branch in z-coordinates (P = I after z = P^{-1/2} theta): L = 1/2 d^T A(s) d + (k3/3) d1^3, d = z - z*(s),
+    z*(s) = (0.5 sin s, 0.3 s), A(s) = diag(1 + 0.2 s, 3).  Placement gap G(z) = -z1 + z2 + 0.1 z2^2 - g0 with the
+    branch switch at s* = 2.  Returns the objects and the Theorem L constants on the tube |d| <= rho, s in [1, 3]."""
+    zs = lambda s: np.array([0.5 * math.sin(s), 0.3 * s])
+    zs1 = lambda s: np.array([0.5 * math.cos(s), 0.3])
+    A = lambda s: np.diag([1 + 0.2 * s, 3.0])
+    grad = lambda z, s: A(s) @ (z - zs(s)) + np.array([k3 * (z[0] - zs(s)[0]) ** 2, 0.0])
+    sstar = 2.0
+    g0 = -0.5 * math.sin(sstar) + 0.3 * sstar + 0.1 * (0.3 * sstar) ** 2
+    G = lambda z: -z[0] + z[1] + 0.1 * z[1] ** 2 - g0
+    dG = lambda z: np.array([-1.0, 1 + 0.2 * z[1]])
+    J = (1.0, 3.0)
+    const = {
+        "lam": min(1 + 0.2 * J[0] - 2 * k3 * rho, 3.0),          # lower eigenvalue bound on the tube
+        "Lam": max(1 + 0.2 * J[1] + 2 * k3 * rho, 3.0),          # upper
+        "M": 2 * k3,                                               # Lipschitz constant of the Hessian in z
+        "D1": math.sqrt(0.25 + 0.09), "D2": 0.5,                  # sup |z*'|, sup |z*''|
+        "H1": 0.2,                                                 # sup |d/ds H(z*(s), s)|
+        "g1": math.sqrt(1 + (1 + 0.2 * (0.3 * J[1] + rho)) ** 2),  # sup |grad G| on the tube
+        "g2": 0.2,                                                 # sup |Hess G|
+        "rho": rho, "J": J, "sstar": sstar}
+    gp = lambda s: -0.5 * math.cos(s) + 0.3 + 0.2 * 0.3 * (0.3 * s)       # g'(s)
+    const["gamma"] = min(gp(s) for s in np.linspace(1.5, 2.5, 1001))       # g' >= gamma on the crossing window
+    const["g2pp"] = const["g2"] * const["D1"] ** 2 + const["g1"] * const["D2"]
+    return {"zs": zs, "zs1": zs1, "A": A, "grad": grad, "G": G, "dG": dG, "gp": gp, "const": const}
+
+
+def theorem_L_bounds(c, sdot, eta, Ks=0.0, w=0.5):
+    """Explicit constants of Theorems L1-L2 (§15.2-15.3) for step eta, maximal rate sdot (per step) and rate-variation
+    constant Ks (|sdot_{t+1} - sdot_t| <= Ks sdot_t^2).  w = half-width of the crossing window J' = [s* - w, s* + w]."""
+    lam, M, D1, D2, H1 = c["lam"], c["M"], c["D1"], c["D2"], c["H1"]
+    q = sdot / (eta * lam)
+    D1b = D1 + D2 * sdot / 2
+    S = q * D1b
+    Ce = 2 * M * D1b ** 2 / lam + H1 * D1b / lam + D2 + D1 * Ks
+    E = Ce * q ** 2
+    ok = (eta * c["Lam"] <= 1) and (E <= S) and (2 * S <= c["rho"])
+    g1, g2, gam, g2pp = c["g1"], c["g2"], c["gamma"], c["g2pp"]
+    S1 = q * (D2 + H1 * D1b / lam)
+    hprime = g2 * D1 * S + g1 * S1
+    ok = ok and hprime <= gam / 2
+    Cl = (2 * g2pp * g1 ** 2 * S ** 2 / gam ** 2 + hprime * 2 * g1 * S / gam) / gam
+    dv = Ks * sdot * (2 * w + sdot)
+    B = g1 * E + g2 * (S + E) ** 2 / 2 + g1 * D1 * dv / (eta * lam)
+    ok = ok and (w > 2 * g1 * S / gam + 2 * B / gam + sdot)
+    return {"q": q, "S": S, "E": E, "C_ell": Cl, "B": B, "lag_error_bound": Cl + 2 * B / gam + sdot,
+            "conditions_hold": bool(ok)}
+
+
+def lag_toy_run(sdot, eta, k3=0.3, ramp="linear"):
+    T = lag_toy(k3)
+    c = T["const"]
+    s0 = 1.2
+    s, z = s0, T["zs"](s0)
+    # start on the branch; ramp; record max |delta - delta_sl| after the transient and the crossing
+    worst, t, prevG = 0.0, 0, T["G"](z)
+    Ks = 0.0
+    while s < 2.8:
+        sd = sdot if ramp == "linear" else sdot * s / c["sstar"]
+        if ramp != "linear":
+            Ks = 1 / 1.2
+        z = z - eta * T["grad"](z, s)
+        s_new = s + sd
+        t += 1
+        # slaved displacement at the new s: -(eta A)^{-1} (z*(s + sdot) - z*(s))
+        Delta = T["zs"](s_new + sd) - T["zs"](s_new)
+        dsl = -np.linalg.solve(eta * T["A"](s_new), Delta)
+        s = s_new
+        d = z - T["zs"](s)
+        if t > 50 / (eta * c["lam"]):
+            worst = max(worst, float(np.linalg.norm(d - dsl)))
+        Gz = T["G"](z)
+        if prevG < 0 <= Gz:
+            s_c = s
+            s_ci = s - sd * Gz / (Gz - prevG)          # linear interpolation of G between the two steps
+            break
+        prevG = Gz
+    sstar = c["sstar"]
+    H = T["A"](sstar); z1 = T["zs1"](sstar); gG = T["dG"](T["zs"](sstar))
+    lam_min = float(np.linalg.eigvalsh(H)[0])
+    kappa = lam_min * float(gG @ np.linalg.solve(H, z1)) / float(gG @ z1)
+    sdot_c = sdot if ramp == "linear" else sdot * sstar / sstar
+    chi = sdot_c / (sstar * eta * lam_min)
+    Delta = T["zs"](sstar + sdot_c) - T["zs"](sstar)
+    ell = float(gG @ np.linalg.solve(eta * H, Delta)) / T["gp"](sstar)
+    bnd = theorem_L_bounds(c, max(sdot, sdot * 2.8 / sstar) if ramp != "linear" else sdot, eta, Ks)
+    return {"sdot": sdot, "eta": eta, "ramp": ramp, "chi": chi, "kappa": kappa, "r_obs": (s_c - sstar) / sstar,
+            "kappa_chi": kappa * chi, "ell_over_sstar": ell / sstar,
+            "lag_minus_ell": s_c - sstar - ell, "r_interp": (s_ci - sstar) / sstar,
+            "interp_lag_minus_ell": s_ci - sstar - ell, "lag_error_bound": bnd["lag_error_bound"],
+            "bound_holds": bool(abs(s_c - sstar - ell) <= bnd["lag_error_bound"]),
+            "max_dev_from_slaved": worst, "E_bound": bnd["E"], "dev_bound_holds": bool(worst <= bnd["E"] * (1 + 1e-9)),
+            "conditions_hold": bnd["conditions_hold"]}
+
+
+def lag_checks():
+    out = {"toy_constants": {k: v for k, v in lag_toy()["const"].items()}}
+    rows = []
+    for eta in (0.25, 0.1):
+        for sdot in (1e-3, 5e-4, 2.5e-4, 1.25e-4, 6.25e-5):
+            rows.append(lag_toy_run(sdot, eta))
+    for sdot in (5e-4, 1.25e-4):
+        rows.append(lag_toy_run(sdot, 0.1, ramp="exponential"))
+    out["L1_toy_ramps"] = rows
+    # L2: second-order scaling of (r - kappa chi) at fixed eta
+    lin = [r for r in rows if r["ramp"] == "linear" and r["eta"] == 0.1]
+    out["L2_residual_over_chi2"] = [{"chi": r["chi"], "(r-ell/s*)/chi^2": (r["r_obs"] - r["ell_over_sstar"]) / r["chi"] ** 2,
+                                     "(r_interp-ell/s*)/chi^2": (r["r_interp"] - r["ell_over_sstar"]) / r["chi"] ** 2}
+                                    for r in lin]
+    # L3: free-training corollary: s trained, sdot = eta * v(s) with v the negative s-gradient of a driving term
+    out["L3_free_training"] = [free_training_toy(eta) for eta in (0.1, 0.05, 0.025)]
+    return out
+
+
+def free_training_toy(eta, v0=2e-3):
+    """s itself trained: s <- s + eta * v0 * (1 + 0.1 (s - 2)) (a driving force independent of eta); chi at the crossing
+    and r_obs should be eta-invariant at leading order (Corollary L)."""
+    T = lag_toy()
+    c = T["const"]
+    s = 1.2
+    z = T["zs"](s)
+    prevG = T["G"](z)
+    while s < 2.8:
+        v = v0 * (1 + 0.1 * (s - 2))
+        z = z - eta * T["grad"](z, s)
+        s = s + eta * v
+        Gz = T["G"](z)
+        if prevG < 0 <= Gz:
+            break
+        prevG = Gz
+    sstar = c["sstar"]
+    lam_min = float(np.linalg.eigvalsh(T["A"](sstar))[0])
+    chi = (eta * v0) / (sstar * eta * lam_min)
+    return {"eta": eta, "chi_at_switch": chi, "r_obs": (s - sstar) / sstar}
+
+
 if __name__ == "__main__":
     os.nice(15)
     cmd = sys.argv[1] if len(sys.argv) > 1 else "fold"
     if cmd == "fold":
         res = fold_checks()
         (RESULTS / "theory_checks_fold.json").write_text(json.dumps(res, indent=1, default=float))
+        print(json.dumps(res, indent=1, default=float))
+    elif cmd == "lag":
+        res = lag_checks()
+        (RESULTS / "theory_checks_lag.json").write_text(json.dumps(res, indent=1, default=float))
         print(json.dumps(res, indent=1, default=float))

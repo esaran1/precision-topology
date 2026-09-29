@@ -1471,3 +1471,184 @@ comes first. The global threshold enters only through which branch is occupied.
   η-free prediction 0.00504.
 - **F5.** λ_min²/(s_F − s) is 2.206, 2.239, 2.262 and 2.279 at s_F − s = 1e−2 … 1.25e−3. It converges, as √(s_F − s),
   to 4|m′c′| = 2.318.
+
+## 15. The lag law as a theorem (Track 3 (2); 2026-09-28)
+
+**Status, stated per part.**
+- **Theorems L1 and L2 and Corollary L3: PROVED, every step checked.**
+  - They cover preconditioned gradient descent with a **fixed** preconditioner and no momentum, on a branch that is
+    locally strongly convex with a Lipschitz Hessian, driven by a scale sequence s_t that increases slowly.
+  - The rate may vary slowly: an imposed ramp, or s itself trained.
+- **Not covered:** Adam's moving v̂ and momentum (§15.5). The theorems give κχ + O(χ²) with explicit constants plus a
+  discreteness term of at most one step.
+- **Numerical checks (not part of the proof):** `src/theory_checks.py lag` → `theory_checks_lag.json`.
+- **§13 is unchanged.** §15 turns its first-order derivation (§13.1) into a bounded statement.
+
+### 15.1 Setting and hypotheses
+
+- **Coordinates.** Work in z = P^{−1/2}θ and set L̃(z, s) = L(P^{1/2}z, s).
+  - Then θ ← θ − ηP∇_θL is exactly z ← z − η∇_zL̃, because ∇_zL̃ = P^{1/2}∇_θL.
+  - The Hessian in z is P^{1/2}∇²_θL·P^{1/2}.
+  - All norms below are Euclidean in z.
+- **The tube.** J is a closed s-interval. The tube is T_ρ = {(z, s): s ∈ J, |z − z\*(s)| ≤ ρ}.
+
+**Hypotheses:**
+- **(L0) Branch.** z\* ∈ C²(J), with ∇_zL̃(z\*(s), s) = 0, |z\*′| ≤ D₁ and |z\*″| ≤ D₂.
+- **(L1) Strong convexity on the tube.** λI ⪯ ∇²_zL̃ ⪯ ΛI on T_ρ, with λ > 0 and ηΛ ≤ 1.
+- **(L2) Lipschitz Hessian.** ‖∇²_zL̃(z, s) − ∇²_zL̃(z′, s)‖ ≤ M|z − z′| on T_ρ.
+- **(L3) Hessian along the branch.** H(s) := ∇²_zL̃(z\*(s), s) is C¹, with ‖H′‖ ≤ H₁.
+- **(L4) Scale sequence.** s_{t+1} = s_t + ṡ_t, with 0 < ṡ_t ≤ ṡ and |ṡ_{t+1} − ṡ_t| ≤ K_s·ṡ_t².
+  - K_s = 0 for a linear ramp.
+  - K_s = 1/min s for s_{t+1} = (1 + γ)s_t.
+  - For free training, see Corollary L3.
+
+**Definitions:**
+- **Rescaled rate:** q := ṡ/(ηλ), which has the units of s. The dimensionless χ of §13 is χ = ṡ/(s\*ηλ_min(H(s\*))).
+- D̄₁ := D₁ + D₂ṡ/2 and S := q·D̄₁.
+- C_e := 2MD̄₁²/λ + H₁D̄₁/λ + D₂ + D₁K_s, and E := C_e·q².
+- **Displacements:** δ_t := z_t − z\*(s_t), Δ_t := z\*(s_{t+1}) − z\*(s_t), and the **slaved displacement**
+  δ^sl_t := −(ηH(s_t))⁻¹Δ_t.
+
+### 15.2 Theorem L1 (tracking)
+
+**Statement.** Assume (L0)–(L4), E ≤ S and 2S ≤ ρ, and let |δ_{t₀} − δ^sl_{t₀}| ≤ S. Then for every t ≥ t₀ with
+s_t, s_{t+1} ∈ J,
+
+  **|δ_t − δ^sl_t| ≤ E + (1 − ηλ)^{t−t₀}·|δ_{t₀} − δ^sl_{t₀}|,  with |δ^sl_t| ≤ S.**
+
+So after the transient, the state follows the slaved displacement to O(q²), while the displacement itself is O(q).
+
+**Proof.**
+1. **Recursion.** δ_{t+1} = z_t − η∇L̃(z_t, s_t) − z\*(s_{t+1}) = δ_t − η∇L̃(z\*(s_t) + δ_t, s_t) − Δ_t.
+   - While |δ_t| ≤ ρ, Taylor's theorem with (L2) gives ∇L̃(z\*(s_t) + δ_t, s_t) = H_tδ_t + R_t, with
+     |R_t| ≤ (M/2)|δ_t|², because the segment lies in T_ρ.
+   - Hence δ_{t+1} = (I − ηH_t)δ_t − Δ_t − ηR_t.
+2. **The slaved point is a fixed point of the linear part.** (I − ηH_t)δ^sl_t − Δ_t = δ^sl_t + Δ_t − Δ_t = δ^sl_t. So
+   e_t := δ_t − δ^sl_t satisfies e_{t+1} = (I − ηH_t)e_t − ηR_t − (δ^sl_{t+1} − δ^sl_t).
+3. **Contraction.** spec(ηH_t) ⊂ [ηλ, ηΛ] ⊂ (0, 1] by (L1), so ‖I − ηH_t‖ ≤ 1 − ηλ.
+4. **Size of the slaved point.** |Δ_t| ≤ D₁ṡ_t + D₂ṡ_t²/2 ≤ D̄₁ṡ, so |δ^sl_t| ≤ D̄₁ṡ/(ηλ) = S.
+5. **Drift of the slaved point.**
+   - δ^sl_{t+1} − δ^sl_t = −η⁻¹[H_{t+1}⁻¹(Δ_{t+1} − Δ_t) + (H_{t+1}⁻¹ − H_t⁻¹)Δ_t].
+   - First, Δ_{t+1} − Δ_t = ∫_{s_t}^{s_t+ṡ_t}[z\*′(u + ṡ_t) − z\*′(u)]du + ∫_{s_{t+1}+ṡ_t}^{s_{t+1}+ṡ_{t+1}} z\*′.
+     This uses s_{t+1} = s_t + ṡ_t. So |Δ_{t+1} − Δ_t| ≤ D₂ṡ_t² + D₁K_sṡ_t².
+   - Second, ‖H_{t+1}⁻¹ − H_t⁻¹‖ = ‖H_{t+1}⁻¹(H_t − H_{t+1})H_t⁻¹‖ ≤ H₁ṡ_t/λ².
+   - Hence V := |δ^sl_{t+1} − δ^sl_t| ≤ (ṡ²/(ηλ))·[D₂ + D₁K_s + H₁D̄₁/λ].
+6. **Induction.** Suppose |e_t| ≤ S. Then |δ_t| ≤ 2S ≤ ρ, so step 1 applies, and
+   - |e_{t+1}| ≤ (1 − ηλ)|e_t| + ηM(2S)²/2 + V = (1 − ηλ)|e_t| + ηλ·[2MS²/λ + V/(ηλ)] = (1 − ηλ)|e_t| + ηλE.
+   - The last equality uses 2MS²/λ + V/(ηλ) = q²[2MD̄₁²/λ + D₂ + D₁K_s + H₁D̄₁/λ] = E.
+   - Since E ≤ S, the right-hand side is ≤ S, so the hypothesis propagates.
+   - Unrolling gives |e_t| ≤ E + (1 − ηλ)^{t−t₀}(|e_{t₀}| − E)₊. ∎
+
+### 15.3 Theorem L2 (the lag)
+
+**Further hypotheses.**
+- **(L5) The gap is C² on the tube.** G ∈ C²(T_ρ) in z, with |∇G| ≤ g₁ and ‖∇²G‖ ≤ g₂.
+  - For the placement gap this holds where the active extremal pair is unique and nondegenerate (§13.2 checks this
+    at every switch used).
+  - Let g(s) := G(z\*(s)), with g(s\*) = 0. On the window J′ = [s\* − w, s\* + w] ⊂ J, assume g′ ≥ γ > 0 and
+    |g″| ≤ g₂″. One may take g₂″ = g₂D₁² + g₁D₂.
+- **Reference rate.** v̂ is the rate ṡ_t̂ at the first step with s_t̂ ≥ s\*. Over the window,
+  |ṡ_t − v̂| ≤ Δv := K_sṡ(2w + ṡ). (The increments sum to at most 2w + ṡ, and each rate change is at most K_sṡ·ṡ_t.)
+
+**Definitions.**
+- h(s) := −∇G(z\*(s))·(ηH(s))⁻¹[z\*(s + v̂) − z\*(s)] and F(s) := g(s) + h(s).
+- **The lag prediction:** ℓ := −h(s\*)/g′(s\*) = ∇G·H(s\*)⁻¹[z\*(s\* + v̂) − z\*(s\*)]/(η·g′(s\*)).
+- S₁ := q(D₂ + H₁D̄₁/λ), h′_max := g₂D₁S + g₁S₁, and E_w := sup of |e_t| over the steps in the window (Theorem L1).
+- B := g₁E_w + g₂(S + E_w)²/2 + g₁D₁Δv/(ηλ).
+- C_ℓ := [2g₂″g₁²S²/γ² + 2h′_max·g₁S/γ]/γ.
+
+**Statement.** Assume Theorem L1's hypotheses, (L5), h′_max ≤ γ/2, and w > 2g₁S/γ + 2B/γ + ṡ. Let s_c be s_t at the
+first step with s_t ∈ J′ and G(z_t) ≥ 0. Then
+
+  **|s_c − s\* − ℓ| ≤ C_ℓ + 2B/γ + ṡ.**
+
+**The same statement in §13's variables.**
+- ℓ = s\*·κχ + ζ, with κ = λ_min·[∇G·H⁻¹z\*′]/[∇G·z\*′] and χ = v̂/(s\*ηλ_min), both at s\*, and |ζ| ≤ g₁D₂v̂²/(2ηλγ).
+  In θ-coordinates this is §13's κ, since ∇_zG·H_z⁻¹z\*′_z = ∇_θG·(PH_θ)⁻¹θ\*′.
+- C_ℓ, B and ζ are all O(q²) = O(χ²), with the constants above. So
+
+  **r = (s_c − s\*)/s\* = κχ + O(χ²) + τ,  0 ≤ τ ≤ ṡ/s\* = ηλ_min·χ·(ṡ/v̂).**
+
+- The last term τ is the discreteness of "the first step with G ≥ 0". It vanishes in the gradient-flow limit. A
+  crossing located by interpolating G between steps removes it; that version is checked numerically only (L2 below).
+
+**Proof.**
+1. **G along the trajectory.** Write G(z_t) = g(s_t) + ∇G(z\*(s_t))·δ_t + ρ_t, with |ρ_t| ≤ g₂|δ_t|²/2 (Taylor, (L5)).
+   Split δ_t = δ^sl_t + e_t.
+2. **Replace the actual rate by v̂.** ∇G(z\*(s_t))·δ^sl_t differs from h(s_t) only through Δ_t versus
+   z\*(s_t + v̂) − z\*(s_t). The difference is at most g₁D₁|ṡ_t − v̂|/(ηλ) ≤ g₁D₁Δv/(ηλ).
+   So |G(z_t) − F(s_t)| ≤ g₁|e_t| + g₂(S + |e_t|)²/2 + g₁D₁Δv/(ηλ) ≤ B.
+3. **F is increasing.**
+   - |h| ≤ g₁S.
+   - |h′| ≤ h′_max: d/ds ∇G(z\*(s)) contributes g₂D₁·S, and d/ds of (ηH)⁻¹[z\*(s + v̂) − z\*(s)] is at most
+     (1/η)[H₁D̄₁v̂/λ² + D₂v̂/λ] ≤ S₁. This is step 5 of L1 with ṡ_t replaced by the fixed v̂.
+   - Hence F′ ≥ g′ − h′_max ≥ γ/2 on J′.
+4. **The zero of F.**
+   - F(s\*) = h(s\*) with |h(s\*)| ≤ g₁S, and F(s\* ± w) has the sign of ±1 since w > 2g₁S/γ. So F has a unique zero
+     s₀ ∈ J′, with |s₀ − s\*| ≤ 2g₁S/γ.
+   - By Taylor, 0 = F(s₀) = g′(s\*)(s₀ − s\*) + ½g″(ξ)(s₀ − s\*)² + h(s\*) + h′(ξ′)(s₀ − s\*).
+   - So g′(s\*)(s₀ − s\* − ℓ) = −½g″(s₀ − s\*)² − h′(s₀ − s\*), which gives |s₀ − s\* − ℓ| ≤ C_ℓ.
+5. **Where the crossing can happen.**
+   - For s_t ∈ J′ with s_t < s₀ − 2B/γ: F(s_t) < −B, so G(z_t) < 0.
+   - For s_t ≥ s₀ + 2B/γ: F(s_t) ≥ B, so G(z_t) ≥ 0.
+   - The window condition guarantees a step in [s₀ + 2B/γ, s₀ + 2B/γ + ṡ] ⊂ J′.
+   - Hence s_c ∈ [s₀ − 2B/γ, s₀ + 2B/γ + ṡ].
+6. **Combine** with step 4. ∎
+
+### 15.4 Corollary L3 (free training: χ is learning-rate invariant, and so is the lag to leading order)
+
+**Setting.** The scale is itself trained with the same fixed-P gradient step, s_{t+1} = s_t + ηp_s·σ_t. Here p_s > 0
+is the preconditioner on s, and σ_t := −∂_sL(z_t, s_t) is the driving force.
+
+**Assumptions** on the tube: σ_min ≤ σ ≤ σ_max, with σ_min > 0, and σ is L_σ-Lipschitz in (z, s).
+
+**Statement.**
+- **(i)** χ_t := ṡ_t/(s_tηλ) = p_sσ_t/(s_tλ) holds identically, so η cancels. After the transient,
+  |χ_t − χ̄(s_t)| ≤ p_sL_σ·2S/(s_tλ), with χ̄(s) := p_sσ(z\*(s), s)/(sλ). Here χ̄ is a function of s alone, with no η in
+  it.
+- **(ii)** (L4) holds with K_s = L_σ(2ΛD̄₁/λ + 1)·σ_max/σ_min², which is η-free.
+- **(iii)** q = ṡ/(ηλ) ≤ p_sσ_max/λ is η-free. So every constant of L1–L2 (E, C_ℓ and B) stays bounded as η → 0.
+  Their only ṡ-dependence, through D̄₁ and Δv/(ηλ) = K_s·q·(2w + ṡ), is bounded.
+- **(iv)** Hence r = κχ + O(χ²) + τ, with the O(χ²) constant η-free and 0 ≤ τ ≤ ṡ/s\* = O(η). As η → 0 the lag tends to
+  κχ̄ + O(χ̄²), not to 0. This is the invariance observed in §13.6 (R4).
+
+**Proof.**
+- **(i)** χ_t = ηp_sσ_t/(s_tηλ). Then |σ_t − σ(z\*(s_t), s_t)| ≤ L_σ|δ_t| ≤ L_σ·2S (L1).
+- **(ii)** |ṡ_{t+1} − ṡ_t| = ηp_s|σ_{t+1} − σ_t| ≤ ηp_sL_σ(|z_{t+1} − z_t| + ṡ_t).
+  - |z_{t+1} − z_t| = η|∇L̃(z_t, s_t)| ≤ ηΛ|δ_t| ≤ 2ηΛS = 2(Λ/λ)D̄₁ṡ.
+  - With ṡ ≤ ηp_sσ_max and ṡ_t ≥ ηp_sσ_min:
+    |ṡ_{t+1} − ṡ_t| ≤ ηp_sL_σ(2ΛD̄₁/λ + 1)ṡ ≤ L_σ(2ΛD̄₁/λ + 1)(σ_max/σ_min²)·ṡ_t².
+- **(iii)** Immediate.
+- **(iv)** Theorem L2. ∎
+
+### 15.5 Scope, and where it fails
+
+**What is covered and what is not:**
+- **Adam.** The theorems need a fixed P, so Adam is covered only with v̂ frozen. §13.6 shows that v̂ moving on the
+  relaxation time breaks the law in forced ramps.
+- **Momentum.** Not covered. §13.3(iii) argues that the steady lag is unchanged, but that is not proved here.
+- **G must be C².** The placement gap is a min/max of extrema, so L2 applies only while the active pair is unique and
+  the extrema are nondegenerate.
+- **Near a fold.** λ → 0, so q = ṡ/(ηλ) blows up and the hypotheses E ≤ S and h′_max ≤ γ/2 fail. §14 takes over there.
+
+**How tight the bounds are.**
+- The constants are explicit but conservative. In the toy check, the lag error is 0.7–13% of the bound.
+- For the sine family the constants would have to be enclosed on a tube around each branch. That has not been done,
+  so the theorem is **not** yet a certified statement about the a = 1.30–1.60 runs. It is the exact form of the law
+  those runs were compared against.
+
+### 15.6 Numerical checks (`theory_checks_lag.json`; not part of the proof)
+
+**Toy branch:** z\*(s) = (0.5 sin s, 0.3s), A(s) = diag(1 + 0.2s, 3), a cubic term (0.3/3)(z₁ − z₁\*)³, a nonlinear G,
+and s\* = 2. The constants were computed on the tube ρ = 0.4, s ∈ [1, 3]: λ = 0.96, Λ = 3, M = 0.6, D₁ = 0.583,
+D₂ = 0.5, H₁ = 0.2, g₁ = 1.61, g₂ = 0.2, γ = 0.292.
+
+- **L1.** 10 linear ramps (η = 0.25 and 0.1, ṡ = 1e−3 … 6.25e−5) and 2 exponential ramps. All hypotheses held.
+  - The deviation from the slaved displacement was at most 0.29 of E.
+  - The lag error |s_c − s\* − ℓ| was 0.7–13% of the bound.
+  - ℓ/s\* and κχ agree to 1e−6.
+- **L2.** With the crossing interpolated between steps, (r − ℓ/s\*)/χ² = −0.933, −0.931, −0.930, −0.929 and −0.929
+  at η = 0.1 as χ halves. The residual is O(χ²), as stated.
+  - With first-step detection the residual is dominated by τ, which is less than one step.
+- **L3.** Free training, ṡ = ηv(s): r_obs = 4.88e−4, 4.90e−4 and 4.91e−4 at η = 0.1, 0.05 and 0.025. They agree to
+  0.6%, and the differences are the O(η) discreteness τ.
