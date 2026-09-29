@@ -1,6 +1,7 @@
 by,group,scoring,PASS,FAIL,PARTIAL,UNRESOLVED,n
 block,A5d k=1,registered rule,2,1,0,2,5
 block,A5d k=10,registered rule,1,2,0,2,5
+block,Adam per-run ordering at an unseen a (Test 2A),registered rule,3,0,0,0,3
 block,Arrhenius 08-27,registered rule,15,11,1,15,42
 block,B,post hoc (census),1,2,0,0,3
 block,Block 3 (held-out windows),post hoc (census),0,0,1,0,1
@@ -25,6 +26,7 @@ block,SGD own thresholds (Track 4),registered rule,3,0,0,0,3
 block,asymmetric windows (Track 2),registered rule,2,2,0,2,6
 block,band task in R^d (Track 3B),post hoc (census),0,0,3,0,3
 block,band task in R^d (Track 3B),registered rule,1,1,0,0,2
+block,band task in R^d vs own R^d switch (Test 2C),registered rule,6,0,0,6,12
 block,boundary test (SGD forced ramps),registered rule,0,0,0,2,2
 block,c1 first order,registered rule,2,0,0,2,4
 block,collapse 09-12,post hoc (census),0,1,0,0,1
@@ -38,9 +40,11 @@ block,early census 08-23 (basin),registered rule,1,4,0,0,5
 block,early census 08-23 (width),registered rule,3,1,0,0,4
 block,interleaved 08-05,registered rule,0,0,0,2,2
 block,kappa,registered rule,3,1,0,0,4
+block,lag law at GELU from a declared start (GELU-T),registered rule,10,0,0,0,10
 block,lag law at an unseen a (Track A),registered rule,3,1,0,0,4
 block,lag test,registered rule,1,1,0,0,2
 block,lag test 2 (deconfounded),registered rule,0,2,0,0,2
+block,lag-law validity boundary (Test 2B),registered rule,1,0,0,1,2
 block,localization 08-22,post hoc (census),0,1,0,0,1
 block,localization 08-22,registered rule,1,0,1,0,2
 block,metric artifact 09-12,post hoc (census),0,0,2,0,2
@@ -108,6 +112,7 @@ registration_file,results/fixed_scale_prediction.md,registered rule,4,1,0,0,5
 registration_file,results/fold1d_prediction.md,registered rule,2,0,2,0,4
 registration_file,results/gelu_scale_prediction.md,post hoc (census),0,1,0,0,1
 registration_file,results/gelu_scale_prediction.md,registered rule,1,0,0,0,1
+registration_file,results/gelu_transfer_registration.md,registered rule,10,0,0,0,10
 registration_file,results/interleaved_predictions.md,registered rule,0,0,0,2,2
 registration_file,results/kappa_certification_prediction.md,registered rule,3,1,0,0,4
 registration_file,results/lag_test2_prediction.md,registered rule,0,2,0,0,2
@@ -146,6 +151,9 @@ registration_file,results/simplicity_bias_v3_registration.md,registered rule,0,0
 registration_file,results/third_optimizer_prediction.md,registered rule,2,0,0,0,2
 registration_file,results/threshold_prediction.md,post hoc (census),1,0,0,0,1
 registration_file,results/threshold_prediction.md,registered rule,2,1,1,0,4
+registration_file,results/track2a_registration.md,registered rule,3,0,0,0,3
+registration_file,results/track2b_registration.md,registered rule,1,0,0,1,2
+registration_file,results/track2c_registration.md,registered rule,6,0,0,6,12
 registration_file,results/track_a_registration.md,registered rule,3,1,0,0,4
 registration_file,results/ts_test_registration.md,registered rule,2,0,0,0,2
 registration_file,results/width2_nogating_design.md,registered rule,0,1,0,0,1

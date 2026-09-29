@@ -234,6 +234,32 @@ def _md(df, cols, fmt=None):
     return head + body
 
 
+def _discussion_round():
+    """Census rows of the 2026-09-29 discussion phase (Tests 2A, 2B, 2C, GELU-T), with per-block verdict strings."""
+    d = pd.read_csv(RESULTS / "registration_census.csv")
+    g = d[d.census_round == "2026-09-29"]
+    vc = lambda x: ", ".join(f"{int((x.verdict == v).sum())} {v}" for v in ("PASS", "FAIL", "PARTIAL", "UNRESOLVED")
+                             if (x.verdict == v).any())
+    blk = lambda b: g[g.block == b]
+    t2a = blk("Adam per-run ordering at an unseen a (Test 2A)")
+    t2b = blk("lag-law validity boundary (Test 2B)")
+    gt = blk("lag law at GELU from a declared start (GELU-T)")
+    t2c = blk("band task in R^d vs own R^d switch (Test 2C)")
+    assert len(t2a) + len(t2b) + len(gt) + len(t2c) == len(g)
+    S2b = json.loads((RESULTS / "track2b" / "scores.json").read_text())
+    c_a = lambda v: sorted({i.rsplit("-", 1)[1] for i in t2c[t2c.verdict == v].id})
+    return {
+        "n": len(g), "all": vc(g), "fail": int((g.verdict == "FAIL").sum()),
+        "partial_or_posthoc": int(((g.verdict == "PARTIAL") | (g.scoring != "registered rule")).sum()),
+        "t2a": "; ".join(f"{i.split('-', 1)[1]} {v}" for i, v in zip(t2a.id, t2a.verdict)),
+        "t2b": "; ".join(f"{i.split('-', 1)[1]} {v}" for i, v in zip(t2b.id, t2b.verdict)),
+        "t2b_c2_invalid": len(S2b["C2_cells_invalid"]),
+        "gt": vc(gt), "gt_n": len(gt), "gt_prim": vc(gt[~gt.id.str.endswith("-control")]),
+        "gt_ctrl": vc(gt[gt.id.str.endswith("-control")]),
+        "t2c": vc(t2c), "t2c_n": len(t2c), "t2c_pass_a": ", ".join(c_a("PASS")), "t2c_unres_a": ", ".join(c_a("UNRESOLVED")),
+    }
+
+
 def render():
     ps = pd.read_csv(RESULTS / "writer_patch_prospective_own_per_setting.csv")
     wi = pd.read_csv(RESULTS / "writer_patch_windows.csv")
@@ -275,6 +301,7 @@ def render():
     t5 = _md(fs, ["file", "width_in", "height_in", "description"])
     tl = pd.read_csv(RESULTS / "registration_tally.csv").set_index("scope")
     h = tl.loc["scored by registered rules"]; p_ = tl.loc["assigned post hoc in the census"]
+    dr = _discussion_round()
     text = f"""# Writer inputs v4 — completion patch (2026-09-24)
 
 Written for the paper's writer. Each item is tied to a ledger ID in `src/verify_ledger.py` (group "V4 patch").
@@ -329,7 +356,9 @@ certified R_glob and R_solve bracket):
 {t3}
 ## WP-4. Registration census by block and by registration file
 
-**Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
+**Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a. A
+criterion registered per unit (Track A's L3 per optimiser; Test 2C's criteria per cell) is scored as registered, one
+row per unit, not merged into a PARTIAL.
 - **Headline**: {int(h.n)} scored by their registered rules: {int(h.PASS)} PASS, {int(h.FAIL)} FAIL, {int(h.PARTIAL)} PARTIAL,
   {int(h.UNRESOLVED)} UNRESOLVED.
 - **Post hoc**: {int(p_.n)} assigned post hoc: {int(p_.PASS)} / {int(p_.FAIL)} / {int(p_.PARTIAL)} / {int(p_.UNRESOLVED)}.
@@ -342,6 +371,18 @@ certified R_glob and R_solve bracket):
 - Width-1 consistency check (`scale_limits_prediction.md`): PASS.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
+
+**Added in the 2026-09-29 round (discussion phase)**: {dr["n"]} rows, all scored by their registered rules ({dr["all"]}; no
+FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, and descriptive analyses are not rows.
+- Test 2A (`track2a_registration.md`, 9fd1f32; Adam per-run ordering at the unseen a = 1.85): {dr["t2a"]}.
+- Test 2B (`track2b_registration.md`, 0708ae9; the lag law's validity boundary in κχ): {dr["t2b"]}. C2 is UNRESOLVED
+  because {dr["t2b_c2_invalid"]} of its 4 cells are invalid.
+- GELU-T (`gelu_transfer_registration.md`, 736b6bf; the lag law at GELU from a declared start): L1–L5 in each of the
+  two registered arms, one row per criterion per arm ({dr["gt_n"]} rows: primary random start {dr["gt_prim"]}; branch-point
+  mechanism control {dr["gt_ctrl"]}).
+- Test 2C (`track2c_registration.md`, b22ebd0; the band task in R^d against each seed's own-sample R^d switch): C1–C3
+  were registered per cell (d ∈ {{2, 4}} × a ∈ {{1.30, 1.50}}) with no pooled verdict, so each is one row per cell
+  ({dr["t2c_n"]} rows: {dr["t2c"]}; PASS at a = {dr["t2c_pass_a"]}, UNRESOLVED at a = {dr["t2c_unres_a"]} on validity V3).
 
 **Not in the headline.**
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
@@ -1117,6 +1158,7 @@ def wp14():
     t = cr.pivot_table(index=["scoring", "relevance"], columns="verdict", values="id", aggfunc="size", fill_value=0)
     tab = "\n".join(f"| {s} | {r} | " + " | ".join(str(int(t.loc[(s, r)].get(v, 0))) for v in ("PASS", "FAIL", "PARTIAL", "UNRESOLVED")) + " |"
                     for s, r in t.index)
+    dr = _discussion_round()
     lines = []
     for claim in ("threshold", "scaling", "prospective", "width2"):
         g = f[f.claim == claim]
@@ -1133,7 +1175,8 @@ peripheral.
   held-out predictions (Block G, Block 3, own-seed), or width 2.
 - **Peripheral:** budget laws, barriers and sharpness, trapping, optimiser equivalence, and the early exploratory
   probes.
-- The classification is post hoc: it was made on 2026-09-25, after every verdict was known.
+- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The four blocks of the
+  2026-09-29 round were classified by the same topic rule (all central, threshold), after their verdicts were known.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
@@ -1173,9 +1216,20 @@ The final round added:
   cells had at least 30 crossings.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
-registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
-census.
+and optimiser) and the band task's primary P1, P2a and P2b (across d). The band task's PARTIAL rows predate the author's
+per-unit ruling (Track A's L3) and were not re-scored. Designs of that round that failed their own rules before
+registration (the night program's 2C design, the GELU prospective test, the Adam ramp from initialisation) are not
+registrations and are not in the census.
+
+The discussion phase (2026-09-29) added {dr["n"]} rows, all scored by their registered rules and none a failure ({dr["all"]}):
+- Test 2A (Adam per-run ordering at a = 1.85): {dr["t2a"]}.
+- Test 2B (the lag law's validity boundary): {dr["t2b"]}.
+- GELU-T (the lag law at GELU; primary and mechanism-control arms, one row per criterion per arm): {dr["gt"]}.
+- Test 2C (the band task in R^d, one row per criterion per cell): {dr["t2c"]}; PASS at a = {dr["t2c_pass_a"]} and
+  UNRESOLVED at a = {dr["t2c_unres_a"]} (validity V3).
+
+Test 2C (b22ebd0) and GELU-T (736b6bf) are new registrations of new designs. They are not the stopped 2C and GELU
+prospective designs above, which remain unregistered and outside the census.
 
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.

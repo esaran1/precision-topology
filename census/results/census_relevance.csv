@@ -235,3 +235,30 @@ trackT-C1,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,
 trackT-C2,simplicity-bias transfer (Track T),registered rule,UNRESOLVED,central,threshold
 boundary-B1,boundary test (SGD forced ramps),registered rule,UNRESOLVED,central,threshold
 boundary-B2,boundary test (SGD forced ramps),registered rule,UNRESOLVED,central,threshold
+test2A-A1,Adam per-run ordering at an unseen a (Test 2A),registered rule,PASS,central,threshold
+test2A-A2,Adam per-run ordering at an unseen a (Test 2A),registered rule,PASS,central,threshold
+test2A-A3,Adam per-run ordering at an unseen a (Test 2A),registered rule,PASS,central,threshold
+test2B-C1,lag-law validity boundary (Test 2B),registered rule,PASS,central,threshold
+test2B-C2,lag-law validity boundary (Test 2B),registered rule,UNRESOLVED,central,threshold
+geluT-L1,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L2,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L3,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L4,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L5,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L1-control,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L2-control,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L3-control,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L4-control,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+geluT-L5-control,lag law at GELU from a declared start (GELU-T),registered rule,PASS,central,threshold
+test2C-C1-d2-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C2-d2-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C3-d2-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C1-d2-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold
+test2C-C2-d2-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold
+test2C-C3-d2-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold
+test2C-C1-d4-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C2-d4-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C3-d4-1.30,band task in R^d vs own R^d switch (Test 2C),registered rule,UNRESOLVED,central,threshold
+test2C-C1-d4-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold
+test2C-C2-d4-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold
+test2C-C3-d4-1.50,band task in R^d vs own R^d switch (Test 2C),registered rule,PASS,central,threshold

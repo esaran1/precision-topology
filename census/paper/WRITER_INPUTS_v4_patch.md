@@ -142,11 +142,13 @@ certified R_glob and R_solve bracket):
 
 ## WP-4. Registration census by block and by registration file
 
-**Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a.
-- **Headline**: 214 scored by their registered rules: 100 PASS, 66 FAIL, 8 PARTIAL,
-  40 UNRESOLVED.
+**Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a. A
+criterion registered per unit (Track A's L3 per optimiser; Test 2C's criteria per cell) is scored as registered, one
+row per unit, not merged into a PARTIAL.
+- **Headline**: 241 scored by their registered rules: 120 PASS, 66 FAIL, 8 PARTIAL,
+  47 UNRESOLVED.
 - **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
-- **Total**: 236 registered predictions.
+- **Total**: 263 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -155,6 +157,18 @@ certified R_glob and R_solve bracket):
 - Width-1 consistency check (`scale_limits_prediction.md`): PASS.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
+
+**Added in the 2026-09-29 round (discussion phase)**: 27 rows, all scored by their registered rules (20 PASS, 7 UNRESOLVED; no
+FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, and descriptive analyses are not rows.
+- Test 2A (`track2a_registration.md`, 9fd1f32; Adam per-run ordering at the unseen a = 1.85): A1 PASS; A2 PASS; A3 PASS.
+- Test 2B (`track2b_registration.md`, 0708ae9; the lag law's validity boundary in κχ): C1 PASS; C2 UNRESOLVED. C2 is UNRESOLVED
+  because 4 of its 4 cells are invalid.
+- GELU-T (`gelu_transfer_registration.md`, 736b6bf; the lag law at GELU from a declared start): L1–L5 in each of the
+  two registered arms, one row per criterion per arm (10 rows: primary random start 5 PASS; branch-point
+  mechanism control 5 PASS).
+- Test 2C (`track2c_registration.md`, b22ebd0; the band task in R^d against each seed's own-sample R^d switch): C1–C3
+  were registered per cell (d ∈ {2, 4} × a ∈ {1.30, 1.50}) with no pooled verdict, so each is one row per cell
+  (12 rows: 6 PASS, 6 UNRESOLVED; PASS at a = 1.50, UNRESOLVED at a = 1.30 on validity V3).
 
 **Not in the headline.**
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
@@ -181,6 +195,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 |---|---|---|---|---|---|---|
 | A5d k=1 | registered rule | 2 | 1 | 0 | 2 | 5 |
 | A5d k=10 | registered rule | 1 | 2 | 0 | 2 | 5 |
+| Adam per-run ordering at an unseen a (Test 2A) | registered rule | 3 | 0 | 0 | 0 | 3 |
 | Arrhenius 08-27 | registered rule | 15 | 11 | 1 | 15 | 42 |
 | B | post hoc (census) | 1 | 2 | 0 | 0 | 3 |
 | Block 3 (held-out windows) | post hoc (census) | 0 | 0 | 1 | 0 | 1 |
@@ -205,6 +220,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | asymmetric windows (Track 2) | registered rule | 2 | 2 | 0 | 2 | 6 |
 | band task in R^d (Track 3B) | post hoc (census) | 0 | 0 | 3 | 0 | 3 |
 | band task in R^d (Track 3B) | registered rule | 1 | 1 | 0 | 0 | 2 |
+| band task in R^d vs own R^d switch (Test 2C) | registered rule | 6 | 0 | 0 | 6 | 12 |
 | boundary test (SGD forced ramps) | registered rule | 0 | 0 | 0 | 2 | 2 |
 | c1 first order | registered rule | 2 | 0 | 0 | 2 | 4 |
 | collapse 09-12 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
@@ -218,9 +234,11 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | early census 08-23 (width) | registered rule | 3 | 1 | 0 | 0 | 4 |
 | interleaved 08-05 | registered rule | 0 | 0 | 0 | 2 | 2 |
 | kappa | registered rule | 3 | 1 | 0 | 0 | 4 |
+| lag law at GELU from a declared start (GELU-T) | registered rule | 10 | 0 | 0 | 0 | 10 |
 | lag law at an unseen a (Track A) | registered rule | 3 | 1 | 0 | 0 | 4 |
 | lag test | registered rule | 1 | 1 | 0 | 0 | 2 |
 | lag test 2 (deconfounded) | registered rule | 0 | 2 | 0 | 0 | 2 |
+| lag-law validity boundary (Test 2B) | registered rule | 1 | 0 | 0 | 1 | 2 |
 | localization 08-22 | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | localization 08-22 | registered rule | 1 | 0 | 1 | 0 | 2 |
 | metric artifact 09-12 | post hoc (census) | 0 | 0 | 2 | 0 | 2 |
@@ -292,6 +310,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/fold1d_prediction.md | registered rule | 2 | 0 | 2 | 0 | 4 |
 | results/gelu_scale_prediction.md | post hoc (census) | 0 | 1 | 0 | 0 | 1 |
 | results/gelu_scale_prediction.md | registered rule | 1 | 0 | 0 | 0 | 1 |
+| results/gelu_transfer_registration.md | registered rule | 10 | 0 | 0 | 0 | 10 |
 | results/interleaved_predictions.md | registered rule | 0 | 0 | 0 | 2 | 2 |
 | results/kappa_certification_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/lag_test2_prediction.md | registered rule | 0 | 2 | 0 | 0 | 2 |
@@ -330,6 +349,9 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/third_optimizer_prediction.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/threshold_prediction.md | post hoc (census) | 1 | 0 | 0 | 0 | 1 |
 | results/threshold_prediction.md | registered rule | 2 | 1 | 1 | 0 | 4 |
+| results/track2a_registration.md | registered rule | 3 | 0 | 0 | 0 | 3 |
+| results/track2b_registration.md | registered rule | 1 | 0 | 0 | 1 | 2 |
+| results/track2c_registration.md | registered rule | 6 | 0 | 0 | 6 | 12 |
 | results/track_a_registration.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/ts_test_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
 | results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
@@ -476,11 +498,11 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 765 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 1065 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
-(`ghat_digit_stability.csv`). A further 13 checks compare two artifacts to 1e−12; they are
-not printed numbers. 6 of them move in their last digits under the blanket δ, and none of
+(`ghat_digit_stability.csv`). A further 22 checks compare two artifacts to 1e−12; they are
+not printed numbers. 8 of them move in their last digits under the blanket δ, and none of
 those depends on the replaced Ĝ(a) (`ghat_digit_stability_machine_precision.csv`: A* is a limit constant; WP-1's P1 and
 P3 use the own-seed windows' Ĝ, which is not replaced). That separation was set after the first run flagged them. The old float endpoints are kept in the table; the strict
 checks on them keep reporting that they are not rigorous in the last one or two ulps.
@@ -942,13 +964,14 @@ peripheral.
   held-out predictions (Block G, Block 3, own-seed), or width 2.
 - **Peripheral:** budget laws, barriers and sharpness, trapping, optimiser equivalence, and the early exploratory
   probes.
-- The classification is post hoc: it was made on 2026-09-25, after every verdict was known.
+- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The four blocks of the
+  2026-09-29 round were classified by the same topic rule (all central, threshold), after their verdicts were known.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 13 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 53 | 31 | 1 | 15 |
+| registered rule | central | 73 | 31 | 1 | 22 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1025,9 +1048,20 @@ The final round added:
   cells had at least 30 crossings.
 
 It also added seven PARTIAL rows, assigned post hoc because verdicts differ across units: the ramp's R1–R3 (across a
-and optimiser) and the band task's primary P1, P2a and P2b (across d). Designs that failed their own rules before
-registration (2C, the GELU prospective test, the Adam ramp from initialisation) are not registrations and are not in the
-census.
+and optimiser) and the band task's primary P1, P2a and P2b (across d). The band task's PARTIAL rows predate the author's
+per-unit ruling (Track A's L3) and were not re-scored. Designs of that round that failed their own rules before
+registration (the night program's 2C design, the GELU prospective test, the Adam ramp from initialisation) are not
+registrations and are not in the census.
+
+The discussion phase (2026-09-29) added 27 rows, all scored by their registered rules and none a failure (20 PASS, 7 UNRESOLVED):
+- Test 2A (Adam per-run ordering at a = 1.85): A1 PASS; A2 PASS; A3 PASS.
+- Test 2B (the lag law's validity boundary): C1 PASS; C2 UNRESOLVED.
+- GELU-T (the lag law at GELU; primary and mechanism-control arms, one row per criterion per arm): 10 PASS.
+- Test 2C (the band task in R^d, one row per criterion per cell): 6 PASS, 6 UNRESOLVED; PASS at a = 1.50 and
+  UNRESOLVED at a = 1.30 (validity V3).
+
+Test 2C (b22ebd0) and GELU-T (736b6bf) are new registrations of new designs. They are not the stopped 2C and GELU
+prospective designs above, which remain unregistered and outside the census.
 
 None is a failure of the certified threshold values themselves, and the primary prospective comparisons (Block 3,
 own-seed primary) passed.
@@ -2068,6 +2102,19 @@ list of symbol clashes) and `src/track4_populations.py` → `track4_populations.
 > localisation, K = sup G₀ with its domain lemma, the Krawczyk boxes of the first-order calculation, and the
 > positive-definite and ring certificates. The outer-exclusion certificates and the solve brackets (finite-a and
 > limit) were not run; only the original searches support them.
+
+**Discussion-phase addendum (2026-09-29; for the revision, not the submitted PDF).** The paragraph above is what the
+submitted statement rests on. Track 4 (`69af96f`; `src/track4_certs.py`, `results/certificate_checks/track4_summary.json`,
+ledger `track4_certificate_checks`) has since run the missing checks, all passing. For a revised statement, replace the
+last sentence with:
+
+> It also re-derives the outer exclusion by a fresh Arb branch and bound (41 of 41 A-intervals; one convexity lemma is
+> used as stated in the math note, not machine-checked), and confirms the signs at both ends of every solve bracket
+> (the limit bracket and 12 finite-a ends at a = 1.30–1.60). It does not check that the sign changes exactly once
+> inside each bracket.
+
+- Do not say that the checker verifies the finite-a margin enclosures as numbers (only their signs), Theorem G's
+  finite-ε parts, or the convexity and localisation lemmas.
 
 - Every statement comes from the checker's docstring, `PREC = 80`, the manifest hash check, `certificate_audit.md` and
   WP-17's table.
@@ -3560,6 +3607,15 @@ note §10.1 (confirmed by the author, 2026-09-26).
 - **The crossover L\* comparisons** use mpmath at 40 digits.
 - **The Γ_n search** uses a grid plus the rescaled small-ε window, with multi-start pattern refinement. It is not a
   certificate. Attainment itself is proved, and Γ_n ≥ Ĝ_cert holds by containment.
+
+### Addendum (2026-09-28): small-scale compactness (math note §17)
+
+- **Population: now PROVED.** The row "C, s → 0: NOT PROVED" above is superseded for the 800-point population.
+  Theorem C of §17 proves that for s < 2.18·10⁻⁶ every conditional minimiser has |w₁| ≤ 2.35·10⁶. The proof uses the
+  attained supremum of Δμ at the alias |w₁| = π/q.
+- **Continuous windows:** the same holds with |w₁| ≤ 12 for s < 0.64, given the computer-checked maximiser scan.
+- **Training samples** (m ≠ 0): compactness fails (Proposition C′). The minimisers are nevertheless unplaced at small
+  scale (Corollary C3).
 
 IDs: `D1 attainment`; `D1 remainder`; `D1 quadratic growth`; `D1 alias`.
 
