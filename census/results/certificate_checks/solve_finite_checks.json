@@ -1,0 +1,374 @@
+{
+ "solve_a1.30_lo": {
+  "a": 1.3,
+  "s": 7.1,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 15432,
+  "solve_sign": "fails",
+  "E": [
+   -0.7932711582273403,
+   0.7932711582273401,
+   3.789981831547025,
+   3.7899856360628683
+  ],
+  "kept_leaves": 46,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 14.496081113815308,
+  "check_seconds": 442.39157581329346
+ },
+ "solve_a1.30_hi": {
+  "a": 1.3,
+  "s": 7.1125,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 15498,
+  "solve_sign": "solves",
+  "E": [
+   -0.793099377022672,
+   0.7930993770226724,
+   3.78980606291508,
+   3.7898106283340915
+  ],
+  "kept_leaves": 50,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 14.020512104034424,
+  "check_seconds": 519.0101521015167
+ },
+ "solve_a1.35_lo": {
+  "a": 1.35,
+  "s": 5.7125,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 16668,
+  "solve_sign": "fails",
+  "E": [
+   -0.84619740796283,
+   0.8461974079628296,
+   3.8343211809873385,
+   3.834324985503182
+  ],
+  "kept_leaves": 46,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 12.562758207321167,
+  "check_seconds": 383.3998317718506
+ },
+ "solve_a1.35_hi": {
+  "a": 1.35,
+  "s": 5.725,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 16752,
+  "solve_sign": "solves",
+  "E": [
+   -0.8459671970644661,
+   0.8459671970644663,
+   3.8340845401019057,
+   3.834089105520918
+  ],
+  "kept_leaves": 52,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 12.275173902511597,
+  "check_seconds": 472.80255603790283
+ },
+ "solve_a1.40_lo": {
+  "a": 1.4,
+  "s": 4.7375,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 17754,
+  "solve_sign": "fails",
+  "E": [
+   -0.8937772827760703,
+   0.8937772827760703,
+   3.874365232040939,
+   3.8743728410726246
+  ],
+  "kept_leaves": 46,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 7.966019868850708,
+  "check_seconds": 369.9838981628418
+ },
+ "solve_a1.40_hi": {
+  "a": 1.4,
+  "s": 4.75,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 17886,
+  "solve_sign": "solves",
+  "E": [
+   -0.893477596720548,
+   0.8934775967205485,
+   3.8740616316766694,
+   3.8740661970956816
+  ],
+  "kept_leaves": 48,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 8.47637391090393,
+  "check_seconds": 477.317440032959
+ },
+ "solve_a1.45_lo": {
+  "a": 1.45,
+  "s": 4.0125,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 19116,
+  "solve_sign": "fails",
+  "E": [
+   -0.9372320987369323,
+   0.9372320987369318,
+   3.9111503348234504,
+   3.9111594656614734
+  ],
+  "kept_leaves": 52,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 7.698262929916382,
+  "check_seconds": 389.13192772865295
+ },
+ "solve_a1.45_hi": {
+  "a": 1.45,
+  "s": 4.025,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 19080,
+  "solve_sign": "solves",
+  "E": [
+   -0.9368595624695294,
+   0.9368595624695285,
+   3.910766839626479,
+   3.9107759704645018
+  ],
+  "kept_leaves": 48,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 0.0024878978729248047,
+  "check_seconds": 451.278932094574
+ },
+ "solve_a1.50_lo": {
+  "a": 1.5,
+  "s": 3.475,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 20514,
+  "solve_sign": "fails",
+  "E": [
+   -0.9765494541121971,
+   0.9765494541121962,
+   3.9444931116712425,
+   3.944500720702928
+  ],
+  "kept_leaves": 46,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 7.844956874847412,
+  "check_seconds": 392.3689091205597
+ },
+ "solve_a1.50_hi": {
+  "a": 1.5,
+  "s": 3.4875,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 20454,
+  "solve_sign": "solves",
+  "E": [
+   -0.9760968197258946,
+   0.976096819725895,
+   3.944025917125726,
+   3.9440350479637485
+  ],
+  "kept_leaves": 50,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 8.659057140350342,
+  "check_seconds": 468.520959854126
+ },
+ "solve_a1.60_lo": {
+  "a": 1.6,
+  "s": 2.7,
+  "published_sign": "fails",
+  "exported_published_sign": "fails",
+  "status_exported": "plus",
+  "leaves": 23292,
+  "solve_sign": "fails",
+  "E": [
+   -1.0470923131664756,
+   1.0470923131664756,
+   4.004802296814008,
+   4.004811427652031
+  ],
+  "kept_leaves": 50,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 7.583966016769409,
+  "check_seconds": 358.81831192970276
+ },
+ "solve_a1.60_hi": {
+  "a": 1.6,
+  "s": 2.7125,
+  "published_sign": "solves",
+  "exported_published_sign": "solves",
+  "status_exported": "plus",
+  "leaves": 23268,
+  "solve_sign": "solves",
+  "E": [
+   -1.0464537528757947,
+   1.0464537528757947,
+   4.004144876476342,
+   4.004152485508029
+  ],
+  "kept_leaves": 44,
+  "checks": {
+   "files_match_committed_hashes": true,
+   "lemma_W": true,
+   "U_point_in_region": true,
+   "outside_W_loses": true,
+   "coverage_+": true,
+   "every_leaf_claim_verified": true,
+   "winning_discarded_exceed_U": true,
+   "losing_region_above_U": true,
+   "sign_decided": true,
+   "sign_equals_published": true
+  },
+  "checker_pass": true,
+  "export_seconds": 6.996201038360596,
+  "check_seconds": 440.1057357788086
+ }
+}

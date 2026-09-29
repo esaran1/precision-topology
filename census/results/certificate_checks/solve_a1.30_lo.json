@@ -1,0 +1,59 @@
+{
+ "name": "solve_a1.30_lo",
+ "checks": {
+  "files_match_committed_hashes": true,
+  "lemma_W": true,
+  "U_point_in_region": true,
+  "outside_W_loses": true,
+  "coverage_+": true,
+  "every_leaf_claim_verified": true,
+  "winning_discarded_exceed_U": true,
+  "losing_region_above_U": true,
+  "sign_decided": true,
+  "sign_equals_published": true
+ },
+ "U_upper": 0.2881528897012517,
+ "leaves": 15432,
+ "failed_leaves": [],
+ "evaluations": 35448,
+ "max_subdivision_depth": 3,
+ "leaves_needing_subdivision": 3876,
+ "seconds": 393.86018776893616,
+ "pass": true,
+ "losing_region_fresh_bnb": {
+  "verdict": "pass",
+  "witness": null,
+  "unresolved_n": 0,
+  "unresolved_first": [],
+  "evals": 3270,
+  "outside_region": 110,
+  "above_U": 2878,
+  "dropped_beyond_W": 0,
+  "max_depth": 4,
+  "witness_tries": 28,
+  "min_cell_lower_bound": 0.28831109454006854,
+  "region": "-",
+  "domain": [
+   -2.625,
+   2.625,
+   0.0,
+   6.375
+  ],
+  "h0": 0.125,
+  "max_depth_cap": 10,
+  "max_evals_cap": 200000,
+  "seconds": 48.25105309486389
+ },
+ "E": [
+  -0.7932711582273403,
+  0.7932711582273401,
+  3.789981831547025,
+  3.7899856360628683
+ ],
+ "kept_leaves": 46,
+ "kept_leaf_signs": {
+  "fails": 46
+ },
+ "solve_sign": "fails",
+ "published_sign": "fails"
+}

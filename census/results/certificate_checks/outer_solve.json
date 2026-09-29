@@ -1,0 +1,42 @@
+{
+ "name": "outer_solve",
+ "files_match_committed_hashes": true,
+ "data_x_symmetric": true,
+ "B24_lower": 0.38797358308678964,
+ "verdict": "pass",
+ "witness": null,
+ "unresolved_n": 0,
+ "unresolved_first": [],
+ "evals": 2161,
+ "leaves_certified": 1943,
+ "dropped_in_box": 33,
+ "dropped_outside_K": 1174,
+ "theta_splits": 218,
+ "max_depth": 5,
+ "witness_tries": 0,
+ "min_margin_certified": 0.00016486519240916492,
+ "min_cell_lower_bound": 0.2813308983721007,
+ "branch_upper": [
+  0.2811660331796916,
+  0.2809537430081668
+ ],
+ "branch_lower": [
+  0.2811660331796915,
+  0.2809537430081667
+ ],
+ "A_lo": 1.05875,
+ "A_hi": 1.06,
+ "centre": [
+  1.5775651931762695,
+  1.2752930806298712
+ ],
+ "margin_target": 0.0001,
+ "rho": 0.15,
+ "P": 24.0,
+ "h0": 1.0,
+ "max_depth_cap": 12,
+ "max_evals_cap": 400000,
+ "seconds": 40.79925608634949,
+ "localised_branch_below_B24": true,
+ "pass": true
+}

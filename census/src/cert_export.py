@@ -18,9 +18,12 @@ import numpy as np
 CERTS = Path(__file__).resolve().parents[1] / "results" / "certificates"
 
 
-def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, kind="finite_a_status", extra=None):
+def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, kind="finite_a_status", extra=None,
+           win_tol=None):
     """One finite-a status certificate at scale s: both regions' leaves, with the status rule of
-    conditional_certified.evaluate (tolerance 1e−7, then 1e−9 if unresolved)."""
+    conditional_certified.evaluate (tolerance 1e−7, then 1e−9 if unresolved).  win_tol: the WINNING region is then
+    searched again at this tolerance (its argmin enclosure) and its leaves replace the first run's; the status must not
+    change."""
     from .conditional_certified import _population
     from .profiled_bnb import certify, profile
     if x is None:
@@ -34,6 +37,12 @@ def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, k
             break
     assert rec["-"]["W"] == rec["+"]["W"] and rec["-"]["nw"] == rec["+"]["nw"]
     win, lose = ("-", "+") if status == "minus" else ("+", "-")
+    if win_tol is not None:
+        assert status != "unresolved"
+        rec[win] = {}
+        rw = certify(s, a, x, y, win, tol=win_tol, max_cells=max_cells, record=rec[win])
+        rm, rp = (rw, rp) if win == "-" else (rm, rw)
+        assert (rp["lower"] > rm["upper"]) if status == "minus" else (rm["lower"] > rp["upper"]), "status changed"
     wr = rm if win == "-" else rp
     if win == "-" and wr["upper"] == math.log(2) and (wr["arg_w1"], wr["arg_b1"]) == (0.0, 0.0):
         U_point = None                                   # the constant predictor
@@ -56,6 +65,8 @@ def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, k
             "regenerate": f"python -m src.cert_export finite {a} {s} {name}",
             "search_result": {"minus": {k: rm[k] for k in ("lower", "upper", "rounds")},
                               "plus": {k: rp[k] for k in ("lower", "upper", "rounds")}}}
+    if win_tol is not None:                              # (only then: the status certificates' JSON is unchanged)
+        meta["tol_winning_region"] = win_tol
     if extra is not None:
         meta.update(extra(rm, rp, win))
     CERTS.mkdir(parents=True, exist_ok=True)
@@ -65,9 +76,13 @@ def finite(a, s, name, x=None, y=None, tols=(1e-7, 1e-9), max_cells=4_000_000, k
 
 
 def solve(a, s, name):
-    """One finite-a SOLVE-bracket-end certificate (Track 5 item 2): the status branch and bound at tolerance 1e−11
-    (as math_note_v2_checks.solve_finite), recorded, plus the search's argmin enclosure of the winning region and the
-    published certified sign of the solve margin there (mn2_solve_finite.csv), which the checker re-derives."""
+    """One finite-a SOLVE-bracket-end certificate (Track 5 item 2): the status branch and bound (tolerance 1e−7, both
+    regions), then the WINNING region again at tolerance 1e−11 (as math_note_v2_checks.solve_finite), recorded, plus the
+    search's argmin enclosure of the winning region and the published certified sign of the solve margin there
+    (mn2_solve_finite.csv), which the checker re-derives.  (Track 4, 2026-09-28: the first design recorded BOTH regions
+    at 1e−11; at a = 1.45, s = 4.025 the losing region alone gave millions of leaves (depth > 30), beyond the checker's
+    63-bit tiling keys.  The losing region only has to lie above U, and the checker now shows that by its own branch
+    and bound, so its 1e−7 leaves are recorded for completeness only.)"""
     import pandas as pd
     pub = pd.read_csv(CERTS.parent / "mn2_solve_finite.csv", float_precision="round_trip")
     pub = pub[(pub.a.round(2) == round(a, 2)) & (pub.s == s)].iloc[0]
@@ -75,8 +90,9 @@ def solve(a, s, name):
     def extra(rm, rp, win):
         g = rp if win == "+" else rm
         return {"encl_search": g.get("encl_pos"), "published_sign": pub.certified_sign,
-                "published_margin": [float(pub.margin_lo), float(pub.margin_hi)]}
-    return finite(a, s, name, tols=(1e-11,), max_cells=16_000_000, kind="finite_a_solve", extra=extra)
+                "published_margin": [float(pub.margin_lo), float(pub.margin_hi)],
+                "regenerate": f"python -m src.cert_export solve {a} {s} {name}"}
+    return finite(a, s, name, max_cells=16_000_000, kind="finite_a_solve", extra=extra, win_tol=1e-11)
 
 
 def ghat(a, name):

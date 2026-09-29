@@ -1,0 +1,100 @@
+{
+ "name": "solve_limit_ends",
+ "bracket": [
+  1.05875,
+  1.06
+ ],
+ "centre": [
+  1.5775651931762695,
+  1.2752930806298712
+ ],
+ "data_x_symmetric": true,
+ "outer_pass": true,
+ "ring": {
+  "A_lo": 1.05875,
+  "A_hi": 1.06,
+  "certified": true,
+  "boxes": 540,
+  "left": 0,
+  "grad_lower": 0.008203877319297401
+ },
+ "pd": {
+  "boxes": 100,
+  "all_pd": true,
+  "b_bracket_all": true
+ },
+ "ends": [
+  {
+   "A": 1.05875,
+   "krawczyk_unique_zero": true,
+   "zero_box_in_rho_in_box": true,
+   "p": [
+    1.5777741573754718,
+    1.5777741593754724
+   ],
+   "q": [
+    1.2755048109800378,
+    1.2755048129800384
+   ],
+   "b": [
+    -0.6130079680415242,
+    -0.6130079660415241
+   ],
+   "margin": [
+    -0.0005003732549172874,
+    -0.0005003665964169071
+   ],
+   "sign": "fails",
+   "published_sign": "fails",
+   "published_margin": [
+    -0.0005433202706828956,
+    -0.00045908937308012835
+   ],
+   "sign_equals_published": true,
+   "margin_overlaps_published": true
+  },
+  {
+   "A": 1.06,
+   "krawczyk_unique_zero": true,
+   "zero_box_in_rho_in_box": true,
+   "p": [
+    1.577565538661779,
+    1.5775655406617797
+   ],
+   "q": [
+    1.2752932220951625,
+    1.275293224095163
+   ],
+   "b": [
+    -0.6130303613178987,
+    -0.6130303593178985
+   ],
+   "margin": [
+    0.0001671436778003974,
+    0.00016715034180077258
+   ],
+   "sign": "solves",
+   "published_sign": "solves",
+   "published_margin": [
+    0.00013202938450106782,
+    0.00020229405843422393
+   ],
+   "sign_equals_published": true,
+   "margin_overlaps_published": true
+  }
+ ],
+ "branch_upper": [
+  0.2811660331796916,
+  0.2809537430081668
+ ],
+ "localised_branch_below_B24": true,
+ "chain_links": {
+  "localisation": true,
+  "outer": true,
+  "ring": true,
+  "pd": true
+ },
+ "ends_pass": true,
+ "pass": true,
+ "seconds": 7.425904035568237
+}

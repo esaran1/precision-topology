@@ -38,6 +38,11 @@ Rigour notes (every step below is an enclosure in Arb ball arithmetic; nothing i
   * The class gap uses the exact range of f_a over an interval (endpoints and the critical points t = ±acos(−1/a)
     + 2πk inside it, all evaluated in Arb).
 
+Track 4 (2026-09-28) adds, with the same rules: outer_exclusion_arb (Link 2 of the limit four-link chain, a fresh
+branch and bound in Arb with A as a ball), limit_solve_end (the limit solve-bracket ends: Krawczyk's unique critical
+point and the margin's sign there), and region_excluded_arb (check_solve's losing region, by a fresh branch and bound
+instead of its exported leaves).  Driver: src/track4_certs.py.
+
     python -m src.verify_certificates [certificate-name ...]     # all certificates if none given
 """
 
@@ -462,10 +467,12 @@ def _chunk(args):
     return out
 
 
-def check_finite(name, verbose=True, workers=WORKERS):
+def check_finite(name, verbose=True, workers=WORKERS, skip_regions=()):
     """See the module docstring.  Each leaf is verified against what it claims: reason 2 (discarded as outside the
     region) by a rigorous gap bound; reasons 0/1 (kept / discarded by its bound) by a rigorous lower bound of L* at
-    least its recorded bound.  For the losing region the chain additionally needs every such bound > U."""
+    least its recorded bound.  For the losing region the chain additionally needs every such bound > U.
+    skip_regions: regions whose exported leaves are NOT used (neither tiled nor verified); the caller must then establish
+    what that region contributes by other means (check_solve: a fresh branch and bound)."""
     from multiprocessing import Pool
     meta = json.loads((CERTS / f"{name}.json").read_text())
     dat = np.load(CERTS / f"{name}.npz")
@@ -489,6 +496,8 @@ def check_finite(name, verbose=True, workers=WORKERS):
     res["checks"]["outside_W_loses"] = bool(U < arb(2).log()) if win == "+" else True
     jobs = []
     for reg in ("-", "+"):
+        if reg in skip_regions:
+            continue
         lv, iw, ib = dat[f"level_{reg}"], dat[f"iw_{reg}"], dat[f"ib_{reg}"]
         ok, why = coverage_ok(lv, iw, ib, meta["nw"], meta["nb"])
         res["checks"][f"coverage_{reg}"] = ok
@@ -843,18 +852,85 @@ def solve_sign_on_box(obj, wl, wh, bl, bh, depth=0, max_depth=5):
     return parts[0] if parts[0] is not None and all(p == parts[0] for p in parts) else None
 
 
+def region_excluded_arb(obj, U, region, W, h0=0.125, max_depth=10, max_evals=200_000, box=None,
+                        witness_from_depth=2):
+    """A fresh branch and bound in Arb (it does not use any exported leaf): every (w₁, b₁) with |w₁| <= W, b₁ ∈ [0, 2π],
+    in `region` ('-': G <= 0, '+': G > 0; orientation w₂ > 0, as in the certificates) has L* > U (an Arb ball; strict).
+    Cells are dyadic squares of side h0 from (−h0·⌈W/h0⌉, 0) (every endpoint an exact double); a cell is dropped only if
+    it lies in |w₁| >= W (exact comparison; the localisation lemma covers it); it is certified if rigorously outside the
+    region (gap bounds) or if its rigorous lower bound of L* exceeds U; otherwise it is split in four.  b₁ ∈ [0, 2π]
+    suffices: f_a(t + 2π) = f_a(t) + 2π, which the profiled b₂ absorbs, and G is unchanged.
+    Verdicts: 'pass'; 'fail' (a witness: a cell centre rigorously in the region with a rigorous upper bound of L* below
+    U's lower end, so the claim is false); 'unresolved' (a cap).  box = (wl, wh, bl, bh) restricts the domain (tests)."""
+    from fractions import Fraction as Fr
+    t0 = time.time()
+    Wf = Fr(float(W))
+    if box is None:
+        nw = int(math.ceil(float(W) / h0)); nb = int(math.ceil(2 * math.pi / h0))
+        box = (-nw * h0, nw * h0, 0.0, nb * h0)
+        assert box[3] >= 2 * math.pi and box[1] >= W
+    wl0, wh0, bl0, bh0 = box
+    n_w, n_b = int(round((wh0 - wl0) / h0)), int(round((bh0 - bl0) / h0))
+    assert wl0 + n_w * h0 == wh0 and bl0 + n_b * h0 == bh0
+    stack = [(wl0 + i * h0, wl0 + (i + 1) * h0, bl0 + j * h0, bl0 + (j + 1) * h0, 0) for i in range(n_w) for j in range(n_b)]
+    st = {"evals": 0, "outside_region": 0, "above_U": 0, "dropped_beyond_W": 0, "max_depth": 0, "witness_tries": 0}
+    unresolved, witness, lb_min = [], None, math.inf
+    while stack:
+        wl, wh, bl, bh, depth = stack.pop()
+        if Fr(wl) >= Wf or Fr(wh) <= -Wf:
+            st["dropped_beyond_W"] += 1
+            continue
+        if st["evals"] >= max_evals:
+            unresolved.append((wl, wh, bl, bh, "evaluation cap"))
+            continue
+        st["evals"] += 1
+        st["max_depth"] = max(st["max_depth"], depth)
+        wc, bc, hw, hb = 0.5 * (wl + wh), 0.5 * (bl + bh), 0.5 * (wh - wl), 0.5 * (bh - bl)
+        assert wc - hw == wl and wc + hw == wh and bc - hb == bl and bc + hb == bh
+        gl, gu = obj.gap_bounds(wl, wh, bl, bh)
+        if (region == "-" and bool(gl > 0)) or (region == "+" and bool(gu <= 0)):
+            st["outside_region"] += 1
+            continue
+        lb = obj.lower_bound(wc, bc, hw, hb)
+        if lb is not None and bool(lb > U):
+            st["above_U"] += 1
+            lb_min = min(lb_min, float_down(lo_(lb)))
+            continue
+        if depth >= witness_from_depth:
+            gpl, gpu = obj.gap_bounds(wc, wc, bc, bc)
+            inside = bool(gpu <= 0) if region == "-" else bool(gpl > 0)
+            Bb = obj.b_bracket(arb(wc), arb(bc))[0] if inside else None
+            if Bb is not None:
+                st["witness_tries"] += 1
+                up = obj.upper_at(wc, bc, float(Bb.mid()))
+                if bool(arb(hi_(up)) < arb(lo_(U))):
+                    witness = {"w1": wc, "b1": bc, "L_upper": float_up(hi_(up)), "U_lower": float_down(lo_(U))}
+                    break
+        if depth < max_depth:
+            stack += [(a0, a1, b0, b1, depth + 1) for a0, a1 in ((wl, wc), (wc, wh)) for b0, b1 in ((bl, bc), (bc, bh))]
+        else:
+            unresolved.append((wl, wh, bl, bh, "depth cap"))
+    verdict = "fail" if witness is not None else ("pass" if not unresolved and not stack else "unresolved")
+    return {"verdict": verdict, "witness": witness, "unresolved_n": len(unresolved) + len(stack),
+            "unresolved_first": unresolved[:10], **st, "min_cell_lower_bound": lb_min if verdict == "pass" else None,
+            "region": region, "domain": list(box), "h0": h0, "max_depth_cap": max_depth, "max_evals_cap": max_evals,
+            "seconds": time.time() - t0}
+
+
 def check_solve(name, verbose=True, workers=WORKERS):
-    """Finite-a solve-bracket end.  The status certificate's checks (check_finite: hashes, lemma W, tiling, every leaf's
-    claim, losing claims > U), plus: every winning-region leaf discarded by its bound has claim > U, so the global
-    minimiser lies in the union of the winning region's KEPT leaves; their bounding box E is recomputed from the
-    integer indices; on E (b₂ in its certified bracket) the solve margin's sign is decided in Arb and must equal the
-    published certified sign."""
+    """Finite-a solve-bracket end.  (1) The WINNING region's exported leaves (tolerance 1e−11): hashes, lemma W, exact
+    tiling, every leaf's claim verified (check_finite, losing region skipped), and every leaf discarded by its bound has
+    claim > U.  (2) The LOSING region: its exported leaves are not used; a fresh Arb branch and bound
+    (region_excluded_arb) shows L* > U on all of it.  (3) Hence the global minimiser lies in the union of the winning
+    region's KEPT leaves (recomputed from the integer indices); on every kept leaf (b₂ in its certified bracket) the
+    solve margin's sign is decided in Arb, and it must be the same on all of them and equal the published sign.
+    (Track 4, 2026-09-28: (2) replaces verifying 1e−11 losing-region leaves, of which there were millions at a = 1.45.)"""
     meta = json.loads((CERTS / f"{name}.json").read_text())
-    res = check_finite(name, verbose=False, workers=workers)
+    win, lose = meta["winning_region"], meta["losing_region"]
+    res = check_finite(name, verbose=False, workers=workers, skip_regions=(lose,))
     res["name"] = name
     dat = np.load(CERTS / f"{name}.npz")
     obj = Objective(dat["x"], dat["y"], meta["s"], meta["a"])
-    win = meta["winning_region"]
     if meta["U_point"] is None:
         res["checks"]["solve_winner_not_constant"] = False
         res["pass"] = False
@@ -863,13 +939,22 @@ def check_solve(name, verbose=True, workers=WORKERS):
     lv, iw, ib = dat[f"level_{win}"], dat[f"iw_{win}"], dat[f"ib_{win}"]
     reason, claim = dat[f"reason_{win}"], dat[f"lb_{win}"]
     res["checks"]["winning_discarded_exceed_U"] = all(arb(float(c)) > U for c in claim[reason == 1])
+    ex = region_excluded_arb(obj, U, lose, meta["W"])
+    res["losing_region_fresh_bnb"] = ex
+    res["checks"]["losing_region_above_U"] = ex["verdict"] == "pass"
     kept = reason == 0
     hw = meta["hw0"] / 2.0 ** lv[kept]; hb = meta["hb0"] / 2.0 ** lv[kept]
     cw = -meta["W"] + (iw[kept] + 0.5) * 2 * hw; cb = (ib[kept] + 0.5) * 2 * hb
+    # The sign is decided on EVERY kept leaf (not on their bounding box: the kept set has two mirror clusters, w₁ ↦ −w₁,
+    # since the data and windows are x-symmetric), each widened by 1e−12 (>> the float rounding of the leaf edges).
     E = (float((cw - hw).min()), float((cw + hw).max()), float((cb - hb).min()), float((cb + hb).max()))
     res["E"] = E; res["kept_leaves"] = int(kept.sum())
-    sign = solve_sign_on_box(obj, *E)
+    signs = [solve_sign_on_box(obj, float(c - h) - 1e-12, float(c + h) + 1e-12, float(d - g) - 1e-12,
+                               float(d + g) + 1e-12) for c, h, d, g in zip(cw, hw, cb, hb)]
+    res["kept_leaf_signs"] = {str(k): signs.count(k) for k in set(signs)}
+    sign = signs[0] if signs and all(v == signs[0] for v in signs) else None
     res["solve_sign"] = sign
+    res["published_sign"] = meta["published_sign"]
     res["checks"]["sign_decided"] = sign is not None
     res["checks"]["sign_equals_published"] = sign == meta["published_sign"]
     res["pass"] = all(res["checks"].values())
@@ -1273,6 +1358,389 @@ def check_ring(name, centre, intervals, rho_in=0.05, rho_out=0.15, side=0.0125, 
     res["pass"] = res["all_certified"]
     out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
     (out_dir / f"{name}.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps(res, indent=1, default=str))
+    return res
+
+
+# ------------------------------------------------------------------------------------------ Track 4: outer exclusion (Link 2)
+# The limit four-link chain (math_note_v2 §3(c)) needs, for every A in an interval J and every θ = (p, q) in K(24)
+# (p >= 0 by x-symmetry) outside the closed 0.15 box around θ_c:  L0*(θ; A) > L0*(θ_c; A) + margin.
+# The producer (certificates_v2.outer_exclusion) is a FLOAT branch and bound per A-sub-interval: a second-order cell
+# bound at the midpoint A_c, an A-term from convexity in A and a median-centred envelope bound, and a 1e−9 allowance
+# for float rounding.  This check shares none of that.  It is a fresh branch and bound in Arb:
+#   * A is carried as a BALL in the objective (never sampled, no convexity-in-A term on the competitor side);
+#   * the logit is written z = A·(h(σ) − c) + b′ with a per-cell constant c.  This is the same model (b′ = b + A·c and b is
+#     profiled over ℝ), so L0* is unchanged; it only narrows the enclosure where h(σ) is large and nearly constant;
+#   * each cell's lower bound is Objective.lower_bound (the checker's first-order mean-value bound and its direct
+#     bound), valid for every θ in the cell and every A in the ball;
+#   * the branch side: L0*(θ_c; ·) is convex in A (the loss is jointly convex in (A, b) since z is jointly linear in them,
+#     and a partial minimum over b of a jointly convex function is convex), so on J = [A_i, A_j] it is at most
+#     max(U(A_i), U(A_j)), with U(A) a rigorous Arb upper bound of L(θ_c, b̂; A) >= L0*(θ_c; A) at a float b̂;
+#   * cells are dyadic squares from the integer grid [0, P] × [−52, 52] (every endpoint an exact double); a cell is
+#     dropped only if it lies in the closed rho box (exact rational test) or is disjoint from K(P) (Arb test);
+#   * a failed cell is split in four (θ); A is never split (one run per published A-sub-interval).
+# Verdicts: 'pass' (every cell certified), 'fail' (a witness: a point θ outside the box and a grid A with a rigorous
+# upper bound of L0*(θ; A) below a rigorous lower bound of L0*(θ_c; A) + margin, i.e. the claim is false there),
+# 'unresolved' (a cap reached, neither shown).
+class HShift(HAct):
+    """h(σ) − c for a constant c (an exact double): the logit A·h(σ) + b is A·(h(σ) − c) + b′ with b′ = b + A·c."""
+
+    def __init__(self, c):
+        super().__init__()
+        self.cc = arb(c)
+        self.cf = float(c)
+
+    def f(self, t):
+        return -t + t * t * t / 6 - self.cc
+
+    def np_f(self, t):
+        return -t + t ** 3 / 6 - self.cf
+
+
+def _float_profile_loss(xf, yf, A, p, q):
+    """Float estimate of L0*(p, q; A) (profiled b by bisection).  Only PROPOSES witness points; never decides."""
+    z0 = A * (-(p * xf + q) + (p * xf + q) ** 3 / 6)
+    z0 = z0 - np.median(z0)
+    yb = yf.mean()
+    lo, hi = -float(np.abs(z0).max()) - 50.0, float(np.abs(z0).max()) + 50.0
+    for _ in range(200):
+        m = 0.5 * (lo + hi)
+        v = np.exp(-np.logaddexp(0, -(z0 + m))).mean() - yb
+        lo, hi = (m, hi) if v < 0 else (lo, m)
+    z = z0 + 0.5 * (lo + hi)
+    return float((np.logaddexp(0, z) - yf * z).mean())
+
+
+def _inside_closed_box(pl, ph, ql, qh, p0, q0, rho):
+    """Exact (rational) test: the cell [pl, ph] × [ql, qh] lies in the closed box |θ − (p0, q0)|_∞ <= rho."""
+    from fractions import Fraction as Fr
+    P0, Q0, R = Fr(p0), Fr(q0), Fr(rho)
+    return Fr(pl) >= P0 - R and Fr(ph) <= P0 + R and Fr(ql) >= Q0 - R and Fr(qh) <= Q0 + R
+
+
+def _point_outside_box(p, q, p0, q0, rho):
+    from fractions import Fraction as Fr
+    return max(abs(Fr(p) - Fr(p0)), abs(Fr(q) - Fr(q0))) > Fr(rho)
+
+
+def _disjoint_from_K(pl, ph, ql, qh, X=2):
+    """K(P) ∩ {p >= 0} = {0 <= p <= P, |q| <= 2√2 + X·p}.  The cell (0 <= p <= ph) is disjoint from it if every q in it
+    has |q| > 2√2 + X·ph (Arb comparison)."""
+    lim = 2 * arb(2).sqrt() + arb(X) * arb(ph)
+    return bool(arb(ql) > lim) or bool(arb(qh) < -lim)
+
+
+def outer_exclusion_arb(x, y, centre, A_lo, A_hi, margin, P=24.0, h0=1.0, q_extent=52.0, rho=0.15,
+                        max_depth=12, max_evals=400_000, region=None, witness_from_depth=2, verbose=False):
+    """See the section comment.  One A-interval J = [A_lo, A_hi] (a ball in the objective).
+    region: (pl, ph, ql, qh) to restrict the domain (tests); default [0, P] × [−q_extent, q_extent] ∩ K(P).
+    Returns the verdict, the certified margin, counts and the branch values."""
+    ctx.prec = PREC
+    t0 = time.time()
+    xf, yf = np.asarray(x, float), np.asarray(y, float)
+    p0, q0 = float(centre[0]), float(centre[1])
+    A_edges = [float(A_lo), float(A_hi)]
+    K = 1
+    assert 0 < A_edges[0] < A_edges[1]
+    assert 2 * math.sqrt(2) + 2 * P < q_extent and float(np.abs(xf).max()) <= 2.0
+    exact = [Objective(xf, yf, A_edges[k], None, act=HAct()) for k in range(K + 1)]
+    U_hi, U_lo = [], []
+    for o in exact:
+        Bb, _ = o.b_bracket(arb(p0), arb(q0))
+        if Bb is None:
+            return {"verdict": "unresolved", "note": "branch bias not bracketed"}
+        U_hi.append(arb(hi_(o.upper_at(p0, q0, float(Bb.mid())))))       # >= L0*(θ_c; A_k)
+        U_lo.append(arb(lo_(o.lower_bound(p0, q0, 0.0, 0.0))))            # <= L0*(θ_c; A_k)
+    mg = arb(float(margin))                               # the exact double
+    o = Objective(xf, yf, ball(A_edges[0], A_edges[1]), None, act=HShift(0.0))
+    branch = max(U_hi[0], U_hi[1])                      # exact points (upper ends); convexity in A: max over J
+    Uf = [_mid(u) for u in U_lo]
+    pl0, ph0, ql0, qh0 = region if region is not None else (0.0, P, -q_extent, q_extent)
+    n_p, n_q = int(round((ph0 - pl0) / h0)), int(round((qh0 - ql0) / h0))
+    assert abs(pl0 + n_p * h0 - ph0) == 0 and abs(ql0 + n_q * h0 - qh0) == 0
+    stack = [(pl0 + a * h0, pl0 + (a + 1) * h0, ql0 + b * h0, ql0 + (b + 1) * h0, 0)
+             for a in range(n_p) for b in range(n_q)]
+    stats = {"evals": 0, "leaves_certified": 0, "dropped_in_box": 0, "dropped_outside_K": 0, "theta_splits": 0,
+             "max_depth": 0, "witness_tries": 0}
+    marg, lb_min = math.inf, math.inf          # min over certified leaves of (lb − branch), and of lb
+    unresolved, witness = [], None
+    while stack:
+        pl, ph, ql, qh, depth = stack.pop()
+        if _inside_closed_box(pl, ph, ql, qh, p0, q0, rho):
+            stats["dropped_in_box"] += 1
+            continue
+        if _disjoint_from_K(pl, ph, ql, qh):
+            stats["dropped_outside_K"] += 1
+            continue
+        if stats["evals"] >= max_evals:
+            unresolved.append((pl, ph, ql, qh, "evaluation cap"))
+            continue
+        stats["evals"] += 1
+        stats["max_depth"] = max(stats["max_depth"], depth)
+        pc, qc, hp, hq = 0.5 * (pl + ph), 0.5 * (ql + qh), 0.5 * (ph - pl), 0.5 * (qh - ql)
+        assert pc - hp == pl and pc + hp == ph and qc - hq == ql and qc + hq == qh      # exact dyadic cells
+        sc = pc * xf + qc
+        o.fa = HShift(float(np.median(-sc + sc ** 3 / 6)))
+        lb = o.lower_bound(pc, qc, hp, hq)
+        if lb is not None and bool(lb > branch + mg):
+            stats["leaves_certified"] += 1
+            marg = min(marg, float_down(lo_(lb) - hi_(branch)))
+            lb_min = min(lb_min, float_down(lo_(lb)))
+            continue
+        # a failed cell: look for a witness that the claim is false (float proposes, Arb decides)
+        if depth >= witness_from_depth and _point_outside_box(pc, qc, p0, q0, rho):
+            for k in (0, 1):
+                if _float_profile_loss(xf, yf, A_edges[k], pc, qc) < Uf[k] + float(margin) + 1e-6:
+                    stats["witness_tries"] += 1
+                    Bb, _ = exact[k].b_bracket(arb(pc), arb(qc))
+                    if Bb is not None:
+                        up = arb(hi_(exact[k].upper_at(pc, qc, float(Bb.mid()))))
+                        if bool(up < U_lo[k] + mg):
+                            witness = {"p": pc, "q": qc, "A": A_edges[k], "L_upper": float_up(up),
+                                       "branch_lower_plus_margin": float_down(lo_(U_lo[k] + mg))}
+                            break
+            if witness is not None:
+                break
+        if depth < max_depth:
+            stack += [(a0, a1, b0, b1, depth + 1) for a0, a1 in ((pl, pc), (pc, ph)) for b0, b1 in ((ql, qc), (qc, qh))]
+            stats["theta_splits"] += 1
+        else:
+            unresolved.append((pl, ph, ql, qh, "depth cap"))
+        if verbose and stats["evals"] % 5000 == 0:
+            print(json.dumps({**stats, "stack": len(stack), "s": round(time.time() - t0, 1)}), flush=True)
+    verdict = "fail" if witness is not None else ("pass" if not unresolved and not stack else "unresolved")
+    return {"verdict": verdict, "witness": witness, "unresolved_n": len(unresolved) + len(stack),
+            "unresolved_first": unresolved[:10], **stats,
+            "min_margin_certified": marg if verdict == "pass" else None,
+            "min_cell_lower_bound": lb_min if verdict == "pass" else None,
+            "branch_upper": [float_up(u) for u in U_hi], "branch_lower": [float_down(u) for u in U_lo],
+            "A_lo": A_edges[0], "A_hi": A_edges[1], "centre": [p0, q0], "margin_target": margin, "rho": rho, "P": P,
+            "h0": h0, "max_depth_cap": max_depth, "max_evals_cap": max_evals,
+            "seconds": time.time() - t0}
+
+
+def _verified_limit_data():
+    """The 800-point population from the hash-checked limit certificate file (the same data the searches used)."""
+    if not files_match_manifest("limit_A_lo"):
+        raise RuntimeError("limit_A_lo certificate files do not match the committed hashes")
+    d = np.load(CERTS / "limit_A_lo.npz")
+    x, y = d["x"], d["y"]
+    sym = sorted(zip(x.tolist(), y.tolist())) == sorted(zip((-x).tolist(), y.tolist()))
+    return x, y, sym
+
+
+# ------------------------------------------------------------------------------------------ Track 4: limit solve bracket ends
+def grad_system_arb(X, xs, ys, A, want_J=True):
+    """∇_{(p, q, b)} L and its Jacobian (the (p, q, b) Hessian) at fixed A, L = mean softplus(z) − y z, z = A h(p x + q) + b."""
+    p, q, b = X
+    n = len(xs)
+    F = [arb(0)] * 3
+    J = [[arb(0)] * 3 for _ in range(3)]
+    for xi, yi in zip(xs, ys):
+        sg = p * xi + q
+        h1s = _h1(sg)
+        z = A * _hh(sg) + b
+        S = _sig(z); res = S - yi
+        dz = [A * h1s * xi, A * h1s, arb(1)]
+        for i in range(3):
+            F[i] += res * dz[i]
+        if want_J:
+            w = S * (1 - S)
+            d2 = [[A * sg * xi * xi, A * sg * xi, arb(0)], [A * sg * xi, A * sg, arb(0)], [arb(0)] * 3]
+            for i in range(3):
+                for j in range(3):
+                    J[i][j] += w * dz[i] * dz[j] + res * d2[i][j]
+    F = [f / n for f in F]
+    if not want_J:
+        return F
+    return F, [[J[i][j] / n for j in range(3)] for i in range(3)]
+
+
+def limit_solve_margin(P, Q, B, A, inner=(-0.8, 0.8), outer=(1.2, 2.0), n_pts=33):
+    """Enclosure of the limit solve margin M = min(−(A·max_I h(p x + q) + b), A·min_O h(p x + q) + b) over the box P × Q × B
+    (balls; A > 0 exact).  Lower end: the exact ranges over the windows (HAct.range, every possibly-contained critical
+    point).  Upper end: M <= −(A h(σ(x_i)) + b) and M <= A h(σ(x_o)) + b at any fixed x_i ∈ I, x_o ∈ O, so the smallest
+    upper end over a grid of fixed points is an upper bound.  Returns (lower, upper) as Arb exact endpoints."""
+    hact = HAct()
+    D = lambda v: arb(f"{v:.12f}")                     # the decimal window point (a ball containing it)
+    pl, ph, ql, qh = lo_(P), hi_(P), lo_(Q), hi_(Q)
+    _, imx = hact.range(*t_interval(pl, ph, ql, qh, D(inner[0]), D(inner[1])))
+    o1, _ = hact.range(*t_interval(pl, ph, ql, qh, D(outer[0]), D(outer[1])))
+    o2, _ = hact.range(*t_interval(pl, ph, ql, qh, D(-outer[1]), D(-outer[0])))
+    low = min(lo_(-(A * imx + hi_(B))), lo_(A * min(o1, o2) + lo_(B)))
+    ups = []
+    for xi in np.linspace(inner[0], inner[1], n_pts):
+        ups.append(hi_(-(A * hact.f(P * D(float(xi)) + Q) + B)))
+    for xo in np.r_[np.linspace(*outer, n_pts), -np.linspace(*outer, n_pts)]:
+        ups.append(hi_(A * hact.f(P * D(float(xo)) + Q) + B))
+    return low, min(ups)
+
+
+def limit_solve_end(x, y, A, start, box_centre, rho_in=0.05, rad=1e-9, newton_steps=12):
+    """At fixed A: Krawczyk proves a unique zero of ∇_{(p, q, b)} L in a box of radius `rad` around a float Newton point
+    started from `start` (p, q, b); the box's (p, q) must lie in the rho_in box around `box_centre` (where, by the chain,
+    the global minimiser is the unique critical point); the solve margin is enclosed over the box and its sign decided."""
+    ctx.prec = PREC
+    xs = [arb(float(v)) for v in x]; ys = [int(v) for v in y]
+    Aa = arb(A)
+
+    def fun(X, want_J=True):
+        return grad_system_arb(X, xs, ys, Aa, want_J)
+    xt = [float(v) for v in start]
+    for _ in range(newton_steps):                                     # float Newton on the Arb midpoints: proposes only
+        Fm, Jm = fun([arb(v) for v in xt], True)
+        step = np.linalg.solve(np.array([[_mid(Jm[i][j]) for j in range(3)] for i in range(3)]),
+                               np.array([_mid(f) for f in Fm]))
+        xt = [xt[i] - float(step[i]) for i in range(3)]
+    ok, Kb, Xb, _ = krawczyk_arb(fun, xt, [rad] * 3)
+    from fractions import Fraction as Fr
+    p0, q0, r = Fr(box_centre[0]), Fr(box_centre[1]), Fr(rho_in)
+    in_box = all(Fr(float_down(lo_(Xb[k]))) >= c - r and Fr(float_up(hi_(Xb[k]))) <= c + r
+                 for k, c in ((0, p0), (1, q0)))
+    lo, hi = limit_solve_margin(Xb[0], Xb[1], Xb[2], Aa)
+    sign = "solves" if bool(lo > 0) else ("fails" if bool(hi < 0) else None)
+    return {"A": A, "krawczyk_unique_zero": bool(ok), "zero_box_in_rho_in_box": bool(in_box),
+            "p": [float_down(lo_(Xb[0])), float_up(hi_(Xb[0]))], "q": [float_down(lo_(Xb[1])), float_up(hi_(Xb[1]))],
+            "b": [float_down(lo_(Xb[2])), float_up(hi_(Xb[2]))],
+            "margin": [float_down(lo), float_up(hi)], "sign": sign}
+
+
+# ------------------------------------------------------------------------------------------ Track 4 driver
+def _published_inputs():
+    """The published parameters the checks take (read as data, as check_krawczyk reads first_order_c1.csv): the annulus
+    centre (limit_switch.csv), the solve bracket and its centre (mn2_solve_limit.csv), the published margins."""
+    import ast
+    import csv
+    R = CERTS.parent
+    ls = next(csv.DictReader((R / "limit_switch.csv").open()))
+    sl = sorted(csv.DictReader((R / "mn2_solve_limit.csv").open()), key=lambda r: float(r["A"]))
+    e = ast.literal_eval(sl[-1]["encl"])
+    return {"annulus_centre": (float(ls["argmin_p"]), float(ls["argmin_q"])),
+            "annulus_edges": np.linspace(0.66, 0.71, 41).tolist(),
+            "solve_bracket": (float(sl[0]["A_solve_lo"]), float(sl[0]["A_solve_hi"])),
+            "solve_centre": (0.5 * (e[0] + e[1]), 0.5 * (e[2] + e[3])),
+            "solve_rows": [{"A": float(r["A"]), "sign": r["certified_sign"], "encl": ast.literal_eval(r["encl"]),
+                            "margin": [float(r["margin_lo"]), float(r["margin_hi"])]} for r in sl]}
+
+
+def track4_outer(which, sub=None, verbose=True):
+    """Outer exclusion (Link 2), independently, margin target 1e−4 (the published statement: >= 1.00e−4 on every annulus
+    sub-interval, >= 1.48e−4 on the solve bracket).  which = 'solve': the solve bracket as one interval ->
+    certificate_checks/outer_solve.json.  which = 'annulus': each of the published 40 sub-intervals of [0.66, 0.71]
+    (checkpointed to outer_glob_annulus_parts.jsonl, skipped on restart) -> outer_glob_annulus.json; sub = k runs only
+    the k-th sub-interval (the timing sample) -> outer_glob_annulus_sub<k>.json."""
+    pub = _published_inputs()
+    x, y, sym = _verified_limit_data()
+    BP, _ = localisation_bounds(x, y, 24.0)
+    out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
+
+    def one(centre, A_lo, A_hi):
+        r = outer_exclusion_arb(x, y, centre, A_lo, A_hi, 1e-4, verbose=verbose)
+        r["localised_branch_below_B24"] = bool(arb(max(r["branch_upper"])) < BP)
+        r["pass"] = r["verdict"] == "pass" and r["localised_branch_below_B24"]
+        return r
+    base = {"files_match_committed_hashes": True, "data_x_symmetric": bool(sym), "B24_lower": float_down(lo_(BP))}
+    if which == "solve":
+        (A_lo, A_hi) = pub["solve_bracket"]
+        res = {"name": "outer_solve", **base, **one(pub["solve_centre"], A_lo, A_hi)}
+        res["pass"] = res["pass"] and sym
+        (out_dir / "outer_solve.json").write_text(json.dumps(res, indent=1, default=str))
+    elif sub is not None:
+        e = pub["annulus_edges"]
+        res = {"name": f"outer_glob_annulus_sub{sub:02d}", **base, **one(pub["annulus_centre"], e[sub], e[sub + 1])}
+        res["pass"] = res["pass"] and sym
+        (out_dir / f"outer_glob_annulus_sub{sub:02d}.json").write_text(json.dumps(res, indent=1, default=str))
+    else:
+        import csv
+        e = pub["annulus_edges"]
+        parts = out_dir / "outer_glob_annulus_parts.jsonl"
+        done = {}
+        if parts.exists():
+            for line in parts.read_text().splitlines():
+                r = json.loads(line); done[r["k"]] = r
+        for k in range(len(e) - 1):
+            if k in done:
+                continue
+            r = {"k": k, **one(pub["annulus_centre"], e[k], e[k + 1])}
+            with parts.open("a") as fh:
+                fh.write(json.dumps(r, default=str) + "\n")
+            done[k] = r
+            if verbose:
+                print(json.dumps({q: r[q] for q in ("k", "A_lo", "A_hi", "verdict", "min_margin_certified", "evals",
+                                                     "seconds")}), flush=True)
+        rows = [done[k] for k in range(len(e) - 1)]
+        prod = {round(float(r["A_lo"]), 6): float(r["outer_margin"])
+                for r in csv.DictReader((CERTS.parent / "certv2_annulus_parts.csv").open())}
+        res = {"name": "outer_glob_annulus", **base, "centre": list(pub["annulus_centre"]),
+               "range": [e[0], e[-1]], "subintervals": len(rows),
+               "subintervals_pass": sum(bool(r["pass"]) for r in rows),
+               "verdicts": {v: sum(r["verdict"] == v for r in rows) for v in ("pass", "fail", "unresolved")},
+               "min_margin_certified": min((r["min_margin_certified"] for r in rows if r["verdict"] == "pass"),
+                                           default=None),
+               "max_branch_upper": max(max(r["branch_upper"]) for r in rows),
+               "evals_total": sum(r["evals"] for r in rows), "max_depth": max(r["max_depth"] for r in rows),
+               "seconds_total": sum(r["seconds"] for r in rows),
+               "per_subinterval": [{"A_lo": r["A_lo"], "A_hi": r["A_hi"], "verdict": r["verdict"],
+                                    "margin": r["min_margin_certified"], "evals": r["evals"], "seconds": r["seconds"],
+                                    "producer_margin": prod.get(round(float(r["A_lo"]), 6))} for r in rows]}
+        res["pass"] = res["subintervals_pass"] == len(rows) == 40 and sym
+        (out_dir / "outer_glob_annulus.json").write_text(json.dumps(res, indent=1, default=str))
+    if verbose:
+        print(json.dumps({k: v for k, v in res.items() if k != "per_subinterval"}, indent=1, default=str))
+    return res
+
+
+def track4_solve_limit(verbose=True, workers=1):
+    """The limit solve bracket's two ends, independently: for each end A, Krawczyk's unique zero of the (p, q, b)
+    gradient, inside the 0.05 box around the published solve centre; the solve margin's sign there in Arb.  That zero is
+    the global minimiser by the chain, whose links are re-run here with recorded parameters: localisation (B(24)),
+    outer exclusion (outer_solve.json, run by track4_outer), ring 0.05–0.15 (_ring_interval) and PD on the 0.05 box
+    (_pd_box, margin 0) over the whole bracket.  Writes certificate_checks/solve_limit_ends.json."""
+    from multiprocessing import Pool
+    t0 = time.time()
+    pub = _published_inputs()
+    x, y, sym = _verified_limit_data()
+    (A_lo, A_hi), c = pub["solve_bracket"], pub["solve_centre"]
+    res = {"name": "solve_limit_ends", "bracket": [A_lo, A_hi], "centre": list(c), "data_x_symmetric": bool(sym)}
+    outer_p = CERTS.parent / "certificate_checks" / "outer_solve.json"
+    res["outer_pass"] = bool(outer_p.exists() and json.loads(outer_p.read_text())["pass"])
+    ring = _ring_interval((A_lo, A_hi, c[0], c[1], 0.05, 0.15, 0.0125, 4))
+    res["ring"] = ring
+    pe = np.linspace(c[0] - 0.05, c[0] + 0.05, 11); qe = np.linspace(c[1] - 0.05, c[1] + 0.05, 11)
+    assert pe[0] <= c[0] - 0.05 and pe[-1] >= c[0] + 0.05 and qe[0] <= c[1] - 0.05 and qe[-1] >= c[1] + 0.05
+    boxes = [(pe[i], pe[i + 1], qe[j], qe[j + 1], A_lo, A_hi, 0.0) for i in range(10) for j in range(10)]
+    with Pool(workers) as pl:
+        pdr = pl.map(_pd_box, boxes)
+    res["pd"] = {"boxes": len(pdr), "all_pd": all(r["pd"] for r in pdr), "b_bracket_all": all(r["b_ok"] for r in pdr)}
+    ends = []
+    for row in pub["solve_rows"]:
+        e = row["encl"]
+        p_, q_ = 0.5 * (e[0] + e[1]), 0.5 * (e[2] + e[3])
+        o = Objective(x, y, row["A"], None, act=HAct())
+        Bb, _ = o.b_bracket(arb(p_), arb(q_))
+        r = limit_solve_end(x, y, row["A"], (p_, q_, float(Bb.mid())), c)
+        r["published_sign"] = row["sign"]; r["published_margin"] = row["margin"]
+        r["sign_equals_published"] = r["sign"] == row["sign"]
+        r["margin_overlaps_published"] = bool(r["margin"][0] <= row["margin"][1] and r["margin"][1] >= row["margin"][0])
+        ends.append(r)
+    res["ends"] = ends
+    BP, _ = localisation_bounds(x, y, 24.0)
+    ub = []
+    for A in (A_lo, A_hi):
+        o = Objective(x, y, A, None, act=HAct())
+        Bb, _ = o.b_bracket(arb(c[0]), arb(c[1]))
+        ub.append(arb(hi_(o.upper_at(c[0], c[1], float(Bb.mid())))))
+    res["branch_upper"] = [float_up(u) for u in ub]
+    res["localised_branch_below_B24"] = all(bool(u < BP) for u in ub)
+    res["chain_links"] = {"localisation": res["localised_branch_below_B24"], "outer": res["outer_pass"],
+                          "ring": bool(ring["certified"]), "pd": res["pd"]["all_pd"] and res["pd"]["b_bracket_all"]}
+    res["ends_pass"] = all(r["krawczyk_unique_zero"] and r["zero_box_in_rho_in_box"] and r["sign_equals_published"]
+                           for r in ends)
+    res["pass"] = res["ends_pass"] and all(res["chain_links"].values()) and sym
+    res["seconds"] = time.time() - t0
+    out_dir = CERTS.parent / "certificate_checks"; out_dir.mkdir(exist_ok=True)
+    (out_dir / "solve_limit_ends.json").write_text(json.dumps(res, indent=1, default=str))
     if verbose:
         print(json.dumps(res, indent=1, default=str))
     return res

@@ -588,6 +588,7 @@ def main() -> None:
     final_checks_boundary_adam()
     final_checks_numbers()
     discussion_phase_checks()
+    track4_certificate_checks()
 
     provenance_check()
 
@@ -873,6 +874,12 @@ PRODUCERS = {
     "theory_checks_lag.json": ("theory_checks", "<module>", "full", ""),
     "local_global.json": ("local_global", "main", "full", ""),
     "small_scale_compactness.json": ("small_scale", "main", "full", ""),
+    # discussion phase, Track 4: independent outer-exclusion and solve-bracket checks
+    "certificate_checks/outer_glob_annulus.json": ("verify_certificates", "track4_outer", "full", ""),
+    "certificate_checks/outer_solve.json": ("verify_certificates", "track4_outer", "full", ""),
+    "certificate_checks/solve_limit_ends.json": ("verify_certificates", "track4_solve_limit", "full", ""),
+    "certificate_checks/solve_finite_checks.json": ("track4_certs", "finite", "full", ""),
+    "certificate_checks/track4_summary.json": ("track4_certs", "summary", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
@@ -2327,6 +2334,122 @@ def discussion_phase_checks() -> None:
                       ("C s1 continuous a=1.60", 0.65, 0.006), ("C samples min |m| (seeds 0-49)", 0.0032, 6e-5),
                       ("C samples median |m| (seeds 0-49)", 0.075, 6e-4), ("C identity max abs err", 1.8e-15, 6e-17)]:
         chk(f"§17 {k}", float(SS[k]), float(v), tol)
+
+
+def track4_certificate_checks() -> None:
+    """Discussion phase, Track 4: independent Arb checks of the limit chain's outer exclusion (Link 2) and of the solve
+    brackets (limit and finite a), src/verify_certificates.py via src/track4_certs.py; and the Track 5 rows that
+    certificate_audit.md restates (results/certificate_checks/)."""
+    C = R / "certificate_checks"
+    J_ = lambda n: json.loads((C / f"{n}.json").read_text())
+    print("Track 4 (independent outer-exclusion and solve-bracket checks)")
+    S = J_("track4_summary")
+    T = S["outer_timing_sample"]
+    chk("T4 timing sample passes", float(T["verdict"] == "pass"), 1.0, 0)
+    chk("T4 timing sample A lo", T["A"][0], 0.66, 0)
+    chk("T4 timing sample evaluations", float(T["evals"]), 2060.0, 0)
+    chk("T4 timing sample seconds", T["seconds"], 39.0, 0.6)
+    chk("T4 extrapolated total h", S["timing"]["extrapolated_total_h"], 1.95, 0.006)
+    chk("T4 actual total h", S["timing"]["actual_total_h"], 1.93, 0.006)
+    chk("T4 finite sample (a=1.45 hi) check s", S["timing"]["sample_finite_end_s"], 451.0, 0.6)
+    A = J_("outer_glob_annulus")
+    chk("T4 outer annulus passes", float(A["pass"]), 1.0, 0)
+    chk("T4 outer annulus sub-intervals passed", float(A["subintervals_pass"]), 40.0, 0)
+    chk("T4 outer annulus fail + unresolved", float(A["verdicts"]["fail"] + A["verdicts"]["unresolved"]), 0.0, 0)
+    chk("T4 outer annulus min certified margin", A["min_margin_certified"], 1.006e-4, 6e-8)
+    worst = min(A["per_subinterval"], key=lambda r: r["margin"])
+    chk("T4 outer annulus min margin at A lo 0.68625", worst["A_lo"], 0.68625, 1e-12)
+    chk("T4 outer annulus min margin >= Theorem G's 1.0024e-4", float(A["min_margin_certified"] >= 1.0024e-4), 1.0, 0)
+    chk("T4 outer annulus every margin >= 1e-4", float(min(r["margin"] for r in A["per_subinterval"]) > 1e-4), 1.0, 0)
+    chk("T4 outer annulus max branch upper", A["max_branch_upper"], 0.35805, 6e-6)
+    chk("T4 outer B(24) lower", A["B24_lower"], 0.38797, 6e-6)
+    chk("T4 outer annulus evaluations", float(A["evals_total"]), 82686.0, 0)
+    chk("T4 outer annulus max depth", float(A["max_depth"]), 6.0, 0)
+    chk("T4 outer annulus seconds", A["seconds_total"], 1577.0, 0.6)
+    secs = [r["seconds"] for r in A["per_subinterval"]]
+    chk("T4 outer annulus per-interval s min", min(secs), 39.0, 0.3)
+    chk("T4 outer annulus per-interval s max", max(secs), 41.0, 0.5)
+    O = J_("outer_solve")
+    chk("T4 outer solve passes", float(O["pass"]), 1.0, 0)
+    chk("T4 outer solve certified margin", O["min_margin_certified"], 1.649e-4, 6e-8)
+    chk("T4 outer solve branch upper", max(O["branch_upper"]), 0.28117, 6e-6)
+    chk("T4 outer solve evaluations", float(O["evals"]), 2161.0, 0)
+    chk("T4 producer's solve outer margin", float(pd.read_csv(R / "certv2_solve_summary.csv").min_outer_margin.iloc[0]),
+        1.476e-4, 6e-8)
+    chk("T4 outer solve seconds", O["seconds"], 41.0, 0.6)
+    L = J_("solve_limit_ends")
+    chk("T4 limit solve ends pass", float(L["pass"]), 1.0, 0)
+    chk("T4 limit solve chain links", float(all(L["chain_links"].values())), 1.0, 0)
+    chk("T4 limit solve ring boxes", float(L["ring"]["boxes"]), 540.0, 0)
+    chk("T4 limit solve ring grad lower", L["ring"]["grad_lower"], 8.2e-3, 6e-5)
+    chk("T4 limit solve PD boxes", float(L["pd"]["boxes"]), 100.0, 0)
+    chk("T4 limit solve seconds", L["seconds"], 7.4, 0.06)
+    e0, e1 = L["ends"]
+    chk("T4 limit solve A lo sign fails", float(e0["A"] == 1.05875 and e0["sign"] == "fails"), 1.0, 0)
+    chk("T4 limit solve A hi sign solves", float(e1["A"] == 1.06 and e1["sign"] == "solves"), 1.0, 0)
+    chk("T4 limit solve margin 1.05875 lo", e0["margin"][0], -5.00373e-4, 6e-10)
+    chk("T4 limit solve margin 1.05875 hi", e0["margin"][1], -5.00367e-4, 6e-10)
+    chk("T4 limit solve margin 1.06 lo", e1["margin"][0], 1.67144e-4, 6e-10)
+    chk("T4 limit solve margin 1.06 hi", e1["margin"][1], 1.67150e-4, 6e-10)
+    chk("T4 limit solve Krawczyk + in box", float(all(e["krawczyk_unique_zero"] and e["zero_box_in_rho_in_box"]
+                                                      for e in L["ends"])), 1.0, 0)
+    chk("T4 limit solve margins inside published", float(all(e["margin_overlaps_published"] for e in L["ends"])), 1.0, 0)
+    F = S["solve_finite"]
+    chk("T4 finite solve ends checked", float(F["ends_checked"]), 12.0, 0)
+    chk("T4 finite solve ends pass", float(F["ends_pass"]), 12.0, 0)
+    pe = F["per_end"]
+    chk("T4 finite signs equal published", float(all(v["solve_sign"] == v["published_sign"] for v in pe.values())), 1.0, 0)
+    chk("T4 finite lo ends fail / hi ends solve", float(all(v["solve_sign"] == ("fails" if n.endswith("_lo") else "solves")
+                                                            for n, v in pe.items())), 1.0, 0)
+    chk("T4 finite leaves min", float(min(v["leaves"] for v in pe.values())), 15432.0, 0)
+    chk("T4 finite leaves max", float(max(v["leaves"] for v in pe.values())), 23292.0, 0)
+    chk("T4 finite kept leaves min", float(min(v["kept_leaves"] for v in pe.values())), 44.0, 0)
+    chk("T4 finite kept leaves max", float(max(v["kept_leaves"] for v in pe.values())), 52.0, 0)
+    chk("T4 finite check s min", min(v["check_seconds"] for v in pe.values()), 359.0, 0.6)
+    chk("T4 finite check s max", max(v["check_seconds"] for v in pe.values()), 519.0, 0.6)
+    ex = [v["export_seconds"] for n, v in pe.items() if n != "solve_a1.45_hi"]
+    chk("T4 finite export s min (11 ends)", min(ex), 7.0, 0.06)
+    chk("T4 finite export s max (11 ends)", max(ex), 14.5, 0.06)
+    per = {n: J_(n) for n in pe}
+    chk("T4 finite Arb evaluations min", float(min(r["evaluations"] for r in per.values())), 33394.0, 0)
+    chk("T4 finite Arb evaluations max", float(max(r["evaluations"] for r in per.values())), 37588.0, 0)
+    chk("T4 finite subdivision depth max", float(max(r["max_subdivision_depth"] for r in per.values())), 3.0, 0)
+    chk("T4 finite every kept leaf decided", float(all(list(r["kept_leaf_signs"]) == [r["solve_sign"]] for r in per.values())), 1.0, 0)
+    lb = [r["losing_region_fresh_bnb"] for r in per.values()]
+    chk("T4 finite losing region all pass", float(all(b["verdict"] == "pass" for b in lb)), 1.0, 0)
+    chk("T4 finite losing cells min", float(min(b["evals"] for b in lb)), 3270.0, 0)
+    chk("T4 finite losing cells max", float(max(b["evals"] for b in lb)), 3972.0, 0)
+    chk("T4 finite losing depth max", float(max(b["max_depth"] for b in lb)), 4.0, 0)
+    chk("T4 finite losing s min", min(b["seconds"] for b in lb), 48.0, 0.3)
+    chk("T4 finite losing s max", max(b["seconds"] for b in lb), 65.0, 0.5)
+    chk("T4 finite losing s (a=1.45 hi)", per["solve_a1.45_hi"]["losing_region_fresh_bnb"]["seconds"], 53.0, 0.3)
+    import csv as _csv
+    man = [r for r in _csv.DictReader((R / "certificates_manifest.csv").open()) if "/solve_a" in r["file"]]
+    chk("T4 manifest rows for solve certificates", float(len(man)), 24.0, 0)
+    chk("T4 solve certificates MB", sum(int(r["bytes"]) for r in man) / 1e6, 41.4, 0.06)
+    npz = [int(r["bytes"]) / 1e6 for r in man if r["file"].endswith(".npz")]
+    chk("T4 solve npz MB min", min(npz), 2.3, 0.06)
+    chk("T4 solve npz MB max", max(npz), 5.3, 0.06)
+    print("Track 5 rows restated in certificate_audit.md")
+    chk("T5 K seconds (published hi)", J_("K_base")["seconds"], 23.0, 0.6)
+    chk("T5 K seconds (tight hi)", J_("K_base_target0.5794559217")["seconds"], 82.0, 0.6)
+    chk("T5 K tight target", J_("K_base_target0.5794559217")["target"], 0.5794559217, 1e-10)
+    kr = J_("c1_krawczyk")
+    chk("T5 Krawczyk A* lo", kr["A_star_lo"], 0.6854452375756532, 1e-16)
+    chk("T5 Krawczyk A* hi", kr["A_star_hi"], 0.6854452375756537, 1e-16)
+    chk("T5 Krawczyk A1/A lo", kr["A1_over_A_lo"], 0.66215478, 6e-9)
+    chk("T5 Krawczyk A1/A hi", kr["A1_over_A_hi"], 0.66215495, 6e-9)
+    pg, ps = J_("pd_glob_neighbourhood"), J_("pd_solve_neighbourhood")
+    chk("T5 PD glob boxes", float(pg["boxes"]), 500.0, 0)
+    chk("T5 PD solve boxes", float(ps["boxes"]), 100.0, 0)
+    chk("T5 PD glob lambda margin", pg["c"], 0.0473, 0)
+    chk("T5 PD solve lambda margin", ps["c"], 0.0209, 0)
+    chk("T5 PD glob seconds", pg["seconds"], 6.7, 0.06)
+    chk("T5 PD solve seconds", ps["seconds"], 1.7, 0.06)
+    rg, rs = J_("ring_glob_annulus"), J_("ring_solve_annulus")
+    chk("T5 ring solve boxes", float(rs["boxes"]), 540.0, 0)
+    chk("T5 ring glob seconds", rg["seconds"], 199.0, 0.6)
+    chk("T5 ring solve seconds", rs["seconds"], 5.8, 0.06)
 
 
 def digit_stability() -> None:

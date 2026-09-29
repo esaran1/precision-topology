@@ -13,3 +13,11 @@ k = 1 check max diff,1e-10,False
 k = 1 check max diff,1e-10,False
 Track 5 Krawczyk A* lo,1e-13,True
 §17 C identity max abs err,6e-17,False
+T4 outer annulus min margin at A lo 0.68625,1e-12,False
+T4 limit solve margin 1.05875 lo,6e-10,False
+T4 limit solve margin 1.05875 hi,6e-10,False
+T4 limit solve margin 1.06 lo,6e-10,False
+T4 limit solve margin 1.06 hi,6e-10,False
+T5 K tight target,1e-10,False
+T5 Krawczyk A* lo,1e-16,True
+T5 Krawczyk A* hi,1e-16,True

@@ -382,3 +382,170 @@ def test_ring_pass_and_fail_cases():
     # a "ring" that contains the minimiser (rho_in = 0) cannot be certified free of critical points
     bad = vc._ring_interval((0.684, 0.685, 1.66808, 1.36923, 0.0, 0.004, 0.004, 2))
     assert not bad["certified"]
+
+
+# ---------------------------------------------------------------- Track 4: outer exclusion and the solve-bracket ends
+C_ANN = (1.6685791015625, 1.3697166410041663)          # limit_switch.csv argmin (the annulus centre)
+REG = (1.875, 2.0, 1.25, 1.5)                           # a dyadic region wholly outside the 0.15 box around C_ANN
+
+
+@pytest.fixture(scope="module")
+def limit_xy():
+    from src import verify_certificates as vc
+    if not (vc.CERTS / "limit_A_lo.npz").exists():
+        pytest.skip("limit certificate files not exported")
+    x, y, sym = vc._verified_limit_data()               # hash-checked against the manifest
+    assert sym
+    return x, y
+
+
+def test_outer_domain_geometry_is_exact():
+    from src import verify_certificates as vc
+    assert vc._inside_closed_box(0.875, 1.0, 0.875, 1.0, 1.0, 1.0, 0.125)                 # touching the boundary
+    assert not vc._inside_closed_box(np.nextafter(0.875, 0), 1.0, 0.875, 1.0, 1.0, 1.0, 0.125)   # one ulp beyond
+    # 0.15 is not dyadic; the float 1.15 lies (exactly) 8.9e-17 inside the float 0.15 box around 1.0
+    assert not vc._point_outside_box(1.15, 1.0, 1.0, 1.0, 0.15)
+    assert vc._point_outside_box(1.1500000000000001, 1.0, 1.0, 1.0, 0.15)
+    # K(P) ∩ {p >= 0}: |q| <= 2√2 + 2p; 2√2 + 2·1 = 4.828...
+    assert vc._disjoint_from_K(0.0, 1.0, 4.9, 5.0) and vc._disjoint_from_K(0.0, 1.0, -5.0, -4.9)
+    assert not vc._disjoint_from_K(0.0, 1.0, 4.8, 5.0) and not vc._disjoint_from_K(0.0, 1.0, -5.0, -4.8)
+
+
+def test_shifted_ball_bound_is_below_sampled_profiled_losses(limit_xy):
+    """HShift (z = A(h − c) + b′) with A a ball: the cell bound must lie below L0*(θ; A) at every sampled θ, A."""
+    from src import verify_certificates as vc
+    x, y = limit_xy
+    rng = np.random.default_rng(1)
+    o = vc.Objective(x, y, vc.ball(0.66, 0.70), None, act=vc.HShift(0.0))
+    n_checked = 0
+    for pc, qc, h in [(0.25, 36.0, 0.25), (1.875, 1.375, 0.0625), (10.0, -5.0, 0.5), (3.0, 7.5, 0.125), (0.5, -20.0, 0.5)]:
+        sc = pc * x + qc
+        o.fa = vc.HShift(float(np.median(-sc + sc ** 3 / 6)))
+        lb = o.lower_bound(pc, qc, h, h)
+        assert lb is not None
+        lo = float(lb.lower().mid())
+        for _ in range(15):
+            p, q, A = pc + rng.uniform(-h, h), qc + rng.uniform(-h, h), rng.uniform(0.66, 0.70)
+            assert lo <= vc._float_profile_loss(x, y, A, p, q) + 1e-9
+            n_checked += 1
+    assert n_checked == 75
+
+
+def test_outer_exclusion_pass_fail_and_unresolved(limit_xy):
+    from src import verify_certificates as vc
+    x, y = limit_xy
+    ok = vc.outer_exclusion_arb(x, y, C_ANN, 0.66, 0.66125, 1e-4, region=REG, h0=0.125)
+    assert ok["verdict"] == "pass" and ok["min_margin_certified"] > 1e-4 and ok["unresolved_n"] == 0
+    # FAIL: the centre shifted by 0.3, so the true minimiser (near C_ANN) lies outside the box: a witness must be found
+    shifted = (C_ANN[0] + 0.3, C_ANN[1])
+    bad = vc.outer_exclusion_arb(x, y, shifted, 0.66, 0.66125, 1e-4, region=(1.5, 1.75, 1.25, 1.5), h0=0.125)
+    assert bad["verdict"] == "fail" and bad["witness"] is not None
+    assert bad["witness"]["L_upper"] < bad["witness"]["branch_lower_plus_margin"]
+    # UNRESOLVED: a true but too-thin margin (0.5e-3 below the region's float minimum gap) within a depth cap of 2
+    U = vc._float_profile_loss(x, y, 0.66125, *C_ANN)
+    g = min(vc._float_profile_loss(x, y, A, p, q) for A in (0.66, 0.66125)
+            for p in np.linspace(REG[0], REG[1], 9) for q in np.linspace(REG[2], REG[3], 17)) - U
+    thin = vc.outer_exclusion_arb(x, y, C_ANN, 0.66, 0.66125, g - 5e-4, region=REG, h0=0.125, max_depth=2)
+    assert thin["verdict"] == "unresolved" and thin["witness"] is None and thin["unresolved_n"] > 0
+    # UNRESOLVED: the evaluation cap
+    cap = vc.outer_exclusion_arb(x, y, C_ANN, 0.66, 0.66125, 1e-4, region=(1.5, 2.0, 1.0, 1.5), h0=0.25, max_evals=2)
+    assert cap["verdict"] == "unresolved"
+
+
+def test_limit_solve_end_pass_fail_and_undecided(limit_xy):
+    import csv
+    from src import verify_certificates as vc
+    x, y = limit_xy
+    pub = vc._published_inputs()
+    c = pub["solve_centre"]
+    out = {}
+    for row in pub["solve_rows"]:
+        e = row["encl"]
+        p_, q_ = 0.5 * (e[0] + e[1]), 0.5 * (e[2] + e[3])
+        o = vc.Objective(x, y, row["A"], None, act=vc.HAct())
+        Bb, _ = o.b_bracket(vc.arb(p_), vc.arb(q_))
+        out[row["A"]] = vc.limit_solve_end(x, y, row["A"], (p_, q_, float(Bb.mid())), c)
+    hi, lo = out[1.06], out[1.05875]
+    assert hi["krawczyk_unique_zero"] and hi["zero_box_in_rho_in_box"] and hi["sign"] == "solves"
+    assert lo["krawczyk_unique_zero"] and lo["zero_box_in_rho_in_box"] and lo["sign"] == "fails"
+    # FAIL: a Krawczyk box that misses the zero (start shifted by 1e-4, no Newton steps) cannot pass
+    z = [0.5 * (hi["p"][0] + hi["p"][1]) + 1e-4, 0.5 * (hi["q"][0] + hi["q"][1]), 0.5 * (hi["b"][0] + hi["b"][1])]
+    miss = vc.limit_solve_end(x, y, 1.06, z, c, newton_steps=0)
+    assert not miss["krawczyk_unique_zero"]
+    # FAIL: a box centre 0.2 away puts the zero outside the rho_in box
+    far = vc.limit_solve_end(x, y, 1.06, z, (c[0] + 0.2, c[1]))
+    assert far["krawczyk_unique_zero"] and not far["zero_box_in_rho_in_box"]
+    # UNDECIDED: over a box too wide for the margin, neither sign is claimed
+    P, Q, B = vc.ball(hi["p"][0] - 0.05, hi["p"][1] + 0.05), vc.ball(hi["q"][0] - 0.05, hi["q"][1] + 0.05), \
+        vc.ball(hi["b"][0] - 0.05, hi["b"][1] + 0.05)
+    mlo, mhi = vc.limit_solve_margin(P, Q, B, vc.arb(1.06))
+    assert mlo < 0 < mhi
+
+
+@pytest.fixture(scope="module")
+def solve_obj():
+    from src import verify_certificates as vc
+    from src.conditional_certified import _population
+    x, y = _population()
+    return vc.Objective(x, y, 4.025, 1.45)                # the a = 1.45 solve-bracket hi end (s = 4.025)
+
+
+def test_region_excluded_pass_fail_and_unresolved(solve_obj):
+    """The fresh branch and bound over the LOSING region (G <= 0) at a = 1.45, s = 4.025, on a box around that region's
+    infimum (0.2938565, at the boundary G = 0 near w₁ = −0.952, b₁ = 3.965) and the winning minimiser's mirror."""
+    from src import verify_certificates as vc
+    U = vc.arb(0.2914789712181956)                         # the certificate's U (upper end)
+    box = (-1.0, -0.875, 3.875, 4.0)
+    ok = vc.region_excluded_arb(solve_obj, U, "-", 3.37, h0=0.125, box=box)
+    assert ok["verdict"] == "pass" and ok["min_cell_lower_bound"] > 0.29148
+    # FAIL: a target above the region's infimum is false there, and a witness must be found
+    bad = vc.region_excluded_arb(solve_obj, U + 0.01, "-", 3.37, h0=0.125, box=box)
+    assert bad["verdict"] == "fail" and bad["witness"]["L_upper"] < bad["witness"]["U_lower"]
+    # UNRESOLVED: a true but too-thin target (1e−6 below the infimum) within a depth cap of 2; never a false 'fail'
+    thin = vc.region_excluded_arb(solve_obj, vc.arb(0.2938555), "-", 3.37, h0=0.125, box=box, max_depth=2)
+    assert thin["verdict"] == "unresolved" and thin["witness"] is None
+    # the other region holds the winning minimiser's mirror (w₁ ≈ −0.937, b₁ ≈ 3.911; L* ≈ U): it is excluded above
+    # U − 1e−3 (true) and not above U + 1e−3 (false, a witness)
+    assert vc.region_excluded_arb(solve_obj, U - 1e-3, "+", 3.37, h0=0.125, box=box)["verdict"] == "pass"
+    assert vc.region_excluded_arb(solve_obj, U + 1e-3, "+", 3.37, h0=0.125, box=box)["verdict"] == "fail"
+
+
+def test_check_solve_pass_fail_and_undecided(tmp_path, monkeypatch):
+    """check_solve's own steps on the exported a = 1.45 hi certificate (copied; the leaf checks of check_finite and the
+    fresh branch and bound are stubbed -- they are tested above and in the status-certificate tests)."""
+    import json
+    import shutil
+    from src import verify_certificates as vc
+    name = "solve_a1.45_hi"
+    if not (vc.CERTS / f"{name}.npz").exists():
+        pytest.skip("solve certificate not exported")
+    certs = tmp_path / "certificates"; certs.mkdir()
+    for ext in ("json", "npz"):
+        shutil.copy(vc.CERTS / f"{name}.{ext}", certs / f"{name}.{ext}")
+    monkeypatch.setattr(vc, "CERTS", certs)
+    monkeypatch.setattr(vc, "check_finite", lambda n, verbose=False, workers=1, skip_regions=(): {
+        "name": n, "checks": {"stub": True}, "skip": skip_regions})
+    monkeypatch.setattr(vc, "region_excluded_arb", lambda obj, U, region, W: {"verdict": "pass", "region": region})
+    r = vc.check_solve(name, verbose=False)
+    assert r["pass"] and r["solve_sign"] == "solves" and r["kept_leaf_signs"] == {"solves": r["kept_leaves"]}
+    assert r["skip"] == ("-",)                             # the losing region's exported leaves are not used
+    # FAIL: a published sign the kept leaves contradict
+    meta = json.loads((certs / f"{name}.json").read_text())
+    meta["published_sign"] = "fails"
+    (certs / f"{name}.json").write_text(json.dumps(meta))
+    assert not vc.check_solve(name, verbose=False)["pass"]
+    # FAIL: the losing region not excluded
+    meta["published_sign"] = "solves"
+    (certs / f"{name}.json").write_text(json.dumps(meta))
+    monkeypatch.setattr(vc, "region_excluded_arb", lambda obj, U, region, W: {"verdict": "unresolved"})
+    assert not vc.check_solve(name, verbose=False)["pass"]
+    monkeypatch.setattr(vc, "region_excluded_arb", lambda obj, U, region, W: {"verdict": "pass"})
+    # UNDECIDED: one kept leaf, coarsened to its level-0 ancestor (side 0.05), is far too wide to decide the sign
+    d = dict(np.load(certs / f"{name}.npz"))
+    k0 = int(np.flatnonzero(d["reason_+"] == 0)[0])
+    lv = int(d["level_+"][k0])
+    d["reason_+"] = np.where(d["reason_+"] == 0, 1, d["reason_+"]); d["reason_+"][k0] = 0
+    d["iw_+"][k0] >>= lv; d["ib_+"][k0] >>= lv; d["level_+"][k0] = 0
+    np.savez_compressed(certs / f"{name}.npz", **d)
+    r = vc.check_solve(name, verbose=False)
+    assert not r["pass"] and r["solve_sign"] is None and not r["checks"]["sign_decided"]
