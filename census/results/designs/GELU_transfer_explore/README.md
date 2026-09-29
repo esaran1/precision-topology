@@ -10,3 +10,4 @@ the design is approved. Run each with `nice -n 15 .venv/bin/python <script>` fro
 - `gelu_explore_c.py`: Adam after release / free Adam (population): ηλ_min(P_tsw), lag in steps.
 - `gelu_explore_d.py`: own-sample landscape (seeds 850,000–850,011): both copies' switches, own κ_SGD, vs act_fold.
 - `gelu_explore_e.py`: random hidden start at fixed s₀ (population): branch reached (54/60 target or mirror).
+- `gelu_explore_f.py` (added after approval, before registration): placed fraction of random (w₁, b₁) at w₂ = +s₀; G during the hold for 150 random hidden starts; population t_sw at η = 0.03.
