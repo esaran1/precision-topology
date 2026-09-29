@@ -78,9 +78,10 @@ Outputs are in `census/results/track2c/`. Registration: `census/results/track2c_
   - t_sw preceded the crossing by a median 54–63 steps; the rule point, by 629–1,613 steps.
 - **Mirror-matched prediction** (registered descriptive, NOT scored). The same rules, with the frozen switch of the
   mirror occupied at the rule point:
-  - d = 2, a = 1.30: PASS pattern, 56/57 scored, C1 0.0027, C2 0.948, C3 upper end −0.106.
+  - d = 2, a = 1.30 (POST HOC reading of an UNRESOLVED cell; not a pass): 56/57 with a pre-crossing prediction,
+    C1 0.0027, C2 0.948, C3 upper end −0.106.
   - d = 2, a = 1.50: PASS pattern, 57/57 scored, C1 0.0067, C2 0.922, C3 upper end −0.125.
-  - d = 4, a = 1.30: V3 fails, 42/51 = 0.824.
+  - d = 4, a = 1.30 (POST HOC reading of an UNRESOLVED cell): 42/51 = 0.824 with a pre-crossing prediction.
   - d = 4, a = 1.50: PASS pattern, 52/53 scored, C1 0.0076, C2 1.064, C3 upper end −0.323.
   - The rule-point mirror was the global minimiser's in 43/57, 42/57, 41/51 and 43/53 crossing runs.
 
@@ -115,8 +116,9 @@ Outputs are in `census/results/track2c/`. Registration: `census/results/track2c_
   threshold.
 
 **Outcome: a = 1.30 cells UNRESOLVED (V3)**
-- Say: "At a = 1.30 the registered test is unresolved. 12% (d = 2) and 20% (d = 4) of crossing runs crossed before
-  reaching the frozen threshold, so they had no pre-crossing prediction; the registered minimum was 90%."
+- Say: "At a = 1.30 the registered test is unresolved on a validity condition that was added at registration, before
+  any run, by analogy with test 2A, and was not on the reviewed design: 12% (d = 2) and 20% (d = 4) of crossing runs
+  crossed before reaching the frozen threshold, so they had no pre-crossing prediction; the registered minimum was 90%."
 - Say, if needed: "On the runs that could be scored, the statistics were within the registered bands (median error 0.3%
   and 0.7%, lag ratio 0.96 and 1.01). They are reported, not scored."
 - Do not say: that C1–C3 passed at a = 1.30. They were not scored.
@@ -128,10 +130,12 @@ Outputs are in `census/results/track2c/`. Registration: `census/results/track2c_
 - Say, labelled post hoc: "Most runs that crossed below the frozen threshold had settled on the mirror branch
   (w₁ → −w₁) of the finite sample. Its own threshold is lower: 17 of 26 such runs, which crossed 1.1–9.0% above their
   mirror's frozen threshold."
-- Say: "Before training we registered, as a descriptive, the mirror-matched version of the prediction (the frozen
-  threshold of the mirror occupied at the rule point). It gave the same picture at d = 2 and at d = 4, a = 1.50, and did
-  not resolve d = 4, a = 1.30 (82% predicted before crossing)."
+- Say: "Before training we registered, as an unscored descriptive, the mirror-matched version of the prediction (the
+  frozen threshold of the mirror occupied at the rule point)." At a = 1.30, report anything about it only as a POST HOC
+  reading of the unresolved cells (e.g. "post hoc, with the mirror-matched threshold, 82% of d = 4 crossing runs had a
+  pre-crossing prediction"), never as a pass.
 - Do not say: that the mirror-matched prediction is the registered test, or that it passed as a registered criterion.
+- Do not say: that the a = 1.30 cells pass, or "would have passed", under the mirror-matched prediction.
 - Do not say: that mirror choice explains every unscored run. 9 of 26 were on the global mirror and crossed slightly
   (0.1–3.8%) below its threshold, 7 of them at d = 4, a = 1.30.
 
