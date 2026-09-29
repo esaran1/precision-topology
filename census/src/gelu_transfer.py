@@ -92,7 +92,7 @@ HOLD_LR, W_MIN, W_RELAX = 0.3, 4000, 25.0
 ETA, BUDGET = 0.03, 40_000
 NEWTON_GTOL, ON_TOL, STATE_TOL = 1e-8, 1e-6, 1e-3
 FOLLOW_FRAC = 0.8                      # branch identity re-checked at the first step with s_t ≥ 0.8·s_switch,branch
-FOLLOW_STATE_TOL = None                # OPEN (author): state-to-branch tolerance at that step; None = Newton identity only
+FOLLOW_STATE_TOL = None                # decided 2026-09-29 (registration §13): Newton condition only, no state distance
 S_HI_FRAC = 1.6
 CONT_H0, CONT_HMAX = 0.01, 0.05        # act_fold defaults; step halving uses half of both
 HALVING_REL = 1e-6

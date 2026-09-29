@@ -22,6 +22,7 @@ def test_registered_constants():
     assert (X.MIN_CROSS, X.TSW_MIN_FRAC, X.REGIME_MAX, X.REGIME_MIN_FRAC, X.LAG_MIN_STEPS, X.KC_Q90_MAX,
             X.CHI_REL_TOL, X.CHI_PATH_Q90_MAX) == (60, 0.90, 0.5, 0.80, 10.0, 0.1, 0.30, 0.25)
     assert (X.PILOT_KC_MAX, X.PILOT_MAX_HALVINGS) == (0.1, 3)
+    assert X.FOLLOW_FRAC == 0.8 and X.FOLLOW_STATE_TOL is None              # the Newton condition only (§13)
 
 
 def test_s_values_come_from_the_registered_3a_file():

@@ -1,9 +1,9 @@
 # GELU-T registration: the lag law at GELU under free SGD from a declared start
 
-**Status: written before any registered run.** No registered seed (876,000–876,079) has been trained. No gap, placement
-or crossing of any training trajectory after release has been evaluated for any seed. This file becomes the
-registration when it is committed together with the frozen inputs of §6 and their SHA-256 hashes
-(`results/gelu_transfer/registration.sha256`). That commit is timestamped with OpenTimestamps
+**REGISTERED.** This file, the code, the tests and the frozen inputs of §6 are committed in one commit, with their SHA-256
+hashes in `results/gelu_transfer/registration.sha256`, before any registered run. No registered seed (876,000–876,079)
+has been trained. No gap, placement or crossing of any training trajectory after release has been evaluated for any
+seed. That commit is timestamped with OpenTimestamps
 (`results/gelu_transfer/registration_stamp.txt` and its `.ots` proof).
 
 ## 1. Design reference
@@ -94,7 +94,7 @@ to cross early and are scored (§10a).
 damped Newton at s = s_{t₀.₈} from the run's (w₁, b₁, b₂), accepted as at release. It is classified against both
 copies' frozen branch points at 0.8·s_switch,branch (§6), each carried to s_{t₀.₈} by one tangent predictor and damped
 Newton, with the release tolerances: Newton point within 1e−6 (sup) of that copy's branch point; the state condition is
-`FOLLOW_STATE_TOL` (§13, OPEN). A run whose copy there differs from its release copy, or is neither, is not scored; it
+`FOLLOW_STATE_TOL` = None, the Newton condition only (§13). A run whose copy there differs from its release copy, or is neither, is not scored; it
 is counted and reported. The check uses the state at t₀.₈ only (no gap); the number of runs whose crossing comes at or
 before t₀.₈ is reported.
 
@@ -252,14 +252,17 @@ A failure stays a failure. Post hoc readings may be placed beside it, labelled P
   the state lands on the release copy's branch point in 20 of 20.
 - On the population, t_sw at η = 0.03 from θ\*_pop(s₀) is 5,684 steps, well inside the 40,000-step budget.
 
-## 13. OPEN before registration: the state condition of the follow check
+## 13. The state condition of the follow check (decided 2026-09-29, after the pilot)
 
-The author's rule says "registered tolerances". At release these are: Newton point within 1e−6 of the branch point
-AND state within 1e−3 of it. In free training the state at t₀.₈ lags its branch by the tracking displacement: 0.012–0.028
-(sup) in 20 of 20 pilot runs. With the 1e−3 state condition every run would be "neither" at t₀.₈, no run would be scored,
-and both arms would be UNRESOLVED (V1). The code has the constant `FOLLOW_STATE_TOL`; it is set to None (Newton
-identity only: the Newton point from the state lies within 1e−6 of the release copy's branch point, which held in 20
-of 20 pilot runs) pending the author's decision. Nothing is registered until it is decided.
+- **Decision: `FOLLOW_STATE_TOL = None`, the Newton condition only.** The author's rule is "the run's branch at 0.8 × its
+  switch must match its branch at release". A run's branch is the branch point that damped Newton reaches from its
+  state at that s: accepted with max|∇| < 1e−8 and H positive definite, and within 1e−6 (sup) of that copy's carried
+  branch point.
+- The 1e−3 state-distance condition came from the coordinator's wording ("registered tolerances"); it was not the
+  author's rule. In free training the state at 0.8·s_switch trails its branch by the tracking displacement that the lag
+  law itself describes: 0.012–0.028 (sup) in all 20 pilot runs. With it every run would be classified as neither.
+- **This detail was fixed after the pilot** (pilot seeds 876,900–876,909 only, disjoint from the registered seeds). With
+  the Newton condition, 20 of 20 pilot runs follow their release branch. The author is informed.
 
 ## 14. Frozen values
 
