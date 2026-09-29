@@ -1,0 +1,88 @@
+{
+ "s_fold": 4.767689442106793,
+ "late": {
+  "n": 16,
+  "n_ever_M": 16,
+  "n_with_leave": 16,
+  "median_leave_over_fold": 0.6593622466338172,
+  "leave_over_fold_range": [
+   0.49888862204981055,
+   0.8764643166124756
+  ],
+  "frac_leave_within_15pct_of_fold": 0.0625,
+  "median_s_cross_over_fold": 2.1655243671701605,
+  "median_rho2_raw_at_fold": 0.13347335823453713,
+  "median_rho2_basin_min_at_fold": 0.5594787332635083,
+  "basin_at_fold_counts": {
+   "S": 14,
+   "other": 1,
+   "L0": 1
+  },
+  "median_min_raw_dist": 0.21684065516397688,
+  "max_frac_steps_raw_on_a_branch": 0.0
+ },
+ "early": {
+  "n": 6,
+  "n_ever_M": 4,
+  "n_with_leave": 4,
+  "median_leave_over_fold": 0.7660604309409207,
+  "leave_over_fold_range": [
+   0.5459556209560092,
+   0.8194642742601398
+  ],
+  "frac_leave_within_15pct_of_fold": 0.0,
+  "median_s_cross_over_fold": 0.14324481079401896,
+  "median_rho2_raw_at_fold": 0.11175766247976415,
+  "median_rho2_basin_min_at_fold": 0.5596870297513232,
+  "basin_at_fold_counts": {
+   "S": 5,
+   "L0": 1
+  },
+  "median_min_raw_dist": 0.16200680962267835,
+  "max_frac_steps_raw_on_a_branch": 0.0
+ },
+ "non-crosser": {
+  "n": 18,
+  "n_ever_M": 18,
+  "n_with_leave": 18,
+  "median_leave_over_fold": 0.7750295876165847,
+  "leave_over_fold_range": [
+   0.5748695343856671,
+   0.9909427272872374
+  ],
+  "frac_leave_within_15pct_of_fold": 0.3333333333333333,
+  "median_s_cross_over_fold": null,
+  "median_rho2_raw_at_fold": 0.01975906026344054,
+  "median_rho2_basin_min_at_fold": 0.5591817953549656,
+  "basin_at_fold_counts": {
+   "S": 11,
+   "other": 4,
+   "L0": 2,
+   "S2": 1
+  },
+  "median_min_raw_dist": 0.1089006627271049,
+  "max_frac_steps_raw_on_a_branch": 0.023928215353938187
+ },
+ "all": {
+  "n": 40,
+  "n_ever_M": 38,
+  "n_with_leave": 38,
+  "median_leave_over_fold": 0.7129755327729357,
+  "leave_over_fold_range": [
+   0.49888862204981055,
+   0.9909427272872374
+  ],
+  "frac_leave_within_15pct_of_fold": 0.18421052631578946,
+  "median_s_cross_over_fold": 2.1540038164859974,
+  "median_rho2_raw_at_fold": 0.06078320105247301,
+  "median_rho2_basin_min_at_fold": 0.5593458152845713,
+  "basin_at_fold_counts": {
+   "S": 30,
+   "other": 5,
+   "L0": 4,
+   "S2": 1
+  },
+  "median_min_raw_dist": 0.17755053292778217,
+  "max_frac_steps_raw_on_a_branch": 0.023928215353938187
+ }
+}
