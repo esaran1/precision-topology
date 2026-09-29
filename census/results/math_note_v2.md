@@ -1956,7 +1956,7 @@ conditional minimiser at s < s_W has |w₁| > W.
 | a | V₁ = Var(φ\*_c) | W_c | s₁ |
 |---|---|---|---|
 | 1.30 | 5.6586 | 10.77 | 0.678 |
-| 1.60 | 6.3027 | 11.90 | 0.646 |
+| 1.60 | 6.2344 | 11.90 | 0.646 |
 
 - So for s < 0.64 every conditional minimiser has |w₁| ≤ 12. It is proved conditional on the maximiser scan.
 
