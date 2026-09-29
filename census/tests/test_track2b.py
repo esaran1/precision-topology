@@ -256,8 +256,8 @@ DESIGN = X.OUT / "design.csv"
 
 @pytest.mark.skipif(not DESIGN.exists(), reason="design not frozen yet")
 def test_frozen_design_follows_the_rules():
-    d = pd.read_csv(DESIGN)
-    br = pd.read_csv(X.OUT / "population_branch.csv")
+    d = X._read(DESIGN)
+    br = X._read(X.OUT / "population_branch.csv")
     assert len(d) == 12 and sorted(set(d.kx_target)) == list(X.KX_TARGETS)
     for r in d.itertuples():
         b = br[(br.a.round(2) == round(r.a, 2)) & (br.s >= r.s0 * (1 - 1e-12)) & (br.s <= r.s_end * (1 + 1e-12))]

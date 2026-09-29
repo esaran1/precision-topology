@@ -73,19 +73,25 @@ RSS_LIMIT = 3 * 1024 ** 3
 # continuation grid and its validation
 GRID_RATIO = 1.0025
 RESID_MAX = 1e-10
-STEP_MAX = 0.05
+STEP_MAX = 0.01                                        # continuation step in (w₁, b₁, b₂/s)
 
 REGISTERED_FILES = ("src/track2b.py", "src/ramp.py", "src/ramp_boundary.py", "src/lag_law.py", "src/fold1d.py",
                     "src/width2_conditional.py", "tests/test_track2b.py", "results/track2b_registration.md",
                     "results/designs/2B_boundary_design.md", "results/lag_law/kappa.csv",
                     "results/lag_law/kappa_by_winding.csv", "results/cond_certified_brackets.csv",
-                    "results/track2b/population_branch.csv", "results/track2b/design.csv",
+                    "results/track2b/population_branch.csv", "results/track2b/branch_validation.json",
+                    "results/track2b/design.csv",
                     "results/track2b/kappa_k.csv", "results/track2b/frozen_switches.csv",
                     "results/track2b/feasibility.json")
 
 
 def _sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+def _read(p):
+    """Frozen CSVs are read back exactly (the default parser can differ from the written value by one ulp)."""
+    return pd.read_csv(p, float_precision="round_trip")
 
 
 # ------------------------------------------------------------------------------------------ a-priori rules (pure)
@@ -181,10 +187,32 @@ def feasible(n_beyond, n=N_SEEDS):
 
 
 # ------------------------------------------------------------------------------------------ population branch (a priori)
+def _polish(z, s, a, x, y, iters=8):
+    """Plain Newton steps after lag_law.branch_point (whose damped search can stop at a residual of ~1e-9 when the loss
+    decrease is below round-off), kept while the gradient residual decreases."""
+    import torch
+    from .lag_law import _loss_t
+    Xt, Yt = torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
+    f = lambda q: _loss_t(q, s, a, Xt, Yt)
+
+    def grad(zz):
+        q = torch.tensor(zz, dtype=torch.float64, requires_grad=True)
+        return torch.autograd.grad(f(q), q)[0].numpy()
+    g = grad(z); r = float(np.abs(g).max())
+    for _ in range(iters):
+        H = torch.autograd.functional.hessian(f, torch.tensor(z, dtype=torch.float64)).numpy()
+        zn = z - np.linalg.solve(H, g)
+        gn = grad(zn); rn = float(np.abs(gn).max())
+        if not rn < r:
+            break
+        z, g, r = zn, gn, rn
+    return z, r
+
+
 def population_branch(a, k, s_hi, extra=()):
-    """Newton continuation (lag_law.branch_point) of the population branch from θ*(s₀) on winding k up to s_hi, on a
-    geometric grid (ratio GRID_RATIO) plus the points `extra`.  Returns a frame with s, z, gradient residual, the
-    continuation step ‖Δz‖, λ_min and λ_max of H_pop."""
+    """Newton continuation (lag_law.branch_point, then plain-Newton polishing) of the population branch from θ*(s₀) on
+    winding k up to s_hi, on a geometric grid (ratio GRID_RATIO) plus the points `extra`.  Returns a frame with s, z,
+    gradient residual, the continuation step in scale-free coordinates (w₁, b₁, b₂/s), λ_min and λ_max of H_pop."""
     from .lag_law import _pop, branch_point, hessian_and_tangent
     x, y = _pop()
     sp = R._s_star_pop(a); s0 = S0_FRAC * sp
@@ -192,23 +220,25 @@ def population_branch(a, k, s_hi, extra=()):
     while grid[-1] * GRID_RATIO < s_hi:
         grid.append(grid[-1] * GRID_RATIO)
     grid = sorted(set(grid) | {float(s_hi)} | {float(e) for e in extra if s0 <= e <= s_hi})
-    z = R.branch_init(a, k)
+    z = R.branch_init(a, k); s_prev = s0
     rows = []
     for s in grid:
-        zn, gr = branch_point(z, s, a, x, y)
+        zn, _ = branch_point(z, s, a, x, y)
+        zn, gr = _polish(zn, s, a, x, y)
         H, _ = hessian_and_tangent(zn, s, a, x, y)
         ev = np.linalg.eigvalsh(H)
+        step = float(np.linalg.norm([zn[0] - z[0], zn[1] - z[1], zn[2] / s - z[2] / s_prev]))
         rows.append({"a": a, "winding": k, "s": s, "s_over_sstar": s / sp, "w1": zn[0], "b1": zn[1], "b2": zn[2],
-                     "grad_residual": gr, "step_norm": float(np.linalg.norm(zn - z)), "lambda_min": float(ev[0]),
-                     "lambda_max": float(ev[-1])})
-        z = zn
+                     "grad_residual": gr, "step_norm": step, "lambda_min": float(ev[0]), "lambda_max": float(ev[-1])})
+        z, s_prev = zn, s
     return pd.DataFrame(rows)
 
 
 def validate_branch(br, a):
     """Validation of the continuation: every point a stationary point (residual < 1e-10) with H positive definite, no
-    continuation step larger than 0.05, and the branch passes through the committed switch point (lag_law/kappa.csv,
-    up to the winding copy)."""
+    continuation step larger than 0.01 in (w₁, b₁, b₂/s), λ_max nondecreasing in s (so the maximum over the continuous
+    interval [s₀, s_end] is attained at the grid point s_end), and the branch passes through the committed switch point
+    (lag_law/kappa.csv, up to the winding copy)."""
     from .lag_law import TWO_PI, _pop, branch_point
     L = R._landscape()[round(a, 2)]
     kt = pd.read_csv(RESULTS / "lag_law" / "kappa.csv")
@@ -221,9 +251,10 @@ def validate_branch(br, a):
     shift = np.array([0.0, TWO_PI * k, -TWO_PI * k * s_sw])
     dz = float(np.abs(zc - (L["z"] + shift)).max())
     out = {"max_residual": float(br.grad_residual.max()), "min_lambda_min": float(br.lambda_min.min()),
-           "max_step_norm": float(br.step_norm.iloc[1:].max()), "switch_point_max_abs_diff": dz}
+           "max_step_norm": float(br.step_norm.iloc[1:].max()), "switch_point_max_abs_diff": dz,
+           "lambda_max_nondecreasing": bool((np.diff(br.lambda_max.to_numpy()) >= 0).all()), "n_points": int(len(br))}
     out["validated"] = bool(out["max_residual"] < RESID_MAX and out["min_lambda_min"] > 0
-                            and out["max_step_norm"] < STEP_MAX and dz < 1e-6)
+                            and out["max_step_norm"] < STEP_MAX and dz < 1e-6 and out["lambda_max_nondecreasing"])
     return out
 
 
@@ -328,14 +359,19 @@ def feasibility():
     """A-priori check (before registration): per cell, the seeds whose predicted crossing (lag = κχ, and at the band's
     edge 1.25κχ) lies at or beyond the ramp's end.  If more than 10 are ruled out at lag κχ in any cell, the crossing
     rule cannot be met even if the law holds exactly, and the test STOPS before registration."""
-    d = pd.read_csv(OUT / "design.csv"); f = pd.read_csv(OUT / "frozen_switches.csv")
+    d = _read(OUT / "design.csv"); f = _read(OUT / "frozen_switches.csv")
     rows = []
     for r in d.itertuples():
         sb = f[f.a.round(2) == round(r.a, 2)].s_branch.to_numpy(float)
         n1 = feasibility_counts(sb, r.s_star_pop, r.kx_target, 1.0)
         n125 = feasibility_counts(sb, r.s_star_pop, r.kx_target, BAND[1])
+        n2 = feasibility_counts(sb, r.s_star_pop, r.kx_target, 2.0)
+        lmo = f[f.a.round(2) == round(r.a, 2)].lambda_min_own.to_numpy(float)
+        chi_rel = (r.gamma / (r.eta_cell * lmo)) / r.chi_target
         rows.append({"a": r.a, "kx_target": r.kx_target, "n_beyond_at_pred": n1, "n_beyond_at_1.25pred": n125,
-                     "feasible_at_pred": feasible(n1), "feasible_at_1.25pred": feasible(n125)})
+                     "n_beyond_at_2pred": n2, "feasible_at_pred": feasible(n1), "feasible_at_1.25pred": feasible(n125),
+                     "feasible_at_2pred": feasible(n2), "chi_own_over_target_median_all40": float(np.median(chi_rel)),
+                     "chi_own_over_target_min": float(chi_rel.min()), "chi_own_over_target_max": float(chi_rel.max())})
     out = {"cells": rows, "all_feasible_at_pred": all(x["feasible_at_pred"] for x in rows),
            "s_branch_over_s_star": {str(round(a, 2)): {"min": float((g.s_branch / R._s_star_pop(a)).min()),
                                                        "median": float((g.s_branch / R._s_star_pop(a)).median()),
@@ -467,8 +503,8 @@ def train():
     torch.set_num_threads(1)
     _assert_registration()
     PATHS.mkdir(parents=True, exist_ok=True)
-    d = pd.read_csv(OUT / "design.csv")
-    fz = pd.read_csv(OUT / "frozen_switches.csv"); fz["a2"] = fz.a.round(2)
+    d = _read(OUT / "design.csv")
+    fz = _read(OUT / "frozen_switches.csv"); fz["a2"] = fz.a.round(2)
     f = OUT / "predictions_parts.jsonl"
     done = set() if not f.exists() else {(round(r["a"], 2), r["kx_target"]) for r in map(json.loads, f.read_text().splitlines())}
     for r in d.itertuples():
@@ -525,12 +561,12 @@ def observe():
     _assert_registration()
     ph = _assert_predictions()
     L = R._landscape()
-    kt = pd.read_csv(OUT / "kappa_k.csv")
-    pr = pd.read_csv(OUT / "predictions.csv")
+    kt = _read(OUT / "kappa_k.csv")
+    pr = _read(OUT / "predictions.csv")
     parts = OUT / "observed_parts.jsonl"
     done = set() if not parts.exists() else {(round(r["a"], 2), r["kx_target"], r["seed"])
                                              for r in map(json.loads, parts.read_text().splitlines())}
-    d = pd.read_csv(OUT / "design.csv")
+    d = _read(OUT / "design.csv")
     for r in pr.itertuples():
         if (round(r.a, 2), r.kx_target, r.seed) in done:
             continue
