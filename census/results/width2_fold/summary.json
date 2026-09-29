@@ -1,0 +1,71 @@
+{
+ "label": "POST HOC (author's request 2026-09-28); T2-3's registered FAIL stands",
+ "n_runs": 79,
+ "replays_reproduce": true,
+ "status_counts": {
+  "switch": 77,
+  "none": 2
+ },
+ "kind_counts": {
+  "two-unit": 66,
+  "duplicate": 13
+ },
+ "exit_found": {
+  "n": 77,
+  "median_ratio_cross_exit": 2.7907108896434387,
+  "frac_within_15pct": 0.03896103896103896
+ },
+ "exit_validated": {
+  "n": 77,
+  "median_ratio_cross_exit": 2.7907108896434387,
+  "frac_within_15pct": 0.03896103896103896
+ },
+ "by_event": {
+  "switch": {
+   "n": 77,
+   "n_validated": 77,
+   "median_ratio": 2.7907108896434387,
+   "frac_within_15pct": 0.03896103896103896,
+   "s_exit_min_median_max": [
+    0.23667281616694816,
+    0.48638097810405484,
+    6.033881171627346
+   ]
+  }
+ },
+ "all_runs_vs_population": {
+  "median_ratio": 3.228778243531118,
+  "frac_within_15pct": 0.02531645569620253
+ },
+ "primary_time_frac_median": 0.5,
+ "addendum_basin": {
+  "n_basin_before_cross_placed": 75,
+  "n_basin_placed_found": 75,
+  "s_basin_placed_min_median_max": [
+   0.2417504047382728,
+   0.47176778483621196,
+   6.03571613492948
+  ],
+  "median_s_basin_placed_over_pop": 1.0599631846064006,
+  "frac_s_basin_placed_within_15pct_of_pop": 0.41333333333333333,
+  "median_ratio_cross_basin_placed": 2.938553624488309
+ },
+ "addendum_own_width2_threshold": {
+  "n": 10,
+  "seeds": [
+   600000,
+   600001,
+   600002,
+   600003,
+   600004,
+   600005,
+   600006,
+   600007,
+   600008,
+   600009
+  ],
+  "median_s_basin_placed_over_own": 1.0191050756409794,
+  "frac_within_15pct": 0.9,
+  "median_s_cross_over_own": 4.111427960851363
+ }
+}
