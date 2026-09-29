@@ -94,3 +94,12 @@ constructed pass and fail cases, and checks the committed results.
 - **The crossover L\* comparisons** use mpmath at 40 digits.
 - **The Γ_n search** uses a grid plus the rescaled small-ε window, with multi-start pattern refinement. It is not a
   certificate. Attainment itself is proved, and Γ_n ≥ Ĝ_cert holds by containment.
+
+## Addendum (2026-09-28): small-scale compactness (math note §17)
+
+- **Population: now PROVED.** The row "C, s → 0: NOT PROVED" above is superseded for the 800-point population.
+  Theorem C of §17 proves that for s < 2.18·10⁻⁶ every conditional minimiser has |w₁| ≤ 2.35·10⁶. The proof uses the
+  attained supremum of Δμ at the alias |w₁| = π/q.
+- **Continuous windows:** the same holds with |w₁| ≤ 12 for s < 0.64, given the computer-checked maximiser scan.
+- **Training samples** (m ≠ 0): compactness fails (Proposition C′). The minimisers are nevertheless unplaced at small
+  scale (Corollary C3).

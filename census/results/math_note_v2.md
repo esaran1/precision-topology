@@ -1837,3 +1837,140 @@ Krawczyk test that passes holds for every such ε at once.
   10⁻⁴/(0.71·2·m₀(5)) ≈ 10⁻⁶.
 - Values of ε₀ comparable to the tested a need a finite-ε certificate with ε as an interval. That is a new search, not
   a perturbation of the limit certificate.
+
+## 17. Small-scale compactness for the sine family, width 1 (Track 3 (3); 2026-09-28)
+
+**Status, stated per part.**
+- **PROVED, every step checked:**
+  - **Lemma C1**, an exact decomposition of the conditional loss;
+  - **Theorem C**: if Δμ attains its supremum, the conditional minimisers stay in an explicit compact set for all
+    small s;
+  - **Proposition C′**: if it does not, they leave every compact set.
+- **Applied to the paper's three objects:**
+  - **800-point population: compactness PROVED.** Δμ's supremum 2a is attained, exactly, at the aliased weight
+    |w₁| = π/q.
+  - **Continuous windows: compactness CHECKED.** It holds given that α\*_c is the global maximiser, which is
+    computer-checked in floats, not proved.
+  - **Training samples: compactness FAILS, proved.** For every sample with m = E_O x − E_I x ≠ 0 (all 50 seeds
+    checked), the supremum is +∞.
+- **Not covered:** width 2.
+- **Producer:** `src/small_scale.py` → `results/small_scale_compactness.json` (the `ledger` block lists every number
+  below). **Tests:** `tests/test_small_scale.py`.
+- **What this means for Theorem 1.**
+  - Its compactness hypothesis holds on the population and fails on samples.
+  - Theorem 1's width-1 conclusion ("unplaced at small scale") does **not** need compactness. See §11's Proposition (i)
+    for the population and Corollary C3 below for samples.
+
+**Setting.** Width 1, φ_θ(x) = sign(w₂)·f_a(w₁x + b₁), s = |w₂|, and balanced classes (n_O = n_I), as in §10.
+Δμ(θ) = mean_O φ − mean_I φ, and S := sup_θ Δμ(θ) ∈ (0, ∞].
+
+### 17.1 Three lemmas
+
+**Lemma C1 (exact decomposition).** For every θ and s > 0,
+
+  **L\*(θ; s) = log 2 − (s/4)·Δμ(θ) + V_s(θ),  V_s(θ) := min_c mean_i ψ(s(φ_i − c)),  ψ(z) = log cosh(z/2) ≥ 0.**
+
+*Proof.*
+- log(1 + e^z) = z/2 + log(2cosh(z/2)), so ℓ(z, y) = log 2 + (½ − y)z + ψ(z).
+- Put z_i = sφ_i + b. Then mean(½ − y_i) = 0 by balance, so the b-term drops.
+- s·mean((½ − y)φ) = s(½·mean φ − ½·μ_O) = s(¼(μ_O + μ_I) − ½μ_O) = −(s/4)Δμ.
+- Minimising over b is minimising over c = −b/s. ψ is convex and coercive, so the minimum is attained. ∎
+- (Numerically: the largest error over 200 random (θ, s) is 1.8·10⁻¹⁵.)
+
+**Lemma C2 (ψ).**
+- ψ is even and increasing in |z|.
+- ψ(z) ≤ z²/8, because (log cosh)″ = sech² ≤ 1.
+- ψ(z) ≥ (5/48)z² for |z| ≤ 2. This uses log cosh u ≥ u²/2 − u⁴/12: the difference f satisfies f(0) = f′(0) = 0 and
+  f″ = u² − tanh²u ≥ 0. Then z²/8 − z⁴/192 ≥ (5/48)z² for |z| ≤ 2.
+- ψ(z) ≥ ψ(2) = log cosh 1 = 0.433781 for |z| ≥ 2.
+
+**Lemma C3 (spreading).** Let N_τ be the largest number of data points in a closed x-interval of length 2τ, and
+F := 1 − N_τ/n. Then for all c and all θ with τ|w₁| > a, at least F·n points satisfy |φ_i − c| ≥ τ|w₁| − a.
+- *Proof:* |φ_i − c| ≥ |w₁x_i + b₁ − c| − a, and |w₁x_i + b₁ − c| < τ|w₁| only on an open x-interval of length 2τ. ∎
+- **For the population with τ = 0.4:** N = 200 (exact sliding count; minimum spacing 0.00401), so F = 0.75. The
+  continuous windows have uniform density 0.3125, so F = 0.75 there too.
+
+### 17.2 Theorem C (attainment implies compactness, explicitly)
+
+**Statement.** Suppose S is attained at θ₁, and let V₁ = Var(φ_{θ₁}). Put
+
+  **s₁ := √(8Fψ(2)/V₁),  W_c := (a + √(1.2·V₁/F))/τ.**
+
+Then for every 0 < s < s₁, every conditional minimiser θ_s satisfies |w₁| ≤ W_c. With b₁ mod 2π this is a compact set
+that does not depend on s. So Corollary 1 of §10 applies: limit points maximise Δμ, and §10's (ii) applies when its
+growth hypothesis holds.
+
+**Proof.**
+1. **Competitor bound.** By C1 and ψ ≤ z²/8 (with c = mean φ₁), L\*(θ₁; s) ≤ log 2 − (s/4)S + (s²/8)V₁.
+2. **Minimiser bound.** A minimiser satisfies log 2 − (s/4)Δμ(θ_s) + V_s(θ_s) ≤ L\*(θ₁; s), and Δμ(θ_s) ≤ S. So
+   V_s(θ_s) ≤ s²V₁/8.
+3. **Spreading.** If τ|w₁| > a, let ζ = s(τ|w₁| − a). By C3 and the monotonicity of ψ, V_s ≥ F·ψ(ζ).
+4. **Case ζ ≥ 2.** Then Fψ(2) ≤ s²V₁/8, which contradicts s < s₁.
+5. **Case ζ < 2.** Then F(5/48)ζ² ≤ s²V₁/8, i.e. (τ|w₁| − a)² ≤ 48V₁/(40F) = 1.2V₁/F. ∎
+
+### 17.3 Proposition C′ (non-attainment implies escape) and Corollary C3
+
+**Proposition C′.** If S is not attained (including S = +∞), then for every W there is s_W > 0 such that every
+conditional minimiser at s < s_W has |w₁| > W.
+
+*Proof.*
+1. On {|w₁| ≤ W} (b₁ mod 2π, both signs of w₂), Δμ is continuous on a compact set, so its maximum M_W is attained.
+   Hence M_W < S.
+2. Pick θ′ with η := Δμ(θ′) − M_W > 0.
+3. For |w₁| ≤ W: L\* ≥ log 2 − (s/4)M_W, since V_s ≥ 0.
+4. L\*(θ′; s) ≤ log 2 − (s/4)Δμ(θ′) + (s²/8)Var(φ_{θ′}), which is smaller than that once s < 2η/Var(φ_{θ′}). ∎
+
+**Corollary C3 (unplaced at small scale, without compactness).**
+- If S is not attained, every conditional minimiser at small s has |w₁| > a/1.4. So it is unplaced for the
+  window gap G, by §11 Step 2, whose four points are window endpoints and do not depend on the sample.
+- If S is attained, Theorem C applies instead.
+
+### 17.4 The three objects
+
+**800-point population: S = 2a is attained; compactness PROVED.**
+- Every x is n·q with q = 0.4/79401: inner n even, outer n odd. This is the exact lattice of the linspace
+  definition; the float values agree with n·q to 4.4·10⁻¹⁶.
+- So at α = π/q = 623,613.996: D(α) = −2 exactly, and with sin b₁ = −1 (w₂ > 0), Δμ = 2a = S. Here |D| ≤ 2 always,
+  and Δμ = a·sin b₁·D(w₁) on symmetric data (§11 Step 1).
+- V₁ = α²·Var(x) + a²: cos αx_i = ±1 by class, and Cov(x, cos αx) = 0 by symmetry. Var(x) = 1.414136.
+
+| a | V₁ | W_c | s₁ |
+|---|---|---|---|
+| 1.30 | 5.4995·10¹¹ | 2.34510·10⁶ | 2.175·10⁻⁶ |
+| 1.60 | 5.4995·10¹¹ | 2.34510·10⁶ | 2.175·10⁻⁶ |
+
+- (All nine a in the JSON, 1.02–1.60, give W_c = 3.76α.)
+- **The limit object is the alias, not α\*.** By Corollary 1 the s → 0 limit points maximise Δμ, so they sit on the
+  aliases. Among the aliases, Var is smallest at |w₁| = π/q (compare §10.1(ii)). The alias beats θ\* only below
+  s ≈ 2·10⁻¹² (`theorem1_checks.json`).
+- The alias is unplaced, as θ\* is, so the width-1 criterion's verdict is unchanged. This refines
+  `theorem1_hypotheses.md`: the compactness hypothesis is now **proved** for the population. In D.1 it was "not proved".
+- **Float caveat.** The float-rounded data are dyadic rationals, so their D is periodic too and S is attained. But
+  the attaining point, and so W_c for the float objective, has not been computed. The theorem above is for the exact
+  linspace population.
+
+**Continuous windows (the idealised population measure): compactness CHECKED.**
+- S = a·|D_c(α\*_c)| is attained at α\*_c = 1.7922917, given the computer-checked global-maximiser scan
+  (`theorem1_checks.json`, float Lipschitz bounds). F = 0.75.
+
+| a | V₁ = Var(φ\*_c) | W_c | s₁ |
+|---|---|---|---|
+| 1.30 | 5.6586 | 10.77 | 0.678 |
+| 1.60 | 6.3027 | 11.90 | 0.646 |
+
+- So for s < 0.64 every conditional minimiser has |w₁| ≤ 12. It is proved conditional on the maximiser scan.
+
+**Training samples: compactness FAILS, proved whenever m ≠ 0.**
+- A sample is not symmetric, so the linear part contributes w₁·m to Δμ, with m = E_O x − E_I x. Hence S = +∞, which
+  is not attained.
+- All 50 seeds (0–49, `make_data(200, seed)`) have m ≠ 0: min |m| = 0.0032, median 0.075.
+- By C′ the minimisers leave every compact set as s → 0.
+- By C3 they are unplaced there, so Theorem 1's conclusion holds on samples, but not through Corollary 1.
+- **Illustration (seed 0; not part of the proof).** The pure ramp w₁ = m/(s·Var x) has a lower conditional loss than
+  θ\* at s = 10⁻³ and 10⁻⁴ (w₁ = 58 and 585), though not at s = 10⁻².
+
+### 17.5 Scope
+
+- **Width 2 is not covered.** Directions with ṽᵢ → 0 and αᵢ → ∞ keep φ bounded, so Lemma C3's spreading argument does
+  not bound the parameters. §10.1's width-2 selection keeps its compactness assumption.
+- **Non-balanced data** would change C1 (the b-term no longer drops). Every object used in the paper is balanced.
