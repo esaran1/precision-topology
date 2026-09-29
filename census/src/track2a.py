@@ -86,17 +86,25 @@ def _sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+def load_track_a(**consts):
+    """A fresh module instance of src/track_a.py (byte-identical to its registered version) with the given module
+    constants rebound.  The imported src.track_a is untouched."""
+    src = Path(__file__).with_name("track_a.py")
+    assert _sha(src) == TRACK_A_SHA256, "src/track_a.py differs from its registered Track A version"
+    spec = importlib.util.spec_from_file_location("src._track_a_instance", src)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    for k, v in consts.items():
+        assert hasattr(m, k), k
+        setattr(m, k, v)
+    return m
+
+
 def pipeline():
-    """src/track_a.py, byte-identical to its registered version, as a separate module instance bound to a = 1.85."""
+    """The Track A pipeline bound to a = 1.85, the 80 2A seeds, results/track2a and Adam only."""
     global _PIPE
     if _PIPE is None:
-        src = Path(__file__).with_name("track_a.py")
-        assert _sha(src) == TRACK_A_SHA256, "src/track_a.py differs from its registered Track A version"
-        spec = importlib.util.spec_from_file_location("src._track_a_for_2a", src)
-        m = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(m)
-        m.A, m.SEEDS, m.OPTS, m.OUT, m.PATHS = A, SEEDS, (OPT,), OUT, PATHS
-        _PIPE = m
+        _PIPE = load_track_a(A=A, SEEDS=SEEDS, OPTS=(OPT,), OUT=OUT, PATHS=PATHS)
     return _PIPE
 
 
@@ -201,9 +209,10 @@ def _assert_registration():
 
 
 # ------------------------------------------------------------------------------------------ training and predictions
-def predict_2a(seed, W, M, V, K, s_frozen):
-    """Primary and secondary predictions with P frozen at t_sw (everything else is track_a.predict_one)."""
-    m = pipeline()
+def predict_2a(seed, W, M, V, K, s_frozen, m=None):
+    """Primary and secondary predictions with P frozen at t_sw (everything else is track_a.predict_one).  `m`: the
+    pipeline instance (default: a = 1.85; another instance is used only to check the machinery at a = 1.65)."""
+    m = pipeline() if m is None else m
     base = m.predict_one(OPT, seed, W, M, V, K, s_frozen)          # Track A's rule (P at t_R): DESCRIPTIVE only
     s = np.abs(W[:, 2])
     t_sw = t_switch(s, base.get("s_run"))
