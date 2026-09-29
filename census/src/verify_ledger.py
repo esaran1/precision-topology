@@ -587,6 +587,7 @@ def main() -> None:
     track_t_v3_checks()
     final_checks_boundary_adam()
     final_checks_numbers()
+    discussion_phase_checks()
 
     provenance_check()
 
@@ -860,6 +861,18 @@ PRODUCERS = {
     "scale_limits_tanh_maximisers.csv": ("scale_limits_tanh", "main", "full", ""),
     "scale_limits_tanh_summary.csv": ("scale_limits_tanh", "main", "full", ""),
     "crossing_audit_summary.csv": ("crossing_audit", "main", "full", ""),
+    # discussion phase (Track 1A post hoc fold checks; Track 3 math note §14-§17)
+    "sb_fold/summary.json": ("sb_fold", "run_summary", "full", ""),
+    "sb_fold/compare.json": ("sb_fold", "run_compare", "full", ""),
+    "sb_fold/validation.json": ("sb_fold", "run_validate", "full", ""),
+    "sb_fold/fold_constants.json": ("sb_fold", "run_fold_constants", "full", ""),
+    "sb_fold/fold_constant_adam.json": ("sb_fold", "run_precond_constant", "full", ""),
+    "width2_fold/summary.json": ("width2_fold", "summary", "full", ""),
+    "act_fold/summary.json": ("act_fold", "summarise", "full", ""),
+    "theory_checks_fold.json": ("theory_checks", "<module>", "full", ""),
+    "theory_checks_lag.json": ("theory_checks", "<module>", "full", ""),
+    "local_global.json": ("local_global", "main", "full", ""),
+    "small_scale_compactness.json": ("small_scale", "main", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
@@ -2233,6 +2246,89 @@ def final_checks_numbers() -> None:
     chk("FC sgd constant ratio", C["sgd"]["constant lag from a = 1.30–1.60"]["median_ratio"], 2.22, 0.006)
 
 
+def discussion_phase_checks() -> None:
+    """Discussion phase: Track 1A fold checks (POST HOC) and math note §14-§17 producers."""
+    import statistics as _st
+    print("Track 1A v3 fold (POST HOC)")
+    S = json.loads((R / "sb_fold" / "summary.json").read_text())
+    chk("1A s_fold", S["s_fold_M"], 4.767689, 6e-7)
+    chk("1A s_fold/s*", S["s_fold_over_s_star"], 1.3275, 6e-5)
+    chk("1A halving change", float(S["folds"]["M_fwd"]["max_abs_change_under_halving"] < 1e-12), 1.0, 0)
+    for k, v in {"L0_to_M": 1.4896, "M_to_S": 3.5891, "S_to_S2": 8.6166}.items():
+        chk(f"1A equal-loss {k}", S["equal_loss_scales"][k], v, 6e-5)
+    for k, v in {"M_bwd": 1.154, "S_bwd": 1.916, "S_fwd": 9.398, "S2_bwd": 0.316}.items():
+        chk(f"1A fold {k}", S["folds"][k]["by_step"]["0.0125"], v, 6e-4)
+    V = json.loads((R / "sb_fold" / "validation.json").read_text())
+    chk("1A search below 1% on M", float(V["below_1pct"]["n_on_branch"]), 27.0, 0)
+    chk("1A search below 0.1% on M", float(V["below_0.1pct"]["n_on_branch"]), 18.0, 0)
+    chk("1A search above on M", float(V["above_0.1pct"]["n_on_branch"] + V["above_1pct"]["n_on_branch"]), 0.0, 0)
+    chk("1A Newton fails above", float(not V["above_0.1pct"]["newton_from_fold_point"]["converged"]), 1.0, 0)
+    C = json.loads((R / "sb_fold" / "compare.json").read_text())
+    L = C["late"]
+    chk("1A late n", float(L["n"]), 16.0, 0)
+    chk("1A late leave/fold median", L["median_leave_over_fold"], 0.66, 0.006)
+    chk("1A late leave within 15%", L["frac_leave_within_15pct_of_fold"] * L["n"], 1.0, 1e-9)
+    chk("1A late cross/fold median", L["median_s_cross_over_fold"], 2.17, 0.006)
+    chk("1A all min distance median", C["all"]["median_min_raw_dist"], 0.18, 0.006)
+    chk("1A never on a branch (late)", L["max_frac_steps_raw_on_a_branch"], 0.0, 0)
+    F0 = json.loads((R / "sb_fold" / "fold_constants.json").read_text())
+    chk("1A |m'c'| P=I", F0["M_upper"]["fit_window_0.05"]["abs_mc"], 5.0e-7, 6e-9)
+    FA = json.loads((R / "sb_fold" / "fold_constant_adam.json").read_text())
+    chk("1A |m'c'| Adam P", FA["adamP_window_0.05"]["abs_mc"], 3.6e-3, 6e-5)
+    chk("1A eps_F", FA["fold_delay_law_post_hoc"]["eps_F"], 5.6, 0.06)
+
+    print("width-2 fold (POST HOC, T2-3)")
+    W = json.loads((R / "width2_fold" / "summary.json").read_text())
+    chk("W2F runs", float(W["n_runs"]), 79.0, 0)
+    chk("W2F folds", float(W["n_runs"] - W["status_counts"]["switch"] - W["status_counts"]["none"]), 0.0, 0)
+    chk("W2F switches", float(W["status_counts"]["switch"]), 77.0, 0)
+    chk("W2F switch s median", W["by_event"]["switch"]["s_exit_min_median_max"][1], 0.486, 6e-4)
+    chk("W2F cross/switch median", W["by_event"]["switch"]["median_ratio"], 2.79, 0.006)
+    chk("W2F within 15%", W["by_event"]["switch"]["frac_within_15pct"] * 77, 3.0, 1e-9)
+    chk("W2F basin placed / pop", W["addendum_basin"]["median_s_basin_placed_over_pop"], 1.06, 0.006)
+    chk("W2F placed before cross", float(W["addendum_basin"]["n_basin_before_cross_placed"]), 75.0, 0)
+
+    print("GELU fold (POST HOC, Track 3A non-early crossers)")
+    G = json.loads((R / "act_fold" / "summary.json").read_text())["acts"]["gelu"]
+    chk("AF gelu analysed", float(G["analysed"]), 114.0, 0)
+    chk("AF gelu reproduced", float(G["reproduced"]), 114.0, 0)
+    chk("AF gelu folds", float(G["with_fold"]), 0.0, 0)
+    chk("AF gelu cross/switch", G["median_ratio_cross_over_switch"], 1.0017, 6e-5)
+    chk("AF gelu within 15%", G["frac_within_15pct_switch"], 1.0, 0)
+    chk("AF gelu within 1%", 100 * G["frac_within_1pct_switch"], 98.2, 0.06)
+    chk("AF gelu halving", float(G["halving_ok"]), 114.0, 0)
+    chk("AF gelu pre85", G["sensitivity_pre85_same_events"], 1.0, 0)
+
+    print("math note §14/§15 checks")
+    TF = json.loads((R / "theory_checks_fold.json").read_text())
+    chk("§14 Omega0", TF["Omega0_used"], 2.338107, 6e-7)
+    TL = json.loads((R / "theory_checks_lag.json").read_text())
+    chk("§15 L1 bounds hold", float(all(r["bound_holds"] for r in TL["L1_toy_ramps"])), 1.0, 0)
+    chk("§15 L2 residual/chi^2", TL["L2_residual_over_chi2"][-1]["(r_interp-ell/s*)/chi^2"], -0.929, 6e-4)
+    r3 = [r["r_obs"] for r in TL["L3_free_training"]]
+    chk("§15 L3 eta spread %", 100 * (max(r3) - min(r3)) / min(r3), 0.6, 0.06)
+
+    print("math note §16 (Theorem G)")
+    LG = json.loads((R / "local_global.json").read_text())
+    chk("§16 holds", float(LG["theorem_G_holds"] and LG["all_links_slack_positive"] and LG["gap"]["unique_sign_change"]), 1.0, 0)
+    chk("§16 eps0", LG["EPS0"], 1.4e-12, 0)
+    chk("§16 outer margin", LG["links"]["outer"]["margin"], 1.00e-4, 6e-7)
+    chk("§16 outer perturbation", LG["links"]["outer"]["perturbation"], 7.8e-5, 6e-7)
+    chk("§16 subintervals", float(LG["gap"]["n_subintervals"]), 110.0, 0)
+    chk("§16 switch A lo", LG["switch_box"]["A_range"][0], 0.684945, 6e-7)
+    chk("§16 switch A hi", LG["switch_box"]["A_range"][1], 0.685945, 6e-7)
+
+    print("math note §17 (small-scale compactness)")
+    SS = json.loads((R / "small_scale_compactness.json").read_text())["ledger"]
+    for k, v, tol in [("C spread count (population, interval 0.8)", 200, 0), ("C spread fraction F (population)", 0.75, 0),
+                      ("C alias alpha = pi/q", 623614, 0.6), ("C Wc population a=1.30", 2.345e6, 600),
+                      ("C s1 population a=1.30", 2.18e-6, 6e-9), ("C Wc continuous a=1.30", 10.8, 0.06),
+                      ("C Wc continuous a=1.60", 11.9, 0.06), ("C s1 continuous a=1.30", 0.68, 0.006),
+                      ("C s1 continuous a=1.60", 0.65, 0.006), ("C samples min |m| (seeds 0-49)", 0.0032, 6e-5),
+                      ("C samples median |m| (seeds 0-49)", 0.075, 6e-4), ("C identity max abs err", 1.8e-15, 6e-17)]:
+        chk(f"§17 {k}", float(SS[k]), float(v), tol)
+
+
 def digit_stability() -> None:
     """Ĝ was replaced by its rigorous enclosure (author's decision 2026-09-24).  Every R is linear in Ĝ, so a stored
     value x computed with the old float Ĝ becomes x·r with |r − 1| <= δ, δ = the largest relative change of Ĝ over a
@@ -2294,8 +2390,10 @@ def provenance_check() -> None:
         stem = art.rsplit(".", 1)[0]
         import re as _re
         fprefixes = _re.findall(r'f"([A-Za-z0-9_]+)_\{', text)      # f"gelu_scale_{arm}"
+        sub, _, base = art.rpartition("/")                           # OUT = RESULTS / "sub"; OUT / "base"
         if not (art in text or f'"{stem}"' in text
-                or any(stem.startswith(fp + "_") for fp in fprefixes)):
+                or any(stem.startswith(fp + "_") for fp in fprefixes)
+                or (sub and f'/ "{sub}"' in text and f'"{base}"' in text)):
             bad.append(f"{art}: src/{mod}.py never references it")
             continue
         if fn == "<module>":

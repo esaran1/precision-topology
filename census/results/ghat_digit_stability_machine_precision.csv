@@ -12,3 +12,4 @@ K domain: identity max relative error,5e-14,False
 k = 1 check max diff,1e-10,False
 k = 1 check max diff,1e-10,False
 Track 5 Krawczyk A* lo,1e-13,True
+§17 C identity max abs err,6e-17,False
