@@ -1,0 +1,38 @@
+{
+ "d2_a1.30": {
+  "n_crossing": 57,
+  "n_scored": 50,
+  "valid": false,
+  "outcome": "UNRESOLVED",
+  "C1": "UNRESOLVED",
+  "C2": "UNRESOLVED",
+  "C3": "UNRESOLVED"
+ },
+ "d2_a1.50": {
+  "n_crossing": 57,
+  "n_scored": 53,
+  "valid": true,
+  "outcome": "PASS",
+  "C1": "PASS",
+  "C2": "PASS",
+  "C3": "PASS"
+ },
+ "d4_a1.30": {
+  "n_crossing": 51,
+  "n_scored": 41,
+  "valid": false,
+  "outcome": "UNRESOLVED",
+  "C1": "UNRESOLVED",
+  "C2": "UNRESOLVED",
+  "C3": "UNRESOLVED"
+ },
+ "d4_a1.50": {
+  "n_crossing": 53,
+  "n_scored": 48,
+  "valid": true,
+  "outcome": "PASS",
+  "C1": "PASS",
+  "C2": "PASS",
+  "C3": "PASS"
+ }
+}

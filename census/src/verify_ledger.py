@@ -585,6 +585,7 @@ def main() -> None:
     track_a_checks()
     track2a_checks()
     track2b_checks()
+    track2c_checks()
     track_t_v2_checks()
     track_t_v3_checks()
     final_checks_boundary_adam()
@@ -879,6 +880,16 @@ PRODUCERS = {
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
     "track2b/posthoc_stability.json": ("track2b_posthoc", "run", "full", ""),
     "track2b/posthoc_stability.csv": ("track2b_posthoc", "run", "full", ""),
+    # registered test 2C (band task in R^d against each seed's own-sample R^d switch)
+    "track2c/scores.json": ("track2c", "score", "full", ""),
+    "track2c/observed_runs.csv": ("track2c", "score", "full", ""),
+    "track2c/predictions.csv": ("track2c", "finalize", "full", ""),
+    "track2c/frozen_seeds.csv": ("track2c", "write_frozen", "full", ""),
+    "track2c/kappa_k.csv": ("track2c", "kappa_table", "full", ""),
+    "track2c/timing.csv": ("track2c", "timing", "full", ""),
+    "track2c/diag_mirror_3b.csv": ("track2c", "diag_mirror", "full", ""),
+    "track2c/posthoc_unscored.csv": ("track2c_posthoc", "run", "full", ""),
+    "track2c/posthoc_summary.csv": ("track2c_posthoc", "run", "full", ""),
     # discussion phase (Track 1A post hoc fold checks; Track 3 math note §14-§17)
     "sb_fold/summary.json": ("sb_fold", "run_summary", "full", ""),
     "sb_fold/compare.json": ("sb_fold", "run_compare", "full", ""),
@@ -2417,6 +2428,84 @@ def gelu_transfer_checks() -> None:
         kp = g[g.kappa > 0]
         chk(f"GT {arm} V2 count", float((kp.t_sw < kp.step_obs).sum()), 67.0 if arm == "random" else 73.0, 0)
         chk(f"GT {arm} kappa>0 runs", float(len(kp)), 72.0 if arm == "random" else 78.0, 0)
+
+
+def track2c_checks() -> None:
+    """Registered test 2C (band task in R^d against each seed's own-sample R^d switch): results/track2c_writer_inputs.md."""
+    import hashlib as _h
+    print("Test 2C (registered; PASS at a = 1.50, UNRESOLVED (V3) at a = 1.30)")
+    D = R / "track2c"
+    chk("2C predictions hash", float(_h.sha256((D / "predictions.csv").read_bytes()).hexdigest()
+                                     == "27c0b676c80638a239a77df28e67bd744184d79b4611218995df3d1bb8e6ad6a"), 1.0, 0)
+    fz = pd.read_csv(D / "frozen_seeds.csv")
+    chk("2C seed-cells", float(len(fz)), 240.0, 0)
+    chk("2C s_own,d validated", float(fz.validated.sum()), 240.0, 0)
+    chk("2C x1-only thresholds defined", float(fz.drop_duplicates(["seed", "a"]).s_own_x1.notna().sum()), 120.0, 0)
+    for (d, a), (ratio, within5) in {(2, 1.3): (1.075, 23), (2, 1.5): (1.078, 21), (4, 1.3): (1.359, 14),
+                                     (4, 1.5): (1.355, 15)}.items():
+        g = fz[(fz.d == d) & (fz.a.round(2) == a)]
+        chk(f"2C d={d} a={a} median s_own,d/s_own,x1", float((g.s_own_d / g.s_own_x1).median()), ratio, 0.0006)
+        other = np.where(g.global_mirror_hi == "+", g["s_mirror_-"], g["s_mirror_+"])
+        chk(f"2C d={d} a={a} other mirror within 5%", float((np.abs(other / g.s_own_d - 1) <= 0.05).sum()), float(within5), 0)
+    k = pd.read_csv(D / "kappa_k.csv")
+    chk("2C kappa a=1.30 k=-1", float(k[(k.a.round(2) == 1.3) & (k.k == -1)].kappa_k.iloc[0]), 7.611, 0.0006)
+    chk("2C kappa a=1.50 k=0", float(k[(k.a.round(2) == 1.5) & (k.k == 0)].kappa_k.iloc[0]), 4.046, 0.0006)
+    pr = pd.read_csv(D / "predictions.csv")
+    chk("2C predictions rows", float(len(pr)), 240.0, 0)
+    chk("2C predictions ok", float((pr.status == "ok").sum()), 219.0, 0)
+    S = json.loads((D / "scores.json").read_text())["cells"]
+    want = {"d2_a1.30": dict(nc=57, ns=50, v3=False, c1=0.0032, c2=0.956, lo=-0.132, hi=-0.094, out="UNRESOLVED"),
+            "d2_a1.50": dict(nc=57, ns=53, v3=True, c1=0.0076, c2=0.940, lo=-0.158, hi=-0.121, out="PASS"),
+            "d4_a1.30": dict(nc=51, ns=41, v3=False, c1=0.0068, c2=1.010, lo=-0.394, hi=-0.310, out="UNRESOLVED"),
+            "d4_a1.50": dict(nc=53, ns=48, v3=True, c1=0.0091, c2=1.071, lo=-0.403, hi=-0.332, out="PASS")}
+    for cell, w in want.items():
+        c = S[cell]
+        chk(f"2C {cell} crossings", float(c["n_crossing"]), float(w["nc"]), 0)
+        chk(f"2C {cell} scored", float(c["n_scored"]), float(w["ns"]), 0)
+        chk(f"2C {cell} rho below 0.05 all", float(c["n_rho_below"] == c["n_crossing"]), 1.0, 0)
+        chk(f"2C {cell} V1", float(c["validity"]["V1_min_crossings"]), 1.0, 0)
+        chk(f"2C {cell} V2", float(c["validity"]["V2_rho"]), 1.0, 0)
+        chk(f"2C {cell} V3", float(c["validity"]["V3_prediction_before_crossing"]), float(w["v3"]), 0)
+        chk(f"2C {cell} C1 median |log err|", c["C1"]["median_abs_log_err"], w["c1"], 0.00006)
+        chk(f"2C {cell} C2 median ratio", c["C2"]["median_ratio"], w["c2"], 0.0006)
+        chk(f"2C {cell} C3 ci lo", c["C3"]["ci95"][0], w["lo"], 0.0006)
+        chk(f"2C {cell} C3 ci hi", c["C3"]["ci95"][1], w["hi"], 0.0006)
+        chk(f"2C {cell} outcome", float(c["outcome"] == w["out"]), 1.0, 0)
+        chk(f"2C {cell} placed at init", float(c["n_placed_at_init"]), 0.0, 0)
+    chk("2C d2 a1.30 V3 fraction %", 100 * S["d2_a1.30"]["frac_scored"], 87.7, 0.06)
+    chk("2C d4 a1.30 V3 fraction %", 100 * S["d4_a1.30"]["frac_scored"], 80.4, 0.06)
+    for cell, (n, c1, c2, hi, out) in {"d2_a1.30": (56, 0.0027, 0.948, -0.106, "PASS"),
+                                       "d2_a1.50": (57, 0.0067, 0.922, -0.125, "PASS"),
+                                       "d4_a1.30": (42, 0.0049, 0.980, -0.298, "UNRESOLVED"),
+                                       "d4_a1.50": (52, 0.0076, 1.064, -0.323, "PASS")}.items():
+        m = S[cell]["descriptive"]["mirror_matched_NOT_SCORED"]
+        chk(f"2C {cell} mirror-matched scored", float(m["n_scored"]), float(n), 0)
+        chk(f"2C {cell} mirror-matched C1", m["C1"]["median_abs_log_err"], c1, 0.00006)
+        chk(f"2C {cell} mirror-matched C2", m["C2"]["median_ratio"], c2, 0.0006)
+        chk(f"2C {cell} mirror-matched C3 hi", m["C3"]["ci95"][1], hi, 0.0006)
+        chk(f"2C {cell} mirror-matched outcome", float(m["outcome"] == out), 1.0, 0)
+    for cell, (g, n) in {"d2_a1.30": (43, 57), "d2_a1.50": (42, 57), "d4_a1.30": (41, 51), "d4_a1.50": (43, 53)}.items():
+        X = S[cell]["descriptive"]
+        chk(f"2C {cell} rule mirror is global", float(X["n_crossing_rule_mirror_is_global_mirror"]), float(g), 0)
+        chk(f"2C {cell} crossing below s_own,d", float(X["n_crossing_below_s_own_d"]),
+            float(S[cell]["n_crossing"] - S[cell]["n_scored"]), 0)
+    O = pd.read_csv(D / "observed_runs.csv")
+    chk("2C max rho at crossing", float(O.rho_cross.max()), 0.045, 0.0006)
+    chk("2C non-crossers", float((~O.crossed.astype(bool)).sum()), 22.0, 0)
+    P = pd.read_csv(D / "posthoc_summary.csv")
+    chk("2C POST HOC unscored total", float(P.n_unscored.sum()), 26.0, 0)
+    chk("2C POST HOC unscored on the other mirror", float(P.n_unscored_rule_mirror_not_global.sum()), 17.0, 0)
+    U = pd.read_csv(D / "posthoc_unscored.csv")
+    o = U[~U.rule_mirror_is_global]; g = U[U.rule_mirror_is_global]
+    chk("2C POST HOC other-mirror obs/switch min", float(o.obs_over_rule_mirror_switch.min()), 1.011, 0.0006)
+    chk("2C POST HOC other-mirror obs/switch max", float(o.obs_over_rule_mirror_switch.max()), 1.090, 0.0006)
+    chk("2C POST HOC global-mirror obs/s_own min", float(g.obs_over_s_own_d.min()), 0.962, 0.0006)
+    chk("2C POST HOC global-mirror obs/s_own max", float(g.obs_over_s_own_d.max()), 0.9992, 0.00006)
+    chk("2C POST HOC unscored obs/s_own min", float(U.obs_over_s_own_d.min()), 0.813, 0.0006)
+    Dg = pd.read_csv(D / "diag_mirror_3b.csv"); Dc = Dg[Dg.s_branch_3B.notna()]
+    chk("2C diag 3B crossing runs", float(len(Dc)), 22.0, 0)
+    chk("2C diag global within 0.5%", float(((Dc.global_over_branch - 1).abs() < 0.005).sum()), 16.0, 0)
+    chk("2C diag run mirror within 0.5%", float(((Dc.run_mirror_switch_over_branch - 1).abs() < 0.005).sum()), 22.0, 0)
 
 
 def track_t_v2_checks() -> None:

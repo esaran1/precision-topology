@@ -1,0 +1,510 @@
+{
+ "cells": {
+  "d2_a1.30": {
+   "d": 2,
+   "a": 1.3,
+   "n_runs": 60,
+   "n_placed_at_init": 0,
+   "n_crossing": 57,
+   "n_rho_below": 57,
+   "frac_rho_below": 1.0,
+   "n_tsw_before_crossing": 50,
+   "n_scored": 50,
+   "frac_scored": 0.8771929824561403,
+   "n_crossing_unscored": 7,
+   "validity": {
+    "V1_min_crossings": true,
+    "V2_rho": true,
+    "V3_prediction_before_crossing": false
+   },
+   "valid": false,
+   "C1": {
+    "n": 50,
+    "median_abs_log_err": 0.003168382772921265,
+    "threshold": 0.05,
+    "verdict": "UNRESOLVED"
+   },
+   "C2": {
+    "n": 50,
+    "median_ratio": 0.9563035075986388,
+    "band": [
+     0.75,
+     1.25
+    ],
+    "verdict": "UNRESOLVED"
+   },
+   "C3": {
+    "n": 50,
+    "mean_D": -0.11295424696164583,
+    "ci95": [
+     -0.13221883380062457,
+     -0.09422498325817223
+    ],
+    "comparator": "x1-only own threshold",
+    "verdict": "UNRESOLVED"
+   },
+   "outcome": "UNRESOLVED",
+   "descriptive": {
+    "n_not_crossed": 3,
+    "status_counts": {
+     "ok": 57,
+     "s never reaches s_own,d": 3
+    },
+    "median_s_own_d_over_x1": 1.0748455664943792,
+    "q10_q90_s_own_d_over_x1": [
+     1.0140980259335213,
+     1.2353437347479086
+    ],
+    "rho_cross_median": 0.007478749185341701,
+    "rho_cross_max": 0.0285873834968541,
+    "n_crossing_below_s_own_d": 7,
+    "median_r_obs": 0.026284470858053743,
+    "median_r_pred": 0.02702201553776985,
+    "median_chi": 0.00355060269836605,
+    "median_kappa": 7.610543288947747,
+    "winding_counts": {
+     "-1.0": 50
+    },
+    "median_abs_log_err_x1_only": 0.10709883368147533,
+    "median_abs_log_err_static_s_own_d": 0.02594495331135003,
+    "stricter_comparator_x1_plus_lag": {
+     "mean_D": -0.08663375695988616,
+     "ci95": [
+      -0.10678392549745647,
+      -0.06706980730455288
+     ],
+     "median_abs_log_err": 0.07894952765271562
+    },
+    "spearman_r_pred_r_obs": 0.5889555822328931,
+    "median_steps_tsw_to_crossing": 59.0,
+    "median_steps_rule_to_crossing": 1297.0,
+    "all_crossing_runs_floor_median_abs_log_err": 0.003261065599269758,
+    "mirror_matched_NOT_SCORED": {
+     "n_runs": 60,
+     "n_placed_at_init": 0,
+     "n_crossing": 57,
+     "n_rho_below": 57,
+     "frac_rho_below": 1.0,
+     "n_tsw_before_crossing": 56,
+     "n_scored": 56,
+     "frac_scored": 0.9824561403508771,
+     "n_crossing_unscored": 1,
+     "validity": {
+      "V1_min_crossings": true,
+      "V2_rho": true,
+      "V3_prediction_before_crossing": true
+     },
+     "valid": true,
+     "C1": {
+      "n": 56,
+      "median_abs_log_err": 0.0026639206976781446,
+      "threshold": 0.05,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 56,
+      "median_ratio": 0.9475411929125718,
+      "band": [
+       0.75,
+       1.25
+      ],
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 56,
+      "mean_D": -0.12719862179174712,
+      "ci95": [
+       -0.15026139618765985,
+       -0.10576925744545893
+      ],
+      "comparator": "x1-only own threshold",
+      "verdict": "PASS"
+     },
+     "outcome": "PASS"
+    },
+    "n_crossing_rule_mirror_is_global_mirror": 43,
+    "n_crossing_with_rule_mirror": 57
+   }
+  },
+  "d2_a1.50": {
+   "d": 2,
+   "a": 1.5,
+   "n_runs": 60,
+   "n_placed_at_init": 0,
+   "n_crossing": 57,
+   "n_rho_below": 57,
+   "frac_rho_below": 1.0,
+   "n_tsw_before_crossing": 53,
+   "n_scored": 53,
+   "frac_scored": 0.9298245614035088,
+   "n_crossing_unscored": 4,
+   "validity": {
+    "V1_min_crossings": true,
+    "V2_rho": true,
+    "V3_prediction_before_crossing": true
+   },
+   "valid": true,
+   "C1": {
+    "n": 53,
+    "median_abs_log_err": 0.007617341025541817,
+    "threshold": 0.05,
+    "verdict": "PASS"
+   },
+   "C2": {
+    "n": 53,
+    "median_ratio": 0.9403268887734108,
+    "band": [
+     0.75,
+     1.25
+    ],
+    "verdict": "PASS"
+   },
+   "C3": {
+    "n": 53,
+    "mean_D": -0.1392029521994235,
+    "ci95": [
+     -0.15822344891772772,
+     -0.12080585079954358
+    ],
+    "comparator": "x1-only own threshold",
+    "verdict": "PASS"
+   },
+   "outcome": "PASS",
+   "descriptive": {
+    "n_not_crossed": 3,
+    "status_counts": {
+     "ok": 57,
+     "s never reaches s_own,d": 3
+    },
+    "median_s_own_d_over_x1": 1.078005848424385,
+    "q10_q90_s_own_d_over_x1": [
+     1.0145451481060124,
+     1.2455829903439832
+    ],
+    "rho_cross_median": 0.00733107392362826,
+    "rho_cross_max": 0.028016566660970733,
+    "n_crossing_below_s_own_d": 4,
+    "median_r_obs": 0.05509109204497009,
+    "median_r_pred": 0.0566626828872581,
+    "median_chi": 0.0140044450933105,
+    "median_kappa": 4.046049844154416,
+    "winding_counts": {
+     "0.0": 53
+    },
+    "median_abs_log_err_x1_only": 0.13171865952233452,
+    "median_abs_log_err_static_s_own_d": 0.05362710637126058,
+    "stricter_comparator_x1_plus_lag": {
+     "mean_D": -0.08302487003430341,
+     "ci95": [
+      -0.10403171700078653,
+      -0.06306630169875835
+     ],
+     "median_abs_log_err": 0.08318748833267392
+    },
+    "spearman_r_pred_r_obs": 0.6739235607160136,
+    "median_steps_tsw_to_crossing": 63.0,
+    "median_steps_rule_to_crossing": 629.0,
+    "all_crossing_runs_floor_median_abs_log_err": 0.008164000989374387,
+    "mirror_matched_NOT_SCORED": {
+     "n_runs": 60,
+     "n_placed_at_init": 0,
+     "n_crossing": 57,
+     "n_rho_below": 57,
+     "frac_rho_below": 1.0,
+     "n_tsw_before_crossing": 57,
+     "n_scored": 57,
+     "frac_scored": 1.0,
+     "n_crossing_unscored": 0,
+     "validity": {
+      "V1_min_crossings": true,
+      "V2_rho": true,
+      "V3_prediction_before_crossing": true
+     },
+     "valid": true,
+     "C1": {
+      "n": 57,
+      "median_abs_log_err": 0.0067112623098943705,
+      "threshold": 0.05,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 57,
+      "median_ratio": 0.9224893548214953,
+      "band": [
+       0.75,
+       1.25
+      ],
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 57,
+      "mean_D": -0.1464439028472163,
+      "ci95": [
+       -0.16864156599168473,
+       -0.1252975378947688
+      ],
+      "comparator": "x1-only own threshold",
+      "verdict": "PASS"
+     },
+     "outcome": "PASS"
+    },
+    "n_crossing_rule_mirror_is_global_mirror": 42,
+    "n_crossing_with_rule_mirror": 57
+   }
+  },
+  "d4_a1.30": {
+   "d": 4,
+   "a": 1.3,
+   "n_runs": 60,
+   "n_placed_at_init": 0,
+   "n_crossing": 51,
+   "n_rho_below": 51,
+   "frac_rho_below": 1.0,
+   "n_tsw_before_crossing": 41,
+   "n_scored": 41,
+   "frac_scored": 0.803921568627451,
+   "n_crossing_unscored": 10,
+   "validity": {
+    "V1_min_crossings": true,
+    "V2_rho": true,
+    "V3_prediction_before_crossing": false
+   },
+   "valid": false,
+   "C1": {
+    "n": 41,
+    "median_abs_log_err": 0.006756472956482322,
+    "threshold": 0.05,
+    "verdict": "UNRESOLVED"
+   },
+   "C2": {
+    "n": 41,
+    "median_ratio": 1.0097890169024613,
+    "band": [
+     0.75,
+     1.25
+    ],
+    "verdict": "UNRESOLVED"
+   },
+   "C3": {
+    "n": 41,
+    "mean_D": -0.35060890924200144,
+    "ci95": [
+     -0.3937166031862768,
+     -0.3095711950399577
+    ],
+    "comparator": "x1-only own threshold",
+    "verdict": "UNRESOLVED"
+   },
+   "outcome": "UNRESOLVED",
+   "descriptive": {
+    "n_not_crossed": 9,
+    "status_counts": {
+     "ok": 51,
+     "s never reaches s_own,d": 9
+    },
+    "median_s_own_d_over_x1": 1.3593624237097688,
+    "q10_q90_s_own_d_over_x1": [
+     1.2320133845785022,
+     1.7233695060800682
+    ],
+    "rho_cross_median": 0.01940822382419463,
+    "rho_cross_max": 0.044903941764107606,
+    "n_crossing_below_s_own_d": 10,
+    "median_r_obs": 0.019449927752998475,
+    "median_r_pred": 0.0181027677818067,
+    "median_chi": 0.0023786432971343,
+    "median_kappa": 7.610543288947747,
+    "winding_counts": {
+     "-1.0": 41
+    },
+    "median_abs_log_err_x1_only": 0.32927694167796145,
+    "median_abs_log_err_static_s_own_d": 0.019263195312236643,
+    "stricter_comparator_x1_plus_lag": {
+     "mean_D": -0.3324402209200658,
+     "ci95": [
+      -0.3763389639005962,
+      -0.2904685979919633
+     ],
+     "median_abs_log_err": 0.30902049675297727
+    },
+    "spearman_r_pred_r_obs": 0.3141114982578398,
+    "median_steps_tsw_to_crossing": 54.0,
+    "median_steps_rule_to_crossing": 1613.0,
+    "all_crossing_runs_floor_median_abs_log_err": 0.007499846800967779,
+    "mirror_matched_NOT_SCORED": {
+     "n_runs": 60,
+     "n_placed_at_init": 0,
+     "n_crossing": 51,
+     "n_rho_below": 51,
+     "frac_rho_below": 1.0,
+     "n_tsw_before_crossing": 42,
+     "n_scored": 42,
+     "frac_scored": 0.8235294117647058,
+     "n_crossing_unscored": 9,
+     "validity": {
+      "V1_min_crossings": true,
+      "V2_rho": true,
+      "V3_prediction_before_crossing": false
+     },
+     "valid": false,
+     "C1": {
+      "n": 42,
+      "median_abs_log_err": 0.004879857836551771,
+      "threshold": 0.05,
+      "verdict": "UNRESOLVED"
+     },
+     "C2": {
+      "n": 42,
+      "median_ratio": 0.979528946347964,
+      "band": [
+       0.75,
+       1.25
+      ],
+      "verdict": "UNRESOLVED"
+     },
+     "C3": {
+      "n": 42,
+      "mean_D": -0.3407140882731704,
+      "ci95": [
+       -0.3852181214743174,
+       -0.29794811886923056
+      ],
+      "comparator": "x1-only own threshold",
+      "verdict": "UNRESOLVED"
+     },
+     "outcome": "UNRESOLVED"
+    },
+    "n_crossing_rule_mirror_is_global_mirror": 41,
+    "n_crossing_with_rule_mirror": 51
+   }
+  },
+  "d4_a1.50": {
+   "d": 4,
+   "a": 1.5,
+   "n_runs": 60,
+   "n_placed_at_init": 0,
+   "n_crossing": 53,
+   "n_rho_below": 53,
+   "frac_rho_below": 1.0,
+   "n_tsw_before_crossing": 48,
+   "n_scored": 48,
+   "frac_scored": 0.9056603773584906,
+   "n_crossing_unscored": 5,
+   "validity": {
+    "V1_min_crossings": true,
+    "V2_rho": true,
+    "V3_prediction_before_crossing": true
+   },
+   "valid": true,
+   "C1": {
+    "n": 48,
+    "median_abs_log_err": 0.009115178689109469,
+    "threshold": 0.05,
+    "verdict": "PASS"
+   },
+   "C2": {
+    "n": 48,
+    "median_ratio": 1.071251969782333,
+    "band": [
+     0.75,
+     1.25
+    ],
+    "verdict": "PASS"
+   },
+   "C3": {
+    "n": 48,
+    "mean_D": -0.3661105027716296,
+    "ci95": [
+     -0.4032116712400005,
+     -0.33216833428086256
+    ],
+    "comparator": "x1-only own threshold",
+    "verdict": "PASS"
+   },
+   "outcome": "PASS",
+   "descriptive": {
+    "n_not_crossed": 7,
+    "status_counts": {
+     "ok": 54,
+     "s never reaches s_own,d": 6
+    },
+    "median_s_own_d_over_x1": 1.354720133667502,
+    "q10_q90_s_own_d_over_x1": [
+     1.2167802234249674,
+     1.7248994370442279
+    ],
+    "rho_cross_median": 0.019299370707368216,
+    "rho_cross_max": 0.04485386496697804,
+    "n_crossing_below_s_own_d": 5,
+    "median_r_obs": 0.04199948637547701,
+    "median_r_pred": 0.03799061324273825,
+    "median_chi": 0.009389556408363451,
+    "median_kappa": 4.046049844154416,
+    "winding_counts": {
+     "0.0": 48
+    },
+    "median_abs_log_err_x1_only": 0.3648019731434672,
+    "median_abs_log_err_static_s_own_d": 0.041141413527218285,
+    "stricter_comparator_x1_plus_lag": {
+     "mean_D": -0.32830182607134883,
+     "ci95": [
+      -0.3672848043254614,
+      -0.29236540462052785
+     ],
+     "median_abs_log_err": 0.32157519051979316
+    },
+    "spearman_r_pred_r_obs": 0.512917933130699,
+    "median_steps_tsw_to_crossing": 60.5,
+    "median_steps_rule_to_crossing": 846.0,
+    "all_crossing_runs_floor_median_abs_log_err": 0.011219635994275395,
+    "mirror_matched_NOT_SCORED": {
+     "n_runs": 60,
+     "n_placed_at_init": 0,
+     "n_crossing": 53,
+     "n_rho_below": 53,
+     "frac_rho_below": 1.0,
+     "n_tsw_before_crossing": 52,
+     "n_scored": 52,
+     "frac_scored": 0.9811320754716981,
+     "n_crossing_unscored": 1,
+     "validity": {
+      "V1_min_crossings": true,
+      "V2_rho": true,
+      "V3_prediction_before_crossing": true
+     },
+     "valid": true,
+     "C1": {
+      "n": 52,
+      "median_abs_log_err": 0.007581652612350359,
+      "threshold": 0.05,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 52,
+      "median_ratio": 1.064072926728664,
+      "band": [
+       0.75,
+       1.25
+      ],
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 52,
+      "mean_D": -0.3606900292768462,
+      "ci95": [
+       -0.39941573209956444,
+       -0.3234460780661428
+      ],
+      "comparator": "x1-only own threshold",
+      "verdict": "PASS"
+     },
+     "outcome": "PASS"
+    },
+    "n_crossing_rule_mirror_is_global_mirror": 43,
+    "n_crossing_with_rule_mirror": 53
+   }
+  }
+ },
+ "predictions_sha256": "27c0b676c80638a239a77df28e67bd744184d79b4611218995df3d1bb8e6ad6a",
+ "registration_sha256_file_sha256": "b9dad3f68d00efaf86f1f49d422ec17fbac4f31fe2ecdf35b17ffc0587500441"
+}
