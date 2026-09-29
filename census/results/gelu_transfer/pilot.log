@@ -1,0 +1,50 @@
+{"arm": "random", "seed": 876900, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5338, "chi_tsw": 0.02272143494063051, "kc_tsw": 0.0027138422294049522, "chi_path_max": 0.1629852466826362}
+{"arm": "random", "seed": 876901, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 3979, "chi_tsw": 0.028211636088237544, "kc_tsw": 0.002498401698360093, "chi_path_max": 0.17730158231418156}
+{"arm": "random", "seed": 876902, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5821, "chi_tsw": 0.02261079711138971, "kc_tsw": 0.002507381565713971, "chi_path_max": 0.2738969756509928}
+{"arm": "random", "seed": 876903, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5913, "chi_tsw": 0.020350960626050362, "kc_tsw": 0.004128617872738626, "chi_path_max": 0.1479603382420571}
+{"arm": "random", "seed": 876904, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 1, "t_sw": 5792, "chi_tsw": 0.023194002040081922, "kc_tsw": 0.0026906490406463685, "chi_path_max": 0.24573032232120892}
+{"arm": "random", "seed": 876905, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 4751, "chi_tsw": 0.026335927251763095, "kc_tsw": 0.002511634174537823, "chi_path_max": 0.24892388663468126}
+{"arm": "random", "seed": 876906, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 7792, "chi_tsw": 0.017179012956481617, "kc_tsw": 0.003259795977916923, "chi_path_max": 0.13456132034282023}
+{"arm": "random", "seed": 876907, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 6156, "chi_tsw": 0.022205681401006195, "kc_tsw": 0.00237961829999954, "chi_path_max": 0.23586385662349676}
+{"arm": "random", "seed": 876908, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 6918, "chi_tsw": 0.019820990957424598, "kc_tsw": 0.003086829775228623, "chi_path_max": 0.19708473716843136}
+{"arm": "random", "seed": 876909, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 7611, "chi_tsw": 0.017506758170164834, "kc_tsw": 0.003384640508400954, "chi_path_max": 0.14942347954646376}
+{"arm": "branch", "seed": 876900, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5291, "chi_tsw": 0.02515375233827828, "kc_tsw": 0.0014610076022476724, "chi_path_max": 0.3128549284025866}
+{"arm": "branch", "seed": 876901, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 6605, "chi_tsw": 0.020225468450063216, "kc_tsw": 0.0030504506328732977, "chi_path_max": 0.20059917792899226}
+{"arm": "branch", "seed": 876902, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5821, "chi_tsw": 0.02261079711138971, "kc_tsw": 0.002507381565713971, "chi_path_max": 0.2738969756509928}
+{"arm": "branch", "seed": 876903, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5913, "chi_tsw": 0.020350960626050362, "kc_tsw": 0.004128617872738626, "chi_path_max": 0.1479603382420571}
+{"arm": "branch", "seed": 876904, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 7898, "chi_tsw": 0.016503696834401706, "kc_tsw": 0.0036967828700524234, "chi_path_max": 0.13733561565746194}
+{"arm": "branch", "seed": 876905, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 4751, "chi_tsw": 0.026335927251763095, "kc_tsw": 0.002511634174537823, "chi_path_max": 0.24892388663468126}
+{"arm": "branch", "seed": 876906, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 7792, "chi_tsw": 0.017179012956481617, "kc_tsw": 0.003259795977916923, "chi_path_max": 0.13456132034282023}
+{"arm": "branch", "seed": 876907, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5130, "chi_tsw": 0.02338713079853684, "kc_tsw": 0.002936017900376918, "chi_path_max": 0.20569684983071088}
+{"arm": "branch", "seed": 876908, "copy_at_release": 1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 4929, "chi_tsw": 0.02354069251659899, "kc_tsw": 0.0036129133567616364, "chi_path_max": 0.16343252953959622}
+{"arm": "branch", "seed": 876909, "copy_at_release": -1, "on_branch": true, "hold_n_G_pos": 0, "t_sw": 5373, "chi_tsw": 0.02362755411162546, "kc_tsw": 0.00307594507577349, "chi_path_max": 0.22409459104082283}
+{
+ "rule": {
+  "status": "ok",
+  "rho": 1.0,
+  "history": [
+   {
+    "rho": 1.0,
+    "n": 20,
+    "q90_abs_kc": 0.003739966370321044
+   }
+  ]
+ },
+ "rho": 1.0,
+ "pilot_median_chi_tsw": {
+  "random": 0.02240823925619795,
+  "branch": 0.022998963954963272
+ },
+ "pilot_seeds": [
+  876900,
+  876901,
+  876902,
+  876903,
+  876904,
+  876905,
+  876906,
+  876907,
+  876908,
+  876909
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "act": "gelu",
+ "s_pop": 6.645633097157587,
+ "s_glob": 6.641491558765203,
+ "s0": 3.3228165485787935,
+ "kappa_json_sha256": "9a4848d27bbfb10e1ecf031f01abe8fec5973d75d4dd974f15e81ee3ac1db779",
+ "z_pop_s0": [
+  1.5592072541218935,
+  -1.0798665148397941,
+  -0.43390400755352543
+ ],
+ "grad_s0": 5.941427905220564e-17,
+ "lam_min_s0": 0.035149128904761205,
+ "tangent_s0": [
+  -0.2888900383434918,
+  0.13126170854319882,
+  0.09710478139400988
+ ],
+ "G_s0": -0.09956500523133363,
+ "dLds_s0": -0.022551718919758323,
+ "z_pop_s0_halved": [
+  1.5592072541217863,
+  -1.0798665148396993,
+  -0.4339040075535034
+ ],
+ "z_pop_s0_direct_newton": [
+  1.559207254121895,
+  -1.0798665148397955,
+  -0.4339040075535258
+ ],
+ "continuation_end": "s_stop",
+ "continuation_n_path": 71,
+ "min_lam_path": 0.03450260719761227,
+ "min_lam_path_halved": 0.03512844678730109,
+ "checks": {
+  "continuation_reached_s0": true,
+  "no_turning_point": true,
+  "no_branch_point": true,
+  "lam_min_positive_on_path": true,
+  "newton_accepted": true,
+  "halving_agrees_1e-6": true,
+  "direct_newton_agrees_1e-6": true,
+  "unplaced_at_s0": true,
+  "dLds_negative_at_s0": true,
+  "z_star_reproduced_1e-8": true
+ },
+ "validated": true
+}
