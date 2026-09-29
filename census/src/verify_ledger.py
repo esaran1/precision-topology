@@ -591,6 +591,7 @@ def main() -> None:
     final_checks_numbers()
     discussion_phase_checks()
     track4_certificate_checks()
+    gelu_transfer_checks()
 
     provenance_check()
 
@@ -867,6 +868,12 @@ PRODUCERS = {
     # registered test 2A (Adam per-run ordering at a = 1.85)
     "track2a/scores.json": ("track2a", "observe", "full", ""),
     "track2a/observed_runs.csv": ("track2a", "observe", "full", ""),
+    "gelu_transfer/scores.json": ("gelu_transfer", "observe", "full", ""),
+    "gelu_transfer/observed_parts.jsonl": ("gelu_transfer", "observe", "full", ""),
+    "gelu_transfer/predictions.csv": ("gelu_transfer", "finalize", "full", ""),
+    "gelu_transfer/pilot.json": ("gelu_transfer", "pilot", "full", ""),
+    "gelu_transfer/frozen_seeds.json": ("gelu_transfer", "freeze", "full", ""),
+    "gelu_transfer/landscape.json": ("gelu_transfer", "landscape", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -2290,6 +2297,126 @@ def track2b_checks() -> None:
         chk(f"2B posthoc {key} violating step fraction", c["frac_realised_steps_violating"], fr, 0.0006)
         chk(f"2B posthoc {key} violations before switch", float(c["n_viol_before_switch"]), 0.0, 0)
     chk("2B posthoc violating runs", float(sum(c["n_violated"] for c in P["cells"])), 157.0, 0)
+
+
+def gelu_transfer_checks() -> None:
+    """Registered test GELU-T (lag law at GELU under free SGD; registration 736b6bf): results/gelu_transfer_writer_inputs.md."""
+    import hashlib as _h
+    print("GELU-T (registered, GELU, free SGD, two arms)")
+    D = R / "gelu_transfer"
+    chk("GT predictions hash", float(_h.sha256((D / "predictions.csv").read_bytes()).hexdigest()
+                                     == "218309c59fae3d921deb0e5ef42736705029051eef9edb6dd8f63ae70ff74044"), 1.0, 0)
+    L = json.loads((D / "landscape.json").read_text())
+    chk("GT landscape validated", float(L["validated"]), 1.0, 0)
+    chk("GT s0", L["s0"], 3.322817, 6e-7)
+    chk("GT s_glob", L["s_glob"], 6.641492, 6e-7)
+    # frozen inputs and the kappa-sign check (registration section 10a)
+    Z = json.loads((D / "frozen_seeds.json").read_text())
+    cps = [r["copies"][c] for r in Z for c in ("1", "-1")]
+    chk("GT frozen copies valid", float(sum(c["valid"] for c in cps)), 180.0, 0)
+    chk("GT follow points valid", float(sum(bool(fp and fp["valid"]) for c in cps for fp in c["follow_points"].values())),
+        360.0, 0)
+    ks = np.array([c["kappa"] for c in cps]); km = np.array([c["kappa_mirror_recomputed"]["kappa"] for c in cps])
+    chk("GT kappa mirror recomputation max |diff|", float(np.abs(ks - km).max()), 0.0, 0)
+    chk("GT kappa transforms max |diff|", float(max(abs(c["kappa_transforms"][k] - c["kappa"]) for c in cps
+                                                for k in ("mirror_coords", "G_sign", "s_direction"))), 0.0, 0)
+    chk("GT negative kappa copies", float((ks < 0).sum()), 13.0, 0)
+    chk("GT negative kappa target copies", float(sum(r["copies"]["1"]["kappa"] < 0 for r in Z)), 4.0, 0)
+    chk("GT negative kappa mirror copies", float(sum(r["copies"]["-1"]["kappa"] < 0 for r in Z)), 9.0, 0)
+    chk("GT most negative kappa", float(ks.min()), -0.168, 0.0006)
+    chk("GT least negative kappa", float(ks[ks < 0].max()), -0.004, 0.0006)
+    # pilot (V7 window chosen after it; follow-check tolerance fixed after it)
+    P = json.loads((D / "pilot.json").read_text())
+    chk("GT rho", P["rho"], 1.0, 0)
+    chk("GT pilot q90 kappa chi", P["rule"]["history"][0]["q90_kc"], 0.0037, 0.00006)
+    chk("GT pilot median chi random", P["pilot_median_chi_tsw"]["random"], 0.0224, 0.00006)
+    chk("GT pilot median chi branch", P["pilot_median_chi_tsw"]["branch"], 0.0230, 0.00006)
+    pr = P["runs"]["1.0"]
+    w = np.array([r["chi_window_max"] for r in pr]); a_ = np.array([r["chi_path_max_all"] for r in pr])
+    chk("GT pilot window q90", float(np.percentile(w, 90)), 0.046, 0.0006)
+    chk("GT pilot window median", float(np.median(w)), 0.036, 0.0006)
+    chk("GT pilot whole-path q90", float(np.percentile(a_, 90)), 0.274, 0.0006)
+    chk("GT pilot whole-path median", float(np.median(a_)), 0.199, 0.0006)
+    fd = [r[f"follow_state_dist_copy{r['copy_at_release']:+d}"] for r in pr]
+    chk("GT pilot follow state distance min", float(min(fd)), 0.012, 0.0006)
+    chk("GT pilot follow state distance max", float(max(fd)), 0.028, 0.0006)
+    chk("GT pilot runs following", float(sum(r["follows_branch"] for r in pr)), 20.0, 0)
+    # registered scores
+    S = json.loads((D / "scores.json").read_text())
+    chk("GT headline PASS", float(S["headline"]["outcome"] == "PASS" and S["headline"]["arm"] == "random"), 1.0, 0)
+    exp = {"random": dict(gate=80, holdpos=6, scored=80, kneg=8, v2=0.931, lag=40.6, kc=0.0039, chi=0.0222, v7=0.060,
+                          l1=1.000, l2=0.977, l3=0.999, l4=(-0.104, -0.121, -0.088), l5=(-0.0031, -0.0036, -0.0026)),
+           "branch": dict(gate=80, holdpos=0, scored=80, kneg=2, v2=0.936, lag=42.6, kc=0.0038, chi=0.0208, v7=0.053,
+                          l1=1.000, l2=0.985, l3=0.999, l4=(-0.103, -0.119, -0.087), l5=(-0.0026, -0.0029, -0.0023))}
+    for arm, e in exp.items():
+        x = S["arms"][arm]
+        chk(f"GT {arm} gate pass", float(x["gate"]["pass"]), 1.0, 0)
+        chk(f"GT {arm} on-branch at release", float(x["gate"]["n_on_branch"]), float(e["gate"]), 0)
+        chk(f"GT {arm} G>0 in hold", float(x["gate"]["n_hold_G_positive"]), float(e["holdpos"]), 0)
+        chk(f"GT {arm} neither/off target", float(x["n_neither_or_off_target"]), 0.0, 0)
+        chk(f"GT {arm} crossed", float(x["n_crossed"]), 80.0, 0)
+        chk(f"GT {arm} not following", float(x["n_on_branch_not_following"]), 0.0, 0)
+        chk(f"GT {arm} scored", float(x["n_scored"]), float(e["scored"]), 0)
+        chk(f"GT {arm} kappa<0 scored", float(x["n_kappa_nonpos_scored"]), float(e["kneg"]), 0)
+        chk(f"GT {arm} valid (all V1-V7)", float(x["valid"] and all(x["validity"].values())), 1.0, 0)
+        chk(f"GT {arm} V2 fraction", x["frac_tsw_before_crossing_kappa_pos"], e["v2"], 0.0006)
+        chk(f"GT {arm} V4 median lag steps", x["median_predicted_lag_steps"], e["lag"], 0.06)
+        chk(f"GT {arm} V5 q90 kappa chi", x["q90_kappa_chi_tsw"], e["kc"], 0.00006)
+        chk(f"GT {arm} V6 median chi", x["median_chi_tsw"], e["chi"], 0.00006)
+        chk(f"GT {arm} V7 q90 window", x["q90_max_chi_window"], e["v7"], 0.0006)
+        chk(f"GT {arm} L1 ratio", x["L1"]["median_ratio"], e["l1"], 0.0006)
+        chk(f"GT {arm} L2 ratio", x["L2"]["median_ratio"], e["l2"], 0.0006)
+        chk(f"GT {arm} L3 spearman", x["L3"]["spearman"], e["l3"], 0.0006)
+        for k in ("l4", "l5"):
+            m, lo, hi = e[k]; K = k.upper(); tol = 0.0006 if k == "l4" else 0.00006
+            chk(f"GT {arm} {K} mean D", x[K]["mean_D"], m, tol)
+            chk(f"GT {arm} {K} ci lo", x[K]["ci95"][0], lo, tol)
+            chk(f"GT {arm} {K} ci hi", x[K]["ci95"][1], hi, tol)
+        for k in ("L1", "L2", "L3", "L4", "L5"):
+            chk(f"GT {arm} {k} PASS", float(x[k]["verdict"] == "PASS"), 1.0, 0)
+        chk(f"GT {arm} outcome PASS", float(x["outcome"] == "PASS"), 1.0, 0)
+    X = S["arms"]["random"]["sensitivity_excluding_hold_G_positive_DESCRIPTIVE"]
+    chk("GT sensitivity scored", float(X["n_scored"]), 74.0, 0)
+    chk("GT sensitivity outcome PASS", float(X["outcome"] == "PASS"), 1.0, 0)
+    chk("GT sensitivity L1", X["L1"]["median_ratio"], 1.000, 0.0006)
+    chk("GT sensitivity L2", X["L2"]["median_ratio"], 0.977, 0.0006)
+    chk("GT sensitivity L3", X["L3"]["spearman"], 0.999, 0.0006)
+    chk("GT sensitivity L4 mean D", X["L4"]["mean_D"], -0.100, 0.0006)
+    chk("GT sensitivity L4 ci", X["L4"]["ci95"][0], -0.118, 0.0006); chk("GT sensitivity L4 ci hi", X["L4"]["ci95"][1], -0.083, 0.0006)
+    chk("GT sensitivity L5 mean D", X["L5"]["mean_D"], -0.0032, 0.00006)
+    chk("GT sensitivity L5 ci", X["L5"]["ci95"][0], -0.0037, 0.00006); chk("GT sensitivity L5 ci hi", X["L5"]["ci95"][1], -0.0027, 0.00006)
+    chk("GT random placed at init", float(S["arms"]["random"]["descriptive"]["n_init_placed"]), 2.0, 0)
+    chk("GT random target copies", float(S["arms"]["random"]["descriptive"]["n_copy_plus"]), 38.0, 0)
+    chk("GT random mirror copies", float(S["arms"]["random"]["descriptive"]["n_copy_minus"]), 42.0, 0)
+    for arm, (rm, st) in {"random": (0.00275, 39.0), "branch": (0.00290, 41.5)}.items():
+        x = S["arms"][arm]["descriptive"]
+        chk(f"GT {arm} median r_obs", x["median_r_obs_scored"], rm, 0.000006)
+        chk(f"GT {arm} median steps t_sw to crossing", x["median_steps_tsw_to_crossing_scored"], st, 0)
+        chk(f"GT {arm} follow check at/after crossing", float(x["n_follow_check_at_or_after_crossing"]), 0.0, 0)
+    # per-run facts from the committed predictions and the observed crossings (descriptive)
+    pr_ = pd.read_csv(D / "predictions.csv")
+    ob = pd.DataFrame([json.loads(l) for l in (D / "observed_parts.jsonl").read_text().splitlines()])
+    m = pr_.merge(ob, on=["arm", "seed"])
+    chk("GT distinct path hashes", float(pr_.path_sha256.nunique()), 152.0, 0)
+    for arm, (eq, le1, le3, dmin, kn) in {"random": (36, 60, 68, -191, 8), "branch": (42, 65, 75, -19, 2)}.items():
+        g = m[m.arm == arm]
+        dd = g.step_obs - g.t_traj
+        chk(f"GT {arm} predicted step = observed", float((dd == 0).sum()), float(eq), 0)
+        chk(f"GT {arm} within 1 step", float((dd.abs() <= 1).sum()), float(le1), 0)
+        chk(f"GT {arm} within 3 steps", float((dd.abs() <= 3).sum()), float(le3), 0)
+        chk(f"GT {arm} observed never after predicted", float(dd.max()), 0.0, 0)
+        chk(f"GT {arm} most negative step difference", float(dd.min()), float(dmin), 0)
+        n = g[g.kappa < 0]
+        r_obs = n.s_obs / n.s_switch - 1
+        chk(f"GT {arm} kappa<0 runs", float(len(n)), float(kn), 0)
+        chk(f"GT {arm} kappa<0 crossed before switch", float((r_obs < 0).sum()), float(kn), 0)
+        chk(f"GT {arm} kappa<0 crossed before t_sw", float((n.step_obs <= n.t_sw).sum()), float(kn), 0)
+        chk(f"GT {arm} kappa<0 predicted early (r_traj<0)", float((n.r_traj < 0).sum()), float(kn), 0)
+        chk(f"GT {arm} kappa<0 |r_obs| > |r_traj| (POST HOC reading)", float((r_obs / n.r_traj > 1).sum()), float(kn), 0)
+        chk(f"GT {arm} V3 regime fraction", S["arms"][arm]["regime_frac"], 1.0, 0)
+        kp = g[g.kappa > 0]
+        chk(f"GT {arm} V2 count", float((kp.t_sw < kp.step_obs).sum()), 67.0 if arm == "random" else 73.0, 0)
+        chk(f"GT {arm} kappa>0 runs", float(len(kp)), 72.0 if arm == "random" else 78.0, 0)
 
 
 def track_t_v2_checks() -> None:
