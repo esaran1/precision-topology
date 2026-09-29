@@ -1,0 +1,4 @@
+GELU-T registration
+registration commit: 736b6bfad0f57390bc1644dfad57bb922a8b81aa
+sha256 results/gelu_transfer_registration.md: 1c42ef5fcaf6044fc7c87789a4a02ef86e7730ba97b2834f2491834135070cfb
+sha256 results/gelu_transfer/registration.sha256: eb80066918dda23de3f5b87bda1db3aac33e855ce9a60ae624c0c4fc713be7d1
