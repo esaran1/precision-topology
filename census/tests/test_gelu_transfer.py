@@ -423,3 +423,23 @@ def test_L3_with_all_predictions_tied_is_unresolved():
         s = X.score_arm(**c)
     assert s["valid"] and s["L3"]["verdict"] == "UNRESOLVED" and s["outcome"] == "UNRESOLVED"
     assert s["L1"]["verdict"] == "PASS"
+
+
+def test_newton_at_rejects_a_singular_hessian_without_raising(monkeypatch):
+    from src import act_general
+    P = X.own_problem(876_950)                                               # a seed outside every registered range
+    monkeypatch.setattr(act_general, "branch_point", lambda z0, s, x, y, act: (np.asarray(z0, float), 0.0))
+    monkeypatch.setattr(X, "hessian_z", lambda z, s, P: np.zeros((3, 3)))    # singular H at the Newton point
+    z, g, lam, ok = X.newton_at([0.0, -1.0, 0.1], 3.3, P)
+    assert not ok and lam == 0.0
+    monkeypatch.setattr(X, "hessian_z", lambda z, s, P: np.full((3, 3), np.nan))
+    assert not X.newton_at([0.0, -1.0, 0.1], 3.3, P)[3]
+    assert X.classify_release([0.0, -1.0, 0.1], z, ok, COP) == 0             # counted as on neither copy
+
+
+def test_hessian_z_matches_act_general():
+    from src.act_general import hessian_and_tangent
+    P = X.own_problem(876_950)
+    z = np.array([1.3, -1.0, -0.3])
+    H, _ = hessian_and_tangent(z, 3.3, P.x, P.y, P.act)
+    assert np.allclose(X.hessian_z(z, 3.3, P), H, rtol=1e-12, atol=1e-14)

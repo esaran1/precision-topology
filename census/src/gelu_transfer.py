@@ -391,13 +391,21 @@ def own_problem(seed):
     return Problem(ACT, int(seed), 1.0)
 
 
+def hessian_z(z, s, P):
+    """Hessian of the loss in z = (w₁, b₁, b₂) at w₂ = +s (no solve, so a singular H is returned, not raised)."""
+    import torch
+    q = torch.tensor(np.r_[np.asarray(z, float), s], dtype=torch.float64)
+    return torch.autograd.functional.hessian(P._L, q).numpy()[:3, :3]
+
+
 def newton_at(z0, s, P):
-    """Damped Newton (act_general.branch_point) at w₂ = +s; returns (z, max|∇|, λ_min(H), accepted)."""
-    from .act_general import branch_point, hessian_and_tangent
+    """Damped Newton (act_general.branch_point) at w₂ = +s; returns (z, max|∇|, λ_min(H), accepted).  Accepted iff
+    max|∇| < 1e−8 and H positive definite; a singular or non-finite H is not accepted."""
+    from .act_general import branch_point
     z, g = branch_point(np.asarray(z0, float), s, P.x, P.y, P.act)
-    H, _ = hessian_and_tangent(z, s, P.x, P.y, P.act)
-    lam = float(np.linalg.eigvalsh(H).min())
-    return z, float(g), lam, bool(g < NEWTON_GTOL and lam > 0)
+    H = hessian_z(z, s, P)
+    lam = float(np.linalg.eigvalsh(0.5 * (H + H.T)).min()) if np.all(np.isfinite(H)) else float("nan")
+    return z, float(g), lam, bool(np.isfinite(g) and g < NEWTON_GTOL and np.isfinite(lam) and lam > 0)
 
 
 def dLds(z, s, P):

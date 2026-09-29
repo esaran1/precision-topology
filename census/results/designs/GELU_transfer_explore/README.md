@@ -11,3 +11,4 @@ the design is approved. Run each with `nice -n 15 .venv/bin/python <script>` fro
 - `gelu_explore_d.py`: own-sample landscape (seeds 850,000–850,011): both copies' switches, own κ_SGD, vs act_fold.
 - `gelu_explore_e.py`: random hidden start at fixed s₀ (population): branch reached (54/60 target or mirror).
 - `gelu_explore_f.py` (added after approval, before registration): placed fraction of random (w₁, b₁) at w₂ = +s₀; G during the hold for 150 random hidden starts; population t_sw at η = 0.03.
+- `gelu_explore_g.py` (coordinator request, before registration; population and pilot seeds only): gate options on 600 population random starts with the registered start rule and hold (categories a-e, Clopper-Pearson interval, P(>= 64/80)); V7 windows on the 20 pilot runs. Writes `gelu_explore_g.json` (and `.log`).
