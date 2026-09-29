@@ -379,7 +379,7 @@ def run(acts=ACTS):
         c, s_glob = runs(name)
         for frac, tag in ((PRE, "pre95"), (PRE_SENS, "pre85")):
             f = OUT / f"runs_{name}_{tag}.csv"
-            done = set() if not f.exists() else set(pd.read_csv(f).seed)
+            done = set() if not f.exists() else set(read_rows(f).seed)
             for r in c[c.non_early].itertuples():
                 if int(r.seed) in done:
                     continue
@@ -388,9 +388,47 @@ def run(acts=ACTS):
                     raise SystemExit(f"STOP (memory watchdog): free {fp}%, swap free {sw} MB")
                 row = analyse_run(name, int(r.seed), int(r.step), float(r.s_cross), s_glob, frac=frac,
                                   validate=(tag == "pre95"))
-                pd.DataFrame([row]).to_csv(f, mode="a", header=not f.exists(), index=False)
+                cols = list(read_rows(f).columns) if f.exists() else list(row)
+                extra = [k for k in row if k not in cols]
+                if extra:                                      # keep one fixed column set per file
+                    raise SystemExit(f"new fields {extra} not in {f.name}; rewrite the file with fixed columns first")
+                pd.DataFrame([row]).reindex(columns=cols).to_csv(f, mode="a", header=not f.exists(), index=False)
                 print(json.dumps({k: row.get(k) for k in ("act", "seed", "reproduced", "G_pre", "fold_s", "switch_s",
                                                           "s_cross", "end_up", "halving_ok")}, default=float), flush=True)
+
+
+DOWN_KEYS = ["end_down", "lower_fold_s"]
+
+
+def read_rows(f):
+    """runs_*.csv were appended row by row with the header of the first row; a row whose branch was placed at s_pre
+    carries two extra fields (DOWN_KEYS) inserted after 'n_path_up'.  Parsed by field count (a writer fixed in the
+    same commit would avoid this; the files were written before it)."""
+    import csv
+    import pandas as pd
+    with open(f) as fh:
+        r = csv.reader(fh); hdr = next(r)
+        if "end_down" in hdr:
+            return pd.read_csv(f)
+        k = hdr.index("n_path_up") + 1
+        hdr_b = hdr[:k] + DOWN_KEYS + hdr[k:]
+        rows = []
+        for line in r:
+            if len(line) == len(hdr):
+                rows.append(dict(zip(hdr, line)))
+            elif len(line) == len(hdr_b):
+                rows.append(dict(zip(hdr_b, line)))
+            else:
+                raise ValueError(f"unexpected field count {len(line)}")
+    d = pd.DataFrame(rows).replace("", np.nan)
+    for c in d.columns:
+        if c in ("act", "note", "end_up", "end_down", "switch_dir", "z_pre"):
+            continue
+        if c in ("reproduced", "halving_ok", "lam_path_ok", "fold_before_switch", "switch_to_placed", "fold_check_ok"):
+            d[c] = d[c].map({"True": True, "False": False})
+            continue
+        d[c] = pd.to_numeric(d[c])
+    return d
 
 
 def summarise():
@@ -401,14 +439,15 @@ def summarise():
         if not f.exists():
             continue
         c, s_glob = runs(name)
-        d = pd.read_csv(f)
+        d = read_rows(f)
+        c = c[c.act == name] if "act" in c else c
         ok = d[d.reproduced & d.note.isna()] if "note" in d else d[d.reproduced]
         rf = ok.s_cross / ok.fold_s; rs = ok.s_cross / ok.switch_s
         within = lambda r: float((np.abs(r[np.isfinite(r)] - 1) <= MATCH).mean()) if np.isfinite(r).any() else float("nan")
         sens = OUT / f"runs_{name}_pre85.csv"
         agree = float("nan")
         if sens.exists():
-            m = d.merge(pd.read_csv(sens), on="seed", suffixes=("", "_85"))
+            m = d.merge(read_rows(sens), on="seed", suffixes=("", "_85"))
             same = lambda a, b: np.where(np.isnan(a) & np.isnan(b), True, np.abs(a - b) <= 1e-6 * np.abs(a))
             agree = float(np.mean(same(m.switch_s.values, m.switch_s_85.values) & same(m.fold_s.values, m.fold_s_85.values)))
         a = {"crossing_runs": int(len(c)), "non_early": int(c.non_early.sum()), "early": int((~c.non_early).sum()),

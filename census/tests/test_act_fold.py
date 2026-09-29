@@ -102,3 +102,16 @@ def test_pre_state():
     k, th = af.pre_state(traj, 10, 11.0, 0.95)                    # last step < 10 with s <= 10.45
     assert k == 9 and th[2] == 10.0
     assert af.pre_state(traj, 10, 0.5, 0.95) is None
+
+
+def test_read_rows_by_field_count(tmp_path):
+    import pandas as pd
+    a = {"act": "silu", "seed": 1, "reproduced": True, "G_pre": -0.1, "n_path_up": 5, "switch_dir": "up", "switch_s": 3.0}
+    b = {"act": "silu", "seed": 2, "reproduced": True, "G_pre": 0.1, "n_path_up": 7, "end_down": "s_stop",
+         "lower_fold_s": float("nan"), "switch_dir": "down", "switch_s": 2.5}
+    f = tmp_path / "r.csv"
+    for r in (a, b):
+        pd.DataFrame([r]).to_csv(f, mode="a", header=not f.exists(), index=False)
+    d = af.read_rows(f)
+    assert d.switch_s.tolist() == [3.0, 2.5] and d.switch_dir.tolist() == ["up", "down"]
+    assert d.end_down.isna().iloc[0] and d.end_down.iloc[1] == "s_stop" and d.reproduced.all()

@@ -1,0 +1,57 @@
+{
+ "label": "POST HOC (coordinator request 2026-09-28); registered Track 3A verdicts stand",
+ "acts": {
+  "gelu": {
+   "crossing_runs": 132,
+   "non_early": 114,
+   "early": 18,
+   "analysed": 114,
+   "reproduced": 114,
+   "usable": 114,
+   "notes": {},
+   "placed_at_pre": 0,
+   "with_fold": 0,
+   "fold_before_switch": 0,
+   "with_switch": 114,
+   "median_ratio_cross_over_switch": 1.0016935424490123,
+   "frac_within_15pct_switch": 1.0,
+   "frac_within_1pct_switch": 0.9824561403508771,
+   "median_ratio_cross_over_fold": NaN,
+   "frac_within_15pct_fold": NaN,
+   "fold_over_switch_median": NaN,
+   "halving_ok": 114,
+   "lam_path_ok": 114,
+   "fold_checks_ok": 0,
+   "end_up": {
+    "s_stop": 114
+   },
+   "sensitivity_pre85_same_events": 1.0
+  },
+  "silu": {
+   "crossing_runs": 135,
+   "non_early": 134,
+   "early": 1,
+   "analysed": 34,
+   "reproduced": 34,
+   "usable": 34,
+   "notes": {},
+   "placed_at_pre": 7,
+   "with_fold": 0,
+   "fold_before_switch": 0,
+   "with_switch": 34,
+   "median_ratio_cross_over_switch": 1.0066421530760192,
+   "frac_within_15pct_switch": 1.0,
+   "frac_within_1pct_switch": 0.38235294117647056,
+   "median_ratio_cross_over_fold": NaN,
+   "frac_within_15pct_fold": NaN,
+   "fold_over_switch_median": NaN,
+   "halving_ok": 34,
+   "lam_path_ok": 34,
+   "fold_checks_ok": 0,
+   "end_up": {
+    "s_stop": 34
+   },
+   "sensitivity_pre85_same_events": NaN
+  }
+ }
+}
