@@ -2,7 +2,7 @@
 
 **Setting.** As Track 3B:
 - the x₁ band task, with x₂…x_d i.i.d. U(−2, 2), at d = 2 and 4 and a = 1.30 and 1.50;
-- a single tanh-free f_a unit, free Adam (lr 0.01), every-step detection;
+- a single f_a unit, free Adam (lr 0.01), every-step detection;
 - **60 fresh seeds per cell**, because d = 4 crossed only about 73% of the time in 3B.
 
 **Prediction**
