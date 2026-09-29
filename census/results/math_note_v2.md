@@ -1284,3 +1284,160 @@ Results:
 - **Adam:** L1 (1.065) and L2 (1.045) PASS. L3 (Spearman 0.25 < 0.5) FAILS: with P frozen at the rule point, the law
   predicts Adam's typical lag but not which runs lag more.
 - 5 of 6 registered criteria pass. That P drifts after the rule point is a post hoc hypothesis and is untested here.
+
+## 14. Fold tracking: crossing at the occupied branch's fold, and the (rate)^{2/3} delay (Track 3 (4); 2026-09-28)
+
+**Status, stated per part.**
+- **§14.2, Theorem F (the normal form): PROVED, every step checked.**
+- **§14.3 (reduction of preconditioned gradient descent to the normal form; the constants m′, c′): derived, with the
+  reduction step resting on cited results (centre manifold / fold-point analysis, §14.5). It is NOT proved here for
+  the n-dimensional discrete map, and it is not presented as a theorem.**
+- **§14.4 (the condition for crossing at the fold): a statement of hypotheses and their consequences, conditional on §14.3.**
+- **Numerical checks, not part of any proof:** `src/theory_checks.py fold` → `theory_checks_fold.json`.
+- Numbers for the paper's v3 fold come from Track 1A (`results/sb_fold/`). None are used here.
+
+### 14.1 Setting
+
+- Trained coordinates θ ∈ ℝⁿ at output scale s. Preconditioned gradient descent θ ← θ − ηP∇_θL(θ; s), with P
+  symmetric positive definite and held fixed (no momentum).
+- The scale moves slowly: s_t = s_F + ṡ·(t − t_F) near the point of interest, with ṡ > 0 per step.
+- **Occupied branch U**: a curve θ_U(s) of strict local minima (∇_θL = 0, H = ∇²_θL ≻ 0) that training tracks.
+- **Fold of U at s_F**: at (θ_F, s_F) the Hessian H_F has a simple zero eigenvalue, H_F r = 0, and U does not
+  continue as a local minimum past s_F.
+- **Normalisation**: r is normalised by rᵀP⁻¹r = 1.
+- **Fold constants**:
+  - m′ = rᵀ∂_s∇_θL(θ_F, s_F), the transversality;
+  - c′ = ½∇³_θL(θ_F, s_F)[r, r, r], the quadratic term.
+  - The fold is nondegenerate iff m′c′ ≠ 0.
+  - Orient r so that the branch lies at y > 0 in the coordinate θ = θ_F + y·r + (hyperbolic part). Then c′ > 0, and
+    the branch exists for s < s_F iff m′ > 0.
+
+### 14.2 Theorem F (the Riccati normal form)
+
+**Statement.** Let X solve X′ = T + X² on an interval (−∞, T_b), with X(T) + √(−T) → 0 as T → −∞, i.e. the solution
+attached to the stable branch X = −√(−T). Then:
+- (i) X is unique and X(T) = Ai′(−T)/Ai(−T);
+- (ii) X is finite for T < Ω₀, and X(T) = 1/(Ω₀ − T) + O(Ω₀ − T) as T ↑ Ω₀;
+- (iii) here **Ω₀ = −a₁ = 2.338107410459767…**, with a₁ the largest (least negative) zero of the Airy function Ai.
+
+**Proof.**
+1. **Linearisation.** On any interval where u ≠ 0, the substitution X = −u′/u gives
+   X′ = −u″/u + (u′/u)² = −u″/u + X². So X′ = T + X² iff u″ + T·u = 0.
+2. **General solution.** Ai″(z) = z·Ai(z), so d²/dT² Ai(−T) = Ai″(−T) = −T·Ai(−T). Likewise for Bi. So
+   u = A·Ai(−T) + B·Bi(−T), and every solution X is −u′/u for some (A : B) ≠ (0 : 0).
+3. **Branch condition, as z = −T → +∞.** Ai(z) ~ e^{−ζ}/(2√π z^{1/4}) and Bi(z) ~ e^{ζ}/(√π z^{1/4}), with
+   ζ = (2/3)z^{3/2}. Also Ai′(z)/Ai(z) = −√z + O(z⁻¹) and Bi′(z)/Bi(z) = +√z + O(z⁻¹).
+   - Since u′(T) = −A·Ai′(−T) − B·Bi′(−T), we have X = [A·Ai′(z) + B·Bi′(z)]/[A·Ai(z) + B·Bi(z)].
+   - If B ≠ 0, the Bi terms dominate and X → +√z = +√(−T), the unstable branch.
+   - So the stable branch forces B = 0. Then X = Ai′(z)/Ai(z) = −√(−T) + O(1/T), and uniqueness follows.
+4. **Blow-up.** All zeros of Ai are real and negative. So Ai(−T) > 0 for −T > a₁, i.e. for T < Ω₀, and X is finite.
+   - The zero a₁ is simple: Ai(a₁) = Ai′(a₁) = 0 together with Ai″ = z·Ai would force Ai ≡ 0.
+   - Near T = Ω₀: Ai(−T) = −Ai′(a₁)(T − Ω₀) + O((T − Ω₀)²) and Ai′(−T) = Ai′(a₁) + O((T − Ω₀)²), since Ai″(a₁) = 0.
+   - Hence X = 1/(Ω₀ − T) + O(Ω₀ − T). ∎
+
+**Scaled form.** Consider the scalar flow dy/dt = η(m(s_F − s(t)) − c·y²), with m, c > 0 and s(t) = s_F + ṡ(t − t_F).
+- Set β = (η²mcṡ)^{−1/3}, k = 1/(βηc), y = −kX and t − t_F = βT.
+- Substituting gives exactly X′ = (η²mcṡβ³)·T + (ηckβ)·X² = T + X².
+- The stable branch y = +√(m(s_F − s)/c) maps to X = −√(−T), since k²/(ṡβ) = m/c.
+- Hence the solution that tracks the branch from the far past escapes (y → −∞) at t = t_F + Ω₀β, that is at
+  **s_esc = s_F + Ω₀·ṡ^{2/3}·(η²mc)^{−1/3}**. This is exact for the flow.
+
+### 14.3 Reduction of preconditioned gradient descent (derived; reduction step cited)
+
+- **Continuous-time limit.** Take θ̇ = −ηP∇_θL(θ; s(t)), and write θ = θ_F + y·r + w with w in the complementary
+  PH-invariant subspace.
+- **Projection onto the centre direction.** The left null vector of PH is l = P⁻¹r: lᵀPH = rᵀH = 0. With lᵀr = 1:
+  ẏ = lᵀθ̇ = −η·rᵀ∇_θL.
+- **Expansion at the fold.** rᵀH_F·w = 0 because H_F is symmetric, and rᵀH_F·r = 0. So
+  ẏ = −η[m′(s − s_F) + c′y² + O(|y|³ + |y||w| + |w|² + |y||s − s_F| + |s − s_F|²)].
+- **The hyperbolic part.** w relaxes at the nonzero rates of PH, which are positive on the minimum branch. It is
+  slaved to a centre manifold w = O(y² + |s − s_F|). That keeps every remainder term above of higher order.
+- **Consequence.** With μ = m′(s_F − s) this is the scalar flow of §14.2 with m = m′, c = c′, plus higher-order terms.
+  The leading escape is:
+
+  **s_esc − s_F = Ω₀·ṡ^{2/3}·(η²|m′c′|)^{−1/3} + O(ṡ·log(1/ṡ)),**
+
+  or, relative and dimensionless,
+
+  **r_F := (s_esc − s_F)/s_F = Ω₀·ε_F^{2/3},  ε_F = (ṡ/s_F)/(η·Λ_F),  Λ_F = (|m′c′|·s_F)^{1/2}.**
+
+- **The error term is not proved here** (§14.5). The classical result for the planar fold gives O(ε ln(1/ε)) in the
+  scaled rate. Its extension to n fast variables with one centre direction goes through the centre-manifold
+  reduction.
+- **Measurable form of the constant.**
+  - Along U, y_U(s) = (m′(s_F − s)/c′)^{1/2}. First-order perturbation of the simple zero eigenvalue of PH, with
+    left vector l and lᵀr = 1, gives λ_min(P^{1/2}HP^{1/2})(s) = 2c′·y_U(s) + O(s_F − s).
+  - Hence **λ_min(s)² = 4|m′c′|·(s_F − s) + O((s_F − s)^{3/2})**.
+  - So |m′c′| is ¼ of the slope of λ_min² against s at the fold. It is read off the same preconditioned Hessian the
+    lag law already uses (§13.1). Λ_F² is s_F times that quarter-slope.
+- **Free training (corollary, conditional on the above).** When s is itself trained, ṡ = η·v with v = −p_s∂L/∂s at
+  the fold. Then s_esc − s_F = Ω₀·v^{2/3}·|m′c′|^{−1/3}, which is independent of η at leading order. This is the
+  analogue of χ's learning-rate invariance (§13.6, R4).
+- **Discrete map.** One step of the map is a forward-Euler step of the flow. In the escape region its relative error
+  per step is O(ηc′|y|). The cited result is for flows, and the discrete statement is checked only numerically (F2–F4).
+
+### 14.4 When a discontinuous global switch leads training to cross at the fold (conditional on §14.3)
+
+**Hypotheses:**
+- **(H-F1) Discontinuous global switch.** At s_glob, two strict local-minimum branches U (unplaced, G < 0) and V
+  (placed) have equal loss. The global minimiser jumps from U to V.
+- **(H-F2) Occupation.** Training tracks U at s_glob, with the linear lag of §13 valid (κχ small against U's
+  relaxation).
+- **(H-F3) U continues unplaced to a nondegenerate fold.** For s ∈ [s_glob, s_F), U is a strict local minimum with
+  G(θ_U(s)) < 0. At s_F it folds, with m′c′ ≠ 0.
+- **(H-F4) Deterministic dynamics.** The dynamics are full-batch, with fixed P, and no noise large enough to cross
+  the barrier between U and V before the fold. The barrier shrinks like (s_F − s)^{3/2} (the normal form's
+  (4/3)·m′^{3/2}(s_F − s)^{3/2}/c′^{1/2}).
+- **(H-F5) The escape leads to placement.** The unstable direction at the fold leads into V's basin, and G changes
+  sign during that fast jump.
+- **(H-F6) Slow passage.** ε_F ≪ 1, and ηλ_max(PH) < 2 (a stable map).
+
+**Consequence.**
+- Training does not cross at the global switch. Under deterministic tracking a strict local minimum is never left
+  while it exists.
+- It crosses at **s_c = s_F + s_F·Ω₀·ε_F^{2/3} + O(s_F·ε_F·log(1/ε_F))**.
+  - The offset s_F − s_glob is static: it does not vanish as the rate goes to 0 (hysteresis).
+  - The rate-dependent delay scales as (rate)^{2/3} with the universal constant Ω₀ = 2.33811. This contrasts with
+    the linear lag κχ at a continuous switch.
+  - The O(ε_F) term depends on where G = 0 lies along the jump (checked: F2 escape at y = −1).
+
+**The general rule, which contains §13 as the continuous case.** Training crosses at the first placement event of
+the branch it occupies: that branch's own continuous switch (lag κχ, §13) or its fold (delay Ω₀ε_F^{2/3}), whichever
+comes first. The global threshold enters only through which branch is occupied.
+
+**Where it fails:**
+- **(a) Noise:** barrier crossing (Kramers) before s_F makes the crossing earlier.
+- **(b) Adam's moving preconditioner:** v̂ changes on the escape time scale, the same failure mode as §13.3(iv)(c).
+- **(c) Momentum:** β₁ turns the flow second order. The escape time β scales as ṡ^{−1/3} and eventually exceeds
+  momentum's 1/(1 − β₁) = 10 steps, and the resulting correction is then O(1) steps, i.e. O(ṡ) in s. This is not
+  proved.
+- **(d) Degenerate fold** (m′c′ = 0, e.g. a cusp): a different exponent.
+- **(e) Fast passage** (ε_F not small): no asymptotic statement.
+
+### 14.5 What is proved, and what is cited
+
+- **Proved here:** Theorem F; the exact scaling of the scalar flow; the formulas for m′, c′ and λ_min², as
+  first-order perturbation identities.
+- **Cited, and not re-verified against the sources in this session:**
+  - the delay asymptotics Ω₀ε^{2/3} + O(ε ln(1/ε)) for a nondegenerate fold of a slow-fast flow (Mishchenko and
+    Rozov 1980; Krupa and Szmolyan 2001, SIAM J. Math. Anal. 33, "fold and canard points in two dimensions");
+  - the centre-manifold reduction from n fast variables to the planar fold.
+- **Not proved:**
+  - the statement for the discrete map (checked numerically: F2–F4);
+  - the momentum and Adam cases.
+
+### 14.6 Numerical checks (`theory_checks_fold.json`; not part of any proof)
+
+- **F0.** Ω₀ = 2.33810741045976703848919725245 (mpmath: −a₁).
+- **F1.** RK4 on X′ = T + X² from the branch at T₀ = −4, −6, −8 blows up at 2.3381073, 2.33810741045 and
+  2.33810741046. The exponentially small dependence on T₀ is as in step 3.
+- **F2.** Scalar map, η = 0.3, m = c = p = 1. Observed/predicted delay is 0.979, 0.995, 1.0004 and 1.0024 at
+  ṡ = 1e−3 … 1e−6.
+  - A second case (η = 0.1, m = 2, c = 0.5, p = 0.4) gives 0.893, 0.949 and 0.977 at ṡ = 1e−4 … 1e−6.
+  - The deficit is −ṡ/(ηpc·|y_esc|), from escape measured at y = −1: an O(ṡ) term, shrinking as ṡ^{1/3} relative.
+- **F3.** Two-dimensional system with a coupled hyperbolic direction and non-diagonal P, with m′ and c′ computed from
+  their definitions at the fold: 0.944, 0.971 and 0.986 at ṡ = 1e−4, 1e−5 and 1e−6.
+- **F4.** Free training, ṡ = η·v at η = 0.2, 0.1 and 0.05: the delay in s is 0.00501, 0.00497 and 0.00495 against the
+  η-free prediction 0.00504.
+- **F5.** λ_min²/(s_F − s) is 2.206, 2.239, 2.262 and 2.279 at s_F − s = 1e−2 … 1.25e−3. It converges, as √(s_F − s),
+  to 4|m′c′| = 2.318.
