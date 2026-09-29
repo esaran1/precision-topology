@@ -138,6 +138,19 @@ step, and (iii) has a finite primary prediction.
 - At 1.65, t_sw preceded the crossing in 74 of 74 runs with a prediction. A negative lag (crossing before s\*_run) would
   make a run unscored under V2.
 
-## 9. Frozen values (filled in by the registration commit, before any training)
+## 9. Frozen values (computed before any training; in the registration commit)
 
-See `results/track2a/landscape.json` and `results/track2a/frozen_seeds.csv`.
+**Landscape** (`results/track2a/landscape.json`, `landscape.log`; `track_a.landscape` unchanged, run at a = 1.85):
+- No certified glob bracket exists at 1.85 (certified brackets exist at a = 1.30, 1.35, 1.40, 1.45, 1.50, 1.60 only).
+  The JSON field `certified_bracket` carries Track A's literal text, which names 1.65; the code is unchanged, so the
+  text is too. It applies equally at 1.85.
+- Continuation in a from the 1.60 switch point (10 Newton steps of 0.025, each residual < 1e-9, Hessian positive
+  definite), winding shift 0 (the continued branch is already on the principal copy, b₁ = −2.1087).
+- **s\*_pop(1.85) = 1.29718.** θ\* = (−1.2334, −2.1087, 3.4980); gradient residual 2.3e-13; H positive definite.
+  κ_SGD(1.85) = 2.330 (descriptive; Adam's κ is per run with the shape of P(t_sw)).
+- **Validation by the conditional search:** global minimiser G = −0.00319 at 0.995·s\*_pop (unplaced) and G = +0.00316
+  at 1.005·s\*_pop (placed), on the continued branch up to the mirror and 2π at both scales. `validated: true`.
+
+**Per seed** (`results/track2a/frozen_seeds.csv`, `freeze.log`): all 80 seeds have an own-sample branch switch
+(s\*_frozen median 1.285, range 1.009–1.687; Newton residual ≤ 7.4e-13) and a global own threshold (80 of 80
+bracketed, no note).

@@ -1,0 +1,44 @@
+{
+ "a": 1.85,
+ "s_star_pop": 1.2971778846018998,
+ "theta_star": [
+  -1.2334072958130669,
+  -2.108711554405639,
+  3.497995016614668
+ ],
+ "tangent": [
+  0.15137965215960933,
+  -0.1590899504323151,
+  3.1186209830649396
+ ],
+ "gradG": [
+  0.6404823560401951,
+  -2.4707719530336902,
+  0.0
+ ],
+ "grad_residual": 2.2517210318540038e-13,
+ "H_pd": true,
+ "winding_shift_from_1p60_copy": 0,
+ "b1_principal": -2.108711554405639,
+ "kappa_sgd": 2.3298470940470413,
+ "validation_global_min": {
+  "0.995": {
+   "global_min_w1": -1.2343931682001934,
+   "global_min_b1": 4.175509918232503,
+   "global_min_G": -0.00319434553885678,
+   "branch_w1": -1.2343931681160982,
+   "branch_b1": -2.1076753889352915,
+   "same_branch_mod_mirror_2pi": true
+  },
+  "1.005": {
+   "global_min_w1": 1.2324294728684249,
+   "global_min_b1": 4.173446205292653,
+   "global_min_G": 0.003162374852462513,
+   "branch_w1": -1.232429472869259,
+   "branch_b1": -2.1097391018875373,
+   "same_branch_mod_mirror_2pi": true
+  }
+ },
+ "validated": true,
+ "certified_bracket": "none exists at a = 1.65; validated by continuation + own_threshold.global_min"
+}
