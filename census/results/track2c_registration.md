@@ -219,7 +219,41 @@ All three are required. If any fails, **C1–C3 of that cell are UNRESOLVED**.
 
 ## 9. Frozen values (computed before any training; in the registration commit)
 
-To be filled in from `results/track2c/frozen_seeds.csv` and `kappa_k.csv` before the registration commit.
+**Per seed and cell** (`results/track2c/frozen_seeds.csv`, `frozen_parts.jsonl`, `freeze.log`):
+- `python -m src.track2c freeze` ran 2026-09-29, about 02:48–06:47 EDT, at one worker. The memory gate never paused it.
+- **240 of 240 seed-cells have a validated s_own,d**: at both bracket ends the ladder, independent search, audit and
+  expected status passed. No bracket hit a floor or ceiling. Every bracket has width 0.00625 (≤ 0.01).
+- **120 of 120 x₁-only own thresholds are defined** (no note).
+- The global minimiser lies in the same mirror at both bracket ends in 240 of 240 seed-cells. So its mirror's switch is
+  s_own,d, and the other mirror's switch is bracketed separately; all 240 are defined.
+- Evaluations: 3,770 R^d scale evaluations in the brackets and 1,026 width-1 evaluations for the x₁-only thresholds.
+
+| d | a | s_own,d median (range) | s_own,d/s_own,x1 median (range) | other mirror/s_own,d median (range) | other mirror within 5% | ‖w_noise‖₂ at s_hi, median |
+|---|---|---|---|---|---|---|
+| 2 | 1.30 | 5.544 (4.406–8.681) | 1.075 (1.006–1.353) | 0.993 (0.463–1.464) | 23/60 | 0.0065 |
+| 2 | 1.50 | 2.828 (2.231–4.438) | 1.078 (1.008–1.352) | 0.983 (0.463–1.476) | 21/60 | 0.0085 |
+| 4 | 1.30 | 6.981 (4.563–11.144) | 1.359 (1.064–2.146) | 0.975 (0.492–1.524) | 14/60 | 0.0157 |
+| 4 | 1.50 | 3.547 (2.319–5.706) | 1.355 (1.068–2.141) | 0.980 (0.486–1.510) | 15/60 | 0.0195 |
+
+- x₁-only own threshold: median 5.047 (4.216–7.153) at a = 1.30 and 2.594 (2.147–3.659) at a = 1.50.
+- **Risk, quantified before training:** the other mirror's switch is within 5% of s_own,d in only 14–23 of 60 seed-cells.
+  A run that settles on the other mirror will usually be far from s_own,d (§8).
+
+**κ_k** (`results/track2c/kappa_k.csv`, `python -m src.track2c kappa`; width-1 landscape and median P of
+`lag_law/kappa.csv`):
+
+| a | k = −3 | −2 | −1 | 0 | +1 | +2 | +3 |
+|---|---|---|---|---|---|---|---|
+| 1.30 | 37.891 | 22.751 | **7.611** | −7.530 | −22.670 | −37.810 | −52.950 |
+| 1.50 | 27.833 | 19.904 | 11.975 | **4.046** | −3.883 | −11.812 | −19.741 |
+
+Bold: 3B's typical windings (k = −1 at 1.30, k = 0 at 1.50). b₁\* = 3.8318 (a = 1.30) and −2.2914 (a = 1.50).
+
+**Manifest** (`results/track2c/registration.sha256`): SHA-256 of `src/track2c.py`, `src/band_rd.py`, `src/track_a.py`,
+`src/own_threshold.py`, `src/profiled_bnb.py`, `src/width2_conditional.py`, `src/residual_timescale.py`,
+`src/lag_law.py`, `src/fold1d.py`, `src/cmaes.py`, `src/linear_response.py`, `tests/test_track2c.py`, this file, the
+design page, `results/lag_law/kappa.csv`, `results/cond_certified_brackets.csv`, `results/track2c/kappa_k.csv` and
+`results/track2c/frozen_seeds.csv`. `train` and `observe` assert every one of them before running.
 
 ## 10. Commands
 
