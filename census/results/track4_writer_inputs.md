@@ -310,6 +310,19 @@ Sources read:
 > positive-definite and ring certificates. The outer-exclusion certificates and the solve brackets (finite-a and
 > limit) were not run; only the original searches support them.
 
+**Discussion-phase addendum (2026-09-29; for the revision, not the submitted PDF).** The paragraph above is what the
+submitted statement rests on. Track 4 (`69af96f`; `src/track4_certs.py`, `results/certificate_checks/track4_summary.json`,
+ledger `track4_certificate_checks`) has since run the missing checks, all passing. For a revised statement, replace the
+last sentence with:
+
+> It also re-derives the outer exclusion by a fresh Arb branch and bound (41 of 41 A-intervals; one convexity lemma is
+> used as stated in the math note, not machine-checked), and confirms the signs at both ends of every solve bracket
+> (the limit bracket and 12 finite-a ends at a = 1.30–1.60). It does not check that the sign changes exactly once
+> inside each bracket.
+
+- Do not say that the checker verifies the finite-a margin enclosures as numbers (only their signs), Theorem G's
+  finite-ε parts, or the convexity and localisation lemmas.
+
 **Where each statement comes from:**
 - **Independence, imports and reading only certificate files**: the checker's header docstring.
 - **Arb at 80 bits**: `PREC = 80` in the checker.
