@@ -1,0 +1,4 @@
+Test 2A registration (Adam per-run ordering at a = 1.85)
+registration commit: 9fd1f322bd1c38b13eef6f74ec99e226d76b62a9
+SHA-256 results/track2a_registration.md: 9a73a305c0ab9ad6ffd27807f1f7a17e5ba452e66238da0e19ffed5276ff97ee
+SHA-256 results/track2a/registration.sha256: 744dd43ce66d751950ac0b925819cc4292f7ac313bc204623df16aefbad8c24f
