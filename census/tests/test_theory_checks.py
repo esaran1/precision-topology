@@ -37,3 +37,8 @@ def test_lambda_sq_slope_approaches_four_mc():
     d = T.lambda_sq_slope()
     last = d["rows"][-1]["lambda_sq_over_d"]
     assert abs(last / d["four_abs_mc"] - 1) < 0.03
+
+
+def test_ks01_bessel_definition_equals_airy_zero():
+    d = T.bessel_form_at_omega0()
+    assert abs(float(d["smallest_positive_zero"]) - T.OMEGA0) < 1e-12

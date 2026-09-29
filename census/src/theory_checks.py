@@ -35,6 +35,19 @@ def omega0(dps=30):
 OMEGA0 = 2.338107410459767
 
 
+def bessel_form_at_omega0(dps=30):
+    """F0b: [KS01] Remark 2.4 defines Omega0 as the smallest positive zero of J_{-1/3}(2z^{3/2}/3) + J_{1/3}(2z^{3/2}/3);
+    returns its value at z = -a1 and the smallest positive zero found by root-finding."""
+    import mpmath as mp
+    mp.mp.dps = dps
+    f = lambda z: mp.besselj(-mp.mpf(1) / 3, 2 * z ** 1.5 / 3) + mp.besselj(mp.mpf(1) / 3, 2 * z ** 1.5 / 3)
+    z0 = omega0(dps)
+    grid = [mp.mpf(k) / 100 for k in range(1, 400)]
+    first = next(g for g, h in zip(grid, grid[1:]) if f(g) * f(h) < 0)
+    root = mp.findroot(f, (first, first + mp.mpf(1) / 100), solver="bisect")
+    return {"value_at_minus_a1": str(f(z0)), "smallest_positive_zero": str(root)}
+
+
 def riccati_blowup(T0=-8.0, h=1e-4, cap=1e4):
     """RK4 for X' = T + X^2 from X(T0) = -sqrt(-T0); returns the T at which X first exceeds cap."""
     X, T = -math.sqrt(-T0), T0
@@ -148,6 +161,7 @@ def lambda_sq_slope(sF=1.0, cy=1.0, m=1.0, k=3.0, g=0.7, e=0.4):
 
 def fold_checks():
     out = {"Omega0_mpmath": str(omega0()), "Omega0_used": OMEGA0}
+    out["F0b_bessel_form"] = bessel_form_at_omega0()
     out["F1_riccati_blowup"] = {str(T0): riccati_blowup(T0) for T0 in (-4.0, -6.0, -8.0)}
     out["F2_scalar"] = [scalar_case(0.3, 1.0, 1.0, 1.0, 1.0, sd) for sd in (1e-3, 1e-4, 1e-5, 1e-6)] + \
                        [scalar_case(0.1, 2.0, 0.5, 0.4, 3.0, sd) for sd in (1e-4, 1e-5, 1e-6)]

@@ -1361,9 +1361,9 @@ attached to the stable branch X = −√(−T). Then:
 
   **r_F := (s_esc − s_F)/s_F = Ω₀·ε_F^{2/3},  ε_F = (ṡ/s_F)/(η·Λ_F),  Λ_F = (|m′c′|·s_F)^{1/2}.**
 
-- **The error term is not proved here** (§14.5). The classical result for the planar fold gives O(ε ln(1/ε)) in the
-  scaled rate. Its extension to n fast variables with one centre direction goes through the centre-manifold
-  reduction.
+- **The error term is not proved here** (§14.5). For the planar fold flow, [KS01] (Remark 2.11, citing [MR80]) gives
+  the leading term −Ω₀ε^{2/3} and a next term O(ε ln ε). The extension to n fast variables with one centre direction
+  (a centre-manifold reduction) is only a remark in [KS01] and is not proved here.
 - **Measurable form of the constant.**
   - Along U, y_U(s) = (m′(s_F − s)/c′)^{1/2}. First-order perturbation of the simple zero eigenvalue of PH, with
     left vector l and lᵀr = 1, gives λ_min(P^{1/2}HP^{1/2})(s) = 2c′·y_U(s) + O(s_F − s).
@@ -1418,10 +1418,39 @@ comes first. The global threshold enters only through which branch is occupied.
 
 - **Proved here:** Theorem F; the exact scaling of the scalar flow; the formulas for m′, c′ and λ_min², as
   first-order perturbation identities.
-- **Cited, and not re-verified against the sources in this session:**
-  - the delay asymptotics Ω₀ε^{2/3} + O(ε ln(1/ε)) for a nondegenerate fold of a slow-fast flow (Mishchenko and
-    Rozov 1980; Krupa and Szmolyan 2001, SIAM J. Math. Anal. 33, "fold and canard points in two dimensions");
-  - the centre-manifold reduction from n fast variables to the planar fold.
+- **Cited.** Each reference was checked against its publisher or DOI record (Crossref) on 2026-09-28. The Krupa–Szmolyan
+  statements below were read in the paper itself.
+  - **[KS01]** M. Krupa and P. Szmolyan, "Extending geometric singular perturbation theory to nonhyperbolic
+    points—fold and canard points in two dimensions", *SIAM J. Math. Anal.* 33(2):286–314, 2001,
+    doi:10.1137/S0036141099360919. The statements used:
+    - **Theorem 2.1.** For the planar fold x′ = −y + x² + h, y′ = ε·g (g = −1 + O(x, y, ε); nondegeneracy (2.2)), with
+      reduced flow toward the fold (jump point):
+      - the attracting slow manifold S_{a,ε} reaches Δ_out = {x = ρ} at y = h(ε) = O(ε^{2/3});
+      - the transition map is a contraction with rate O(e^{−c/ε}).
+    - **Proposition 2.3 and Remark 2.4.**
+      - The Riccati equation x′ = x² − y, y′ = −1 has a unique orbit asymptotic to the attracting branch.
+      - That orbit has the horizontal asymptote y = −Ω₀.
+      - Ω₀ is the smallest positive zero of J_{−1/3}(2z^{3/2}/3) + J_{1/3}(2z^{3/2}/3).
+    - **Remark 2.11.** h(ε) = −Ω₀ε^{2/3} + o(ε^{2/3}). The remark adds that "the next term in the expansion is
+      O(ε ln ε)", referring to [MR80].
+    - **§1.** The analysis "carries over to higher-dimensional problems with one-dimensional critical manifolds
+      containing fold points. By means of a center-manifold reduction, all normally hyperbolic directions can be
+      eliminated". This is a remark in [KS01], not a theorem proved there.
+  - **[MR80]** E. F. Mishchenko and N. Kh. Rozov, *Differential Equations with Small Parameters and Relaxation
+    Oscillations*, Plenum Press / Springer US, New York, 1980, doi:10.1007/978-1-4615-9047-7.
+    - [KS01] cites pp. 68–72 for the Riccati facts and for the O(ε ln ε) term.
+    - I have not read [MR80] itself. The O(ε ln ε) error term is used here only as [KS01] Remark 2.11 reports it.
+  - **Consistency with Theorem F.** J_{−1/3}(ζ) + J_{1/3}(ζ) = 3Ai(−z)/√z with ζ = (2/3)z^{3/2} (standard Airy–Bessel
+    relation). So Ω₀ of [KS01] is −a₁, the Ω₀ of Theorem F. This is checked numerically (F0b).
+    - Theorem F's X′ = T + X² is [KS01]'s (2.16) with x = X and y = −T. Their asymptote y = −Ω₀ is our blow-up
+      time T = Ω₀.
+  - **How §14.3 uses them.**
+    - The leading delay Ω₀ε^{2/3} and the O(ε ln ε) remainder hold for **planar flows** ([KS01] Theorem 2.1 with
+      Remark 2.11).
+    - The reduction from n dimensions is [KS01]'s §1 remark, not a proved theorem there. It is **not proved here**.
+    - A discrete-time theory near non-hyperbolic points exists (S. Jelbart and C. Kuehn, "Extending discrete
+      geometric singular perturbation theory to non-hyperbolic points", *Nonlinearity* 37(10):105006, 2024,
+      doi:10.1088/1361-6544/ad72c5; record checked). I have not read it, and nothing here relies on it.
 - **Not proved:**
   - the statement for the discrete map (checked numerically: F2–F4);
   - the momentum and Adam cases.
@@ -1429,6 +1458,7 @@ comes first. The global threshold enters only through which branch is occupied.
 ### 14.6 Numerical checks (`theory_checks_fold.json`; not part of any proof)
 
 - **F0.** Ω₀ = 2.33810741045976703848919725245 (mpmath: −a₁).
+- **F0b.** The smallest positive zero of [KS01]'s J_{−1/3}(2z^{3/2}/3) + J_{1/3}(2z^{3/2}/3) equals −a₁ (difference < 1e−12).
 - **F1.** RK4 on X′ = T + X² from the branch at T₀ = −4, −6, −8 blows up at 2.3381073, 2.33810741045 and
   2.33810741046. The exponentially small dependence on T₀ is as in step 3.
 - **F2.** Scalar map, η = 0.3, m = c = p = 1. Observed/predicted delay is 0.979, 0.995, 1.0004 and 1.0024 at
