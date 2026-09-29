@@ -30,3 +30,4 @@ results/crossing_audit_full_parts.csv
 results/width2_lag/states/
 results/band_rd/traces_*.npz
 results/track_a/paths/
+results/track2a/paths/
