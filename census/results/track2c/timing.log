@@ -1,0 +1,4 @@
+{"seed": 889000, "d": 2, "a": 1.3, "s_own_x1": 4.859375, "s_own_d": 5.575, "evals": 13, "validated": true, "bracket_seconds": 125.98227190971375, "validation_seconds": 13.344400882720947}
+{"seed": 889000, "d": 4, "a": 1.3, "s_own_x1": 4.859375, "s_own_d": 7.94375, "evals": 36, "validated": true, "bracket_seconds": 54.098844051361084, "validation_seconds": 28.572795867919922}
+{"seed": 889000, "d": 2, "a": 1.5, "s_own_x1": 2.4781250000000004, "s_own_d": 2.83125, "evals": 9, "validated": true, "bracket_seconds": 3.2184009552001953, "validation_seconds": 13.011085748672485}
+{"seed": 889000, "d": 4, "a": 1.5, "s_own_x1": 2.4781250000000004, "s_own_d": 4.01875, "evals": 21, "validated": true, "bracket_seconds": 5.952517032623291, "validation_seconds": 14.417518854141235}
