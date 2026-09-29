@@ -584,6 +584,7 @@ def main() -> None:
     track_t_checks()
     track_a_checks()
     track2a_checks()
+    track2b_checks()
     track_t_v2_checks()
     track_t_v3_checks()
     final_checks_boundary_adam()
@@ -866,6 +867,11 @@ PRODUCERS = {
     # registered test 2A (Adam per-run ordering at a = 1.85)
     "track2a/scores.json": ("track2a", "observe", "full", ""),
     "track2a/observed_runs.csv": ("track2a", "observe", "full", ""),
+    # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
+    "track2b/scores.json": ("track2b", "observe", "full", ""),
+    "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
+    "track2b/posthoc_stability.json": ("track2b_posthoc", "run", "full", ""),
+    "track2b/posthoc_stability.csv": ("track2b_posthoc", "run", "full", ""),
     # discussion phase (Track 1A post hoc fold checks; Track 3 math note §14-§17)
     "sb_fold/summary.json": ("sb_fold", "run_summary", "full", ""),
     "sb_fold/compare.json": ("sb_fold", "run_compare", "full", ""),
@@ -2211,6 +2217,79 @@ def track2a_checks() -> None:
         1.0, 0)
     chk("2A branches (runs with s*_run)", float(O.s_run.notna().sum()), 78.0, 0)
     chk("2A min passing A2 count for 75 scored", float(next(k for k in range(76) if k / 75 >= 0.75)), 57.0, 0)
+
+
+def track2b_checks() -> None:
+    """Registered test 2B (the validity boundary of the lag law in κχ, redesigned): results/track2b_writer_inputs.md."""
+    import hashlib as _h
+    print("Test 2B (registered; C1 PASS, C2 UNRESOLVED)")
+    D = R / "track2b"
+    chk("2B predictions hash", float(_h.sha256((D / "predictions.csv").read_bytes()).hexdigest()
+                                     == "9bff05191e60616be12f6bf842b075f8a1b665c483c94affec0453ef3123fb95"), 1.0, 0)
+    reg = {p: h for h, p in (l.split() for l in (D / "registration.sha256").read_text().splitlines())}
+    for p in ("results/track2b/design.csv", "results/track2b/frozen_switches.csv", "results/track2b_registration.md"):
+        chk(f"2B registered hash {p}", float(_h.sha256((R.parent / p).read_bytes()).hexdigest() == reg[p]), 1.0, 0)
+    S = json.loads((D / "scores.json").read_text())
+    chk("2B C1 PASS", float(S["C1"] == "PASS"), 1.0, 0)
+    chk("2B C2 UNRESOLVED", float(S["C2"] == "UNRESOLVED"), 1.0, 0)
+    chk("2B C1 cells invalid", float(len(S["C1_cells_invalid"])), 0.0, 0)
+    chk("2B C2 cells invalid", float(len(S["C2_cells_invalid"])), 4.0, 0)
+    chk("2B kx* a=1.30", float(S["kx_star"]["1.3"]), 0.2, 0)
+    chk("2B kx* a=1.50", float(S["kx_star"]["1.5"]), 0.2, 0)
+    chk("2B runs", float(S["n_runs"]), 480.0, 0)
+    chk("2B crossed", float(S["n_crossed"]), 413.0, 0)
+    cells = {(round(c["a"], 2), c["kx_target"]): c for c in S["cells"]}
+    # (crossings, median ratio (3 d.p.), IQR lo, IQR hi, median chi_own/target, max realised eta*lambda, violating, valid)
+    want = {(1.3, 0.02): (36, 1.046, 1.003, 1.104, 1.006, 0.853, 0, True),
+            (1.3, 0.05): (40, 1.102, 1.048, 1.207, 1.007, 0.889, 0, True),
+            (1.3, 0.1): (40, 1.209, 1.146, 1.344, 1.007, 0.970, 0, True),
+            (1.3, 0.2): (40, 1.557, 1.466, 1.805, 1.007, 1.135, 21, False),
+            (1.3, 0.3): (27, 2.482, 2.185, 2.817, 0.987, 5.90, 39, False),
+            (1.3, 0.4): (33, 5.101, 4.748, 5.492, 1.003, 22.3, 40, False),
+            (1.5, 0.02): (32, 0.990, 0.941, 1.051, 0.985, 0.573, 0, True),
+            (1.5, 0.05): (40, 1.046, 0.984, 1.103, 0.998, 0.621, 0, True),
+            (1.5, 0.1): (40, 1.139, 1.053, 1.202, 0.998, 0.686, 0, True),
+            (1.5, 0.2): (40, 1.410, 1.265, 1.508, 0.998, 0.912, 0, True),
+            (1.5, 0.3): (39, 1.975, 1.692, 2.280, 0.997, 1.95, 17, False),
+            (1.5, 0.4): (6, 2.676, 2.298, 3.147, 0.952, 2.79, 40, False)}
+    for key, (n, med, q25, q75, chi, stab, nv, valid) in want.items():
+        c = cells[key]
+        chk(f"2B {key} crossings", float(c["n_cross"]), float(n), 0)
+        chk(f"2B {key} median ratio", c["median_ratio"], med, 0.0006)
+        chk(f"2B {key} ratio q25", c["ratio_q25"], q25, 0.0006)
+        chk(f"2B {key} ratio q75", c["ratio_q75"], q75, 0.0006)
+        chk(f"2B {key} chi_own/target", c["chi_own_median"] / c["chi_target"], chi, 0.0006)
+        chk(f"2B {key} max realised eta*lambda", c["max_eta_lambda_realised"], stab,
+            0.06 if stab > 10 else (0.006 if stab > 1.5 else 0.0006))
+        chk(f"2B {key} runs violating", float(c["n_runs_stability_violated"]), float(nv), 0)
+        chk(f"2B {key} valid", float(c["valid"]), float(valid), 0)
+        chk(f"2B {key} placed in held phase", float(c["n_placed_in_warmup"]), 0.0, 0)
+        chk(f"2B {key} winding changed", float(c["n_winding_changed"]), 0.0, 0)
+    chk("2B C2 cells failing V1", float(sum(not cells[k]["crossings_ok"] for k in ((1.3, 0.3), (1.3, 0.4), (1.5, 0.3), (1.5, 0.4)))), 2.0, 0)
+    chk("2B C2 cells failing V3", float(sum(not cells[k]["stability_ok"] for k in ((1.3, 0.3), (1.3, 0.4), (1.5, 0.3), (1.5, 0.4)))), 4.0, 0)
+    chk("2B C1 max realised eta*lambda", max(cells[(a, x)]["max_eta_lambda_realised"] for a in (1.3, 1.5) for x in (0.02, 0.05, 0.1)), 0.970, 0.0006)
+    Dg = pd.read_csv(D / "design.csv", float_precision="round_trip")
+    chk("2B eta_cell = 0.3 cells", float((Dg.eta_cell == 0.3).sum()), 9.0, 0)
+    for kx, eta in ((0.2, 0.2766), (0.3, 0.2630), (0.4, 0.2578)):
+        chk(f"2B eta_cell a=1.30 kx={kx}", float(Dg[(Dg.a == 1.3) & (Dg.kx_target == kx)].eta_cell.iloc[0]), eta, 0.00006)
+    O = pd.read_csv(D / "observed_runs.csv", float_precision="round_trip")
+    for a, n in ((1.3, 4), (1.5, 8)):
+        r = Dg[(Dg.a == a) & (Dg.kx_target == 0.02)].iloc[0]
+        g = O[(O.a == a) & (O.kx_target == 0.02)]
+        ruled = set(g[g.s_branch * 1.02 >= r.s_end].seed)
+        chk(f"2B a={a} kx=0.02 non-crossers = a-priori ruled-out seeds", float(ruled == set(g[~g.crossed].seed)), 1.0, 0)
+        chk(f"2B a={a} kx=0.02 ruled out", float(len(ruled)), float(n), 0)
+    P = json.loads((D / "posthoc_stability.json").read_text())
+    pc = {(round(c["a"], 2), c["kx_target"]): c for c in P["cells"]}
+    for key, (sv, lr, fr) in {(1.3, 0.2): (1.265, 1.233, 0.007), (1.3, 0.3): (1.252, 1.320, 0.060),
+                              (1.3, 0.4): (1.198, 1.380, 0.094), (1.5, 0.3): (1.528, 1.507, 0.005),
+                              (1.5, 0.4): (1.534, 1.558, 0.036)}.items():
+        c = pc[key]
+        chk(f"2B posthoc {key} s_viol/s_branch", c["median_s_viol_over_s_branch"], sv, 0.0006)
+        chk(f"2B posthoc {key} lambda ratio", c["median_lam_ratio_at_viol"], lr, 0.0006)
+        chk(f"2B posthoc {key} violating step fraction", c["frac_realised_steps_violating"], fr, 0.0006)
+        chk(f"2B posthoc {key} violations before switch", float(c["n_viol_before_switch"]), 0.0, 0)
+    chk("2B posthoc violating runs", float(sum(c["n_violated"] for c in P["cells"])), 157.0, 0)
 
 
 def track_t_v2_checks() -> None:
