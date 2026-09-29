@@ -34,3 +34,6 @@ results/track2a/paths/
 results/gelu_transfer/paths/
 results/track2b/paths/
 results/track2c/paths/
+
+# W2-A training paths (hashed in results/width2_asym/predictions.csv; regenerate: python -m src.width2_asym train)
+results/width2_asym/paths/
