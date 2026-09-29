@@ -1,0 +1,3 @@
+D n_pred(slaved) 199.6 n_obs 203 N_min 6 r_min 9.4e-04 r_obs 3.13e-02
+T n_pred(slaved) 28.1 n_obs 28 N_min 6 r_min 2.7e-04 r_obs 1.28e-03
+T' n_pred(slaved) -47.9 n_obs -49 N_min 6 r_min 4.9e-04 r_obs -3.96e-03

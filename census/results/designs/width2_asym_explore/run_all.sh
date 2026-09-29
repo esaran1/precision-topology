@@ -22,3 +22,9 @@ R w2_explore_f.py > w2_explore_f.log
   W2A=w2_explore_a_s0.2225_u0.1.json W2B=w2_explore_b_s0.2225_u0.1.json R w2_explore_c.py 0.03 0.001 400000 0   # arm T candidate
 } > w2_explore_c.log
 python3 w2_explore_g.py > w2_explore_g.log
+# added after the author's approval with changes A-D (T′ feasibility; population and used seeds only)
+R w2_explore_h.py > w2_explore_h.log
+{ for e r in 0.03 0.001 0.03 0.0003 0.3 0.001 0.3 0.003 0.3 0.01; do
+    CONT=1 W2A=w2_explore_a_s0.2225_u0.1.json W2B=w2_explore_b_s0.2225_u0.1.json R w2_explore_c.py $e $r 1000000 2
+  done; } > w2_explore_c_Tprime.log
+python3 w2_explore_i.py > w2_explore_i.log

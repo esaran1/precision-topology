@@ -1,0 +1,252 @@
+{
+ "types_at_u0.1": {
+  "T": "two-unit (+,-) unplaced",
+  "T'": "two-unit (-,+) unplaced"
+ },
+ "T'_equals_swapped_T": false,
+ "T_swapped_is_stationary_at_(0.9,0.1)": true,
+ "scan": {
+  "0.02": {
+   "two-unit (+,-) unplaced": 55,
+   "not accepted": 15,
+   "two-unit (-,+) unplaced": 12,
+   "D unplaced": 18
+  },
+  "0.05": {
+   "two-unit (+,-) unplaced": 61,
+   "D unplaced": 21,
+   "two-unit (-,+) unplaced": 12,
+   "not accepted": 6
+  },
+  "0.1": {
+   "two-unit (+,-) unplaced": 62,
+   "D unplaced": 22,
+   "two-unit (-,+) unplaced": 12,
+   "not accepted": 4
+  },
+  "0.15": {
+   "two-unit (+,-) unplaced": 56,
+   "D unplaced": 25,
+   "two-unit (-,+) unplaced": 13,
+   "not accepted": 6
+  },
+  "0.2": {
+   "two-unit (+,-) unplaced": 47,
+   "D unplaced": 30,
+   "two-unit (-,+) unplaced": 13,
+   "not accepted": 10
+  },
+  "0.3": {
+   "two-unit (+,-) unplaced": 22,
+   "D unplaced": 38,
+   "not accepted": 27,
+   "two-unit (-,+) unplaced": 13
+  }
+ },
+ "own_Tprime": [
+  {
+   "seed": 600000,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008939095037065121,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 2.8976820942716586e-13,
+   "adiabatic": {
+    "s_sw": 0.3417344872949144,
+    "share": 0.3263482233096608,
+    "kappa": -0.025981378766364922,
+    "lam": 0.044323193978814505,
+    "dGz_tp": -0.6103338057911714,
+    "dGv": 3.7816569495308094
+   }
+  },
+  {
+   "seed": 600001,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008229344413153884,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.3802767817594486e-09,
+   "adiabatic": {
+    "s_sw": 0.3333177952743337,
+    "share": 0.32642919345829,
+    "kappa": -0.06400209976015762,
+    "lam": 0.04053097862047508,
+    "dGz_tp": -0.5288978772289912,
+    "dGv": 2.7867558537453263
+   }
+  },
+  {
+   "seed": 600002,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.00842259737481434,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 2.6645352591003757e-14,
+   "adiabatic": {
+    "s_sw": 0.3574237155204659,
+    "share": 0.34833710749315483,
+    "kappa": -0.056565006102848946,
+    "lam": 0.046948848412316384,
+    "dGz_tp": -0.45579887099309324,
+    "dGv": 2.4717152417030874
+   }
+  },
+  {
+   "seed": 600003,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008597452000210488,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.3988810110276972e-14,
+   "adiabatic": {
+    "s_sw": 0.3333177952743337,
+    "share": 0.32062932847674186,
+    "kappa": -0.05209405856790189,
+    "lam": 0.04110317569931714,
+    "dGz_tp": -0.4633717948953322,
+    "dGv": 2.708464751421946
+   }
+  },
+  {
+   "seed": 600004,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.007964486384339949,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.6209256159527285e-14,
+   "adiabatic": {
+    "s_sw": 0.3123918519149913,
+    "share": 0.3019447568784144,
+    "kappa": -0.060050021267101863,
+    "lam": 0.0344454162444045,
+    "dGz_tp": -0.5609116470207355,
+    "dGv": 3.055850668121085
+   }
+  },
+  {
+   "seed": 600005,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008298569469819245,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 2.83550960489265e-13,
+   "adiabatic": {
+    "s_sw": 0.3171011981315913,
+    "share": 0.3098598046468082,
+    "kappa": -0.065003523695434,
+    "lam": 0.03686544856421569,
+    "dGz_tp": -0.5662811890151235,
+    "dGv": 2.967059022696006
+   }
+  },
+  {
+   "seed": 600006,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008053422552590634,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.4876988529977098e-14,
+   "adiabatic": {
+    "s_sw": 0.32673394275660805,
+    "share": 0.3190008286648624,
+    "kappa": -0.05973459294953917,
+    "lam": 0.03843784666845492,
+    "dGz_tp": -0.5234298767812874,
+    "dGv": 2.876567028076149
+   }
+  },
+  {
+   "seed": 600007,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.0083740211623328,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 4.100540573759304e-09,
+   "adiabatic": {
+    "s_sw": 0.32028013764286045,
+    "share": 0.3087642369165465,
+    "kappa": -0.054872836298379406,
+    "lam": 0.03750002173115811,
+    "dGz_tp": -0.5095904122026491,
+    "dGv": 2.9006176194279476
+   }
+  },
+  {
+   "seed": 600008,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.00804815426428808,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 9.933609490531126e-12,
+   "adiabatic": {
+    "s_sw": 0.3046978493923889,
+    "share": 0.29459024952894647,
+    "kappa": -0.062134719482936286,
+    "lam": 0.03303885485437718,
+    "dGz_tp": -0.5914742335901937,
+    "dGv": 3.135512167851129
+   }
+  },
+  {
+   "seed": 600009,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008175605610011807,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.532107773982716e-14,
+   "adiabatic": {
+    "s_sw": 0.3300094505327432,
+    "share": 0.32127790954101293,
+    "kappa": -0.05726508096900132,
+    "lam": 0.0394185882962799,
+    "dGz_tp": -0.5052704422955872,
+    "dGv": 2.826642829190096
+   }
+  },
+  {
+   "seed": 600010,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008432403864416252,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.4876988529977098e-14,
+   "adiabatic": {
+    "s_sw": 0.3400343157163328,
+    "share": 0.3334265579546375,
+    "kappa": -0.059130159716597436,
+    "lam": 0.04308682649884804,
+    "dGz_tp": -0.49261397260913853,
+    "dGv": 2.6751330825525166
+   }
+  },
+  {
+   "seed": 600011,
+   "own_copy": true,
+   "type": "two-unit (-,+) unplaced",
+   "lam_s0": 0.008925601732819234,
+   "W": 4000,
+   "release_on_copy": true,
+   "release_dist": 1.4876988529977098e-14,
+   "adiabatic": {
+    "s_sw": 0.32510840075284375,
+    "share": 0.3123100717476726,
+    "kappa": -0.04483643641625459,
+    "lam": 0.040481424320003005,
+    "dGz_tp": -0.46162874196183995,
+    "dGv": 2.8156667977174976
+   }
+  }
+ ]
+}

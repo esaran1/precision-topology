@@ -5,7 +5,8 @@ Per run: the crossing (first step with G₊ > 0: dense screen, exact extrema to 
 the run's OWN v path (z*(v_t) by warm-started Newton every 25 steps, then step bisection), s_sw,path; the ray switch from
 w2_explore_b; r_obs vs both; the slaved prediction κχ at t_sw (χ = (ṡ/s_sw)/(η·λ_min), ṡ over min(100, t) steps, κ and
 λ_min on the reduced Hessian at z*(v_{t_sw}) along the run's local v direction); max χ_t over s_t ≥ 0.8·s_sw (sampled every
-25 steps); ηλ_max; the share v₁/s at the crossing; the release-to-crossing step count.  Prints one JSON line per run (run_all.sh collects them in w2_explore_c.log)."""
+25 steps); ηλ_max; the share v₁/s at the crossing; the release-to-crossing step count.  CONT=1: training continues after the crossing (no
+placement evaluated) to s ≥ 1.1·s_obs, so a switch after the crossing (negative κ) is found.  Prints one JSON line per run (run_all.sh collects them in w2_explore_c.log)."""
 import json
 import math
 import sys
@@ -59,12 +60,22 @@ for ci in IDX:
         if placed(q[W.ZI], q[W.VI]):
             cross = t
             break
+    if cross is not None and os.environ.get("CONT"):
+        # CONT=1 (added for the T′ check): keep training after the crossing, NO placement evaluated, until s ≥ 1.1·s_obs
+        # (or as many steps again), so a predicted-early run's own-path switch (after its crossing) can be located.
+        s_obs_ = S[cross]
+        for t in range(cross + 1, 2 * cross + 200_000):
+            g = W.grad(q, x, y)
+            q[W.ZI] -= ETA * g[W.ZI]; q[W.VI] -= RHO * ETA * g[W.VI]
+            V.append(q[W.VI].copy()); S.append(float(np.abs(q[W.VI]).sum()))
+            if S[-1] >= 1.1 * s_obs_:
+                break
     out = {"class": ci, "kind": rec_b["class"][0], "eta": ETA, "rho": RHO, "budget": BUDGET, "crossed": cross is not None,
            "secs_train": round(time.time() - t0, 1)}
     if cross is None:
         print(json.dumps(out), flush=True); continue
     s_obs = S[cross]
-    out.update({"cross_step": cross, "s_obs": s_obs, "share_at_cross": float(q[2] / S[cross]),
+    out.update({"cross_step": cross, "s_obs": s_obs, "share_at_cross": float(V[cross][0] / S[cross]),
                 "s_sw_ray": rec_b.get("s_sw_ray"), "s_sw_adiabatic": rec_b["adiabatic"].get("s")})
     # lag-free switch along the run's own v path
     zg, tprev, zprev, tsw = zc.copy(), 0, zc.copy(), None

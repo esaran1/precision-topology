@@ -23,3 +23,13 @@ design is approved. `run_all.sh` reproduces everything in order (one process, ni
 - `w2_explore_f.py`: seed 600,000's unresolved starts with a 10× longer hold; own-sample two-unit copy T at shares
   (0.1, 0.9) (adiabatic switch) and landing fractions on seeds 600,000–600,005.
 - `w2_explore_g.py`: pooled own-sample landing rates and the binomial chance of passing the proposed gate (arithmetic only).
+
+Added after the author's approval with changes A–D (2026-09-29; still population and used seeds 600,000–600,011 only).
+Each log starts with its memory-gate check line.
+- `w2_explore_h.py`: is T′ the unit-swap image of T (no); landing on T-type (+,−) and T′-type (−,+) two-unit branches at
+  shares 0.02–0.3; branch-point start of T′ on the used own samples (release on the own T′ copy, adiabatic switch, κ).
+- `w2_explore_c_Tprime.log`: `w2_explore_c.py` with `CONT=1` (training continues after the crossing, no placement
+  evaluated, so a negative-κ run's own-path switch after its crossing is found) from T′ at η 0.03 / 0.3 and several ρ.
+- Memory gate: each earlier job (a–g) was preceded by a separate gate check (free 50–59%, swap free 502–950 MB, all OK), but those
+  checks were not written into the logs. The jobs added after approval (h, c_Tprime) have the check as their first log line.
+- `w2_explore_i.py`: the L5 resolution rule (N_min = 6 steps) and r_min at the candidate settings (arithmetic on the c logs).
