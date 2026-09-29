@@ -95,14 +95,17 @@ def test_gate_primary_edges():
     on[63] = False
     assert not X.gate("random", on, np.zeros(80, bool))["pass"]
     on[63] = True
-    hp = np.zeros(80, bool); hp[70] = True                                  # one run with G > 0 in its hold
+    hp = np.zeros(80, bool); hp[:30] = True                                 # G > 0 in the hold: no effect on the primary
     g = X.gate("random", on, hp)
-    assert not g["pass"] and g["frac_ok"] and not g["hold_ok"] and g["n_hold_G_positive"] == 1
+    assert g["pass"] and g["n_hold_G_positive"] == 30 and not g["hold_condition_applies"]
 
 
 def test_gate_control_edges():
     on = np.zeros(80, bool); on[:72] = True                                 # 72/80 = 0.90
     assert X.gate("branch", on, np.zeros(80, bool))["pass"]
+    hp = np.zeros(80, bool); hp[75] = True                                  # the control keeps the hold condition
+    g = X.gate("branch", on, hp)
+    assert not g["pass"] and g["frac_ok"] and not g["hold_ok"] and g["hold_condition_applies"]
     on[71] = False
     assert not X.gate("branch", on, np.zeros(80, bool))["pass"]
     assert not X.gate("random", np.zeros(0, bool), np.zeros(0, bool))["pass"]
@@ -149,8 +152,10 @@ def test_pilot_rule_inactive_runs_once():
     assert r["status"] == "ok" and r["rho"] == 1.0 and calls == [1.0]
 
 
-def test_pilot_rule_uses_absolute_kappa_chi():
-    r = X.pilot_rule(lambda rho: [0.01] * 8 + [-0.3 * rho] * 2)            # negative-κ runs count by size
+def test_pilot_rule_uses_signed_kappa_chi():
+    r = X.pilot_rule(lambda rho: [0.01] * 8 + [-0.3 * rho] * 2)            # signed: negative values do not raise q90
+    assert r["status"] == "ok" and r["rho"] == 1.0 and r["history"][0]["q90_kc"] == pytest.approx(0.01)
+    r = X.pilot_rule(lambda rho: [0.01] * 8 + [0.3 * rho] * 2)
     assert r["status"] == "ok" and r["rho"] == 0.25
 
 
@@ -224,6 +229,9 @@ def test_gate_fail_makes_everything_unresolved_primary_and_control():
     s = X.score_arm(**c)
     assert s["outcome"] == "UNRESOLVED (gate)" and _v(s) == ("UNRESOLVED",) * 5 and s["scored_index"] == []
     c = _case(); c["hold_positive"] = c["hold_positive"].copy(); c["hold_positive"][5] = True
+    s = X.score_arm(**c)                                                    # primary: flagged, scored, gate passes
+    assert s["outcome"] == "PASS" and s["n_scored"] == 80 and s["n_on_branch_hold_G_positive"] == 1
+    c["arm"] = "branch"
     s = X.score_arm(**c)
     assert s["outcome"] == "UNRESOLVED (gate)" and not s["gate"]["hold_ok"]
     c = _case(n_on=71); c["arm"] = "branch"                                 # 71/80 < 0.90 for the control
@@ -351,11 +359,11 @@ def test_V4_resolution():
 def test_V5_q90_kappa_chi():
     c = _case(); c["r_cf"] = np.full(80, 0.1); c["r_traj"] = np.full(80, 0.1 / 1.01)
     c["s_traj"] = c["s_sw"] * (1 + c["r_traj"]); c["s_obs"] = c["s_sw"] * (1 + 0.1)
-    assert X.score_arm(**c)["validity"]["V5_q90_abs_kappa_chi_le_0p1"]
+    assert X.score_arm(**c)["validity"]["V5_q90_kappa_chi_le_0p1"]
     c["r_cf"] = np.full(80, 0.1001)
-    assert not X.score_arm(**c)["validity"]["V5_q90_abs_kappa_chi_le_0p1"]
-    c = _case(); c["r_cf"] = c["r_cf"].copy(); c["r_cf"][:10] = -0.2         # |κχ| counts for a negative κ
-    assert not X.score_arm(**c)["validity"]["V5_q90_abs_kappa_chi_le_0p1"]
+    assert not X.score_arm(**c)["validity"]["V5_q90_kappa_chi_le_0p1"]
+    c = _case(); c["r_cf"] = c["r_cf"].copy(); c["r_cf"][:10] = -0.2         # signed: negative κχ does not raise q90
+    assert X.score_arm(**c)["validity"]["V5_q90_kappa_chi_le_0p1"]
 
 
 def test_V6_chi_against_pilot():
@@ -374,11 +382,11 @@ def test_V6_chi_against_pilot():
 def test_V7_follows_branch():
     c = _case(); c["chi_path_max"] = np.where(np.arange(80) < 70, 0.1, 0.3)
     s = X.score_arm(**c)
-    assert s["q90_max_chi_path"] > 0.25 and not s["validity"]["V7_q90_max_chi_path_le_0p25"]
+    assert s["q90_max_chi_window"] > 0.25 and not s["validity"]["V7_q90_max_chi_window_le_0p25"]
     c["chi_path_max"] = np.full(80, 0.25)
-    assert X.score_arm(**c)["validity"]["V7_q90_max_chi_path_le_0p25"]
+    assert X.score_arm(**c)["validity"]["V7_q90_max_chi_window_le_0p25"]
     c["chi_path_max"] = np.full(80, 0.1); c["chi_path_max"][3] = np.nan     # an undefined path max fails V7
-    assert not X.score_arm(**c)["validity"]["V7_q90_max_chi_path_le_0p25"]
+    assert not X.score_arm(**c)["validity"]["V7_q90_max_chi_window_le_0p25"]
 
 
 def test_invalid_even_if_statistics_would_fail():
@@ -443,3 +451,118 @@ def test_hessian_z_matches_act_general():
     z = np.array([1.3, -1.0, -0.3])
     H, _ = hessian_and_tangent(z, 3.3, P.x, P.y, P.act)
     assert np.allclose(X.hessian_z(z, 3.3, P), H, rtol=1e-12, atol=1e-14)
+
+
+# ------------------------------------------------------------------------------------------ author's decisions 2026-09-29
+def test_chi_window_max_uses_only_s_at_or_above_0p8_switch():
+    s = np.array([3.0, 3.5, 4.0, 4.79, 4.81, 5.5, 6.0, 6.1])
+    chi = np.array([0.9, 0.8, 0.7, 0.6, 0.05, 0.04, 0.03])                 # χ_t for t = 0 … t_sw − 1 (t_sw = 7)
+    assert X.chi_window_max(s, 7, chi, 6.0) == 0.05                         # s_t ≥ 4.8 from t = 4 (χ_0…χ_3 excluded)
+    assert X.chi_window_max(s, 7, chi, 100.0) != X.chi_window_max(s, 7, chi, 6.0)
+    assert math.isnan(X.chi_window_max(s, 7, chi, 100.0))                  # empty window
+    chi2 = chi.copy(); chi2[5] = np.nan
+    assert math.isnan(X.chi_window_max(s, 7, chi2, 6.0))
+    assert math.isnan(X.chi_window_max(s, None, chi, 6.0))
+    assert X.first_at_fraction(s, 6.0) == 4 and X.first_at_fraction(s, 100.0) is None
+
+
+def test_follows_branch_rule():
+    assert X.follows_branch(1, 1) and X.follows_branch(-1, -1)
+    assert not X.follows_branch(1, -1) and not X.follows_branch(-1, 1)
+    assert not X.follows_branch(1, 0) and not X.follows_branch(0, 0)
+
+
+def test_follow_classification_newton_identity_and_state_tolerance():
+    zt = COP[1]
+    lagging = zt + 0.02                                                     # a state lagging its branch by 2e-2
+    assert X.classify_release(lagging, zt, True, COP, state_tol=None) == 1
+    assert X.classify_release(lagging, zt, True, COP, state_tol=1e-3) == 0
+    assert X.classify_release(lagging, COP[-1], True, COP, state_tol=None) == -1   # Newton lands on the other copy
+    assert X.classify_release(lagging, zt + 2e-6, True, COP, state_tol=None) == 0
+    assert X.classify_release(lagging, zt, False, COP, state_tol=None) == 0
+
+
+def test_runs_not_following_their_branch_are_not_scored():
+    c = _case()
+    fol = np.ones(80, bool); fol[:10] = False
+    c["s_obs"] = c["s_obs"].copy(); c["s_obs"][:10] = 100.0                 # would fail everything if scored
+    s = X.score_arm(**c, follows=fol)
+    assert s["n_scored"] == 70 and s["n_on_branch_not_following"] == 10 and s["outcome"] == "PASS"
+    fol[:21] = False
+    assert X.score_arm(**c, follows=fol)["outcome"] == "UNRESOLVED (validity)"      # 59 scored < 60
+
+
+def test_sensitivity_exclusion_is_separate_from_the_registered_scoring():
+    c = _case()
+    hp = np.zeros(80, bool); hp[:25] = True
+    c["hold_positive"] = hp
+    s = X.score_arm(**c)
+    assert s["n_scored"] == 80 and s["outcome"] == "PASS"
+    sens = X.score_arm(**c, exclude=hp)
+    assert sens["n_scored"] == 55 and sens["outcome"] == "UNRESOLVED (validity)"   # fewer than 60 once excluded
+    assert sens["gate"]["pass"] and sens["n_excluded_sensitivity"] == 25
+
+
+def test_kappa_invariant_under_mirror_coordinates_G_sign_and_s_direction():
+    rng = np.random.default_rng(1)
+    for _ in range(50):
+        A = rng.normal(size=(3, 3)); H = A @ A.T + 0.1 * np.eye(3)
+        tan, dG = rng.normal(size=3), np.r_[rng.normal(size=2), 0.0]
+        k = X.kappa_transforms(H, tan, dG)
+        for key in ("mirror_coords", "G_sign", "s_direction"):
+            assert k[key] == pytest.approx(k["kappa"], rel=1e-9, abs=1e-12)
+    # a negative κ stays negative: the sign is not a convention
+    H = np.diag([1.0, 10.0, 1.0]); tan = np.array([1.0, 1.0, 0.0]); dG = np.array([-1.0, 1.2, 0.0])
+    k = X.kappa_transforms(H, tan, dG)
+    assert k["kappa"] < 0 and k["mirror_coords"] < 0 and k["G_sign"] < 0 and k["s_direction"] < 0
+
+
+def test_kappa_recomputed_on_the_mirrored_sample_equals_the_original():
+    from src.act_general import hessian_and_tangent
+    from src.lag_law import kappa
+    seed, s = 876_950, 5.0                                                  # outside every registered range
+    P = X.own_problem(seed)
+    z, g, lam, ok = X.newton_at([1.3, -1.0, -0.3], s, P)
+    assert ok
+    H, tan = hessian_and_tangent(z, s, P.x, P.y, P.act)
+    dG, _ = X.grad_gap_checked(z[0], z[1], P.act)
+    k0 = kappa(H, tan, dG, np.ones(3))[0]
+    m = X.kappa_mirror_recomputed(seed, z, s)
+    assert m["newton_ok"] and m["dist_from_mirror_image"] < 1e-9
+    assert m["kappa"] == pytest.approx(k0, rel=1e-6)
+
+
+def _neg_case(n_neg=20, ratio=1.02):
+    """20 predicted-early runs (κ < 0): signed lags negative, crossing before t_sw."""
+    c = _case(noise=0.0, ratio=ratio)
+    k = c["kappa"].copy(); k[:n_neg] = -0.19; c["kappa"] = k
+    rt = c["r_traj"].copy(); rt[:n_neg] *= -1; c["r_traj"] = rt; c["r_cf"] = rt * 1.01
+    c["s_traj"] = c["s_sw"] * (1 + rt)
+    c["s_obs"] = c["s_sw"] * (1 + rt * ratio)
+    ts = c["t_sw"].copy(); ts[:n_neg] = 6100.0; c["t_sw"] = ts                # t_sw after the (early) crossing
+    return c
+
+
+def test_negative_kappa_runs_are_scored_with_signed_ratios():
+    s = X.score_arm(**_neg_case())
+    assert s["valid"] and s["n_scored"] == 80 and s["n_kappa_nonpos_scored"] == 20 and s["outcome"] == "PASS"
+    assert s["n_kappa_pos_crossing"] == 60 and s["frac_tsw_before_crossing_kappa_pos"] == 1.0
+
+
+def test_negative_kappa_runs_with_the_wrong_sign_fail():
+    c = _neg_case()
+    c["s_obs"] = c["s_obs"].copy()
+    c["s_obs"][:20] = c["s_sw"][:20] * (1 - c["r_traj"][:20])              # observed LATE where predicted early
+    s = X.score_arm(**c)
+    ratios = (c["s_obs"] / c["s_sw"] - 1) / c["r_traj"]
+    assert (ratios[:20] < 0).all()                                          # signed ratios: −1 for those runs
+    assert s["valid"] and s["L3"]["spearman"] < 0.9 and s["L5"]["verdict"] in ("PASS", "FAIL")
+    c["s_obs"][:45] = c["s_sw"][:45] * (1 - c["r_traj"][:45])               # 45 of 80 of the wrong sign: L1 fails
+    assert X.score_arm(**c)["L1"]["verdict"] == "FAIL"
+
+
+def test_V4_uses_signed_predicted_lag():
+    c = _neg_case(n_neg=41)
+    c["lag_steps"] = np.where(c["kappa"] < 0, -40.0, 40.0)                 # median of signed lags < 10
+    s = X.score_arm(**c)
+    assert s["median_predicted_lag_steps"] < 10 and not s["validity"]["V4_median_predicted_lag_ge_10_steps"]

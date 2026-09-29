@@ -24,6 +24,15 @@ Classification at release: damped Newton at s₀ from the release state (accepte
 definite); on copy c iff the Newton point is within 1e−6 (sup) of the frozen θ*_own,c(s₀) AND the release state is
 within 1e−3 of it.  random arm: on-branch iff on either copy (the run gets that copy's prediction); branch arm: on
 target iff on the assigned copy.  Other runs get no prediction and are counted, never replaced.
+Gates (author's decision 2026-09-29): random ≥ 80% on-branch at release, regardless of G in the hold (runs with G > 0
+at the start or in the hold are scored, flagged, and excluded only in a DESCRIPTIVE sensitivity analysis); branch ≥ 90%
+on target AND no run with G > 0 at any hold step.
+Follow check (author's decision): at the first step with s_t ≥ 0.8·s_switch,branch, Newton at that s from the run's
+state, classified against both copies' frozen branch points at 0.8·s_switch carried to that s; a run whose copy there
+differs from its release copy (or is neither) is not scored (counted).  V7 is the q90 of max χ_t over the part of the
+path with s_t ≥ 0.8·s_switch,branch up to t_sw.  κχ is SIGNED everywhere (pilot rule, V5, predictions): κ's sign is
+invariant under the mirror coordinates, the sign convention of G and the direction of s (kappa_transforms,
+kappa_mirror_recomputed), so a negative κ is a predicted crossing before the switch.
 
 Frozen per seed and copy (freeze): θ*_own(s₀) (Newton from θ*_pop(s₀) or its mirror), λ_min(s₀), W_copy,
 s_switch,branch (act_fold pseudo-arclength continuation from s₀ to 1.6·s_pop; the first G sign change, bisected to
@@ -82,6 +91,8 @@ S0_FRAC = 0.5
 HOLD_LR, W_MIN, W_RELAX = 0.3, 4000, 25.0
 ETA, BUDGET = 0.03, 40_000
 NEWTON_GTOL, ON_TOL, STATE_TOL = 1e-8, 1e-6, 1e-3
+FOLLOW_FRAC = 0.8                      # branch identity re-checked at the first step with s_t ≥ 0.8·s_switch,branch
+FOLLOW_STATE_TOL = None                # OPEN (author): state-to-branch tolerance at that step; None = Newton identity only
 S_HI_FRAC = 1.6
 CONT_H0, CONT_HMAX = 0.01, 0.05        # act_fold defaults; step halving uses half of both
 HALVING_REL = 1e-6
@@ -136,15 +147,16 @@ def arm_hold_steps(arm, seed, W_by_copy):
     return None if any(w is None for w in ws) else int(max(ws))
 
 
-def classify_release(z_release, z_newton, newton_ok, copies):
-    """Copy the run is on at release: +1, −1 or 0 (neither).  copies = {c: frozen θ*_own,c(s₀) or None}.  On c iff the
-    Newton point is accepted and within ON_TOL (sup) of θ*_own,c(s₀) and the release state within STATE_TOL of it."""
+def classify_release(z_release, z_newton, newton_ok, copies, state_tol=STATE_TOL):
+    """Copy the run is on: +1, −1 or 0 (neither).  copies = {c: that copy's branch point at this s, or None}.  On c iff
+    the Newton point is accepted and within ON_TOL (sup) of the branch point and the state within state_tol of it
+    (state_tol None: no state condition)."""
     if not newton_ok:
         return 0
     z_release, z_newton = np.asarray(z_release, float), np.asarray(z_newton, float)
     hits = [c for c, zc in copies.items() if zc is not None
             and np.abs(z_newton - np.asarray(zc, float)).max() <= ON_TOL
-            and np.abs(z_release - np.asarray(zc, float)).max() <= STATE_TOL]
+            and (state_tol is None or np.abs(z_release - np.asarray(zc, float)).max() <= state_tol)]
     assert len(hits) <= 1, "a state cannot be on both copies"
     return hits[0] if hits else 0
 
@@ -175,6 +187,26 @@ def closed_form(s_path, t_sw, s_sw, kappa, lam_sw, eta=ETA):
     return float(kappa * chi), float(chi), float(sdot)
 
 
+def chi_window_max(s_path, t_sw, chi, s_sw, frac=FOLLOW_FRAC):
+    """V7's statistic: max of χ_t over 0 ≤ t < t_sw with s_t ≥ frac·s_switch (NaN if the window is empty or any χ_t in
+    it is not finite)."""
+    if t_sw is None or t_sw < 1 or len(chi) == 0:
+        return float("nan")
+    s = np.asarray(s_path, float)[:int(t_sw)]
+    w = np.asarray(chi, float)[s >= frac * s_sw]
+    return float(w.max()) if len(w) and np.all(np.isfinite(w)) else float("nan")
+
+
+def first_at_fraction(s_path, s_sw, frac=FOLLOW_FRAC):
+    """The first step with s_t ≥ frac·s_switch (None if never)."""
+    return t_switch(s_path, frac * s_sw) if s_sw is not None and np.isfinite(s_sw) else None
+
+
+def follows_branch(copy_release, copy_follow):
+    """The run is on the same copy at the follow check as at release (neither at the check: does not follow)."""
+    return bool(copy_release in COPIES and copy_follow == copy_release)
+
+
 def chi_path(s_path, t_sw, lam_of_s, eta=ETA):
     """χ_t = ((s_{t+1} − s_t)/s_t)/(η·λ_min(H(s_t))) for t = 0 … t_sw − 1 (Corollary L3's χ_t with the one-step ṡ).
     lam_of_s(s) → λ_min of the occupied branch's Hessian at s (NaN outside the branch range)."""
@@ -200,23 +232,23 @@ def pilot_rho(q):
 
 
 def pilot_rule(run_pilot):
-    """The registered pilot rule.  run_pilot(ρ) → the pilot runs' κ_seed·χ at t_sw (on-branch runs only).  q90 is taken
-    of |κχ| (a negative-κ copy's lag is as large in magnitude).  ρ = min(1, 2^⌊log₂(0.1/q90)⌋) at ρ = 1; if ρ < 1 the
+    """The registered pilot rule.  run_pilot(ρ) → the pilot runs' SIGNED κ_seed·χ at t_sw (on-branch runs only); q90 is
+    the 90th percentile of the signed values.  ρ = min(1, 2^⌊log₂(0.1/q90)⌋) at ρ = 1; if ρ < 1 the
     pilot is rerun at ρ and ρ is kept only if q90 ≤ 0.1, otherwise ρ is halved and the pilot rerun, up to three halvings;
     then STOP.  No pilot value at all: STOP."""
     hist = []
-    kc = np.abs(np.asarray(run_pilot(1.0), float))
+    kc = np.asarray(run_pilot(1.0), float)
     q = q90(kc)
-    hist.append({"rho": 1.0, "n": int(len(kc)), "q90_abs_kc": q})
+    hist.append({"rho": 1.0, "n": int(len(kc)), "q90_kc": q})
     if not np.isfinite(q):
         return {"status": "STOP", "rho": None, "history": hist, "reason": "no pilot value"}
     rho = pilot_rho(q)
     if rho == 1.0:
         return {"status": "ok", "rho": 1.0, "history": hist}
     for k in range(PILOT_MAX_HALVINGS + 1):
-        kc = np.abs(np.asarray(run_pilot(rho), float))
+        kc = np.asarray(run_pilot(rho), float)
         q = q90(kc)
-        hist.append({"rho": rho, "n": int(len(kc)), "q90_abs_kc": q})
+        hist.append({"rho": rho, "n": int(len(kc)), "q90_kc": q})
         if np.isfinite(q) and q <= PILOT_KC_MAX:
             return {"status": "ok", "rho": rho, "history": hist}
         if k == PILOT_MAX_HALVINGS:
@@ -237,29 +269,36 @@ def bootstrap_mean_ci(D, n_boot=BOOT_N, seed=BOOT_SEED):
 
 
 def gate(arm, on_branch, hold_positive):
-    """Registered gate: fraction on-branch at release ≥ 0.80 (random) / 0.90 (branch), and no run with G > 0 at any
-    hold step (the start state included)."""
+    """Registered gate.  random: fraction on-branch (target or mirror) at release ≥ 0.80, regardless of G in the hold.
+    branch: fraction on target ≥ 0.90 AND no run with G > 0 at any hold step (the start state included)."""
     on_branch = np.asarray(on_branch, bool); hold_positive = np.asarray(hold_positive, bool)
     frac = float(on_branch.mean()) if len(on_branch) else float("nan")
     ok_frac = bool(len(on_branch) and frac >= GATE_FRAC[arm])
     ok_hold = not bool(hold_positive.any())
     return {"n_runs": int(len(on_branch)), "n_on_branch": int(on_branch.sum()), "frac_on_branch": frac,
             "min_frac": GATE_FRAC[arm], "n_hold_G_positive": int(hold_positive.sum()),
-            "frac_ok": ok_frac, "hold_ok": ok_hold, "pass": bool(ok_frac and ok_hold)}
+            "frac_ok": ok_frac, "hold_ok": ok_hold,
+            "pass": bool(ok_frac and (ok_hold or arm == PRIMARY)), "hold_condition_applies": arm == CONTROL}
 
 
 def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_traj, r_traj, r_cf, kappa, t_sw,
-              eta_lam, lag_steps, chi_tsw, chi_path_max, pilot_chi_median, s_glob):
+              eta_lam, lag_steps, chi_tsw, chi_path_max, pilot_chi_median, s_glob, follows=None, exclude=None):
     """Registered verdicts for one arm.  Arrays over the arm's 80 runs (NaN where undefined).
 
-    Gate first (fail: every criterion UNRESOLVED, nothing scored).  Scored run: on-branch at release, crossed, finite
-    r_traj, r_cf and r_obs.  Validity V1-V7 (any fails: L1-L5 UNRESOLVED).  L4/L5 use s_pred = s_traj."""
+    Gate first (fail: every criterion UNRESOLVED, nothing scored).  Scored run: on-branch at release, on the same copy
+    at the follow check (`follows`; None: all True), crossed, finite r_traj, r_cf and r_obs, and not in `exclude` (the
+    DESCRIPTIVE sensitivity analysis only; None in the registered scoring).  All lags are SIGNED: a negative-κ run has a
+    negative predicted lag (predicted crossing before its switch); ratios r_obs/r_pred are of signed lags.  Validity
+    V1-V7 (any fails: L1-L5 UNRESOLVED); V2 counts only crossing runs with κ_seed > 0 (predicted-late); predicted-early
+    runs (κ_seed ≤ 0) are scored and not in V2.  V5 is the q90 of the SIGNED κχ.  L4/L5 use s_pred = s_traj."""
     A = lambda v, t=float: np.asarray(v, t)
     on_branch, hold_positive, crossed = A(on_branch, bool), A(hold_positive, bool), A(crossed, bool)
     step_obs, s_obs, s_sw, s_traj, r_traj, r_cf, kappa, t_sw, eta_lam, lag_steps, chi_tsw, chi_path_max = (
         A(v) for v in (step_obs, s_obs, s_sw, s_traj, r_traj, r_cf, kappa, t_sw, eta_lam, lag_steps, chi_tsw,
                        chi_path_max))
     names = ("L1", "L2", "L3", "L4", "L5")
+    follows = np.ones(len(on_branch), bool) if follows is None else A(follows, bool)
+    exclude = np.zeros(len(on_branch), bool) if exclude is None else A(exclude, bool)
     g = gate(arm, on_branch, hold_positive)
     out = {"arm": arm, "role": "primary" if arm == PRIMARY else "mechanism control", "gate": g}
     if not g["pass"]:
@@ -269,7 +308,8 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
         return out
     with np.errstate(invalid="ignore", divide="ignore"):
         r_obs = s_obs / s_sw - 1
-    scored = on_branch & crossed & np.isfinite(r_traj) & np.isfinite(r_cf) & np.isfinite(r_obs) & np.isfinite(s_traj)
+    scored = (on_branch & follows & ~exclude & crossed & np.isfinite(r_traj) & np.isfinite(r_cf) & np.isfinite(r_obs)
+              & np.isfinite(s_traj))
     n = int(scored.sum())
     kpos = on_branch & crossed & np.isfinite(kappa) & (kappa > 0)
     tsw_before = kpos & np.isfinite(t_sw) & np.isfinite(step_obs) & (t_sw < step_obs)
@@ -278,7 +318,7 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
     med = lambda v: float(np.median(v)) if len(v) else float("nan")
     regime_frac = float(np.mean(S(eta_lam) <= REGIME_MAX)) if n else float("nan")
     lag_med = med(S(lag_steps))
-    kc_q90 = q90(np.abs(S(r_cf)))
+    kc_q90 = q90(S(r_cf))
     chi_med = med(S(chi_tsw))
     chi_rel = abs(chi_med / pilot_chi_median - 1) if n and np.isfinite(pilot_chi_median) and pilot_chi_median else float("nan")
     chi_path_q90 = q90(S(chi_path_max))
@@ -286,18 +326,22 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
          "V2_tsw_before_crossing_90pct_kappa_pos": bool(kpos.sum() == 0 or frac_tsw >= TSW_MIN_FRAC),
          "V3_regime_eta_lam_le_0p5_in_80pct": bool(n and regime_frac >= REGIME_MIN_FRAC),
          "V4_median_predicted_lag_ge_10_steps": bool(np.isfinite(lag_med) and lag_med >= LAG_MIN_STEPS),
-         "V5_q90_abs_kappa_chi_le_0p1": bool(np.isfinite(kc_q90) and kc_q90 <= KC_Q90_MAX),
+         "V5_q90_kappa_chi_le_0p1": bool(np.isfinite(kc_q90) and kc_q90 <= KC_Q90_MAX),
          "V6_median_chi_within_30pct_of_pilot": bool(np.isfinite(chi_rel) and chi_rel <= CHI_REL_TOL),
-         "V7_q90_max_chi_path_le_0p25": bool(np.isfinite(chi_path_q90) and chi_path_q90 <= CHI_PATH_Q90_MAX)}
+         "V7_q90_max_chi_window_le_0p25": bool(np.isfinite(chi_path_q90) and chi_path_q90 <= CHI_PATH_Q90_MAX)}
     valid = all(V.values())
     out.update({"n_runs": int(len(on_branch)), "n_on_branch": int(on_branch.sum()),
                 "n_neither_or_off_target": int((~on_branch).sum()), "n_crossed": int(crossed.sum()),
+                "n_on_branch_not_following": int((on_branch & ~follows).sum()),
+                "n_on_branch_hold_G_positive": int((on_branch & hold_positive).sum()),
+                "n_excluded_sensitivity": int((on_branch & exclude).sum()),
+                "n_kappa_nonpos_scored": int((scored & ~(kappa > 0)).sum()),
                 "n_on_branch_crossed": int((on_branch & crossed).sum()), "n_scored": n,
                 "n_on_branch_crossed_no_prediction": int((on_branch & crossed & ~scored).sum()),
                 "n_kappa_pos_crossing": int(kpos.sum()), "frac_tsw_before_crossing_kappa_pos": frac_tsw,
-                "regime_frac": regime_frac, "median_predicted_lag_steps": lag_med, "q90_abs_kappa_chi_tsw": kc_q90,
+                "regime_frac": regime_frac, "median_predicted_lag_steps": lag_med, "q90_kappa_chi_tsw": kc_q90,
                 "median_chi_tsw": chi_med, "pilot_median_chi_tsw": float(pilot_chi_median),
-                "chi_rel_to_pilot": chi_rel, "q90_max_chi_path": chi_path_q90,
+                "chi_rel_to_pilot": chi_rel, "q90_max_chi_window": chi_path_q90,
                 "validity": {k: bool(v) for k, v in V.items()}, "valid": bool(valid),
                 "scored_index": np.nonzero(scored)[0].tolist()})
     ro, rt, rc = S(r_obs), S(r_traj), S(r_cf)
@@ -579,11 +623,86 @@ def freeze_copy(P, z_pop, c, s0, s_pop):
     return row
 
 
+D_MIRROR = np.array([-1.0, 1.0, 1.0])      # z = (w₁, b₁, b₂) → (−w₁, b₁, b₂) under x → −x
+
+
+def kappa_transforms(H, tan, dG):
+    """κ (P = I) of (H, θ*′, ∇G) and under the three reparametrisations/conventions: the mirror coordinates
+    (H → DHD, θ*′ → Dθ*′, ∇G → D∇G, D = diag(−1, 1, 1)), the sign of G (∇G → −∇G) and the direction of s (θ*′ → −θ*′).
+    κ = λ_min·[∇G·H⁻¹θ*′]/[∇G·θ*′] is invariant under all three (each rescales numerator and denominator alike)."""
+    from .lag_law import kappa
+    H, tan, dG = (np.asarray(v, float) for v in (H, tan, dG))
+    D = np.diag(D_MIRROR)
+    one = np.ones(3)
+    return {"kappa": kappa(H, tan, dG, one)[0], "mirror_coords": kappa(D @ H @ D, D @ tan, D @ dG, one)[0],
+            "G_sign": kappa(H, tan, -dG, one)[0], "s_direction": kappa(H, -tan, dG, one)[0]}
+
+
+def mirrored_problem(seed):
+    """The seed's own sample mirrored, x → −x (same labels): the loss at (−w₁, b₁, b₂) equals the original loss at
+    (w₁, b₁, b₂)."""
+    P = own_problem(seed)
+    P.X = -P.X
+    P.x = P.X.numpy().astype(float)
+    return P
+
+
+def kappa_mirror_recomputed(seed, z_switch, s_sw):
+    """κ recomputed from scratch on the mirrored sample at the mirror image of a frozen switch point (Newton there,
+    H, θ*′ and ∇G of the mirrored problem).  Equal to the frozen κ if its sign and size are not a coordinate artefact."""
+    from .act_general import hessian_and_tangent
+    from .lag_law import kappa
+    Q = mirrored_problem(seed)
+    zm, g, lam, ok = newton_at(D_MIRROR * np.asarray(z_switch, float), s_sw, Q)
+    H, tan = hessian_and_tangent(zm, s_sw, Q.x, Q.y, Q.act)
+    dG, _ = grad_gap_checked(zm[0], zm[1], Q.act)
+    return {"kappa": kappa(H, tan, dG, np.ones(3))[0], "newton_ok": ok,
+            "dist_from_mirror_image": float(np.abs(zm - D_MIRROR * np.asarray(z_switch, float)).max())}
+
+
+def branch_point_at(P, z_s0, s0, s_target):
+    """Copy branch point at s_target by act_fold continuation from (θ*_own(s₀), s₀), then damped Newton at s_target;
+    validated by step halving (1e−6 sup) and no turning point on the way.  Returns z, θ*′ and the checks."""
+    from .act_fold import continue_branch
+    from .act_general import hessian_and_tangent
+    X0 = np.r_[np.asarray(z_s0, float), s0]
+    res = []
+    for h0, hm in ((CONT_H0, CONT_HMAX), (CONT_H0 / 2, CONT_HMAX / 2)):
+        ev, path = continue_branch(P.F, P.J, X0, +1, s_stop=s_target, gapf=None, h0=h0, hmax=hm)
+        below = [p for p in path if p["s"] <= s_target] or path[:1]
+        z, g, lam, ok = newton_at(below[-1]["z"], s_target, P)
+        res.append((ev, z, g, lam, ok))
+    (ev, z, g, lam, ok), (ev2, z2, *_ , ok2) = res
+    _, tan = hessian_and_tangent(z, s_target, P.x, P.y, P.act) if ok else (None, np.full(3, np.nan))
+    valid = bool(ok and ok2 and ev["fold"] is None and ev2["fold"] is None and ev["end"] == "s_stop"
+                 and float(np.abs(z - z2).max()) <= HALVING_REL)
+    return {"s": float(s_target), "z": z.tolist(), "tangent": np.asarray(tan).tolist(), "grad": g, "lam_min": lam,
+            "halving_sup": float(np.abs(z - z2).max()), "valid": valid}
+
+
+def branch_point_near(fp, s, P):
+    """A frozen follow point (at s_f = 0.8·s_switch) carried to the run's s by one tangent predictor + damped Newton."""
+    if fp is None or not fp.get("valid"):
+        return None
+    z, g, lam, ok = newton_at(np.asarray(fp["z"]) + np.asarray(fp["tangent"]) * (s - fp["s"]), s, P)
+    return z if ok else None
+
+
 def freeze_one(seed):
     land = _land()
     s_pop, s0 = land["s_pop"], land["s0"]
     P = own_problem(seed)
     rows = {c: freeze_copy(P, np.array(land["z_pop_s0"]), c, s0, s_pop) for c in COPIES}
+    for c in COPIES:                     # both copies' branch points at 0.8·s_switch of copy c (the follow check)
+        r = rows[c]
+        if not r.get("valid"):
+            continue
+        s_f = FOLLOW_FRAC * r["s_switch"]
+        r["s_follow"] = s_f
+        r["follow_points"] = {str(c2): (branch_point_at(P, rows[c2]["z_s0"], s0, s_f) if rows[c2]["newton_ok"] else None)
+                              for c2 in COPIES}
+        r["kappa_transforms"] = kappa_transforms(r["H_switch"], r["tangent_switch"], r["gradG"])
+        r["kappa_mirror_recomputed"] = kappa_mirror_recomputed(seed, r["z_switch"], r["s_switch"])
     Wc = {c: rows[c]["W"] for c in COPIES}
     return {"seed": int(seed), "pilot": seed in PILOT_SEEDS, "copies": {str(c): rows[c] for c in COPIES},
             "W_branch_arm": arm_hold_steps(CONTROL, seed, Wc), "W_random_arm": arm_hold_steps(PRIMARY, seed, Wc)}
@@ -700,6 +819,22 @@ def run_start(arm, seed, fr, land):
     return th_rel, rec, (X, Y, u, P)
 
 
+def follow_check(Wp, s, copy_release, cf, P):
+    """Branch at the first step with s_t ≥ 0.8·s_switch,branch (of the release copy): Newton at that s from the run's
+    (w₁, b₁, b₂), classified against both copies' frozen branch points (0.8·s_switch) carried to that s, tolerances as at
+    release with the state condition FOLLOW_STATE_TOL.  Uses the state at that step only (no gap)."""
+    t08 = first_at_fraction(s, cf["s_switch"])
+    if t08 is None:
+        return {"t_follow": None, "copy_at_follow": 0, "follows_branch": False}
+    st = float(s[t08]); z = Wp[t08, [0, 1, 3]]
+    pts = {int(c2): branch_point_near(fp, st, P) for c2, fp in cf["follow_points"].items()}
+    zn, gn, ln, okn = newton_at(z, st, P)
+    c08 = classify_release(z, zn, okn, pts, state_tol=FOLLOW_STATE_TOL)
+    dist = {f"follow_state_dist_copy{c2:+d}": (float(np.abs(z - zc).max()) if zc is not None else None) for c2, zc in pts.items()}
+    return {"t_follow": int(t08), "s_follow_run": st, "copy_at_follow": c08, "follow_newton_ok": okn,
+            "follows_branch": follows_branch(copy_release, c08), **dist}
+
+
 def predict_one(arm, seed, Wp, rec, fr, land, P, with_traj=True):
     """Predictions for one run from its release classification and its s path (no gap of the actual path)."""
     out = dict(rec)
@@ -719,7 +854,10 @@ def predict_one(arm, seed, Wp, rec, fr, land, P, with_traj=True):
     B = GBranch(s0, np.array(cf["z_s0"]), P, 0.95 * s0, S_HI_FRAC * s_pop, GRID_H_FRAC * s_pop)
     out.update(branch_lo=B.lo, branch_hi=B.hi, branch_anchor_ok=B.anchor_ok)
     cp = chi_path(s, t_sw, B.lam_min) if t_sw is not None else np.array([])
-    out["chi_path_max"] = float(cp.max()) if len(cp) and np.all(np.isfinite(cp)) else float("nan")
+    out["chi_path_max_all"] = float(cp.max()) if len(cp) and np.all(np.isfinite(cp)) else float("nan")   # descriptive
+    out["chi_window_max"] = chi_window_max(s, t_sw, cp, s_sw)                                          # V7
+    out.update(follow_check(Wp, s, rec["copy_at_release"], cf, P))
+    out["pred_signed_s_cross_cf"] = s_sw * (1 + r_cf) if np.isfinite(r_cf) else float("nan")
     if not with_traj:
         return {**out, "status": "ok (pilot: no trajectory prediction)"}
     from .act_general import gap_mid
@@ -773,7 +911,8 @@ def pilot():
                 row["rho"] = rho
                 rows.append(row)
                 print(json.dumps({k: row.get(k) for k in ("arm", "seed", "copy_at_release", "on_branch", "hold_n_G_pos", "t_sw",
-                                                          "chi_tsw", "kc_tsw", "chi_path_max")}, default=float), flush=True)
+                                                          "chi_tsw", "kc_tsw", "chi_window_max", "copy_at_follow",
+                                                          "follows_branch")}, default=float), flush=True)
                 _rss_guard()
         runs[rho] = rows
         return vals
@@ -916,10 +1055,16 @@ def observe():
         d = g.merge(obs[obs.arm == arm], on=["arm", "seed"], how="left")
         assert len(d) == len(SEEDS)
         col = lambda c: d[c].to_numpy(float) if c in d else np.full(len(d), np.nan)
-        sc = score_arm(arm, d.on_branch.astype(bool), d.hold_G_positive.astype(bool), d.crossed.fillna(False).astype(bool),
-                       col("step_obs"), col("s_obs"), col("s_switch"), col("s_traj"), col("r_traj"), col("r_cf"),
-                       col("kappa"), col("t_sw"), col("eta_lam"), col("lag_steps_pred"), col("chi_tsw"),
-                       col("chi_path_max"), pil["pilot_median_chi_tsw"][arm], land["s_glob"])
+        fol = d["follows_branch"].fillna(False).astype(bool) if "follows_branch" in d else np.zeros(len(d), bool)
+        args = (arm, d.on_branch.astype(bool), d.hold_G_positive.astype(bool), d.crossed.fillna(False).astype(bool),
+                col("step_obs"), col("s_obs"), col("s_switch"), col("s_traj"), col("r_traj"), col("r_cf"),
+                col("kappa"), col("t_sw"), col("eta_lam"), col("lag_steps_pred"), col("chi_tsw"),
+                col("chi_window_max"), pil["pilot_median_chi_tsw"][arm], land["s_glob"])
+        sc = score_arm(*args, follows=fol)
+        if arm == PRIMARY:           # registered DESCRIPTIVE sensitivity analysis: runs with G > 0 in the hold excluded
+            sens = score_arm(*args, follows=fol, exclude=d.hold_G_positive.astype(bool))
+            sens.pop("scored_index")
+            sc["sensitivity_excluding_hold_G_positive_DESCRIPTIVE"] = sens
         d["scored"] = False
         d.loc[d.index[sc["scored_index"]], "scored"] = True
         d["r_obs"] = d.s_obs / d.s_switch - 1
@@ -932,7 +1077,15 @@ def observe():
             "median_r_cf_scored": float(S.r_cf.median()),
             "median_steps_tsw_to_crossing_scored": float((S.step_obs - S.t_sw).median()),
             "median_s_obs_over_s_switch_scored": float((S.s_obs / S.s_switch).median()),
-            "n_kappa_negative_scored": int((S.kappa < 0).sum())}
+            "n_kappa_negative_scored": int((S.kappa < 0).sum()),
+            "n_on_branch_not_following": int((d.on_branch.astype(bool) & ~fol).sum()),
+            "n_follow_check_at_or_after_crossing": int((d.crossed.fillna(False).astype(bool)
+                                                        & (d.t_follow >= d.step_obs)).sum()),
+            "n_hold_G_positive": int(d.hold_G_positive.astype(bool).sum()),
+            "n_hold_G_positive_scored": int((S.hold_G_positive.astype(bool)).sum()),
+            "median_chi_path_max_all_scored_descriptive": float(S.chi_path_max_all.median()),
+            "n_signed_r_traj_negative_scored": int((S.r_traj < 0).sum()),
+            "n_r_obs_negative_scored": int((S.r_obs < 0).sum())}
         res["arms"][arm] = sc
     res["headline"] = {"arm": PRIMARY, "outcome": res["arms"][PRIMARY]["outcome"]}
     (OUT / "scores.json").write_text(json.dumps(res, indent=1, default=float))

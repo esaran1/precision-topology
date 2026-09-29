@@ -17,6 +17,15 @@ registration when it is committed together with the frozen inputs of §6 and the
 - Code: `src/gelu_transfer.py`. Tests of every decision rule on constructed pass, fail and unresolved cases:
   `tests/test_gelu_transfer.py`.
 - Where the approved page leaves a detail open, this file fixes it (§10). Nothing else differs from the page.
+- **The author's decisions of 2026-09-29, after the pre-registration pilot and exploration (commits 09e2fea, 29b0a7e;
+  pilot and population only, no registered seed):**
+  1. the primary gate counts on-branch runs at release regardless of G in the hold (§3), with a descriptive
+     sensitivity analysis excluding runs with G > 0 in the hold (§9);
+  2. the control gate is unchanged;
+  3. V7 is taken over the part of the path with s_t ≥ 0.8·s_switch,branch, and a follow check at 0.8·s_switch,branch
+     is added (§5, §9). **This window was chosen after the pilot** (§12);
+  4. κχ is signed everywhere; the sign of κ is shown to be physical (§10a);
+  5. the other §10 details are approved as written.
 
 ## 2. Setting (Track 3A) and seeds
 
@@ -48,11 +57,13 @@ Both arms, per run:
 
 | arm | role | start before the hold | on-branch at release | gate |
 |---|---|---|---|---|
-| `random` | **primary** (the headline verdict) | (w₁, b₁, b₂) = coordinates 0, 1 and 3 of U(−1, 1)⁴, drawn in float32 by a torch Generator seeded with the seed (the same draw as 3A's `torch.manual_seed(seed)`), cast to double; w₂ = +s₀ | on the target copy (w₁ > 0) or the mirror copy; the run gets that copy's prediction | ≥ 80% of the 80 runs on-branch, and no run with G > 0 at any hold step |
+| `random` | **primary** (the headline verdict) | (w₁, b₁, b₂) = coordinates 0, 1 and 3 of U(−1, 1)⁴, drawn in float32 by a torch Generator seeded with the seed (the same draw as 3A's `torch.manual_seed(seed)`), cast to double; w₂ = +s₀ | on the target copy (w₁ > 0) or the mirror copy; the run gets that copy's prediction | ≥ 80% of the 80 runs on-branch at release, **regardless of G during the hold** |
 | `branch` | **mechanism control** | θ\*_pop(s₀); even seeds the w₁ > 0 copy, odd seeds the mirror (w₁ → −w₁) | on the assigned copy | ≥ 90% of the 80 runs on target, and no run with G > 0 at any hold step |
 
 - A run on neither copy (primary) or off target (control) gets no prediction. It is counted and reported, never
   replaced. This is the paper's "reaches a branch" condition.
+- Primary arm: a run with G > 0 at the start state or at any hold step that is on-branch at release **is scored**. It
+  is flagged (`hold_G_positive`) and counted, and the descriptive sensitivity analysis of §9 excludes it.
 - **Gate failure:** the arm is UNRESOLVED and stops. Its crossings are not evaluated.
 - The headline verdict is the primary arm's. The control tests the mechanism from a start on the branch.
 
@@ -75,8 +86,17 @@ Both arms, per run:
 
 ## 5. Scored runs
 
-A run is **scored** if it is on-branch at release (primary: either copy; control: the assigned copy), crosses within
-the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are predicted to cross early and are scored.
+A run is **scored** if it is on-branch at release (primary: either copy; control: the assigned copy), **follows its
+branch** (below), crosses within the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are predicted
+to cross early and are scored (§10a).
+
+**Follow check** (author's decision). At t₀.₈, the first step with s_t ≥ 0.8·s_switch,branch of the release copy:
+damped Newton at s = s_{t₀.₈} from the run's (w₁, b₁, b₂), accepted as at release. It is classified against both
+copies' frozen branch points at 0.8·s_switch,branch (§6), each carried to s_{t₀.₈} by one tangent predictor and damped
+Newton, with the release tolerances: Newton point within 1e−6 (sup) of that copy's branch point; the state condition is
+`FOLLOW_STATE_TOL` (§13, OPEN). A run whose copy there differs from its release copy, or is neither, is not scored; it
+is counted and reported. The check uses the state at t₀.₈ only (no gap); the number of runs whose crossing comes at or
+before t₀.₈ is reported.
 
 ## 6. Frozen before any registered training (the registration commit)
 
@@ -94,6 +114,10 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
     ∇G is by central differences (step 1e−6) of the enclosure midpoint; the one-sided differences agree to ≤ 1e−5
     relative in both components.
   - A copy failing any check is invalid. A run on an invalid copy gets no prediction (counted).
+  - **Follow points:** for each copy c, both copies' branch points at s = 0.8·s_switch,branch,c, by act_fold
+    continuation from their θ\*_own(s₀) and damped Newton, with θ\*′ there; validated by step halving (1e−6 sup),
+    no turning point on the way and Newton acceptance. All 360 are valid.
+  - **κ-sign checks** (§10a): κ under the three reparametrisations, and κ recomputed on the mirrored sample.
 - `results/gelu_transfer/pilot.json` (`gelu_transfer.pilot`): ρ and the pilot medians of χ at t_sw (§7).
 - The code and its hash. `registration.sha256` lists: `src/gelu_transfer.py`, `tests/test_gelu_transfer.py`, this
   file, the design page, the three frozen files above, `act_general/kappa_gelu_frozen.json`, and the modules the
@@ -104,8 +128,8 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
 
 - Both arms are run on the 10 pilot seeds up to t_sw only. No gap is evaluated after release, and no crossing or
   residual is computed.
-- The values are κ_seed·χ at t_sw of the on-branch pilot runs, pooled over both arms. q90 is the 90th percentile of
-  their absolute values (numpy linear interpolation).
+- The values are the SIGNED κ_seed·χ at t_sw of the on-branch pilot runs, pooled over both arms. q90 is their 90th
+  percentile (numpy linear interpolation).
 - ρ = min(1, 2^⌊log₂(0.1/q90)⌋). If ρ < 1, the pilot is rerun at ρ, and ρ is kept only if q90 ≤ 0.1. Otherwise ρ is
   halved and the pilot rerun, up to three halvings, and then GELU-T STOPS. With no pilot value at all, it STOPS.
 - Each arm's pilot median of χ at t_sw (at the chosen ρ) is frozen for V6.
@@ -130,12 +154,12 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
 | | condition |
 |---|---|
 | V1 | at least 60 of the 80 runs are scored (on-branch, crossed, with predictions). For the primary arm the count is out of 80; the on-branch count is reported separately. |
-| V2 | t_sw strictly precedes the crossing in ≥ 90% of on-branch crossing runs with κ_seed > 0 (undefined t_sw counts as not preceding; with no such run the condition holds). |
+| V2 | t_sw strictly precedes the crossing in ≥ 90% of on-branch crossing runs with κ_seed > 0 (predicted-late runs; undefined t_sw counts as not preceding; with no such run the condition holds). Predicted-early runs (κ_seed ≤ 0) are not in V2. |
 | V3 | regime: η·λ_min(H(s_switch)) ≤ 0.5 in ≥ 80% of scored runs. |
-| V4 | resolution: the median over scored runs of the predicted lag in steps, κ_seed/(η·λ_min(H(s_switch))), is ≥ 10. |
-| V5 | the q90 over scored runs of \|κ_seed·χ\| at t_sw is ≤ 0.1. |
+| V4 | resolution: the median over scored runs of the SIGNED predicted lag in steps, κ_seed/(η·λ_min(H(s_switch))), is ≥ 10. |
+| V5 | the q90 over scored runs of the SIGNED κ_seed·χ at t_sw is ≤ 0.1. |
 | V6 | \|median χ at t_sw over scored runs / the arm's pilot median − 1\| ≤ 0.30. |
-| V7 | follows the branch: the q90 over scored runs of max_{0 ≤ t < t_sw} χ_t is ≤ 0.25, with χ_t = ((s_{t+1} − s_t)/s_t)/(η·λ_min(H(s_t))) on the occupied branch (Corollary L3's χ_t with the one-step ṡ). |
+| V7 | follows the branch: the q90 over scored runs of max χ_t over 0 ≤ t < t_sw **with s_t ≥ 0.8·s_switch,branch** is ≤ 0.25, with χ_t = ((s_{t+1} − s_t)/s_t)/(η·λ_min(H(s_t))) on the occupied branch (Corollary L3's χ_t with the one-step ṡ). An empty window or a non-finite χ_t in it fails. The maximum over the whole path is reported, not scored. |
 
 **Criteria** (scored runs only):
 
@@ -151,6 +175,15 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
   for L4 and L5); the interval is the 2.5th and 97.5th percentiles of the resampled means.
 - A statistic that cannot be computed (Spearman NaN, e.g. all predictions tied; fewer than 2 runs for the bootstrap) is
   UNRESOLVED.
+- **Signed lags.** Every lag is signed: r_traj, r_cf and r_obs are negative for a crossing before the switch. L1 and L2
+  are medians of ratios of signed lags (a run observed on the wrong side of its switch has a negative ratio). L3 ranks
+  the signed values. L4 and L5 use the signed s_pred = s_traj; the registered closed-form prediction is
+  s_cross = s_switch,branch·(1 + κ_seed·χ), reported per run (`pred_signed_s_cross_cf`).
+- **Predicted-early runs (κ_seed < 0).** Scored like every other run. For them t_sw normally comes after the crossing,
+  so χ in r_cf uses ṡ at t_sw from the s path after the crossing (the s path only; no gap and no crossing information).
+- **Descriptive sensitivity analysis (primary arm; registered; NOT a criterion).** The whole scoring (validity and
+  L1–L5) is repeated with the runs that had G > 0 at the start or in the hold excluded. It is reported beside the
+  registered verdicts and never replaces them.
 - **Outcome per arm:** PASS if L1–L5 all pass; UNRESOLVED if any is UNRESOLVED; otherwise FAIL, naming each failing
   criterion. Numbers are compared in float64 without rounding.
 
@@ -158,12 +191,31 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
 
 - The primary arm's W: the larger of the two copies' W (its copy is unknown before release).
 - The pilot with two arms: both arms on the pilot seeds; κχ values pooled for ρ; each arm's own pilot median χ for V6.
-- κχ enters the pilot rule and V5 by absolute value (a negative-κ copy's lag is as large in magnitude).
 - s_pred in L4 and L5 is the primary prediction s_traj.
 - "Predicted lag in steps" (V4) is the slaved lag κ_seed/(η·λ_min), the quantity the design used to choose η.
 - χ_t in V7 is defined in §9; the start state of the hold counts as a hold step for the gate.
 - The random draw uses a local torch Generator (bit-identical to 3A's `torch.manual_seed` draw; tested), so no global
   RNG state changes.
+
+## 10a. The sign of κ is physical, not a convention
+
+- κ = λ_min·[∇G·H⁻¹θ\*′]/[∇G·θ\*′] (P = I). Its numerator and denominator are both bilinear in (∇G, θ\*′):
+  - **Mirror coordinates** (w₁ → −w₁, i.e. choosing to describe a copy through its mirror image): H → DHD, θ\*′ → Dθ\*′,
+    ∇G → D∇G with D = diag(−1, 1, 1) = D⁻¹. Then ∇G·H⁻¹θ\*′ → ∇G·D(DHD)⁻¹Dθ\*′ = ∇G·H⁻¹θ\*′, and ∇G·θ\*′ is unchanged.
+  - **Sign convention of G** (G → −G): both factors change sign; κ is unchanged.
+  - **Direction of s** (θ\*′ → −θ\*′): both factors change sign; κ is unchanged.
+  - λ_min is invariant under all three.
+- So κ has no orientation freedom. Its sign has a direct meaning: at a switch to placed, g′ = ∇G·θ\*′ > 0, and the
+  slaved displacement δ = −(ηH)⁻¹θ\*′ṡ gives ∇G·δ = −(ṡ/η)∇G·H⁻¹θ\*′. κ < 0 ⇔ ∇G·δ > 0: the lag raises G, and the run
+  is predicted to cross **before** its branch's switch. **The sign is part of what is tested.**
+- The orientation that remains fixed by construction: w₂ > 0 (σ = +1, the placing orientation; w₂ is held at +s₀ and
+  grows), and G is `phase2b_ordering.state`'s gap in w₂'s orientation.
+- **Numerical check (frozen, all 180 copies):** κ recomputed from scratch on the mirrored sample (x → −x) at the mirror
+  image of each frozen switch point (Newton, H, θ\*′, ∇G of the mirrored problem) equals the frozen κ exactly in all
+  180 (the mirror map is exact in floating point), including the 13 negative ones (κ from −0.168 to −0.004: 4 target
+  copies, 9 mirror copies). κ under the three transforms equals κ to 0.0 in all 180. Tests:
+  `test_kappa_invariant_under_mirror_coordinates_G_sign_and_s_direction`,
+  `test_kappa_recomputed_on_the_mirrored_sample_equals_the_original`.
 
 ## 11. Competing outcomes and falsifiers
 
@@ -174,6 +226,7 @@ the budget, and has finite r_traj, r_cf and r_obs. Runs with κ_seed < 0 are pre
 | L3 fails | The magnitude is right but the per-run ordering is not. |
 | L4 fails | The own-branch switch does not carry the sample variation (contrary to 3A's post hoc result). |
 | L5 fails | The predicted lag is not resolved against a crossing at the branch switch itself. |
+| negative-κ runs on the wrong side | Counted in L1–L3 through negative ratios and ranks; the sign of the lag is part of the test (§10a). |
 | gate fails | Random starts (primary) or branch-point starts (control) do not reach a branch at release, or the hold places a run. |
 | UNRESOLVED (validity) | Too few crossings, t_sw at or after the crossing, outside the regime, lag unresolved, κχ too large, χ off the pilot, or the run does not follow its branch. The test says nothing about the law. |
 
@@ -184,13 +237,31 @@ A failure stays a failure. Post hoc readings may be placed beside it, labelled P
 - Exploratory (`designs/GELU_transfer_explore/gelu_explore_f.py`; population only, numpy seeds; no candidate seed):
   7.2% of 4,000 random (w₁, b₁) draws are placed at w₂ = +s₀. Of 150 random hidden starts held as in §3, 16 are placed
   at the start, 11 of them are still placed after the first hold step, and 5 unplaced starts become placed during the
-  hold: 21 of 150 have G > 0 at the start or at some hold step (16 of 150 after a hold step). The primary gate requires
-  no such run among 80. At these rates the chance that none of 80 runs has one is below 1e−3 (0.86⁸⁰ ≈ 6e−6 counting
-  the start; 0.893⁸⁰ ≈ 1e−4 without it).
-- V7: at release λ_min(s₀) is small (0.035 on the population), so χ_t is largest just after release; its size on
-  own samples is first measured by the pilot (§7; `pilot.json`).
+  hold: 21 of 150 have G > 0 at the start or at some hold step (16 of 150 after a hold step). Under the gate before the
+  author's decision (no such run among 80) the chance of passing was below 1e−3 (0.86⁸⁰ ≈ 6e−6 counting the start;
+  0.893⁸⁰ ≈ 1e−4 without it); this is why the primary gate now ignores G in the hold (§1, §3).
+- **V7's window was chosen after the pilot** (pilot seeds 876,900–876,909 only, disjoint from the registered seeds;
+  `designs/GELU_transfer_explore/gelu_explore_g.py`, reproduced by `pilot.json`). Over the whole path (the text before
+  the decision) the q90 / median of max χ_t were 0.274 / 0.199 (random 0.251 / 0.187, branch 0.278 / 0.203; 3 of 20
+  above 0.25), with the maximum at step 0, the first step after release, in 20 of 20 runs (s/s_switch 0.42–0.57, where
+  λ_min is smallest). With s_t ≥ 0.8·s_switch,branch: 0.046 / 0.036 (random 0.046 / 0.035, branch 0.044 / 0.037;
+  none above 0.25). Over the last 5 relaxation times before t_sw: 0.037 / 0.029. χ at t_sw: 0.026 / 0.023.
+- **Primary gate, population (exploratory, 600 random starts, `gelu_explore_g.py`):** 563 of 600 (93.8%) on-branch at
+  release regardless of G (the registered gate's quantity); 81 of them had G > 0 at the start or in the hold.
+- **Follow check, pilot:** at t₀.₈ the state lags its branch point by 0.012–0.028 (sup) in all 20 pilot runs; Newton from
+  the state lands on the release copy's branch point in 20 of 20.
 - On the population, t_sw at η = 0.03 from θ\*_pop(s₀) is 5,684 steps, well inside the 40,000-step budget.
 
-## 13. Frozen values
+## 13. OPEN before registration: the state condition of the follow check
 
-Filled by the registration commit: see `results/gelu_transfer/landscape.json`, `frozen_seeds.json` and `pilot.json`.
+The author's rule says "registered tolerances". At release these are: Newton point within 1e−6 of the branch point
+AND state within 1e−3 of it. In free training the state at t₀.₈ lags its branch by the tracking displacement: 0.012–0.028
+(sup) in 20 of 20 pilot runs. With the 1e−3 state condition every run would be "neither" at t₀.₈, no run would be scored,
+and both arms would be UNRESOLVED (V1). The code has the constant `FOLLOW_STATE_TOL`; it is set to None (Newton
+identity only: the Newton point from the state lies within 1e−6 of the release copy's branch point, which held in 20
+of 20 pilot runs) pending the author's decision. Nothing is registered until it is decided.
+
+## 14. Frozen values
+
+See ``results/gelu_transfer/landscape.json`, `frozen_seeds.json` and `pilot.json` (recomputed with the final code;
+identical to the 09e2fea values to 3e−16 in every frozen scalar, and the pilot identical).
