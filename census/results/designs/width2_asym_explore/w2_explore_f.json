@@ -1,0 +1,90 @@
+{
+ "600000_equal_shares_40000_steps": {
+  "duplicate unplaced": 19,
+  "two-unit placed": 28,
+  "not accepted": 13
+ },
+ "unequal": [
+  {
+   "seed": 600000,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.45865533862597785,
+    0.33651805984363165
+   ],
+   "landing": {
+    "two-unit unplaced": 30,
+    "duplicate unplaced": 10
+   }
+  },
+  {
+   "seed": 600001,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.4655696251876822,
+    0.32200734309184115
+   ],
+   "landing": {
+    "two-unit unplaced": 33,
+    "duplicate unplaced": 6,
+    "not accepted": 1
+   }
+  },
+  {
+   "seed": 600002,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.4234766460962528,
+    0.31240560380384497
+   ],
+   "landing": {
+    "duplicate unplaced": 13,
+    "two-unit unplaced": 27
+   }
+  },
+  {
+   "seed": 600003,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.46325335839570314,
+    0.33146176737673166
+   ],
+   "landing": {
+    "two-unit unplaced": 26,
+    "duplicate unplaced": 14
+   }
+  },
+  {
+   "seed": 600004,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.5353457600421069,
+    0.3354448814009458
+   ],
+   "landing": {
+    "two-unit unplaced": 17,
+    "not accepted": 14,
+    "duplicate unplaced": 9
+   }
+  },
+  {
+   "seed": 600005,
+   "own_T1": true,
+   "adiabatic": [
+    "switch",
+    0.5144058197423538,
+    0.3272554240893544
+   ],
+   "landing": {
+    "two-unit unplaced": 17,
+    "duplicate unplaced": 14,
+    "not accepted": 9
+   }
+  }
+ ]
+}

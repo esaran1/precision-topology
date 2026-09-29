@@ -1,0 +1,69 @@
+{
+ "0.05": {
+  "counts": {
+   "duplicate unplaced (0, 0)": 113,
+   "two-unit placed (0, 0)": 37
+  },
+  "max_release_dist": 0.0,
+  "lam_min_range": [
+   0.010594701604792303,
+   0.011782005798996256
+  ]
+ },
+ "0.1": {
+  "counts": {
+   "duplicate unplaced (0, 0)": 114,
+   "two-unit placed (0, 0)": 36
+  },
+  "max_release_dist": 0.0,
+  "lam_min_range": [
+   0.01946003507968132,
+   0.023284595141684006
+  ]
+ },
+ "0.15": {
+  "counts": {
+   "duplicate unplaced (0, 0)": 114,
+   "two-unit placed (0, 0)": 36
+  },
+  "max_release_dist": 0.0,
+  "lam_min_range": [
+   0.026675013251779872,
+   0.03408368739283621
+  ]
+ },
+ "0.2225": {
+  "counts": {
+   "duplicate unplaced (0, 0)": 112,
+   "two-unit placed (0, 0)": 38
+  },
+  "max_release_dist": 0.0,
+  "lam_min_range": [
+   0.03467212223018244,
+   0.047618982568162806
+  ]
+ },
+ "0.3": {
+  "counts": {
+   "duplicate unplaced (0, 0)": 39,
+   "not accepted": 71,
+   "two-unit placed (0, 0)": 40
+  },
+  "max_release_dist": 4.1962199448519755e-07,
+  "lam_min_range": [
+   0.04087419490638996,
+   0.058334178791266206
+  ]
+ },
+ "0.445": {
+  "counts": {
+   "two-unit placed (0, 0)": 143,
+   "duplicate unplaced (0, 0)": 7
+  },
+  "max_release_dist": 0.0,
+  "lam_min_range": [
+   0.04891122798645478,
+   0.07372608110627021
+  ]
+ }
+}
