@@ -881,6 +881,10 @@ PRODUCERS = {
     "gelu_transfer/pilot.json": ("gelu_transfer", "pilot", "full", ""),
     "gelu_transfer/frozen_seeds.json": ("gelu_transfer", "freeze", "full", ""),
     "gelu_transfer/landscape.json": ("gelu_transfer", "landscape", "full", ""),
+    # W2-A (width-2 asymmetric-window lag law; pre-registration computations, not yet registered)
+    "width2_asym/landscape.json": ("width2_asym", "landscape", "full", ""),
+    "width2_asym/frozen_seeds.json": ("width2_asym", "freeze", "full", ""),
+    "width2_asym/pilot.json": ("width2_asym", "pilot", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),

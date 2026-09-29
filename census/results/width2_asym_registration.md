@@ -1,10 +1,12 @@
 # W2-A registration: the lag law at width 2 on the asymmetric windows (arms T, D, T′)
 
-**NOT YET REGISTERED.** This is the registration text, committed before any pilot run. The registration commit will
-add the frozen inputs (§6), the pilot result (§8) and the manifest `results/width2_asym/registration.sha256`. It is
-made only after the author has decided the open items in §0. No registered seed (884,000–884,119, 884,200–884,319) has
-been held, trained or observed. No pilot seed (884,900–884,909) has been held or trained. No gap, placement or crossing
-of any training state after release has been evaluated for any of these seeds.
+**NOT YET REGISTERED.** This text was first committed before any pilot run (fd119b2).
+- **Since then:** the pre-registration computations are done. They are the population landscape, the frozen inputs for
+  all 250 seeds (no training) and the pilot on pilot seeds 884,900–884,909 only, to t_sw. They are in §14.
+- **The pilot forces a STOP** (§0 item 6). The registration commit (the manifest
+  `results/width2_asym/registration.sha256`) is made only after the author has decided the open items in §0.
+- **Not yet done:** no registered seed (884,000–884,119, 884,200–884,319) has been held, trained or observed. No gap,
+  placement or crossing of any training state after release has been evaluated for any seed, pilot seeds included.
 
 ## 0. Open items for the author (the standing rule: STOP before the registration commit)
 
@@ -27,7 +29,18 @@ scoring set. Nothing is decided here. The code implements the literal reading sh
    computes κ for the run's actual (k₁, k₂) by the page's formula (exact, tested against a direct computation). It
    admits a winding to the table iff −3 ≤ k₁ + k₂ ≤ 3, which is the page's range. All 400 exploratory random-start
    landings were at winding (0, 0).
-5. **For information** (on the page, no decision needed unless the author wants one):
+6. **The pilot: arm D's gate looks infeasible, and arm T's is marginal** (pilot seeds only; §14).
+   - **Arm D:** 3 of 10 pilot runs released on D (0 on D′).
+     - The other 7 released on already-placed two-unit points, with G > 0 in 3,821–3,993 of the 4,001 hold states.
+     - At a landing rate of 0.3, P(≥ 60/120) ≈ 3.5e−6.
+     - The exploration's pooled own-sample D rate, 0.633, would give 3 or fewer of 10 with probability 0.034.
+   - **Arm T:** 5 of 10 on T. The others were 2 on T′, 1 on D, 1 on D′ and 1 unconverged. At 0.5, P(≥ 60/120) ≈ 0.54.
+   - **Arm T′:** 10 of 10 on T′, no G > 0 in any hold.
+   - The pilot rules themselves did not STOP: D ρ = 1, T ρ = 2⁻¹⁰, T′ ρ = 2⁻¹² after two halvings.
+   - The standing rule ("a gate looks infeasible") asks the author before registration. W2-A stops here. Possible
+     decisions are the author's: register as is (with the D gate's likely UNRESOLVED stated in advance), change D's
+     start or gate, or drop or redesign arm D.
+7. **For information** (on the page, no decision needed unless the author wants one):
    - The recomputed population switches, validated and bisected, are T 0.481586 and T′ 0.327167. The page's 0.482 and
      0.328 came from the exploration's adiabatic path, which was not bisected: it reported the first 0.5% step past
      the sign change. L4 uses the recomputed values.
@@ -380,6 +393,38 @@ A failure stays a failure. Post hoc readings may be placed beside it, labelled P
   may halve ρ once or twice. At ρ = 0.0003 it is 0.053.
 - **T's lag.** It is about 28 steps. Its resolution r_min is 3e−4 against a lag of 1.3e−3 (change D's numbers).
 
-## 14. Frozen values
+## 14. Frozen values (pre-registration computations; pilot seeds only for the pilot)
 
-Added with the registration commit: the landscape, the freeze counts and the pilot.
+**Landscape** (`landscape.json`, validated; population).
+
+| copy | λ_min(s₀) | switch | halved | κ₀ | winding coefficients (a₁, a₂) | λ_min(switch) |
+|---|---|---|---|---|---|---|
+| D | 0.04763 | 5.079637 | agrees | 7.674 | (−7.492, −7.492) | 0.1281 (split block 0.157) |
+| D′ | 0.03468 | 4.970592 | agrees | 8.920 | (−8.708, −8.708) | 0.1698 (split block 0.203) |
+| T | 0.00971 | 0.481586 | agrees | 0.0486 | (−0.139, −0.127) | 0.0576 |
+| T′ | 0.00838 | 0.327167 | agrees | −0.0564 | (−0.086, −0.027) | 0.0394 |
+
+**Freeze** (`frozen_seeds.json`; 250 seeds; the own samples only, no training).
+- All 520 full copies are valid: T 130, T′ 130, D 130, D′ 130 (the 10 pilot seeds and 120 per arm). All 760 copy points
+  are accepted and of their type.
+- W = 4000 for every copy.
+- Frozen κ₀ over the 130 full copies of each:
+
+| copy | κ₀ range | median | κ₀ < 0 | median κ/(η·λ_min) |
+|---|---|---|---|---|
+| T | −0.0061 to 0.1528 | 0.0503 | 1 | +29.3 steps |
+| T′ | −0.0782 to −0.0084 | −0.0524 | 130 | −43.1 steps |
+| D | 6.351 to 9.381 | 7.746 | 0 | +202.4 steps |
+| D′ | 7.177 to 12.987 | 8.934 | 0 | +174.8 steps |
+
+**Pilot** (`pilot.json`; seeds 884,900–884,909; to t_sw; no gap of any state after release).
+
+| arm | on the scored copy | pilot values | rule | ρ | median χ at t_sw (V6) |
+|---|---|---|---|---|---|
+| D | 3/10 on D, 0 on D′; 7 placed two-unit | q90 κχ 0.0282 | inactive | 1 | 0.00353 |
+| T | 5/10 on T; 2 T′, 1 D, 1 D′, 1 unconverged | q90 window max χ_t 0.0699 at 2⁻¹⁰ | kept | 2⁻¹⁰ | 0.0259 |
+| T′ | 10/10 on T′; no G > 0 in any hold | q90 0.290 (2⁻¹⁰), 0.145 (2⁻¹¹), 0.0726 (2⁻¹²) | two halvings | 2⁻¹² | 0.0162 |
+
+- Every on-branch pilot run followed its branch at 0.8·s_switch: D 3/3, T 5/5, T′ 30/30 over the three ρ.
+- Every on-branch pilot release was at winding (0, 0).
+- T′'s budget at ρ = 2⁻¹² is 400,000 steps; its pilot t_sw is 10,589–25,256 steps.
