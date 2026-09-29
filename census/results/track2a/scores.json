@@ -1,0 +1,80 @@
+{
+ "n_runs": 80,
+ "n_crossed": 79,
+ "n_tsw_before_crossing": 78,
+ "frac_tsw_before_crossing": 0.9873417721518988,
+ "n_crossed_tsw_not_before": 1,
+ "n_crossed_tsw_before_no_prediction": 3,
+ "n_scored": 75,
+ "n_scored_rule_not_before_crossing": 0,
+ "validity": {
+  "min_crossings": true,
+  "tsw_before_90pct": true,
+  "rule_before_all_scored": true
+ },
+ "valid": true,
+ "A1": {
+  "n": 75,
+  "spearman": 0.932176386913229,
+  "verdict": "PASS"
+ },
+ "A2": {
+  "n": 75,
+  "frac_within_10pct": 0.7733333333333333,
+  "verdict": "PASS"
+ },
+ "A3": {
+  "n": 75,
+  "median_ratio": 1.057862422999403,
+  "verdict": "PASS"
+ },
+ "outcome": "PASS",
+ "secondary_closed_form": {
+  "n": 75,
+  "spearman": 0.6312660028449502,
+  "frac_within_10pct": 0.5066666666666667,
+  "median_ratio": 0.9632874584214729,
+  "note": "reported, not scored"
+ },
+ "unscored_crossing_runs": [
+  {
+   "seed": 1850066,
+   "t_sw": null,
+   "step_obs": 20626,
+   "status_2a": "no prediction: branch rule: no minimum at the rule point"
+  }
+ ],
+ "descriptive": {
+  "n_status_2a": {
+   "ok": 75,
+   "no primary prediction (no prediction (no hit / unstable / diverged))": 3,
+   "no prediction: never reaches the rule point": 1,
+   "no prediction: branch rule: no minimum at the rule point": 1
+  },
+  "n_winding_rule_agrees": 78,
+  "median_r_obs_scored": 0.1360403469053577,
+  "median_r_traj_scored": 0.1282314345512931,
+  "r_obs_q10_q90_scored": [
+   0.11064222342035598,
+   0.16332741537189302
+  ],
+  "r_traj_q10_q90_scored": [
+   0.09919207406021956,
+   0.15740657955124607
+  ],
+  "ratio_q10_q90_scored": [
+   1.0000000000000004,
+   1.1250170130756383
+  ],
+  "median_steps_tsw_to_crossing_scored": 56.0,
+  "median_steps_rule_to_crossing_scored": 221.0,
+  "median_s_run_over_s_frozen": 1.0000000000007054,
+  "track_a_rule_P_at_rule_point_NOT_SCORED": {
+   "spearman": 0.36409672830725465,
+   "frac_within_10pct": 0.17333333333333334,
+   "median_ratio": 1.314334807714979
+  }
+ },
+ "predictions_sha256": "428a58dbbe5c197a4b2f55a990b059227c344b318f5c97485afd8d64e0faf873",
+ "registration_sha256_file_sha256": "744dd43ce66d751950ac0b925819cc4292f7ac313bc204623df16aefbad8c24f"
+}

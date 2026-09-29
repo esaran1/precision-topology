@@ -583,6 +583,7 @@ def main() -> None:
     theorem1_checks()
     track_t_checks()
     track_a_checks()
+    track2a_checks()
     track_t_v2_checks()
     track_t_v3_checks()
     final_checks_boundary_adam()
@@ -862,6 +863,9 @@ PRODUCERS = {
     "scale_limits_tanh_maximisers.csv": ("scale_limits_tanh", "main", "full", ""),
     "scale_limits_tanh_summary.csv": ("scale_limits_tanh", "main", "full", ""),
     "crossing_audit_summary.csv": ("crossing_audit", "main", "full", ""),
+    # registered test 2A (Adam per-run ordering at a = 1.85)
+    "track2a/scores.json": ("track2a", "observe", "full", ""),
+    "track2a/observed_runs.csv": ("track2a", "observe", "full", ""),
     # discussion phase (Track 1A post hoc fold checks; Track 3 math note §14-§17)
     "sb_fold/summary.json": ("sb_fold", "run_summary", "full", ""),
     "sb_fold/compare.json": ("sb_fold", "run_compare", "full", ""),
@@ -2144,6 +2148,69 @@ def track_a_checks() -> None:
         chk(f"TA {opt} L1", float(x["L1"]["verdict"] == v1), 1.0, 0); chk(f"TA {opt} L1 ratio", x["L1"]["median_ratio"], l1, 0.0006)
         chk(f"TA {opt} L2", float(x["L2"]["verdict"] == v2), 1.0, 0); chk(f"TA {opt} L2 ratio", x["L2"]["median_ratio"], l2, 0.0006)
         chk(f"TA {opt} L3", float(x["L3"]["verdict"] == v3), 1.0, 0); chk(f"TA {opt} L3 spearman", x["L3"]["spearman"], l3, 0.006 if opt == "adam" else 0.0006)
+
+
+def track2a_checks() -> None:
+    """Registered test 2A (Adam per-run ordering at a = 1.85, P frozen at t_sw): results/track2a_writer_inputs.md."""
+    import hashlib as _h
+    print("Test 2A (registered, a = 1.85)")
+    D2 = R / "track2a"
+    chk("2A predictions hash", float(_h.sha256((D2 / "predictions.csv").read_bytes()).hexdigest()
+                                     == "428a58dbbe5c197a4b2f55a990b059227c344b318f5c97485afd8d64e0faf873"), 1.0, 0)
+    L = json.loads((D2 / "landscape.json").read_text())
+    chk("2A s*_pop", L["s_star_pop"], 1.29718, 6e-6)
+    chk("2A landscape validated", float(L["validated"]), 1.0, 0)
+    S = json.loads((D2 / "scores.json").read_text())
+    chk("2A runs", float(S["n_runs"]), 80.0, 0)
+    chk("2A crossed", float(S["n_crossed"]), 79.0, 0)
+    chk("2A t_sw before crossing", float(S["n_tsw_before_crossing"]), 78.0, 0)
+    chk("2A t_sw before crossing %", 100 * S["frac_tsw_before_crossing"], 98.7, 0.06)
+    chk("2A scored", float(S["n_scored"]), 75.0, 0)
+    chk("2A scored rule not before crossing", float(S["n_scored_rule_not_before_crossing"]), 0.0, 0)
+    chk("2A tsw-before without primary prediction", float(S["n_crossed_tsw_before_no_prediction"]), 3.0, 0)
+    chk("2A valid", float(S["valid"] and all(S["validity"].values())), 1.0, 0)
+    chk("2A unscored crossing run is 1850066",
+        float([u["seed"] for u in S["unscored_crossing_runs"]] == [1850066]), 1.0, 0)
+    chk("2A A1 spearman", S["A1"]["spearman"], 0.93, 0.006)
+    chk("2A A1 PASS", float(S["A1"]["verdict"] == "PASS"), 1.0, 0)
+    chk("2A A2 fraction", S["A2"]["frac_within_10pct"], 0.773, 0.0006)
+    chk("2A A2 %", 100 * S["A2"]["frac_within_10pct"], 77.0, 0.6)
+    chk("2A A2 PASS", float(S["A2"]["verdict"] == "PASS"), 1.0, 0)
+    chk("2A A3 median ratio", S["A3"]["median_ratio"], 1.058, 0.0006)
+    chk("2A A3 median ratio (2 d.p.)", S["A3"]["median_ratio"], 1.06, 0.006)
+    chk("2A A3 PASS", float(S["A3"]["verdict"] == "PASS"), 1.0, 0)
+    chk("2A outcome PASS", float(S["outcome"] == "PASS"), 1.0, 0)
+    C = S["secondary_closed_form"]
+    chk("2A closed form spearman", C["spearman"], 0.63, 0.006)
+    chk("2A closed form within10 fraction", C["frac_within_10pct"], 0.51, 0.006)
+    chk("2A closed form median ratio", C["median_ratio"], 0.963, 0.0006)
+    X = S["descriptive"]
+    chk("2A median r_obs", X["median_r_obs_scored"], 0.136, 0.0006)
+    chk("2A median r_pred", X["median_r_traj_scored"], 0.128, 0.0006)
+    for k, (lo, hi) in {"r_obs_q10_q90_scored": (0.111, 0.163), "r_traj_q10_q90_scored": (0.099, 0.157)}.items():
+        chk(f"2A {k} lo", X[k][0], lo, 0.0006); chk(f"2A {k} hi", X[k][1], hi, 0.0006)
+    chk("2A ratio q10", X["ratio_q10_q90_scored"][0], 1.00, 0.006)
+    chk("2A ratio q90", X["ratio_q10_q90_scored"][1], 1.125, 0.0006)
+    chk("2A median steps t_sw to crossing", X["median_steps_tsw_to_crossing_scored"], 56.0, 0)
+    chk("2A median steps rule to crossing", X["median_steps_rule_to_crossing_scored"], 221.0, 0)
+    chk("2A winding rule agrees", float(X["n_winding_rule_agrees"]), 78.0, 0)
+    TA = X["track_a_rule_P_at_rule_point_NOT_SCORED"]
+    chk("2A Track A rule spearman", TA["spearman"], 0.36, 0.006)
+    chk("2A Track A rule within10 fraction", TA["frac_within_10pct"], 0.17, 0.006)
+    chk("2A Track A rule median ratio", TA["median_ratio"], 1.31, 0.006)
+    O = pd.read_csv(D2 / "observed_runs.csv")
+    Sc = O[O.scored]
+    r = Sc.r_obs / Sc.r_traj
+    chk("2A within 10% count", float(((r - 1).abs() <= 0.10).sum()), 58.0, 0)
+    chk("2A above 1.1", float((r > 1.1).sum()), 15.0, 0)
+    chk("2A below 0.9", float((r < 0.9).sum()), 2.0, 0)
+    chk("2A closed form within10 count", float(((Sc.r_obs / Sc.r_cf - 1).abs() <= 0.10).sum()), 38.0, 0)
+    chk("2A Track A rule within10 count", float(((Sc.r_obs / Sc.descr_r_traj_P_rule - 1).abs() <= 0.10).sum()), 13.0, 0)
+    chk("2A non-crossing run is 1850015", float(O[~O.crossed].seed.tolist() == [1850015]), 1.0, 0)
+    chk("2A no-primary seeds", float(sorted(O[O.tsw_before_cross & ~O.scored].seed.tolist()) == [1850004, 1850049, 1850068]),
+        1.0, 0)
+    chk("2A branches (runs with s*_run)", float(O.s_run.notna().sum()), 78.0, 0)
+    chk("2A min passing A2 count for 75 scored", float(next(k for k in range(76) if k / 75 >= 0.75)), 57.0, 0)
 
 
 def track_t_v2_checks() -> None:

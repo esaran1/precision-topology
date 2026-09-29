@@ -1,0 +1,160 @@
+{"seed": 1850000, "crossed": true, "step_obs": 1030, "s_obs": 1.471791400772721}
+{"seed": 1850001, "crossed": true, "step_obs": 1274, "s_obs": 1.4521240564011706}
+{"seed": 1850002, "crossed": true, "step_obs": 412, "s_obs": 1.7472844902796494}
+{"seed": 1850003, "crossed": true, "step_obs": 1536, "s_obs": 1.5585041073322017}
+{"seed": 1850004, "crossed": true, "step_obs": 14821, "s_obs": 1.3960646480553154}
+{"seed": 1850005, "crossed": true, "step_obs": 318, "s_obs": 1.589456928085975}
+{"seed": 1850006, "crossed": true, "step_obs": 411, "s_obs": 1.5621412824029008}
+{"seed": 1850007, "crossed": true, "step_obs": 674, "s_obs": 1.8639654008052626}
+{"seed": 1850008, "crossed": true, "step_obs": 735, "s_obs": 1.7291535658574497}
+{"seed": 1850009, "crossed": true, "step_obs": 1740, "s_obs": 1.4929134959248402}
+{"seed": 1850010, "crossed": true, "step_obs": 762, "s_obs": 1.4932806504048861}
+{"seed": 1850011, "crossed": true, "step_obs": 562, "s_obs": 1.481808659694549}
+{"seed": 1850012, "crossed": true, "step_obs": 372, "s_obs": 1.4881492249266262}
+{"seed": 1850013, "crossed": true, "step_obs": 388, "s_obs": 1.4369516645227542}
+{"seed": 1850014, "crossed": true, "step_obs": 367, "s_obs": 1.6643884476561368}
+{"seed": 1850015, "crossed": false, "step_obs": null, "s_obs": NaN}
+{"seed": 1850016, "crossed": true, "step_obs": 5289, "s_obs": 1.4969304904769678}
+{"seed": 1850017, "crossed": true, "step_obs": 330, "s_obs": 1.4335604444882188}
+{"seed": 1850018, "crossed": true, "step_obs": 1358, "s_obs": 1.5246267732597572}
+{"seed": 1850019, "crossed": true, "step_obs": 372, "s_obs": 1.364036589721425}
+{"seed": 1850020, "crossed": true, "step_obs": 6319, "s_obs": 1.5495755058243101}
+{"seed": 1850021, "crossed": true, "step_obs": 1137, "s_obs": 1.447732955087225}
+{"seed": 1850022, "crossed": true, "step_obs": 854, "s_obs": 1.5801212888297078}
+{"seed": 1850023, "crossed": true, "step_obs": 472, "s_obs": 1.421771412637126}
+{"seed": 1850024, "crossed": true, "step_obs": 719, "s_obs": 1.600862815339347}
+{"seed": 1850025, "crossed": true, "step_obs": 4546, "s_obs": 1.6295125217751756}
+{"seed": 1850026, "crossed": true, "step_obs": 2143, "s_obs": 1.4939747413509465}
+{"seed": 1850027, "crossed": true, "step_obs": 366, "s_obs": 1.7106897165419188}
+{"seed": 1850028, "crossed": true, "step_obs": 324, "s_obs": 1.5357550097684334}
+{"seed": 1850029, "crossed": true, "step_obs": 7474, "s_obs": 1.544896442587793}
+{"seed": 1850030, "crossed": true, "step_obs": 353, "s_obs": 1.481772743508381}
+{"seed": 1850031, "crossed": true, "step_obs": 25539, "s_obs": 1.3945874514201655}
+{"seed": 1850032, "crossed": true, "step_obs": 1150, "s_obs": 1.6469442254855293}
+{"seed": 1850033, "crossed": true, "step_obs": 455, "s_obs": 1.6396429440932632}
+{"seed": 1850034, "crossed": true, "step_obs": 567, "s_obs": 1.7218455572277038}
+{"seed": 1850035, "crossed": true, "step_obs": 647, "s_obs": 1.4829267964760913}
+{"seed": 1850036, "crossed": true, "step_obs": 611, "s_obs": 1.6260517613899017}
+{"seed": 1850037, "crossed": true, "step_obs": 7220, "s_obs": 1.688278280270712}
+{"seed": 1850038, "crossed": true, "step_obs": 1440, "s_obs": 1.6621027321074557}
+{"seed": 1850039, "crossed": true, "step_obs": 347, "s_obs": 1.3399241287463441}
+{"seed": 1850040, "crossed": true, "step_obs": 3051, "s_obs": 1.3976704370259923}
+{"seed": 1850041, "crossed": true, "step_obs": 1285, "s_obs": 1.6218909251084892}
+{"seed": 1850042, "crossed": true, "step_obs": 377, "s_obs": 1.65084781601234}
+{"seed": 1850043, "crossed": true, "step_obs": 816, "s_obs": 1.4593214121802216}
+{"seed": 1850044, "crossed": true, "step_obs": 781, "s_obs": 1.6404907176634502}
+{"seed": 1850045, "crossed": true, "step_obs": 1615, "s_obs": 1.720818297377932}
+{"seed": 1850046, "crossed": true, "step_obs": 4003, "s_obs": 1.4506260747290507}
+{"seed": 1850047, "crossed": true, "step_obs": 733, "s_obs": 1.564259678087251}
+{"seed": 1850048, "crossed": true, "step_obs": 2691, "s_obs": 1.5283694216181127}
+{"seed": 1850049, "crossed": true, "step_obs": 1510, "s_obs": 1.7578451371176873}
+{"seed": 1850050, "crossed": true, "step_obs": 555, "s_obs": 1.5886828730179363}
+{"seed": 1850051, "crossed": true, "step_obs": 6288, "s_obs": 1.4189297133570045}
+{"seed": 1850052, "crossed": true, "step_obs": 5087, "s_obs": 1.584783257394828}
+{"seed": 1850053, "crossed": true, "step_obs": 514, "s_obs": 1.4666138056396032}
+{"seed": 1850054, "crossed": true, "step_obs": 469, "s_obs": 1.6242743584757642}
+{"seed": 1850055, "crossed": true, "step_obs": 511, "s_obs": 1.5677443767890127}
+{"seed": 1850056, "crossed": true, "step_obs": 646, "s_obs": 1.604319079770138}
+{"seed": 1850057, "crossed": true, "step_obs": 4303, "s_obs": 1.5278475360494363}
+{"seed": 1850058, "crossed": true, "step_obs": 353, "s_obs": 1.5392738095448353}
+{"seed": 1850059, "crossed": true, "step_obs": 1749, "s_obs": 1.519182893172388}
+{"seed": 1850060, "crossed": true, "step_obs": 6927, "s_obs": 1.6205196666011403}
+{"seed": 1850061, "crossed": true, "step_obs": 1172, "s_obs": 1.631452508502841}
+{"seed": 1850062, "crossed": true, "step_obs": 677, "s_obs": 1.4045176179481316}
+{"seed": 1850063, "crossed": true, "step_obs": 1419, "s_obs": 1.6371066459267984}
+{"seed": 1850064, "crossed": true, "step_obs": 420, "s_obs": 1.4957705106817194}
+{"seed": 1850065, "crossed": true, "step_obs": 356, "s_obs": 1.5161365876082575}
+{"seed": 1850066, "crossed": true, "step_obs": 20626, "s_obs": 1.653137534223665}
+{"seed": 1850067, "crossed": true, "step_obs": 542, "s_obs": 1.5147443629529527}
+{"seed": 1850068, "crossed": true, "step_obs": 672, "s_obs": 1.8258786840129062}
+{"seed": 1850069, "crossed": true, "step_obs": 1021, "s_obs": 1.5304004639808002}
+{"seed": 1850070, "crossed": true, "step_obs": 1343, "s_obs": 1.8631552735228138}
+{"seed": 1850071, "crossed": true, "step_obs": 3763, "s_obs": 1.3403347685284732}
+{"seed": 1850072, "crossed": true, "step_obs": 833, "s_obs": 1.4759878382412095}
+{"seed": 1850073, "crossed": true, "step_obs": 487, "s_obs": 1.4585329274284384}
+{"seed": 1850074, "crossed": true, "step_obs": 7883, "s_obs": 1.6335997120376589}
+{"seed": 1850075, "crossed": true, "step_obs": 980, "s_obs": 1.5435663777502808}
+{"seed": 1850076, "crossed": true, "step_obs": 2161, "s_obs": 1.51328126599388}
+{"seed": 1850077, "crossed": true, "step_obs": 833, "s_obs": 1.4397589027524582}
+{"seed": 1850078, "crossed": true, "step_obs": 427, "s_obs": 1.4202056047761245}
+{"seed": 1850079, "crossed": true, "step_obs": 466, "s_obs": 1.5884627498663226}
+{
+ "n_runs": 80,
+ "n_crossed": 79,
+ "n_tsw_before_crossing": 78,
+ "frac_tsw_before_crossing": 0.9873417721518988,
+ "n_crossed_tsw_not_before": 1,
+ "n_crossed_tsw_before_no_prediction": 3,
+ "n_scored": 75,
+ "n_scored_rule_not_before_crossing": 0,
+ "validity": {
+  "min_crossings": true,
+  "tsw_before_90pct": true,
+  "rule_before_all_scored": true
+ },
+ "valid": true,
+ "A1": {
+  "n": 75,
+  "spearman": 0.932176386913229,
+  "verdict": "PASS"
+ },
+ "A2": {
+  "n": 75,
+  "frac_within_10pct": 0.7733333333333333,
+  "verdict": "PASS"
+ },
+ "A3": {
+  "n": 75,
+  "median_ratio": 1.057862422999403,
+  "verdict": "PASS"
+ },
+ "outcome": "PASS",
+ "secondary_closed_form": {
+  "n": 75,
+  "spearman": 0.6312660028449502,
+  "frac_within_10pct": 0.5066666666666667,
+  "median_ratio": 0.9632874584214729,
+  "note": "reported, not scored"
+ },
+ "unscored_crossing_runs": [
+  {
+   "seed": 1850066,
+   "t_sw": null,
+   "step_obs": 20626,
+   "status_2a": "no prediction: branch rule: no minimum at the rule point"
+  }
+ ],
+ "descriptive": {
+  "n_status_2a": {
+   "ok": 75,
+   "no primary prediction (no prediction (no hit / unstable / diverged))": 3,
+   "no prediction: never reaches the rule point": 1,
+   "no prediction: branch rule: no minimum at the rule point": 1
+  },
+  "n_winding_rule_agrees": 78,
+  "median_r_obs_scored": 0.1360403469053577,
+  "median_r_traj_scored": 0.1282314345512931,
+  "r_obs_q10_q90_scored": [
+   0.11064222342035598,
+   0.16332741537189302
+  ],
+  "r_traj_q10_q90_scored": [
+   0.09919207406021956,
+   0.15740657955124607
+  ],
+  "ratio_q10_q90_scored": [
+   1.0000000000000004,
+   1.1250170130756383
+  ],
+  "median_steps_tsw_to_crossing_scored": 56.0,
+  "median_steps_rule_to_crossing_scored": 221.0,
+  "median_s_run_over_s_frozen": 1.0000000000007054,
+  "track_a_rule_P_at_rule_point_NOT_SCORED": {
+   "spearman": 0.36409672830725465,
+   "frac_within_10pct": 0.17333333333333334,
+   "median_ratio": 1.314334807714979
+  }
+ },
+ "predictions_sha256": "428a58dbbe5c197a4b2f55a990b059227c344b318f5c97485afd8d64e0faf873",
+ "registration_sha256_file_sha256": "744dd43ce66d751950ac0b925819cc4292f7ac313bc204623df16aefbad8c24f"
+}
