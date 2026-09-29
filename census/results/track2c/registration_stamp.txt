@@ -1,0 +1,4 @@
+Test 2C registration (band task in R^d against each seed's own-sample R^d switch, prospectively)
+registration commit: b22ebd05a6b4d7282904524bbcc11af51a1a3506
+SHA-256 results/track2c_registration.md: 4ab4ea1fec512c2b9e40b8a19dda464746623ad9ca5d7fad9c668455ce4f306f
+SHA-256 results/track2c/registration.sha256: b9dad3f68d00efaf86f1f49d422ec17fbac4f31fe2ecdf35b17ffc0587500441
