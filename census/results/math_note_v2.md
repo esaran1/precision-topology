@@ -1512,7 +1512,7 @@ comes first. The global threshold enters only through which branch is occupied.
 ### 15.2 Theorem L1 (tracking)
 
 **Statement.** Assume (L0)–(L4), E ≤ S and 2S ≤ ρ, and let |δ_{t₀} − δ^sl_{t₀}| ≤ S. Then for every t ≥ t₀ with
-s_t, s_{t+1} ∈ J,
+s_t, s_{t+1}, s_{t+2} ∈ J (step 5 evaluates z\* at s_{t+1} + ṡ_{t+1} = s_{t+2}),
 
   **|δ_t − δ^sl_t| ≤ E + (1 − ηλ)^{t−t₀}·|δ_{t₀} − δ^sl_{t₀}|,  with |δ^sl_t| ≤ S.**
 
