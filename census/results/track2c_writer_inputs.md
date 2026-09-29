@@ -16,7 +16,7 @@ Outputs are in `census/results/track2c/`. Registration: `census/results/track2c_
 | b22ebd0 | **REGISTRATION:** frozen inputs and the SHA-256 manifest `registration.sha256` (18 files). |
 | 906c07b | OpenTimestamps proof of b22ebd0 (`registration_stamp.txt`, `.ots`, 4 calendars). |
 | d8d3569 | **Predictions** of all 240 runs, committed before any crossing was evaluated. `predictions.csv` SHA-256 27c0b676…, with per-run path hashes. |
-| (this commit) | Observation, scores, POST HOC, these writer inputs, ledger checks. |
+| (b863a54) | Observation, scores, POST HOC, these writer inputs, ledger checks. |
 
 **Order.**
 - The registration text was committed before any registered seed was searched.
