@@ -304,7 +304,8 @@ ends of all 12 certified R_glob and R_solve brackets, population objective):
 
 ## 7. Limits
 
-- The corollary is asymptotic: "for all sufficiently small ε". No explicit ε₀ is claimed. The measured
+- The corollary is asymptotic: "for all sufficiently small ε". No explicit ε₀ is claimed. (Forward reference, 2026-09-28: §16 gives an explicit ε₀ = 1.4·10⁻¹² for the switch in s-units and
+  proves that the branch is the global minimiser there.) The measured
   finite-a thresholds (ε = 0.30–0.60) sit 7–14% above the limit.
 - Global preference at finite a rests on Block 1c at the six reported a, not on the limit.
 - Everything is exact for the stated finite objective. For another sample (for example a run's own 400
@@ -1652,3 +1653,187 @@ D₂ = 0.5, H₁ = 0.2, g₁ = 1.61, g₂ = 0.2, γ = 0.292.
   - With first-step detection the residual is dominated by τ, which is less than one step.
 - **L3.** Free training, ṡ = ηv(s): r_obs = 4.88e−4, 4.90e−4 and 4.91e−4 at η = 0.1, 0.05 and 0.025. They agree to
   0.6%, and the differences are the O(η) discreteness τ.
+
+## 16. Local to global near the limit: the continued branch is the global minimiser for ε ≤ ε₀ = 1.4·10⁻¹² (Track 3 (1); 2026-09-28)
+
+**Status.**
+- **Theorem G: PROVED, every step checked.** It proves the **s-form** of the scaling law (5) as a statement about the
+  **global** conditional minimiser, with an explicit ε₀.
+- **The R-form (c₁) is not covered.** It also needs the unit Ĝ(a) to be attained at the tied corner for every
+  ε ≤ ε₀. That is certified only at ε = 0, 10⁻⁴, 10⁻³ and 0.005 (§8), not for all small ε. This is stated in §16.5.
+- **Producer:** `src/local_global.py` → `results/local_global.json`. One process, 7 minutes, mpmath interval
+  arithmetic.
+- **Inputs:** the committed limit certificates (`certv2_annulus_summary.csv`, `certv2_annulus_parts.csv`,
+  `mn2_bounds.csv`, `first_order_c1.csv`).
+
+### 16.0 Statement
+
+**Theorem G.** Let 0 < ε ≤ ε₀ = 1.4·10⁻¹², a = 1 + ε, and the 800-point quadrature objective. For every A ∈ [0.66, 0.71]
+(i.e. s = Aε^{−3/2}):
+- **(i)** The conditional loss L\*_ε(·; A) has a unique global minimiser, up to the reflection p ↦ −p and the windings
+  b₁ ↦ b₁ + 2πk. In rescaled coordinates it lies in the 0.05 box U around θ_c = (1.66858, 1.36972). It is the
+  continued branch.
+- **(ii)** The branch's gap changes sign exactly once in A ∈ [0.66, 0.71], at A_ε ∈ [0.68495, 0.68595]. It is
+  negative before A_ε and positive after.
+- **(iii)** Hence the global threshold in s-units, restricted to this A-range, is s_glob(ε) = A_ε·ε^{−3/2}, with
+  **A_ε = A\*(1 + c_s·ε + O(ε²))**, A\* = 0.685445237…, and c_s ∈ [0.6621547, 0.6621550].
+  - A_ε is the analytic continuation of the switch point of §8, by the implicit-function theorem at the
+    Krawczyk-certified point with an invertible Jacobian. φ_ε is entire in ε.
+  - The zero in (ii) is that point, by uniqueness in the switch box Z of §16.3.
+
+**What ε₀ means.** ε₀ is set by the smallest certified limit margin (the outer exclusion, 1.0·10⁻⁴) against the
+crudest perturbation bound (on K(24), where |σ| reaches 98.8). It is far below every tested a. At a = 1.01–1.12 the
+global statements rest on the per-a certificates (§5, the c₁ tests), not on this theorem. The theorem closes (5)'s
+s-form as an asymptotic statement about the global threshold.
+
+### 16.1 Two lemmas
+
+**Lemma G1 (pointwise remainder, all σ, all ε > 0).** With u = √ε·σ and φ_ε(σ) = (u − (1 + ε)sin u)/ε^{3/2}:
+- |φ_ε − h| ≤ ε·m₀(|σ|), with m₀(S) = S⁵/120 + S³/6;
+- |φ_ε′ − h′| ≤ ε·m₁, with m₁ = S⁴/24 + S²/2;
+- |φ_ε″ − h″| ≤ ε·m₂, with m₂ = S³/6 + S.
+
+*Proof.*
+- φ_ε − h = [u − sin u − u³/6]/ε^{3/2} + [u − sin u]/√ε, and the two Taylor remainders of sin are bounded by |u|⁵/120
+  and |u|³/6 for all real u.
+- φ_ε′ − h′ = [1 − cos u − u²/2]/ε + (1 − cos u), with remainders u⁴/24 and u²/2.
+- φ_ε″ − h″ = [sin u − u]/√ε + ε·sin u/√ε, with remainders |u|³/6 and |u|.
+- Substituting u = √ε·σ gives the stated forms. ∎
+
+**Lemma G2 (localisation at finite ε).** Let u₀ be the positive zero of g(u) = u − a·sin u, and β = arccos(1/a). Assume:
+- (a) 4W(s, a) + u₀ < 2π − β, with W from the §5.0 lemma;
+- (b) the branch-loss bound U_ε := max_A L\*_0(θ_c; A) + 0.71·ε·m₀(S_c) is below B(24), B_full and log 2.
+
+Then every global minimiser of the finite-a conditional loss has |w₁| ≤ W. In rescaled coordinates relative to the
+unique fold centre π + 2πk met by its t-range, it has (p, q) ∈ K(24).
+
+*Proof.*
+1. **|w₁| ≤ W.** For |w₁| > W, L\* > log 2 > U_ε (§5.0).
+2. **At most one fold window.** For |w₁| ≤ W the t-range T = {w₁x + b₁ : x ∈ [−2, 2]} has length ≤ 4W. By (a) it meets
+   at most one fold window [c − u₀, c + u₀], c = π + 2πk. If it meets none, f_a is increasing on T. Then the logit is
+   monotone in x at every point, so L\* ≥ B_full.
+3. **Ordering outside the window.** g is odd, decreasing on [0, β], increasing on [β, 2π − β], and g(u₀) = 0 with
+   u₀ > β. So on the points with |u| ≥ u₀, where u = t − c:
+   - u₁ < u₂ ≤ −u₀ and u₀ ≤ u₁ < u₂ are ordered, because g is increasing on [−(2π − β), −β] and [β, 2π − β], and
+     T ⊂ [c − 2π + β, c + 2π − β] by (a);
+   - u₁ ≤ −u₀ < u₀ ≤ u₂ gives g(u₁) ≤ g(−u₀) = 0 = g(u₀) ≤ g(u₂).
+   So the logit is monotone in x on the retained points. Dropping the other points (nonnegative losses) gives
+   L\* ≥ (1/n) × the best monotone logistic fit to the retained points.
+4. **The window is short.** u₀ < 2√2·√ε. Indeed g(u) ≥ −εu + (1 + ε)u³/6 − (1 + ε)u⁵/120, and at u = 2√2·√ε this is
+   ε^{3/2}·[−2√2 + (1 + ε)(2√2)³/6 − …] > 0, while g < 0 on (0, u₀).
+   So the dropped points lie in σ ∈ (−2√2, 2√2), an x-window of length ≤ 4√2/|p|.
+   - For |p| ≥ 24 the bound is B(24), the same exact PAVA value as in §3(a): dropping a sub-window only removes
+     fewer points.
+5. **What is left.** If |p| < 24 and some point has |σ| < 2√2, then |q| < 2√2 + 48. That is K(24).
+6. By (b), every region other than K(24) has loss above the branch. ∎
+
+### 16.2 Part (i): the four-link chain at finite ε
+
+**Chain.** The limit chain of §3(c) holds on each of 40 A-sub-intervals of [0.66, 0.71] with θ_c fixed. Each link
+transfers if its certified limit margin exceeds its perturbation. All bounds below are increasing in ε, so they hold
+on (0, ε₀].
+
+**Perturbation bounds**, from Lemma G1, |ℓ′| ≤ 1, σ′ ≤ ¼, |σ″| ≤ 1/(6√3), and |b\*_ε − b\*_0| ≤ max_i A|Δφ_i|:
+- **Loss.** |L\*_ε(θ; A) − L\*_0(θ; A)| ≤ A·ε·m₀(S(θ)), where S(θ) = max_i |σ_i(θ)|. The profiled minimum over b moves
+  at most by the sup of the change.
+- **Gradient.** By the envelope theorem, ∂_pL\* = mean[(σ(z) − y)Aφ′(σ)x]. So
+  |Δ∂_pL\*| ≤ 2Aε[m₁(S) + (S²/2 + 1)(A/2)m₀(S)], and the same without the factor 2 for ∂_q.
+- **Hessian** of the (p, q, b) function at (p, q, b\*_ε):
+  - (direct) each entry changes by at most
+    (6√3)⁻¹Aεm₀d² + 2dAεm₁ + A²εm₀(S + εm₂) + 4Aεm₂, with d = max(1, 2A(S²/2 + 1 + εm₁));
+  - (b-shift) plus a Lipschitz term in b, ((6√3)⁻¹d² + AS)·Aεm₀;
+  - the Frobenius norm is at most 3 × the entry bound.
+  - The Schur complement of a PD matrix is PD, so the profiled loss is strictly convex on U. That is what "at most
+    one critical point in U" uses.
+
+**Radii.** From θ_c = (1.668579, 1.369717):
+- S_c = 4.707 (θ_c itself);
+- S_U = 4.857 (0.05 box);
+- S_R = 5.157 (0.15 box);
+- S_K = 98.83 (K(24)).
+
+**At ε₀ = 1.4·10⁻¹²** (`local_global.json`, `links`):
+
+| link | certified limit margin | perturbation at ε₀ | slack |
+|---|---|---|---|
+| localisation (Lemma G2(b)) | B(24) − max branch loss = 0.38797 − 0.35804 | 0.71·ε₀·m₀(4.707) = 3.6·10⁻¹¹ | 0.0299 |
+| 2, outer exclusion on K(24) ∖ 0.15 box | 1.0024·10⁻⁴ | 0.71·ε₀·(m₀(98.83) + m₀(4.707)) = 7.83·10⁻⁵ | 2.2·10⁻⁵ |
+| 3, ring (gradient component) | 3.2786·10⁻³ | 6.2·10⁻¹⁰ | 3.28·10⁻³ |
+| 4, PD on U | 0.047346 | 1.3·10⁻⁸ | 0.04735 |
+
+- **Lemma G2(a):** W ≤ 1.0005 (s ≥ 0.66ε₀^{−3/2}, a ≤ 1 + ε₀; W is monotone in both), so 4W + u₀ = 4.0020 < 2π − β. The
+  scaled value g(2√2√ε)/ε^{3/2} ≥ 0.943 > 0.
+- **Why ε₀ is this value.** It is 0.8 × (the value at which the outer slack vanishes, 1.79·10⁻¹²), rounded down.
+- **Hence (i):** the global minimiser exists (Lemma G2 bounds the domain), lies in K(24) (G2), lies in the 0.15 box
+  (link 2), is not in the ring (link 3; it is a critical point), and is the unique critical point in the 0.05 box
+  (link 4). ∎
+
+### 16.3 Part (ii): one sign change, by parametric Krawczyk
+
+**The ε-inflated enclosure.** Every quantity is evaluated in interval arithmetic with φ, φ′ and φ″ replaced by
+h + [−1, 1]ε₀m₀(|σ|), h′ + [−1, 1]ε₀m₁ and h″ + [−1, 1]ε₀m₂. By Lemma G1 these enclose φ_ε for every ε ∈ [0, ε₀]. So a
+Krawczyk test that passes holds for every such ε at once.
+
+**The switch box.**
+- The box is Z = (p, q, b, A) ∈ switch point ± (6, 6, 2, 5)·10⁻⁴, around the §8 point.
+- The Krawczyk test for Φ = (∇_{p,q,b}L, φ(q − 1.2p) − φ(q + 0.8p)) passes on Z. So there is exactly one zero in Z for
+  each ε ≤ ε₀.
+- **The active pair is valid on Z (inflated).** The pair is inner x = 0.8, outer x = −1.2:
+  - the other window endpoints are strictly dominated;
+  - the inner σ-range stays above −√2 + 0.01;
+  - the negative outer σ-range stays below √2 − 0.01;
+  - the positive outer σ-range stays above √2 + 0.01.
+  - φ_ε's critical points lie at ±β/√ε = ±√2(1 + O(ε)).
+  - So φ_ε's window extrema are at the edges, and on Z the true gap equals that expression.
+- Z's A-range is [0.684945, 0.685945].
+
+**Branch boxes.**
+- [0.66, 0.71] is covered by 110 closed A-sub-intervals: widths ≤ 2·10⁻³ away from Z, 2·10⁻⁵ inside Z, with bisection
+  wherever the sign is undecided.
+- On each, a parametric Krawczyk test for ∇_{p,q,b}L_ε(·; A) = 0, with A the sub-interval as an interval parameter
+  and ε-inflation, passes on a box X_k (grown by ε-inflation). Each X_k lies in U.
+- So X_k contains the unique critical point in U for every A in the sub-interval, i.e. θ_ε(A) by (i).
+- **The gap over X_k** is enclosed over the continuous windows:
+  - the lower bound is min over each window's σ-hull of the inflated φ (extrema at the ends or at ±√2), minus the
+    inflated max over I;
+  - the upper bound is φ at single window points.
+- **Result** (`gap` in the JSON): all 110 boxes pass and lie in U.
+  - Every sub-interval left of Z has gap < 0 (the largest upper bound is −2.5·10⁻⁴).
+  - Every sub-interval right of Z has gap > 0 (the smallest lower bound is +7.8·10⁻⁴).
+  - Every box for A inside Z lies inside Z's θ-range.
+
+**Conclusion.**
+- A ↦ G(θ_ε(A)) is continuous: θ_ε is the unique nondegenerate minimiser, hence C^∞ by the implicit-function
+  theorem.
+- It is negative on [0.66, 0.684945] and positive on [0.685945, 0.71].
+- On Z's A-range its zeros are zeros of Φ in Z, because θ_ε(A) lies in Z's θ-range there. There is exactly one.
+- So the sign changes exactly once. ∎
+
+### 16.4 Part (iii)
+
+- Φ(·; ε) is analytic in ε (φ_ε is entire in ε), and ∂Φ/∂(p, q, b, A) is invertible at the §8 point (Krawczyk).
+- So the zero continues analytically: A_ε = A\* + A′(0)ε + O(ε²), with A′(0)/A\* = c_s ∈ [0.6621547, 0.6621550] (§8).
+- By uniqueness in Z it is the zero of (ii). Finally s = A/ε^{3/2}. ∎
+
+### 16.5 What is not proved, and what would enlarge ε₀
+
+**The R-form, R_glob = R_glob^∞(1 + c₁ε + O(ε²)).**
+- R = A·K(ε)/2 with K(ε) = Ĝ(a)/ε^{3/2}, the global supremum of the gap.
+- **What is still needed.** For every ε ≤ ε₀, the maximiser of G̃_ε must be the tied corner. Two ingredients would
+  give this:
+  - a certified margin sup G₀ ≤ K − Δ outside a neighbourhood of ±corner;
+  - the sharp-maximum argument on that neighbourhood, with interval gradients.
+  Neither is done here.
+- **What exists.** §12 proves that the maximiser lies in a compact set for ε ≤ 0.029. §8 certifies the corner at
+  ε = 0 (branch and bound) and at 10⁻⁴, 10⁻³ and 0.005 (free branch and bound). So the R-form holds for the global
+  switch in s-units, with a K(ε) whose global-ness is certified only at those ε.
+- **The per-a certificates** cover the tested a directly: every registered c₁ bracket is a global certificate.
+
+**Why ε₀ is tiny, and what would enlarge it.**
+- The binding link is the outer exclusion. Its certified limit margin is 1.0·10⁻⁴, while |σ| reaches 98.8 on K(24),
+  where m₀ ≈ 7.9·10⁷.
+- A per-cell version would help: re-running the §3(c) outer exclusion with the perturbation 0.71·ε·m₀(cell σ-range)
+  subtracted cell by cell. This is not done. It would lift ε₀ to about the near-branch limit,
+  10⁻⁴/(0.71·2·m₀(5)) ≈ 10⁻⁶.
+- Values of ε₀ comparable to the tested a need a finite-ε certificate with ε as an interval. That is a new search, not
+  a perturbation of the limit certificate.
