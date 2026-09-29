@@ -1,0 +1,4 @@
+Test 2B registration (the validity boundary of the lag law in kx, redesigned)
+registration commit: 0708ae913ab589dc898b40322d824f0ee7a9640f
+SHA-256 results/track2b_registration.md: f1b5c7b1a6072678c6fe8950e025be23fe22260c10db412c28a6e58beef1df60
+SHA-256 results/track2b/registration.sha256: 66f60490815dbd036ae86ce02a0abcfea8d073777dd1363644915e02083c0e64
