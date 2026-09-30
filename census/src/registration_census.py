@@ -83,7 +83,7 @@ def build() -> pd.DataFrame:
     rules = other[other.kind.astype(str).str.startswith("registered decision rule")]
     assert not set(other.id) & set(d.id)
     for label, t in (("", p), ("by registered unit: ", d)):
-        v4 = t[t.census_round.isin(["2026-09-24", "2026-09-25", "2026-09-29"])]   # 09-29: discussion phase
+        v4 = t[t.census_round.isin(["2026-09-24", "2026-09-25", "2026-09-29", "2026-09-30"])]   # 09-29, 09-30: discussion phase
         for scope, g in (("scored by registered rules", t[t.scoring == "registered rule"]),
                          ("assigned post hoc in the census", t[t.scoring != "registered rule"]),
                          ("all", t),

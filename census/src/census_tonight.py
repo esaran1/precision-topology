@@ -1,5 +1,5 @@
 """Census additions for the 2026-09-25 night program (Tracks 1B, 2C, 3A, 3B) and the 2026-09-29 discussion phase
-(Tests 2A, 2B, 2C, GELU-T; census_round 2026-09-29): registered units appended to
+(Tests 2A, 2B, 2C, GELU-T: census_round 2026-09-29; Test W2-A: 2026-09-30): registered units appended to
 results/registration_census_enumeration.csv from the committed verdict files (idempotent: rows with these id prefixes
 are replaced).  Track 1A (κ) is not a registered prediction (a no-fit comparison derived after the fitted relationship
 was known) and is not in the census.
@@ -17,9 +17,10 @@ import pandas as pd
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 ENUM = RESULTS / "registration_census_enumeration.csv"
 PREFIXES = ("ramp-", "act-", "t2c-", "band-", "c1-followup", "trackA-", "trackT-", "boundary-",
-            "test2A-", "test2B-", "geluT-", "test2C-")
+            "test2A-", "test2B-", "geluT-", "test2C-", "w2A-")
 ROUND = "2026-09-25"
 ROUND_DISCUSSION = "2026-09-29"      # discussion phase: Tests 2A, 2B, 2C and GELU-T
+ROUND_DISCUSSION_2 = "2026-09-30"    # discussion phase, second day: Test W2-A
 
 
 def _row(id_, block, reg, commit, verdict, text, scored, note="", round_=ROUND):
@@ -259,6 +260,35 @@ def test2c_rows():
     return rows
 
 
+def w2a_rows():
+    """Test W2-A (discussion phase, 2026-09-30): the lag law at width 2 on the asymmetric windows; three registered arms
+    (T headline, D control, T' own arm), each with its own gate, validity and L1-L5 and its own verdict; one row per
+    criterion per arm (author, 2026-09-30, as GELU-T's arms)."""
+    f = RESULTS / "width2_asym" / "scores.json"
+    if not f.exists():
+        return []
+    S = json.loads(f.read_text())
+    blk, reg, com = "lag law at width 2 on asymmetric windows (Test W2-A)", "results/width2_asym_registration.md", "28b2432"
+    rule = {"L1": "median r_obs/r_traj in [0.90, 1.10]", "L2": "median r_obs/r_cf in [0.80, 1.20]",
+            "L3": "Spearman(r_traj, r_obs) >= 0.5",
+            "L4": "upper end of the bootstrap 95% interval of mean D < 0, D against the run's copy's population switch",
+            "L5": "upper end of the bootstrap 95% interval of mean D < 0, D against the lag-free own switch"}
+    rows = []
+    for arm, suf, label in (("T", "", "arm T, the headline"), ("D", "-D", "arm D, control (branch-point start)"),
+                            ("Tp", "-Tprime", "arm T', own arm with its own verdict")):
+        A = S["arms"][arm]
+        for L in ("L1", "L2", "L3", "L4", "L5"):
+            x = A[L]
+            val = (f"median ratio {x['median_ratio']:.3f}" if L in ("L1", "L2") else f"Spearman {x['spearman']:.4f}"
+                   if L == "L3" else f"95% CI [{x['ci95'][0]:.4f}, {x['ci95'][1]:.4f}], n = {x['n']}")
+            rows.append(_row(f"w2A-{L}{suf}", blk, reg, com, x["verdict"],
+                             f"{L} ({label}): {rule[L]}; width 2, asymmetric windows, free SGD, everything frozen and "
+                             f"hashed before any run. Scored: gate {'passed' if A['gate']['pass'] else 'failed'}, validity "
+                             f"{'met' if A['valid'] else 'failed'}, {A['n_scored']} of {A['n_runs']} runs scored, {val}: "
+                             f"{x['verdict']}.", "results/width2_asym/scores.json", round_=ROUND_DISCUSSION_2))
+    return rows
+
+
 def extra_rows():
     """Track 2C and Track 3B rows, from their agents' committed files (added when those tracks are scored)."""
     rows = []
@@ -272,7 +302,7 @@ def main():
     d = pd.read_csv(ENUM)
     d = d[~d.id.str.startswith(PREFIXES)]
     new = pd.DataFrame(ramp_rows() + act_rows() + band_rows() + c1_rows() + track_a_rows() + track_t_rows() + boundary_rows() + extra_rows()
-                       + test2a_rows() + test2b_rows() + gelu_t_rows() + test2c_rows())
+                       + test2a_rows() + test2b_rows() + gelu_t_rows() + test2c_rows() + w2a_rows())
     for c in d.columns:
         if c not in new.columns:
             new[c] = ""

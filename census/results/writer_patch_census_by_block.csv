@@ -42,6 +42,7 @@ block,interleaved 08-05,registered rule,0,0,0,2,2
 block,kappa,registered rule,3,1,0,0,4
 block,lag law at GELU from a declared start (GELU-T),registered rule,10,0,0,0,10
 block,lag law at an unseen a (Track A),registered rule,3,1,0,0,4
+block,lag law at width 2 on asymmetric windows (Test W2-A),registered rule,15,0,0,0,15
 block,lag test,registered rule,1,1,0,0,2
 block,lag test 2 (deconfounded),registered rule,0,2,0,0,2
 block,lag-law validity boundary (Test 2B),registered rule,1,0,0,1,2
@@ -156,6 +157,7 @@ registration_file,results/track2b_registration.md,registered rule,1,0,0,1,2
 registration_file,results/track2c_registration.md,registered rule,6,0,0,6,12
 registration_file,results/track_a_registration.md,registered rule,3,1,0,0,4
 registration_file,results/ts_test_registration.md,registered rule,2,0,0,0,2
+registration_file,results/width2_asym_registration.md,registered rule,15,0,0,0,15
 registration_file,results/width2_nogating_design.md,registered rule,0,1,0,0,1
 registration_file,results/width_prediction.md,registered rule,3,1,0,0,4
 registration_file,results/winding_prediction.md,registered rule,4,0,0,0,4

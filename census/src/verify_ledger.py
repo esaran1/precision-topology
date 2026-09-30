@@ -477,7 +477,7 @@ def main() -> None:
 
     print("T78 registration census")
     rc = pd.read_csv(R / "registration_census.csv")
-    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 263.0, 0)
+    chk("registered predictions (headline convention: one row per prediction)", float(len(rc)), 278.0, 0)
     chk("first-round rows (2026-09-23)", float((rc.census_round == "2026-09-23").sum()), 164.0, 0)
     chk("third-round rows (2026-09-25)", float((rc.census_round == "2026-09-25").sum()), 41.0, 0)
     chk("discussion-phase rows (2026-09-29)", float((rc.census_round == "2026-09-29").sum()), 27.0, 0)
@@ -486,24 +486,27 @@ def main() -> None:
         float(((rd_.verdict == "PASS") & (rd_.scoring == "registered rule")).sum()), 20.0, 0)
     chk("discussion-phase rows: UNRESOLVED, all by registered rule",
         float(((rd_.verdict == "UNRESOLVED") & (rd_.scoring == "registered rule")).sum()), 7.0, 0)
+    chk("discussion-phase rows (2026-09-30, Test W2-A)", float((rc.census_round == "2026-09-30").sum()), 15.0, 0)
+    chk("W2-A rows: PASS by registered rule",
+        float(((rc.census_round == "2026-09-30") & (rc.verdict == "PASS") & (rc.scoring == "registered rule")).sum()), 15.0, 0)
     ru = pd.read_csv(R / "registration_census_by_unit.csv")
-    chk("registered units (appendix convention: per a)", float(len(ru)), 323.0, 0)
-    for v, n in (("PASS", 154), ("FAIL", 99), ("PARTIAL", 13), ("UNRESOLVED", 57)):
+    chk("registered units (appendix convention: per a)", float(len(ru)), 338.0, 0)
+    for v, n in (("PASS", 169), ("FAIL", 99), ("PARTIAL", 13), ("UNRESOLVED", 57)):
         chk(f"units, all: {v}", float((ru.verdict == v).sum()), float(n), 0)
-    for v, n in (("PASS", 123), ("FAIL", 72), ("PARTIAL", 21), ("UNRESOLVED", 47)):
+    for v, n in (("PASS", 138), ("FAIL", 72), ("PARTIAL", 21), ("UNRESOLVED", 47)):
         chk(f"all: {v}", float((rc.verdict == v).sum()), float(n), 0)
     r64 = rc[rc.counted_in_existing_64 == "yes"]
     chk("existing 64 rows", float(len(r64)), 64.0, 0)
     for v, n in (("PASS", 27), ("FAIL", 24), ("PARTIAL", 1), ("UNRESOLVED", 12)):
         chk(f"64: {v}", float((r64.verdict == v).sum()), float(n), 0)
     tl = pd.read_csv(R / "registration_tally.csv").set_index("scope")
-    for scope, want in (("scored by registered rules", (241, 120, 66, 8, 47)),
+    for scope, want in (("scored by registered rules", (256, 135, 66, 8, 47)),
                         ("assigned post hoc in the census", (22, 3, 6, 13, 0)),
-                        ("since 2026-09-23: scored by registered rules", (90, 54, 19, 0, 17)),
+                        ("since 2026-09-23: scored by registered rules", (105, 69, 19, 0, 17)),
                         ("since 2026-09-23: assigned post hoc", (9, 0, 0, 9, 0)),
-                        ("by registered unit: scored by registered rules", (309, 151, 93, 8, 57)),
+                        ("by registered unit: scored by registered rules", (324, 166, 93, 8, 57)),
                         ("by registered unit: assigned post hoc in the census", (14, 3, 6, 5, 0)),
-                        ("by registered unit: since 2026-09-23: scored by registered rules", (158, 85, 46, 0, 27)),
+                        ("by registered unit: since 2026-09-23: scored by registered rules", (173, 100, 46, 0, 27)),
                         ("by registered unit: since 2026-09-23: assigned post hoc", (1, 0, 0, 1, 0)),
                         ("since 2026-09-23: validity gates (not predictions; not in the headline)", (20, 20, 0, 0, 0))):
         got = tl.loc[scope]
@@ -1256,8 +1259,8 @@ def v4_checks() -> None:
     chk("WP-3: W at a=1.30 glob lo", float(wp3[(wp3.a == 1.3) & (wp3.kind == "glob") & (wp3.end == "lo")].W.iloc[0]),
         2.9077, 0.0001)
     wp4 = pd.read_csv(R / "writer_patch_census_by_block.csv")
-    chk("WP-4: by-block rows sum to 263", float(wp4[wp4.by == "block"].n.sum()), 263.0, 0)
-    chk("WP-4: by-file rows sum to 263", float(wp4[wp4.by == "registration_file"].n.sum()), 263.0, 0)
+    chk("WP-4: by-block rows sum to 278", float(wp4[wp4.by == "block"].n.sum()), 278.0, 0)
+    chk("WP-4: by-file rows sum to 278", float(wp4[wp4.by == "registration_file"].n.sum()), 278.0, 0)
     oth_ = pd.read_csv(R / "registration_census_v4_gates_and_reported.csv")
     chk("width-2 verdict listed as a registered decision rule, not a prediction",
         float((oth_.id == "sl-width2").sum() == 1
@@ -1580,11 +1583,11 @@ def harsh_review_checks() -> None:
     chk("A4 FAIL registered peripheral", n(verdict="FAIL", scoring="registered rule", relevance="peripheral"), 35.0, 0)
     chk("A4 FAIL post hoc central", n(verdict="FAIL", scoring="post hoc (census)", relevance="central"), 2.0, 0)
     chk("A4 FAIL post hoc peripheral", n(verdict="FAIL", scoring="post hoc (census)", relevance="peripheral"), 4.0, 0)
-    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 73.0, 0)
+    chk("A4 PASS registered central", n(verdict="PASS", scoring="registered rule", relevance="central"), 88.0, 0)
     chk("A4 PASS registered peripheral", n(verdict="PASS", scoring="registered rule", relevance="peripheral"), 47.0, 0)
     chk("A4 PARTIAL registered central", n(verdict="PARTIAL", scoring="registered rule", relevance="central"), 1.0, 0)
     chk("A4 UNRESOLVED registered central", n(verdict="UNRESOLVED", scoring="registered rule", relevance="central"), 22.0, 0)
-    chk("A4 rows", float(len(cr)), 263.0, 0)
+    chk("A4 rows", float(len(cr)), 278.0, 0)
 
 
 def tracks_checks() -> None:

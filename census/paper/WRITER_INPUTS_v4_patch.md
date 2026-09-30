@@ -145,10 +145,10 @@ certified R_glob and R_solve bracket):
 **Headline convention** (as in the 2026-09-23 census): each registered prediction is counted once across a. A
 criterion registered per unit (Track A's L3 per optimiser; Test 2C's criteria per cell) is scored as registered, one
 row per unit, not merged into a PARTIAL.
-- **Headline**: 241 scored by their registered rules: 120 PASS, 66 FAIL, 8 PARTIAL,
+- **Headline**: 256 scored by their registered rules: 135 PASS, 66 FAIL, 8 PARTIAL,
   47 UNRESOLVED.
 - **Post hoc**: 22 assigned post hoc: 3 / 6 / 13 / 0.
-- **Total**: 263 registered predictions.
+- **Total**: 278 registered predictions.
 
 **Added in the 2026-09-25 round** (registrations through the current commit):
 - Block 4b (`residual_mechanism_design.md`): the two competing hypotheses, inherited displacement and optimiser memory,
@@ -158,8 +158,9 @@ row per unit, not merged into a PARTIAL.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
 
-**Added in the 2026-09-29 round (discussion phase)**: 27 rows, all scored by their registered rules (20 PASS, 7 UNRESOLVED; no
-FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, and descriptive analyses are not rows.
+**Added in the discussion phase (rounds 2026-09-29 and 2026-09-30)**: 42 rows from 5 tests, all scored by
+their registered rules (35 PASS, 7 UNRESOLVED; no FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell
+outcomes, and descriptive analyses are not rows.
 - Test 2A (`track2a_registration.md`, 9fd1f32; Adam per-run ordering at the unseen a = 1.85): A1 PASS; A2 PASS; A3 PASS.
 - Test 2B (`track2b_registration.md`, 0708ae9; the lag law's validity boundary in κχ): C1 PASS; C2 UNRESOLVED. C2 is UNRESOLVED
   because 4 of its 4 cells are invalid.
@@ -169,6 +170,9 @@ FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, an
 - Test 2C (`track2c_registration.md`, b22ebd0; the band task in R^d against each seed's own-sample R^d switch): C1–C3
   were registered per cell (d ∈ {2, 4} × a ∈ {1.30, 1.50}) with no pooled verdict, so each is one row per cell
   (12 rows: 6 PASS, 6 UNRESOLVED; PASS at a = 1.50, UNRESOLVED at a = 1.30 on validity V3).
+- Test W2-A (`width2_asym_registration.md`, 28b2432; round 2026-09-30; the lag law at width 2 on the asymmetric
+  windows): L1–L5 in each of the three registered arms, each arm with its own verdict, one row per criterion per arm
+  (15 rows: T, the headline, 5 PASS; D, the control, 5 PASS; T′, its own arm, 5 PASS).
 
 **Not in the headline.**
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
@@ -236,6 +240,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | kappa | registered rule | 3 | 1 | 0 | 0 | 4 |
 | lag law at GELU from a declared start (GELU-T) | registered rule | 10 | 0 | 0 | 0 | 10 |
 | lag law at an unseen a (Track A) | registered rule | 3 | 1 | 0 | 0 | 4 |
+| lag law at width 2 on asymmetric windows (Test W2-A) | registered rule | 15 | 0 | 0 | 0 | 15 |
 | lag test | registered rule | 1 | 1 | 0 | 0 | 2 |
 | lag test 2 (deconfounded) | registered rule | 0 | 2 | 0 | 0 | 2 |
 | lag-law validity boundary (Test 2B) | registered rule | 1 | 0 | 0 | 1 | 2 |
@@ -354,6 +359,7 @@ Source for the tables below: `writer_patch_census_by_block.csv`.
 | results/track2c_registration.md | registered rule | 6 | 0 | 0 | 6 | 12 |
 | results/track_a_registration.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/ts_test_registration.md | registered rule | 2 | 0 | 0 | 0 | 2 |
+| results/width2_asym_registration.md | registered rule | 15 | 0 | 0 | 0 | 15 |
 | results/width2_nogating_design.md | registered rule | 0 | 1 | 0 | 0 | 1 |
 | results/width_prediction.md | registered rule | 3 | 1 | 0 | 0 | 4 |
 | results/winding_prediction.md | registered rule | 4 | 0 | 0 | 0 | 4 |
@@ -498,7 +504,7 @@ absolute difference is 7.09e-06 (at a = 1.60, 3.16e-05 relative).
 | 3.00 | [1.052297757851, 1.053233148730] | Ĝ_cert witness | 0.00e+00 | 0.00e+00 | +4.4e-16 |
 
 **No printed digit of Ĝ or R changes.** The largest relative change of Ĝ is δ = 8.4e-14. Every R is linear in Ĝ.
-All 1065 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
+All 1137 printed-number checks of the ledger (`src/verify_ledger.py`, which verifies every
 printed number against its artifact) still hold, and round to the same printed digits, with their artifact value
 scaled by 1 ± δ (conservatively applied to every check, Ĝ-dependent or not); 0 are unstable
 (`ghat_digit_stability.csv`). A further 22 checks compare two artifacts to 1e−12; they are
@@ -964,14 +970,15 @@ peripheral.
   held-out predictions (Block G, Block 3, own-seed), or width 2.
 - **Peripheral:** budget laws, barriers and sharpness, trapping, optimiser equivalence, and the early exploratory
   probes.
-- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The four blocks of the
-  2026-09-29 round were classified by the same topic rule (all central, threshold), after their verdicts were known.
+- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The five blocks of the
+  discussion phase (2026-09-29 and 2026-09-30) were classified by the same topic rule (all central, threshold), after
+  their verdicts were known.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
 | post hoc (census) | central | 1 | 2 | 13 | 0 |
 | post hoc (census) | peripheral | 2 | 4 | 0 | 0 |
-| registered rule | central | 73 | 31 | 1 | 22 |
+| registered rule | central | 88 | 31 | 1 | 22 |
 | registered rule | peripheral | 47 | 35 | 7 | 25 |
 
 IDs: `A4 FAIL registered central`; `A4 FAIL registered peripheral`; `A4 FAIL post hoc central`; `A4 FAIL post hoc peripheral`; `A4 PASS registered central`; `A4 PASS registered peripheral`; `A4 rows`.
@@ -1053,12 +1060,15 @@ per-unit ruling (Track A's L3) and were not re-scored. Designs of that round tha
 registration (the night program's 2C design, the GELU prospective test, the Adam ramp from initialisation) are not
 registrations and are not in the census.
 
-The discussion phase (2026-09-29) added 27 rows, all scored by their registered rules and none a failure (20 PASS, 7 UNRESOLVED):
+The discussion phase (2026-09-29 and 2026-09-30) added 42 rows from 5 tests, all scored by their registered
+rules and none a failure (35 PASS, 7 UNRESOLVED):
 - Test 2A (Adam per-run ordering at a = 1.85): A1 PASS; A2 PASS; A3 PASS.
 - Test 2B (the lag law's validity boundary): C1 PASS; C2 UNRESOLVED.
 - GELU-T (the lag law at GELU; primary and mechanism-control arms, one row per criterion per arm): 10 PASS.
 - Test 2C (the band task in R^d, one row per criterion per cell): 6 PASS, 6 UNRESOLVED; PASS at a = 1.50 and
   UNRESOLVED at a = 1.30 (validity V3).
+- Test W2-A (the lag law at width 2 on the asymmetric windows; arms T, the headline, D, the control, and T′, one row
+  per criterion per arm): 15 PASS.
 
 Test 2C (b22ebd0) and GELU-T (736b6bf) are new registrations of new designs. They are not the stopped 2C and GELU
 prospective designs above, which remain unregistered and outside the census.

@@ -45,11 +45,12 @@ BLOCKS = {
     "lag law at an unseen a (Track A)": ("central", "threshold"),
     "simplicity-bias transfer (Track T)": ("central", "threshold"),
     "boundary test (SGD forced ramps)": ("central", "threshold"),
-    # 2026-09-29 discussion phase (classified by topic: training crossings relative to the threshold, the lag law)
+    # 2026-09-29/30 discussion phase (classified by topic: training crossings relative to the threshold, the lag law)
     "Adam per-run ordering at an unseen a (Test 2A)": ("central", "threshold"),
     "lag-law validity boundary (Test 2B)": ("central", "threshold"),
     "lag law at GELU from a declared start (GELU-T)": ("central", "threshold"),
     "band task in R^d vs own R^d switch (Test 2C)": ("central", "threshold"),
+    "lag law at width 2 on asymmetric windows (Test W2-A)": ("central", "threshold"),   # 2026-09-30, by topic (the lag law)
     # peripheral
     "Arrhenius 08-27": ("peripheral", "budget law / barriers"), "MNIST budget law 09-11": ("peripheral", "budget law"),
     "collapse 09-12": ("peripheral", "budget law"), "nu": ("peripheral", "budget law"),

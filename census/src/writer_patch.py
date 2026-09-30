@@ -235,9 +235,10 @@ def _md(df, cols, fmt=None):
 
 
 def _discussion_round():
-    """Census rows of the 2026-09-29 discussion phase (Tests 2A, 2B, 2C, GELU-T), with per-block verdict strings."""
+    """Census rows of the discussion phase (round 2026-09-29: Tests 2A, 2B, 2C, GELU-T; round 2026-09-30: Test W2-A),
+    with per-block verdict strings."""
     d = pd.read_csv(RESULTS / "registration_census.csv")
-    g = d[d.census_round == "2026-09-29"]
+    g = d[d.census_round.isin(["2026-09-29", "2026-09-30"])]
     vc = lambda x: ", ".join(f"{int((x.verdict == v).sum())} {v}" for v in ("PASS", "FAIL", "PARTIAL", "UNRESOLVED")
                              if (x.verdict == v).any())
     blk = lambda b: g[g.block == b]
@@ -245,7 +246,8 @@ def _discussion_round():
     t2b = blk("lag-law validity boundary (Test 2B)")
     gt = blk("lag law at GELU from a declared start (GELU-T)")
     t2c = blk("band task in R^d vs own R^d switch (Test 2C)")
-    assert len(t2a) + len(t2b) + len(gt) + len(t2c) == len(g)
+    w2 = blk("lag law at width 2 on asymmetric windows (Test W2-A)")
+    assert len(t2a) + len(t2b) + len(gt) + len(t2c) + len(w2) == len(g)
     S2b = json.loads((RESULTS / "track2b" / "scores.json").read_text())
     c_a = lambda v: sorted({i.rsplit("-", 1)[1] for i in t2c[t2c.verdict == v].id})
     return {
@@ -256,6 +258,9 @@ def _discussion_round():
         "t2b_c2_invalid": len(S2b["C2_cells_invalid"]),
         "gt": vc(gt), "gt_n": len(gt), "gt_prim": vc(gt[~gt.id.str.endswith("-control")]),
         "gt_ctrl": vc(gt[gt.id.str.endswith("-control")]),
+        "n_tests": sum(len(x) > 0 for x in (t2a, t2b, gt, t2c, w2)),
+        "w2": vc(w2), "w2_n": len(w2), "w2_T": vc(w2[~w2.id.str.contains("-D|-Tprime")]),
+        "w2_D": vc(w2[w2.id.str.endswith("-D")]), "w2_Tp": vc(w2[w2.id.str.endswith("-Tprime")]),
         "t2c": vc(t2c), "t2c_n": len(t2c), "t2c_pass_a": ", ".join(c_a("PASS")), "t2c_unres_a": ", ".join(c_a("UNRESOLVED")),
     }
 
@@ -372,8 +377,9 @@ row per unit, not merged into a PARTIAL.
 - tanh (`scale_limits_tanh_prediction.md`): FAIL. The registered expectation was not met as written ("neither", by
   the author's decision; the E-stall convention).
 
-**Added in the 2026-09-29 round (discussion phase)**: {dr["n"]} rows, all scored by their registered rules ({dr["all"]}; no
-FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, and descriptive analyses are not rows.
+**Added in the discussion phase (rounds 2026-09-29 and 2026-09-30)**: {dr["n"]} rows from {dr["n_tests"]} tests, all scored by
+their registered rules ({dr["all"]}; no FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell
+outcomes, and descriptive analyses are not rows.
 - Test 2A (`track2a_registration.md`, 9fd1f32; Adam per-run ordering at the unseen a = 1.85): {dr["t2a"]}.
 - Test 2B (`track2b_registration.md`, 0708ae9; the lag law's validity boundary in κχ): {dr["t2b"]}. C2 is UNRESOLVED
   because {dr["t2b_c2_invalid"]} of its 4 cells are invalid.
@@ -383,6 +389,9 @@ FAIL, no PARTIAL). Gates, validity conditions, per-arm and per-cell outcomes, an
 - Test 2C (`track2c_registration.md`, b22ebd0; the band task in R^d against each seed's own-sample R^d switch): C1–C3
   were registered per cell (d ∈ {{2, 4}} × a ∈ {{1.30, 1.50}}) with no pooled verdict, so each is one row per cell
   ({dr["t2c_n"]} rows: {dr["t2c"]}; PASS at a = {dr["t2c_pass_a"]}, UNRESOLVED at a = {dr["t2c_unres_a"]} on validity V3).
+- Test W2-A (`width2_asym_registration.md`, 28b2432; round 2026-09-30; the lag law at width 2 on the asymmetric
+  windows): L1–L5 in each of the three registered arms, each arm with its own verdict, one row per criterion per arm
+  ({dr["w2_n"]} rows: T, the headline, {dr["w2_T"]}; D, the control, {dr["w2_D"]}; T′, its own arm, {dr["w2_Tp"]}).
 
 **Not in the headline.**
 - *Registered decision rule (outcome, not a prediction)*: the width-2 verdict (`scale_limits_prediction.md`). Its
@@ -1175,8 +1184,9 @@ peripheral.
   held-out predictions (Block G, Block 3, own-seed), or width 2.
 - **Peripheral:** budget laws, barriers and sharpness, trapping, optimiser equivalence, and the early exploratory
   probes.
-- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The four blocks of the
-  2026-09-29 round were classified by the same topic rule (all central, threshold), after their verdicts were known.
+- The classification is post hoc: it was made on 2026-09-25, after every verdict was known. The five blocks of the
+  discussion phase (2026-09-29 and 2026-09-30) were classified by the same topic rule (all central, threshold), after
+  their verdicts were known.
 
 | scoring | relevance | PASS | FAIL | PARTIAL | UNRESOLVED |
 |---|---|---|---|---|---|
@@ -1221,12 +1231,15 @@ per-unit ruling (Track A's L3) and were not re-scored. Designs of that round tha
 registration (the night program's 2C design, the GELU prospective test, the Adam ramp from initialisation) are not
 registrations and are not in the census.
 
-The discussion phase (2026-09-29) added {dr["n"]} rows, all scored by their registered rules and none a failure ({dr["all"]}):
+The discussion phase (2026-09-29 and 2026-09-30) added {dr["n"]} rows from {dr["n_tests"]} tests, all scored by their registered
+rules and none a failure ({dr["all"]}):
 - Test 2A (Adam per-run ordering at a = 1.85): {dr["t2a"]}.
 - Test 2B (the lag law's validity boundary): {dr["t2b"]}.
 - GELU-T (the lag law at GELU; primary and mechanism-control arms, one row per criterion per arm): {dr["gt"]}.
 - Test 2C (the band task in R^d, one row per criterion per cell): {dr["t2c"]}; PASS at a = {dr["t2c_pass_a"]} and
   UNRESOLVED at a = {dr["t2c_unres_a"]} (validity V3).
+- Test W2-A (the lag law at width 2 on the asymmetric windows; arms T, the headline, D, the control, and T′, one row
+  per criterion per arm): {dr["w2"]}.
 
 Test 2C (b22ebd0) and GELU-T (736b6bf) are new registrations of new designs. They are not the stopped 2C and GELU
 prospective designs above, which remain unregistered and outside the census.
