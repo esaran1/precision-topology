@@ -1,0 +1,4 @@
+W2-A registration (width-2 asymmetric-window lag law; arms T, D, T-prime)
+registration commit: 28b2432bc712dde6c723cff9b09735239716bf62
+sha256 results/width2_asym_registration.md: 1af4965e198dfd93f53cd20b94ed886f269e3003151528c59a9d1d4ff560806b
+sha256 results/width2_asym/registration.sha256: 14544bf0f56fa7393ffafe9c0909a74fda8da6c6a961fb92157b67e59a92744b
