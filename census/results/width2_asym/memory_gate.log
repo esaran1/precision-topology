@@ -304,3 +304,135 @@
 2026-09-29 18:38:37 pilot Tp 884908 rho=0.000244140625 free=37% swap_free=1219.31MB OK
 2026-09-29 18:38:45 pilot Tp 884909 rho=0.000244140625 free=37% swap_free=1259.31MB OK
 2026-09-29 18:40:04 ledger (gate): System-wide memory free percentage: 33% | total = 12288.00M  used = 10812.69M  free = 1475.31M  (encrypted)
+2026-09-30 13:22:54 launch freeze (separate gate): free=67% swap_free=1083.44MB OK
+2026-09-30 13:22:54 freeze 884120 free=67% swap_free=1083.44MB OK
+2026-09-30 13:22:56 freeze 884121 free=69% swap_free=1083.44MB OK
+2026-09-30 13:22:59 freeze 884122 free=68% swap_free=1091.44MB OK
+2026-09-30 13:23:01 freeze 884123 free=69% swap_free=1091.44MB OK
+2026-09-30 13:23:03 freeze 884124 free=69% swap_free=1091.44MB OK
+2026-09-30 13:23:05 freeze 884125 free=69% swap_free=1091.44MB OK
+2026-09-30 13:23:07 freeze 884126 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:09 freeze 884127 free=68% swap_free=1099.44MB OK
+2026-09-30 13:23:12 freeze 884128 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:14 freeze 884129 free=68% swap_free=1099.44MB OK
+2026-09-30 13:23:16 freeze 884130 free=68% swap_free=1099.44MB OK
+2026-09-30 13:23:18 freeze 884131 free=68% swap_free=1099.44MB OK
+2026-09-30 13:23:20 freeze 884132 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:22 freeze 884133 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:24 freeze 884134 free=68% swap_free=1099.44MB OK
+2026-09-30 13:23:26 freeze 884135 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:28 freeze 884136 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:30 freeze 884137 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:32 freeze 884138 free=70% swap_free=1099.44MB OK
+2026-09-30 13:23:35 freeze 884139 free=69% swap_free=1099.44MB OK
+2026-09-30 13:23:37 freeze 884140 free=69% swap_free=1107.44MB OK
+2026-09-30 13:23:38 freeze 884141 free=70% swap_free=1107.44MB OK
+2026-09-30 13:23:40 freeze 884142 free=69% swap_free=1115.44MB OK
+2026-09-30 13:23:42 freeze 884143 free=70% swap_free=1115.44MB OK
+2026-09-30 13:23:44 freeze 884144 free=69% swap_free=1115.44MB OK
+2026-09-30 13:23:46 freeze 884145 free=70% swap_free=1115.44MB OK
+2026-09-30 13:23:48 freeze 884146 free=70% swap_free=1123.44MB OK
+2026-09-30 13:23:50 freeze 884147 free=69% swap_free=1123.44MB OK
+2026-09-30 13:23:52 freeze 884148 free=70% swap_free=1123.44MB OK
+2026-09-30 13:23:55 freeze 884149 free=69% swap_free=1123.44MB OK
+2026-09-30 13:23:56 freeze 884150 free=69% swap_free=1123.44MB OK
+2026-09-30 13:23:58 freeze 884151 free=70% swap_free=1131.44MB OK
+2026-09-30 13:24:00 freeze 884152 free=69% swap_free=1131.44MB OK
+2026-09-30 13:24:02 freeze 884153 free=70% swap_free=1131.44MB OK
+2026-09-30 13:24:04 freeze 884154 free=70% swap_free=1139.44MB OK
+2026-09-30 13:24:06 freeze 884155 free=70% swap_free=1139.44MB OK
+2026-09-30 13:24:08 freeze 884156 free=71% swap_free=1139.44MB OK
+2026-09-30 13:24:10 freeze 884157 free=70% swap_free=1139.44MB OK
+2026-09-30 13:24:12 freeze 884158 free=71% swap_free=1139.44MB OK
+2026-09-30 13:24:14 freeze 884159 free=70% swap_free=1147.44MB OK
+2026-09-30 13:24:16 freeze 884160 free=70% swap_free=1147.44MB OK
+2026-09-30 13:24:18 freeze 884161 free=71% swap_free=1147.44MB OK
+2026-09-30 13:24:21 freeze 884162 free=70% swap_free=1187.44MB OK
+2026-09-30 13:24:22 freeze 884163 free=70% swap_free=1187.44MB OK
+2026-09-30 13:24:25 freeze 884164 free=70% swap_free=1187.44MB OK
+2026-09-30 13:24:28 freeze 884165 free=71% swap_free=1187.44MB OK
+2026-09-30 13:24:30 freeze 884166 free=70% swap_free=1187.44MB OK
+2026-09-30 13:24:33 freeze 884167 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:34 freeze 884168 free=70% swap_free=1203.44MB OK
+2026-09-30 13:24:36 freeze 884169 free=70% swap_free=1203.44MB OK
+2026-09-30 13:24:39 freeze 884170 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:41 freeze 884171 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:44 freeze 884172 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:46 freeze 884173 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:48 freeze 884174 free=71% swap_free=1203.44MB OK
+2026-09-30 13:24:51 freeze 884175 free=71% swap_free=1211.44MB OK
+2026-09-30 13:24:53 freeze 884176 free=71% swap_free=1211.44MB OK
+2026-09-30 13:24:55 freeze 884177 free=70% swap_free=1211.44MB OK
+2026-09-30 13:24:57 freeze 884178 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:00 freeze 884179 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:02 freeze 884180 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:04 freeze 884181 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:06 freeze 884182 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:07 freeze 884183 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:10 freeze 884184 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:12 freeze 884185 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:14 freeze 884186 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:15 freeze 884187 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:17 freeze 884188 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:19 freeze 884189 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:21 freeze 884190 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:23 freeze 884191 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:25 freeze 884192 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:27 freeze 884193 free=70% swap_free=1211.44MB OK
+2026-09-30 13:25:29 freeze 884194 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:32 freeze 884195 free=71% swap_free=1211.44MB OK
+2026-09-30 13:25:34 freeze 884196 free=70% swap_free=1219.44MB OK
+2026-09-30 13:25:36 freeze 884197 free=70% swap_free=1219.44MB OK
+2026-09-30 13:25:38 freeze 884198 free=71% swap_free=1219.44MB OK
+2026-09-30 13:25:41 freeze 884199 free=71% swap_free=1219.44MB OK
+2026-09-30 13:26:09 launch pilot (separate gate): free=71% swap_free=1227.44MB OK
+2026-09-30 13:26:09 pilot D 884900 rho=1.0 free=70% swap_free=1227.44MB OK
+2026-09-30 13:26:11 pilot D 884901 rho=1.0 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:12 pilot D 884902 rho=1.0 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:13 pilot D 884903 rho=1.0 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:15 pilot D 884904 rho=1.0 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:16 pilot D 884905 rho=1.0 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:17 pilot D 884906 rho=1.0 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:19 pilot D 884907 rho=1.0 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:20 pilot D 884908 rho=1.0 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:22 pilot D 884909 rho=1.0 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:23 pilot T 884900 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:30 pilot T 884901 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:34 pilot T 884902 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:34 pilot T 884903 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:35 pilot T 884904 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:39 pilot T 884905 rho=0.0009765625 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:39 pilot T 884906 rho=0.0009765625 free=70% swap_free=1251.5MB OK
+2026-09-30 13:26:39 pilot T 884907 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:39 pilot T 884908 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:46 pilot T 884909 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:55 pilot Tp 884900 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:26:57 pilot Tp 884901 rho=0.0009765625 free=70% swap_free=1251.5MB OK
+2026-09-30 13:27:00 pilot Tp 884902 rho=0.0009765625 free=71% swap_free=1251.5MB OK
+2026-09-30 13:27:03 pilot Tp 884903 rho=0.0009765625 free=71% swap_free=1259.5MB OK
+2026-09-30 13:27:05 pilot Tp 884904 rho=0.0009765625 free=71% swap_free=1259.5MB OK
+2026-09-30 13:27:08 pilot Tp 884905 rho=0.0009765625 free=71% swap_free=1259.5MB OK
+2026-09-30 13:27:10 pilot Tp 884906 rho=0.0009765625 free=71% swap_free=1267.5MB OK
+2026-09-30 13:27:12 pilot Tp 884907 rho=0.0009765625 free=70% swap_free=1267.5MB OK
+2026-09-30 13:27:15 pilot Tp 884908 rho=0.0009765625 free=68% swap_free=1267.5MB OK
+2026-09-30 13:27:17 pilot Tp 884909 rho=0.0009765625 free=68% swap_free=1267.5MB OK
+2026-09-30 13:27:19 pilot Tp 884900 rho=0.00048828125 free=65% swap_free=1275.5MB OK
+2026-09-30 13:27:24 pilot Tp 884901 rho=0.00048828125 free=67% swap_free=1283.5MB OK
+2026-09-30 13:27:29 pilot Tp 884902 rho=0.00048828125 free=68% swap_free=1291.5MB OK
+2026-09-30 13:27:35 pilot Tp 884903 rho=0.00048828125 free=64% swap_free=1307.5MB OK
+2026-09-30 13:27:38 pilot Tp 884904 rho=0.00048828125 free=59% swap_free=1315.5MB OK
+2026-09-30 13:27:46 pilot Tp 884905 rho=0.00048828125 free=52% swap_free=1323.5MB OK
+2026-09-30 13:27:50 pilot Tp 884906 rho=0.00048828125 free=55% swap_free=1323.5MB OK
+2026-09-30 13:27:53 pilot Tp 884907 rho=0.00048828125 free=55% swap_free=1323.5MB OK
+2026-09-30 13:27:59 pilot Tp 884908 rho=0.00048828125 free=54% swap_free=1323.5MB OK
+2026-09-30 13:28:03 pilot Tp 884909 rho=0.00048828125 free=53% swap_free=1339.5MB OK
+2026-09-30 13:28:06 pilot Tp 884900 rho=0.000244140625 free=52% swap_free=1339.5MB OK
+2026-09-30 13:28:15 pilot Tp 884901 rho=0.000244140625 free=52% swap_free=1347.5MB OK
+2026-09-30 13:28:25 pilot Tp 884902 rho=0.000244140625 free=54% swap_free=1411.5MB OK
+2026-09-30 13:28:37 pilot Tp 884903 rho=0.000244140625 free=58% swap_free=1547.56MB OK
+2026-09-30 13:28:43 pilot Tp 884904 rho=0.000244140625 free=54% swap_free=1579.56MB OK
+2026-09-30 13:28:56 pilot Tp 884905 rho=0.000244140625 free=61% swap_free=1587.56MB OK
+2026-09-30 13:29:03 pilot Tp 884906 rho=0.000244140625 free=57% swap_free=1587.56MB OK
+2026-09-30 13:29:11 pilot Tp 884907 rho=0.000244140625 free=55% swap_free=1659.62MB OK
+2026-09-30 13:29:23 pilot Tp 884908 rho=0.000244140625 free=45% swap_free=1659.62MB OK
+2026-09-30 13:29:30 pilot Tp 884909 rho=0.000244140625 free=50% swap_free=1659.62MB OK

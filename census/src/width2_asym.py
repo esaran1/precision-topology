@@ -16,9 +16,11 @@ enclosure midpoint > 0.  s_pop2 = √(s_lo·s_hi) of T2-1's validated bracket (a
 
 Arms (hold: v fixed at v₀, hidden GD at lr 1.0 for W steps; release: full-batch SGD, η on z, ρ·η on v):
   T   HEADLINE.  v₀ = s₀·(0.1, 0.9); hidden = coordinates 0, 1, 3, 4, 6 of the seed's U(−1, 1)⁷ draw (width2_train's
-      draw, from a local torch Generator); η = 0.03; seeds 884,000-884,119; scored copy T; gate ≥ 60/120 on T.
-  D   CONTROL.  v₀ = s₀·(½, ½); the same hidden draw; η = 0.3; the same seeds; scored copies D and D′ (D′ as GELU-T's
-      mirror copy: it gets its own prediction); gate ≥ 60/120 on D or D′.
+      draw, from a local torch Generator); η = 0.03; seeds 884,000-884,199 (200; author's change 2 of 2026-09-30);
+      scored copy T; gate ≥ 60 runs on T at release (absolute count).
+  D   CONTROL.  v₀ = s₀·(½, ½); hidden start θ*_D,pop(s₀) (branch-point start; author's change 1 of 2026-09-30);
+      η = 0.3; seeds 884,000-884,119 (T's first 120 seeds, the same own samples); scored copies D and D′ (D′ as
+      GELU-T's mirror copy: it gets its own prediction); gate ≥ 108/120 on D or D′ and no run with G > 0 in the hold.
   Tp  T′ (change A).  v₀ = s₀·(0.1, 0.9); hidden start θ*_T′,pop(s₀); η = 0.03; seeds 884,200-884,319; scored copy T′;
       gate ≥ 108/120 on T′ and no run with G > 0 at the start or any hold step.
 Copies (population points at v₀, landscape()): D = the unplaced duplicate with α > 0, D′ = the unplaced duplicate with
@@ -63,16 +65,17 @@ ZI, VI = [0, 1, 3, 4, 6], [2, 5]
 TWO_PI = 2 * math.pi
 S_POP2_EXPECTED = 0.44507940623559955
 
-SEEDS = tuple(range(884_000, 884_120))
+SEEDS = tuple(range(884_000, 884_120))            # arm D
+SEEDS_T = tuple(range(884_000, 884_200))          # arm T (change 2, 2026-09-30)
 SEEDS_TP = tuple(range(884_200, 884_320))
 PILOT_SEEDS = tuple(range(884_900, 884_910))
 T, D, TP = "T", "D", "Tp"
 ARMS = (T, D, TP)
 HEADLINE = T
-ROLE = {T: "headline", D: "control", TP: "T-prime arm (change A; own verdict)"}
+ROLE = {T: "headline", D: "control (branch-point start)", TP: "T-prime arm (change A; own verdict)"}
 SHARES = {T: (0.1, 0.9), D: (0.5, 0.5), TP: (0.1, 0.9)}
 ETA = {T: 0.03, D: 0.3, TP: 0.03}
-ARM_SEEDS = {T: SEEDS, D: SEEDS, TP: SEEDS_TP}
+ARM_SEEDS = {T: SEEDS_T, D: SEEDS, TP: SEEDS_TP}
 SCORED_COPIES = {T: ("T",), D: ("D", "Dp"), TP: ("Tp",)}
 CLASSIFY_COPIES = {T: ("T", "Tp"), D: ("D", "Dp"), TP: ("Tp", "T")}     # the copies a release is classified against
 COPY_SHARES = {"T": SHARES[T], "Tp": SHARES[T], "D": SHARES[D], "Dp": SHARES[D]}
@@ -111,8 +114,8 @@ DIVERGED = 1.0                     # R4: sup|δ| > 1 is no prediction (Track A)
 RADIUS_EVERY = 10
 
 # registered criteria and conditions
-GATE_MIN = {T: 60, D: 60, TP: 108}
-GATE_HOLD_CONDITION = {T: False, D: False, TP: True}
+GATE_MIN = {T: 60, D: 108, TP: 108}                      # absolute counts (changes 1 and 2, 2026-09-30)
+GATE_HOLD_CONDITION = {T: False, D: True, TP: True}
 L1_BAND, L2_BAND, L3_MIN = (0.90, 1.10), (0.80, 1.20), 0.5
 BOOT_N, BOOT_SEED, BOOT_PCT = 10_000, 884_000, (2.5, 97.5)
 MIN_SCORED = 60
@@ -567,8 +570,8 @@ def bootstrap_mean_ci(Dv, n_boot=BOOT_N, seed=BOOT_SEED):
 
 
 def gate(arm, on_branch, hold_positive):
-    """T: ≥ 60/120 on T; D: ≥ 60/120 on D or D′ (both regardless of G in the hold); T′: ≥ 108/120 on T′ AND no run
-    with G > 0 at the start state or any hold step."""
+    """T: ≥ 60 runs (of 200) on T, regardless of G in the hold; D: ≥ 108/120 on D or D′ AND no run with G > 0 at the
+    start state or any hold step; T′: ≥ 108/120 on T′ AND no such run (changes 1 and 2 of 2026-09-30)."""
     on_branch = np.asarray(on_branch, bool)
     hold_positive = np.asarray(hold_positive, bool)
     n_on = int(on_branch.sum())
@@ -586,7 +589,8 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
 
     Gate first (fail: every criterion UNRESOLVED, nothing scored).  A run is scored if it is on a scored copy at release,
     follows its branch, crossed, has finite r_traj, r_cf, r_obs and s_traj, and is not in `exclude` (the DESCRIPTIVE
-    sensitivity analysis only).  All lags SIGNED.  V1-V7 as GELU-T with V1 ≥ 60/120 (any fails: L1-L5 UNRESOLVED).
+    sensitivity analysis only).  All lags SIGNED.  V1-V7 as GELU-T with V1 ≥ 60 scored runs, V4 on the median |κ/(ηλ)|
+    and V5 on q90 |κχ| (change 3, 2026-09-30) (any fails: L1-L5 UNRESOLVED).
     L4: D = |log(s_obs/s_traj)| − |log(s_obs/s_pop,branch)| (the run's branch's population switch).  L5: the same against
     s_switch (the lag-free own switch) over the scored runs with |t_traj − t_sw| ≥ 6 (change D); UNRESOLVED if fewer
     than half the scored runs, or fewer than 2, remain."""
@@ -621,8 +625,8 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
     def med(v):
         return float(np.median(v)) if len(v) else float("nan")
     regime_frac = float(np.mean(S(eta_lam) <= REGIME_MAX)) if n else float("nan")
-    lag_med = med(S(lag_steps))
-    kc_q90 = q90(S(r_cf))
+    lag_med = med(np.abs(S(lag_steps)))            # change 3 (2026-09-30): V4 on |predicted lag|
+    kc_q90 = q90(np.abs(S(r_cf)))                  # change 3: V5 on |κχ|; predictions and L1-L5 stay signed
     chi_med = med(S(chi_tsw))
     chi_rel = (abs(chi_med / pilot_chi_median - 1) if n and pilot_chi_median is not None
                and np.isfinite(pilot_chi_median) and pilot_chi_median != 0 else float("nan"))
@@ -630,8 +634,8 @@ def score_arm(arm, on_branch, hold_positive, crossed, step_obs, s_obs, s_sw, s_t
     V = {"V1_min_scored_60": n >= MIN_SCORED,
          "V2_tsw_before_crossing_90pct_kappa_pos": bool(kpos.sum() == 0 or frac_tsw >= TSW_MIN_FRAC),
          "V3_regime_eta_lam_le_0p5_in_80pct": bool(n and regime_frac >= REGIME_MIN_FRAC),
-         "V4_median_predicted_lag_ge_10_steps": bool(np.isfinite(lag_med) and lag_med >= LAG_MIN_STEPS),
-         "V5_q90_kappa_chi_le_0p1": bool(np.isfinite(kc_q90) and kc_q90 <= KC_Q90_MAX),
+         "V4_median_abs_predicted_lag_ge_10_steps": bool(np.isfinite(lag_med) and lag_med >= LAG_MIN_STEPS),
+         "V5_q90_abs_kappa_chi_le_0p1": bool(np.isfinite(kc_q90) and kc_q90 <= KC_Q90_MAX),
          "V6_median_chi_within_30pct_of_pilot": bool(np.isfinite(chi_rel) and chi_rel <= CHI_REL_TOL),
          "V7_q90_max_chi_window_le_0p25": bool(np.isfinite(chi_path_q90) and chi_path_q90 <= CHI_PATH_Q90_MAX)}
     valid = all(V.values())
@@ -1152,13 +1156,15 @@ def _land():
 # ------------------------------------------------------------------------------------------ per-seed frozen inputs
 def seed_copies(seed):
     """(copies frozen in full, copies frozen as points only).  Registered seeds 884,000-884,119: T, D, D′ in full (arms
-    T and D), T′ as a point (arm T's release classification); 884,200-884,319: T′ in full, T as a point; pilot seeds:
-    all four in full (every arm is piloted on them)."""
+    T and D), T′ as a point (arm T's release classification); 884,120-884,199: T in full, T′ as a point (arm T only);
+    884,200-884,319: T′ in full, T as a point; pilot seeds: all four in full (every arm is piloted on them)."""
     if seed in SEEDS_TP:
         return ("Tp",), ("T",)
     if seed in PILOT_SEEDS:
         return ("T", "Tp", "D", "Dp"), ()
-    return ("T", "D", "Dp"), ("Tp",)
+    if seed in SEEDS:
+        return ("T", "D", "Dp"), ("Tp",)
+    return ("T",), ("Tp",)
 
 
 def freeze_copy(copy, land, x, y, full):
@@ -1201,7 +1207,7 @@ def freeze():
     land = _land()
     f = OUT / "frozen_parts.jsonl"
     done = set() if not f.exists() else {json.loads(ln)["seed"] for ln in f.read_text().splitlines()}
-    for seed in PILOT_SEEDS + SEEDS + SEEDS_TP:
+    for seed in PILOT_SEEDS + SEEDS_T + SEEDS_TP:
         if seed in done:
             continue
         _memory_guard(f"freeze {seed}")
@@ -1214,7 +1220,7 @@ def freeze():
                              for c, v in r["copies"].items()}}, default=float), flush=True)
         _rss_guard()
     rows = sorted((json.loads(ln) for ln in f.read_text().splitlines()), key=lambda r: r["seed"])
-    assert [r["seed"] for r in rows] == sorted(PILOT_SEEDS + SEEDS + SEEDS_TP)
+    assert [r["seed"] for r in rows] == sorted(PILOT_SEEDS + SEEDS_T + SEEDS_TP)
     (OUT / "frozen_seeds.json").write_text(json.dumps(rows, indent=1))
     nv = {}
     for r in rows:
@@ -1261,11 +1267,22 @@ def hold(z_start, v0, W, x, y):
                "hold_G_positive": npos > 0, "hold_n_undecided": und}
 
 
+def start_state(arm, seed, land):
+    """The hidden start before the hold: T, the seed's hidden draw; D, θ*_D,pop(s₀) (change 1, 2026-09-30); T′,
+    θ*_T′,pop(s₀) (change A)."""
+    if arm == T:
+        return hidden_draw(seed)
+    return np.array(land["copies"]["D" if arm == D else "Tp"]["z_s0"], float)
+
+
 def run_start(arm, seed, fr, land):
-    """Start, hold and release classification (information up to release only)."""
+    """Start, hold and release classification (information up to release only).  THE WINDING PAIR (k₁, k₂) OF A RUN IS
+    DETERMINED HERE, AT RELEASE, from its pre-crossing state: the winding of the frozen copy point nearest the accepted
+    Newton point from the release state (classify / windings_to); every later use (κ_k, the own-path branch, R4, the
+    follow check) takes it from this record (author's condition 1, 2026-09-30)."""
     x, y = own_sample(seed)
     v0 = v_held(SHARES[arm], land["s0"])
-    z0 = np.array(land["copies"]["Tp"]["z_s0"]) if arm == TP else hidden_draw(seed)
+    z0 = start_state(arm, seed, land)
     W = fr["W_arm"][arm]
     z_rel, rec = hold(z0, v0, W, x, y)
     zn, gn, lamn, okn = newton(z_rel, v0, x, y)
@@ -1618,7 +1635,7 @@ def observe():
                 col("r_cf"), col("kappa"), col("t_sw"), col("eta_lam"), col("lag_steps_pred"), col("chi_tsw"),
                 col("chi_window_max"), med_chi, col("s_pop_branch"))
         sc = score_arm(*args, follows=fol)
-        if arm in (T, D):          # GELU-T's registered DESCRIPTIVE sensitivity analysis: runs with G > 0 in the hold out
+        if arm == T:               # GELU-T's registered DESCRIPTIVE sensitivity analysis: runs with G > 0 in the hold out
             sens = score_arm(*args, follows=fol, exclude=d.hold_G_positive.astype(bool))
             sens.pop("scored_index")
             sc["sensitivity_excluding_hold_G_positive_DESCRIPTIVE"] = sens

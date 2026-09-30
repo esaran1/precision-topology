@@ -1,50 +1,65 @@
 # W2-A registration: the lag law at width 2 on the asymmetric windows (arms T, D, T′)
 
-**NOT YET REGISTERED.** This text was first committed before any pilot run (fd119b2).
-- **Since then:** the pre-registration computations are done. They are the population landscape, the frozen inputs for
-  all 250 seeds (no training) and the pilot on pilot seeds 884,900–884,909 only, to t_sw. They are in §14.
-- **The pilot forces a STOP** (§0 item 6). The registration commit (the manifest
-  `results/width2_asym/registration.sha256`) is made only after the author has decided the open items in §0.
-- **Not yet done:** no registered seed (884,000–884,119, 884,200–884,319) has been held, trained or observed. No gap,
-  placement or crossing of any training state after release has been evaluated for any seed, pilot seeds included.
+**REGISTERED.** This file, the code, the tests and the frozen inputs of §6 are committed in one commit, with their
+SHA-256 hashes in `results/width2_asym/registration.sha256`, before any registered run. That commit is timestamped with
+OpenTimestamps (`results/width2_asym/registration_stamp.txt` and its `.ots` proof).
+- **History:** the text was first committed before any pilot run (fd119b2). The pre-registration computations and the
+  first pilot followed (b3f483d). The author's changes of 2026-09-30 (§0) came after that pilot, and D was then
+  re-piloted.
+- **Not done before registration:** no registered seed (884,000–884,199, 884,200–884,319) has been held, trained or
+  observed. No gap, placement or crossing of any training state after release has been evaluated for any seed, pilot
+  seeds included.
 
-## 0. Open items for the author (the standing rule: STOP before the registration commit)
+## 0. Changes made after the pilot (author's decision, 2026-09-30)
 
-These details are not fixed by the approved page, and each one touches a criterion, a validity condition or the
-scoring set. Nothing is decided here. The code implements the literal reading shown and is tested on it.
+**All five changes below were made after the pilot, on pilot seeds 884,900–884,909 only, before any registered seed
+was touched.** They were recommended in the pilot report (b3f483d, §0 there) and approved by the author on 2026-09-30
+as recommended, with two conditions (after the list). The approved page (907e225) is otherwise unchanged; where it
+differs, this section rules.
 
-1. **V4 for T′.** GELU-T's V4 requires the median SIGNED predicted lag κ/(η·λ_min) to be ≥ 10 steps. T′'s lag is
-   negative by design (population: κ = −0.0564, −47.7 steps). So under the literal rule T′ is always UNRESOLVED
-   (validity), whatever the data show. The test `test_negative_lags_t_prime_pass_l1_to_l5_with_signed_ratios_and_the_literal_v4`
-   shows this. One option, by analogy with clarification (2): V4 on the median of |κ|/(η·λ_min).
-2. **V5 for T′.** GELU-T's V5 (q90 of the SIGNED κχ at t_sw ≤ 0.1) holds trivially when every κ < 0. By analogy with
-   (2) it could use |κχ|. The population value is |κχ| ≈ 0.0040 at ρ = 2⁻¹⁰, so either reading passes there.
-3. **L4's comparator for D′ runs.** The page freezes the population switches of D, T and T′ (5.080, 0.482, 0.328). L4
-   is "vs the branch's population switch", and D′ is scored in arm D, but D′'s population switch is not on the page.
-   D′ is not the mirror image of D on these windows. Its recomputed population switch is 4.97059 (D: 5.07964). The
-   code uses D′'s own value.
-4. **T's κ by winding.** The page's table is indexed by k₁ + k₂ (−3..3). That is exact for D, where v′ = (½, ½), but
-   not for T or T′, where κ_k = κ₀ + a₁k₁ + a₂k₂ with a₁ ≠ a₂. At the population T switch, a = (−0.139, −0.127), so
-   κ(1, 0) = −0.090 and κ(0, 1) = −0.078, against κ(0, 0) = +0.049. One winding reverses the predicted sign. The code
-   computes κ for the run's actual (k₁, k₂) by the page's formula (exact, tested against a direct computation). It
-   admits a winding to the table iff −3 ≤ k₁ + k₂ ≤ 3, which is the page's range. All 400 exploratory random-start
-   landings were at winding (0, 0).
-6. **The pilot: arm D's gate looks infeasible, and arm T's is marginal** (pilot seeds only; §14).
-   - **Arm D:** 3 of 10 pilot runs released on D (0 on D′).
-     - The other 7 released on already-placed two-unit points, with G > 0 in 3,821–3,993 of the 4,001 hold states.
-     - At a landing rate of 0.3, P(≥ 60/120) ≈ 3.5e−6.
-     - The exploration's pooled own-sample D rate, 0.633, would give 3 or fewer of 10 with probability 0.034.
-   - **Arm T:** 5 of 10 on T. The others were 2 on T′, 1 on D, 1 on D′ and 1 unconverged. At 0.5, P(≥ 60/120) ≈ 0.54.
-   - **Arm T′:** 10 of 10 on T′, no G > 0 in any hold.
-   - The pilot rules themselves did not STOP: D ρ = 1, T ρ = 2⁻¹⁰, T′ ρ = 2⁻¹² after two halvings.
-   - The standing rule ("a gate looks infeasible") asks the author before registration. W2-A stops here. Possible
-     decisions are the author's: register as is (with the D gate's likely UNRESOLVED stated in advance), change D's
-     start or gate, or drop or redesign arm D.
-7. **For information** (on the page, no decision needed unless the author wants one):
-   - The recomputed population switches, validated and bisected, are T 0.481586 and T′ 0.327167. The page's 0.482 and
-     0.328 came from the exploration's adiabatic path, which was not bisected: it reported the first 0.5% step past
-     the sign change. L4 uses the recomputed values.
-   - V2 for T′ is vacuous. GELU-T's V2 excludes predicted-early runs (κ ≤ 0), and every T′ run is predicted early.
+1. **Arm D: a branch-point start.** D now starts at θ\*_D,pop(s₀), as T′ and GELU-T's control do. Its gate is ≥ 108/120
+   on D (D′ as its mirror copy, as before) with no run having G > 0 in the hold, and V1 ≥ 60/120.
+   - Motivated by the first pilot, from the page's random hidden start: 3 of 10 pilot runs released on D, 0 on D′. The
+     other 7 released on already-placed two-unit points, with G > 0 in 3,821–3,993 of the 4,001 hold states.
+   - At a landing rate of 0.3, P(≥ 60/120) ≈ 3.5e−6. At the exploration's pooled rate (0.633), 3 or fewer of 10 has
+     probability 0.034.
+   - D was re-piloted from the branch-point start (§14): 10 of 10 on D, no G > 0 in any hold.
+2. **Arm T: 200 seeds, 884,000–884,199.** The gate is ≥ 60 runs on T at release (an absolute count), and V1 ≥ 60
+   scored (crossing) runs. Runs landing elsewhere are counted, never replaced.
+   - Motivated by the pilot: 5 of 10 on T (2 on T′, 1 on D, 1 on D′, 1 unconverged). At 0.5, P(≥ 60/120) ≈ 0.54 and
+     P(≥ 60/200) > 0.999.
+   - Seeds 884,120–884,199 were verified unused (§2).
+   - D keeps 884,000–884,119. The code shares these seeds between arms T and D: the same own samples, and T's hidden
+     draws, which D no longer uses.
+3. **V4 and V5 on absolute values (every arm).** V4 is on the median over scored runs of |κ/(η·λ_min)| ≥ 10 steps. V5
+   is on the q90 over scored runs of |κχ| at t_sw ≤ 0.1. Predictions and L1–L5 stay SIGNED.
+   - Motivated by T′: its lag is negative by design (frozen median −43.1 steps). The signed V4 made T′ UNRESOLVED by
+     construction, and the signed V5 was vacuous for it.
+   - For T and D, where κ > 0 in all but 3 of their 470 frozen full copies (3 T copies, κ₀ ≥ −0.0061), the change does
+     not matter in practice.
+4. **L4's comparator for D′ runs** is D′'s own population switch, **4.970592**.
+   - Motivated by the page: it lists D, T and T′ only. D′ is scored in arm D, and on these windows it is not D's
+     mirror image.
+5. **κ at each run's actual winding pair (k₁, k₂)**, admitted to the table if k₁ + k₂ ∈ −3..3, computed by the frozen,
+   hashed code (κ_k = κ₀ + a₁k₁ + a₂k₂, exact).
+   - Motivated by the landscape: the page's table is indexed by k₁ + k₂, which is exact only for D (v′ = (½, ½)). For T
+     at the population switch, a = (−0.139, −0.127): κ is +0.049 at (0, 0), −0.090 at (1, 0) and −0.078 at (0, 1), so
+     one winding reverses the predicted sign.
+   - Every on-branch pilot release was at (0, 0).
+
+**Author's conditions (2026-09-30)**
+- **Condition 1: the winding pair is fixed at release.** Each run's winding pair (k₁, k₂) is determined AT RELEASE from
+  its pre-crossing state, by the frozen and hashed code (`width2_asym.run_start` → `classify` → `windings_to`). It is
+  the winding at which the frozen copy point matches the accepted Newton point from the release state. κ_k, the
+  own-path branch, R4 and the follow check all take it from that record. It is never re-determined later.
+- **Condition 2:** this section lists all five changes as made after the pilot, with the numbers that motivated each.
+
+**Also stated.** L4 uses the bisected, recomputed population switches: D 5.079637, D′ 4.970592, T 0.481586,
+T′ 0.327167. The page's 0.482 and 0.328 came from the exploration's adiabatic path, which was not bisected: it
+reported the first 0.5% step past the sign change.
+
+**For information.** V2 is vacuous for T′. GELU-T's V2 excludes predicted-early runs (κ ≤ 0), and every T′ run is
+predicted early.
 
 ## 1. Design reference
 
@@ -94,11 +109,14 @@ scoring set. Nothing is decided here. The code implements the literal reading sh
   every step.
 - **s₀** = 0.5·s_pop2 = 0.2225397, where s_pop2 = √(s_lo·s_hi) = 0.4450794 is T2-1's validated bracket
   (`results/asym_scores.json`, hashed).
-- **Seeds.** Arms T and D use 884,000–884,119, with the same seeds and the same own samples in both. Arm T′ uses
-  884,200–884,319. The pilot uses 884,900–884,909 for all arms.
-- **Unused-seed check (2026-09-29).** No integer in these ranges appears as a token in any text file under `src/`,
-  `tests/`, `results/` or `paper/`, other than this test's own files. No `*seed*` column of any
-  `results/**/*.parquet` file (14 files) takes a value in 884,000–884,999.
+- **Seeds.**
+  - Arm T: 884,000–884,199 (200; change 2).
+  - Arm D: 884,000–884,119, the same seeds and own samples as T's first 120.
+  - Arm T′: 884,200–884,319.
+  - Pilot: 884,900–884,909 for all arms.
+- **Unused-seed check (2026-09-29; for 884,120–884,199 repeated 2026-09-30).** No integer in these ranges appears as a
+  token in any text file under `src/`, `tests/`, `results/` or `paper/`, other than this test's own files. No
+  `*seed*` column of any `results/**/*.parquet` file (14 files) takes a value in 884,000–884,999.
 
 ## 3. Width-2 background (from the draft, ccce4fa; exploratory, recomputed where frozen)
 
@@ -135,13 +153,14 @@ scoring set. Nothing is decided here. The code implements the literal reading sh
 - **Hold.** v is held at v₀. z takes full-batch GD steps at lr 1.0 for W steps. G is evaluated at the start state and
   after every hold step; `hold_G_positive` is set if G > 0 at any of them (placed = enclosure lower end > 0).
 - **W.** W_c = max(4000, ⌈25/λ_min,own,c(s₀)⌉), with λ_min the full z-Hessian's λ_min at the seed's own copy c.
-  - Arm D uses max(W_D, W_D′), because the copy is not known before release.
+  - Arm D uses max(W_D, W_D′), the larger of its two scored copies.
   - Arm T uses W_T. Arm T′ uses W_T′.
   - A copy with no accepted own point does not count. The floor is 4000.
 - **Release.** Full-batch SGD without momentum: η on z, and ρ·η on v.
   - Budgets: D 40,000 steps; T and T′ 100,000·2⁻¹⁰/ρ steps.
   - ρ comes from each arm's pilot (§8).
-- **Classification at release** (release information only). Damped Newton at v₀ from the release state is accepted if
+- **Classification at release** (release information only). **This is also where the run's winding pair is fixed**
+  (condition 1; §0). Damped Newton at v₀ from the release state is accepted if
   max|∇| < 1e−8 and the z-Hessian is positive definite. The run is **on copy c at winding k** if:
   - the accepted Newton point is within 1e−6 (sup) of shift(θ\*_own,c(s₀), v₀, k), and
   - the release state is within 1e−3 of it, and
@@ -151,12 +170,12 @@ scoring set. Nothing is decided here. The code implements the literal reading sh
 
 | arm | role | v₀ | start before the hold | η | seeds | classified against | scored copy | gate |
 |---|---|---|---|---|---|---|---|---|
-| **T** | headline | s₀·(0.1, 0.9) | coordinates 0, 1, 3, 4, 6 of the seed's U(−1, 1)⁷ (width2_train's draw, local generator) | 0.03 | 884,000–884,119 | T, T′ | T | ≥ 60/120 on T, regardless of G in the hold |
-| **D** | control | s₀·(½, ½) | the same | 0.3 | 884,000–884,119 | D, D′ | D, D′ | ≥ 60/120 on D or D′, regardless of G in the hold |
+| **T** | headline | s₀·(0.1, 0.9) | coordinates 0, 1, 3, 4, 6 of the seed's U(−1, 1)⁷ (width2_train's draw, local generator) | 0.03 | 884,000–884,199 | T, T′ | T | ≥ 60 runs (of 200) on T, regardless of G in the hold (change 2) |
+| **D** | control | s₀·(½, ½) | θ\*_D,pop(s₀) (change 1) | 0.3 | 884,000–884,119 | D, D′ | D, D′ | ≥ 108/120 on D or D′ **and** no run with G > 0 at the start or any hold step (change 1) |
 | **T′** | own arm | s₀·(0.1, 0.9) | θ\*_T′,pop(s₀) | 0.03 | 884,200–884,319 | T′, T | T′ | ≥ 108/120 on T′ **and** no run with G > 0 at the start or any hold step |
 
-- **G > 0 in a T or D hold.** The run is scored and flagged. GELU-T's registered descriptive sensitivity analysis
-  (§10) excludes it.
+- **G > 0 in a T hold.** The run is scored and flagged. GELU-T's registered descriptive sensitivity analysis (§10)
+  excludes it. In D and T′ such a run fails the gate.
 - **Gate failure.** The arm is UNRESOLVED and stops. Its crossings are not evaluated.
 - **Winding table.** A run on a copy at a winding with k₁ + k₂ outside −3..3 gets no prediction (counted).
 
@@ -189,14 +208,14 @@ scoring set. Nothing is decided here. The code implements the literal reading sh
 - **Observed.** The observed crossing is the first step t ≥ 1 whose state is placed (enclosure lower end > 0). Then
   s_obs = ‖v‖₁ there and r_obs = s_obs/s_switch − 1. All lags are signed.
 - **Competing predictions.** (a) No lag: the crossing at s_switch (L5). (b) The branch's population switch (L4): D
-  5.07964, D′ 4.97059, T 0.481586, T′ 0.327167 (recomputed; see §0 item 3 for D′).
+  5.07964, D′ 4.97059, T 0.481586, T′ 0.327167 (bisected, recomputed; D′ by change 4).
 
 ## 6. Frozen before any registered training (the registration commit)
 
 **`landscape.json` (`width2_asym.landscape`).** The four population copies at v₀. Each is found by damped Newton on
 the population from the exploratory class point, and checked to be accepted, of its type and unplaced. Each switch is
 validated as below with s_max = 30. The landscape STOPs if a copy is invalid, or if its switch is more than 0.5% from
-the page's value (one exploratory step, §0 item 5).
+the page's value (one exploratory step; §0).
 
 **`frozen_seeds.json` (`width2_asym.freeze`), per seed and copy**
 - **θ\*_own(s₀):** Newton from the population copy on the own sample, accepted and of its type. With it: λ_min(s₀)
@@ -221,12 +240,14 @@ the page's value (one exploratory step, §0 item 5).
   sup), with ∂z\*/∂v there.
 - **Frozen in full or as points only.**
   - Registered seeds 884,000–884,119: T, D and D′ in full; T′ as a point only (T's classification).
+  - 884,120–884,199 (arm T only): T in full; T′ as a point only.
   - 884,200–884,319: T′ in full; T as a point only.
   - Pilot seeds: all four in full.
   - A copy that fails any check is invalid. A run on it gets no prediction (counted).
 
 **Also frozen**
-- `pilot.json` (`width2_asym.pilot`): ρ per arm, and each arm's pilot median of χ at t_sw.
+- `pilot.json` (`width2_asym.pilot`): ρ per arm, and each arm's pilot median of χ at t_sw. This is the re-pilot with
+  the final code: D from its branch-point start; T and T′ reproduced the first pilot exactly.
 - **The code and its hash**, including the own-path switch procedure (change C). `registration.sha256` lists: this
   file, the design page, the code, the tests, the three frozen files, `results/asym_scores.json`, and the modules the
   pipeline calls (`width2_geometry`, `asym_register`, `asym_pilot`, `width2_train`, `track_a`, `act_fold`). `train`
@@ -265,7 +286,10 @@ the page's value (one exploratory step, §0 item 5).
   - No value: STOP.
 - Each arm's pilot median of χ at t_sw, at its chosen ρ, is frozen for V6.
 - A STOP halts W2-A before registration, and the author is asked.
-- **Result:** §14, after the pilot.
+- **Two pilots.** The first pilot (b3f483d) drew D from the random hidden start; it motivated change 1. After the
+  changes, the whole pilot was rerun with the final code: D from its branch-point start. T and T′ reproduced the first
+  pilot bit for bit.
+- **Result:** §14.
 
 ## 9. Scored runs and the follow check
 
@@ -296,11 +320,11 @@ Runs with κ ≤ 0 are scored (predicted early).
 
 | | condition |
 |---|---|
-| V1 | ≥ 60 of the arm's 120 runs are scored |
+| V1 | ≥ 60 scored runs (of 200 in T; of 120 in D and T′) |
 | V2 | t_sw strictly precedes the crossing in ≥ 90% of on-branch crossing runs with κ > 0 (undefined t_sw counts as not preceding; with no such run it holds) |
 | V3 | η·λ_min(switch) ≤ 0.5 in ≥ 80% of scored runs |
-| V4 | median over scored runs of the SIGNED predicted lag κ/(η·λ_min) ≥ 10 steps (**§0 item 1 for T′**) |
-| V5 | q90 over scored runs of the SIGNED κχ at t_sw ≤ 0.1 (**§0 item 2 for T′**) |
+| V4 | median over scored runs of the ABSOLUTE predicted lag \|κ/(η·λ_min)\| ≥ 10 steps (change 3) |
+| V5 | q90 over scored runs of \|κχ\| at t_sw ≤ 0.1 (change 3) |
 | V6 | \|median χ at t_sw over scored runs / the arm's pilot median − 1\| ≤ 0.30 |
 | V7 | q90 over scored runs of max χ_t over 0 ≤ t < t_sw with s_t ≥ 0.8·s_switch ≤ 0.25. Here χ_t = ((s_{t+1} − s_t)/s_t)/(η·λ_min,t), with λ_min,t the reduced λ_min at z\*(v_t). An empty window or a non-finite χ_t fails. |
 
@@ -311,7 +335,7 @@ Runs with κ ≤ 0 are scored (predicted early).
 | **L1** | median of r_obs/r_traj | ∈ [0.90, 1.10] |
 | **L2** | median of r_obs/r_cf | ∈ [0.80, 1.20] |
 | **L3** | Spearman(r_traj, r_obs), average ranks | ≥ 0.5 |
-| **L4** | D = \|log(s_obs/s_traj)\| − \|log(s_obs/s_pop,branch)\| | upper end of the 95% percentile bootstrap interval of mean D < 0 |
+| **L4** | D = \|log(s_obs/s_traj)\| − \|log(s_obs/s_pop,branch)\|, with s_pop,branch the bisected population switch of the run's copy: D 5.079637, D′ 4.970592 (change 4), T 0.481586, T′ 0.327167 | upper end of the 95% percentile bootstrap interval of mean D < 0 |
 | **L5** | D = \|log(s_obs/s_traj)\| − \|log(s_obs/s_switch)\|, over the scored runs with \|t_traj − t_sw\| ≥ 6 (change D, clarification 2) | the same rule; UNRESOLVED if fewer than half the scored runs, or fewer than 2, remain |
 
 - **Bootstrap.** 10,000 resamples with replacement, `numpy.random.default_rng(884000)`; the interval is the 2.5th and
@@ -325,7 +349,7 @@ Runs with κ ≤ 0 are scored (predicted early).
     its lower end > 0, the branch and prediction rule its midpoint > 0.
 - **Outcome per arm.** PASS if L1–L5 all pass; UNRESOLVED if any is UNRESOLVED; otherwise FAIL, naming each failing
   criterion. Numbers are compared in float64 without rounding.
-- **Descriptive sensitivity analysis (arms T and D; GELU-T's; NOT a criterion).** The whole scoring is repeated
+- **Descriptive sensitivity analysis (arm T; GELU-T's; NOT a criterion; in D and T′ such runs fail the gate).** The whole scoring is repeated
   without the runs that had G > 0 at the start or in the hold. It is reported beside the registered verdicts and
   never replaces them.
 
@@ -333,14 +357,15 @@ Runs with κ ≤ 0 are scored (predicted early).
 
 1. **Population copies.** Found by damped Newton from the exploratory class points (`POP_START`, 6 decimals), not by
    a new multistart. They are checked for type and unplaced status, and their switches against the page's numbers to
-   0.5% (§0 item 5).
+   0.5% (§0).
 2. **Observation and prediction rules.** Observation: enclosure lower end > 0. Branch, switch and prediction:
    enclosure midpoint > 0. Both are screened by the dense grid, which bounds G₊ from above.
 3. **W per arm** as in §4.
 4. **Classification sets.** Arm T also classifies against T′, and arm T′ against T, for counting only. D-landings at
    T's v₀ (D is stationary there) are counted as neither.
 5. **Frozen in full or as points** as in §6.
-6. **κ at a winding** by the exact affine formula (§7; §0 item 4).
+6. **κ at a winding** by the exact affine formula at the run's (k₁, k₂), fixed at release (§7; §0 change 5 and
+   condition 1).
 7. **T's and T′'s r_cf.** It uses the frozen κ_k and λ_min at the adiabatic reference switch, with the own-path
    s_switch and ṡ.
 8. **Two different switches.** t₀.₈ uses the copy's frozen switch, where its follow point is. V7's window uses the
@@ -350,7 +375,8 @@ Runs with κ ≤ 0 are scored (predicted early).
     10th step.
 11. **The one-sided ∇G check** is relative to the sup norm of the five derivatives, because a component can be near 0.
 12. **Bootstrap seed:** 884,000.
-13. **Pilot.** ρ per arm (the page's "ρ per arm"). T′ is piloted from the branch-point start on the pilot seeds.
+13. **Pilot.** ρ per arm (the page's "ρ per arm"). T′ and D are piloted from their branch-point starts on the
+    pilot seeds.
 14. **Continuation steps.** Diagonal: log-s steps 0.02, halved 0.01. Adiabatic: RK4 at 0.5% of s, halved 0.25%.
     Decided at (1 ± 1e−3)·s_switch along the reference path.
 15. **Lost branch.** A run whose own-path branch is lost before its switch or its predicted crossing gets no
@@ -374,23 +400,23 @@ Runs with κ ≤ 0 are scored (predicted early).
 | L5 fails | The lag is not resolved against a lag-free crossing at the run's own switch. |
 | L5 UNRESOLVED | Fewer than half the scored runs (or fewer than 2) have \|t_traj − t_sw\| ≥ 6 steps. |
 | follow check fails often (V1) | Runs leave D for the placed branch, or T splits: the branch identity is not kept. |
-| gate fails | T: random holds do not reach T; D: they do not reach D or D′; T′: the branch-point start does not stay on T′, or the hold places a run. |
+| gate fails | T: fewer than 60 of 200 random holds reach T. D or T′: the branch-point start does not stay on D (or D′) or T′ in 108/120, or a hold places a run. |
 | UNRESOLVED (validity) | The test says nothing about the law. |
 
 A failure stays a failure. Post hoc readings may be placed beside it, labelled POST HOC.
 
 ## 13. A-priori risks (exploratory; population and used seeds only)
 
-- **The T gate is at risk.**
+- **The T gate.**
   - The draft's chance of passing 60/120 was about 0.998 (`w2_explore_g`). It used the pooled own-sample rate of all
     unplaced two-unit landings, 0.625, which counts T and T′ together.
-  - On the population at shares 0.1/0.9, T-type landings are 62 of 100 and T′-type 12 of 100 (`w2_explore_h`). At
-    that proportion T's own rate would be about 0.52, and the binomial chance of ≥ 60/120 about 0.73.
-  - Unconverged holds (up to 35% in one own sample) and landings on other two-unit points also count as neither.
-  - D's pooled rate (0.633) is D-type only, so its chance of about 0.999 is unaffected.
-- **Windings.** For T, one winding reverses κ's sign (§0 item 4). All 400 exploratory landings were at (0, 0).
-- **T′'s pilot.** Its window max χ_t on the population is 0.176 at ρ = 0.001 (sampled every 25 steps), so the pilot
-  may halve ρ once or twice. At ρ = 0.0003 it is 0.053.
+  - On the population the T:T′ split is 62:12 (`w2_explore_h`); in the pilot, 5 of 10 landed on T.
+  - With 200 seeds and ≥ 60 on T (change 2), the binomial chance of passing is > 0.999 at a rate of 0.5, and about
+    0.94 at 0.35.
+- **The D gate (change 1).** It is 108/120 from the branch-point start. The pilot gave 10 of 10 on D, with no G > 0 in
+  any hold.
+- **Windings.** For T, one winding reverses κ's sign (§0 change 5). All 400 exploratory landings and all on-branch
+  pilot releases were at (0, 0).
 - **T's lag.** It is about 28 steps. Its resolution r_min is 3e−4 against a lag of 1.3e−3 (change D's numbers).
 
 ## 14. Frozen values (pre-registration computations; pilot seeds only for the pilot)
@@ -404,27 +430,32 @@ A failure stays a failure. Post hoc readings may be placed beside it, labelled P
 | T | 0.00971 | 0.481586 | agrees | 0.0486 | (−0.139, −0.127) | 0.0576 |
 | T′ | 0.00838 | 0.327167 | agrees | −0.0564 | (−0.086, −0.027) | 0.0394 |
 
-**Freeze** (`frozen_seeds.json`; 250 seeds; the own samples only, no training).
-- All 520 full copies are valid: T 130, T′ 130, D 130, D′ 130 (the 10 pilot seeds and 120 per arm). All 760 copy points
-  are accepted and of their type.
+**Freeze** (`frozen_seeds.json`; 330 seeds: the pilot, 884,000–884,199 and 884,200–884,319; own samples only, no
+training).
+- All 600 full copies are valid: T 210, T′ 130, D 130, D′ 130. All 840 copy points are accepted and of their type.
 - W = 4000 for every copy.
-- Frozen κ₀ over the 130 full copies of each:
+- The 80 seeds 884,120–884,199 were added after change 2 by the same, resumable code. Three earlier rows (884,903,
+  884,007, 884,250), recomputed with the final code, are identical to the frozen ones.
+- Frozen κ₀:
 
-| copy | κ₀ range | median | κ₀ < 0 | median κ/(η·λ_min) |
-|---|---|---|---|---|
-| T | −0.0061 to 0.1528 | 0.0503 | 1 | +29.3 steps |
-| T′ | −0.0782 to −0.0084 | −0.0524 | 130 | −43.1 steps |
-| D | 6.351 to 9.381 | 7.746 | 0 | +202.4 steps |
-| D′ | 7.177 to 12.987 | 8.934 | 0 | +174.8 steps |
+| copy | full copies | κ₀ range | median | κ₀ < 0 | median κ/(η·λ_min) |
+|---|---|---|---|---|---|
+| T | 210 | -0.0061 to 0.1528 | 0.0518 | 3 | +30.1 steps |
+| T′ | 130 | −0.0782 to −0.0084 | −0.0524 | 130 | −43.1 steps |
+| D | 130 | 6.351 to 9.381 | 7.746 | 0 | +202.4 steps |
+| D′ | 130 | 7.177 to 12.987 | 8.934 | 0 | +174.8 steps |
 
 **Pilot** (`pilot.json`; seeds 884,900–884,909; to t_sw; no gap of any state after release).
 
 | arm | on the scored copy | pilot values | rule | ρ | median χ at t_sw (V6) |
 |---|---|---|---|---|---|
-| D | 3/10 on D, 0 on D′; 7 placed two-unit | q90 κχ 0.0282 | inactive | 1 | 0.00353 |
+| D (branch-point start, re-pilot) | 10/10 on D; no G > 0 in any hold | q90 κχ 0.0342 | inactive | 1 | 0.00388 |
 | T | 5/10 on T; 2 T′, 1 D, 1 D′, 1 unconverged | q90 window max χ_t 0.0699 at 2⁻¹⁰ | kept | 2⁻¹⁰ | 0.0259 |
 | T′ | 10/10 on T′; no G > 0 in any hold | q90 0.290 (2⁻¹⁰), 0.145 (2⁻¹¹), 0.0726 (2⁻¹²) | two halvings | 2⁻¹² | 0.0162 |
 
-- Every on-branch pilot run followed its branch at 0.8·s_switch: D 3/3, T 5/5, T′ 30/30 over the three ρ.
-- Every on-branch pilot release was at winding (0, 0).
-- T′'s budget at ρ = 2⁻¹² is 400,000 steps; its pilot t_sw is 10,589–25,256 steps.
+- **The first pilot's arm D** (random hidden start; b3f483d, superseded by change 1): 3/10 on D, q90 κχ 0.0282, ρ 1,
+  median χ 0.00353. Its rows are kept, untracked, in `results/width2_asym/pilot_parts_v1_random_D.jsonl`.
+- **Follow check:** every on-branch pilot run followed its branch at 0.8·s_switch (D 10/10, T 5/5, T′ 30/30 over the
+  three ρ). Every on-branch pilot release was at winding (0, 0).
+- **Pilot t_sw:** D 3,344–5,376 steps (budget 40,000); T 7,359–16,190 (budget 100,000); T′ 10,589–25,256 at 2⁻¹²
+  (budget 400,000).

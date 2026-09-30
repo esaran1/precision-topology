@@ -40,19 +40,21 @@ def pts(pop, s0):
 # ------------------------------------------------------------------------------------------ registered constants
 def test_registered_constants():
     assert X.SEEDS == tuple(range(884_000, 884_120)) and X.SEEDS_TP == tuple(range(884_200, 884_320))
+    assert X.SEEDS_T == tuple(range(884_000, 884_200)) and set(X.SEEDS) <= set(X.SEEDS_T)          # change 2
+    assert not (set(X.SEEDS_T) & set(X.SEEDS_TP))
     assert X.PILOT_SEEDS == tuple(range(884_900, 884_910))
     assert not (set(X.SEEDS) & set(X.SEEDS_TP)) and not (set(X.SEEDS + X.SEEDS_TP) & set(X.PILOT_SEEDS))
     assert X.ARMS == ("T", "D", "Tp") and X.HEADLINE == "T"
     assert X.SHARES == {"T": (0.1, 0.9), "D": (0.5, 0.5), "Tp": (0.1, 0.9)}
     assert X.ETA == {"T": 0.03, "D": 0.3, "Tp": 0.03}
-    assert X.ARM_SEEDS == {"T": X.SEEDS, "D": X.SEEDS, "Tp": X.SEEDS_TP}
+    assert X.ARM_SEEDS == {"T": X.SEEDS_T, "D": X.SEEDS, "Tp": X.SEEDS_TP}
     assert X.SCORED_COPIES == {"T": ("T",), "D": ("D", "Dp"), "Tp": ("Tp",)}
     assert X.OWN_PATH_SWITCH == {"T": True, "D": False, "Tp": True}
     assert (X.HOLD_LR, X.W_MIN, X.W_RELAX) == (1.0, 4000, 25.0)
     assert (X.BUDGET_D, X.BUDGET_T_BASE, X.RHO_T_START) == (40_000, 100_000, 2.0 ** -10)
     assert (X.NEWTON_GTOL, X.ON_TOL, X.STATE_TOL, X.FOLLOW_FRAC, X.FOLLOW_STATE_TOL) == (1e-8, 1e-6, 1e-3, 0.8, None)
-    assert X.GATE_MIN == {"T": 60, "D": 60, "Tp": 108}
-    assert X.GATE_HOLD_CONDITION == {"T": False, "D": False, "Tp": True}
+    assert X.GATE_MIN == {"T": 60, "D": 108, "Tp": 108}                                          # changes 1, 2
+    assert X.GATE_HOLD_CONDITION == {"T": False, "D": True, "Tp": True}
     assert (X.L1_BAND, X.L2_BAND, X.L3_MIN) == ((0.90, 1.10), (0.80, 1.20), 0.5)
     assert (X.BOOT_N, X.BOOT_PCT) == (10_000, (2.5, 97.5))
     assert (X.MIN_SCORED, X.TSW_MIN_FRAC, X.REGIME_MAX, X.REGIME_MIN_FRAC, X.LAG_MIN_STEPS, X.KC_Q90_MAX,
@@ -350,20 +352,25 @@ def test_pilot_rule_t_halves_from_2_to_minus_10_then_stops():
 
 # ------------------------------------------------------------------------------------------ gates
 def test_gates_t_d_and_t_prime():
-    on = np.zeros(120, bool); on[:60] = True
-    hp = np.zeros(120, bool)
-    assert X.gate("T", on, hp)["pass"] and X.gate("D", on, hp)["pass"]
+    on = np.zeros(200, bool); on[:60] = True                                 # T: 200 runs, ≥ 60 on T (absolute)
+    hp = np.zeros(200, bool)
+    g = X.gate("T", on, hp)
+    assert g["pass"] and g["n_runs"] == 200 and g["n_on_branch"] == 60
     on[59] = False
-    assert not X.gate("T", on, hp)["pass"] and not X.gate("D", on, hp)["pass"]
+    assert not X.gate("T", on, hp)["pass"]
     on[:] = True; hp[7] = True
-    assert X.gate("T", on, hp)["pass"] and X.gate("D", on, hp)["pass"]      # G > 0 in the hold: scored, flagged
-    g = X.gate("Tp", on, hp)
-    assert not g["pass"] and g["count_ok"] and not g["hold_ok"]              # T′: no G > 0 in the hold
-    hp[:] = False
-    on[:] = False; on[:108] = True
-    assert X.gate("Tp", on, hp)["pass"]
-    on[107] = False
-    assert not X.gate("Tp", on, hp)["pass"]
+    assert X.gate("T", on, hp)["pass"]                                       # G > 0 in a T hold: scored, flagged
+    for arm in ("D", "Tp"):                                                  # D (change 1) and T′: 108/120, no G > 0
+        on = np.zeros(120, bool); on[:108] = True
+        hp = np.zeros(120, bool)
+        assert X.gate(arm, on, hp)["pass"]
+        on[107] = False
+        assert not X.gate(arm, on, hp)["pass"]
+        on[:] = True; hp[7] = True
+        g = X.gate(arm, on, hp)
+        assert not g["pass"] and g["count_ok"] and not g["hold_ok"]
+    on = np.zeros(120, bool); on[:60] = True
+    assert not X.gate("D", on, np.zeros(120, bool))["pass"]                  # the former 60/120 no longer passes D
 
 
 # ------------------------------------------------------------------------------------------ scoring
@@ -402,10 +409,18 @@ def test_gate_fail_makes_everything_unresolved():
     assert s["outcome"] == "UNRESOLVED (gate)" and _v(s) == ("UNRESOLVED",) * 5 and s["scored_index"] == []
     c = _case(arm="Tp"); c["hold_positive"] = c["hold_positive"].copy(); c["hold_positive"][3] = True
     assert X.score_arm(**c)["outcome"] == "UNRESOLVED (gate)"
+    c["arm"] = "D"
+    assert X.score_arm(**c)["outcome"] == "UNRESOLVED (gate)"               # change 1: D's hold condition
     c["arm"] = "T"
     s = X.score_arm(**c)
     assert s["outcome"] == "PASS" and s["n_on_branch_hold_G_positive"] == 1 and s["n_scored"] == 120
     assert X.score_arm(**_case(arm="Tp", n_on=107))["outcome"] == "UNRESOLVED (gate)"
+    assert X.score_arm(**_case(arm="D", n_on=107))["outcome"] == "UNRESOLVED (gate)"
+    s = X.score_arm(**_case(arm="T", n=200, n_on=60))                       # change 2: 60 of 200, absolute
+    assert s["gate"]["pass"] and s["n_scored"] == 60 and s["valid"] and s["outcome"] == "PASS"
+    assert X.score_arm(**_case(arm="T", n=200, n_on=59))["outcome"] == "UNRESOLVED (gate)"
+    s = X.score_arm(**_case(arm="T", n=200, n_on=80, n_cross=59))          # V1: ≥ 60 scored (crossing) runs
+    assert s["gate"]["pass"] and s["outcome"] == "UNRESOLVED (validity)" and not s["validity"]["V1_min_scored_60"]
 
 
 def test_off_branch_and_not_following_runs_are_counted_not_scored():
@@ -466,17 +481,26 @@ def test_l5_resolution_rule_and_its_unresolved_branch():
     assert X.score_arm(**c)["L5"]["n"] == 120
 
 
-def test_negative_lags_t_prime_pass_l1_to_l5_with_signed_ratios_and_the_literal_v4():
+def test_negative_lags_t_prime_pass_l1_to_l5_with_signed_ratios_and_absolute_v4_v5():
     c = _case(arm="Tp", lag=-0.0040, t_lag=-48.0, kappa=-0.0564, s_pop=0.3272)
     c["r_cf"] = c["r_traj"] * 1.01
     s = X.score_arm(**c)
     assert s["L1"]["median_ratio"] == pytest.approx(1.0, abs=0.03) and s["L3"]["spearman"] > 0.9
-    # GELU-T's V4 is the SIGNED median predicted lag ≥ 10 steps: a negative-κ arm fails it by construction
-    assert not s["validity"]["V4_median_predicted_lag_ge_10_steps"] and s["outcome"] == "UNRESOLVED (validity)"
-    assert s["n_kappa_nonpos_scored"] == 120 and s["n_kappa_pos_crossing"] == 0
+    # change 3 (2026-09-30): V4 on the median |predicted lag|, V5 on q90 |κχ|; the lags themselves stay signed
+    assert s["validity"]["V4_median_abs_predicted_lag_ge_10_steps"] and s["median_predicted_lag_steps"] == 48.0
+    assert s["validity"]["V5_q90_abs_kappa_chi_le_0p1"] and s["q90_kappa_chi_tsw"] > 0
+    assert s["outcome"] == "PASS" and s["n_kappa_nonpos_scored"] == 120 and s["n_kappa_pos_crossing"] == 0
     assert s["validity"]["V2_tsw_before_crossing_90pct_kappa_pos"]         # no κ > 0 run: V2 holds
-    c["lag_steps"] = np.full(120, 10.0)                                     # (if V4 held, everything else passes)
-    assert X.score_arm(**c)["outcome"] == "PASS"
+    c2 = dict(c); c2["lag_steps"] = np.full(120, -9.99)                     # |−9.99| < 10: fails
+    s2 = X.score_arm(**c2)
+    assert not s2["validity"]["V4_median_abs_predicted_lag_ge_10_steps"] and s2["outcome"] == "UNRESOLVED (validity)"
+    c2["lag_steps"] = np.full(120, -10.0)
+    assert X.score_arm(**c2)["validity"]["V4_median_abs_predicted_lag_ge_10_steps"]
+    c3 = dict(c); c3["r_cf"] = np.full(120, -0.1001)                        # |κχ| = 0.1001 > 0.1: fails
+    s3 = X.score_arm(**c3)
+    assert not s3["validity"]["V5_q90_abs_kappa_chi_le_0p1"] and s3["outcome"] == "UNRESOLVED (validity)"
+    c3["r_cf"] = np.full(120, -0.1)
+    assert X.score_arm(**c3)["validity"]["V5_q90_abs_kappa_chi_le_0p1"]
     c["s_obs"] = c["s_sw"] * (1 - c["r_traj"])                              # observed on the wrong side
     s = X.score_arm(**c)
     assert s["L1"]["verdict"] == "FAIL" and s["L1"]["median_ratio"] < 0
@@ -496,10 +520,17 @@ def test_each_validity_condition_makes_l1_l5_unresolved():
     c = _case(); c["eta_lam"] = np.where(np.arange(120) < 24, 0.6, 0.01)                   # 96/120 = 0.8
     assert X.score_arm(**c)["valid"]
     c = _case(); c["lag_steps"] = np.full(120, 9.99)
-    check(c, "V4_median_predicted_lag_ge_10_steps")
+    check(c, "V4_median_abs_predicted_lag_ge_10_steps")
+    c = _case(); c["lag_steps"] = np.where(np.arange(120) < 61, -9.0, 30.0)              # median |lag| 9 < 10
+    check(c, "V4_median_abs_predicted_lag_ge_10_steps")
     c = _case(); c["r_cf"] = np.full(120, 0.1001); c["r_traj"] = c["r_cf"] / 1.01
     c["s_traj"] = c["s_sw"] * (1 + c["r_traj"]); c["s_obs"] = c["s_sw"] * (1 + c["r_cf"])
-    check(c, "V5_q90_kappa_chi_le_0p1")
+    check(c, "V5_q90_abs_kappa_chi_le_0p1")
+    c = _case(); c["r_cf"] = c["r_cf"].copy(); c["r_cf"][:13] = -0.2                    # 13/120 with |κχ| 0.2: q90 > 0.1
+    check(c, "V5_q90_abs_kappa_chi_le_0p1")
+    c = _case(); c["r_cf"] = c["r_cf"].copy(); c["r_cf"][:12] = -0.2                    # 12/120: q90 (index 107.1)
+    s = X.score_arm(**c)                                                                  # is still below 0.1
+    assert s["q90_kappa_chi_tsw"] < 0.1 and s["validity"]["V5_q90_abs_kappa_chi_le_0p1"]
     c = _case(); c["pilot_chi_median"] = 0.027 / 1.301
     check(c, "V6_median_chi_within_30pct_of_pilot")
     c = _case(); c["pilot_chi_median"] = 0.027 / 1.299
@@ -719,3 +750,31 @@ def test_end_to_end_on_the_population_reproduces_the_exploration(pop, pts, copy,
         assert r["min_lam_split_to_tsw"] > 0
     else:
         assert r["s_switch_own_path"] == r["s_switch"] and abs(r["s_switch"] / cf["s_switch"] - 1) < 0.01
+
+
+def test_seed_copies_per_range_and_start_states(pts):
+    assert X.seed_copies(884_000) == (("T", "D", "Dp"), ("Tp",)) and X.seed_copies(884_119)[0] == ("T", "D", "Dp")
+    assert X.seed_copies(884_120) == (("T",), ("Tp",)) and X.seed_copies(884_199) == (("T",), ("Tp",))   # change 2
+    assert X.seed_copies(884_200) == (("Tp",), ("T",)) and X.seed_copies(884_905) == (("T", "Tp", "D", "Dp"), ())
+    land = {"copies": {"D": {"z_s0": pts["D"][0].tolist()}, "Tp": {"z_s0": pts["Tp"][0].tolist()}}}
+    assert np.array_equal(X.start_state("D", 884_003, land), pts["D"][0])               # change 1: branch-point start
+    assert np.array_equal(X.start_state("Tp", 884_203, land), pts["Tp"][0])
+    assert np.array_equal(X.start_state("T", 884_150, land), X.hidden_draw(884_150))
+
+
+def test_d_arm_starts_at_the_population_d_point_and_releases_on_d_at_winding_zero(pop, pts):
+    """run_start for arm D on the POPULATION as sample (monkeypatched), a 5-step hold: D releases on D at (0, 0), the
+    winding pair fixed at release (condition 1)."""
+    x, y = pop
+    zD, vD = pts["D"]
+    land = {"s0": X.s0_value(), "copies": {"D": {"z_s0": zD.tolist()}}}
+    fr = {"W_arm": {"D": 5}, "copies": {"D": {"z_s0": zD.tolist(), "point_ok": True},
+                                         "Dp": {"z_s0": pts["Dp"][0].tolist(), "point_ok": True}}}
+    orig = X.own_sample
+    try:
+        X.own_sample = lambda seed: (x, y)
+        z_rel, v0, rec, _ = X.run_start("D", 1, fr, land)
+    finally:
+        X.own_sample = orig
+    assert np.allclose(v0, vD) and rec["copy_at_release"] == "D" and rec["windings"] == [0, 0] and rec["on_branch"]
+    assert rec["z_init"] == zD.tolist() and not rec["hold_G_positive"]

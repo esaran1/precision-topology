@@ -19,58 +19,106 @@
     "history": [
      {
       "rho": 1.0,
-      "n": 3,
-      "q90": 0.028210094376326128
+      "n": 10,
+      "q90": 0.03424259155401216
      }
     ]
    },
    "rho": 1.0,
-   "pilot_median_chi_tsw": 0.0035259830159078917,
-   "n_on_branch_final": 3,
-   "n_with_value_final": 3,
+   "pilot_median_chi_tsw": 0.0038754558065711665,
+   "n_on_branch_final": 10,
+   "n_with_value_final": 10,
    "runs": {
     "1.0": [
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3945,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884900,
-      "newton_type": "Tp placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 7.5671562732687585,
+      "s_switch_frozen": 5.346925176099016,
+      "s_switch": 5.346925176099016,
+      "t_sw": 4485,
+      "chi_tsw": 0.003701762912075521,
+      "kc_tsw": 0.028011818442265905,
+      "chi_path_max_all": 63.60799382810537,
+      "chi_window_max": 0.005042065216575535,
+      "t_follow": 3189,
+      "follow_state_dist": 0.06751021843024141,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 6.3
+      "n_steps_run": 6000,
+      "secs": 1.4
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3821,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884901,
-      "newton_type": "T placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 6.955602564609361,
+      "s_switch_frozen": 4.640463823403078,
+      "s_switch": 4.640463823403078,
+      "t_sw": 3515,
+      "chi_tsw": 0.004499510674200145,
+      "kc_tsw": 0.031296807984953726,
+      "chi_path_max_all": 57.865666445334604,
+      "chi_window_max": 0.006134472612652218,
+      "t_follow": 2498,
+      "follow_state_dist": 0.07103563452091066,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.4
+      "n_steps_run": 4000,
+      "secs": 1.1
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3971,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884902,
-      "newton_type": "T placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 7.526633865538175,
+      "s_switch_frozen": 4.447097849785929,
+      "s_switch": 4.447097849785929,
+      "t_sw": 3344,
+      "chi_tsw": 0.005008976128871937,
+      "kc_tsw": 0.03770072936323983,
+      "chi_path_max_all": 63.1850509708604,
+      "chi_window_max": 0.00686111221630902,
+      "t_follow": 2362,
+      "follow_state_dist": 0.07605784852878195,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.7
+      "n_steps_run": 4000,
+      "secs": 1.1
      },
      {
       "W_hold": 4000,
@@ -89,10 +137,10 @@
       "s_switch_frozen": 5.429511053481967,
       "s_switch": 5.429511053481967,
       "t_sw": 5101,
-      "chi_tsw": 0.003729762163000027,
-      "kc_tsw": 0.028041002577967815,
-      "chi_path_max_all": 83.4390484629806,
-      "chi_window_max": 0.005112059078566764,
+      "chi_tsw": 0.00372976216299993,
+      "kc_tsw": 0.028041002577967086,
+      "chi_path_max_all": 83.43904846298062,
+      "chi_window_max": 0.005112059078578661,
       "t_follow": 3597,
       "follow_state_dist": 0.0700225805690895,
       "follows_branch": true,
@@ -104,31 +152,63 @@
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3939,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884904,
-      "newton_type": "T placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 7.2020573831553385,
+      "s_switch_frozen": 4.929438024297631,
+      "s_switch": 4.929438024297631,
+      "t_sw": 3780,
+      "chi_tsw": 0.004021149450142403,
+      "kc_tsw": 0.028960549086169126,
+      "chi_path_max_all": 52.95439969722441,
+      "chi_window_max": 0.005450974320916258,
+      "t_follow": 2707,
+      "follow_state_dist": 0.06679942083325763,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.6
+      "n_steps_run": 4000,
+      "secs": 1.2
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3976,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884905,
-      "newton_type": "T placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 7.508789727055817,
+      "s_switch_frozen": 4.861709997903431,
+      "s_switch": 4.861709997903431,
+      "t_sw": 4108,
+      "chi_tsw": 0.004383009026759816,
+      "kc_tsw": 0.03291109315372702,
+      "chi_path_max_all": 75.77107639345398,
+      "chi_window_max": 0.006008127268158342,
+      "t_follow": 2892,
+      "follow_state_dist": 0.07341083924868919,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.8
+      "n_steps_run": 6000,
+      "secs": 1.3
      },
      {
       "W_hold": 4000,
@@ -147,10 +227,10 @@
       "s_switch_frozen": 5.607120721218756,
       "s_switch": 5.607120721218756,
       "t_sw": 4935,
-      "chi_tsw": 0.0035259830159078917,
-      "kc_tsw": 0.028252367325915705,
-      "chi_path_max_all": 68.70606049363032,
-      "chi_window_max": 0.004812032101578779,
+      "chi_tsw": 0.003525983015907934,
+      "kc_tsw": 0.028252367325916045,
+      "chi_path_max_all": 68.70606049363039,
+      "chi_window_max": 0.004812032101573611,
       "t_follow": 3500,
       "follow_state_dist": 0.06779320623445173,
       "follows_branch": true,
@@ -158,21 +238,37 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
       "n_steps_run": 6000,
-      "secs": 1.6
+      "secs": 1.5
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3920,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884907,
-      "newton_type": "Tp placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 7.073451275639324,
+      "s_switch_frozen": 4.442409416113723,
+      "s_switch": 4.442409416113723,
+      "t_sw": 3347,
+      "chi_tsw": 0.004786680886070469,
+      "kc_tsw": 0.03385835401965353,
+      "chi_path_max_all": 60.51564038003975,
+      "chi_window_max": 0.0065402549583242365,
+      "t_follow": 2371,
+      "follow_state_dist": 0.07243975665185332,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.6
+      "n_steps_run": 4000,
+      "secs": 1.1
      },
      {
       "W_hold": 4000,
@@ -191,10 +287,10 @@
       "s_switch_frozen": 5.862635725394145,
       "s_switch": 5.862635725394145,
       "t_sw": 5210,
-      "chi_tsw": 0.003282222955505863,
-      "kc_tsw": 0.02668773872065832,
-      "chi_path_max_all": 65.18071500776144,
-      "chi_window_max": 0.004462426623819146,
+      "chi_tsw": 0.0032822229555059413,
+      "kc_tsw": 0.02668773872065896,
+      "chi_path_max_all": 65.18071500776162,
+      "chi_window_max": 0.004462426623819145,
       "t_follow": 3707,
       "follow_state_dist": 0.06557865355950199,
       "follows_branch": true,
@@ -206,17 +302,33 @@
      },
      {
       "W_hold": 4000,
-      "hold_n_G_pos": 3993,
+      "hold_n_G_pos": 0,
       "arm": "D",
       "seed": 884909,
-      "newton_type": "Tp placed",
-      "copy_at_release": null,
-      "windings": null,
-      "on_branch": false,
+      "newton_type": "D",
+      "copy_at_release": "D",
+      "windings": [
+       0,
+       0
+      ],
+      "on_branch": true,
       "release_dist": 0.0,
+      "kappa": 8.228531403996096,
+      "s_switch_frozen": 5.836626720904754,
+      "s_switch": 5.836626720904754,
+      "t_sw": 5376,
+      "chi_tsw": 0.0033951923983213147,
+      "kc_tsw": 0.02793744727219576,
+      "chi_path_max_all": 73.25659995046455,
+      "chi_window_max": 0.0046347921432020305,
+      "t_follow": 3808,
+      "follow_state_dist": 0.06794130168536405,
+      "follows_branch": true,
+      "branch_lost_at": null,
+      "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 1.0,
-      "status": "no prediction: not on a scored copy at release",
-      "secs": 5.8
+      "n_steps_run": 6000,
+      "secs": 1.6
      }
     ]
    }
@@ -267,7 +379,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 12000,
-      "secs": 6.0
+      "secs": 6.4
      },
      {
       "W_hold": 4000,
@@ -297,7 +409,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 10000,
-      "secs": 4.8
+      "secs": 4.7
      },
      {
       "W_hold": 4000,
@@ -314,7 +426,7 @@
       "release_dist": 0.0,
       "rho": 0.0009765625,
       "status": "no prediction: not on a scored copy at release",
-      "secs": 0.2
+      "secs": 0.1
      },
      {
       "W_hold": 4000,
@@ -328,7 +440,7 @@
       "release_dist": 0.0,
       "rho": 0.0009765625,
       "status": "no prediction: not on a scored copy at release",
-      "secs": 0.2
+      "secs": 0.1
      },
      {
       "W_hold": 4000,
@@ -358,7 +470,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 8000,
-      "secs": 4.2
+      "secs": 4.1
      },
      {
       "W_hold": 4000,
@@ -389,7 +501,7 @@
       "release_dist": 2.225368759629848,
       "rho": 0.0009765625,
       "status": "no prediction: not on a scored copy at release",
-      "secs": 0.2
+      "secs": 0.1
      },
      {
       "W_hold": 4000,
@@ -403,7 +515,7 @@
       "release_dist": 0.0,
       "rho": 0.0009765625,
       "status": "no prediction: not on a scored copy at release",
-      "secs": 0.2
+      "secs": 0.1
      },
      {
       "W_hold": 4000,
@@ -433,7 +545,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 14000,
-      "secs": 7.4
+      "secs": 7.1
      },
      {
       "W_hold": 4000,
@@ -463,7 +575,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 18000,
-      "secs": 9.0
+      "secs": 8.6
      }
     ]
    }
@@ -524,7 +636,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 6000,
-      "secs": 2.5
+      "secs": 2.4
      },
      {
       "W_hold": 4000,
@@ -644,7 +756,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 8000,
-      "secs": 3.6
+      "secs": 3.5
      },
      {
       "W_hold": 4000,
@@ -674,7 +786,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 4000,
-      "secs": 2.2
+      "secs": 2.1
      },
      {
       "W_hold": 4000,
@@ -704,7 +816,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 4000,
-      "secs": 2.1
+      "secs": 2.0
      },
      {
       "W_hold": 4000,
@@ -734,7 +846,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.0009765625,
       "n_steps_run": 6000,
-      "secs": 2.9
+      "secs": 2.8
      },
      {
       "W_hold": 4000,
@@ -826,7 +938,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 10000,
-      "secs": 4.8
+      "secs": 4.7
      },
      {
       "W_hold": 4000,
@@ -856,7 +968,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 10000,
-      "secs": 5.2
+      "secs": 5.0
      },
      {
       "W_hold": 4000,
@@ -886,7 +998,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 12000,
-      "secs": 6.2
+      "secs": 6.0
      },
      {
       "W_hold": 4000,
@@ -916,7 +1028,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 6000,
-      "secs": 3.0
+      "secs": 3.3
      },
      {
       "W_hold": 4000,
@@ -946,7 +1058,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 14000,
-      "secs": 7.0
+      "secs": 7.4
      },
      {
       "W_hold": 4000,
@@ -976,7 +1088,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 8000,
-      "secs": 4.1
+      "secs": 4.0
      },
      {
       "W_hold": 4000,
@@ -1006,7 +1118,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 8000,
-      "secs": 3.8
+      "secs": 3.7
      },
      {
       "W_hold": 4000,
@@ -1096,7 +1208,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.00048828125,
       "n_steps_run": 6000,
-      "secs": 3.2
+      "secs": 3.3
      }
     ],
     "0.000244140625": [
@@ -1128,7 +1240,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 18000,
-      "secs": 9.2
+      "secs": 9.1
      },
      {
       "W_hold": 4000,
@@ -1158,7 +1270,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 20000,
-      "secs": 10.1
+      "secs": 9.9
      },
      {
       "W_hold": 4000,
@@ -1188,7 +1300,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 24000,
-      "secs": 12.0
+      "secs": 11.9
      },
      {
       "W_hold": 4000,
@@ -1218,7 +1330,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 12000,
-      "secs": 5.8
+      "secs": 5.9
      },
      {
       "W_hold": 4000,
@@ -1248,7 +1360,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 26000,
-      "secs": 13.5
+      "secs": 12.8
      },
      {
       "W_hold": 4000,
@@ -1278,7 +1390,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 16000,
-      "secs": 8.0
+      "secs": 7.7
      },
      {
       "W_hold": 4000,
@@ -1308,7 +1420,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 14000,
-      "secs": 7.4
+      "secs": 7.8
      },
      {
       "W_hold": 4000,
@@ -1338,7 +1450,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 20000,
-      "secs": 10.6
+      "secs": 11.4
      },
      {
       "W_hold": 4000,
@@ -1368,7 +1480,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 16000,
-      "secs": 7.9
+      "secs": 7.8
      },
      {
       "W_hold": 4000,
@@ -1398,7 +1510,7 @@
       "status": "ok (pilot: to t_sw, no recursion)",
       "rho": 0.000244140625,
       "n_steps_run": 12000,
-      "secs": 6.2
+      "secs": 6.1
      }
     ]
    }
