@@ -599,6 +599,7 @@ def main() -> None:
     discussion_phase_checks()
     track4_certificate_checks()
     gelu_transfer_checks()
+    width2_asym_checks()
 
     provenance_check()
 
@@ -885,6 +886,9 @@ PRODUCERS = {
     "width2_asym/landscape.json": ("width2_asym", "landscape", "full", ""),
     "width2_asym/frozen_seeds.json": ("width2_asym", "freeze", "full", ""),
     "width2_asym/pilot.json": ("width2_asym", "pilot", "full", ""),
+    "width2_asym/predictions.csv": ("width2_asym", "finalize", "full", ""),
+    "width2_asym/observed_parts.jsonl": ("width2_asym", "observe", "full", ""),
+    "width2_asym/scores.json": ("width2_asym", "observe", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -2865,6 +2869,115 @@ def digit_stability() -> None:
           f"({rows[0]['machine_precision_moved']} move in their last digits); {n_skip} exact or non-numeric")
     for b in bad:
         F.append(f"digit stability under the rigorous Ĝ: {b}")
+
+
+def width2_asym_checks() -> None:
+    """Registered test W2-A (lag law at width 2 on the asymmetric windows; registration 28b2432, stamp 7800b48,
+    predictions 2c630f2): results/width2_asym_writer_inputs.md."""
+    import hashlib as _h
+    print("W2-A (registered, width 2, asymmetric windows, arms T / D / T')")
+    D = R / "width2_asym"
+    chk("W2A predictions hash", float(_h.sha256((D / "predictions.csv").read_bytes()).hexdigest()
+                                      == "e78d85c80ad7287db698fcf299bb22854fa811d620f382bc64a2db531bb409ab"), 1.0, 0)
+    L = json.loads((D / "landscape.json").read_text())
+    chk("W2A landscape validated", float(L["validated"]), 1.0, 0)
+    chk("W2A s0", L["s0"], 0.2225397, 6e-8)
+    for c, s, k in (("D", 5.079637, 7.674), ("Dp", 4.970592, 8.920), ("T", 0.481586, 0.0486), ("Tp", 0.327167, -0.0564)):
+        chk(f"W2A population switch {c}", L["copies"][c]["s_pop_branch"], s, 6e-7)
+        chk(f"W2A population kappa0 {c}", L["copies"][c]["switch"]["kappa0"], k, 0.0006 if abs(k) > 1 else 0.00006)
+    coef = L["copies"]["T"]["switch"]["kappa_winding_coef"]
+    chk("W2A T winding coef a1", coef[0], -0.139, 0.0006); chk("W2A T winding coef a2", coef[1], -0.127, 0.0006)
+    Z = json.loads((D / "frozen_seeds.json").read_text())
+    chk("W2A frozen seeds", float(len(Z)), 330.0, 0)
+    full = [(c, v) for r in Z for c, v in r["copies"].items() if v.get("full")]
+    chk("W2A frozen full copies", float(len(full)), 600.0, 0)
+    chk("W2A frozen full copies valid", float(sum(bool(v["valid"]) for _, v in full)), 600.0, 0)
+    chk("W2A frozen points accepted", float(sum(bool(v["point_ok"]) for r in Z for v in r["copies"].values())), 920.0, 0)
+    for c, n, lo, hi, neg in (("T", 210, -0.0061, 0.1528, 3), ("Tp", 130, -0.0782, -0.0084, 130),
+                              ("D", 130, 6.351, 9.381, 0), ("Dp", 130, 7.177, 12.987, 0)):
+        ks = np.array([v["kappa0"] for cc, v in full if cc == c])
+        chk(f"W2A frozen {c} copies", float(len(ks)), float(n), 0)
+        chk(f"W2A frozen {c} kappa min", float(ks.min()), lo, 0.0006 if abs(lo) > 1 else 0.00006)
+        chk(f"W2A frozen {c} kappa max", float(ks.max()), hi, 0.0006 if abs(hi) > 1 else 0.00006)
+        chk(f"W2A frozen {c} kappa<0", float((ks < 0).sum()), float(neg), 0)
+    P = json.loads((D / "pilot.json").read_text())["arms"]
+    for arm, rho, q, med, on in (("D", 1.0, 0.0342, 0.00388, 10), ("T", 2 ** -10, 0.0699, 0.0259, 5),
+                                 ("Tp", 2 ** -12, 0.0726, 0.0162, 10)):
+        chk(f"W2A pilot rho {arm}", P[arm]["rho"], rho, 0)
+        chk(f"W2A pilot q90 {arm}", P[arm]["rule"]["history"][-1]["q90"], q, 0.00006)
+        chk(f"W2A pilot median chi {arm}", P[arm]["pilot_median_chi_tsw"], med, 0.000006 if med < 0.01 else 0.00006)
+        chk(f"W2A pilot on-branch {arm}", float(P[arm]["n_on_branch_final"]), float(on), 0)
+    chk("W2A pilot T' q90 at 2^-10", P["Tp"]["rule"]["history"][0]["q90"], 0.290, 0.0006)
+    chk("W2A pilot T' q90 at 2^-11", P["Tp"]["rule"]["history"][1]["q90"], 0.145, 0.0006)
+    S = json.loads((D / "scores.json").read_text())
+    chk("W2A headline T PASS", float(S["headline"]["outcome"] == "PASS" and S["headline"]["arm"] == "T"), 1.0, 0)
+    exp = {"T": dict(runs=200, on=98, hp=1, cross=139, scored=98, kneg=1, el=92, v2=0.969, lag=24.8, kc=0.00167,
+                     chi=0.0284, v7=0.077, l1=1.000, l2=1.009, l3=1.000, l4=(-0.109, -0.125, -0.094),
+                     l5=(-0.00121, -0.00129, -0.00113), rmed=0.00116, steps=24.0),
+           "D": dict(runs=120, on=120, hp=0, cross=120, scored=120, kneg=0, el=120, v2=1.0, lag=202.4, kc=0.0359,
+                     chi=0.00411, v7=0.0064, l1=1.021, l2=1.008, l3=0.997, l4=(-0.077, -0.088, -0.065),
+                     l5=(-0.0307, -0.0314, -0.0300), rmed=0.0320, steps=206.0),
+           "Tp": dict(runs=120, on=120, hp=0, cross=120, scored=120, kneg=120, el=120, v2=None, lag=43.3, kc=0.00142,
+                      chi=0.0165, v7=0.075, l1=1.000, l2=0.993, l3=1.000, l4=(-0.062, -0.070, -0.054),
+                      l5=(-0.00088, -0.00095, -0.00082), rmed=-0.00084, steps=-43.5)}
+    for arm, e in exp.items():
+        x = S["arms"][arm]
+        chk(f"W2A {arm} gate pass", float(x["gate"]["pass"]), 1.0, 0)
+        chk(f"W2A {arm} runs", float(x["gate"]["n_runs"]), float(e["runs"]), 0)
+        chk(f"W2A {arm} on-branch at release", float(x["gate"]["n_on_branch"]), float(e["on"]), 0)
+        chk(f"W2A {arm} G>0 in hold", float(x["gate"]["n_hold_G_positive"]), float(e["hp"]), 0)
+        chk(f"W2A {arm} crossed", float(x["n_crossed"]), float(e["cross"]), 0)
+        chk(f"W2A {arm} not following", float(x["n_on_branch_not_following"]), 0.0, 0)
+        chk(f"W2A {arm} scored", float(x["n_scored"]), float(e["scored"]), 0)
+        chk(f"W2A {arm} kappa<=0 scored", float(x["n_kappa_nonpos_scored"]), float(e["kneg"]), 0)
+        chk(f"W2A {arm} L5 eligible", float(x["n_L5_eligible"]), float(e["el"]), 0)
+        chk(f"W2A {arm} valid (all V1-V7)", float(x["valid"] and all(x["validity"].values())), 1.0, 0)
+        if e["v2"] is not None:
+            chk(f"W2A {arm} V2 fraction", x["frac_tsw_before_crossing_kappa_pos"], e["v2"], 0.0006)
+        chk(f"W2A {arm} V4 median |lag| steps", x["median_predicted_lag_steps"], e["lag"], 0.06)
+        chk(f"W2A {arm} V5 q90 |kappa chi|", x["q90_kappa_chi_tsw"], e["kc"], 0.00006 if e["kc"] < 0.01 else 0.0006)
+        chk(f"W2A {arm} V6 median chi", x["median_chi_tsw"], e["chi"], 0.000006 if e["chi"] < 0.01 else 0.00006)
+        chk(f"W2A {arm} V7 q90 window", x["q90_max_chi_window"], e["v7"], 0.0006 if e["v7"] > 0.01 else 0.00006)
+        chk(f"W2A {arm} L1 ratio", x["L1"]["median_ratio"], e["l1"], 0.0006)
+        chk(f"W2A {arm} L2 ratio", x["L2"]["median_ratio"], e["l2"], 0.0006)
+        chk(f"W2A {arm} L3 spearman", x["L3"]["spearman"], e["l3"], 0.0006)
+        for k in ("l4", "l5"):
+            m, lo, hi = e[k]
+            K = k.upper()
+            tol = 0.0006 if abs(m) > 0.01 else 0.000006
+            chk(f"W2A {arm} {K} mean D", x[K]["mean_D"], m, tol)
+            chk(f"W2A {arm} {K} ci lo", x[K]["ci95"][0], lo, tol)
+            chk(f"W2A {arm} {K} ci hi", x[K]["ci95"][1], hi, tol)
+        for k in ("L1", "L2", "L3", "L4", "L5"):
+            chk(f"W2A {arm} {k} PASS", float(x[k]["verdict"] == "PASS"), 1.0, 0)
+        chk(f"W2A {arm} outcome PASS", float(x["outcome"] == "PASS"), 1.0, 0)
+        de = x["descriptive"]
+        chk(f"W2A {arm} median r_obs", de["median_r_obs_scored"], e["rmed"], 0.000006 if abs(e["rmed"]) < 0.01 else 0.00006)
+        chk(f"W2A {arm} median steps t_sw to crossing", de["median_steps_tsw_to_crossing_scored"], e["steps"], 0)
+        chk(f"W2A {arm} undecided steps", float(de["n_undecided_steps_total"]), 0.0, 0)
+    X = S["arms"]["T"]["sensitivity_excluding_hold_G_positive_DESCRIPTIVE"]
+    chk("W2A T sensitivity scored", float(X["n_scored"]), 97.0, 0)
+    chk("W2A T sensitivity outcome PASS", float(X["outcome"] == "PASS"), 1.0, 0)
+    chk("W2A T sensitivity L2", X["L2"]["median_ratio"], 1.008, 0.0006)
+    dT = S["arms"]["T"]["descriptive"]["newton_type_counts"]
+    for k, n in (("T", 100), ("D", 58), ("not accepted", 24), ("Tp", 15), ("Dp", 3)):
+        chk(f"W2A T release Newton type {k}", float(dT.get(k, 0)), float(n), 0)
+    # per-run step agreement (descriptive; writer inputs section 3)
+    for arm, eq, le1, lo, hi in (("T", 97, 98, -1, 0), ("Tp", 118, 120, 0, 1), ("D", 0, 14, 1, 6)):
+        o = pd.read_csv(D / f"observed_runs_{arm}.csv")
+        o = o[o.scored]
+        dd = o.step_obs - o.t_traj
+        chk(f"W2A {arm} observed step == predicted", float((dd == 0).sum()), float(eq), 0)
+        chk(f"W2A {arm} within 1 step", float((dd.abs() <= 1).sum()), float(le1), 0)
+        chk(f"W2A {arm} step diff min", float(dd.min()), float(lo), 0)
+        chk(f"W2A {arm} step diff max", float(dd.max()), float(hi), 0)
+    o = pd.read_csv(D / "observed_runs_Tp.csv")
+    o = o[o.scored]
+    chk("W2A T' runs crossing before their switch", float((o.step_obs < o.t_sw).sum()), 120.0, 0)
+    o = pd.read_csv(D / "observed_runs_D.csv")
+    chk("W2A D within 3 steps", float(((o[o.scored].step_obs - o[o.scored].t_traj).abs() <= 3).sum()), 28.0, 0)
+    oT = pd.read_csv(D / "observed_runs_T.csv")
+    chk("W2A T off-branch runs that crossed", float((oT.crossed.astype(bool) & ~oT.on_branch.astype(bool)).sum()), 41.0, 0)
 
 
 def provenance_check() -> None:

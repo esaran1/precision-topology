@@ -12,10 +12,10 @@ on pilot seeds only (registration §0). Code: `src/width2_asym.py`. Outputs: `re
 | `596942c` | Implementation with tests of every decision rule (not registered). |
 | `fd119b2` | Registration text, not yet registered; committed before any pilot run. |
 | `b3f483d` | Pre-registration computations: landscape, frozen inputs, first pilot (pilot seeds only). Arm D's random start landed on D in 3/10: STOP for the author. |
-| (registration) | The author's five changes (2026-09-30); D re-piloted from its branch-point start; code, tests, text and frozen inputs hashed (`registration.sha256`). |
-| (stamp) | OpenTimestamps proof of the registration commit. |
-| (predictions) | All runs trained to their budgets with no gap or placement of the state evaluated after release; `predictions.csv` and every path hash committed, together with §2 of this file. |
-| (observation) | `observe`: hashes asserted; gates first; every-step detection; scored (§3). |
+| `28b2432` | The author's five changes (2026-09-30); D re-piloted from its branch-point start; code, tests, text and frozen inputs hashed (`registration.sha256`). |
+| `7800b48` | OpenTimestamps proof of the registration commit. |
+| `2c630f2` | 440 runs (T 200, D 120, T′ 120) trained to their budgets, with no gap or placement of the state evaluated after release. `predictions.csv` (SHA-256 `e78d85c80ad7287db698fcf299bb22854fa811d620f382bc64a2db531bb409ab`) and every path hash committed, together with §2 of this file. |
+| this commit | `observe`: asserted the registration hashes, the committed predictions hash and all 440 path hashes; gates first; every-step detection; scored (§3). |
 
 ## 2. Say / Do not say for every possible outcome, per arm (written before the observation was run)
 
@@ -101,6 +101,101 @@ on pilot seeds only (registration §0). Code: `src/width2_asym.py`. Outputs: `re
 | **Wrong sign** (T′ runs cross AFTER their switch although predicted early; L1/L2 medians negative or L3 negative) | "T′: the observed lags had the wrong sign in k of n scored runs (median signed ratio x); the negative-κ prediction failed." This comes with the L1/L2 (and L3) FAIL rows. | That the magnitude was right; that the sign is a convention (it is physical, registration §7). |
 | **V2 (information)** | V2 is vacuous for T′ (no κ > 0 runs), as GELU-T's rule defines it. Say so if asked. | That V2 checked T′'s timing. |
 
-## 3. What occurred
+## 3. What occurred: PASS in all three arms (registered; `results/width2_asym/scores.json`)
 
-(Written after the observation; §2 was committed with the predictions, before it.)
+ρ (from the pilot): T 2⁻¹⁰, D 1, T′ 2⁻¹².
+
+**Gates**
+- **T:** 98 of 200 on T at release. PASS (≥ 60).
+  - The rest: 15 on T′ and 87 on neither (Newton landed on D 58, not accepted 24, D′ 3, T 2 off the frozen copy
+    point). These are counted and not scored.
+  - 1 run had G > 0 in the hold (seed 884,192, one hold state). It is on T, scored and flagged.
+- **D:** 120 of 120 on D, none on D′, no run with G > 0 in the hold. PASS (≥ 108).
+- **T′:** 120 of 120 on T′, no run with G > 0 in the hold. PASS (≥ 108).
+- Every on-branch run released at winding (0, 0), fixed at release.
+
+**Counts**
+
+| | T | D | T′ |
+|---|---|---|---|
+| on-branch at release | 98 | 120 | 120 |
+| neither / other copy | 102 | 0 | 0 |
+| unconverged (Newton not accepted) | 24 (inside "neither") | 0 | 0 |
+| crossed (all runs) | 139 | 120 | 120 |
+| on-branch and crossed | 98 | 120 | 120 |
+| not following their branch | 0 | 0 | 0 |
+| scored | 98 | 120 | 120 |
+| κ ≤ 0 among scored | 1 | 0 | 120 |
+| L5-eligible (\|t_pred − t_sw\| ≥ 6) | 92 of 98 | 120 of 120 | 120 of 120 |
+
+**Validity (all seven hold in every arm)**
+
+| | T | D | T′ | bound |
+|---|---|---|---|---|
+| V1 scored runs | 98 | 120 | 120 | ≥ 60 |
+| V2 t_sw before crossing, κ > 0 | 94 of 97 (0.969) | 120 of 120 | no κ > 0 run (holds) | ≥ 0.90 |
+| V3 η·λ_min ≤ 0.5 | all | all | all | ≥ 80% |
+| V4 median \|predicted lag\| (steps) | 24.8 | 202.4 | 43.3 | ≥ 10 |
+| V5 q90 \|κχ\| at t_sw | 0.00167 | 0.0359 | 0.00142 | ≤ 0.1 |
+| V6 median χ at t_sw (pilot) | 0.0284 (0.0259) | 0.00411 (0.00388) | 0.0165 (0.0162) | within 30% |
+| V7 q90 window max χ_t | 0.077 | 0.0064 | 0.075 | ≤ 0.25 |
+
+**Criteria**
+
+| criterion | T (headline) | D (control) | T′ |
+|---|---|---|---|
+| **L1** median r_obs/r_traj ∈ [0.90, 1.10] | 1.000 PASS | 1.021 PASS | 1.000 PASS |
+| **L2** median r_obs/r_cf ∈ [0.80, 1.20] | 1.009 PASS | 1.008 PASS | 0.993 PASS |
+| **L3** Spearman ≥ 0.5 | 1.000 PASS | 0.997 PASS | 1.000 PASS |
+| **L4** mean D vs the branch's population switch, upper end < 0 | −0.109 [−0.125, −0.094] PASS | −0.077 [−0.088, −0.065] PASS | −0.062 [−0.070, −0.054] PASS |
+| **L5** mean D vs the own switch (eligible runs), upper end < 0 | −0.00121 [−0.00129, −0.00113] (n 92) PASS | −0.0307 [−0.0314, −0.0300] (n 120) PASS | −0.00088 [−0.00095, −0.00082] (n 120) PASS |
+
+**Outcome: PASS in T (the headline), PASS in D (the control) and PASS in T′.** Each arm's PASS row in §2 applies, with
+the numbers above.
+- **T:** 98 scored; 98 of 200 on T at release; 15 on T′ and 87 on neither.
+- **T′:** every one of the 120 scored runs crossed before its own switch, as predicted. The median signed lag is −43.5
+  steps, and r_obs ranges from −0.00196 to −0.00017.
+- **The pilot changes:** each Say line carries the registered five-change disclosure (§2 rules).
+
+**Sensitivity analysis (T; registered, DESCRIPTIVE, not a criterion).** Excluding the 1 run with G > 0 in the hold:
+97 scored, all validity conditions hold; L1 1.000, L2 1.008, L3 1.000, L4 −0.109 [−0.125, −0.094], L5 −0.00121
+[−0.00129, −0.00113]; PASS.
+
+**Descriptive** (from the committed predictions and the observed crossings; not criteria)
+- **Median observed lag r_obs:** T 0.00116 (median 24 steps from t_sw to the crossing); D 0.0320 (206 steps); T′
+  −0.00084 (−43.5 steps).
+- **Predicted against observed crossing step:**
+  - T: equal in 97 of 98 runs; 1 step earlier than predicted in 1.
+  - T′: equal in 118 of 120; 1 step later in 2.
+  - D: the observed step is always 1–6 steps after the predicted one (within 1 in 14, within 3 in 28, of 120). The
+    predicted lag there is about 200 steps.
+- **T's one scored run with κ < 0** (seed 884,149, κ = −0.0041): predicted and observed to cross 3 steps before its
+  switch, at the same step.
+- **Off-branch crossings:** 41 of T's 102 runs that were not on T at release crossed during training. They are not
+  scored and have no prediction.
+- **Undecided enclosure states:** 0 during observation, in every arm.
+
+## 4. POST HOC readings (not registered; beside the verdicts)
+
+- **D's observed crossing always trails the recursion by 1–6 steps** (POST HOC). This is 0.5–3% of its ~200-step lag,
+  and it moves L1 to 1.021, inside the band. A candidate reason is D's split directions: the R4 recursion is linear in
+  them, and they relax at a rate of their own. Not analysed.
+
+## 5. Scope and caveats (for the writer)
+
+- **Setting.** One activation family (f_a, a = 1.30), width 2, asymmetric windows (Δ = 0.4), full-batch SGD at one
+  (η, ρ) per arm: T 0.03 / 2⁻¹⁰, D 0.3 / 1, T′ 0.03 / 2⁻¹². T2-3 (Adam) stays FAIL.
+- **Own-path switch (disclosure C).** T's and T′'s lag-free switch is read from each run's own output path, so their
+  predictions are conditional on that path. D's switch is frozen.
+- **Changes before registration.** Disclosure B: the total-derivative κ was adopted after exploratory runs. The five
+  changes of registration §0 were made after the pilot, on pilot seeds only, before any registered seed was touched.
+- **Arm starts.** D and T′ are branch-point starts. Only T starts at random, and fewer than half of its runs (98 of
+  200) reached T.
+
+## 6. Erratum (found by the ledger after the observation)
+
+- **Registration §14** (hashed in 28b2432) says "All 840 copy points are accepted". The frozen file
+  (`frozen_seeds.json`, unchanged and hashed) has **920** copy points, all accepted and of their type: 40 on the
+  pilot seeds, 480 on 884,000–884,119, 160 on 884,120–884,199 and 240 on 884,200–884,319.
+- The count 840 was an arithmetic slip in the text only. The registration commit message repeats it. No frozen value,
+  rule or verdict is affected, and the registration text is left unchanged because it is hashed.
