@@ -181,15 +181,19 @@ def criterion_c4(t_fc, t_sw_fc, t_obs, has_fc):
 
 
 def criterion_sign(lag_fc, lag_obs, has_fc):
-    """S (T′): lag_fc < 0 and lag_obs < 0 in ≥ 80% of the scored runs with a forecast and |lag_fc| ≥ 6 steps.  None:
-    UNRESOLVED."""
+    """S (T′): lag_fc < 0 and lag_obs < 0 in ≥ 80% of the eligible scored runs.  Eligible: the scored runs with a
+    forecast and |lag_fc| ≥ 6 steps, AND every scored run without a forecast (a MISS), which counts as not both negative
+    (author's decision 2026-10-01; as D9 does for an undefined observed lag).  No eligible run: UNRESOLVED."""
     lag_fc, lag_obs, has_fc = _arr(lag_fc), _arr(lag_obs), _arr(has_fc, bool)
     with np.errstate(invalid="ignore"):
-        el = has_fc & np.isfinite(lag_fc) & (np.abs(lag_fc) >= S_MIN_ABS_LAG)
-        both = el & (lag_fc < 0) & np.isfinite(lag_obs) & (lag_obs < 0)
+        el_fc = has_fc & np.isfinite(lag_fc) & (np.abs(lag_fc) >= S_MIN_ABS_LAG)
+        miss = ~has_fc
+        el = el_fc | miss
+        both = el_fc & (lag_fc < 0) & np.isfinite(lag_obs) & (lag_obs < 0)
     n, k = int(el.sum()), int(both.sum())
     frac = k / n if n else float("nan")
-    return {"n_eligible": n, "n_both_negative": k, "frac": frac, "min_frac": S_MIN_FRAC, "min_abs_lag": S_MIN_ABS_LAG,
+    return {"n_eligible": n, "n_eligible_miss": int(miss.sum()), "n_both_negative": k, "frac": frac,
+            "min_frac": S_MIN_FRAC, "min_abs_lag": S_MIN_ABS_LAG,
             "verdict": "UNRESOLVED" if n == 0 else ("PASS" if frac >= S_MIN_FRAC else "FAIL")}
 
 

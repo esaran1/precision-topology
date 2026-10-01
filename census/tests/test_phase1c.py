@@ -153,8 +153,23 @@ def test_sign_criterion():
     assert c["n_eligible"] == 5 and c["n_both_negative"] == 4 and c["verdict"] == "PASS"    # |lag_fc| < 6 ignored
     c = P.criterion_sign(lf, np.array([-8, -8, -8, 2, 2, -8, 5]), np.ones(7, bool))
     assert c["verdict"] == "FAIL"
-    assert P.criterion_sign([3, -5], [-1, -1], [True, True])["verdict"] == "UNRESOLVED"
-    assert P.criterion_sign([-10, -10], [-1, -1], [False, False])["verdict"] == "UNRESOLVED"
+    assert P.criterion_sign([3, -5], [-1, -1], [True, True])["verdict"] == "UNRESOLVED"     # no eligible run
+
+
+def test_sign_criterion_misses_count_as_failures():
+    """Author's decision 2026-10-01: a miss enters S's denominator as not both negative."""
+    lf = np.array([-10.0] * 8 + [np.nan] * 2)
+    lo = np.full(10, -8.0)
+    has = np.array([True] * 8 + [False] * 2)
+    c = P.criterion_sign(lf, lo, has)
+    assert c["n_eligible"] == 10 and c["n_eligible_miss"] == 2 and c["frac"] == 0.8 and c["verdict"] == "PASS"
+    has3 = np.array([True] * 7 + [False] * 3)
+    lf3 = np.where(has3, -10.0, np.nan)
+    c3 = P.criterion_sign(lf3, lo, has3)
+    assert c3["frac"] == 0.7 and c3["verdict"] == "FAIL"                 # a miss lowers the fraction
+    c0 = P.criterion_sign([np.nan, np.nan], [-1.0, -1.0], [False, False])
+    assert c0["n_eligible"] == 2 and c0["verdict"] == "FAIL"             # only misses: eligible, failures
+    assert P.criterion_sign([], [], [])["verdict"] == "UNRESOLVED"       # UNRESOLVED only with no eligible run
 
 
 # ================================================================================================ horizons, outcome

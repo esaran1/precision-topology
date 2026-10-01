@@ -577,6 +577,7 @@
      },
      "S": {
       "n_eligible": 19,
+      "n_eligible_miss": 0,
       "n_both_negative": 19,
       "frac": 1.0,
       "min_frac": 0.8,
@@ -670,6 +671,7 @@
      },
      "S": {
       "n_eligible": 19,
+      "n_eligible_miss": 0,
       "n_both_negative": 19,
       "frac": 1.0,
       "min_frac": 0.8,

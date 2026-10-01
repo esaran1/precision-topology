@@ -1,11 +1,13 @@
 # Phase 1C registration: the registered causal replication on fresh seeds
 
-**STATUS: PREPARED, NOT YET REGISTERED (2026-10-01).** §9 lists details the approved page leaves open that touch a
-criterion, the validity conditions or the scoring set. By the author's standing rule they come to the author before the
-registration commit. Each has a proposed resolution, implemented in `src/phase1c.py` and tested in
-`tests/test_phase1c.py`. Once the author approves them (or changes them), this status line is replaced by the
-registration statement, the manifest is rewritten, and the registration commit is made. No registered seed has been
-trained. No gap, placement or crossing of any training run of a 1C seed has been evaluated.
+**REGISTERED.** This file, the approved design page, `src/phase1c.py`, `tests/test_phase1c.py`, the frozen forecaster,
+the code it reaches, the frozen per-seed inputs and the seed scans are committed in one commit before any registered
+run. Their SHA-256 hashes are in `results/phase1c/registration.sha256` (§11).
+- **Not yet done:** no registered seed has been trained, and no gap, placement or crossing of any training run of a 1C
+  seed has been evaluated.
+- **The open details:** the author approved D1–D10 (§9) on 2026-10-01, as proposed, with one change. In S, a miss
+  counts as a failure (D2, D9).
+- **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
 
 ## 1. Design reference
 
@@ -122,7 +124,7 @@ s_obs/s_sw − 1.
 | **C2** | \|lag_fc − lag_obs\| ≤ τ_lag (inclusive) | in ≥ 80% of the scored runs (a miss is not within) |
 | **C3** | median of r_obs/r_fc over the scored runs with a forecast | ∈ [1 − b, 1 + b] (closed) |
 | **C4** | D = \|t_fc − t_obs\| − \|t_nolag − t_obs\|, t_nolag = t_sw,fc, paired per run over the scored runs with a forecast | the upper end of the 95% percentile bootstrap interval of mean D is < 0 |
-| **S** (T′) | lag_fc < 0 and lag_obs < 0 | in ≥ 80% of the scored runs with a forecast and \|lag_fc\| ≥ 6 |
+| **S** (T′) | lag_fc < 0 and lag_obs < 0 | in ≥ 80% of the eligible scored runs: those with a forecast and \|lag_fc\| ≥ 6, plus every miss, which counts as not both negative (author 2026-10-01) |
 
 - **C4, as implemented** (`criterion_c4`, `bootstrap_mean_ci`):
   - 10,000 resamples of the runs, with replacement, from `numpy.random.default_rng(9350000)` (a local generator);
@@ -218,20 +220,22 @@ been drawn.
 
 ## 9. Details the approved page leaves open
 
-**STOP items.** Each of these touches a criterion, a validity condition or the scoring set. The author decides them
-before the registration commit. The proposed resolution is implemented and tested.
+**Decided by the author (2026-10-01).** Each of these touches a criterion, a validity condition or the scoring set.
+Under the standing rule they went to the author before the registration commit.
+- D1–D10 were approved as proposed, with ONE change, in S: a miss counts as a failure (D2, D9).
+- Each resolution below is the registered rule, implemented and tested.
 
 | # | detail | proposed resolution (implemented) | touches |
 |---|---|---|---|
 | D1 | **The 1C scored set.** | The base (§6.2) with t_c < t_obs. G, T and T′ keep the registered conditions except the registered predictions: finite r_traj and s_traj are dropped; finite r_cf (V5's input) and r_obs are kept. W1 also needs the actual t_sw to be defined (the analogue of finite r_cf). | scoring set |
-| D2 | **Misses in each criterion.** | C1 and C2: a miss is in the denominator and not within. C3, C4 and S: misses are excluded, because they have no r_fc, t_fc or lag_fc; they already fail C1 and C2. A forecast with t_fc but no t_sw,fc is a miss. | C1–C4, S |
+| D2 | **Misses in each criterion.** | C1 and C2: a miss is in the denominator and not within. C3 and C4: misses are excluded, because they have no r_fc or t_fc; they already fail C1 and C2. **S (author's change, 2026-10-01): a miss is in S's denominator and counts as not both negative.** A forecast with t_fc but no t_sw,fc is a miss. | C1–C4, S |
 | D3 | **V1–V7 with the new predictions.** | The registered V1–V7, computed by the registered function over the 1C scored set (D1), misses included, so V1 counts misses. The registered predictions are replaced by a finite placeholder only to select that set. Every V reads only frozen and observed quantities, so their values do not depend on the placeholder (tested equal to the registered call). | validity |
 | D4 | **W1 validity.** | Track A's counts carried over: ≥ 60 crossings within the budget, and ≥ 60 scored runs, misses included ("≥ 60 scored" on the page). | validity |
 | D5 | **The 90% cutoff rule.** | Its denominator is the base (§6.2): crossing runs on a scored copy that follow their branch, with no cutoff counted as not before. A failure makes the arm UNRESOLVED (validity). It is computed at the arm's f only. | validity |
 | D6 | **A NaN recomputation that differs.** | Any run with a cutoff at the arm's f whose recomputation differs makes the arm UNRESOLVED (validity). It is not treated as a per-run miss: a differing recomputation means the forecaster read past the cutoff. | validity |
 | D7 | **C4 details.** | The statistic is the MEAN of D (as in the registered L4 and L5). The generator is default_rng(9350000). The interval is the 2.5–97.5 percentiles. Fewer than 2 runs is UNRESOLVED. | C4 |
-| D8 | **C3 and "not computable".** | A run with r_fc = 0 has no ratio and is excluded. C3 with no finite ratio is UNRESOLVED. C1 and C2 with no scored run are UNRESOLVED. S with no run having \|lag_fc\| ≥ 6 is UNRESOLVED. | C1–C3, S |
-| D9 | **S with lag_obs undefined.** | It counts as not both negative. For T′ this cannot occur in a scored run, because finite r_obs needs the own-path switch. | S |
+| D8 | **C3 and "not computable".** | A run with r_fc = 0 has no ratio and is excluded. C3 with no finite ratio is UNRESOLVED. C1 and C2 with no scored run are UNRESOLVED. S is UNRESOLVED only when no run is eligible (no run with a forecast and \|lag_fc\| ≥ 6, and no miss). | C1–C3, S |
+| D9 | **S with lag_obs undefined, or with no forecast.** | Either counts as not both negative. For a miss this is the author's change of 2026-10-01. An undefined lag_obs cannot occur in a scored T′ run, because finite r_obs needs the own-path switch. | S |
 | D10 | **W1's observed switch.** | The actual t_sw is the first step with s ≥ s\*_run, where s\*_run is the branch at the arm's-f cutoff rule point (the forecaster's own). Track A's t_top rule point is not used (the page replaces R1). r_obs = s_obs/s\*_run − 1. | C2, C3 |
 
 **Implementation only.** These do not touch a criterion, a gate, validity or the scoring set.
