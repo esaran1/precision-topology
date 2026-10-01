@@ -39,3 +39,5 @@ results/track2c/paths/
 results/width2_asym/paths/
 # Phase 1A pilot output paths (untracked; SHA-256 in results/phase1a/runs_*.jsonl)
 results/phase1a/paths/
+# Phase 1C output path prefixes (untracked; SHA-256 in results/phase1c/runs_*.jsonl; observe retrains the full path)
+results/phase1c/paths/
