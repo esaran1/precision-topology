@@ -1,0 +1,14 @@
+{
+ "a": 1.58,
+ "literal_files": [
+  "src/verify_ledger.py",
+  "results/sb_fold/branch_losses.csv"
+ ],
+ "float_artefact_files": [],
+ "csv_a_column_hits": {
+  "results/corner_tracking.csv": [
+   1.575
+  ]
+ },
+ "note": "literal_files: every text file with the token 1.58 (any role: a scale value, a statistic); csv_a_column_hits: results CSVs whose a / act_a / parameter column has a value in [1.575, 1.585] (training or crossing data at a = 1.58 would appear there)."
+}

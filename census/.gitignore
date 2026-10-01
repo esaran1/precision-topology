@@ -37,3 +37,5 @@ results/track2c/paths/
 
 # W2-A training paths (hashed in results/width2_asym/predictions.csv; regenerate: python -m src.width2_asym train)
 results/width2_asym/paths/
+# Phase 1A pilot output paths (untracked; SHA-256 in results/phase1a/runs_*.jsonl)
+results/phase1a/paths/

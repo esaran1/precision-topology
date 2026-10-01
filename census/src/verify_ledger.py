@@ -604,6 +604,7 @@ def main() -> None:
     gelu_transfer_checks()
     width2_asym_checks()
     prediction_inputs_audit_checks()
+    phase1a_checks()
 
     provenance_check()
 
@@ -903,6 +904,23 @@ PRODUCERS = {
     "prediction_inputs_audit/truncated_gelu.jsonl": ("prediction_inputs_audit", "truncated_gelu", "full", ""),
     "prediction_inputs_audit/truncated_track_a.jsonl": ("prediction_inputs_audit", "truncated_track_a", "full", ""),
     "prediction_inputs_audit/truncated_track2a.jsonl": ("prediction_inputs_audit", "truncated_track2a", "full", ""),
+    # Phase 1A (author's program 2026-09-30): causal forecaster, pilot-seed error estimate (not a registration)
+    "phase1a/summary.json": ("phase1a_pilot", "summarize", "full", ""),
+    "phase1a/error_estimate.md": ("phase1a_pilot", "summarize", "full", ""),
+    "phase1a/landscape_w1.json": ("phase1a_pilot", "landscape", "full", ""),
+    "phase1a/a_candidate_scan.json": ("phase1a_pilot", "scan", "full", ""),
+    "phase1a/seed_scan.json": ("phase1a_pilot", "scan", "full", ""),
+    "phase1a/runs_w1_sgd.jsonl": ("phase1a_pilot", "run", "full", ""),
+    "phase1a/runs_gelu_random.jsonl": ("phase1a_pilot", "run", "full", ""),
+    "phase1a/runs_w2a_T.jsonl": ("phase1a_pilot", "run", "full", ""),
+    "phase1a/runs_w2a_Tp.jsonl": ("phase1a_pilot", "run", "full", ""),
+    "phase1a/forecasts_w1_sgd.jsonl": ("phase1a_pilot", "forecast", "full", ""),
+    "phase1a/forecasts_w1_sgd_run.jsonl": ("phase1a_pilot", "forecast", "full", ""),
+    "phase1a/forecasts_gelu_random.jsonl": ("phase1a_pilot", "forecast", "full", ""),
+    "phase1a/forecasts_w2a_T.jsonl": ("phase1a_pilot", "forecast", "full", ""),
+    "phase1a/forecasts_w2a_Tp.jsonl": ("phase1a_pilot", "forecast", "full", ""),
+    "phase1a/fixtures/gelu_random.npz": ("phase1a_pilot", "make_fixtures", "full", ""),
+    "phase1a/fixtures/w2a_T.npz": ("phase1a_pilot", "make_fixtures", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3073,6 +3091,58 @@ def prediction_inputs_audit_checks() -> None:
             float(X["arms"][arm]["follow_check_t_follow_vs_t_obs"]["n_at_or_after"]), 0.0, 0)
         chk(f"PIA {test} {arm} on-branch runs excluded by the follow check",
             float(X["arms"][arm]["n_on_branch_not_following_excluded"]), 0.0, 0)
+
+
+P1A_N_ROWS = 5221.0               # forecast rows with a cutoff (dev + est, every setting and configuration)
+P1A_N_ELIGIBLE = {"w1_sgd": 40, "w1_sgd_run": 40, "gelu_random": 19, "w2a_T": 26, "w2a_Tp": 20}
+P1A_F = 0.8                       # the largest f of the one-lag rule common to all settings (recommendation 0.95)
+
+
+def phase1a_checks() -> None:
+    """Phase 1A (author's program 2026-09-30; results/phase1a/error_estimate.md): the causal forecaster's pilot-seed
+    error estimate.  summary.json and error_estimate.md regenerate from the committed run and forecast rows; no forecast
+    read a row at or after its cutoff; the pilot seeds are fresh and not registered; the a = 1.58 landscape is validated;
+    the fixtures match their hashes; headline counts pinned."""
+    import hashlib as _h
+    from . import phase1a_pilot as PP
+    print("Phase 1A: causal forecaster, pilot-seed error estimate")
+    O = R / "phase1a"
+    S = json.loads((O / "summary.json").read_text())
+    chk("P1A summary.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(PP._jsonable(PP.build_summary())))), 1.0, 0)
+    chk("P1A error_estimate.md regenerates from summary.json", float((O / "error_estimate.md").read_text()
+                                                                   == PP.render_md(S)), 1.0, 0)
+    n_rows, n_bad = 0, 0
+    for st in PP.SETTINGS:
+        for r in PP._rows(O / f"forecasts_{st}.jsonl"):
+            if r.get("t_c") is None:
+                continue
+            n_rows += 1
+            n_bad += int(max((r.get("max_index_read") or {}).values() or [-1]) >= r["t_c"])
+    chk("P1A forecasts that read a row at or after the cutoff", float(n_bad), 0.0, 0)
+    chk("P1A forecast rows with a cutoff", float(n_rows), P1A_N_ROWS, 0)
+    chk("P1A pilot seeds that are registered or pilot seeds of a test",
+        float(sum(len(v) for v in PP.registered_overlap().values())), 0.0, 0)
+    sc = json.loads((O / "seed_scan.json").read_text())
+    chk("P1A pilot seed prefixes found in src/tests/results/paper",
+        float(sum(len(v) for v in sc["prefix_pattern_files"].values())), 0.0, 0)
+    ac = json.loads((O / "a_candidate_scan.json").read_text())
+    chk("P1A a-column values in [1.575, 1.585] other than corner_tracking's 1.575 (landscape table)",
+        float(sum(len(v) for k, v in ac["csv_a_column_hits"].items() if not (k == "results/corner_tracking.csv"
+                                                                          and v == [1.575]))), 0.0, 0)
+    chk("P1A files with the token 1.58 other than sb_fold/branch_losses.csv (s-grid) and this ledger",
+        float(len(set(ac["literal_files"]) - {"results/sb_fold/branch_losses.csv", "src/verify_ledger.py"})), 0.0, 0)
+    chk("P1A landscape at a = 1.58 validated", float(json.loads((O / "landscape_w1.json").read_text())["validated"]),
+        1.0, 0)
+    for name in ("gelu_random", "w2a_T"):
+        p = O / "fixtures" / f"{name}.npz"
+        want = (O / "fixtures" / f"{name}.sha256").read_text().split()[0]
+        chk(f"P1A fixture {name} hash", float(_h.sha256(p.read_bytes()).hexdigest() == want), 1.0, 0)
+    for st, n in P1A_N_ELIGIBLE.items():
+        chk(f"P1A {st} est eligible runs", float(S["settings"][st]["runs"]["est"]["n_eligible"]), float(n), 0)
+    chk("P1A one-lag rule common f", float(S["proposal"]["f_proposed"] or -1), P1A_F, 0)
+    chk("P1A minimal rule admits every f in the grid", float(S["proposal"]["f_ok_minimal"] == S["f_grid"]), 1.0, 0)
+    chk("P1A primary configuration quad/0.05", float(S["primary"] == "quad/0.05"), 1.0, 0)
 
 
 def provenance_check() -> None:

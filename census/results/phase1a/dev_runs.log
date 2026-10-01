@@ -1,0 +1,26 @@
+gate (36, 1172.75)
+{"setting": "w1_sgd", "seed": 9310001, "split": "dev", "status": "ok", "t_obs": 937, "s_ref": 2.2135752790954557, "secs_run": 2.4}
+{"setting": "w1_sgd", "seed": 9310002, "split": "dev", "status": "ok", "t_obs": 674, "s_ref": 2.045096622181722, "secs_run": 1.8}
+{"setting": "w1_sgd", "seed": 9310003, "split": "dev", "status": "ok", "t_obs": 779, "s_ref": 1.9394679035138025, "secs_run": 1.8}
+{"setting": "w1_sgd", "seed": 9310004, "split": "dev", "status": "ok", "t_obs": 678, "s_ref": 2.0002552729987917, "secs_run": 1.8}
+gate (35, 1172.75)
+{"setting": "gelu_random", "seed": 9320001, "split": "dev", "status": "ok", "t_obs": 6196, "s_ref": 6.921490547092802, "secs_run": 7.0}
+{"setting": "gelu_random", "seed": 9320002, "split": "dev", "status": "ok", "t_obs": 8747, "s_ref": 7.993515891867425, "secs_run": 6.7}
+{"setting": "gelu_random", "seed": 9320003, "split": "dev", "status": "ok", "t_obs": 6960, "s_ref": 6.978622270594485, "secs_run": 6.6}
+{"setting": "gelu_random", "seed": 9320004, "split": "dev", "status": "ok", "t_obs": 3857, "s_ref": 5.7454039936192105, "secs_run": 6.5}
+gate (35, 1172.75)
+{"setting": "w2a_T", "seed": 9330001, "split": "dev", "status": "ok", "t_obs": 37412, "s_ref": null, "secs_run": 5.4}
+{"setting": "w2a_T", "seed": 9330002, "split": "dev", "status": "ok", "t_obs": 8793, "s_ref": 0.43013302354328564, "secs_run": 4.2}
+{"setting": "w2a_T", "seed": 9330003, "split": "dev", "status": "ok", "t_obs": 7475, "s_ref": null, "secs_run": 3.7}
+{"setting": "w2a_T", "seed": 9330004, "split": "dev", "status": "ok", "t_obs": null, "s_ref": null, "secs_run": 6.2}
+{"setting": "w2a_T", "seed": 9330005, "split": "dev", "status": "ok", "t_obs": null, "s_ref": null, "secs_run": 6.1}
+{"setting": "w2a_T", "seed": 9330006, "split": "dev", "status": "ok", "t_obs": 14159, "s_ref": 0.5425118615259898, "secs_run": 4.9}
+{"setting": "w2a_T", "seed": 9330007, "split": "dev", "status": "ok", "t_obs": 9620, "s_ref": 0.4506725314509248, "secs_run": 4.4}
+{"setting": "w2a_T", "seed": 9330008, "split": "dev", "status": "ok", "t_obs": 3087, "s_ref": null, "secs_run": 4.8}
+{"setting": "w2a_T", "seed": 9330009, "split": "dev", "status": "ok", "t_obs": 46983, "s_ref": null, "secs_run": 5.9}
+gate (36, 1172.75)
+{"setting": "w2a_Tp", "seed": 9340001, "split": "dev", "status": "ok", "t_obs": 13322, "s_ref": 0.3134176599944832, "secs_run": 9.3}
+{"setting": "w2a_Tp", "seed": 9340002, "split": "dev", "status": "ok", "t_obs": 14675, "s_ref": 0.3239030066436909, "secs_run": 9.3}
+{"setting": "w2a_Tp", "seed": 9340003, "split": "dev", "status": "ok", "t_obs": 11593, "s_ref": 0.3036372570182826, "secs_run": 9.3}
+{"setting": "w2a_Tp", "seed": 9340004, "split": "dev", "status": "ok", "t_obs": 13697, "s_ref": 0.31735861090761974, "secs_run": 9.9}
+CHAIN_DONE

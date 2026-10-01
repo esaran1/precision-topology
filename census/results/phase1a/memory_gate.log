@@ -1,0 +1,661 @@
+2026-09-30 21:25:39 pre-launch landscape free=34% swap_free=1156.75MB OK
+2026-09-30 21:25:40 landscape w1 free=35% swap_free=1156.75MB OK
+2026-09-30 21:26:14 pre-job run w1_sgd dev 1 free=36% swap_free=1164.75MB OK
+2026-09-30 21:26:15 run w1_sgd dev 9310000 free=36% swap_free=1164.75MB OK
+2026-09-30 21:26:18 pre-job run gelu_random dev 1 free=35% swap_free=1164.75MB OK
+2026-09-30 21:26:18 run gelu_random dev 9320000 free=35% swap_free=1164.75MB OK
+2026-09-30 21:26:26 pre-job run w2a_T dev 1 free=34% swap_free=1164.75MB OK
+2026-09-30 21:26:26 run w2a_T dev 9330000 free=34% swap_free=1164.75MB OK
+2026-09-30 21:26:31 pre-job run w2a_Tp dev 1 free=35% swap_free=1164.75MB OK
+2026-09-30 21:26:32 run w2a_Tp dev 9340000 free=35% swap_free=1164.75MB OK
+2026-09-30 21:27:30 pre-job run w1_sgd dev free=36% swap_free=1172.75MB OK
+2026-09-30 21:27:31 run w1_sgd dev 9310001 free=36% swap_free=1172.75MB OK
+2026-09-30 21:27:33 run w1_sgd dev 9310002 free=35% swap_free=1172.75MB OK
+2026-09-30 21:27:35 run w1_sgd dev 9310003 free=35% swap_free=1172.75MB OK
+2026-09-30 21:27:36 run w1_sgd dev 9310004 free=36% swap_free=1172.75MB OK
+2026-09-30 21:27:39 pre-job run gelu_random dev free=35% swap_free=1172.75MB OK
+2026-09-30 21:27:39 run gelu_random dev 9320001 free=35% swap_free=1172.75MB OK
+2026-09-30 21:27:46 run gelu_random dev 9320002 free=34% swap_free=1172.75MB OK
+2026-09-30 21:27:53 run gelu_random dev 9320003 free=34% swap_free=1172.75MB OK
+2026-09-30 21:28:00 run gelu_random dev 9320004 free=35% swap_free=1172.75MB OK
+2026-09-30 21:28:07 pre-job run w2a_T dev free=35% swap_free=1172.75MB OK
+2026-09-30 21:28:07 run w2a_T dev 9330001 free=35% swap_free=1172.75MB OK
+2026-09-30 21:28:13 run w2a_T dev 9330002 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:17 run w2a_T dev 9330003 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:21 run w2a_T dev 9330004 free=37% swap_free=1172.75MB OK
+2026-09-30 21:28:27 run w2a_T dev 9330005 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:33 run w2a_T dev 9330006 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:38 run w2a_T dev 9330007 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:42 run w2a_T dev 9330008 free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:47 run w2a_T dev 9330009 free=37% swap_free=1172.75MB OK
+2026-09-30 21:28:53 pre-job run w2a_Tp dev free=36% swap_free=1172.75MB OK
+2026-09-30 21:28:54 run w2a_Tp dev 9340001 free=35% swap_free=1172.75MB OK
+2026-09-30 21:29:03 run w2a_Tp dev 9340002 free=36% swap_free=1172.75MB OK
+2026-09-30 21:29:13 run w2a_Tp dev 9340003 free=36% swap_free=1172.75MB OK
+2026-09-30 21:29:22 run w2a_Tp dev 9340004 free=35% swap_free=1110.94MB OK
+2026-09-30 21:29:43 pre-job forecast w1_sgd dev free=30% swap_free=771.5MB OK
+2026-09-30 21:29:44 forecast w1_sgd 9310000 free=31% swap_free=732.56MB OK
+2026-09-30 21:29:46 forecast w1_sgd 9310001 free=33% swap_free=732.56MB OK
+2026-09-30 21:29:49 forecast w1_sgd 9310002 free=33% swap_free=780.56MB OK
+2026-09-30 21:29:51 forecast w1_sgd 9310003 free=33% swap_free=796.56MB OK
+2026-09-30 21:29:54 forecast w1_sgd 9310004 free=34% swap_free=796.56MB OK
+2026-09-30 21:29:56 pre-job forecast gelu_random dev free=36% swap_free=796.56MB OK
+2026-09-30 21:29:57 forecast gelu_random 9320000 free=36% swap_free=796.56MB OK
+2026-09-30 21:30:22 pre-job forecast w2a_Tp dev free=35% swap_free=450.44MB WAIT
+2026-09-30 21:30:28 pre-job forecast w1_sgd dev free=34% swap_free=450.44MB WAIT
+2026-09-30 21:31:28 pre-job forecast w1_sgd dev free=33% swap_free=463.69MB WAIT
+2026-09-30 21:32:28 pre-job forecast w1_sgd dev free=36% swap_free=607.69MB OK
+2026-09-30 21:32:29 forecast w1_sgd 9310000 free=34% swap_free=607.69MB OK
+2026-09-30 21:32:33 forecast w1_sgd 9310001 free=34% swap_free=607.69MB OK
+2026-09-30 21:32:38 forecast w1_sgd 9310002 free=35% swap_free=607.69MB OK
+2026-09-30 21:32:43 forecast w1_sgd 9310003 free=32% swap_free=623.69MB OK
+2026-09-30 21:32:47 forecast w1_sgd 9310004 free=33% swap_free=623.69MB OK
+2026-09-30 21:32:53 pre-job forecast gelu_random dev free=33% swap_free=623.69MB OK
+2026-09-30 21:32:54 forecast gelu_random 9320000 free=33% swap_free=623.69MB OK
+2026-09-30 21:35:54 forecast gelu_random 9320001 free=38% swap_free=1198.56MB OK
+2026-09-30 21:39:05 forecast gelu_random 9320002 free=41% swap_free=862.88MB OK
+2026-09-30 21:43:16 forecast gelu_random 9320003 free=42% swap_free=1188.69MB OK
+2026-09-30 21:46:38 forecast gelu_random 9320004 free=32% swap_free=635.5MB OK
+2026-09-30 21:48:33 pre-job forecast w2a_Tp dev free=46% swap_free=1191.56MB OK
+2026-09-30 21:48:34 forecast w2a_Tp 9340000 free=47% swap_free=1191.56MB OK
+2026-09-30 21:49:59 forecast w2a_Tp 9340001 free=42% swap_free=1335.56MB OK
+2026-09-30 21:51:30 forecast w2a_Tp 9340002 free=44% swap_free=1439.56MB OK
+2026-09-30 21:53:09 forecast w2a_Tp 9340003 free=31% swap_free=1306.62MB OK
+2026-09-30 21:54:28 forecast w2a_Tp 9340004 free=39% swap_free=832.81MB OK
+2026-09-30 21:56:01 pre-job forecast w2a_T dev free=40% swap_free=872.81MB OK
+2026-09-30 21:56:01 forecast w2a_T 9330002 free=38% swap_free=872.81MB OK
+2026-09-30 21:57:05 forecast w2a_T 9330006 free=37% swap_free=912.81MB OK
+2026-09-30 21:58:48 forecast w2a_T 9330007 free=32% swap_free=494.19MB WAIT
+2026-09-30 21:59:48 forecast w2a_T 9330007 free=39% swap_free=427.0MB WAIT
+2026-09-30 22:00:48 forecast w2a_T 9330007 free=41% swap_free=731.0MB OK
+2026-09-30 22:02:02 pre-job forecast w1_sgd dev w0.05 free=41% swap_free=979.06MB OK
+2026-09-30 22:02:03 forecast w1_sgd 9310000 free=42% swap_free=979.06MB OK
+2026-09-30 22:02:05 forecast w1_sgd 9310001 free=43% swap_free=979.06MB OK
+2026-09-30 22:02:07 forecast w1_sgd 9310002 free=40% swap_free=979.06MB OK
+2026-09-30 22:02:10 forecast w1_sgd 9310003 free=38% swap_free=995.06MB OK
+2026-09-30 22:02:12 forecast w1_sgd 9310004 free=41% swap_free=1003.06MB OK
+2026-09-30 22:02:14 pre-job forecast gelu_random dev w0.05 free=42% swap_free=1003.06MB OK
+2026-09-30 22:02:15 forecast gelu_random 9320000 free=41% swap_free=1011.06MB OK
+2026-09-30 22:03:45 forecast gelu_random 9320001 free=41% swap_free=1123.06MB OK
+2026-09-30 22:05:22 forecast gelu_random 9320002 free=44% swap_free=1100.38MB OK
+2026-09-30 22:07:29 forecast gelu_random 9320003 free=45% swap_free=1292.44MB OK
+2026-09-30 22:09:11 forecast gelu_random 9320004 free=46% swap_free=1332.44MB OK
+2026-09-30 22:10:08 pre-job forecast w2a_Tp dev w0.05 free=46% swap_free=1348.44MB OK
+2026-09-30 22:10:09 forecast w2a_Tp 9340000 free=45% swap_free=1356.44MB OK
+2026-09-30 22:10:53 forecast w2a_Tp 9340001 free=39% swap_free=1396.44MB OK
+2026-09-30 22:11:39 forecast w2a_Tp 9340002 free=44% swap_free=1396.44MB OK
+2026-09-30 22:12:29 forecast w2a_Tp 9340003 free=44% swap_free=1404.44MB OK
+2026-09-30 22:13:10 forecast w2a_Tp 9340004 free=39% swap_free=1412.44MB OK
+2026-09-30 22:14:01 pre-job forecast w2a_T dev w0.05 free=37% swap_free=1331.12MB OK
+2026-09-30 22:14:02 forecast w2a_T 9330002 free=37% swap_free=1331.12MB OK
+2026-09-30 22:14:34 forecast w2a_T 9330006 free=37% swap_free=1339.12MB OK
+2026-09-30 22:15:25 forecast w2a_T 9330007 free=38% swap_free=1347.12MB OK
+2026-09-30 22:16:21 pre-job run w1_sgd est free=39% swap_free=1363.12MB OK
+2026-09-30 22:16:22 run w1_sgd est 9310100 free=37% swap_free=1363.12MB OK
+2026-09-30 22:16:25 run w1_sgd est 9310101 free=34% swap_free=1387.12MB OK
+2026-09-30 22:16:27 run w1_sgd est 9310102 free=33% swap_free=1603.12MB OK
+2026-09-30 22:16:31 run w1_sgd est 9310103 free=30% swap_free=1459.56MB OK
+2026-09-30 22:16:33 run w1_sgd est 9310104 free=31% swap_free=1459.56MB OK
+2026-09-30 22:16:35 run w1_sgd est 9310105 free=33% swap_free=1459.56MB OK
+2026-09-30 22:16:37 run w1_sgd est 9310106 free=31% swap_free=1467.56MB OK
+2026-09-30 22:16:39 run w1_sgd est 9310107 free=30% swap_free=1467.56MB OK
+2026-09-30 22:16:42 run w1_sgd est 9310108 free=32% swap_free=1467.56MB OK
+2026-09-30 22:16:45 run w1_sgd est 9310109 free=32% swap_free=1467.56MB OK
+2026-09-30 22:16:47 run w1_sgd est 9310110 free=32% swap_free=1467.56MB OK
+2026-09-30 22:16:49 run w1_sgd est 9310111 free=32% swap_free=1467.56MB OK
+2026-09-30 22:16:51 run w1_sgd est 9310112 free=33% swap_free=1467.56MB OK
+2026-09-30 22:16:54 run w1_sgd est 9310113 free=33% swap_free=1475.56MB OK
+2026-09-30 22:16:56 run w1_sgd est 9310114 free=34% swap_free=1475.56MB OK
+2026-09-30 22:16:57 run w1_sgd est 9310115 free=36% swap_free=1475.56MB OK
+2026-09-30 22:16:59 run w1_sgd est 9310116 free=35% swap_free=1483.56MB OK
+2026-09-30 22:17:01 run w1_sgd est 9310117 free=35% swap_free=1483.56MB OK
+2026-09-30 22:17:03 run w1_sgd est 9310118 free=35% swap_free=1483.56MB OK
+2026-09-30 22:17:05 run w1_sgd est 9310119 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:08 pre-job run gelu_random est free=36% swap_free=1483.56MB OK
+2026-09-30 22:17:09 run gelu_random est 9320100 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:16 run gelu_random est 9320101 free=36% swap_free=1483.56MB OK
+2026-09-30 22:17:22 run gelu_random est 9320102 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:29 run gelu_random est 9320103 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:36 run gelu_random est 9320104 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:42 run gelu_random est 9320105 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:49 run gelu_random est 9320106 free=37% swap_free=1483.56MB OK
+2026-09-30 22:17:55 run gelu_random est 9320107 free=37% swap_free=1483.56MB OK
+2026-09-30 22:18:02 run gelu_random est 9320108 free=37% swap_free=1483.56MB OK
+2026-09-30 22:18:09 run gelu_random est 9320109 free=37% swap_free=1483.56MB OK
+2026-09-30 22:18:15 run gelu_random est 9320110 free=31% swap_free=1442.88MB OK
+2026-09-30 22:18:22 run gelu_random est 9320111 free=34% swap_free=1442.88MB OK
+2026-09-30 22:18:29 run gelu_random est 9320112 free=31% swap_free=1442.88MB OK
+2026-09-30 22:18:36 run gelu_random est 9320113 free=33% swap_free=1442.88MB OK
+2026-09-30 22:18:43 run gelu_random est 9320114 free=33% swap_free=1450.88MB OK
+2026-09-30 22:18:50 run gelu_random est 9320115 free=35% swap_free=1450.88MB OK
+2026-09-30 22:18:57 run gelu_random est 9320116 free=36% swap_free=1450.88MB OK
+2026-09-30 22:19:03 run gelu_random est 9320117 free=38% swap_free=1458.88MB OK
+2026-09-30 22:19:10 run gelu_random est 9320118 free=39% swap_free=1458.88MB OK
+2026-09-30 22:19:16 run gelu_random est 9320119 free=39% swap_free=1458.88MB OK
+2026-09-30 22:19:24 pre-job run w2a_T est free=40% swap_free=1458.88MB OK
+2026-09-30 22:19:24 run w2a_T est 9330100 free=40% swap_free=1458.88MB OK
+2026-09-30 22:19:29 run w2a_T est 9330101 free=40% swap_free=1458.88MB OK
+2026-09-30 22:19:35 run w2a_T est 9330102 free=41% swap_free=1458.88MB OK
+2026-09-30 22:19:39 run w2a_T est 9330103 free=40% swap_free=1458.88MB OK
+2026-09-30 22:19:43 run w2a_T est 9330104 free=41% swap_free=1458.88MB OK
+2026-09-30 22:19:50 run w2a_T est 9330105 free=33% swap_free=1466.88MB OK
+2026-09-30 22:19:56 run w2a_T est 9330106 free=33% swap_free=1466.88MB OK
+2026-09-30 22:20:01 run w2a_T est 9330107 free=33% swap_free=1466.88MB OK
+2026-09-30 22:20:05 run w2a_T est 9330108 free=36% swap_free=1466.88MB OK
+2026-09-30 22:20:13 run w2a_T est 9330109 free=37% swap_free=1466.88MB OK
+2026-09-30 22:20:18 run w2a_T est 9330110 free=37% swap_free=1466.88MB OK
+2026-09-30 22:20:23 run w2a_T est 9330111 free=38% swap_free=1474.88MB OK
+2026-09-30 22:20:27 run w2a_T est 9330112 free=39% swap_free=1474.88MB OK
+2026-09-30 22:20:32 run w2a_T est 9330113 free=40% swap_free=1474.88MB OK
+2026-09-30 22:20:38 run w2a_T est 9330114 free=39% swap_free=1482.88MB OK
+2026-09-30 22:20:43 run w2a_T est 9330115 free=40% swap_free=1482.88MB OK
+2026-09-30 22:20:48 run w2a_T est 9330116 free=39% swap_free=1490.88MB OK
+2026-09-30 22:20:52 run w2a_T est 9330117 free=40% swap_free=1490.88MB OK
+2026-09-30 22:20:56 run w2a_T est 9330118 free=41% swap_free=1498.88MB OK
+2026-09-30 22:21:00 run w2a_T est 9330119 free=40% swap_free=1498.88MB OK
+2026-09-30 22:21:05 run w2a_T est 9330120 free=40% swap_free=1498.88MB OK
+2026-09-30 22:21:10 run w2a_T est 9330121 free=40% swap_free=1498.88MB OK
+2026-09-30 22:21:16 run w2a_T est 9330122 free=41% swap_free=1498.88MB OK
+2026-09-30 22:21:19 run w2a_T est 9330123 free=41% swap_free=1498.88MB OK
+2026-09-30 22:21:24 run w2a_T est 9330124 free=41% swap_free=1498.88MB OK
+2026-09-30 22:21:29 run w2a_T est 9330125 free=42% swap_free=1498.88MB OK
+2026-09-30 22:21:33 run w2a_T est 9330126 free=40% swap_free=1506.88MB OK
+2026-09-30 22:21:38 run w2a_T est 9330127 free=41% swap_free=1506.88MB OK
+2026-09-30 22:21:43 run w2a_T est 9330128 free=41% swap_free=1506.88MB OK
+2026-09-30 22:21:49 run w2a_T est 9330129 free=40% swap_free=1506.88MB OK
+2026-09-30 22:21:54 run w2a_T est 9330130 free=34% swap_free=1506.88MB OK
+2026-09-30 22:22:01 run w2a_T est 9330131 free=32% swap_free=1594.88MB OK
+2026-09-30 22:22:06 run w2a_T est 9330132 free=33% swap_free=1594.88MB OK
+2026-09-30 22:22:10 run w2a_T est 9330133 free=33% swap_free=1594.88MB OK
+2026-09-30 22:22:16 run w2a_T est 9330134 free=36% swap_free=1594.88MB OK
+2026-09-30 22:22:21 run w2a_T est 9330135 free=38% swap_free=1594.88MB OK
+2026-09-30 22:22:25 run w2a_T est 9330136 free=33% swap_free=1594.88MB OK
+2026-09-30 22:22:31 run w2a_T est 9330137 free=36% swap_free=1602.88MB OK
+2026-09-30 22:22:35 run w2a_T est 9330138 free=37% swap_free=1602.88MB OK
+2026-09-30 22:22:40 run w2a_T est 9330139 free=38% swap_free=1602.88MB OK
+2026-09-30 22:22:45 pre-job run w2a_Tp est free=38% swap_free=1602.88MB OK
+2026-09-30 22:22:46 run w2a_Tp est 9340100 free=38% swap_free=1602.88MB OK
+2026-09-30 22:22:55 run w2a_Tp est 9340101 free=38% swap_free=1602.88MB OK
+2026-09-30 22:23:05 run w2a_Tp est 9340102 free=39% swap_free=1610.88MB OK
+2026-09-30 22:23:14 run w2a_Tp est 9340103 free=39% swap_free=1610.88MB OK
+2026-09-30 22:23:24 run w2a_Tp est 9340104 free=39% swap_free=1618.88MB OK
+2026-09-30 22:23:34 run w2a_Tp est 9340105 free=37% swap_free=1666.88MB OK
+2026-09-30 22:23:43 run w2a_Tp est 9340106 free=37% swap_free=1666.88MB OK
+2026-09-30 22:23:53 run w2a_Tp est 9340107 free=37% swap_free=1666.88MB OK
+2026-09-30 22:24:03 run w2a_Tp est 9340108 free=37% swap_free=1666.88MB OK
+2026-09-30 22:24:13 run w2a_Tp est 9340109 free=38% swap_free=1666.88MB OK
+2026-09-30 22:24:23 run w2a_Tp est 9340110 free=37% swap_free=1666.88MB OK
+2026-09-30 22:24:32 run w2a_Tp est 9340111 free=36% swap_free=1666.88MB OK
+2026-09-30 22:24:42 run w2a_Tp est 9340112 free=32% swap_free=1666.88MB OK
+2026-09-30 22:24:52 run w2a_Tp est 9340113 free=36% swap_free=1441.81MB OK
+2026-09-30 22:25:02 run w2a_Tp est 9340114 free=35% swap_free=1294.12MB OK
+2026-09-30 22:25:12 run w2a_Tp est 9340115 free=34% swap_free=1310.12MB OK
+2026-09-30 22:25:22 run w2a_Tp est 9340116 free=35% swap_free=1326.12MB OK
+2026-09-30 22:25:32 run w2a_Tp est 9340117 free=32% swap_free=1326.12MB OK
+2026-09-30 22:25:42 run w2a_Tp est 9340118 free=34% swap_free=1326.12MB OK
+2026-09-30 22:25:51 run w2a_Tp est 9340119 free=35% swap_free=1334.12MB OK
+2026-09-30 22:26:02 pre-job forecast w1_sgd est free=36% swap_free=1334.12MB OK
+2026-09-30 22:26:02 forecast w1_sgd 9310100 free=36% swap_free=1334.12MB OK
+2026-09-30 22:26:09 forecast w1_sgd 9310101 free=31% swap_free=1217.56MB OK
+2026-09-30 22:26:16 forecast w1_sgd 9310102 free=36% swap_free=1217.56MB OK
+2026-09-30 22:26:16 forecast w1_sgd 9310103 free=36% swap_free=1217.56MB OK
+2026-09-30 22:26:23 forecast w1_sgd 9310104 free=34% swap_free=1225.56MB OK
+2026-09-30 22:26:30 forecast w1_sgd 9310105 free=36% swap_free=1225.56MB OK
+2026-09-30 22:26:37 forecast w1_sgd 9310106 free=36% swap_free=1233.56MB OK
+2026-09-30 22:26:44 forecast w1_sgd 9310107 free=37% swap_free=1233.56MB OK
+2026-09-30 22:26:51 forecast w1_sgd 9310108 free=35% swap_free=1233.56MB OK
+2026-09-30 22:26:51 forecast w1_sgd 9310109 free=35% swap_free=1233.56MB OK
+2026-09-30 22:26:58 forecast w1_sgd 9310110 free=37% swap_free=1233.56MB OK
+2026-09-30 22:27:05 forecast w1_sgd 9310111 free=35% swap_free=1241.56MB OK
+2026-09-30 22:27:13 forecast w1_sgd 9310112 free=34% swap_free=1226.5MB OK
+2026-09-30 22:27:13 forecast w1_sgd 9310113 free=35% swap_free=1226.5MB OK
+2026-09-30 22:27:20 forecast w1_sgd 9310114 free=36% swap_free=1234.5MB OK
+2026-09-30 22:27:27 forecast w1_sgd 9310115 free=36% swap_free=1234.5MB OK
+2026-09-30 22:27:34 forecast w1_sgd 9310116 free=34% swap_free=1282.5MB OK
+2026-09-30 22:27:41 forecast w1_sgd 9310117 free=34% swap_free=1282.5MB OK
+2026-09-30 22:27:48 forecast w1_sgd 9310118 free=31% swap_free=1298.5MB OK
+2026-09-30 22:27:56 forecast w1_sgd 9310119 free=31% swap_free=1306.5MB OK
+2026-09-30 22:28:04 pre-job forecast gelu_random est primary free=33% swap_free=1168.06MB OK
+2026-09-30 22:28:04 forecast gelu_random 9320100 free=32% swap_free=1168.06MB OK
+2026-09-30 22:28:28 forecast gelu_random 9320101 free=34% swap_free=364.06MB WAIT
+2026-09-30 22:29:28 forecast gelu_random 9320101 free=32% swap_free=619.06MB OK
+2026-09-30 22:29:57 forecast gelu_random 9320102 free=34% swap_free=1231.75MB OK
+2026-09-30 22:30:30 forecast gelu_random 9320103 free=38% swap_free=923.69MB OK
+2026-09-30 22:31:27 forecast gelu_random 9320104 free=34% swap_free=906.81MB OK
+2026-09-30 22:31:49 forecast gelu_random 9320105 free=35% swap_free=930.81MB OK
+2026-09-30 22:32:20 forecast gelu_random 9320106 free=45% swap_free=1243.06MB OK
+2026-09-30 22:32:48 forecast gelu_random 9320107 free=43% swap_free=1387.06MB OK
+2026-09-30 22:33:19 forecast gelu_random 9320108 free=41% swap_free=1531.12MB OK
+2026-09-30 22:33:54 forecast gelu_random 9320109 free=33% swap_free=1252.19MB OK
+2026-09-30 22:34:25 forecast gelu_random 9320110 free=37% swap_free=1358.75MB OK
+2026-09-30 22:34:49 forecast gelu_random 9320111 free=38% swap_free=1366.75MB OK
+2026-09-30 22:35:14 forecast gelu_random 9320112 free=35% swap_free=1438.75MB OK
+2026-09-30 22:35:48 forecast gelu_random 9320113 free=37% swap_free=1412.56MB OK
+2026-09-30 22:36:25 forecast gelu_random 9320114 free=35% swap_free=1420.56MB OK
+2026-09-30 22:37:04 forecast gelu_random 9320115 free=35% swap_free=1129.44MB OK
+2026-09-30 22:37:37 forecast gelu_random 9320117 free=36% swap_free=1012.88MB OK
+2026-09-30 22:38:02 forecast gelu_random 9320118 free=40% swap_free=1124.88MB OK
+2026-09-30 22:38:32 forecast gelu_random 9320119 free=37% swap_free=1140.88MB OK
+2026-09-30 22:39:25 pre-job forecast w2a_T est primary free=38% swap_free=1180.88MB OK
+2026-09-30 22:39:26 forecast w2a_T 9330102 free=35% swap_free=1180.88MB OK
+2026-09-30 22:39:40 forecast w2a_T 9330103 free=34% swap_free=1180.88MB OK
+2026-09-30 22:39:53 forecast w2a_T 9330107 free=36% swap_free=1188.88MB OK
+2026-09-30 22:40:08 forecast w2a_T 9330110 free=37% swap_free=1276.88MB OK
+2026-09-30 22:40:25 forecast w2a_T 9330115 free=38% swap_free=1284.88MB OK
+2026-09-30 22:40:37 forecast w2a_T 9330116 free=37% swap_free=1292.88MB OK
+2026-09-30 22:40:51 forecast w2a_T 9330118 free=34% swap_free=1330.06MB OK
+2026-09-30 22:41:04 forecast w2a_T 9330121 free=34% swap_free=993.5MB OK
+2026-09-30 22:41:30 forecast w2a_T 9330123 free=41% swap_free=684.19MB OK
+2026-09-30 22:41:43 forecast w2a_T 9330125 free=41% swap_free=692.19MB OK
+2026-09-30 22:41:51 forecast w2a_T 9330131 free=40% swap_free=748.19MB OK
+2026-09-30 22:42:09 forecast w2a_T 9330132 free=45% swap_free=772.19MB OK
+2026-09-30 22:42:22 forecast w2a_T 9330134 free=46% swap_free=772.19MB OK
+2026-09-30 22:42:35 forecast w2a_T 9330135 free=44% swap_free=780.19MB OK
+2026-09-30 22:42:48 forecast w2a_T 9330139 free=43% swap_free=788.19MB OK
+2026-09-30 22:43:07 pre-job forecast w2a_Tp est primary free=42% swap_free=828.19MB OK
+2026-09-30 22:43:08 forecast w2a_Tp 9340100 free=43% swap_free=828.19MB OK
+2026-09-30 22:43:28 forecast w2a_Tp 9340101 free=44% swap_free=892.19MB OK
+2026-09-30 22:43:52 forecast w2a_Tp 9340102 free=42% swap_free=940.19MB OK
+2026-09-30 22:44:12 forecast w2a_Tp 9340103 free=41% swap_free=948.19MB OK
+2026-09-30 22:44:43 forecast w2a_Tp 9340104 free=41% swap_free=1036.19MB OK
+2026-09-30 22:45:07 forecast w2a_Tp 9340105 free=45% swap_free=1220.25MB OK
+2026-09-30 22:45:28 forecast w2a_Tp 9340106 free=41% swap_free=1228.25MB OK
+2026-09-30 22:45:51 forecast w2a_Tp 9340107 free=43% swap_free=1244.25MB OK
+2026-09-30 22:46:29 forecast w2a_Tp 9340108 free=44% swap_free=1244.25MB OK
+2026-09-30 22:46:53 forecast w2a_Tp 9340109 free=41% swap_free=1292.25MB OK
+2026-09-30 22:47:22 forecast w2a_Tp 9340110 free=41% swap_free=1292.25MB OK
+2026-09-30 22:47:49 forecast w2a_Tp 9340111 free=41% swap_free=1332.25MB OK
+2026-09-30 22:48:09 forecast w2a_Tp 9340112 free=39% swap_free=1348.25MB OK
+2026-09-30 22:48:28 forecast w2a_Tp 9340113 free=40% swap_free=1356.25MB OK
+2026-09-30 22:48:41 forecast w2a_Tp 9340114 free=41% swap_free=1356.25MB OK
+2026-09-30 22:49:03 forecast w2a_Tp 9340115 free=45% swap_free=1356.25MB OK
+2026-09-30 22:49:19 forecast w2a_Tp 9340116 free=45% swap_free=1356.25MB OK
+2026-09-30 22:49:41 forecast w2a_Tp 9340117 free=42% swap_free=1452.25MB OK
+2026-09-30 22:50:06 forecast w2a_Tp 9340118 free=47% swap_free=1460.25MB OK
+2026-09-30 22:50:27 forecast w2a_Tp 9340119 free=46% swap_free=1468.25MB OK
+2026-09-30 22:50:50 pre-job forecast gelu_random est sensitivity free=47% swap_free=1476.25MB OK
+2026-09-30 22:50:51 forecast gelu_random 9320100 free=47% swap_free=1476.25MB OK
+2026-09-30 22:51:31 forecast gelu_random 9320101 free=45% swap_free=1484.25MB OK
+2026-09-30 22:52:18 forecast gelu_random 9320102 free=46% swap_free=1516.25MB OK
+2026-09-30 22:53:13 forecast gelu_random 9320103 free=45% swap_free=1708.31MB OK
+2026-09-30 22:54:51 forecast gelu_random 9320104 free=42% swap_free=1403.0MB OK
+2026-09-30 22:55:30 forecast gelu_random 9320105 free=41% swap_free=1419.0MB OK
+2026-09-30 22:56:18 forecast gelu_random 9320106 free=36% swap_free=1443.06MB OK
+2026-09-30 22:57:06 forecast gelu_random 9320107 free=41% swap_free=1507.06MB OK
+2026-09-30 22:58:01 forecast gelu_random 9320108 free=38% swap_free=1667.19MB OK
+2026-09-30 22:59:01 forecast gelu_random 9320109 free=38% swap_free=809.12MB OK
+2026-09-30 22:59:53 forecast gelu_random 9320110 free=33% swap_free=745.44MB OK
+2026-09-30 23:00:35 forecast gelu_random 9320111 free=34% swap_free=969.44MB OK
+2026-09-30 23:01:19 forecast gelu_random 9320112 free=36% swap_free=857.56MB OK
+2026-09-30 23:02:17 forecast gelu_random 9320113 free=41% swap_free=534.25MB OK
+2026-09-30 23:03:23 forecast gelu_random 9320114 free=42% swap_free=542.25MB OK
+2026-09-30 23:04:30 forecast gelu_random 9320115 free=37% swap_free=694.31MB OK
+2026-09-30 23:05:29 forecast gelu_random 9320117 free=31% swap_free=791.56MB OK
+2026-09-30 23:06:11 forecast gelu_random 9320118 free=40% swap_free=1206.62MB OK
+2026-09-30 23:07:05 forecast gelu_random 9320119 free=35% swap_free=1246.62MB OK
+2026-09-30 23:08:39 pre-job run w1_sgd dev free=38% swap_free=1462.62MB OK
+2026-09-30 23:08:40 run w1_sgd dev 9310000 free=39% swap_free=1462.62MB OK
+2026-09-30 23:08:43 run w1_sgd dev 9310001 free=41% swap_free=1462.62MB OK
+2026-09-30 23:08:44 run w1_sgd dev 9310002 free=41% swap_free=1462.62MB OK
+2026-09-30 23:08:46 run w1_sgd dev 9310003 free=40% swap_free=1462.62MB OK
+2026-09-30 23:08:48 run w1_sgd dev 9310004 free=41% swap_free=1462.62MB OK
+2026-09-30 23:08:50 run w1_sgd dev 9310100 free=41% swap_free=1470.62MB OK
+2026-09-30 23:08:52 run w1_sgd dev 9310101 free=41% swap_free=1470.62MB OK
+2026-09-30 23:08:54 run w1_sgd dev 9310102 free=39% swap_free=1470.62MB OK
+2026-09-30 23:08:57 run w1_sgd dev 9310103 free=40% swap_free=1470.62MB OK
+2026-09-30 23:08:59 run w1_sgd dev 9310104 free=40% swap_free=1470.62MB OK
+2026-09-30 23:09:01 run w1_sgd dev 9310105 free=41% swap_free=1470.62MB OK
+2026-09-30 23:09:03 run w1_sgd dev 9310106 free=41% swap_free=1470.62MB OK
+2026-09-30 23:09:05 run w1_sgd dev 9310107 free=41% swap_free=1478.62MB OK
+2026-09-30 23:09:07 run w1_sgd dev 9310108 free=42% swap_free=1478.62MB OK
+2026-09-30 23:09:10 run w1_sgd dev 9310109 free=40% swap_free=1486.62MB OK
+2026-09-30 23:09:12 run w1_sgd dev 9310110 free=41% swap_free=1486.62MB OK
+2026-09-30 23:09:14 run w1_sgd dev 9310111 free=41% swap_free=1486.62MB OK
+2026-09-30 23:09:16 run w1_sgd dev 9310112 free=41% swap_free=1486.62MB OK
+2026-09-30 23:09:19 run w1_sgd dev 9310113 free=42% swap_free=1486.62MB OK
+2026-09-30 23:09:21 run w1_sgd dev 9310114 free=43% swap_free=1486.62MB OK
+2026-09-30 23:09:23 run w1_sgd dev 9310115 free=43% swap_free=1486.62MB OK
+2026-09-30 23:09:25 run w1_sgd dev 9310116 free=39% swap_free=1486.62MB OK
+2026-09-30 23:09:27 run w1_sgd dev 9310117 free=40% swap_free=1486.62MB OK
+2026-09-30 23:09:28 run w1_sgd dev 9310118 free=40% swap_free=1486.62MB OK
+2026-09-30 23:09:30 run w1_sgd dev 9310119 free=40% swap_free=1486.62MB OK
+2026-09-30 23:09:34 pre-job run w1_sgd est free=42% swap_free=1494.62MB OK
+2026-09-30 23:09:35 run w1_sgd est 9310200 free=42% swap_free=1494.62MB OK
+2026-09-30 23:09:37 run w1_sgd est 9310201 free=42% swap_free=1494.62MB OK
+2026-09-30 23:09:39 run w1_sgd est 9310202 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:41 run w1_sgd est 9310203 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:43 run w1_sgd est 9310204 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:45 run w1_sgd est 9310205 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:46 run w1_sgd est 9310206 free=40% swap_free=1494.62MB OK
+2026-09-30 23:09:48 run w1_sgd est 9310207 free=40% swap_free=1494.62MB OK
+2026-09-30 23:09:51 run w1_sgd est 9310208 free=40% swap_free=1494.62MB OK
+2026-09-30 23:09:54 run w1_sgd est 9310209 free=42% swap_free=1494.62MB OK
+2026-09-30 23:09:56 run w1_sgd est 9310210 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:58 run w1_sgd est 9310211 free=39% swap_free=1494.62MB OK
+2026-09-30 23:09:59 run w1_sgd est 9310212 free=40% swap_free=1494.62MB OK
+2026-09-30 23:10:01 run w1_sgd est 9310213 free=41% swap_free=1494.62MB OK
+2026-09-30 23:10:04 run w1_sgd est 9310214 free=41% swap_free=1494.62MB OK
+2026-09-30 23:10:06 run w1_sgd est 9310215 free=41% swap_free=1494.62MB OK
+2026-09-30 23:10:09 run w1_sgd est 9310216 free=42% swap_free=1494.62MB OK
+2026-09-30 23:10:11 run w1_sgd est 9310217 free=39% swap_free=1494.62MB OK
+2026-09-30 23:10:13 run w1_sgd est 9310218 free=39% swap_free=1494.62MB OK
+2026-09-30 23:10:15 run w1_sgd est 9310219 free=40% swap_free=1494.62MB OK
+2026-09-30 23:10:18 run w1_sgd est 9310220 free=39% swap_free=1502.62MB OK
+2026-09-30 23:10:20 run w1_sgd est 9310221 free=40% swap_free=1502.62MB OK
+2026-09-30 23:10:21 run w1_sgd est 9310222 free=42% swap_free=1502.62MB OK
+2026-09-30 23:10:23 run w1_sgd est 9310223 free=43% swap_free=1502.62MB OK
+2026-09-30 23:10:25 run w1_sgd est 9310224 free=43% swap_free=1502.62MB OK
+2026-09-30 23:10:27 run w1_sgd est 9310225 free=41% swap_free=1502.62MB OK
+2026-09-30 23:10:29 run w1_sgd est 9310226 free=41% swap_free=1502.62MB OK
+2026-09-30 23:10:31 run w1_sgd est 9310227 free=42% swap_free=1502.62MB OK
+2026-09-30 23:10:33 run w1_sgd est 9310228 free=42% swap_free=1502.62MB OK
+2026-09-30 23:10:36 run w1_sgd est 9310229 free=43% swap_free=1502.62MB OK
+2026-09-30 23:10:38 run w1_sgd est 9310230 free=43% swap_free=1574.62MB OK
+2026-09-30 23:10:40 run w1_sgd est 9310231 free=43% swap_free=1574.62MB OK
+2026-09-30 23:10:42 run w1_sgd est 9310232 free=41% swap_free=1574.62MB OK
+2026-09-30 23:10:43 run w1_sgd est 9310233 free=41% swap_free=1574.62MB OK
+2026-09-30 23:10:47 run w1_sgd est 9310234 free=41% swap_free=1574.62MB OK
+2026-09-30 23:10:50 run w1_sgd est 9310235 free=41% swap_free=1574.62MB OK
+2026-09-30 23:10:52 run w1_sgd est 9310236 free=42% swap_free=1574.62MB OK
+2026-09-30 23:10:55 run w1_sgd est 9310237 free=42% swap_free=1574.62MB OK
+2026-09-30 23:10:56 run w1_sgd est 9310238 free=42% swap_free=1574.62MB OK
+2026-09-30 23:10:58 run w1_sgd est 9310239 free=38% swap_free=1582.62MB OK
+2026-09-30 23:11:01 pre-job forecast w1_sgd dev free=41% swap_free=1582.62MB OK
+2026-09-30 23:11:02 forecast w1_sgd 9310000 free=41% swap_free=1582.62MB OK
+2026-09-30 23:11:09 forecast w1_sgd 9310001 free=42% swap_free=1582.62MB OK
+2026-09-30 23:11:16 forecast w1_sgd 9310002 free=40% swap_free=1582.62MB OK
+2026-09-30 23:11:22 forecast w1_sgd 9310003 free=42% swap_free=1582.62MB OK
+2026-09-30 23:11:29 forecast w1_sgd 9310004 free=40% swap_free=1582.62MB OK
+2026-09-30 23:11:36 forecast w1_sgd 9310100 free=42% swap_free=1582.62MB OK
+2026-09-30 23:11:43 forecast w1_sgd 9310101 free=43% swap_free=1582.62MB OK
+2026-09-30 23:11:50 forecast w1_sgd 9310102 free=40% swap_free=1582.62MB OK
+2026-09-30 23:11:50 forecast w1_sgd 9310103 free=40% swap_free=1582.62MB OK
+2026-09-30 23:11:57 forecast w1_sgd 9310104 free=41% swap_free=1582.62MB OK
+2026-09-30 23:12:04 forecast w1_sgd 9310105 free=40% swap_free=1598.62MB OK
+2026-09-30 23:12:10 forecast w1_sgd 9310106 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:17 forecast w1_sgd 9310107 free=40% swap_free=1598.62MB OK
+2026-09-30 23:12:25 forecast w1_sgd 9310108 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:25 forecast w1_sgd 9310109 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:32 forecast w1_sgd 9310110 free=40% swap_free=1598.62MB OK
+2026-09-30 23:12:38 forecast w1_sgd 9310111 free=40% swap_free=1598.62MB OK
+2026-09-30 23:12:45 forecast w1_sgd 9310112 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:45 forecast w1_sgd 9310113 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:52 forecast w1_sgd 9310114 free=41% swap_free=1598.62MB OK
+2026-09-30 23:12:59 forecast w1_sgd 9310115 free=42% swap_free=1598.62MB OK
+2026-09-30 23:13:06 forecast w1_sgd 9310116 free=40% swap_free=1598.62MB OK
+2026-09-30 23:13:13 forecast w1_sgd 9310117 free=40% swap_free=1614.62MB OK
+2026-09-30 23:13:20 forecast w1_sgd 9310118 free=39% swap_free=1614.62MB OK
+2026-09-30 23:13:27 forecast w1_sgd 9310119 free=40% swap_free=1622.62MB OK
+2026-09-30 23:13:34 pre-job forecast w1_sgd est free=39% swap_free=1630.62MB OK
+2026-09-30 23:13:35 forecast w1_sgd 9310200 free=39% swap_free=1630.62MB OK
+2026-09-30 23:13:42 forecast w1_sgd 9310201 free=40% swap_free=1630.62MB OK
+2026-09-30 23:13:49 forecast w1_sgd 9310202 free=34% swap_free=1630.62MB OK
+2026-09-30 23:13:56 forecast w1_sgd 9310203 free=38% swap_free=1630.62MB OK
+2026-09-30 23:14:03 forecast w1_sgd 9310204 free=40% swap_free=1630.62MB OK
+2026-09-30 23:14:09 forecast w1_sgd 9310205 free=40% swap_free=1630.62MB OK
+2026-09-30 23:14:15 forecast w1_sgd 9310206 free=41% swap_free=1630.62MB OK
+2026-09-30 23:14:22 forecast w1_sgd 9310207 free=39% swap_free=1630.62MB OK
+2026-09-30 23:14:22 forecast w1_sgd 9310208 free=39% swap_free=1630.62MB OK
+2026-09-30 23:14:29 forecast w1_sgd 9310209 free=39% swap_free=1630.62MB OK
+2026-09-30 23:14:36 forecast w1_sgd 9310210 free=38% swap_free=1630.62MB OK
+2026-09-30 23:14:43 forecast w1_sgd 9310211 free=39% swap_free=1638.62MB OK
+2026-09-30 23:14:50 forecast w1_sgd 9310212 free=41% swap_free=1638.62MB OK
+2026-09-30 23:14:57 forecast w1_sgd 9310213 free=38% swap_free=1646.62MB OK
+2026-09-30 23:14:57 forecast w1_sgd 9310214 free=38% swap_free=1646.62MB OK
+2026-09-30 23:15:04 forecast w1_sgd 9310215 free=40% swap_free=1646.62MB OK
+2026-09-30 23:15:04 forecast w1_sgd 9310216 free=40% swap_free=1646.62MB OK
+2026-09-30 23:15:11 forecast w1_sgd 9310217 free=40% swap_free=1646.62MB OK
+2026-09-30 23:15:18 forecast w1_sgd 9310218 free=39% swap_free=1646.62MB OK
+2026-09-30 23:15:24 forecast w1_sgd 9310219 free=38% swap_free=1646.62MB OK
+2026-09-30 23:15:24 forecast w1_sgd 9310220 free=38% swap_free=1646.62MB OK
+2026-09-30 23:15:31 forecast w1_sgd 9310221 free=38% swap_free=1646.62MB OK
+2026-09-30 23:15:38 forecast w1_sgd 9310222 free=41% swap_free=1718.62MB OK
+2026-09-30 23:15:45 forecast w1_sgd 9310223 free=40% swap_free=1718.62MB OK
+2026-09-30 23:15:51 forecast w1_sgd 9310224 free=41% swap_free=1718.62MB OK
+2026-09-30 23:15:58 forecast w1_sgd 9310225 free=39% swap_free=1718.62MB OK
+2026-09-30 23:16:06 forecast w1_sgd 9310226 free=41% swap_free=1726.62MB OK
+2026-09-30 23:16:12 forecast w1_sgd 9310227 free=39% swap_free=1726.62MB OK
+2026-09-30 23:16:19 forecast w1_sgd 9310228 free=40% swap_free=1726.62MB OK
+2026-09-30 23:16:19 forecast w1_sgd 9310229 free=40% swap_free=1726.62MB OK
+2026-09-30 23:16:26 forecast w1_sgd 9310230 free=39% swap_free=1726.62MB OK
+2026-09-30 23:16:33 forecast w1_sgd 9310231 free=40% swap_free=1726.62MB OK
+2026-09-30 23:16:40 forecast w1_sgd 9310232 free=41% swap_free=1726.62MB OK
+2026-09-30 23:16:47 forecast w1_sgd 9310233 free=39% swap_free=1726.62MB OK
+2026-09-30 23:16:47 forecast w1_sgd 9310234 free=39% swap_free=1726.62MB OK
+2026-09-30 23:16:47 forecast w1_sgd 9310235 free=39% swap_free=1726.62MB OK
+2026-09-30 23:16:54 forecast w1_sgd 9310236 free=41% swap_free=1726.62MB OK
+2026-09-30 23:17:02 forecast w1_sgd 9310237 free=41% swap_free=1726.62MB OK
+2026-09-30 23:17:09 forecast w1_sgd 9310238 free=42% swap_free=1726.62MB OK
+2026-09-30 23:17:16 forecast w1_sgd 9310239 free=40% swap_free=1726.62MB OK
+2026-09-30 23:17:24 pre-job forecast w1_sgd_run dev free=42% swap_free=1734.62MB OK
+2026-09-30 23:17:25 forecast w1_sgd_run 9310000 free=42% swap_free=1734.62MB OK
+2026-09-30 23:17:32 forecast w1_sgd_run 9310001 free=40% swap_free=1734.62MB OK
+2026-09-30 23:17:39 forecast w1_sgd_run 9310002 free=41% swap_free=1734.62MB OK
+2026-09-30 23:17:46 forecast w1_sgd_run 9310003 free=39% swap_free=1734.62MB OK
+2026-09-30 23:17:54 forecast w1_sgd_run 9310004 free=41% swap_free=1734.62MB OK
+2026-09-30 23:18:01 forecast w1_sgd_run 9310100 free=38% swap_free=1734.62MB OK
+2026-09-30 23:18:08 forecast w1_sgd_run 9310101 free=40% swap_free=1734.62MB OK
+2026-09-30 23:18:15 forecast w1_sgd_run 9310102 free=41% swap_free=1734.62MB OK
+2026-09-30 23:18:15 forecast w1_sgd_run 9310103 free=41% swap_free=1734.62MB OK
+2026-09-30 23:18:23 forecast w1_sgd_run 9310104 free=41% swap_free=1306.88MB OK
+2026-09-30 23:18:30 forecast w1_sgd_run 9310105 free=42% swap_free=1306.88MB OK
+2026-09-30 23:18:37 forecast w1_sgd_run 9310106 free=40% swap_free=1306.88MB OK
+2026-09-30 23:18:44 forecast w1_sgd_run 9310107 free=42% swap_free=1306.88MB OK
+2026-09-30 23:18:51 forecast w1_sgd_run 9310108 free=39% swap_free=1306.88MB OK
+2026-09-30 23:18:51 forecast w1_sgd_run 9310109 free=39% swap_free=1306.88MB OK
+2026-09-30 23:18:59 forecast w1_sgd_run 9310110 free=41% swap_free=1314.88MB OK
+2026-09-30 23:19:06 forecast w1_sgd_run 9310111 free=40% swap_free=1322.88MB OK
+2026-09-30 23:19:14 forecast w1_sgd_run 9310112 free=41% swap_free=1322.88MB OK
+2026-09-30 23:19:14 forecast w1_sgd_run 9310113 free=41% swap_free=1322.88MB OK
+2026-09-30 23:19:21 forecast w1_sgd_run 9310114 free=39% swap_free=1322.88MB OK
+2026-09-30 23:19:28 forecast w1_sgd_run 9310115 free=39% swap_free=1322.88MB OK
+2026-09-30 23:19:35 forecast w1_sgd_run 9310116 free=39% swap_free=1322.88MB OK
+2026-09-30 23:19:42 forecast w1_sgd_run 9310117 free=40% swap_free=1322.88MB OK
+2026-09-30 23:19:49 forecast w1_sgd_run 9310118 free=40% swap_free=1322.88MB OK
+2026-09-30 23:19:56 forecast w1_sgd_run 9310119 free=40% swap_free=1322.88MB OK
+2026-09-30 23:20:04 pre-job forecast w1_sgd_run est free=41% swap_free=1322.88MB OK
+2026-09-30 23:20:05 forecast w1_sgd_run 9310200 free=41% swap_free=1322.88MB OK
+2026-09-30 23:20:12 forecast w1_sgd_run 9310201 free=40% swap_free=1322.88MB OK
+2026-09-30 23:20:20 forecast w1_sgd_run 9310202 free=41% swap_free=1322.88MB OK
+2026-09-30 23:20:27 forecast w1_sgd_run 9310203 free=40% swap_free=1322.88MB OK
+2026-09-30 23:20:34 forecast w1_sgd_run 9310204 free=41% swap_free=1322.88MB OK
+2026-09-30 23:20:42 forecast w1_sgd_run 9310205 free=39% swap_free=1322.88MB OK
+2026-09-30 23:20:49 forecast w1_sgd_run 9310206 free=40% swap_free=1322.88MB OK
+2026-09-30 23:20:56 forecast w1_sgd_run 9310207 free=39% swap_free=1322.88MB OK
+2026-09-30 23:20:57 forecast w1_sgd_run 9310208 free=39% swap_free=1322.88MB OK
+2026-09-30 23:21:04 forecast w1_sgd_run 9310209 free=41% swap_free=1322.88MB OK
+2026-09-30 23:21:12 forecast w1_sgd_run 9310210 free=39% swap_free=1322.88MB OK
+2026-09-30 23:21:19 forecast w1_sgd_run 9310211 free=40% swap_free=1322.88MB OK
+2026-09-30 23:21:26 forecast w1_sgd_run 9310212 free=40% swap_free=1322.88MB OK
+2026-09-30 23:21:34 forecast w1_sgd_run 9310213 free=41% swap_free=1322.88MB OK
+2026-09-30 23:21:34 forecast w1_sgd_run 9310214 free=41% swap_free=1322.88MB OK
+2026-09-30 23:21:41 forecast w1_sgd_run 9310215 free=38% swap_free=1322.88MB OK
+2026-09-30 23:21:41 forecast w1_sgd_run 9310216 free=38% swap_free=1322.88MB OK
+2026-09-30 23:21:47 forecast w1_sgd_run 9310217 free=39% swap_free=1322.88MB OK
+2026-09-30 23:21:54 forecast w1_sgd_run 9310218 free=40% swap_free=1322.88MB OK
+2026-09-30 23:22:01 forecast w1_sgd_run 9310219 free=40% swap_free=1322.88MB OK
+2026-09-30 23:22:01 forecast w1_sgd_run 9310220 free=40% swap_free=1322.88MB OK
+2026-09-30 23:22:08 forecast w1_sgd_run 9310221 free=41% swap_free=1322.88MB OK
+2026-09-30 23:22:16 forecast w1_sgd_run 9310222 free=40% swap_free=1322.88MB OK
+2026-09-30 23:22:23 forecast w1_sgd_run 9310223 free=41% swap_free=1322.88MB OK
+2026-09-30 23:22:31 forecast w1_sgd_run 9310224 free=36% swap_free=1330.88MB OK
+2026-09-30 23:22:39 forecast w1_sgd_run 9310225 free=37% swap_free=1338.88MB OK
+2026-09-30 23:22:48 forecast w1_sgd_run 9310226 free=32% swap_free=765.0MB OK
+2026-09-30 23:22:55 forecast w1_sgd_run 9310227 free=36% swap_free=773.0MB OK
+2026-09-30 23:23:03 forecast w1_sgd_run 9310228 free=32% swap_free=781.0MB OK
+2026-09-30 23:23:03 forecast w1_sgd_run 9310229 free=33% swap_free=781.0MB OK
+2026-09-30 23:23:11 forecast w1_sgd_run 9310230 free=32% swap_free=789.0MB OK
+2026-09-30 23:23:19 forecast w1_sgd_run 9310231 free=34% swap_free=789.0MB OK
+2026-09-30 23:23:27 forecast w1_sgd_run 9310232 free=36% swap_free=789.0MB OK
+2026-09-30 23:23:34 forecast w1_sgd_run 9310233 free=34% swap_free=778.56MB OK
+2026-09-30 23:23:34 forecast w1_sgd_run 9310234 free=34% swap_free=778.56MB OK
+2026-09-30 23:23:35 forecast w1_sgd_run 9310235 free=34% swap_free=778.56MB OK
+2026-09-30 23:23:42 forecast w1_sgd_run 9310236 free=37% swap_free=794.56MB OK
+2026-09-30 23:23:42 forecast w1_sgd_run 9310237 free=37% swap_free=794.56MB OK
+2026-09-30 23:23:50 forecast w1_sgd_run 9310238 free=35% swap_free=394.31MB WAIT
+2026-09-30 23:24:50 forecast w1_sgd_run 9310238 free=43% swap_free=450.38MB WAIT
+2026-09-30 23:25:50 forecast w1_sgd_run 9310238 free=43% swap_free=714.38MB OK
+2026-09-30 23:25:57 forecast w1_sgd_run 9310239 free=46% swap_free=794.38MB OK
+2026-09-30 23:26:05 pre-job run w2a_T est extra free=48% swap_free=794.38MB OK
+2026-09-30 23:26:06 run w2a_T est 9330140 free=48% swap_free=794.38MB OK
+2026-09-30 23:26:12 run w2a_T est 9330141 free=44% swap_free=858.38MB OK
+2026-09-30 23:26:17 run w2a_T est 9330142 free=46% swap_free=858.38MB OK
+2026-09-30 23:26:21 run w2a_T est 9330143 free=48% swap_free=866.38MB OK
+2026-09-30 23:26:27 run w2a_T est 9330144 free=43% swap_free=874.38MB OK
+2026-09-30 23:26:32 run w2a_T est 9330145 free=44% swap_free=882.38MB OK
+2026-09-30 23:26:36 run w2a_T est 9330146 free=46% swap_free=890.38MB OK
+2026-09-30 23:26:41 run w2a_T est 9330147 free=36% swap_free=898.38MB OK
+2026-09-30 23:26:46 run w2a_T est 9330148 free=45% swap_free=938.38MB OK
+2026-09-30 23:26:51 run w2a_T est 9330149 free=46% swap_free=1010.38MB OK
+2026-09-30 23:26:56 run w2a_T est 9330150 free=43% swap_free=1010.38MB OK
+2026-09-30 23:27:03 run w2a_T est 9330151 free=44% swap_free=1010.38MB OK
+2026-09-30 23:27:07 run w2a_T est 9330152 free=42% swap_free=1050.38MB OK
+2026-09-30 23:27:14 run w2a_T est 9330153 free=42% swap_free=1050.38MB OK
+2026-09-30 23:27:18 run w2a_T est 9330154 free=43% swap_free=1050.38MB OK
+2026-09-30 23:27:22 run w2a_T est 9330155 free=46% swap_free=1058.38MB OK
+2026-09-30 23:27:28 run w2a_T est 9330156 free=41% swap_free=1074.38MB OK
+2026-09-30 23:27:33 run w2a_T est 9330157 free=43% swap_free=1074.38MB OK
+2026-09-30 23:27:37 run w2a_T est 9330158 free=43% swap_free=1074.38MB OK
+2026-09-30 23:27:43 run w2a_T est 9330159 free=43% swap_free=1082.38MB OK
+2026-09-30 23:27:49 pre-job forecast w2a_T est primary free=45% swap_free=1122.38MB OK
+2026-09-30 23:27:50 forecast w2a_T 9330143 free=44% swap_free=1122.38MB OK
+2026-09-30 23:28:23 forecast w2a_T 9330144 free=42% swap_free=1306.44MB OK
+2026-09-30 23:28:41 forecast w2a_T 9330145 free=42% swap_free=1330.44MB OK
+2026-09-30 23:28:57 forecast w2a_T 9330146 free=46% swap_free=1346.44MB OK
+2026-09-30 23:29:10 forecast w2a_T 9330147 free=48% swap_free=1378.44MB OK
+2026-09-30 23:29:22 forecast w2a_T 9330148 free=51% swap_free=1378.44MB OK
+2026-09-30 23:29:45 forecast w2a_T 9330149 free=48% swap_free=1378.44MB OK
+2026-09-30 23:30:01 forecast w2a_T 9330151 free=45% swap_free=1466.44MB OK
+2026-09-30 23:30:11 forecast w2a_T 9330153 free=45% swap_free=1466.44MB OK
+2026-09-30 23:30:26 forecast w2a_T 9330154 free=46% swap_free=1506.44MB OK
+2026-09-30 23:30:38 forecast w2a_T 9330155 free=46% swap_free=1514.44MB OK
+2026-09-30 23:31:00 pre-job forecast gelu quad0.1 free=44% swap_free=1514.44MB OK
+2026-09-30 23:31:01 forecast gelu_random 9320100 free=43% swap_free=1514.44MB OK
+2026-09-30 23:31:23 forecast gelu_random 9320101 free=40% swap_free=1514.44MB OK
+2026-09-30 23:31:50 forecast gelu_random 9320102 free=42% swap_free=1514.44MB OK
+2026-09-30 23:32:20 forecast gelu_random 9320103 free=43% swap_free=1522.44MB OK
+2026-09-30 23:33:13 forecast gelu_random 9320104 free=44% swap_free=1530.44MB OK
+2026-09-30 23:33:35 forecast gelu_random 9320105 free=43% swap_free=1530.44MB OK
+2026-09-30 23:34:01 forecast gelu_random 9320106 free=42% swap_free=1530.44MB OK
+2026-09-30 23:34:27 forecast gelu_random 9320107 free=41% swap_free=1570.44MB OK
+2026-09-30 23:34:59 forecast gelu_random 9320108 free=38% swap_free=1586.44MB OK
+2026-09-30 23:35:32 forecast gelu_random 9320109 free=40% swap_free=1658.44MB OK
+2026-09-30 23:36:02 forecast gelu_random 9320110 free=39% swap_free=1658.44MB OK
+2026-09-30 23:36:25 forecast gelu_random 9320111 free=40% swap_free=1658.44MB OK
+2026-09-30 23:36:51 forecast gelu_random 9320112 free=36% swap_free=1666.44MB OK
+2026-09-30 23:37:22 forecast gelu_random 9320113 free=39% swap_free=1714.56MB OK
+2026-09-30 23:37:58 forecast gelu_random 9320114 free=40% swap_free=1730.56MB OK
+2026-09-30 23:38:35 forecast gelu_random 9320115 free=41% swap_free=1730.56MB OK
+2026-09-30 23:39:06 forecast gelu_random 9320117 free=41% swap_free=1738.56MB OK
+2026-09-30 23:39:29 forecast gelu_random 9320118 free=31% swap_free=1738.56MB OK
+2026-09-30 23:40:01 forecast gelu_random 9320119 free=34% swap_free=1738.56MB OK
+2026-09-30 23:40:53 pre-job forecast w2a_T sens free=44% swap_free=816.12MB OK
+2026-09-30 23:40:53 forecast w2a_T 9330102 free=43% swap_free=816.12MB OK
+2026-09-30 23:41:06 forecast w2a_T 9330103 free=42% swap_free=816.12MB OK
+2026-09-30 23:41:18 forecast w2a_T 9330107 free=42% swap_free=816.12MB OK
+2026-09-30 23:41:33 forecast w2a_T 9330110 free=41% swap_free=824.12MB OK
+2026-09-30 23:41:49 forecast w2a_T 9330115 free=40% swap_free=840.12MB OK
+2026-09-30 23:42:01 forecast w2a_T 9330116 free=40% swap_free=840.12MB OK
+2026-09-30 23:42:13 forecast w2a_T 9330118 free=39% swap_free=848.12MB OK
+2026-09-30 23:42:25 forecast w2a_T 9330121 free=37% swap_free=848.12MB OK
+2026-09-30 23:42:51 forecast w2a_T 9330123 free=38% swap_free=856.12MB OK
+2026-09-30 23:43:03 forecast w2a_T 9330125 free=34% swap_free=872.12MB OK
+2026-09-30 23:43:11 forecast w2a_T 9330131 free=35% swap_free=872.12MB OK
+2026-09-30 23:43:28 forecast w2a_T 9330132 free=34% swap_free=872.12MB OK
+2026-09-30 23:43:41 forecast w2a_T 9330134 free=37% swap_free=880.12MB OK
+2026-09-30 23:43:53 forecast w2a_T 9330135 free=33% swap_free=880.12MB OK
+2026-09-30 23:44:07 forecast w2a_T 9330139 free=40% swap_free=880.12MB OK
+2026-09-30 23:44:25 forecast w2a_T 9330143 free=42% swap_free=904.12MB OK
+2026-09-30 23:44:56 forecast w2a_T 9330144 free=43% swap_free=904.12MB OK
+2026-09-30 23:45:14 forecast w2a_T 9330145 free=43% swap_free=904.12MB OK
+2026-09-30 23:45:29 forecast w2a_T 9330146 free=39% swap_free=904.12MB OK
+2026-09-30 23:45:42 forecast w2a_T 9330147 free=36% swap_free=904.12MB OK
+2026-09-30 23:45:54 forecast w2a_T 9330148 free=37% swap_free=904.12MB OK
+2026-09-30 23:46:17 forecast w2a_T 9330149 free=40% swap_free=912.12MB OK
+2026-09-30 23:46:34 forecast w2a_T 9330151 free=41% swap_free=920.12MB OK
+2026-09-30 23:46:45 forecast w2a_T 9330153 free=41% swap_free=928.12MB OK
+2026-09-30 23:47:00 forecast w2a_T 9330154 free=39% swap_free=976.12MB OK
+2026-09-30 23:47:12 forecast w2a_T 9330155 free=40% swap_free=976.12MB OK
+2026-09-30 23:47:37 forecast w2a_T 9330102 free=33% swap_free=753.69MB OK
+2026-09-30 23:47:52 forecast w2a_T 9330103 free=39% swap_free=753.69MB OK
+2026-09-30 23:48:05 forecast w2a_T 9330107 free=41% swap_free=753.69MB OK
+2026-09-30 23:48:19 forecast w2a_T 9330110 free=42% swap_free=753.69MB OK
+2026-09-30 23:48:35 forecast w2a_T 9330115 free=43% swap_free=753.69MB OK
+2026-09-30 23:48:47 forecast w2a_T 9330116 free=44% swap_free=753.69MB OK
+2026-09-30 23:48:59 forecast w2a_T 9330118 free=44% swap_free=753.69MB OK
+2026-09-30 23:49:11 forecast w2a_T 9330121 free=41% swap_free=761.69MB OK
+2026-09-30 23:49:36 forecast w2a_T 9330123 free=42% swap_free=769.69MB OK
+2026-09-30 23:49:49 forecast w2a_T 9330125 free=42% swap_free=769.69MB OK
+2026-09-30 23:49:57 forecast w2a_T 9330131 free=42% swap_free=769.69MB OK
+2026-09-30 23:50:14 forecast w2a_T 9330132 free=42% swap_free=769.69MB OK
+2026-09-30 23:50:26 forecast w2a_T 9330134 free=43% swap_free=769.69MB OK
+2026-09-30 23:50:39 forecast w2a_T 9330135 free=42% swap_free=769.69MB OK
+2026-09-30 23:50:52 forecast w2a_T 9330139 free=42% swap_free=769.69MB OK
+2026-09-30 23:51:12 forecast w2a_T 9330143 free=35% swap_free=921.69MB OK
+2026-09-30 23:51:43 forecast w2a_T 9330144 free=38% swap_free=929.69MB OK
+2026-09-30 23:52:01 forecast w2a_T 9330145 free=35% swap_free=929.69MB OK
+2026-09-30 23:52:16 forecast w2a_T 9330146 free=36% swap_free=929.69MB OK
+2026-09-30 23:52:30 forecast w2a_T 9330147 free=36% swap_free=929.69MB OK
+2026-09-30 23:52:41 forecast w2a_T 9330148 free=37% swap_free=929.69MB OK
+2026-09-30 23:53:03 forecast w2a_T 9330149 free=38% swap_free=929.69MB OK
+2026-09-30 23:53:19 forecast w2a_T 9330151 free=38% swap_free=929.69MB OK
+2026-09-30 23:53:29 forecast w2a_T 9330153 free=38% swap_free=929.69MB OK
+2026-09-30 23:53:44 forecast w2a_T 9330154 free=38% swap_free=929.69MB OK
+2026-09-30 23:53:55 forecast w2a_T 9330155 free=38% swap_free=937.69MB OK
+2026-09-30 23:54:17 pre-job forecast w2a_Tp sens free=38% swap_free=937.69MB OK
+2026-09-30 23:54:18 forecast w2a_Tp 9340100 free=38% swap_free=937.69MB OK
+2026-09-30 23:54:36 forecast w2a_Tp 9340101 free=38% swap_free=937.69MB OK
+2026-09-30 23:54:58 forecast w2a_Tp 9340102 free=37% swap_free=945.69MB OK
+2026-09-30 23:55:16 forecast w2a_Tp 9340103 free=38% swap_free=945.69MB OK
+2026-09-30 23:55:45 forecast w2a_Tp 9340104 free=39% swap_free=945.69MB OK
+2026-09-30 23:56:07 forecast w2a_Tp 9340105 free=38% swap_free=945.69MB OK
+2026-09-30 23:56:26 forecast w2a_Tp 9340106 free=38% swap_free=961.69MB OK
+2026-09-30 23:56:46 forecast w2a_Tp 9340107 free=38% swap_free=961.69MB OK
+2026-09-30 23:57:22 forecast w2a_Tp 9340108 free=38% swap_free=961.69MB OK
+2026-09-30 23:57:44 forecast w2a_Tp 9340109 free=37% swap_free=961.69MB OK
+2026-09-30 23:58:10 forecast w2a_Tp 9340110 free=32% swap_free=1049.69MB OK
+2026-09-30 23:58:35 forecast w2a_Tp 9340111 free=32% swap_free=928.75MB OK
+2026-09-30 23:58:53 forecast w2a_Tp 9340112 free=32% swap_free=832.56MB OK
+2026-09-30 23:59:11 forecast w2a_Tp 9340113 free=37% swap_free=791.25MB OK
+2026-09-30 23:59:24 forecast w2a_Tp 9340114 free=34% swap_free=697.25MB OK
+2026-09-30 23:59:44 forecast w2a_Tp 9340115 free=41% swap_free=705.25MB OK
+2026-10-01 00:01:02 forecast w2a_Tp 9340116 free=36% swap_free=776.81MB OK
+2026-10-01 00:09:36 forecast w2a_Tp 9340117 free=33% swap_free=936.81MB OK
+2026-10-01 00:10:01 forecast w2a_Tp 9340118 free=34% swap_free=976.81MB OK
+2026-10-01 00:10:34 forecast w2a_Tp 9340119 free=35% swap_free=992.81MB OK
+2026-10-01 00:20:46 forecast w2a_Tp 9340100 free=34% swap_free=1008.81MB OK
+2026-10-01 00:32:28 forecast w2a_Tp 9340101 free=34% swap_free=1032.81MB OK
+2026-10-01 00:54:13 forecast w2a_Tp 9340102 free=38% swap_free=1080.81MB OK
+2026-10-01 01:37:13 forecast w2a_Tp 9340103 free=36% swap_free=1296.88MB OK
+2026-10-01 02:14:33 forecast w2a_Tp 9340104 free=33% swap_free=1408.88MB OK
+2026-10-01 02:39:36 forecast w2a_Tp 9340105 free=31% swap_free=1404.0MB OK
+2026-10-01 03:21:52 forecast w2a_Tp 9340106 free=34% swap_free=1335.81MB OK
+2026-10-01 04:09:00 forecast w2a_Tp 9340107 free=33% swap_free=1343.94MB OK
+2026-10-01 04:42:27 forecast w2a_Tp 9340108 free=35% swap_free=1399.94MB OK
+2026-10-01 05:10:31 forecast w2a_Tp 9340109 free=34% swap_free=1399.94MB OK
+2026-10-01 05:53:49 forecast w2a_Tp 9340110 free=32% swap_free=1487.94MB OK
+2026-10-01 05:56:43 forecast w2a_Tp 9340111 free=33% swap_free=1479.56MB OK
+2026-10-01 06:03:54 forecast w2a_Tp 9340112 free=33% swap_free=1479.56MB OK
+2026-10-01 06:36:52 forecast w2a_Tp 9340113 free=32% swap_free=1479.56MB OK
+2026-10-01 06:50:45 forecast w2a_Tp 9340114 free=35% swap_free=1479.56MB OK
+2026-10-01 07:22:07 forecast w2a_Tp 9340115 free=34% swap_free=1559.56MB OK
+2026-10-01 07:42:29 forecast w2a_Tp 9340116 free=34% swap_free=1623.56MB OK
+2026-10-01 08:05:51 forecast w2a_Tp 9340117 free=34% swap_free=1623.56MB OK
+2026-10-01 08:26:58 forecast w2a_Tp 9340118 free=35% swap_free=696.69MB OK
+2026-10-01 08:27:21 forecast w2a_Tp 9340119 free=35% swap_free=696.88MB OK
+2026-10-01 08:28:11 pre-job fixtures free=36% swap_free=784.88MB OK
+2026-10-01 08:28:12 pre-job summarize free=35% swap_free=792.88MB OK
+2026-10-01 08:28:12 pre-job scan free=35% swap_free=792.88MB OK
+2026-10-01 08:28:28 pre-job fixtures free=30% swap_free=1174.38MB OK
+2026-10-01 08:28:29 fixture gelu_random 9320004 free=31% swap_free=1075.19MB OK
+2026-10-01 08:28:36 fixture w2a_T 9330002 free=32% swap_free=742.94MB OK
+2026-10-01 08:28:39 pre-job summarize free=33% swap_free=742.94MB OK
+2026-10-01 08:28:39 pre-job scan free=33% swap_free=742.94MB OK
+2026-10-01 08:35:57 pre-job summarize 2 free=39% swap_free=1503.12MB OK
+2026-10-01 08:36:29 pre-job summarize 3 free=37% swap_free=1511.12MB OK
+2026-10-01 08:37:18 pre-job ledger free=40% swap_free=1575.12MB OK
+2026-10-01 08:37:41 pre-job ledger 2 free=39% swap_free=1583.12MB OK
+2026-10-01 08:37:56 pre-job suite free=38% swap_free=1583.12MB OK
+2026-10-01 08:38:21 pre-job summarize 4 free=36% swap_free=1583.12MB OK
+2026-10-01 08:38:31 pre-job ledger 3 free=37% swap_free=1583.12MB OK
+2026-10-01 08:38:36 pre-job suite 2 free=37% swap_free=1583.12MB OK

@@ -1,0 +1,17 @@
+gate (36, 1164.75)
+{"setting": "w1_sgd", "seed": 9310000, "split": "dev", "status": "ok", "t_obs": 5741, "s_ref": 1.9043640962158586, "secs_run": 2.7}
+        3.69 real         2.90 user         0.25 sys
+           353812480  maximum resident set size
+gate (35, 1164.75)
+{"setting": "gelu_random", "seed": 9320000, "split": "dev", "status": "ok", "t_obs": 6152, "s_ref": 7.0126943297049005, "secs_run": 7.2}
+        7.88 real         7.49 user         0.20 sys
+           475136000  maximum resident set size
+gate (34, 1164.75)
+{"setting": "w2a_T", "seed": 9330000, "split": "dev", "status": "ok", "t_obs": 3222, "s_ref": null, "secs_run": 4.8}
+        5.40 real         5.28 user         0.09 sys
+           278396928  maximum resident set size
+gate (35, 1164.75)
+{"setting": "w2a_Tp", "seed": 9340000, "split": "dev", "status": "ok", "t_obs": 12576, "s_ref": 0.3124252006182994, "secs_run": 9.3}
+        9.96 real         9.79 user         0.13 sys
+           306200576  maximum resident set size
+CHAIN_DONE

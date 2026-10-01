@@ -1,0 +1,66 @@
+{
+ "ranges": {
+  "w1_sgd_dev": [
+   9310000,
+   9310119,
+   25
+  ],
+  "w1_sgd_est": [
+   9310200,
+   9310239,
+   40
+  ],
+  "gelu_random_dev": [
+   9320000,
+   9320004,
+   5
+  ],
+  "gelu_random_est": [
+   9320100,
+   9320119,
+   20
+  ],
+  "w2a_T_dev": [
+   9330000,
+   9330009,
+   10
+  ],
+  "w2a_T_est": [
+   9330100,
+   9330159,
+   60
+  ],
+  "w2a_Tp_dev": [
+   9340000,
+   9340004,
+   5
+  ],
+  "w2a_Tp_est": [
+   9340100,
+   9340119,
+   20
+  ]
+ },
+ "prefix_pattern_files": {
+  "w1_sgd_dev": [],
+  "w1_sgd_est": [],
+  "gelu_random_dev": [],
+  "gelu_random_est": [],
+  "w2a_T_dev": [],
+  "w2a_T_est": [],
+  "w2a_Tp_dev": [],
+  "w2a_Tp_est": []
+ },
+ "registered_seed_overlap": {
+  "track_a.SEEDS": [],
+  "track2a.SEEDS": [],
+  "track2b.SEEDS": [],
+  "track2c.SEEDS": [],
+  "gelu_transfer.PILOT_SEEDS": [],
+  "gelu_transfer.SEEDS": [],
+  "width2_asym.PILOT_SEEDS": [],
+  "width2_asym.SEEDS": [],
+  "width2_asym.SEEDS_T": [],
+  "width2_asym.SEEDS_TP": []
+ }
+}
