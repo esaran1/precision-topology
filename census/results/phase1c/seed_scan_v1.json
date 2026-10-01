@@ -1,0 +1,17 @@
+{
+ "label": "FIRST seed scan (superseded; kept for disclosure). Written by hand from the first scan's printed output (job log), because the re-run overwrote seed_scan.json.",
+ "ranges": {"W1": [9350000, 9350099, 100], "G": [9360000, 9360079, 80], "T": [9370000, 9370199, 200], "Tp": [9380000, 9380119, 120]},
+ "prefix_pattern_first": "(^|[^0-9.])PPPP[0-9]{3}([^0-9]|$)|P_PPP_[0-9]{3}|P,PPP,[0-9]{3}   (PPPP = 9350, 9360, 9370, 9380)",
+ "prefix_pattern_files": {"W1": [], "G": ["results/linear_response/predictions.csv"], "T": [], "Tp": []},
+ "registered_seed_overlap": "all empty (track_a, track2a, track2b, track2c, gelu_transfer, width2_asym, phase1a_pilot)",
+ "unused": false,
+ "the_hit": {
+  "file": "results/linear_response/predictions.csv",
+  "line": 1249,
+  "row": {"set": "lag2-prim", "a": "1.5", "seed": "300026", "arm": "0.5"},
+  "matched_text": "9,360,112",
+  "context": "...652319501206977,575.0,0.06442199760214429,360,1123,,...",
+  "reading": "NOT a seed: the comma-form pattern matched across three CSV fields (the last digit of the float 0.06442199760214429, the integer 360 and the first digits of 1123). The row's seed is 300,026."
+ },
+ "change": "The comma form was tightened to (^|[^0-9.,])P,PPP,[0-9]{3}([^0-9,]|$) (not inside a CSV row of numbers) and the whole scan re-run: results/phase1c/seed_scan.json."
+}
