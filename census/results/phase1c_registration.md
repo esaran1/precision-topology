@@ -37,6 +37,14 @@ trained. No gap, placement or crossing of any training run of a 1C seed has been
   - No 7-digit number with an arm's 4-digit prefix (9350, 9360, 9370 or 9380; also written 9_350_xxx or 9,350,xxx)
     occurs in any text file under src/, tests/, results/ or paper/. 1C's own files are excepted.
   - No 1C seed is a registered or pilot seed of any test module (`registered_overlap`), Phase 1A included.
+  - **The scan pattern was tightened after a false-positive hit (disclosed).** The first scan
+    (`results/phase1c/seed_scan_v1.json`) flagged `results/linear_response/predictions.csv`, line 1249, for G's prefix.
+    - The matched text was `9,360,112`, in `…0.06442199760214429,360,1123,…`. The comma-form pattern matched across
+      three CSV fields: the last digit of a float, the integer 360 and the first digits of 1123.
+    - It is not a seed. That row's seed is 300,026 (set lag2-prim, a = 1.5).
+    - The comma form was tightened so it cannot match inside a row of numbers: `(^|[^0-9.,])9,360,[0-9]{3}([^0-9,]|$)`.
+      The whole scan was then re-run, with 0 hits for every arm (`seed_scan.json`).
+    - The seed ranges were not changed.
 - **Per-seed draws, as in each registration:**
   - W1: `fold1d.make_data(200, seed)`, and U(−1, 1)⁴ in float32 from a local torch Generator, cast to float64.
   - G: the sample and the Generator draw of GELU-T §3.
@@ -266,10 +274,23 @@ before the registration commit. The proposed resolution is implemented and teste
 - the code closure of `src/phase1c.py` (every src module reached by relative imports, including `causal_forecast`,
   `phase1a_pilot`, `track_a`, `gelu_transfer`, `width2_asym` and their dependencies);
 - `tests/test_phase1c.py` and `tests/test_causal_forecast.py`;
-- the frozen per-seed files `results/phase1c/frozen_{W1,G,T,Tp}.jsonl` and `results/phase1c/seed_scan.json`;
+- the frozen per-seed files `results/phase1c/frozen_{W1,G,T,Tp}.jsonl` and `results/phase1c/seed_scan.json` (with the superseded first scan, `seed_scan_v1.json`);
 - every frozen input the replicated pipelines read: `phase1a/landscape_w1.json`, `phase1a/summary.json`, the Phase 1A
   fixtures, `gelu_transfer/{landscape,pilot}.json`, `act_general/kappa_gelu_frozen.json`,
   `width2_asym/{landscape,pilot}.json`, `asym_scores.json` and `lag_law/kappa.csv`.
+
+**Freeze summary (2026-10-01).** No training was run. Each item was computed by the replicated registration's own
+function, with a memory gate before each job and between seeds.
+
+| arm | seeds frozen | result | CPU time |
+|---|---|---|---|
+| W1 | 100 | s\*_frozen found for 100/100, range 1.650–2.682 (s\*_pop = 2.090) | 36 min, mostly the descriptive own threshold |
+| G | 80 | both copies valid for 80/80 | 5 min |
+| T | 200 | copy T valid for 199/200; the hold length W is 4000 for every seed | 8 min |
+| T′ | 120 | copy T′ valid for 120/120; W is 4000 for every seed | 2 min |
+
+The one invalid T copy is seed 9,370,060: "no validated switch below 0.7705". A run on that copy gets no prediction. It
+is counted, as in the W2-A registration (§6).
 
 `run`, `observe` and `score` assert every hash, and that the manifest is committed and unmodified.
 `results/phase1c/registration_stamp.txt` records the registration commit and the SHA-256 of this file and of the

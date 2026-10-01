@@ -517,7 +517,8 @@ def scan():
     OUT.mkdir(parents=True, exist_ok=True)
     pats = {}
     for arm, p in SEED_PREFIX.items():
-        pats[arm] = rf"(^|[^0-9.]){p}[0-9]{{3}}([^0-9]|$)|{p[0]}_{p[1:4]}_[0-9]{{3}}|{p[0]},{p[1:4]},[0-9]{{3}}"
+        pats[arm] = (rf"(^|[^0-9.]){p}[0-9]{{3}}([^0-9]|$)|{p[0]}_{p[1:4]}_[0-9]{{3}}"
+                     rf"|(^|[^0-9.,]){p[0]},{p[1:4]},[0-9]{{3}}([^0-9,]|$)")      # comma form: not inside a CSV row
     hits = _scan_tree(pats)
     ov = registered_overlap()
     out = {"ranges": {a: [s[0], s[-1], len(s)] for a, s in SEEDS.items()}, "prefix_pattern": pats,
@@ -595,7 +596,7 @@ def _frozen(arm):
 
 # ------------------------------------------------------------------------------------------ registration manifest
 FROZEN_DATA = ("results/designs/phase1c_causal_design.md", "results/phase1c_registration.md",
-               "results/phase1c/seed_scan.json", "results/phase1c/frozen_W1.jsonl", "results/phase1c/frozen_G.jsonl",
+               "results/phase1c/seed_scan.json", "results/phase1c/seed_scan_v1.json", "results/phase1c/frozen_W1.jsonl", "results/phase1c/frozen_G.jsonl",
                "results/phase1c/frozen_T.jsonl", "results/phase1c/frozen_Tp.jsonl", "tests/test_phase1c.py",
                "tests/test_causal_forecast.py", "results/phase1a/landscape_w1.json", "results/phase1a/summary.json",
                "results/phase1a/fixtures/gelu_random.npz", "results/phase1a/fixtures/w2a_T.npz",
