@@ -603,6 +603,7 @@ def main() -> None:
     track4_certificate_checks()
     gelu_transfer_checks()
     width2_asym_checks()
+    prediction_inputs_audit_checks()
 
     provenance_check()
 
@@ -892,6 +893,16 @@ PRODUCERS = {
     "width2_asym/predictions.csv": ("width2_asym", "finalize", "full", ""),
     "width2_asym/observed_parts.jsonl": ("width2_asym", "observe", "full", ""),
     "width2_asym/scores.json": ("width2_asym", "observe", "full", ""),
+    # AUDIT of the prediction inputs (author-requested 2026-09-30; W2-A, GELU-T, Test 2A, Track A)
+    "prediction_inputs_audit.json": ("prediction_inputs_audit", "summarize", "full", ""),
+    "prediction_inputs_audit/replay_w2a.jsonl": ("prediction_inputs_audit", "replay_w2a", "full", ""),
+    "prediction_inputs_audit/replay_gelu.jsonl": ("prediction_inputs_audit", "replay_gelu", "full", ""),
+    "prediction_inputs_audit/replay_track_a.jsonl": ("prediction_inputs_audit", "replay_track_a", "full", ""),
+    "prediction_inputs_audit/replay_track2a.jsonl": ("prediction_inputs_audit", "replay_track2a", "full", ""),
+    "prediction_inputs_audit/truncated_w2a.jsonl": ("prediction_inputs_audit", "truncated_w2a", "full", ""),
+    "prediction_inputs_audit/truncated_gelu.jsonl": ("prediction_inputs_audit", "truncated_gelu", "full", ""),
+    "prediction_inputs_audit/truncated_track_a.jsonl": ("prediction_inputs_audit", "truncated_track_a", "full", ""),
+    "prediction_inputs_audit/truncated_track2a.jsonl": ("prediction_inputs_audit", "truncated_track2a", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -2981,6 +2992,87 @@ def width2_asym_checks() -> None:
     chk("W2A D within 3 steps", float(((o[o.scored].step_obs - o[o.scored].t_traj).abs() <= 3).sum()), 28.0, 0)
     oT = pd.read_csv(D / "observed_runs_T.csv")
     chk("W2A T off-branch runs that crossed", float((oT.crossed.astype(bool) & ~oT.on_branch.astype(bool)).sum()), 41.0, 0)
+
+
+def prediction_inputs_audit_checks() -> None:
+    """AUDIT (author-requested 2026-09-30; results/prediction_inputs_audit.md): which information the registered r_traj
+    and r_cf use in W2-A, GELU-T, Test 2A and Track A (a = 1.65).  The committed counts regenerate from the committed
+    CSVs and replay rows, every cited line still holds, the MASKED and TRUNCATED replays reproduce every prediction,
+    and the headline counts of steps read at or after the observed crossing are pinned."""
+    from . import prediction_inputs_audit as PA
+    print("Prediction-inputs audit (W2-A, GELU-T, Test 2A, Track A a = 1.65)")
+    chk("PIA cited code lines that no longer hold", float(len(PA.code_refs_check())), 0.0, 0)
+    chk("PIA md citations without a token check", float(len(PA.md_refs_check(PA.AUDIT_MD.read_text()))), 0.0, 0)
+    J = json.loads(PA.OUT_JSON.read_text())
+    chk("PIA JSON regenerates from the committed CSVs and replay rows", float(J == json.loads(json.dumps(PA.build()))),
+        1.0, 0)
+    for k, ok in J["committed_predictions_hash_matches"].items():
+        chk(f"PIA {k} predictions.csv hash", float(ok), 1.0, 0)
+    for k, n in (("w2a", 338), ("gelu", 160), ("track_a", 137), ("track2a", 75)):
+        chk(f"PIA replay rows {k}", float(J["replay_row_counts"][k]), float(n), 0)
+        chk(f"PIA truncated rows {k}", float(J["truncated_row_counts"][k]), float(n), 0)
+    groups = (("W2-A", "arms", {"T": 98, "D": 120, "Tp": 120}), ("GELU-T", "arms", {"random": 80, "branch": 80}),
+              ("Track A", "opts", {"adam": 74, "sgd": 63}), ("Test 2A", "opts", {"adam": 75}))
+    for test, key, ns in groups:
+        for g, n in ns.items():
+            rp, tr, a = J[test]["replay"][g], J[test]["truncated"][g], J[test][key][g]
+            chk(f"PIA {test} {g} path hashes verified", float(rp["n_path_sha256_verified"]), float(n), 0)
+            chk(f"PIA {test} {g} MASKED: every field reproduced",
+                float(min(v["n_equal"] for v in rp["masked_reproduces"].values())), float(n), 0)
+            chk(f"PIA {test} {g} TRUNCATED r_traj reproduced", float(tr["n_all_traj_fields_reproduced"]), float(n), 0)
+            chk(f"PIA {test} {g} TRUNCATED r_cf reproduced", float(tr["n_all_cf_fields_reproduced"]), float(n), 0)
+            chk(f"PIA {test} {g} causal: no run without a prediction", float(rp["causal_POST_HOC"]["n_no_prediction"]),
+                0.0, 0)
+            csv_all = a.get("r_traj_any_input_last_read_vs_t_obs", a["r_traj_recursion_last_read_vs_t_obs"])
+            for f_ in ("n_at", "n_strictly_after", "max_steps_after"):
+                chk(f"PIA {test} {g} L_traj vs t_obs {f_} (replay = CSV)", float(tr["L_traj_vs_t_obs"][f_]),
+                    float(csv_all[f_]), 0)
+    # (iii), pinned: (at, strictly after, max steps after) over the scored runs
+    W, G, TA, T2 = (J[k] for k in ("W2-A", "GELU-T", "Track A", "Test 2A"))
+    pins = [("W2-A T r_traj all inputs", W["arms"]["T"]["r_traj_any_input_last_read_vs_t_obs"], (95, 3, 3)),
+            ("W2-A T r_traj recursion", W["arms"]["T"]["r_traj_recursion_last_read_vs_t_obs"], (97, 1, 1)),
+            ("W2-A T t_sw", W["arms"]["T"]["t_sw_vs_t_obs"], (2, 2, 3)),
+            ("W2-A D r_traj all inputs", W["arms"]["D"]["r_traj_any_input_last_read_vs_t_obs"], (0, 0, 0)),
+            ("W2-A D t_sw", W["arms"]["D"]["t_sw_vs_t_obs"], (0, 0, 0)),
+            ("W2-A T' r_traj all inputs", W["arms"]["Tp"]["r_traj_any_input_last_read_vs_t_obs"], (0, 120, 83)),
+            ("W2-A T' r_traj recursion", W["arms"]["Tp"]["r_traj_recursion_last_read_vs_t_obs"], (118, 0, 0)),
+            ("W2-A T' t_sw", W["arms"]["Tp"]["t_sw_vs_t_obs"], (0, 120, 83)),
+            ("GELU-T random r_traj", G["arms"]["random"]["r_traj_recursion_last_read_vs_t_obs"], (36, 44, 191)),
+            ("GELU-T random t_sw", G["arms"]["random"]["t_sw_vs_t_obs"], (0, 13, 310)),
+            ("GELU-T random kappa<0 t_sw", G["arms"]["random"]["kappa_negative_t_sw_vs_t_obs"], (0, 8, 310)),
+            ("GELU-T branch r_traj", G["arms"]["branch"]["r_traj_recursion_last_read_vs_t_obs"], (42, 38, 19)),
+            ("GELU-T branch t_sw", G["arms"]["branch"]["t_sw_vs_t_obs"], (0, 7, 60)),
+            ("GELU-T branch kappa<0 t_sw", G["arms"]["branch"]["kappa_negative_t_sw_vs_t_obs"], (0, 2, 60)),
+            ("Track A Adam r_traj all inputs", TA["opts"]["adam"]["r_traj_any_input_last_read_vs_t_obs"], (1, 33, 140)),
+            ("Track A Adam r_traj recursion", TA["opts"]["adam"]["r_traj_recursion_last_read_vs_t_obs"], (1, 32, 66)),
+            ("Track A Adam r_cf all inputs", TA["opts"]["adam"]["r_cf_any_input_last_read_vs_t_obs"], (0, 4, 140)),
+            ("Track A SGD r_traj all inputs", TA["opts"]["sgd"]["r_traj_any_input_last_read_vs_t_obs"], (1, 4, 181)),
+            ("Track A SGD r_traj recursion", TA["opts"]["sgd"]["r_traj_recursion_last_read_vs_t_obs"], (1, 0, 0)),
+            ("Track A SGD r_cf all inputs", TA["opts"]["sgd"]["r_cf_any_input_last_read_vs_t_obs"], (0, 4, 181)),
+            ("Test 2A r_traj all inputs", T2["opts"]["adam"]["r_traj_any_input_last_read_vs_t_obs"], (2, 8, 53)),
+            ("Test 2A r_traj recursion", T2["opts"]["adam"]["r_traj_recursion_last_read_vs_t_obs"], (3, 7, 4)),
+            ("Test 2A r_cf all inputs", T2["opts"]["adam"]["r_cf_any_input_last_read_vs_t_obs"], (0, 1, 53))]
+    for label, x, (at, after, mx) in pins:
+        chk(f"PIA {label}: at t_obs", float(x["n_at"]), float(at), 0)
+        chk(f"PIA {label}: after t_obs", float(x["n_strictly_after"]), float(after), 0)
+        chk(f"PIA {label}: max steps after", float(x["max_steps_after"]), float(mx), 0)
+    for arm, n_id in (("T", 97), ("D", 0), ("Tp", 118)):
+        chk(f"PIA W2-A {arm} t_traj = t_obs (s_traj identical)",
+            float(W["arms"][arm]["L1_ratio_split"]["n_identity_s_traj_identical_s_obs"]), float(n_id), 0)
+    for arm, n_id in (("random", 36), ("branch", 42)):
+        chk(f"PIA GELU-T {arm} t_traj = t_obs (s_traj identical)",
+            float(G["arms"][arm]["L1_ratio_split"]["n_identity_s_traj_identical_s_obs"]), float(n_id), 0)
+    chk("PIA 2A P read at t_sw after t_R", float(T2["opts"]["adam"]["n_P_read_at_t_sw_after_t_R"]), 75.0, 0)
+    chk("PIA Track A Adam replay bit-identical", float(TA["opts"]["adam"]["n_adam_replay_bit_identical"]), 74.0, 0)
+    chk("PIA 2A Adam replay bit-identical", float(T2["opts"]["adam"]["n_adam_replay_bit_identical"]), 75.0, 0)
+    for test, X, arm in (("W2-A", W, "T"), ("W2-A", W, "D"), ("W2-A", W, "Tp"), ("GELU-T", G, "random"),
+                         ("GELU-T", G, "branch")):
+        chk(f"PIA {test} {arm} causal t_traj changed (POST HOC)",
+            float(X["replay"][arm]["causal_POST_HOC"]["n_t_traj_changed"]), 0.0, 0)
+        chk(f"PIA {test} {arm} follow check before the crossing",
+            float(X["arms"][arm]["follow_check_t_follow_vs_t_obs"]["n_at_or_after"]), 0.0, 0)
+        chk(f"PIA {test} {arm} on-branch runs excluded by the follow check",
+            float(X["arms"][arm]["n_on_branch_not_following_excluded"]), 0.0, 0)
 
 
 def provenance_check() -> None:

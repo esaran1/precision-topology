@@ -1,0 +1,3255 @@
+{
+ "note": "AUDIT of prediction inputs (2026-09-30). The CAUSAL replay is a POST HOC diagnostic; it replaces no registered prediction or verdict.",
+ "committed_predictions_hash_matches": {
+  "width2_asym": true,
+  "gelu_transfer": true,
+  "track2a": true,
+  "track_a": true
+ },
+ "code_refs": [
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf",
+   "input": "occupied copy and winding k (fixed at release)",
+   "class": "release / rule-point state",
+   "file": "src/width2_asym.py",
+   "line": 1292,
+   "token": "copy, k = classify(z_rel"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf",
+   "input": "frozen copy point z_c(s0), s_switch (D), kappa0 + winding coef, lam_min_switch",
+   "class": "frozen before training",
+   "file": "src/width2_asym.py",
+   "line": 1361,
+   "token": "kap = kappa_winding"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_cf",
+   "input": "lam_min at the copy's frozen switch",
+   "class": "frozen before training",
+   "file": "src/width2_asym.py",
+   "line": 1362,
+   "token": "lam_sw = cf["
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf, t_sw",
+   "input": "the run's output-weight path V = P[:, VI], s = |v|_1",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1359,
+   "token": "V = P[:, VI]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, t_sw (T, T')",
+   "input": "own branch z*(v_t): warm-started Newton at each v_t on the seed's own sample",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 738,
+   "token": "pred = self.Z[-1]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "release state z_release = P[0][ZI] (delta_0)",
+   "class": "release / rule-point state",
+   "file": "src/width2_asym.py",
+   "line": 1390,
+   "token": "t_hit, st, mx, rad = r4_recursion"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "delta_0 = z_release - z*(v_0)",
+   "class": "release / rule-point state",
+   "file": "src/width2_asym.py",
+   "line": 783,
+   "token": "d = np.asarray(z_release"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "recursion delta_{t+1} = (I - eta H_t) delta_t - (z*(v_{t+1}) - z*(v_t)): v_0..v_t_hit",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 798,
+   "token": "d = d - eta"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "hit test: gap of the PREDICTED state z*(v_t) + delta_t at v_t",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/width2_asym.py",
+   "line": 792,
+   "token": "if t >= 1 and placed_fn"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "s_traj = s[t_hit] (the run's own s at the predicted step)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1396,
+   "token": "out.update(t_traj=int(t_hit)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw, s_switch (T, T')",
+   "input": "own-path switch: first t with z*(v_t) placed; v_0..v_t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1370,
+   "token": "t_sw, s_sw = own_path_switch"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw, s_switch (T, T')",
+   "input": "gap of branch points z*(v_t) (not training states)",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/width2_asym.py",
+   "line": 760,
+   "token": "if placed_fn(br.Z[t], br.V[t])"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw, s_switch (T, T')",
+   "input": "bisection on the segment v_{t_sw-1} -> v_{t_sw}",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/width2_asym.py",
+   "line": 767,
+   "token": "if okm and gap_fn"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw (D)",
+   "input": "t_sw = first s_t >= frozen s_switch",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1373,
+   "token": "t_sw, s_sw = first_ge"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_cf",
+   "input": "s-dot = (s[t_sw] - s[t_sw - w]) / w, w = min(100, t_sw)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 469,
+   "token": "sdot = (s[t_sw]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_cf",
+   "input": "closed form kappa_k * chi at t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1379,
+   "token": "r_cf, chi, sdot = closed_form"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "V7 statistic",
+   "input": "chi_t on 0..t_sw (s path and own-branch lam_min)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1381,
+   "token": "cp = chi_path"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "follow check (scored set)",
+   "input": "hidden state z at t_0.8 = P[t08][ZI]",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/width2_asym.py",
+   "line": 1324,
+   "token": "zr, vr = P[t08]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "gate (D, T'); T sensitivity",
+   "input": "gap of every pre-release hold state (v fixed at v_0)",
+   "class": "gap of a training state",
+   "file": "src/width2_asym.py",
+   "line": 1261,
+   "token": "p, u = placed_state(z, v0)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "descriptive",
+   "input": "s_min_after_release = min over the whole path",
+   "class": "descriptive column (not used by any prediction or verdict)",
+   "file": "src/width2_asym.py",
+   "line": 1365,
+   "token": "s_min_after_release="
+  },
+  {
+   "test": "W2-A",
+   "prediction": "coupling",
+   "input": "joint update of (z, v) by the full gradient",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1248,
+   "token": "q = q - lr * grad"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj, r_cf",
+   "input": "copy at release",
+   "class": "release / rule-point state",
+   "file": "src/gelu_transfer.py",
+   "line": 814,
+   "token": "copy = classify_release(z_rel"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj, r_cf",
+   "input": "frozen s_switch, kappa, lam_min_switch of the copy",
+   "class": "frozen before training",
+   "file": "src/gelu_transfer.py",
+   "line": 848,
+   "token": "s_sw, kap, lam_sw = cf"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj, r_cf",
+   "input": "s = |w2| path",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 846,
+   "token": "s = np.abs(Wp[:, 2])"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_cf",
+   "input": "t_sw = first s_t >= frozen s_switch",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 849,
+   "token": "t_sw = t_switch(s, s_sw)"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_cf",
+   "input": "s-dot window s[t_sw - w .. t_sw]",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 185,
+   "token": "sdot = (s[t_sw]"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "static own-sample branch grid from the frozen copy point (no path input)",
+   "class": "frozen before training",
+   "file": "src/gelu_transfer.py",
+   "line": 854,
+   "token": "B = GBranch(s0"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "release state z_rel = Wp[0, [0, 1, 3]]",
+   "class": "release / rule-point state",
+   "file": "src/gelu_transfer.py",
+   "line": 864,
+   "token": "z_rel = Wp[0, [0, 1, 3]]"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "segment end T_end = first s_t outside the branch grid (loop bound only)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 866,
+   "token": "T_end = len(s) if"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "theta*(s_t), H(s_t) along the run's s path",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 868,
+   "token": "th_seg = np.array("
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "hit test: gap of the PREDICTED state theta*(s_t) + delta_t",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/gelu_transfer.py",
+   "line": 873,
+   "token": "gapf = lambda"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "linear-response recursion (stops at the first hit)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/linear_response.py",
+   "line": 332,
+   "token": "if gapf(t + 1, d) > 0"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "s_traj = s[t_hit]",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 882,
+   "token": "out.update(s_traj=float(s_seg"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "follow check (scored set)",
+   "input": "hidden state at t_0.8 = Wp[t08, [0, 1, 3]]",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/gelu_transfer.py",
+   "line": 829,
+   "token": "st = float(s[t08]); z = Wp"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "gate (branch); random sensitivity",
+   "input": "gap of every pre-release hold state",
+   "class": "gap of a training state",
+   "file": "src/gelu_transfer.py",
+   "line": 768,
+   "token": "st = state(th.detach()"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "descriptive",
+   "input": "w2_min_after_release = min over the whole path",
+   "class": "descriptive column (not used by any prediction or verdict)",
+   "file": "src/gelu_transfer.py",
+   "line": 847,
+   "token": "w2_min_after_release"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "coupling",
+   "input": "one torch SGD optimiser over (w1, b1, w2, b2)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 783,
+   "token": "opt = torch.optim.SGD"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "landscape kappa inputs H_pop, theta*', grad G at s*_pop",
+   "class": "frozen before training",
+   "file": "src/track_a.py",
+   "line": 294,
+   "token": "d, th_pop, H_pop"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "rule point",
+   "input": "t_R reads s_1 .. s_t_top (t_top = first s_t >= s_frozen)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 102,
+   "token": "top = np.nonzero(s_path[1:] >= s_frozen)"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "rule-point state theta_{t_R} -> Newton -> occupied branch, s*_run",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 306,
+   "token": "th_b, res, Hn = LR.newton(TH[tR]"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "own-sample branch grid from the rule-point Newton point",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 309,
+   "token": "B = LR.Branch(float(s[tR])"
+  },
+  {
+   "test": "Track A",
+   "prediction": "r_traj, r_cf",
+   "input": "P_R = 1/(sqrt(v-hat_{t_R}) + eps) (Adam)",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 315,
+   "token": "P_R = (1.0 / (np.sqrt(V[tR"
+  },
+  {
+   "test": "Test 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "v-hat at t_sw put in row t_R: P = P(t_sw) (Adam 2nd moment of the hidden coords)",
+   "class": "optimiser state after the rule point",
+   "file": "src/track2a.py",
+   "line": 122,
+   "token": "Vm[t_rule] = V[t_sw]"
+  },
+  {
+   "test": "Test 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "t_sw = first s_t >= s*_run",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track2a.py",
+   "line": 218,
+   "token": "t_sw = t_switch(s, base"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_cf",
+   "input": "t_sw = first s_t >= s*_run; s-dot window",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 322,
+   "token": "win = min(100, t_sw)"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "delta_0 = theta_{t_R} - theta*(s_{t_R})",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 332,
+   "token": "d0 = TH[tR]"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "m_0 = Adam first moment at t_R",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 337,
+   "token": "t_hit, path = LR.simulate"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "s path from t_R to the hit (theta*(s_t), H(s_t))",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 326,
+   "token": "s_seg = s[tR:]"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "hit test: gap of the PREDICTED state",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/linear_response.py",
+   "line": 332,
+   "token": "if gapf(t + 1, d) > 0"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "s_traj = s[t_R + t_hit]",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 346,
+   "token": "out.update(s_traj=float(s_seg"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "coupling",
+   "input": "one torch optimiser over (w1, b1, w2, b2)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 286,
+   "token": "W[t] = th.detach()"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "all",
+   "input": "predict_one (registered)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1350,
+   "token": "def predict_one(arm, seed, P"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf",
+   "input": "Newton at v0 from the release state",
+   "class": "release / rule-point state",
+   "file": "src/width2_asym.py",
+   "line": 1288,
+   "token": "zn, gn, lamn, okn = newton(z_rel, v0"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "the seed's own training sample",
+   "class": "frozen before training",
+   "file": "src/width2_asym.py",
+   "line": 1283,
+   "token": "x, y = own_sample(seed)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf",
+   "input": "eta of the arm",
+   "class": "frozen before training",
+   "file": "src/width2_asym.py",
+   "line": 1358,
+   "token": "eta = ETA[arm]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, r_cf",
+   "input": "s = |v|_1",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1360,
+   "token": "s = np.abs(V).sum(axis=1)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, t_sw (T, T')",
+   "input": "own branch anchored at the frozen copy point, shifted to k at v_0",
+   "class": "frozen before training",
+   "file": "src/width2_asym.py",
+   "line": 1367,
+   "token": "br = OwnBranch(V, shift("
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj, t_sw (T, T')",
+   "input": "Newton at v_k (warm start)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 739,
+   "token": "zn, _, _, ok = newton(pred, self.V[k]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw (T, T')",
+   "input": "loop over t = 1 .. t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 757,
+   "token": "for t in range(max(1, t_from)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw (T, T')",
+   "input": "bisection starts at v_{t_sw - 1}",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/width2_asym.py",
+   "line": 761,
+   "token": "lo, hi, zl = 0.0, 1.0, br.Z[t - 1]"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "t_sw (T, T')",
+   "input": "returns at t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 772,
+   "token": "return int(t), float(np.abs(vr)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "r_traj",
+   "input": "recursion returns at the first hit",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 793,
+   "token": "return t, \"ok\", mx, rad"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "V7 statistic",
+   "input": "chi_window_max over t < t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/width2_asym.py",
+   "line": 1383,
+   "token": "out[\"chi_window_max\"] = chi_window_max("
+  },
+  {
+   "test": "W2-A",
+   "prediction": "rules",
+   "input": "observation rule: enclosure lower end > 0 (placed_state)",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/width2_asym.py",
+   "line": 284,
+   "token": "def placed_state(z, v)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "rules",
+   "input": "prediction and branch-point rule: enclosure midpoint > 0 (branch_placed)",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/width2_asym.py",
+   "line": 293,
+   "token": "def branch_placed(z, v)"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "observation",
+   "input": "every-step detection on the actual state",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/width2_asym.py",
+   "line": 1580,
+   "token": "p, u = placed_state(P[t][ZI], P[t][VI])"
+  },
+  {
+   "test": "W2-A",
+   "prediction": "observation",
+   "input": "r_obs = s_obs / s_switch - 1",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/width2_asym.py",
+   "line": 1644,
+   "token": "d[\"r_obs\"] = col(\"s_obs\") / col(\"s_switch\") - 1"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "all",
+   "input": "predict_one (registered)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 838,
+   "token": "def predict_one(arm, seed, Wp"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_cf",
+   "input": "w = min(100, t_sw)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 184,
+   "token": "w = min(SDOT_WIN, int(t_sw))"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_cf",
+   "input": "closed form at t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 850,
+   "token": "r_cf, chi, sdot = closed_form(s, t_sw"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "V7 statistic",
+   "input": "chi_window_max over t < t_sw",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 858,
+   "token": "out[\"chi_window_max\"] = chi_window_max("
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "segment test: s_t inside the branch grid",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 865,
+   "token": "inside = (s >= B.lo) & (s <= B.hi)"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "H(s_t) along the s path",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 869,
+   "token": "Hs = [B.hess(v) for v in s_seg]"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "r_traj",
+   "input": "stability radius over recursion indices <= t_hit",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 876,
+   "token": "rad = max(LR.step_map_radius(Hs[i]"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "coupling",
+   "input": "every training step saved",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/gelu_transfer.py",
+   "line": 791,
+   "token": "Wp[t] = th.detach()"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "observation",
+   "input": "every-step detection: phase2b_ordering.state placement",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/gelu_transfer.py",
+   "line": 1035,
+   "token": "if state(torch.tensor(Wp[t]"
+  },
+  {
+   "test": "GELU-T",
+   "prediction": "observation",
+   "input": "r_obs = s_obs / s_switch - 1",
+   "class": "scored-set membership (not a prediction input)",
+   "file": "src/gelu_transfer.py",
+   "line": 1070,
+   "token": "d[\"r_obs\"] = d.s_obs / d.s_switch - 1"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "all",
+   "input": "predict_one (registered)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 293,
+   "token": "def predict_one(opt_name, seed, W"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "rule point",
+   "input": "rule_step definition",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 96,
+   "token": "def rule_step(s_path, s_frozen"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "rule point",
+   "input": "t_R = rule_step(s, s_frozen)",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 302,
+   "token": "tR = rule_step(s, s_frozen)"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "hidden coordinates and Adam m (only row t_R is used)",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 300,
+   "token": "TH = W[:, [0, 1, 3]] * flip; MM = M[:, [0, 1, 3]] * flip"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "s*_run = the rule-point branch's switch (no path input)",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 310,
+   "token": "s_run = B.switch(s_frozen)"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_cf",
+   "input": "t_sw = first s_t >= s*_run",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 318,
+   "token": "t_sw = LR._first_ge(s, s_run)"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_cf",
+   "input": "closed form with P_R and the landscape kappa",
+   "class": "frozen before training",
+   "file": "src/track_a.py",
+   "line": 323,
+   "token": "r_cf, kap, chi = closed_form_r(H_pop"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "H(s_t) along the s path",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 331,
+   "token": "Hs = [B.hess(v) for v in s_seg]"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "hit test: exact gap of the PREDICTED state",
+   "class": "gap of a non-training point (predicted state or branch point)",
+   "file": "src/track_a.py",
+   "line": 336,
+   "token": "gapf = lambda i, dd: LR.gap_exact("
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "P frozen for the recursion",
+   "class": "release / rule-point state",
+   "file": "src/track_a.py",
+   "line": 334,
+   "token": "PP = np.tile(P_R"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "r_traj",
+   "input": "Adam bias correction from the step count K (not a state)",
+   "class": "frozen before training",
+   "file": "src/track_a.py",
+   "line": 335,
+   "token": "bc1 = (1 - LR.BETA1 ** K[tR"
+  },
+  {
+   "test": "Track A / 2A",
+   "prediction": "coupling",
+   "input": "one step on the full parameter vector",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/track_a.py",
+   "line": 282,
+   "token": "for t in range(1, BUDGET + 1)"
+  },
+  {
+   "test": "Test 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "v_at_switch: P frozen at t_sw",
+   "class": "optimiser state after the rule point",
+   "file": "src/track2a.py",
+   "line": 119,
+   "token": "def v_at_switch(V, t_rule, t_sw)"
+  },
+  {
+   "test": "Test 2A",
+   "prediction": "r_traj, r_cf",
+   "input": "Track A's predict_one with v-hat(t_sw) in row t_R",
+   "class": "optimiser state after the rule point",
+   "file": "src/track2a.py",
+   "line": 225,
+   "token": "v_at_switch(V, base[\"t_rule\"], t_sw)"
+  },
+  {
+   "test": "all",
+   "prediction": "r_traj",
+   "input": "one recursion step uses H at step t",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/linear_response.py",
+   "line": 317,
+   "token": "g = H_of(t) @ d"
+  },
+  {
+   "test": "all",
+   "prediction": "r_traj",
+   "input": "simulate returns at the first hit",
+   "class": "output-weight path (s_t or v_t)",
+   "file": "src/linear_response.py",
+   "line": 333,
+   "token": "return t + 1, path"
+  }
+ ],
+ "code_refs_mismatches": [],
+ "md_refs_not_in_code_refs": [],
+ "replay_row_counts": {
+  "w2a": 338,
+  "gelu": 160,
+  "track_a": 137,
+  "track2a": 75
+ },
+ "truncated_row_counts": {
+  "w2a": 338,
+  "gelu": 160,
+  "track_a": 137,
+  "track2a": 75
+ },
+ "W2-A": {
+  "arms": {
+   "T": {
+    "n_runs": 200,
+    "n_on_branch": 98,
+    "n_scored": 98,
+    "own_path_switch": true,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 98,
+     "n_at": 97,
+     "n_strictly_after": 1,
+     "n_before": 0,
+     "max_steps_after": 1.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 1.0
+    },
+    "n_t_traj_equal_t_obs": 97,
+    "L1_ratio_split": {
+     "n": 98,
+     "n_t_traj_equal_t_obs": 97,
+     "n_identity_s_traj_identical_s_obs": 97,
+     "max_abs_ratio_minus_1_among_identity": 6.787015394138507e-12,
+     "n_other": 1,
+     "n_other_ratio_below_1": 1,
+     "n_other_ratio_above_1": 0,
+     "n_other_ratio_exactly_1": 0
+    },
+    "t_sw_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 4,
+     "n_at": 2,
+     "n_strictly_after": 2,
+     "n_before": 94,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 2.0,
+     "d_min": -75.0,
+     "d_median": -24.0,
+     "d_max": 3.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 98,
+     "n_at": 95,
+     "n_strictly_after": 3,
+     "n_before": 0,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 3.0
+    },
+    "any_prediction_last_v_read_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 98,
+     "n_at": 95,
+     "n_strictly_after": 3,
+     "n_before": 0,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 3.0
+    },
+    "n_t_sw_before_t_traj": 94,
+    "branch_steps_computed_minus_1_equals_max_t_traj_t_sw": 98,
+    "r_cf_sdot_window": {
+     "n": 98,
+     "n_end_at_or_after": 4,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 4,
+     "max_steps_tsw_after": 3.0
+    },
+    "n_kappa_negative_scored": 1,
+    "kappa_negative_t_sw_vs_t_obs": {
+     "n": 1,
+     "n_at_or_after": 1,
+     "n_at": 0,
+     "n_strictly_after": 1,
+     "n_before": 0,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 3.0,
+     "d_min": 3.0,
+     "d_median": 3.0,
+     "d_max": 3.0
+    },
+    "observed_lag_steps_t_obs_minus_t_sw": {
+     "min": -3.0,
+     "median": 24.0,
+     "max": 75.0
+    },
+    "follow_check_t_follow_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 98,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -7594.0,
+     "d_median": -4124.0,
+     "d_max": -3032.0
+    },
+    "n_on_branch_not_following_excluded": 0,
+    "n_on_branch_crossed_follow_check_at_or_after_crossing": 0,
+    "n_hold_G_positive_all_runs": 1,
+    "n_branch_lost_scored": 0,
+    "registered": {
+     "L1": {
+      "n": 98,
+      "median_ratio": 1.000000000000049,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 98,
+      "spearman": 0.9999234932960999,
+      "verdict": "PASS"
+     }
+    }
+   },
+   "D": {
+    "n_runs": 120,
+    "n_on_branch": 120,
+    "n_scored": 120,
+    "own_path_switch": false,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -6.0,
+     "d_median": -4.0,
+     "d_max": -1.0
+    },
+    "n_t_traj_equal_t_obs": 0,
+    "L1_ratio_split": {
+     "n": 120,
+     "n_t_traj_equal_t_obs": 0,
+     "n_identity_s_traj_identical_s_obs": 0,
+     "max_abs_ratio_minus_1_among_identity": null,
+     "n_other": 120,
+     "n_other_ratio_below_1": 0,
+     "n_other_ratio_above_1": 120,
+     "n_other_ratio_exactly_1": 0
+    },
+    "t_sw_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -289.0,
+     "d_median": -206.0,
+     "d_max": -161.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -6.0,
+     "d_median": -4.0,
+     "d_max": -1.0
+    },
+    "any_prediction_last_v_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -6.0,
+     "d_median": -4.0,
+     "d_max": -1.0
+    },
+    "n_t_sw_before_t_traj": 120,
+    "branch_steps_computed_minus_1_equals_max_t_traj_t_sw": 120,
+    "r_cf_sdot_window": {
+     "n": 120,
+     "n_end_at_or_after": 0,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 0,
+     "max_steps_tsw_after": 0.0
+    },
+    "n_kappa_negative_scored": 0,
+    "kappa_negative_t_sw_vs_t_obs": {
+     "n": 0,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 0,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": null,
+     "d_median": null,
+     "d_max": null
+    },
+    "observed_lag_steps_t_obs_minus_t_sw": {
+     "min": 161.0,
+     "median": 206.0,
+     "max": 289.0
+    },
+    "follow_check_t_follow_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -2167.0,
+     "d_median": -1418.5,
+     "d_max": -968.0
+    },
+    "n_on_branch_not_following_excluded": 0,
+    "n_on_branch_crossed_follow_check_at_or_after_crossing": 0,
+    "n_hold_G_positive_all_runs": 0,
+    "n_branch_lost_scored": 0,
+    "registered": {
+     "L1": {
+      "n": 120,
+      "median_ratio": 1.0209549796592823,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 120,
+      "spearman": 0.9972984235016318,
+      "verdict": "PASS"
+     }
+    }
+   },
+   "Tp": {
+    "n_runs": 120,
+    "n_on_branch": 120,
+    "n_scored": 120,
+    "own_path_switch": true,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 118,
+     "n_at": 118,
+     "n_strictly_after": 0,
+     "n_before": 2,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -1.0,
+     "d_median": 0.0,
+     "d_max": 0.0
+    },
+    "n_t_traj_equal_t_obs": 118,
+    "L1_ratio_split": {
+     "n": 120,
+     "n_t_traj_equal_t_obs": 118,
+     "n_identity_s_traj_identical_s_obs": 118,
+     "max_abs_ratio_minus_1_among_identity": 8.446576771348191e-13,
+     "n_other": 2,
+     "n_other_ratio_below_1": 2,
+     "n_other_ratio_above_1": 0,
+     "n_other_ratio_exactly_1": 0
+    },
+    "t_sw_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    },
+    "any_prediction_last_v_read_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    },
+    "n_t_sw_before_t_traj": 0,
+    "branch_steps_computed_minus_1_equals_max_t_traj_t_sw": 120,
+    "r_cf_sdot_window": {
+     "n": 120,
+     "n_end_at_or_after": 120,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 120,
+     "max_steps_tsw_after": 83.0
+    },
+    "n_kappa_negative_scored": 120,
+    "kappa_negative_t_sw_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    },
+    "observed_lag_steps_t_obs_minus_t_sw": {
+     "min": -83.0,
+     "median": -43.5,
+     "max": -10.0
+    },
+    "follow_check_t_follow_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -12603.0,
+     "d_median": -9806.5,
+     "d_max": -7821.0
+    },
+    "n_on_branch_not_following_excluded": 0,
+    "n_on_branch_crossed_follow_check_at_or_after_crossing": 0,
+    "n_hold_G_positive_all_runs": 0,
+    "n_branch_lost_scored": 0,
+    "registered": {
+     "L1": {
+      "n": 120,
+      "median_ratio": 1.0000000000000038,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 120,
+      "spearman": 0.9999861101465378,
+      "verdict": "PASS"
+     }
+    }
+   }
+  },
+  "replay": {
+   "D": {
+    "n_rows": 120,
+    "n_path_sha256_verified": 120,
+    "masked_reproduces": {
+     "t_sw": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_switch": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "sdot": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_cf": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "chi_window_max": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "t_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "follows_branch": {
+      "n": 120,
+      "n_equal": 120
+     }
+    },
+    "masked_follows_branch_true": 120,
+    "causal_POST_HOC": {
+     "n": 120,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 120,
+      "n_at_or_after": 0,
+      "n_at": 0,
+      "n_strictly_after": 0,
+      "n_before": 120,
+      "max_steps_after": 0.0,
+      "median_steps_after_among_after": null,
+      "d_min": -6.0,
+      "d_median": -4.0,
+      "d_max": -1.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 120,
+     "max_rel_change_r_traj": 3.552713678800501e-15,
+     "median_rel_change_r_traj": 1.4432899320127035e-15,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 1.02095497965928,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9972984235016318,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 1.0209549796592794,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0209549796592814
+    },
+    "causal_reproduces_registered": {
+     "t_sw": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_switch": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "sdot": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_cf": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "chi_window_max": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "t_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "follows_branch": {
+      "n": 120,
+      "n_equal": 120
+     }
+    }
+   },
+   "T": {
+    "n_rows": 98,
+    "n_path_sha256_verified": 98,
+    "masked_reproduces": {
+     "t_sw": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "s_switch": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "sdot": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "r_cf": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "chi_window_max": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "t_traj": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "s_traj": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "r_traj": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "follows_branch": {
+      "n": 98,
+      "n_equal": 98
+     }
+    },
+    "masked_follows_branch_true": 98,
+    "causal_POST_HOC": {
+     "n": 98,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 98,
+      "n_at_or_after": 98,
+      "n_at": 97,
+      "n_strictly_after": 1,
+      "n_before": 0,
+      "max_steps_after": 1.0,
+      "median_steps_after_among_after": 1.0,
+      "d_min": 0.0,
+      "d_median": 0.0,
+      "d_max": 1.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 0,
+     "max_rel_change_r_traj": 0.006867800001295388,
+     "median_rel_change_r_traj": 2.929437977861049e-05,
+     "max_rel_change_s_switch": 1.646194192073125e-07,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 0.9999710070537784,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9999234932960999,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 0.9999710070536996,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0
+    },
+    "causal_reproduces_registered": {
+     "t_sw": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "s_switch": {
+      "n": 98,
+      "n_equal": 94
+     },
+     "sdot": {
+      "n": 98,
+      "n_equal": 94
+     },
+     "r_cf": {
+      "n": 98,
+      "n_equal": 94
+     },
+     "chi_window_max": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "t_traj": {
+      "n": 98,
+      "n_equal": 98
+     },
+     "s_traj": {
+      "n": 98,
+      "n_equal": 0
+     },
+     "r_traj": {
+      "n": 98,
+      "n_equal": 0
+     },
+     "follows_branch": {
+      "n": 98,
+      "n_equal": 98
+     }
+    }
+   },
+   "Tp": {
+    "n_rows": 120,
+    "n_path_sha256_verified": 120,
+    "masked_reproduces": {
+     "t_sw": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_switch": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "sdot": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_cf": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "chi_window_max": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "t_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "r_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "follows_branch": {
+      "n": 120,
+      "n_equal": 120
+     }
+    },
+    "masked_follows_branch_true": 120,
+    "causal_POST_HOC": {
+     "n": 120,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 120,
+      "n_at_or_after": 118,
+      "n_at": 118,
+      "n_strictly_after": 0,
+      "n_before": 2,
+      "max_steps_after": 0.0,
+      "median_steps_after_among_after": null,
+      "d_min": -1.0,
+      "d_median": 0.0,
+      "d_max": 0.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 0,
+     "max_rel_change_r_traj": 0.0005004276384362738,
+     "median_rel_change_r_traj": 0.00043395796965051137,
+     "max_rel_change_s_switch": 8.791111067996127e-07,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 1.0000067931343464,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9999861101465378,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 1.0004341463711235,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0
+    },
+    "causal_reproduces_registered": {
+     "t_sw": {
+      "n": 120,
+      "n_equal": 115
+     },
+     "s_switch": {
+      "n": 120,
+      "n_equal": 0
+     },
+     "sdot": {
+      "n": 120,
+      "n_equal": 0
+     },
+     "r_cf": {
+      "n": 120,
+      "n_equal": 0
+     },
+     "chi_window_max": {
+      "n": 120,
+      "n_equal": 118
+     },
+     "t_traj": {
+      "n": 120,
+      "n_equal": 120
+     },
+     "s_traj": {
+      "n": 120,
+      "n_equal": 2
+     },
+     "r_traj": {
+      "n": 120,
+      "n_equal": 0
+     },
+     "follows_branch": {
+      "n": 120,
+      "n_equal": 120
+     }
+    }
+   }
+  },
+  "truncated": {
+   "D": {
+    "n_rows": 120,
+    "n_path_sha256_verified": 120,
+    "reproduces": {
+     "trunc_traj": {
+      "t_sw": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_switch": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "t_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "r_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "follows_branch": {
+       "n": 120,
+       "n_equal": 120
+      }
+     },
+     "trunc_cf": {
+      "t_sw": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_switch": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "sdot": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "r_cf": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "chi_window_max": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "follows_branch": {
+       "n": 120,
+       "n_equal": 120
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 120,
+    "n_all_cf_fields_reproduced": 120,
+    "L_traj_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -6.0,
+     "d_median": -4.0,
+     "d_max": -1.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 120,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -289.0,
+     "d_median": -206.0,
+     "d_max": -161.0
+    }
+   },
+   "T": {
+    "n_rows": 98,
+    "n_path_sha256_verified": 98,
+    "reproduces": {
+     "trunc_traj": {
+      "t_sw": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "s_switch": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "t_traj": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "s_traj": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "r_traj": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "follows_branch": {
+       "n": 98,
+       "n_equal": 98
+      }
+     },
+     "trunc_cf": {
+      "t_sw": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "s_switch": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "sdot": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "r_cf": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "chi_window_max": {
+       "n": 98,
+       "n_equal": 98
+      },
+      "follows_branch": {
+       "n": 98,
+       "n_equal": 98
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 98,
+    "n_all_cf_fields_reproduced": 98,
+    "L_traj_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 98,
+     "n_at": 95,
+     "n_strictly_after": 3,
+     "n_before": 0,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 3.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 98,
+     "n_at_or_after": 4,
+     "n_at": 2,
+     "n_strictly_after": 2,
+     "n_before": 94,
+     "max_steps_after": 3.0,
+     "median_steps_after_among_after": 2.0,
+     "d_min": -75.0,
+     "d_median": -24.0,
+     "d_max": 3.0
+    }
+   },
+   "Tp": {
+    "n_rows": 120,
+    "n_path_sha256_verified": 120,
+    "reproduces": {
+     "trunc_traj": {
+      "t_sw": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_switch": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "t_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "r_traj": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "follows_branch": {
+       "n": 120,
+       "n_equal": 120
+      }
+     },
+     "trunc_cf": {
+      "t_sw": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "s_switch": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "sdot": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "r_cf": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "chi_window_max": {
+       "n": 120,
+       "n_equal": 120
+      },
+      "follows_branch": {
+       "n": 120,
+       "n_equal": 120
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 120,
+    "n_all_cf_fields_reproduced": 120,
+    "L_traj_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 120,
+     "n_at_or_after": 120,
+     "n_at": 0,
+     "n_strictly_after": 120,
+     "n_before": 0,
+     "max_steps_after": 83.0,
+     "median_steps_after_among_after": 43.5,
+     "d_min": 10.0,
+     "d_median": 43.5,
+     "d_max": 83.0
+    }
+   }
+  }
+ },
+ "GELU-T": {
+  "arms": {
+   "random": {
+    "n_runs": 80,
+    "n_on_branch": 80,
+    "n_scored": 80,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 80,
+     "n_at": 36,
+     "n_strictly_after": 44,
+     "n_before": 0,
+     "max_steps_after": 191.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 1.0,
+     "d_max": 191.0
+    },
+    "n_t_traj_equal_t_obs": 36,
+    "L1_ratio_split": {
+     "n": 80,
+     "n_t_traj_equal_t_obs": 36,
+     "n_identity_s_traj_identical_s_obs": 36,
+     "max_abs_ratio_minus_1_among_identity": 7.260858581048524e-14,
+     "n_other": 44,
+     "n_other_ratio_below_1": 34,
+     "n_other_ratio_above_1": 10,
+     "n_other_ratio_exactly_1": 0
+    },
+    "kappa_negative_t_sw_minus_t_traj": {
+     "min": 14.0,
+     "max": 119.0
+    },
+    "s_traj_minus_s_obs_over_s_switch_among_after": {
+     "n": 44,
+     "min": 5.9427411734647365e-05,
+     "median": 9.781536369841303e-05,
+     "max": 0.01877966762276667
+    },
+    "segment_end_traj_T_min_scored": 12894,
+    "n_traj_T_greater_than_t_obs": 80,
+    "t_sw_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 13,
+     "n_at": 0,
+     "n_strictly_after": 13,
+     "n_before": 67,
+     "max_steps_after": 310.0,
+     "median_steps_after_among_after": 37.0,
+     "d_min": -61.0,
+     "d_median": -39.0,
+     "d_max": 310.0
+    },
+    "r_cf_sdot_window": {
+     "n": 80,
+     "n_end_at_or_after": 13,
+     "n_entirely_at_or_after": 4,
+     "n_straddling": 9,
+     "max_steps_tsw_after": 310.0
+    },
+    "n_kappa_negative_scored": 8,
+    "kappa_negative_t_sw_vs_t_obs": {
+     "n": 8,
+     "n_at_or_after": 8,
+     "n_at": 0,
+     "n_strictly_after": 8,
+     "n_before": 0,
+     "max_steps_after": 310.0,
+     "median_steps_after_among_after": 84.0,
+     "d_min": 20.0,
+     "d_median": 84.0,
+     "d_max": 310.0
+    },
+    "kappa_positive_t_sw_vs_t_obs": {
+     "n": 72,
+     "n_at_or_after": 5,
+     "n_at": 0,
+     "n_strictly_after": 5,
+     "n_before": 67,
+     "max_steps_after": 11.0,
+     "median_steps_after_among_after": 2.0,
+     "d_min": -61.0,
+     "d_median": -40.0,
+     "d_max": 11.0
+    },
+    "follow_check_t_follow_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 80,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -4266.0,
+     "d_median": -2424.5,
+     "d_max": -1378.0
+    },
+    "n_on_branch_not_following_excluded": 0,
+    "n_hold_G_positive_all_runs": 6,
+    "registered": {
+     "L1": {
+      "n": 80,
+      "median_ratio": 1.0000000000000087,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 80,
+      "spearman": 0.9985935302391,
+      "verdict": "PASS"
+     }
+    }
+   },
+   "branch": {
+    "n_runs": 80,
+    "n_on_branch": 80,
+    "n_scored": 80,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 80,
+     "n_at": 42,
+     "n_strictly_after": 38,
+     "n_before": 0,
+     "max_steps_after": 19.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 19.0
+    },
+    "n_t_traj_equal_t_obs": 42,
+    "L1_ratio_split": {
+     "n": 80,
+     "n_t_traj_equal_t_obs": 42,
+     "n_identity_s_traj_identical_s_obs": 42,
+     "max_abs_ratio_minus_1_among_identity": 7.260858581048524e-14,
+     "n_other": 38,
+     "n_other_ratio_below_1": 33,
+     "n_other_ratio_above_1": 5,
+     "n_other_ratio_exactly_1": 0
+    },
+    "kappa_negative_t_sw_minus_t_traj": {
+     "min": 19.0,
+     "max": 41.0
+    },
+    "s_traj_minus_s_obs_over_s_switch_among_after": {
+     "n": 38,
+     "min": 5.9427411734647365e-05,
+     "median": 9.048409077485741e-05,
+     "max": 0.002416983629654378
+    },
+    "segment_end_traj_T_min_scored": 12951,
+    "n_traj_T_greater_than_t_obs": 80,
+    "t_sw_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 7,
+     "n_at": 0,
+     "n_strictly_after": 7,
+     "n_before": 73,
+     "max_steps_after": 60.0,
+     "median_steps_after_among_after": 10.0,
+     "d_min": -61.0,
+     "d_median": -41.5,
+     "d_max": 60.0
+    },
+    "r_cf_sdot_window": {
+     "n": 80,
+     "n_end_at_or_after": 7,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 7,
+     "max_steps_tsw_after": 60.0
+    },
+    "n_kappa_negative_scored": 2,
+    "kappa_negative_t_sw_vs_t_obs": {
+     "n": 2,
+     "n_at_or_after": 2,
+     "n_at": 0,
+     "n_strictly_after": 2,
+     "n_before": 0,
+     "max_steps_after": 60.0,
+     "median_steps_after_among_after": 43.0,
+     "d_min": 26.0,
+     "d_median": 43.0,
+     "d_max": 60.0
+    },
+    "kappa_positive_t_sw_vs_t_obs": {
+     "n": 78,
+     "n_at_or_after": 5,
+     "n_at": 0,
+     "n_strictly_after": 5,
+     "n_before": 73,
+     "max_steps_after": 13.0,
+     "median_steps_after_among_after": 10.0,
+     "d_min": -61.0,
+     "d_median": -42.5,
+     "d_max": 13.0
+    },
+    "follow_check_t_follow_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 80,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -4266.0,
+     "d_median": -2571.0,
+     "d_max": -1482.0
+    },
+    "n_on_branch_not_following_excluded": 0,
+    "n_hold_G_positive_all_runs": 0,
+    "registered": {
+     "L1": {
+      "n": 80,
+      "median_ratio": 1.000000000000006,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 80,
+      "spearman": 0.9987576183778716,
+      "verdict": "PASS"
+     }
+    }
+   }
+  },
+  "replay": {
+   "branch": {
+    "n_rows": 80,
+    "n_path_sha256_verified": 80,
+    "masked_reproduces": {
+     "t_sw": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_switch": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "sdot": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "r_cf": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "chi_window_max": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "t_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "r_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "follows_branch": {
+      "n": 80,
+      "n_equal": 80
+     }
+    },
+    "masked_follows_branch_true": 80,
+    "causal_POST_HOC": {
+     "n": 80,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 80,
+      "n_at_or_after": 80,
+      "n_at": 42,
+      "n_strictly_after": 38,
+      "n_before": 0,
+      "max_steps_after": 19.0,
+      "median_steps_after_among_after": 1.0,
+      "d_min": 0.0,
+      "d_median": 0.0,
+      "d_max": 19.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 0,
+     "max_rel_change_r_traj": 0.34812945800799167,
+     "median_rel_change_r_traj": 4.9368495800727885e-05,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 0.9999620236677442,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9987576183778716,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 0.9999620236677198,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0
+    },
+    "causal_reproduces_registered": {
+     "t_sw": {
+      "n": 80,
+      "n_equal": 79
+     },
+     "s_switch": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "sdot": {
+      "n": 80,
+      "n_equal": 73
+     },
+     "r_cf": {
+      "n": 80,
+      "n_equal": 73
+     },
+     "chi_window_max": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "t_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_traj": {
+      "n": 80,
+      "n_equal": 0
+     },
+     "r_traj": {
+      "n": 80,
+      "n_equal": 0
+     },
+     "follows_branch": {
+      "n": 80,
+      "n_equal": 80
+     }
+    }
+   },
+   "random": {
+    "n_rows": 80,
+    "n_path_sha256_verified": 80,
+    "masked_reproduces": {
+     "t_sw": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_switch": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "sdot": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "r_cf": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "chi_window_max": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "t_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "r_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "follows_branch": {
+      "n": 80,
+      "n_equal": 80
+     }
+    },
+    "masked_follows_branch_true": 80,
+    "causal_POST_HOC": {
+     "n": 80,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 80,
+      "n_at_or_after": 80,
+      "n_at": 36,
+      "n_strictly_after": 44,
+      "n_before": 0,
+      "max_steps_after": 191.0,
+      "median_steps_after_among_after": 1.0,
+      "d_min": 0.0,
+      "d_median": 1.0,
+      "d_max": 191.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 0,
+     "max_rel_change_r_traj": 0.34812945703054354,
+     "median_rel_change_r_traj": 6.23343173771218e-05,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 0.9999578839375565,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9985935302391,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 0.9999578839375369,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0
+    },
+    "causal_reproduces_registered": {
+     "t_sw": {
+      "n": 80,
+      "n_equal": 77
+     },
+     "s_switch": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "sdot": {
+      "n": 80,
+      "n_equal": 67
+     },
+     "r_cf": {
+      "n": 80,
+      "n_equal": 67
+     },
+     "chi_window_max": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "t_traj": {
+      "n": 80,
+      "n_equal": 80
+     },
+     "s_traj": {
+      "n": 80,
+      "n_equal": 0
+     },
+     "r_traj": {
+      "n": 80,
+      "n_equal": 0
+     },
+     "follows_branch": {
+      "n": 80,
+      "n_equal": 80
+     }
+    }
+   }
+  },
+  "truncated": {
+   "branch": {
+    "n_rows": 80,
+    "n_path_sha256_verified": 80,
+    "reproduces": {
+     "trunc_traj": {
+      "t_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "s_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "r_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "follows_branch": {
+       "n": 80,
+       "n_equal": 80
+      }
+     },
+     "trunc_cf": {
+      "t_sw": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "s_switch": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "sdot": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "r_cf": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "chi_window_max": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "follows_branch": {
+       "n": 80,
+       "n_equal": 80
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 80,
+    "n_all_cf_fields_reproduced": 80,
+    "L_traj_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 80,
+     "n_at": 42,
+     "n_strictly_after": 38,
+     "n_before": 0,
+     "max_steps_after": 19.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 0.0,
+     "d_max": 19.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 7,
+     "n_at": 0,
+     "n_strictly_after": 7,
+     "n_before": 73,
+     "max_steps_after": 60.0,
+     "median_steps_after_among_after": 10.0,
+     "d_min": -61.0,
+     "d_median": -41.5,
+     "d_max": 60.0
+    }
+   },
+   "random": {
+    "n_rows": 80,
+    "n_path_sha256_verified": 80,
+    "reproduces": {
+     "trunc_traj": {
+      "t_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "s_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "r_traj": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "follows_branch": {
+       "n": 80,
+       "n_equal": 80
+      }
+     },
+     "trunc_cf": {
+      "t_sw": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "s_switch": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "sdot": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "r_cf": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "chi_window_max": {
+       "n": 80,
+       "n_equal": 80
+      },
+      "follows_branch": {
+       "n": 80,
+       "n_equal": 80
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 80,
+    "n_all_cf_fields_reproduced": 80,
+    "L_traj_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 80,
+     "n_at": 36,
+     "n_strictly_after": 44,
+     "n_before": 0,
+     "max_steps_after": 191.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": 0.0,
+     "d_median": 1.0,
+     "d_max": 191.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 80,
+     "n_at_or_after": 13,
+     "n_at": 0,
+     "n_strictly_after": 13,
+     "n_before": 67,
+     "max_steps_after": 310.0,
+     "median_steps_after_among_after": 37.0,
+     "d_min": -61.0,
+     "d_median": -39.0,
+     "d_max": 310.0
+    }
+   }
+  }
+ },
+ "Track A": {
+  "opts": {
+   "adam": {
+    "n_scored": 74,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 33,
+     "n_at": 1,
+     "n_strictly_after": 32,
+     "n_before": 41,
+     "max_steps_after": 66.0,
+     "median_steps_after_among_after": 16.0,
+     "d_min": -21.0,
+     "d_median": -3.5,
+     "d_max": 66.0
+    },
+    "n_t_traj_equal_t_obs": 1,
+    "L1_ratio_split": {
+     "n": 74,
+     "n_t_traj_equal_t_obs": 1,
+     "n_identity_s_traj_identical_s_obs": 1,
+     "max_abs_ratio_minus_1_among_identity": 0.0,
+     "n_other": 73,
+     "n_other_ratio_below_1": 32,
+     "n_other_ratio_above_1": 41,
+     "n_other_ratio_exactly_1": 0
+    },
+    "rule_point_t_R_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 74,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -744.0,
+     "d_median": -390.5,
+     "d_max": -78.0
+    },
+    "registered": {
+     "L1": {
+      "n": 74,
+      "median_ratio": 1.0650932556464947,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 74,
+      "spearman": 0.2484561273602369,
+      "verdict": "FAIL"
+     }
+    },
+    "rule_definition_t_top_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 70,
+     "max_steps_after": 140.0,
+     "median_steps_after_among_after": 75.0,
+     "d_min": -310.0,
+     "d_median": -64.0,
+     "d_max": 140.0
+    },
+    "r_cf_t_sw_vs_t_obs_from_path": {
+     "n": 74,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 74,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -123.0,
+     "d_median": -59.0,
+     "d_max": -18.0
+    },
+    "r_cf_sdot_window_from_path": {
+     "n": 74,
+     "n_end_at_or_after": 0,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 0,
+     "max_steps_tsw_after": 0.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 34,
+     "n_at": 1,
+     "n_strictly_after": 33,
+     "n_before": 40,
+     "max_steps_after": 140.0,
+     "median_steps_after_among_after": 19.0,
+     "d_min": -21.0,
+     "d_median": -3.0,
+     "d_max": 140.0
+    },
+    "r_cf_any_input_last_read_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 70,
+     "max_steps_after": 140.0,
+     "median_steps_after_among_after": 75.0,
+     "d_min": -123.0,
+     "d_median": -55.0,
+     "d_max": 140.0
+    },
+    "n_t_obs_replay_equal_csv": 74,
+    "n_adam_replay_bit_identical": 74
+   },
+   "sgd": {
+    "n_scored": 63,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 1,
+     "n_at": 1,
+     "n_strictly_after": 0,
+     "n_before": 62,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -5.0,
+     "d_median": -4.0,
+     "d_max": 0.0
+    },
+    "n_t_traj_equal_t_obs": 1,
+    "L1_ratio_split": {
+     "n": 63,
+     "n_t_traj_equal_t_obs": 1,
+     "n_identity_s_traj_identical_s_obs": 1,
+     "max_abs_ratio_minus_1_among_identity": 0.0,
+     "n_other": 62,
+     "n_other_ratio_below_1": 0,
+     "n_other_ratio_above_1": 62,
+     "n_other_ratio_exactly_1": 0
+    },
+    "rule_point_t_R_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 63,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -647.0,
+     "d_median": -425.0,
+     "d_max": -205.0
+    },
+    "registered": {
+     "L1": {
+      "n": 63,
+      "median_ratio": 1.0555267302534392,
+      "verdict": "PASS"
+     },
+     "L3": {
+      "n": 63,
+      "spearman": 0.9945276497695852,
+      "verdict": "PASS"
+     }
+    },
+    "rule_definition_t_top_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 59,
+     "max_steps_after": 181.0,
+     "median_steps_after_among_after": 94.5,
+     "d_min": -391.0,
+     "d_median": -81.0,
+     "d_max": 181.0
+    },
+    "r_cf_t_sw_vs_t_obs_from_path": {
+     "n": 63,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 63,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -93.0,
+     "d_median": -74.0,
+     "d_max": -61.0
+    },
+    "r_cf_sdot_window_from_path": {
+     "n": 63,
+     "n_end_at_or_after": 0,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 0,
+     "max_steps_tsw_after": 0.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 5,
+     "n_at": 1,
+     "n_strictly_after": 4,
+     "n_before": 58,
+     "max_steps_after": 181.0,
+     "median_steps_after_among_after": 94.5,
+     "d_min": -5.0,
+     "d_median": -4.0,
+     "d_max": 181.0
+    },
+    "r_cf_any_input_last_read_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 59,
+     "max_steps_after": 181.0,
+     "median_steps_after_among_after": 94.5,
+     "d_min": -93.0,
+     "d_median": -73.0,
+     "d_max": 181.0
+    },
+    "n_t_obs_replay_equal_csv": 63
+   }
+  },
+  "replay": {
+   "adam": {
+    "n_rows": 74,
+    "n_path_sha256_verified": 74,
+    "masked_reproduces": {
+     "t_rule": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "s_run": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "sdot": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "r_cf": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "t_traj": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "s_traj": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "r_traj": {
+      "n": 74,
+      "n_equal": 74
+     }
+    },
+    "masked_follows_branch_true": null,
+    "causal_POST_HOC": {
+     "n": 74,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 1,
+     "t_traj_minus_t_obs": {
+      "n": 74,
+      "n_at_or_after": 33,
+      "n_at": 1,
+      "n_strictly_after": 32,
+      "n_before": 41,
+      "max_steps_after": 66.0,
+      "median_steps_after_among_after": 16.0,
+      "d_min": -21.0,
+      "d_median": -3.5,
+      "d_max": 66.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 41,
+     "max_rel_change_r_traj": 0.014200981129647294,
+     "median_rel_change_r_traj": 1.2212453270876722e-15,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 1.0650932556464934,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.24890040725657162,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 1.0650932556464938,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0650932556464938
+    },
+    "causal_reproduces_registered": {
+     "t_rule": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "s_run": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "sdot": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "r_cf": {
+      "n": 74,
+      "n_equal": 74
+     },
+     "t_traj": {
+      "n": 74,
+      "n_equal": 73
+     },
+     "s_traj": {
+      "n": 74,
+      "n_equal": 41
+     },
+     "r_traj": {
+      "n": 74,
+      "n_equal": 41
+     }
+    }
+   },
+   "sgd": {
+    "n_rows": 63,
+    "n_path_sha256_verified": 63,
+    "masked_reproduces": {
+     "t_rule": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "s_run": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "sdot": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "r_cf": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "t_traj": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "s_traj": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "r_traj": {
+      "n": 63,
+      "n_equal": 63
+     }
+    },
+    "masked_follows_branch_true": null,
+    "causal_POST_HOC": {
+     "n": 63,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 63,
+      "n_at_or_after": 1,
+      "n_at": 1,
+      "n_strictly_after": 0,
+      "n_before": 62,
+      "max_steps_after": 0.0,
+      "median_steps_after_among_after": null,
+      "d_min": -5.0,
+      "d_median": -4.0,
+      "d_max": 0.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 62,
+     "max_rel_change_r_traj": 0.0003329842112473891,
+     "median_rel_change_r_traj": 4.440892098500626e-16,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 1.0555267302534384,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9945276497695852,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 1.0555267302534375,
+     "median_ratio_registered_r_obs_over_r_traj": 1.0555267302534384
+    },
+    "causal_reproduces_registered": {
+     "t_rule": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "s_run": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "sdot": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "r_cf": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "t_traj": {
+      "n": 63,
+      "n_equal": 63
+     },
+     "s_traj": {
+      "n": 63,
+      "n_equal": 62
+     },
+     "r_traj": {
+      "n": 63,
+      "n_equal": 62
+     }
+    }
+   }
+  },
+  "truncated": {
+   "adam": {
+    "n_rows": 74,
+    "n_path_sha256_verified": 74,
+    "reproduces": {
+     "trunc_traj": {
+      "t_rule": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "s_run": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "t_traj": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "s_traj": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "r_traj": {
+       "n": 74,
+       "n_equal": 74
+      }
+     },
+     "trunc_cf": {
+      "t_rule": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "s_run": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "sdot": {
+       "n": 74,
+       "n_equal": 74
+      },
+      "r_cf": {
+       "n": 74,
+       "n_equal": 74
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 74,
+    "n_all_cf_fields_reproduced": 74,
+    "L_traj_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 34,
+     "n_at": 1,
+     "n_strictly_after": 33,
+     "n_before": 40,
+     "max_steps_after": 140.0,
+     "median_steps_after_among_after": 19.0,
+     "d_min": -21.0,
+     "d_median": -3.0,
+     "d_max": 140.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 74,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 70,
+     "max_steps_after": 140.0,
+     "median_steps_after_among_after": 75.0,
+     "d_min": -123.0,
+     "d_median": -55.0,
+     "d_max": 140.0
+    }
+   },
+   "sgd": {
+    "n_rows": 63,
+    "n_path_sha256_verified": 63,
+    "reproduces": {
+     "trunc_traj": {
+      "t_rule": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "s_run": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "t_traj": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "s_traj": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "r_traj": {
+       "n": 63,
+       "n_equal": 63
+      }
+     },
+     "trunc_cf": {
+      "t_rule": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "s_run": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "sdot": {
+       "n": 63,
+       "n_equal": 63
+      },
+      "r_cf": {
+       "n": 63,
+       "n_equal": 63
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 63,
+    "n_all_cf_fields_reproduced": 63,
+    "L_traj_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 5,
+     "n_at": 1,
+     "n_strictly_after": 4,
+     "n_before": 58,
+     "max_steps_after": 181.0,
+     "median_steps_after_among_after": 94.5,
+     "d_min": -5.0,
+     "d_median": -4.0,
+     "d_max": 181.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 63,
+     "n_at_or_after": 4,
+     "n_at": 0,
+     "n_strictly_after": 4,
+     "n_before": 59,
+     "max_steps_after": 181.0,
+     "median_steps_after_among_after": 94.5,
+     "d_min": -93.0,
+     "d_median": -73.0,
+     "d_max": 181.0
+    }
+   }
+  }
+ },
+ "Test 2A": {
+  "opts": {
+   "adam": {
+    "n_scored": 75,
+    "r_traj_recursion_last_read_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 10,
+     "n_at": 3,
+     "n_strictly_after": 7,
+     "n_before": 65,
+     "max_steps_after": 4.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": -6.0,
+     "d_median": -3.0,
+     "d_max": 4.0
+    },
+    "n_t_traj_equal_t_obs": 3,
+    "L1_ratio_split": {
+     "n": 75,
+     "n_t_traj_equal_t_obs": 3,
+     "n_identity_s_traj_identical_s_obs": 3,
+     "max_abs_ratio_minus_1_among_identity": 1.3322676295501878e-15,
+     "n_other": 72,
+     "n_other_ratio_below_1": 7,
+     "n_other_ratio_above_1": 65,
+     "n_other_ratio_exactly_1": 0
+    },
+    "rule_point_t_R_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 75,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -604.0,
+     "d_median": -221.0,
+     "d_max": -41.0
+    },
+    "registered": {
+     "A1": {
+      "n": 75,
+      "spearman": 0.932176386913229,
+      "verdict": "PASS"
+     },
+     "A3": {
+      "n": 75,
+      "median_ratio": 1.057862422999403,
+      "verdict": "PASS"
+     }
+    },
+    "t_sw_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 75,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -122.0,
+     "d_median": -56.0,
+     "d_max": -8.0
+    },
+    "r_cf_sdot_window": {
+     "n": 75,
+     "n_end_at_or_after": 0,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 0,
+     "max_steps_tsw_after": 0.0
+    },
+    "n_P_read_at_t_sw_after_t_R": 75,
+    "t_sw_minus_t_R": {
+     "min": 30.0,
+     "median": 164.0,
+     "max": 488.0
+    },
+    "rule_definition_t_top_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 1,
+     "n_at": 0,
+     "n_strictly_after": 1,
+     "n_before": 74,
+     "max_steps_after": 53.0,
+     "median_steps_after_among_after": 53.0,
+     "d_min": -289.0,
+     "d_median": -62.0,
+     "d_max": 53.0
+    },
+    "r_cf_t_sw_vs_t_obs_from_path": {
+     "n": 75,
+     "n_at_or_after": 0,
+     "n_at": 0,
+     "n_strictly_after": 0,
+     "n_before": 75,
+     "max_steps_after": 0.0,
+     "median_steps_after_among_after": null,
+     "d_min": -122.0,
+     "d_median": -56.0,
+     "d_max": -8.0
+    },
+    "r_cf_sdot_window_from_path": {
+     "n": 75,
+     "n_end_at_or_after": 0,
+     "n_entirely_at_or_after": 0,
+     "n_straddling": 0,
+     "max_steps_tsw_after": 0.0
+    },
+    "r_traj_any_input_last_read_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 10,
+     "n_at": 2,
+     "n_strictly_after": 8,
+     "n_before": 65,
+     "max_steps_after": 53.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": -6.0,
+     "d_median": -3.0,
+     "d_max": 53.0
+    },
+    "r_cf_any_input_last_read_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 1,
+     "n_at": 0,
+     "n_strictly_after": 1,
+     "n_before": 74,
+     "max_steps_after": 53.0,
+     "median_steps_after_among_after": 53.0,
+     "d_min": -122.0,
+     "d_median": -54.0,
+     "d_max": 53.0
+    },
+    "n_t_obs_replay_equal_csv": 75,
+    "n_adam_replay_bit_identical": 75
+   }
+  },
+  "replay": {
+   "adam": {
+    "n_rows": 75,
+    "n_path_sha256_verified": 75,
+    "masked_reproduces": {
+     "t_rule": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "s_run": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "t_sw": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "sdot": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "r_cf": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "t_traj": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "s_traj": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "r_traj": {
+      "n": 75,
+      "n_equal": 75
+     }
+    },
+    "masked_follows_branch_true": null,
+    "causal_POST_HOC": {
+     "n": 75,
+     "n_no_prediction": 0,
+     "n_t_traj_changed": 0,
+     "t_traj_minus_t_obs": {
+      "n": 75,
+      "n_at_or_after": 10,
+      "n_at": 3,
+      "n_strictly_after": 7,
+      "n_before": 65,
+      "max_steps_after": 4.0,
+      "median_steps_after_among_after": 1.0,
+      "d_min": -6.0,
+      "d_median": -3.0,
+      "d_max": 4.0
+     },
+     "n_r_traj_bit_or_rtol_equal_registered": 65,
+     "max_rel_change_r_traj": 0.04433397839227693,
+     "median_rel_change_r_traj": 4.440892098500626e-16,
+     "max_rel_change_s_switch": 2.220446049250313e-16,
+     "median_ratio_r_obs_over_r_traj_causal_same_s_switch": 1.0578624229994027,
+     "spearman_r_traj_causal_vs_r_obs_same_s_switch": 0.9302133712660027,
+     "median_ratio_r_obs_registered_over_r_traj_causal": 1.0578624229994027,
+     "median_ratio_registered_r_obs_over_r_traj": 1.057862422999403
+    },
+    "causal_reproduces_registered": {
+     "t_rule": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "s_run": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "t_sw": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "sdot": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "r_cf": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "t_traj": {
+      "n": 75,
+      "n_equal": 75
+     },
+     "s_traj": {
+      "n": 75,
+      "n_equal": 65
+     },
+     "r_traj": {
+      "n": 75,
+      "n_equal": 65
+     }
+    }
+   }
+  },
+  "truncated": {
+   "adam": {
+    "n_rows": 75,
+    "n_path_sha256_verified": 75,
+    "reproduces": {
+     "trunc_traj": {
+      "t_rule": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "s_run": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "t_sw": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "t_traj": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "s_traj": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "r_traj": {
+       "n": 75,
+       "n_equal": 75
+      }
+     },
+     "trunc_cf": {
+      "t_rule": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "s_run": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "t_sw": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "sdot": {
+       "n": 75,
+       "n_equal": 75
+      },
+      "r_cf": {
+       "n": 75,
+       "n_equal": 75
+      }
+     }
+    },
+    "n_all_traj_fields_reproduced": 75,
+    "n_all_cf_fields_reproduced": 75,
+    "L_traj_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 10,
+     "n_at": 2,
+     "n_strictly_after": 8,
+     "n_before": 65,
+     "max_steps_after": 53.0,
+     "median_steps_after_among_after": 1.0,
+     "d_min": -6.0,
+     "d_median": -3.0,
+     "d_max": 53.0
+    },
+    "L_cf_vs_t_obs": {
+     "n": 75,
+     "n_at_or_after": 1,
+     "n_at": 0,
+     "n_strictly_after": 1,
+     "n_before": 74,
+     "max_steps_after": 53.0,
+     "median_steps_after_among_after": 53.0,
+     "d_min": -122.0,
+     "d_median": -54.0,
+     "d_max": 53.0
+    }
+   }
+  }
+ }
+}
