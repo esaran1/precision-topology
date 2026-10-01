@@ -1,0 +1,4 @@
+Phase 1C registration
+registration commit: 6433edc3ce821684dd1aad38cd55fdd35de8f95d
+sha256 results/phase1c_registration.md: 876bbc13f06193fb06ca1f58d303f91f16ec90021e57bb1b2096e019829f90e7
+sha256 results/phase1c/registration.sha256: 4dad6c07f8d5f503f46156e630dff2ab1aea2c4c2b1383893c7273be1ee3a715
