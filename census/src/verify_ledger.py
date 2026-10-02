@@ -607,6 +607,7 @@ def main() -> None:
     phase1a_checks()
     phase1c_checks()
     phase1b_checks()
+    phase2c_checks()
 
     provenance_check()
 
@@ -949,6 +950,10 @@ PRODUCERS = {
     "phase1b/runs_w2a.jsonl": ("phase1b", "run", "full", ""),
     "phase1b/summary.json": ("phase1b", "summarize", "full", ""),
     "phase1b_results.md": ("phase1b", "report", "full", ""),
+    # Phase 2C (DESCRIPTIVE: κχ at the crossing in standard training): src/phase2c_map.py
+    "phase2c/kappa_chi_map.json": ("phase2c_map", "main", "full", ""),
+    "phase2c_kappa_chi_map.md": ("phase2c_map", "main", "full", ""),
+    "phase2c/sb_eps_F.json": ("phase2c_map", "sb_eps_f", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3261,6 +3266,30 @@ def phase1b_checks() -> None:
             chk(f"P1B {arm} misses at f", float(o["at_f"]["n_scored_miss"]), float(n_miss), 0)
             chk(f"P1B {arm} POST HOC criteria outcome {oc}", float(o["at_f"]["outcome_criteria"] == oc), 1.0, 0)
             chk(f"P1B {arm} registered outcome unchanged ({reg})", float(o["registered"]["outcome"] == reg), 1.0, 0)
+
+
+P2C_PIN = {"width-1 sine | Adam": 408, "width-1 sine | SGD": 207, "width-1 GELU | Adam": 114,
+           "band task in R^d | Adam": 705, "width 2 | Adam": 75}   # pooled n with a finite κχ
+
+
+def phase2c_checks() -> None:
+    """Phase 2C (DESCRIPTIVE; no registration, no criteria): kappa_chi_map.json regenerates from the committed sources;
+    the page regenerates from it; the per-run ε_F file reproduces the committed population fold constant with the
+    median P; pooled counts pinned; no κχ for the simplicity-bias benchmark (κ undefined on M)."""
+    from . import phase2c_map as P2C
+    print("Phase 2C: κχ at the crossing in standard training (DESCRIPTIVE)")
+    J = json.loads((P2C.OUT / "kappa_chi_map.json").read_text())
+    chk("P2C kappa_chi_map.json regenerates from the committed sources",
+        float(J == json.loads(json.dumps(P2C.finalize(P2C.build())))), 1.0, 0)
+    chk("P2C phase2c_kappa_chi_map.md regenerates from the JSON", float(P2C.MD.read_text() == P2C.render_md(J)), 1.0, 0)
+    E = json.loads((P2C.OUT / "sb_eps_F.json").read_text())["population"]
+    chk("P2C ε_F (median P) reproduces fold_constant_adam.json",
+        abs(E["eps_F_recomputed_median_P"] / E["eps_F_committed"] - 1), 0.0, 1e-12)
+    chk("P2C λ_min path (median P) max rel diff", float(E["lambda_path_max_rel_diff"]), 0.0, 1e-12)
+    for k, n in P2C_PIN.items():
+        chk(f"P2C pooled {k} n", float(J["pooled"][k]["summary"]["n"]), float(n), 0)
+    chk("P2C κχ cells for the simplicity-bias benchmark",
+        float(sum(c["setting"] == "simplicity bias" and c["quantity"] == "kappa_chi" for c in J["cells"])), 0.0, 0)
 
 
 def provenance_check() -> None:

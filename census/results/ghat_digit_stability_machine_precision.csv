@@ -21,3 +21,5 @@ T4 limit solve margin 1.06 hi,6e-10,False
 T5 K tight target,1e-10,False
 T5 Krawczyk A* lo,1e-16,True
 T5 Krawczyk A* hi,1e-16,True
+P2C ε_F (median P) reproduces fold_constant_adam.json,1e-12,False
+P2C λ_min path (median P) max rel diff,1e-12,False
