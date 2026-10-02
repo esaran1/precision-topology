@@ -1,0 +1,35 @@
+2026-10-02 00:13:06 memory gate: free 40% swap_free 575.31M -> OK
+{
+ "label": "EXPLORATORY check (seed 2,953,099)",
+ "adam_numpy_vs_torch_max_rel_param_diff": {
+  "t<=100": 5.193372799892634e-16,
+  "t<=500": 9.201892588394722e-16,
+  "t<=1499": 9.201892588394722e-16
+ },
+ "s_torch_vs_numpy_at_1499": [
+  14.859869484739987,
+  14.859869484739992
+ ],
+ "rho2_grid_vs_src_max_abs_diff": 7.771561172376096e-16,
+ "rho2_rows_compared": 60,
+ "gplus_vs_src_max_abs_diff": 8.326672684688674e-17,
+ "gplus_rows_compared": 15
+}
+        1.70 real         1.27 user         0.15 sys
+           490553344  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               37706  page reclaims
+                 235  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                2337  voluntary context switches
+                 734  involuntary context switches
+         19313750371  instructions retired
+          5836940148  cycles elapsed
+           419136472  peak memory footprint

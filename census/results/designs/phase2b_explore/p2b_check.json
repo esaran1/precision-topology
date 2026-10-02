@@ -1,0 +1,16 @@
+{
+ "label": "EXPLORATORY check (seed 2,953,099)",
+ "adam_numpy_vs_torch_max_rel_param_diff": {
+  "t<=100": 5.193372799892634e-16,
+  "t<=500": 9.201892588394722e-16,
+  "t<=1499": 9.201892588394722e-16
+ },
+ "s_torch_vs_numpy_at_1499": [
+  14.859869484739987,
+  14.859869484739992
+ ],
+ "rho2_grid_vs_src_max_abs_diff": 7.771561172376096e-16,
+ "rho2_rows_compared": 60,
+ "gplus_vs_src_max_abs_diff": 8.326672684688674e-17,
+ "gplus_rows_compared": 15
+}

@@ -1,0 +1,11 @@
+#!/bin/zsh
+# Memory gate (separate logged step before every job and between runs): free >= 25% and swap free >= 500 MB, else wait.
+log=${1:-/dev/stdout}
+while true; do
+  free=$(memory_pressure -Q | awk -F': ' '/free percentage/{gsub("%","",$2); print $2}')
+  swapfree=$(sysctl -n vm.swapusage | sed -E 's/.*free = ([0-9.]+)M.*/\1/')
+  ok=$(awk -v f=$free -v s=$swapfree 'BEGIN{print (f>=25 && s>=500)?"OK":"WAIT"}')
+  echo "$(date '+%Y-%m-%d %H:%M:%S') memory gate: free ${free}% swap_free ${swapfree}M -> $ok" >> $log
+  [[ $ok == OK ]] && exit 0
+  sleep 60
+done
