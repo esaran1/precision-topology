@@ -1,0 +1,408 @@
+{
+ "label": "EXPLORATORY (exploration seeds; never to be registered)",
+ "arm2": "out16",
+ "arm3": "glob",
+ "on_exploration_seeds": {
+  "R_pass": true,
+  "N_pass": true,
+  "O_pass": true,
+  "onset_frac_above_s*": 0.9,
+  "arm2_median_diff": {
+   "scale_1.25s*|rho2": 0.2715,
+   "scale_1.25s*|acc_shuffled": 0.1172,
+   "scale_1.25s*|acc_reversed": 0.1469,
+   "scale_2s*|rho2": 0.2478,
+   "scale_2s*|acc_shuffled": 0.1484,
+   "scale_2s*|acc_reversed": 0.2494,
+   "scale_3s*|rho2": 0.307,
+   "scale_3s*|acc_shuffled": 0.1619,
+   "scale_3s*|acc_reversed": 0.3238,
+   "loss_0.1|rho2": 0.1168,
+   "loss_0.1|acc_shuffled": 0.0387,
+   "loss_0.1|acc_reversed": 0.0713,
+   "loss_0.03|rho2": 0.0621,
+   "loss_0.03|acc_shuffled": 0.025,
+   "loss_0.03|acc_reversed": 0.05,
+   "loss_0.01|rho2": 0.1916,
+   "loss_0.01|acc_shuffled": 0.0684,
+   "loss_0.01|acc_reversed": 0.1369
+  },
+  "arm2_ci_low": {
+   "scale_1.25s*|rho2": 0.1907,
+   "scale_1.25s*|acc_shuffled": 0.1094,
+   "scale_1.25s*|acc_reversed": 0.1338,
+   "scale_2s*|rho2": 0.1861,
+   "scale_2s*|acc_shuffled": 0.0956,
+   "scale_2s*|acc_reversed": 0.1831,
+   "scale_3s*|rho2": 0.2884,
+   "scale_3s*|acc_shuffled": 0.1444,
+   "scale_3s*|acc_reversed": 0.2888,
+   "loss_0.1|rho2": 0.081,
+   "loss_0.1|acc_shuffled": 0.0162,
+   "loss_0.1|acc_reversed": 0.0263,
+   "loss_0.03|rho2": 0.0442,
+   "loss_0.03|acc_shuffled": 0.0172,
+   "loss_0.03|acc_reversed": 0.0344,
+   "loss_0.01|rho2": 0.1672,
+   "loss_0.01|acc_shuffled": 0.0572,
+   "loss_0.01|acc_reversed": 0.1144
+  },
+  "arm2_n_up_down": {
+   "scale_1.25s*|rho2": [
+    20,
+    0
+   ],
+   "scale_1.25s*|acc_shuffled": [
+    19,
+    1
+   ],
+   "scale_1.25s*|acc_reversed": [
+    19,
+    1
+   ],
+   "scale_2s*|rho2": [
+    20,
+    0
+   ],
+   "scale_2s*|acc_shuffled": [
+    20,
+    0
+   ],
+   "scale_2s*|acc_reversed": [
+    20,
+    0
+   ],
+   "scale_3s*|rho2": [
+    20,
+    0
+   ],
+   "scale_3s*|acc_shuffled": [
+    20,
+    0
+   ],
+   "scale_3s*|acc_reversed": [
+    20,
+    0
+   ],
+   "loss_0.1|rho2": [
+    20,
+    0
+   ],
+   "loss_0.1|acc_shuffled": [
+    18,
+    2
+   ],
+   "loss_0.1|acc_reversed": [
+    18,
+    2
+   ],
+   "loss_0.03|rho2": [
+    20,
+    0
+   ],
+   "loss_0.03|acc_shuffled": [
+    18,
+    2
+   ],
+   "loss_0.03|acc_reversed": [
+    18,
+    2
+   ],
+   "loss_0.01|rho2": [
+    20,
+    0
+   ],
+   "loss_0.01|acc_shuffled": [
+    20,
+    0
+   ],
+   "loss_0.01|acc_reversed": [
+    20,
+    0
+   ]
+  },
+  "arm3_median_diff": {
+   "scale_1.25s*|rho2": 0.0072,
+   "scale_1.25s*|acc_shuffled": 0.0059,
+   "scale_1.25s*|acc_reversed": 0.0075,
+   "scale_2s*|rho2": -0.0022,
+   "scale_2s*|acc_shuffled": -0.0022,
+   "scale_2s*|acc_reversed": -0.0038,
+   "scale_3s*|rho2": -0.0428,
+   "scale_3s*|acc_shuffled": -0.0284,
+   "scale_3s*|acc_reversed": -0.0556,
+   "loss_0.1|rho2": -0.0051,
+   "loss_0.1|acc_shuffled": -0.0003,
+   "loss_0.1|acc_reversed": -0.0006,
+   "loss_0.03|rho2": -0.0181,
+   "loss_0.03|acc_shuffled": -0.0122,
+   "loss_0.03|acc_reversed": -0.0237,
+   "loss_0.01|rho2": -0.008,
+   "loss_0.01|acc_shuffled": -0.0156,
+   "loss_0.01|acc_reversed": -0.0312
+  },
+  "arm3_ci_high": {
+   "scale_1.25s*|rho2": 0.0281,
+   "scale_1.25s*|acc_shuffled": 0.0125,
+   "scale_1.25s*|acc_reversed": 0.0137,
+   "scale_2s*|rho2": 0.0042,
+   "scale_2s*|acc_shuffled": 0.0091,
+   "scale_2s*|acc_reversed": 0.0137,
+   "scale_3s*|rho2": -0.0265,
+   "scale_3s*|acc_shuffled": -0.0156,
+   "scale_3s*|acc_reversed": -0.0313,
+   "loss_0.1|rho2": 0.0036,
+   "loss_0.1|acc_shuffled": 0.0028,
+   "loss_0.1|acc_reversed": 0.0044,
+   "loss_0.03|rho2": -0.0127,
+   "loss_0.03|acc_shuffled": -0.0041,
+   "loss_0.03|acc_reversed": -0.0063,
+   "loss_0.01|rho2": -0.0007,
+   "loss_0.01|acc_shuffled": -0.0016,
+   "loss_0.01|acc_reversed": -0.0031
+  },
+  "arm3_n_up_down": {
+   "scale_1.25s*|rho2": [
+    14,
+    6
+   ],
+   "scale_1.25s*|acc_shuffled": [
+    13,
+    2
+   ],
+   "scale_1.25s*|acc_reversed": [
+    13,
+    2
+   ],
+   "scale_2s*|rho2": [
+    9,
+    11
+   ],
+   "scale_2s*|acc_shuffled": [
+    8,
+    11
+   ],
+   "scale_2s*|acc_reversed": [
+    7,
+    11
+   ],
+   "scale_3s*|rho2": [
+    2,
+    18
+   ],
+   "scale_3s*|acc_shuffled": [
+    2,
+    18
+   ],
+   "scale_3s*|acc_reversed": [
+    2,
+    18
+   ],
+   "loss_0.1|rho2": [
+    8,
+    12
+   ],
+   "loss_0.1|acc_shuffled": [
+    9,
+    10
+   ],
+   "loss_0.1|acc_reversed": [
+    9,
+    10
+   ],
+   "loss_0.03|rho2": [
+    2,
+    18
+   ],
+   "loss_0.03|acc_shuffled": [
+    3,
+    17
+   ],
+   "loss_0.03|acc_reversed": [
+    3,
+    17
+   ],
+   "loss_0.01|rho2": [
+    5,
+    15
+   ],
+   "loss_0.01|acc_shuffled": [
+    6,
+    14
+   ],
+   "loss_0.01|acc_reversed": [
+    6,
+    14
+   ]
+  },
+  "arm2_sd": {
+   "scale_1.25s*|rho2": 0.095,
+   "scale_1.25s*|acc_shuffled": 0.0632,
+   "scale_1.25s*|acc_reversed": 0.1044,
+   "scale_2s*|rho2": 0.0948,
+   "scale_2s*|acc_shuffled": 0.0589,
+   "scale_2s*|acc_reversed": 0.0912,
+   "scale_3s*|rho2": 0.0571,
+   "scale_3s*|acc_shuffled": 0.0375,
+   "scale_3s*|acc_reversed": 0.0746,
+   "loss_0.1|rho2": 0.0699,
+   "loss_0.1|acc_shuffled": 0.0438,
+   "loss_0.1|acc_reversed": 0.0859,
+   "loss_0.03|rho2": 0.052,
+   "loss_0.03|acc_shuffled": 0.0303,
+   "loss_0.03|acc_reversed": 0.0606,
+   "loss_0.01|rho2": 0.0426,
+   "loss_0.01|acc_shuffled": 0.0256,
+   "loss_0.01|acc_reversed": 0.0513
+  },
+  "arm3_sd": {
+   "scale_1.25s*|rho2": 0.0366,
+   "scale_1.25s*|acc_shuffled": 0.0143,
+   "scale_1.25s*|acc_reversed": 0.0164,
+   "scale_2s*|rho2": 0.0738,
+   "scale_2s*|acc_shuffled": 0.0501,
+   "scale_2s*|acc_reversed": 0.0658,
+   "scale_3s*|rho2": 0.0577,
+   "scale_3s*|acc_shuffled": 0.036,
+   "scale_3s*|acc_reversed": 0.069,
+   "loss_0.1|rho2": 0.0263,
+   "loss_0.1|acc_shuffled": 0.0156,
+   "loss_0.1|acc_reversed": 0.0259,
+   "loss_0.03|rho2": 0.0256,
+   "loss_0.03|acc_shuffled": 0.0188,
+   "loss_0.03|acc_reversed": 0.0375,
+   "loss_0.01|rho2": 0.0272,
+   "loss_0.01|acc_shuffled": 0.0236,
+   "loss_0.01|acc_reversed": 0.0471
+  }
+ },
+ "onset_binomial": {
+  "k_of_20": 18,
+  "wilson_low": 0.6989663528135878,
+  "P_pass_n20": {
+   "at_p_hat": 0.9887468658354911,
+   "at_wilson_low": 0.4124159639242597,
+   "at_0.85": 0.932692025814226
+  },
+  "P_pass_n30": {
+   "at_p_hat": 0.9922163807620787,
+   "at_wilson_low": 0.27725558365580116,
+   "at_0.85": 0.9302150123522642
+  },
+  "P_pass_n40": {
+   "at_p_hat": 0.9985302775027758,
+   "at_wilson_low": 0.30376601486901783,
+   "at_0.85": 0.9700791795412641
+  },
+  "P_pass_n60": {
+   "at_p_hat": 0.9997986122245103,
+   "at_wilson_low": 0.23839298063034997,
+   "at_0.85": 0.9864005300746337
+  }
+ },
+ "power_resampled": {
+  "as_explored": {
+   "30": {
+    "R": 0.9966666666666667,
+    "N": 0.6333333333333333,
+    "O": 0.9933333333333333,
+    "all": 0.63
+   },
+   "40": {
+    "R": 1.0,
+    "N": 0.7766666666666666,
+    "O": 1.0,
+    "all": 0.7766666666666666
+   },
+   "60": {
+    "R": 1.0,
+    "N": 0.9033333333333333,
+    "O": 1.0,
+    "all": 0.9033333333333333
+   }
+  },
+  "arm2_effect_halved_spread_doubled": {
+   "30": {
+    "R": 0.043333333333333335,
+    "N": 0.6066666666666667,
+    "O": 0.9966666666666667,
+    "all": 0.02
+   },
+   "40": {
+    "R": 0.06333333333333334,
+    "N": 0.7533333333333333,
+    "O": 1.0,
+    "all": 0.05
+   },
+   "60": {
+    "R": 0.09,
+    "N": 0.9,
+    "O": 1.0,
+    "all": 0.08333333333333333
+   }
+  },
+  "arm3_spread_doubled": {
+   "30": {
+    "R": 1.0,
+    "N": 0.15,
+    "O": 1.0,
+    "all": 0.15
+   },
+   "40": {
+    "R": 1.0,
+    "N": 0.25666666666666665,
+    "O": 1.0,
+    "all": 0.25666666666666665
+   },
+   "60": {
+    "R": 1.0,
+    "N": 0.39,
+    "O": 1.0,
+    "all": 0.39
+   }
+  },
+  "arm3_shifted_to_margin (should fail ~>= 50%)": {
+   "30": {
+    "R": 1.0,
+    "N": 0.0,
+    "O": 0.9933333333333333,
+    "all": 0.0
+   },
+   "40": {
+    "R": 1.0,
+    "N": 0.0,
+    "O": 1.0,
+    "all": 0.0
+   },
+   "60": {
+    "R": 1.0,
+    "N": 0.0,
+    "O": 1.0,
+    "all": 0.0
+   }
+  }
+ },
+ "power_settings": {
+  "sims": 300,
+  "inner_bootstrap": 1000,
+  "rng": [
+   20261002,
+   20261003
+  ],
+  "margins": {
+   "rho2": 0.03,
+   "acc_shuffled": 0.02,
+   "acc_reversed": 0.03
+  },
+  "onset_min": 0.75,
+  "onset_end": "T40000",
+  "points": [
+   "scale_1.25s*",
+   "scale_2s*",
+   "scale_3s*",
+   "loss_0.1",
+   "loss_0.03",
+   "loss_0.01"
+  ]
+ }
+}
