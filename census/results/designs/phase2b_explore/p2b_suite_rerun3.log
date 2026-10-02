@@ -1,0 +1,4 @@
+2026-10-02 01:48:12 memory gate: free 43% swap_free 1271.44M -> OK
+...                                                                      [100%]
+3 passed in 1.70s
+exit 0

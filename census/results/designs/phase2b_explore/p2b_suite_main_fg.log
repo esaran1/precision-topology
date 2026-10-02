@@ -1,0 +1,60 @@
+2026-10-02 01:48:33 memory gate: free 43% swap_free 1271.44M -> OK
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 54%]
+........................................................................ [ 62%]
+........................................................................ [ 70%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+.....................................................                    [100%]
+=============================== warnings summary ===============================
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: overflow encountered in scalar power
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: invalid value encountered in scalar add
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:78: RuntimeWarning: overflow encountered in scalar power
+    g = np.array([z[0] ** 2 - (C - s) - 0.3 * (z[1] - 0.3 * z[0]), z[1] - 0.3 * z[0], z[2]])
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: invalid value encountered in scalar subtract
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:78: RuntimeWarning: invalid value encountered in scalar subtract
+    g = np.array([z[0] ** 2 - (C - s) - 0.3 * (z[1] - 0.3 * z[0]), z[1] - 0.3 * z[0], z[2]])
+
+tests/test_gelu_transfer.py::test_L4_fails_when_the_prediction_is_no_closer_than_s_glob
+tests/test_gelu_transfer.py::test_V5_q90_kappa_chi
+tests/test_phase1c.py::test_registered_arms_pass[G-80-80]
+tests/test_phase1c.py::test_g_hold_positive_does_not_fail_the_random_gate
+tests/test_phase1c.py::test_registered_v6_unchanged_and_late_cutoffs_unscored
+tests/test_ramp.py::test_score_setting_cases
+tests/test_track2a.py::test_secondary_closed_form_is_reported_not_scored
+  /Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[:, None]
+
+tests/test_gelu_transfer.py::test_L4_fails_when_the_prediction_is_no_closer_than_s_glob
+tests/test_gelu_transfer.py::test_V5_q90_kappa_chi
+tests/test_ramp.py::test_score_setting_cases
+tests/test_track2a.py::test_secondary_closed_form_is_reported_not_scored
+  /Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[None, :]
+
+tests/test_simplicity_bias_v3.py::test_init_rule_caps_output_scale
+  /Users/Evan/precision-topology/census/tests/test_simplicity_bias_v3.py:57: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+  Consider using tensor.detach() first. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:823.)
+    s = float(out.weight.abs().sum())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+917 passed, 17 warnings in 316.51s (0:05:16)
+exit 0

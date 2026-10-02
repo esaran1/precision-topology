@@ -207,6 +207,18 @@ separately).
   - the check (2 s), the s-only timing pilot (~7 min, including one 6M-step run) and the diagnostics (~4 min).
 - The budget allowed 20 seeds instead of the suggested 8–10.
 
+**Test suite.** It ran as two processes, each gated, under nice 15, with no src/ or tests/ change in this work.
+
+| Log | Run | Result |
+|---|---|---|
+| `p2b_suite_certs.log` | test_verify_certificates | 33 passed, exit 0 |
+| `p2b_suite_main.log` | main suite, first run, detached in the background | 3 failed, 914 passed, exit 1 |
+| `p2b_suite_rerun3.log` | the 3 failing tests in the foreground | 3 passed, exit 0 (they also pass in the foreground under nice 15) |
+| `p2b_suite_main_fg.log` | main suite, rerun in the foreground | **917 passed, exit 0** |
+
+- The 3 failures were `PermissionError` from an unguarded `os.nice(15)` in `src/band_rd.py:629` and `src/ramp2.py:116`.
+- They are environmental: setpriority was refused in the detached background context of this session.
+
 ## Files
 
 | File | Contents |
