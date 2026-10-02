@@ -1,0 +1,3781 @@
+{
+ "label": "PHASE 1B: POST HOC causal re-scoring (no registered verdict changes)",
+ "forecaster": {
+  "file": "src/causal_forecast.py",
+  "commit": "25aac9e",
+  "sha256": "d6039f50c202531b6f255fb90af185a0df867232eaafbde12db881efb3a1750f"
+ },
+ "decisions": {
+  "f": {
+   "track_a/sgd": 0.9,
+   "track_a/adam": 0.9,
+   "track2a/adam": 0.9,
+   "gelu/random": 0.95,
+   "gelu/branch": 0.95,
+   "w2a/T": 0.95,
+   "w2a/D": 0.95,
+   "w2a/Tp": 0.95
+  },
+  "f_other": {
+   "track_a/sgd": 0.95,
+   "track_a/adam": 0.95,
+   "track2a/adam": 0.95,
+   "gelu/random": 0.9,
+   "gelu/branch": 0.9,
+   "w2a/T": 0.9,
+   "w2a/D": 0.9,
+   "w2a/Tp": 0.9
+  },
+  "tol_key": {
+   "track_a/sgd": "W1",
+   "track_a/adam": "W1",
+   "track2a/adam": "W1",
+   "gelu/random": "G",
+   "gelu/branch": "G",
+   "w2a/T": "T",
+   "w2a/D": null,
+   "w2a/Tp": "Tp"
+  },
+  "adam_P": {
+   "track_a/adam": "rule_point",
+   "track2a/adam": "cutoff"
+  },
+  "adam_P_other": {
+   "track_a/adam": "cutoff",
+   "track2a/adam": "rule_point"
+  },
+  "config": {
+   "family": "quad",
+   "window_frac": 0.05,
+   "min_window": 50,
+   "horizon_factor": 1.6
+  },
+  "tolerances": {
+   "W1": {
+    "tau_cross": 10,
+    "tau_lag": 15,
+    "band": 0.2
+   },
+   "G": {
+    "tau_cross": 10,
+    "tau_lag": 10,
+    "band": 0.15
+   },
+   "T": {
+    "tau_cross": 15,
+    "tau_lag": 5,
+    "band": 0.1
+   },
+   "Tp": {
+    "tau_cross": 30,
+    "tau_lag": 5,
+    "band": 0.1
+   }
+  }
+ },
+ "runs_files": {
+  "runs_track_a.jsonl": {
+   "sha256": "6bdc61543be701cff024b97badba0b25473df85d91bf8c5a2520551b0ead5b8f",
+   "n_forecasts_with_cutoff": 422,
+   "n_read_at_or_after_cutoff": 0,
+   "n_nan_recompute_differs": 0,
+   "n_rows": 137,
+   "n_path_sha256_ok": 137,
+   "n_adam_replay_bit_identical": 74,
+   "n_adam_rows": 74
+  },
+  "runs_track2a.jsonl": {
+   "sha256": "db2cf5872d504f5326b92519c0743ec1e7bbb0dd49d84aab3951656310f1461b",
+   "n_forecasts_with_cutoff": 300,
+   "n_read_at_or_after_cutoff": 0,
+   "n_nan_recompute_differs": 0,
+   "n_rows": 75,
+   "n_path_sha256_ok": 75,
+   "n_adam_replay_bit_identical": 75,
+   "n_adam_rows": 75
+  },
+  "runs_gelu.jsonl": {
+   "sha256": "27e182b6ae5577cda5a13afa9329ee1df64f7fb50d7b75ff19437b3b233f335e",
+   "n_forecasts_with_cutoff": 320,
+   "n_read_at_or_after_cutoff": 0,
+   "n_nan_recompute_differs": 0,
+   "n_rows": 160,
+   "n_path_sha256_ok": 160,
+   "n_adam_replay_bit_identical": 0,
+   "n_adam_rows": 0
+  },
+  "runs_w2a.jsonl": {
+   "sha256": "e636ce806c0f70dad706e7701d907d287a0b2738a94e609f1586815ac3e45b42",
+   "n_forecasts_with_cutoff": 676,
+   "n_read_at_or_after_cutoff": 0,
+   "n_nan_recompute_differs": 0,
+   "n_rows": 338,
+   "n_path_sha256_ok": 338,
+   "n_adam_replay_bit_identical": 0,
+   "n_adam_rows": 0
+  }
+ },
+ "arms": {
+  "track_a/sgd": {
+   "arm_id": "track_a/sgd",
+   "label": "Track A SGD (a = 1.65)",
+   "f": 0.9,
+   "f_other": 0.95,
+   "tol_key": "W1",
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 80,
+   "n_registered_scored": 63,
+   "registered": {
+    "outcome": "no combined outcome (L1 PASS, L2 PASS, L3 PASS)",
+    "L1": {
+     "verdict": "PASS",
+     "n": 63,
+     "median_ratio": 1.0555267302534392
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 63,
+     "median_ratio": 1.0237915919988754
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 63,
+     "spearman": 0.9945276497695852
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 63,
+    "cutoff_validity": {
+     "n_crossing_runs": 63,
+     "n_cutoff_before_crossing": 63,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 63,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 63,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 63,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 63,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 1.0,
+      "q10": 2.0,
+      "median": 3.0,
+      "q90": 4.0,
+      "max": 5.0,
+      "signed_median": -3.0
+     },
+     "abs_err_lag": {
+      "min": 3.0,
+      "q10": 4.0,
+      "median": 5.0,
+      "q90": 6.800000000000004,
+      "max": 8.0,
+      "signed_median": -5.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 63,
+      "q10": 1.1878266106862878,
+      "median": 1.2164073916748177,
+      "q90": 1.245638592347608
+     },
+     "D_vs_no_lag": {
+      "n": 63,
+      "mean": -70.01587301587301,
+      "ci95": [
+       -71.66666666666667,
+       -68.38095238095238
+      ],
+      "n_D_negative": 63
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 63,
+      "min": 115.0,
+      "median": 152.0,
+      "max": 197.0
+     },
+     "switch_steps": {
+      "n": 63,
+      "min": 51.0,
+      "median": 78.0,
+      "max": 111.0
+     },
+     "cross_lags": {
+      "n": 63,
+      "min": 1.7727272727272727,
+      "median": 2.012987012987013,
+      "max": 2.391891891891892
+     },
+     "switch_lags": {
+      "n": 63,
+      "min": 0.7727272727272727,
+      "median": 1.0129870129870129,
+      "max": 1.3918918918918919
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 63,
+      "n_within": 63,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 63,
+      "n_within": 63,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 63,
+      "n_excluded": 0,
+      "median_ratio": 1.2164073916748177,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "FAIL"
+     },
+     "C4": {
+      "n": 63,
+      "mean_D": -70.01587301587301,
+      "ci95": [
+       -71.66666666666667,
+       -68.38095238095238
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 63,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     }
+    },
+    "outcome_criteria": "FAIL C3",
+    "outcome_1c_rule": "FAIL C3",
+    "registered_criteria_on_r_fc": {
+     "outcome": null,
+     "valid": true,
+     "n_scored": null,
+     "L1": {
+      "verdict": "FAIL",
+      "n": 63,
+      "median_ratio": 1.2164073916748177
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 63,
+      "median_ratio": 1.023791591998875
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 63,
+      "spearman": 0.994815668202765
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 63
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 63,
+    "cutoff_validity": {
+     "n_crossing_runs": 63,
+     "n_cutoff_before_crossing": 63,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 63,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 63,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 63,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 63,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 2.0,
+      "q10": 3.2,
+      "median": 4.0,
+      "q90": 5.0,
+      "max": 6.0,
+      "signed_median": -4.0
+     },
+     "abs_err_lag": {
+      "min": 2.0,
+      "q10": 3.2,
+      "median": 5.0,
+      "q90": 6.0,
+      "max": 7.0,
+      "signed_median": -5.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 63,
+      "q10": 1.1069230961829755,
+      "median": 1.1226113256870063,
+      "q90": 1.1399097980057742
+     },
+     "D_vs_no_lag": {
+      "n": 63,
+      "mean": -70.61904761904762,
+      "ci95": [
+       -72.31746031746032,
+       -68.93650793650794
+      ],
+      "n_D_negative": 63
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 63,
+      "min": 89.0,
+      "median": 113.0,
+      "max": 146.0
+     },
+     "switch_steps": {
+      "n": 63,
+      "min": 25.0,
+      "median": 39.0,
+      "max": 57.0
+     },
+     "cross_lags": {
+      "n": 63,
+      "min": 1.378787878787879,
+      "median": 1.513157894736842,
+      "max": 1.7027027027027026
+     },
+     "switch_lags": {
+      "n": 63,
+      "min": 0.3787878787878788,
+      "median": 0.5131578947368421,
+      "max": 0.7027027027027027
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 63,
+      "n_within": 63,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 63,
+      "n_within": 63,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 63,
+      "n_excluded": 0,
+      "median_ratio": 1.1226113256870063,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 63,
+      "mean_D": -70.61904761904762,
+      "ci95": [
+       -72.31746031746032,
+       -68.93650793650794
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 63,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     }
+    },
+    "outcome_criteria": "PASS",
+    "outcome_1c_rule": "PASS",
+    "registered_criteria_on_r_fc": {
+     "outcome": null,
+     "valid": true,
+     "n_scored": null,
+     "L1": {
+      "verdict": "FAIL",
+      "n": 63,
+      "median_ratio": 1.1226113256870058
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 63,
+      "median_ratio": 1.023791591998875
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 63,
+      "spearman": 0.994959677419355
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 63
+   },
+   "s_run_cutoff_vs_registered": {
+    "n": 63,
+    "n_equal_rel_1e-9": 63,
+    "max_rel_diff": 2.220446049250313e-16
+   }
+  },
+  "track_a/adam": {
+   "arm_id": "track_a/adam",
+   "label": "Track A Adam (a = 1.65)",
+   "f": 0.9,
+   "f_other": 0.95,
+   "tol_key": "W1",
+   "adam_P": "rule_point",
+   "adam_P_other": "cutoff",
+   "n_runs": 80,
+   "n_registered_scored": 74,
+   "registered": {
+    "outcome": "no combined outcome (L1 PASS, L2 PASS, L3 FAIL)",
+    "L1": {
+     "verdict": "PASS",
+     "n": 74,
+     "median_ratio": 1.0650932556464947
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 74,
+     "median_ratio": 1.0454504462626704
+    },
+    "L3": {
+     "verdict": "FAIL",
+     "n": 74,
+     "spearman": 0.2484561273602369
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 74,
+    "cutoff_validity": {
+     "n_crossing_runs": 74,
+     "n_cutoff_before_crossing": 74,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 74,
+    "n_scored_miss": 8,
+    "n_scored_with_forecast": 66,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 74,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 74,
+     "n_miss": 8,
+     "abs_err_cross": {
+      "min": 0.0,
+      "q10": 2.5,
+      "median": 9.5,
+      "q90": 32.5,
+      "max": 64.0,
+      "signed_median": -1.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 3.0,
+      "median": 12.0,
+      "q90": 31.5,
+      "max": 64.0,
+      "signed_median": -3.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 66,
+      "q10": 0.7704524405992353,
+      "median": 1.1580195762776477,
+      "q90": 3.1858461766760615
+     },
+     "D_vs_no_lag": {
+      "n": 66,
+      "mean": -45.10606060606061,
+      "ci95": [
+       -49.81856060606061,
+       -40.09090909090909
+      ],
+      "n_D_negative": 66
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 74,
+      "min": 36.0,
+      "median": 132.5,
+      "max": 244.0
+     },
+     "switch_steps": {
+      "n": 74,
+      "min": 16.0,
+      "median": 69.0,
+      "max": 121.0
+     },
+     "cross_lags": {
+      "n": 74,
+      "min": 1.7307692307692308,
+      "median": 2.0339080459770114,
+      "max": 2.6666666666666665
+     },
+     "switch_lags": {
+      "n": 74,
+      "min": 0.7307692307692307,
+      "median": 1.0339080459770116,
+      "max": 1.6666666666666667
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 74,
+      "n_within": 39,
+      "n_miss": 8,
+      "n_err_undefined": 0,
+      "frac_within": 0.527027027027027,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 74,
+      "n_within": 43,
+      "n_miss": 8,
+      "n_err_undefined": 0,
+      "frac_within": 0.581081081081081,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C3": {
+      "n": 66,
+      "n_excluded": 8,
+      "median_ratio": 1.1580195762776477,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 66,
+      "mean_D": -45.10606060606061,
+      "ci95": [
+       -49.81856060606061,
+       -40.09090909090909
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 66,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     }
+    },
+    "outcome_criteria": "FAIL C1+C2",
+    "outcome_1c_rule": "FAIL C1+C2",
+    "registered_criteria_on_r_fc": {
+     "outcome": null,
+     "valid": true,
+     "n_scored": null,
+     "L1": {
+      "verdict": "FAIL",
+      "n": 66,
+      "median_ratio": 1.1580195762776468
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 66,
+      "median_ratio": 1.0454504462626697
+     },
+     "L3": {
+      "verdict": "FAIL",
+      "n": 66,
+      "spearman": 0.21816094353407786
+     }
+    },
+    "miss_statuses": {
+     "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 5
+    },
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 66
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 74,
+    "cutoff_validity": {
+     "n_crossing_runs": 74,
+     "n_cutoff_before_crossing": 74,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 74,
+    "n_scored_miss": 7,
+    "n_scored_with_forecast": 67,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 74,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 74,
+     "n_miss": 7,
+     "abs_err_cross": {
+      "min": 0.0,
+      "q10": 3.0,
+      "median": 10.0,
+      "q90": 32.4,
+      "max": 64.0,
+      "signed_median": -2.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 3.0,
+      "median": 12.0,
+      "q90": 32.4,
+      "max": 64.0,
+      "signed_median": -2.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 67,
+      "q10": 0.7273340826349043,
+      "median": 1.0666988209334867,
+      "q90": 2.1363428180211583
+     },
+     "D_vs_no_lag": {
+      "n": 67,
+      "mean": -45.53731343283582,
+      "ci95": [
+       -50.417910447761194,
+       -40.43246268656716
+      ],
+      "n_D_negative": 66
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 74,
+      "min": 28.0,
+      "median": 97.0,
+      "max": 184.0
+     },
+     "switch_steps": {
+      "n": 74,
+      "min": 8.0,
+      "median": 35.0,
+      "max": 61.0
+     },
+     "cross_lags": {
+      "n": 74,
+      "min": 1.380952380952381,
+      "median": 1.5212469522814351,
+      "max": 1.8571428571428572
+     },
+     "switch_lags": {
+      "n": 74,
+      "min": 0.38095238095238093,
+      "median": 0.5212469522814351,
+      "max": 0.8571428571428571
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 74,
+      "n_within": 34,
+      "n_miss": 7,
+      "n_err_undefined": 0,
+      "frac_within": 0.4594594594594595,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 74,
+      "n_within": 46,
+      "n_miss": 7,
+      "n_err_undefined": 0,
+      "frac_within": 0.6216216216216216,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C3": {
+      "n": 67,
+      "n_excluded": 7,
+      "median_ratio": 1.0666988209334867,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 67,
+      "mean_D": -45.53731343283582,
+      "ci95": [
+       -50.417910447761194,
+       -40.43246268656716
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 66,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 0.9850746268656716
+     }
+    },
+    "outcome_criteria": "FAIL C1+C2",
+    "outcome_1c_rule": "FAIL C1+C2",
+    "registered_criteria_on_r_fc": {
+     "outcome": null,
+     "valid": true,
+     "n_scored": null,
+     "L1": {
+      "verdict": "PASS",
+      "n": 67,
+      "median_ratio": 1.0666988209334858
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 67,
+      "median_ratio": 1.0519450309494125
+     },
+     "L3": {
+      "verdict": "FAIL",
+      "n": 67,
+      "spearman": 0.33837497006943895
+     }
+    },
+    "miss_statuses": {
+     "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7
+    },
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 67
+   },
+   "other_P_DESCRIPTIVE": {
+    "adam_P": "cutoff",
+    "at_f": {
+     "n_registered_scored": 74,
+     "cutoff_validity": {
+      "n_crossing_runs": 74,
+      "n_cutoff_before_crossing": 74,
+      "n_cutoff_not_before_unscored": 0,
+      "frac": 1.0,
+      "min_frac": 0.9,
+      "ok": true
+     },
+     "n_scored": 74,
+     "n_scored_miss": 8,
+     "n_scored_with_forecast": 66,
+     "n_base_no_cutoff": 0,
+     "n_base_cutoff_not_before": 0,
+     "n_base_no_actual_switch": 0,
+     "n_nan_recompute_checked": 74,
+     "n_nan_recompute_differs": 0,
+     "validity_1c": {
+      "cutoff_before_crossing_90pct": true,
+      "nan_recomputation_identical": true,
+      "W1_min_60_base": true,
+      "W1_min_60_scored": true
+     },
+     "valid_1c": true,
+     "tol_key": "W1",
+     "raw": {
+      "n": 74,
+      "n_miss": 8,
+      "abs_err_cross": {
+       "min": 0.0,
+       "q10": 0.0,
+       "median": 2.0,
+       "q90": 6.0,
+       "max": 9.0,
+       "signed_median": -1.0
+      },
+      "abs_err_lag": {
+       "min": 0.0,
+       "q10": 1.0,
+       "median": 4.0,
+       "q90": 9.0,
+       "max": 19.0,
+       "signed_median": -3.0
+      },
+      "ratio_r_obs_over_r_fc": {
+       "n": 66,
+       "q10": 1.0171251226424056,
+       "median": 1.1538283702149859,
+       "q90": 2.453105054972755
+      },
+      "D_vs_no_lag": {
+       "n": 66,
+       "mean": -56.515151515151516,
+       "ci95": [
+        -62.42424242424242,
+        -50.39393939393939
+       ],
+       "n_D_negative": 66
+      }
+     },
+     "horizon": {
+      "cross_steps": {
+       "n": 74,
+       "min": 36.0,
+       "median": 132.5,
+       "max": 244.0
+      },
+      "switch_steps": {
+       "n": 74,
+       "min": 16.0,
+       "median": 69.0,
+       "max": 121.0
+      },
+      "cross_lags": {
+       "n": 74,
+       "min": 1.7307692307692308,
+       "median": 2.0339080459770114,
+       "max": 2.6666666666666665
+      },
+      "switch_lags": {
+       "n": 74,
+       "min": 0.7307692307692307,
+       "median": 1.0339080459770116,
+       "max": 1.6666666666666667
+      }
+     },
+     "criteria": {
+      "C1": {
+       "n": 74,
+       "n_within": 66,
+       "n_miss": 8,
+       "n_err_undefined": 0,
+       "frac_within": 0.8918918918918919,
+       "tau": 10,
+       "min_frac": 0.8,
+       "verdict": "PASS"
+      },
+      "C2": {
+       "n": 74,
+       "n_within": 65,
+       "n_miss": 8,
+       "n_err_undefined": 0,
+       "frac_within": 0.8783783783783784,
+       "tau": 15,
+       "min_frac": 0.8,
+       "verdict": "PASS"
+      },
+      "C3": {
+       "n": 66,
+       "n_excluded": 8,
+       "median_ratio": 1.1538283702149859,
+       "band": [
+        0.8,
+        1.2
+       ],
+       "verdict": "PASS"
+      },
+      "C4": {
+       "n": 66,
+       "mean_D": -56.515151515151516,
+       "ci95": [
+        -62.42424242424242,
+        -50.39393939393939
+       ],
+       "boot_n": 10000,
+       "boot_seed": 9350000,
+       "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+       "verdict": "PASS",
+       "DESCRIPTIVE_n_forecast_closer": 66,
+       "DESCRIPTIVE_n_ties": 0,
+       "DESCRIPTIVE_frac_forecast_closer": 1.0
+      }
+     },
+     "outcome_criteria": "PASS",
+     "outcome_1c_rule": "PASS",
+     "registered_criteria_on_r_fc": {
+      "outcome": null,
+      "valid": true,
+      "n_scored": null,
+      "L1": {
+       "verdict": "FAIL",
+       "n": 66,
+       "median_ratio": 1.1538283702149852
+      },
+      "L2": {
+       "verdict": "PASS",
+       "n": 66,
+       "median_ratio": 1.0454504462626697
+      },
+      "L3": {
+       "verdict": "FAIL",
+       "n": 66,
+       "spearman": 0.37267508610792205
+      }
+     },
+     "miss_statuses": {
+      "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7,
+      "no forecast: no predicted crossing on the extrapolated path": 1
+     },
+     "no_cutoff_or_late_statuses": {},
+     "n_scored_with_forecast_hit_in_extrapolated_part": 66
+    },
+    "at_f_other": {
+     "n_registered_scored": 74,
+     "cutoff_validity": {
+      "n_crossing_runs": 74,
+      "n_cutoff_before_crossing": 74,
+      "n_cutoff_not_before_unscored": 0,
+      "frac": 1.0,
+      "min_frac": 0.9,
+      "ok": true
+     },
+     "n_scored": 74,
+     "n_scored_miss": 7,
+     "n_scored_with_forecast": 67,
+     "n_base_no_cutoff": 0,
+     "n_base_cutoff_not_before": 0,
+     "n_base_no_actual_switch": 0,
+     "n_nan_recompute_checked": 74,
+     "n_nan_recompute_differs": 0,
+     "validity_1c": {
+      "cutoff_before_crossing_90pct": true,
+      "nan_recomputation_identical": true,
+      "W1_min_60_base": true,
+      "W1_min_60_scored": true
+     },
+     "valid_1c": true,
+     "tol_key": "W1",
+     "raw": {
+      "n": 74,
+      "n_miss": 7,
+      "abs_err_cross": {
+       "min": 0.0,
+       "q10": 1.0,
+       "median": 3.0,
+       "q90": 6.0,
+       "max": 9.0,
+       "signed_median": -3.0
+      },
+      "abs_err_lag": {
+       "min": 0.0,
+       "q10": 1.0,
+       "median": 3.0,
+       "q90": 7.399999999999999,
+       "max": 24.0,
+       "signed_median": -3.0
+      },
+      "ratio_r_obs_over_r_fc": {
+       "n": 67,
+       "q10": 1.0024612128441541,
+       "median": 1.0915563803566013,
+       "q90": 1.6280593267885028
+      },
+      "D_vs_no_lag": {
+       "n": 67,
+       "mean": -57.37313432835821,
+       "ci95": [
+        -63.44813432835821,
+        -51.08955223880597
+       ],
+       "n_D_negative": 66
+      }
+     },
+     "horizon": {
+      "cross_steps": {
+       "n": 74,
+       "min": 28.0,
+       "median": 97.0,
+       "max": 184.0
+      },
+      "switch_steps": {
+       "n": 74,
+       "min": 8.0,
+       "median": 35.0,
+       "max": 61.0
+      },
+      "cross_lags": {
+       "n": 74,
+       "min": 1.380952380952381,
+       "median": 1.5212469522814351,
+       "max": 1.8571428571428572
+      },
+      "switch_lags": {
+       "n": 74,
+       "min": 0.38095238095238093,
+       "median": 0.5212469522814351,
+       "max": 0.8571428571428571
+      }
+     },
+     "criteria": {
+      "C1": {
+       "n": 74,
+       "n_within": 67,
+       "n_miss": 7,
+       "n_err_undefined": 0,
+       "frac_within": 0.9054054054054054,
+       "tau": 10,
+       "min_frac": 0.8,
+       "verdict": "PASS"
+      },
+      "C2": {
+       "n": 74,
+       "n_within": 66,
+       "n_miss": 7,
+       "n_err_undefined": 0,
+       "frac_within": 0.8918918918918919,
+       "tau": 15,
+       "min_frac": 0.8,
+       "verdict": "PASS"
+      },
+      "C3": {
+       "n": 67,
+       "n_excluded": 7,
+       "median_ratio": 1.0915563803566013,
+       "band": [
+        0.8,
+        1.2
+       ],
+       "verdict": "PASS"
+      },
+      "C4": {
+       "n": 67,
+       "mean_D": -57.37313432835821,
+       "ci95": [
+        -63.44813432835821,
+        -51.08955223880597
+       ],
+       "boot_n": 10000,
+       "boot_seed": 9350000,
+       "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+       "verdict": "PASS",
+       "DESCRIPTIVE_n_forecast_closer": 66,
+       "DESCRIPTIVE_n_ties": 0,
+       "DESCRIPTIVE_frac_forecast_closer": 0.9850746268656716
+      }
+     },
+     "outcome_criteria": "PASS",
+     "outcome_1c_rule": "PASS",
+     "registered_criteria_on_r_fc": {
+      "outcome": null,
+      "valid": true,
+      "n_scored": null,
+      "L1": {
+       "verdict": "PASS",
+       "n": 67,
+       "median_ratio": 1.0915563803565984
+      },
+      "L2": {
+       "verdict": "PASS",
+       "n": 67,
+       "median_ratio": 1.0519450309494125
+      },
+      "L3": {
+       "verdict": "PASS",
+       "n": 67,
+       "spearman": 0.5746667730864395
+      }
+     },
+     "miss_statuses": {
+      "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7
+     },
+     "no_cutoff_or_late_statuses": {},
+     "n_scored_with_forecast_hit_in_extrapolated_part": 67
+    }
+   },
+   "s_run_cutoff_vs_registered": {
+    "n": 74,
+    "n_equal_rel_1e-9": 74,
+    "max_rel_diff": 2.220446049250313e-16
+   }
+  },
+  "track2a/adam": {
+   "arm_id": "track2a/adam",
+   "label": "Test 2A Adam (a = 1.85)",
+   "f": 0.9,
+   "f_other": 0.95,
+   "tol_key": "W1",
+   "adam_P": "cutoff",
+   "adam_P_other": "rule_point",
+   "n_runs": 80,
+   "n_registered_scored": 75,
+   "registered": {
+    "outcome": "PASS",
+    "A1": {
+     "verdict": "PASS",
+     "n": 75,
+     "spearman": 0.932176386913229
+    },
+    "A2": {
+     "verdict": "PASS",
+     "n": 75,
+     "frac_within_10pct": 0.7733333333333333
+    },
+    "A3": {
+     "verdict": "PASS",
+     "n": 75,
+     "median_ratio": 1.057862422999403
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 75,
+    "cutoff_validity": {
+     "n_crossing_runs": 75,
+     "n_cutoff_before_crossing": 75,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 75,
+    "n_scored_miss": 19,
+    "n_scored_with_forecast": 56,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 75,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 75,
+     "n_miss": 19,
+     "abs_err_cross": {
+      "min": 0.0,
+      "q10": 1.0,
+      "median": 4.0,
+      "q90": 7.5,
+      "max": 11.0,
+      "signed_median": -3.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 1.0,
+      "median": 6.0,
+      "q90": 11.0,
+      "max": 19.0,
+      "signed_median": -5.5
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 56,
+      "q10": 1.051760055890277,
+      "median": 1.3537150138197531,
+      "q90": 2.1843093599244923
+     },
+     "D_vs_no_lag": {
+      "n": 56,
+      "mean": -60.107142857142854,
+      "ci95": [
+       -66.42857142857143,
+       -53.589285714285715
+      ],
+      "n_D_negative": 56
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 75,
+      "min": 17.0,
+      "median": 96.0,
+      "max": 1921.0
+     },
+     "switch_steps": {
+      "n": 75,
+      "min": 6.0,
+      "median": 38.0,
+      "max": 1899.0
+     },
+     "cross_lags": {
+      "n": 75,
+      "min": 1.4736842105263157,
+      "median": 1.6875,
+      "max": 87.31818181818181
+     },
+     "switch_lags": {
+      "n": 75,
+      "min": 0.47368421052631576,
+      "median": 0.6875,
+      "max": 86.31818181818181
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 75,
+      "n_within": 55,
+      "n_miss": 19,
+      "n_err_undefined": 0,
+      "frac_within": 0.7333333333333333,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 75,
+      "n_within": 55,
+      "n_miss": 19,
+      "n_err_undefined": 0,
+      "frac_within": 0.7333333333333333,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C3": {
+      "n": 56,
+      "n_excluded": 19,
+      "median_ratio": 1.3537150138197531,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "FAIL"
+     },
+     "C4": {
+      "n": 56,
+      "mean_D": -60.107142857142854,
+      "ci95": [
+       -66.42857142857143,
+       -53.589285714285715
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 56,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     }
+    },
+    "outcome_criteria": "FAIL C1+C2+C3",
+    "outcome_1c_rule": "FAIL C1+C2+C3",
+    "registered_criteria_on_r_fc": {
+     "outcome": "FAIL A1+A2+A3",
+     "valid": true,
+     "n_scored": 56,
+     "A1": {
+      "verdict": "FAIL",
+      "n": 56,
+      "spearman": 0.3879699248120301
+     },
+     "A2": {
+      "verdict": "FAIL",
+      "n": 56,
+      "frac_within_10pct": 0.21428571428571427
+     },
+     "A3": {
+      "verdict": "FAIL",
+      "n": 56,
+      "median_ratio": 1.353715013819753
+     }
+    },
+    "miss_statuses": {
+     "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 11,
+     "no forecast: unstable / diverged (Track 1 rule)": 1
+    },
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 56
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 75,
+    "cutoff_validity": {
+     "n_crossing_runs": 75,
+     "n_cutoff_before_crossing": 75,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 75,
+    "n_scored_miss": 14,
+    "n_scored_with_forecast": 61,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 75,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true,
+     "W1_min_60_base": true,
+     "W1_min_60_scored": true
+    },
+    "valid_1c": true,
+    "tol_key": "W1",
+    "raw": {
+     "n": 75,
+     "n_miss": 14,
+     "abs_err_cross": {
+      "min": 0.0,
+      "q10": 1.0,
+      "median": 5.0,
+      "q90": 8.0,
+      "max": 10.0,
+      "signed_median": -5.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 1.0,
+      "median": 5.0,
+      "q90": 9.0,
+      "max": 16.0,
+      "signed_median": -5.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 61,
+      "q10": 1.0360140204593073,
+      "median": 1.2085221426006365,
+      "q90": 1.8909365171313184
+     },
+     "D_vs_no_lag": {
+      "n": 61,
+      "mean": -58.67213114754098,
+      "ci95": [
+       -65.06557377049181,
+       -52.049180327868854
+      ],
+      "n_D_negative": 61
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 75,
+      "min": 14.0,
+      "median": 75.0,
+      "max": 171.0
+     },
+     "switch_steps": {
+      "n": 75,
+      "min": 3.0,
+      "median": 19.0,
+      "max": 49.0
+     },
+     "cross_lags": {
+      "n": 75,
+      "min": 1.2105263157894737,
+      "median": 1.3452380952380953,
+      "max": 1.875
+     },
+     "switch_lags": {
+      "n": 75,
+      "min": 0.21052631578947367,
+      "median": 0.34523809523809523,
+      "max": 0.875
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 75,
+      "n_within": 61,
+      "n_miss": 14,
+      "n_err_undefined": 0,
+      "frac_within": 0.8133333333333334,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 75,
+      "n_within": 60,
+      "n_miss": 14,
+      "n_err_undefined": 0,
+      "frac_within": 0.8,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 61,
+      "n_excluded": 14,
+      "median_ratio": 1.2085221426006365,
+      "band": [
+       0.8,
+       1.2
+      ],
+      "verdict": "FAIL"
+     },
+     "C4": {
+      "n": 61,
+      "mean_D": -58.67213114754098,
+      "ci95": [
+       -65.06557377049181,
+       -52.049180327868854
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 61,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     }
+    },
+    "outcome_criteria": "FAIL C3",
+    "outcome_1c_rule": "FAIL C3",
+    "registered_criteria_on_r_fc": {
+     "outcome": "FAIL A1+A2+A3",
+     "valid": true,
+     "n_scored": 61,
+     "A1": {
+      "verdict": "FAIL",
+      "n": 61,
+      "spearman": 0.4841353781068217
+     },
+     "A2": {
+      "verdict": "FAIL",
+      "n": 61,
+      "frac_within_10pct": 0.26229508196721313
+     },
+     "A3": {
+      "verdict": "FAIL",
+      "n": 61,
+      "median_ratio": 1.2085221426006363
+     }
+    },
+    "miss_statuses": {
+     "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 7
+    },
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 61
+   },
+   "other_P_DESCRIPTIVE": {
+    "adam_P": "rule_point",
+    "at_f": {
+     "n_registered_scored": 75,
+     "cutoff_validity": {
+      "n_crossing_runs": 75,
+      "n_cutoff_before_crossing": 75,
+      "n_cutoff_not_before_unscored": 0,
+      "frac": 1.0,
+      "min_frac": 0.9,
+      "ok": true
+     },
+     "n_scored": 75,
+     "n_scored_miss": 19,
+     "n_scored_with_forecast": 56,
+     "n_base_no_cutoff": 0,
+     "n_base_cutoff_not_before": 0,
+     "n_base_no_actual_switch": 0,
+     "n_nan_recompute_checked": 75,
+     "n_nan_recompute_differs": 0,
+     "validity_1c": {
+      "cutoff_before_crossing_90pct": true,
+      "nan_recomputation_identical": true,
+      "W1_min_60_base": true,
+      "W1_min_60_scored": true
+     },
+     "valid_1c": true,
+     "tol_key": "W1",
+     "raw": {
+      "n": 75,
+      "n_miss": 19,
+      "abs_err_cross": {
+       "min": 0.0,
+       "q10": 3.0,
+       "median": 13.5,
+       "q90": 39.5,
+       "max": 54.0,
+       "signed_median": -7.0
+      },
+      "abs_err_lag": {
+       "min": 1.0,
+       "q10": 4.0,
+       "median": 16.5,
+       "q90": 39.5,
+       "max": 53.0,
+       "signed_median": -9.5
+      },
+      "ratio_r_obs_over_r_fc": {
+       "n": 56,
+       "q10": 0.818373821379288,
+       "median": 1.53257666964572,
+       "q90": 2.8133409619687253
+      },
+      "D_vs_no_lag": {
+       "n": 56,
+       "mean": -46.42857142857143,
+       "ci95": [
+        -51.714732142857144,
+        -41.05357142857143
+       ],
+       "n_D_negative": 56
+      }
+     },
+     "horizon": {
+      "cross_steps": {
+       "n": 75,
+       "min": 17.0,
+       "median": 96.0,
+       "max": 1921.0
+      },
+      "switch_steps": {
+       "n": 75,
+       "min": 6.0,
+       "median": 38.0,
+       "max": 1899.0
+      },
+      "cross_lags": {
+       "n": 75,
+       "min": 1.4736842105263157,
+       "median": 1.6875,
+       "max": 87.31818181818181
+      },
+      "switch_lags": {
+       "n": 75,
+       "min": 0.47368421052631576,
+       "median": 0.6875,
+       "max": 86.31818181818181
+      }
+     },
+     "criteria": {
+      "C1": {
+       "n": 75,
+       "n_within": 23,
+       "n_miss": 19,
+       "n_err_undefined": 0,
+       "frac_within": 0.30666666666666664,
+       "tau": 10,
+       "min_frac": 0.8,
+       "verdict": "FAIL"
+      },
+      "C2": {
+       "n": 75,
+       "n_within": 27,
+       "n_miss": 19,
+       "n_err_undefined": 0,
+       "frac_within": 0.36,
+       "tau": 15,
+       "min_frac": 0.8,
+       "verdict": "FAIL"
+      },
+      "C3": {
+       "n": 56,
+       "n_excluded": 19,
+       "median_ratio": 1.53257666964572,
+       "band": [
+        0.8,
+        1.2
+       ],
+       "verdict": "FAIL"
+      },
+      "C4": {
+       "n": 56,
+       "mean_D": -46.42857142857143,
+       "ci95": [
+        -51.714732142857144,
+        -41.05357142857143
+       ],
+       "boot_n": 10000,
+       "boot_seed": 9350000,
+       "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+       "verdict": "PASS",
+       "DESCRIPTIVE_n_forecast_closer": 56,
+       "DESCRIPTIVE_n_ties": 0,
+       "DESCRIPTIVE_frac_forecast_closer": 1.0
+      }
+     },
+     "outcome_criteria": "FAIL C1+C2+C3",
+     "outcome_1c_rule": "FAIL C1+C2+C3",
+     "registered_criteria_on_r_fc": {
+      "outcome": "FAIL A1+A2+A3",
+      "valid": true,
+      "n_scored": 56,
+      "A1": {
+       "verdict": "FAIL",
+       "n": 56,
+       "spearman": 0.19364319890635684
+      },
+      "A2": {
+       "verdict": "FAIL",
+       "n": 56,
+       "frac_within_10pct": 0.07142857142857142
+      },
+      "A3": {
+       "verdict": "FAIL",
+       "n": 56,
+       "median_ratio": 1.5325766696457197
+      }
+     },
+     "miss_statuses": {
+      "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 5,
+      "no forecast: extrapolated path not growing at the cutoff": 11,
+      "no forecast: no predicted crossing on the extrapolated path": 3
+     },
+     "no_cutoff_or_late_statuses": {},
+     "n_scored_with_forecast_hit_in_extrapolated_part": 56
+    },
+    "at_f_other": {
+     "n_registered_scored": 75,
+     "cutoff_validity": {
+      "n_crossing_runs": 75,
+      "n_cutoff_before_crossing": 75,
+      "n_cutoff_not_before_unscored": 0,
+      "frac": 1.0,
+      "min_frac": 0.9,
+      "ok": true
+     },
+     "n_scored": 75,
+     "n_scored_miss": 14,
+     "n_scored_with_forecast": 61,
+     "n_base_no_cutoff": 0,
+     "n_base_cutoff_not_before": 0,
+     "n_base_no_actual_switch": 0,
+     "n_nan_recompute_checked": 75,
+     "n_nan_recompute_differs": 0,
+     "validity_1c": {
+      "cutoff_before_crossing_90pct": true,
+      "nan_recomputation_identical": true,
+      "W1_min_60_base": true,
+      "W1_min_60_scored": true
+     },
+     "valid_1c": true,
+     "tol_key": "W1",
+     "raw": {
+      "n": 75,
+      "n_miss": 14,
+      "abs_err_cross": {
+       "min": 0.0,
+       "q10": 4.0,
+       "median": 15.0,
+       "q90": 37.0,
+       "max": 55.0,
+       "signed_median": -9.0
+      },
+      "abs_err_lag": {
+       "min": 1.0,
+       "q10": 4.0,
+       "median": 16.0,
+       "q90": 37.0,
+       "max": 54.0,
+       "signed_median": -9.0
+      },
+      "ratio_r_obs_over_r_fc": {
+       "n": 61,
+       "q10": 0.7818585078281213,
+       "median": 1.3635341442386117,
+       "q90": 2.792054851397386
+      },
+      "D_vs_no_lag": {
+       "n": 61,
+       "mean": -44.77049180327869,
+       "ci95": [
+        -50.13155737704918,
+        -39.131147540983605
+       ],
+       "n_D_negative": 60
+      }
+     },
+     "horizon": {
+      "cross_steps": {
+       "n": 75,
+       "min": 14.0,
+       "median": 75.0,
+       "max": 171.0
+      },
+      "switch_steps": {
+       "n": 75,
+       "min": 3.0,
+       "median": 19.0,
+       "max": 49.0
+      },
+      "cross_lags": {
+       "n": 75,
+       "min": 1.2105263157894737,
+       "median": 1.3452380952380953,
+       "max": 1.875
+      },
+      "switch_lags": {
+       "n": 75,
+       "min": 0.21052631578947367,
+       "median": 0.34523809523809523,
+       "max": 0.875
+      }
+     },
+     "criteria": {
+      "C1": {
+       "n": 75,
+       "n_within": 21,
+       "n_miss": 14,
+       "n_err_undefined": 0,
+       "frac_within": 0.28,
+       "tau": 10,
+       "min_frac": 0.8,
+       "verdict": "FAIL"
+      },
+      "C2": {
+       "n": 75,
+       "n_within": 29,
+       "n_miss": 14,
+       "n_err_undefined": 0,
+       "frac_within": 0.38666666666666666,
+       "tau": 15,
+       "min_frac": 0.8,
+       "verdict": "FAIL"
+      },
+      "C3": {
+       "n": 61,
+       "n_excluded": 14,
+       "median_ratio": 1.3635341442386117,
+       "band": [
+        0.8,
+        1.2
+       ],
+       "verdict": "FAIL"
+      },
+      "C4": {
+       "n": 61,
+       "mean_D": -44.77049180327869,
+       "ci95": [
+        -50.13155737704918,
+        -39.131147540983605
+       ],
+       "boot_n": 10000,
+       "boot_seed": 9350000,
+       "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+       "verdict": "PASS",
+       "DESCRIPTIVE_n_forecast_closer": 60,
+       "DESCRIPTIVE_n_ties": 0,
+       "DESCRIPTIVE_frac_forecast_closer": 0.9836065573770492
+      }
+     },
+     "outcome_criteria": "FAIL C1+C2+C3",
+     "outcome_1c_rule": "FAIL C1+C2+C3",
+     "registered_criteria_on_r_fc": {
+      "outcome": "FAIL A1+A2+A3",
+      "valid": true,
+      "n_scored": 61,
+      "A1": {
+       "verdict": "FAIL",
+       "n": 61,
+       "spearman": 0.13701745108408248
+      },
+      "A2": {
+       "verdict": "FAIL",
+       "n": 61,
+       "frac_within_10pct": 0.13114754098360656
+      },
+      "A3": {
+       "verdict": "FAIL",
+       "n": 61,
+       "median_ratio": 1.3635341442386115
+      }
+     },
+     "miss_statuses": {
+      "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)": 7,
+      "no forecast: extrapolated path not growing at the cutoff": 7
+     },
+     "no_cutoff_or_late_statuses": {},
+     "n_scored_with_forecast_hit_in_extrapolated_part": 61
+    }
+   },
+   "s_run_cutoff_vs_registered": {
+    "n": 75,
+    "n_equal_rel_1e-9": 75,
+    "max_rel_diff": 2.220446049250313e-16
+   }
+  },
+  "gelu/random": {
+   "arm_id": "gelu/random",
+   "label": "GELU-T random",
+   "f": 0.95,
+   "f_other": 0.9,
+   "tol_key": "G",
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 80,
+   "n_registered_scored": 80,
+   "registered": {
+    "outcome": "PASS",
+    "L1": {
+     "verdict": "PASS",
+     "n": 80,
+     "median_ratio": 1.0000000000000087
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 80,
+     "median_ratio": 0.9767926950175866
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 80,
+     "spearman": 0.9985935302391
+    },
+    "L4": {
+     "verdict": "PASS",
+     "n": 80,
+     "mean_D": -0.10392272944913838,
+     "ci95": [
+      -0.12074759641108386,
+      -0.08779772658254702
+     ]
+    },
+    "L5": {
+     "verdict": "PASS",
+     "n": 80,
+     "mean_D": -0.003087191954903969,
+     "ci95": [
+      -0.0036295132140841506,
+      -0.0026196465568317988
+     ]
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 80,
+    "cutoff_validity": {
+     "n_crossing_runs": 80,
+     "n_cutoff_before_crossing": 80,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 80,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 80,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 80,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "G",
+    "raw": {
+     "n": 80,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 2.0,
+      "q10": 2.0,
+      "median": 3.0,
+      "q90": 6.1000000000000085,
+      "max": 190.0,
+      "signed_median": 3.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 1.0,
+      "q90": 5.1000000000000085,
+      "max": 191.0,
+      "signed_median": 1.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 80,
+      "q10": 0.9194484436418072,
+      "median": 0.9985923350502077,
+      "q90": 1.3194687756079257
+     },
+     "D_vs_no_lag": {
+      "n": 80,
+      "mean": -34.55,
+      "ci95": [
+       -39.4003125,
+       -29.962187500000002
+      ],
+      "n_D_negative": 75
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 80,
+      "min": 199.0,
+      "median": 654.0,
+      "max": 1153.0
+     },
+     "switch_steps": {
+      "n": 80,
+      "min": 384.0,
+      "median": 616.0,
+      "max": 1092.0
+     },
+     "cross_lags": {
+      "n": 80,
+      "min": 0.6419354838709678,
+      "median": 18.191447368421052,
+      "max": 484.0
+     },
+     "switch_lags": {
+      "n": 80,
+      "min": 1.6419354838709677,
+      "median": 17.191447368421052,
+      "max": 483.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 80,
+      "n_within": 74,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.925,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 80,
+      "n_within": 74,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.925,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 80,
+      "n_excluded": 0,
+      "median_ratio": 0.9985923350502077,
+      "band": [
+       0.85,
+       1.15
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 80,
+      "mean_D": -34.55,
+      "ci95": [
+       -39.4003125,
+       -29.962187500000002
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 75,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 0.9375
+     }
+    },
+    "outcome_criteria": "PASS",
+    "outcome_1c_rule": "PASS",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 80,
+     "L1": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9985923350502077
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9767926950175866
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 80,
+      "spearman": 0.9983591186122832
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.10392771690944232,
+      "ci95": [
+       -0.12075607152759013,
+       -0.08780506927479068
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.0030921794152078855,
+      "ci95": [
+       -0.0036343189136199077,
+       -0.00262419665387845
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 80
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 80,
+    "cutoff_validity": {
+     "n_crossing_runs": 80,
+     "n_cutoff_before_crossing": 80,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 80,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 80,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 80,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "G",
+    "raw": {
+     "n": 80,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 10.0,
+      "q10": 10.0,
+      "median": 14.0,
+      "q90": 22.10000000000001,
+      "max": 187.0,
+      "signed_median": 14.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 1.0,
+      "q90": 5.1000000000000085,
+      "max": 192.0,
+      "signed_median": 1.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 80,
+      "q10": 0.9783135708339511,
+      "median": 1.021467982581252,
+      "q90": 1.350142745120213
+     },
+     "D_vs_no_lag": {
+      "n": 80,
+      "mean": -14.3875,
+      "ci95": [
+       -19.7,
+       -9.837187500000004
+      ],
+      "n_D_negative": 65
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 80,
+      "min": 621.0,
+      "median": 1256.0,
+      "max": 2217.0
+     },
+     "switch_steps": {
+      "n": 80,
+      "min": 765.0,
+      "median": 1219.5,
+      "max": 2156.0
+     },
+     "cross_lags": {
+      "n": 80,
+      "min": 2.293548387096774,
+      "median": 35.03684210526316,
+      "max": 960.0
+     },
+     "switch_lags": {
+      "n": 80,
+      "min": 3.293548387096774,
+      "median": 34.03684210526316,
+      "max": 959.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 80,
+      "n_within": 10,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.125,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 80,
+      "n_within": 74,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.925,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 80,
+      "n_excluded": 0,
+      "median_ratio": 1.021467982581252,
+      "band": [
+       0.85,
+       1.15
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 80,
+      "mean_D": -14.3875,
+      "ci95": [
+       -19.7,
+       -9.837187500000004
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 65,
+      "DESCRIPTIVE_n_ties": 2,
+      "DESCRIPTIVE_frac_forecast_closer": 0.8125
+     }
+    },
+    "outcome_criteria": "FAIL C1",
+    "outcome_1c_rule": "FAIL C1",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 80,
+     "L1": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 1.021467982581252
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9767926950175866
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 80,
+      "spearman": 0.9986872948898267
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.10390005648436111,
+      "ci95": [
+       -0.12072597687948923,
+       -0.08778035778698536
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.003064518990126709,
+      "ci95": [
+       -0.003604026330317101,
+       -0.002600482841673742
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 80
+   }
+  },
+  "gelu/branch": {
+   "arm_id": "gelu/branch",
+   "label": "GELU-T branch",
+   "f": 0.95,
+   "f_other": 0.9,
+   "tol_key": "G",
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 80,
+   "n_registered_scored": 80,
+   "registered": {
+    "outcome": "PASS",
+    "L1": {
+     "verdict": "PASS",
+     "n": 80,
+     "median_ratio": 1.000000000000006
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 80,
+     "median_ratio": 0.9845260812124985
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 80,
+     "spearman": 0.9987576183778716
+    },
+    "L4": {
+     "verdict": "PASS",
+     "n": 80,
+     "mean_D": -0.10299180984614349,
+     "ci95": [
+      -0.11943593900886508,
+      -0.08713292809692869
+     ]
+    },
+    "L5": {
+     "verdict": "PASS",
+     "n": 80,
+     "mean_D": -0.002611804875908421,
+     "ci95": [
+      -0.0028670100700221653,
+      -0.0023449938850628148
+     ]
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 80,
+    "cutoff_validity": {
+     "n_crossing_runs": 80,
+     "n_cutoff_before_crossing": 80,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 80,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 80,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 80,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "G",
+    "raw": {
+     "n": 80,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 2.0,
+      "q10": 2.0,
+      "median": 3.0,
+      "q90": 4.0,
+      "max": 20.0,
+      "signed_median": 3.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 1.0,
+      "q90": 2.1000000000000085,
+      "max": 19.0,
+      "signed_median": 1.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 80,
+      "q10": 0.9194484436562748,
+      "median": 0.9970586945832615,
+      "q90": 1.0194734127900225
+     },
+     "D_vs_no_lag": {
+      "n": 80,
+      "mean": -31.55,
+      "ci95": [
+       -35.0,
+       -27.9625
+      ],
+      "n_D_negative": 74
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 80,
+      "min": 331.0,
+      "median": 702.0,
+      "max": 1153.0
+     },
+     "switch_steps": {
+      "n": 80,
+      "min": 391.0,
+      "median": 651.0,
+      "max": 1092.0
+     },
+     "cross_lags": {
+      "n": 80,
+      "min": 5.516666666666667,
+      "median": 17.78482972136223,
+      "max": 517.0
+     },
+     "switch_lags": {
+      "n": 80,
+      "min": 6.516666666666667,
+      "median": 17.191447368421052,
+      "max": 518.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 80,
+      "n_within": 79,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.9875,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 80,
+      "n_within": 79,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.9875,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 80,
+      "n_excluded": 0,
+      "median_ratio": 0.9970586945832615,
+      "band": [
+       0.85,
+       1.15
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 80,
+      "mean_D": -31.55,
+      "ci95": [
+       -35.0,
+       -27.9625
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 74,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 0.925
+     }
+    },
+    "outcome_criteria": "PASS",
+    "outcome_1c_rule": "PASS",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 80,
+     "L1": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9970586945832615
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9845260812124985
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 80,
+      "spearman": 0.9978199718706049
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.1029875558494691,
+      "ci95": [
+       -0.11943071437755287,
+       -0.08712358219370633
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.0026075508792340373,
+      "ci95": [
+       -0.0028606481359571656,
+       -0.0023429896052575144
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 80
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 80,
+    "cutoff_validity": {
+     "n_crossing_runs": 80,
+     "n_cutoff_before_crossing": 80,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 80,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 80,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 80,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "G",
+    "raw": {
+     "n": 80,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 9.0,
+      "q10": 11.0,
+      "median": 15.0,
+      "q90": 22.0,
+      "max": 29.0,
+      "signed_median": 15.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 1.0,
+      "q90": 2.0,
+      "max": 18.0,
+      "signed_median": 1.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 80,
+      "q10": 0.9638683217216836,
+      "median": 1.0207987286032902,
+      "q90": 1.0458020249599407
+     },
+     "D_vs_no_lag": {
+      "n": 80,
+      "mean": -8.95,
+      "ci95": [
+       -11.1125,
+       -6.85
+      ],
+      "n_D_negative": 63
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 80,
+      "min": 718.0,
+      "median": 1338.0,
+      "max": 2217.0
+     },
+     "switch_steps": {
+      "n": 80,
+      "min": 778.0,
+      "median": 1289.0,
+      "max": 2156.0
+     },
+     "cross_lags": {
+      "n": 80,
+      "min": 11.966666666666667,
+      "median": 35.03684210526316,
+      "max": 1027.0
+     },
+     "switch_lags": {
+      "n": 80,
+      "min": 12.966666666666667,
+      "median": 34.03684210526316,
+      "max": 1028.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 80,
+      "n_within": 6,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.075,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 80,
+      "n_within": 79,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.9875,
+      "tau": 10,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 80,
+      "n_excluded": 0,
+      "median_ratio": 1.0207987286032902,
+      "band": [
+       0.85,
+       1.15
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 80,
+      "mean_D": -8.95,
+      "ci95": [
+       -11.1125,
+       -6.85
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 63,
+      "DESCRIPTIVE_n_ties": 1,
+      "DESCRIPTIVE_frac_forecast_closer": 0.7875
+     }
+    },
+    "outcome_criteria": "FAIL C1",
+    "outcome_1c_rule": "FAIL C1",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 80,
+     "L1": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 1.0207987286032902
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 80,
+      "median_ratio": 0.9845260812124985
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 80,
+      "spearman": 0.9984763244256917
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.10296371958233135,
+      "ci95": [
+       -0.11940661887098077,
+       -0.08710084903013934
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 80,
+      "mean_D": -0.002583714612096286,
+      "ci95": [
+       -0.0028318088713274185,
+       -0.0023241705482346486
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 80
+   }
+  },
+  "w2a/T": {
+   "arm_id": "w2a/T",
+   "label": "W2-A T",
+   "f": 0.95,
+   "f_other": 0.9,
+   "tol_key": "T",
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 200,
+   "n_registered_scored": 98,
+   "registered": {
+    "outcome": "PASS",
+    "L1": {
+     "verdict": "PASS",
+     "n": 98,
+     "median_ratio": 1.000000000000049
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 98,
+     "median_ratio": 1.0086669030409947
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 98,
+     "spearman": 0.9999234932960999
+    },
+    "L4": {
+     "verdict": "PASS",
+     "n": 98,
+     "mean_D": -0.109018581771878,
+     "ci95": [
+      -0.12482764557803061,
+      -0.09367937129864262
+     ]
+    },
+    "L5": {
+     "verdict": "PASS",
+     "n": 92,
+     "mean_D": -0.001207388270077351,
+     "ci95": [
+      -0.001285533548760318,
+      -0.001128970114118048
+     ]
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 98,
+    "cutoff_validity": {
+     "n_crossing_runs": 98,
+     "n_cutoff_before_crossing": 98,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 98,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 98,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 98,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "T",
+    "raw": {
+     "n": 98,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 5.0,
+      "q10": 6.0,
+      "median": 7.0,
+      "q90": 9.299999999999997,
+      "max": 13.0,
+      "signed_median": 7.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 1.0,
+      "q90": 2.0,
+      "max": 2.0,
+      "signed_median": 1.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 98,
+      "q10": 0.9321615408941373,
+      "median": 0.9780502277393821,
+      "q90": 0.9991241166272287
+     },
+     "D_vs_no_lag": {
+      "n": 98,
+      "mean": -12.193877551020408,
+      "ci95": [
+       -14.673724489795918,
+       -9.83673469387755
+      ],
+      "n_D_negative": 80
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 98,
+      "min": 767.0,
+      "median": 1068.0,
+      "max": 2020.0
+     },
+     "switch_steps": {
+      "n": 98,
+      "min": 767.0,
+      "median": 1044.5,
+      "max": 1961.0
+     },
+     "cross_lags": {
+      "n": 98,
+      "min": 23.294117647058822,
+      "median": 45.13286713286713,
+      "max": 843.0
+     },
+     "switch_lags": {
+      "n": 98,
+      "min": 22.294117647058822,
+      "median": 44.13286713286713,
+      "max": 843.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 98,
+      "n_within": 98,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 98,
+      "n_within": 98,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 5,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 98,
+      "n_excluded": 0,
+      "median_ratio": 0.9780502277393821,
+      "band": [
+       0.9,
+       1.1
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 98,
+      "mean_D": -12.193877551020408,
+      "ci95": [
+       -14.673724489795918,
+       -9.83673469387755
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 80,
+      "DESCRIPTIVE_n_ties": 8,
+      "DESCRIPTIVE_frac_forecast_closer": 0.8163265306122449
+     }
+    },
+    "outcome_criteria": "PASS",
+    "outcome_1c_rule": "PASS",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 98,
+     "L1": {
+      "verdict": "PASS",
+      "n": 98,
+      "median_ratio": 0.9780502277393821
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 98,
+      "median_ratio": 1.0086669030409947
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 98,
+      "spearman": 0.9982785991622515
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 98,
+      "mean_D": -0.10881203724560859,
+      "ci95": [
+       -0.12462051864735763,
+       -0.09347557579420078
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 95,
+      "mean_D": -0.0009697557498795251,
+      "ci95": [
+       -0.0010602144629801163,
+       -0.0008797773694756649
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 98
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 98,
+    "cutoff_validity": {
+     "n_crossing_runs": 98,
+     "n_cutoff_before_crossing": 98,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 98,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 98,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 98,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "T",
+    "raw": {
+     "n": 98,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 40.0,
+      "q10": 44.0,
+      "median": 52.0,
+      "q90": 63.599999999999994,
+      "max": 87.0,
+      "signed_median": 52.0
+     },
+     "abs_err_lag": {
+      "min": 2.0,
+      "q10": 3.0,
+      "median": 4.0,
+      "q90": 5.0,
+      "max": 6.0,
+      "signed_median": 4.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 98,
+      "q10": 0.8042825174432745,
+      "median": 0.892192372257687,
+      "q90": 0.959255788403472
+     },
+     "D_vs_no_lag": {
+      "n": 98,
+      "mean": 29.571428571428573,
+      "ci95": [
+       26.693877551020407,
+       32.55102040816327
+      ],
+      "n_D_negative": 1
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 98,
+      "min": 1531.0,
+      "median": 2101.0,
+      "max": 3925.0
+     },
+     "switch_steps": {
+      "n": 98,
+      "min": 1531.0,
+      "median": 2078.5,
+      "max": 3866.0
+     },
+     "cross_lags": {
+      "n": 98,
+      "min": 44.88235294117647,
+      "median": 88.78496503496504,
+      "max": 1684.0
+     },
+     "switch_lags": {
+      "n": 98,
+      "min": 43.88235294117647,
+      "median": 87.78496503496504,
+      "max": 1684.0
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 98,
+      "n_within": 0,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.0,
+      "tau": 15,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 98,
+      "n_within": 97,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.9897959183673469,
+      "tau": 5,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 98,
+      "n_excluded": 0,
+      "median_ratio": 0.892192372257687,
+      "band": [
+       0.9,
+       1.1
+      ],
+      "verdict": "FAIL"
+     },
+     "C4": {
+      "n": 98,
+      "mean_D": 29.571428571428573,
+      "ci95": [
+       26.693877551020407,
+       32.55102040816327
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "FAIL",
+      "DESCRIPTIVE_n_forecast_closer": 1,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 0.01020408163265306
+     }
+    },
+    "outcome_criteria": "FAIL C1+C3+C4",
+    "outcome_1c_rule": "FAIL C1+C3+C4",
+    "registered_criteria_on_r_fc": {
+     "outcome": "FAIL L1+L5",
+     "valid": true,
+     "n_scored": 98,
+     "L1": {
+      "verdict": "FAIL",
+      "n": 98,
+      "median_ratio": 0.892192372257687
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 98,
+      "median_ratio": 1.0086669030409947
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 98,
+      "spearman": 0.9976920477656852
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 98,
+      "mean_D": -0.10753384158067295,
+      "ci95": [
+       -0.12337288482893081,
+       -0.09220528171314114
+      ]
+     },
+     "L5": {
+      "verdict": "FAIL",
+      "n": 98,
+      "mean_D": 0.00034192778289077695,
+      "ci95": [
+       0.00020947403566910148,
+       0.00047066374652467326
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 98
+   }
+  },
+  "w2a/D": {
+   "arm_id": "w2a/D",
+   "label": "W2-A D",
+   "f": 0.95,
+   "f_other": 0.9,
+   "tol_key": null,
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 120,
+   "n_registered_scored": 120,
+   "registered": {
+    "outcome": "PASS",
+    "L1": {
+     "verdict": "PASS",
+     "n": 120,
+     "median_ratio": 1.0209549796592823
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 120,
+     "median_ratio": 1.0080118141961394
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 120,
+     "spearman": 0.9972984235016318
+    },
+    "L4": {
+     "verdict": "PASS",
+     "n": 120,
+     "mean_D": -0.07663414923513755,
+     "ci95": [
+      -0.08848694462780168,
+      -0.0653532587087799
+     ]
+    },
+    "L5": {
+     "verdict": "PASS",
+     "n": 120,
+     "mean_D": -0.030701971487745568,
+     "ci95": [
+      -0.031360348531173025,
+      -0.030034192632127903
+     ]
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 120,
+    "cutoff_validity": {
+     "n_crossing_runs": 120,
+     "n_cutoff_before_crossing": 120,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 120,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 120,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 120,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": null,
+    "raw": {
+     "n": 120,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 1.0,
+      "q10": 1.0,
+      "median": 4.0,
+      "q90": 5.0,
+      "max": 6.0,
+      "signed_median": -4.0
+     },
+     "abs_err_lag": {
+      "min": 2.0,
+      "q10": 3.0,
+      "median": 5.0,
+      "q90": 6.0,
+      "max": 8.0,
+      "signed_median": -5.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 120,
+      "q10": 1.0298625912133146,
+      "median": 1.0442558532774124,
+      "q90": 1.0474857730266132
+     },
+     "D_vs_no_lag": {
+      "n": 120,
+      "mean": -202.98333333333332,
+      "ci95": [
+       -207.31666666666666,
+       -198.85
+      ],
+      "n_D_negative": 120
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 120,
+      "min": 370.0,
+      "median": 527.5,
+      "max": 734.0
+     },
+     "switch_steps": {
+      "n": 120,
+      "min": 209.0,
+      "median": 314.5,
+      "max": 508.0
+     },
+     "cross_lags": {
+      "n": 120,
+      "min": 2.1758793969849246,
+      "median": 2.536566213921901,
+      "max": 3.247787610619469
+     },
+     "switch_lags": {
+      "n": 120,
+      "min": 1.1758793969849246,
+      "median": 1.5365662139219016,
+      "max": 2.247787610619469
+     }
+    },
+    "criteria": null,
+    "outcome_criteria": "no tolerance set: raw errors only",
+    "outcome_1c_rule": "no tolerance set: raw errors only",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 120,
+     "L1": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.0442558532774124
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.0080118141961394
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 120,
+      "spearman": 0.9972984235016318
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.07594983165670702,
+      "ci95": [
+       -0.08780521126806973,
+       -0.06465832672199566
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.030017653909315028,
+      "ci95": [
+       -0.030654938582817516,
+       -0.02937447130661747
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 120
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 120,
+    "cutoff_validity": {
+     "n_crossing_runs": 120,
+     "n_cutoff_before_crossing": 120,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 120,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 120,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 120,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": null,
+    "raw": {
+     "n": 120,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 0.0,
+      "q10": 1.9000000000000004,
+      "median": 4.0,
+      "q90": 7.0,
+      "max": 10.0,
+      "signed_median": 4.0
+     },
+     "abs_err_lag": {
+      "min": 2.0,
+      "q10": 4.0,
+      "median": 6.0,
+      "q90": 7.1000000000000085,
+      "max": 9.0,
+      "signed_median": -6.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 120,
+      "q10": 1.0756245716071715,
+      "median": 1.0872327173978085,
+      "q90": 1.0923037929162989
+     },
+     "D_vs_no_lag": {
+      "n": 120,
+      "mean": -194.06666666666666,
+      "ci95": [
+       -198.03333333333333,
+       -190.3
+      ],
+      "n_D_negative": 120
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 120,
+      "min": 575.0,
+      "median": 834.0,
+      "max": 1227.0
+     },
+     "switch_steps": {
+      "n": 120,
+      "min": 414.0,
+      "median": 621.0,
+      "max": 1001.0
+     },
+     "cross_lags": {
+      "n": 120,
+      "min": 3.3266331658291457,
+      "median": 4.034550084889643,
+      "max": 5.429203539823009
+     },
+     "switch_lags": {
+      "n": 120,
+      "min": 2.3266331658291457,
+      "median": 3.034550084889643,
+      "max": 4.429203539823009
+     }
+    },
+    "criteria": null,
+    "outcome_criteria": "no tolerance set: raw errors only",
+    "outcome_1c_rule": "no tolerance set: raw errors only",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 120,
+     "L1": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.0872327173978085
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.0080118141961394
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 120,
+      "spearman": 0.9976040002777967
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.07475468760019346,
+      "ci95": [
+       -0.0866204073853441,
+       -0.06343277986194598
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.02882250985280149,
+      "ci95": [
+       -0.02942860612567136,
+       -0.02820667586004771
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 120
+   }
+  },
+  "w2a/Tp": {
+   "arm_id": "w2a/Tp",
+   "label": "W2-A T\u2032",
+   "f": 0.95,
+   "f_other": 0.9,
+   "tol_key": "Tp",
+   "adam_P": null,
+   "adam_P_other": null,
+   "n_runs": 120,
+   "n_registered_scored": 120,
+   "registered": {
+    "outcome": "PASS",
+    "L1": {
+     "verdict": "PASS",
+     "n": 120,
+     "median_ratio": 1.0000000000000038
+    },
+    "L2": {
+     "verdict": "PASS",
+     "n": 120,
+     "median_ratio": 0.9930796774544781
+    },
+    "L3": {
+     "verdict": "PASS",
+     "n": 120,
+     "spearman": 0.9999861101465378
+    },
+    "L4": {
+     "verdict": "PASS",
+     "n": 120,
+     "mean_D": -0.06167568771060645,
+     "ci95": [
+      -0.06950116601342757,
+      -0.05418706511340799
+     ]
+    },
+    "L5": {
+     "verdict": "PASS",
+     "n": 120,
+     "mean_D": -0.000884788042380631,
+     "ci95": [
+      -0.0009507832081251228,
+      -0.0008215843174522302
+     ]
+    },
+    "reproduced_by_registered_function": true
+   },
+   "at_f": {
+    "n_registered_scored": 120,
+    "cutoff_validity": {
+     "n_crossing_runs": 120,
+     "n_cutoff_before_crossing": 120,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 120,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 120,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 120,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "Tp",
+    "raw": {
+     "n": 120,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 11.0,
+      "q10": 13.0,
+      "median": 16.0,
+      "q90": 21.0,
+      "max": 25.0,
+      "signed_median": 16.0
+     },
+     "abs_err_lag": {
+      "min": 0.0,
+      "q10": 0.0,
+      "median": 0.0,
+      "q90": 1.0,
+      "max": 2.0,
+      "signed_median": 0.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 120,
+      "q10": 1.0010675903908073,
+      "median": 1.014988178354866,
+      "q90": 1.0319169116120535
+     },
+     "D_vs_no_lag": {
+      "n": 120,
+      "mean": -43.833333333333336,
+      "ci95": [
+       -46.483333333333334,
+       -41.166666666666664
+      ],
+      "n_D_negative": 120
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 120,
+      "min": 1942.0,
+      "median": 2466.0,
+      "max": 3192.0
+     },
+     "switch_steps": {
+      "n": 120,
+      "min": 2022.0,
+      "median": 2513.5,
+      "max": 3220.0
+     },
+     "cross_lags": {
+      "n": 120,
+      "min": 24.16867469879518,
+      "median": 57.51190476190476,
+      "max": 292.1
+     },
+     "switch_lags": {
+      "n": 120,
+      "min": 25.16867469879518,
+      "median": 58.51190476190476,
+      "max": 293.1
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 120,
+      "n_within": 120,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 30,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C2": {
+      "n": 120,
+      "n_within": 120,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 5,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 120,
+      "n_excluded": 0,
+      "median_ratio": 1.014988178354866,
+      "band": [
+       0.9,
+       1.1
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 120,
+      "mean_D": -43.833333333333336,
+      "ci95": [
+       -46.483333333333334,
+       -41.166666666666664
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 120,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     },
+     "S": {
+      "n_eligible": 120,
+      "n_eligible_miss": 0,
+      "n_both_negative": 120,
+      "frac": 1.0,
+      "min_frac": 0.8,
+      "min_abs_lag": 6,
+      "verdict": "PASS"
+     }
+    },
+    "outcome_criteria": "PASS",
+    "outcome_1c_rule": "PASS",
+    "registered_criteria_on_r_fc": {
+     "outcome": "PASS",
+     "valid": true,
+     "n_scored": 120,
+     "L1": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.014988178354866
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 0.9930796774545916
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 120,
+      "spearman": 0.9995555246892144
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.0614567010376837,
+      "ci95": [
+       -0.06928132925497485,
+       -0.05397007528928076
+      ]
+     },
+     "L5": {
+      "verdict": "PASS",
+      "n": 112,
+      "mean_D": -0.0007050853850110358,
+      "ci95": [
+       -0.0007723381702043459,
+       -0.0006392599797425949
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 120
+   },
+   "at_f_other_DESCRIPTIVE": {
+    "n_registered_scored": 120,
+    "cutoff_validity": {
+     "n_crossing_runs": 120,
+     "n_cutoff_before_crossing": 120,
+     "n_cutoff_not_before_unscored": 0,
+     "frac": 1.0,
+     "min_frac": 0.9,
+     "ok": true
+    },
+    "n_scored": 120,
+    "n_scored_miss": 0,
+    "n_scored_with_forecast": 120,
+    "n_base_no_cutoff": 0,
+    "n_base_cutoff_not_before": 0,
+    "n_base_no_actual_switch": 0,
+    "n_nan_recompute_checked": 120,
+    "n_nan_recompute_differs": 0,
+    "validity_1c": {
+     "cutoff_before_crossing_90pct": true,
+     "nan_recomputation_identical": true
+    },
+    "valid_1c": true,
+    "tol_key": "Tp",
+    "raw": {
+     "n": 120,
+     "n_miss": 0,
+     "abs_err_cross": {
+      "min": 94.0,
+      "q10": 105.9,
+      "median": 131.0,
+      "q90": 165.10000000000002,
+      "max": 190.0,
+      "signed_median": 131.0
+     },
+     "abs_err_lag": {
+      "min": 1.0,
+      "q10": 2.0,
+      "median": 3.0,
+      "q90": 4.0,
+      "max": 5.0,
+      "signed_median": 3.0
+     },
+     "ratio_r_obs_over_r_fc": {
+      "n": 120,
+      "q10": 1.062400625836224,
+      "median": 1.09534014037524,
+      "q90": 1.1832466401489257
+     },
+     "D_vs_no_lag": {
+      "n": 120,
+      "mean": -41.5,
+      "ci95": [
+       -44.20854166666667,
+       -38.783125
+      ],
+      "n_D_negative": 120
+     }
+    },
+    "horizon": {
+     "cross_steps": {
+      "n": 120,
+      "min": 3934.0,
+      "median": 4950.0,
+      "max": 6376.0
+     },
+     "switch_steps": {
+      "n": 120,
+      "min": 4014.0,
+      "median": 4996.0,
+      "max": 6404.0
+     },
+     "cross_lags": {
+      "n": 120,
+      "min": 48.93975903614458,
+      "median": 115.29824561403508,
+      "max": 582.1
+     },
+     "switch_lags": {
+      "n": 120,
+      "min": 49.93975903614458,
+      "median": 116.29824561403508,
+      "max": 583.1
+     }
+    },
+    "criteria": {
+     "C1": {
+      "n": 120,
+      "n_within": 0,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 0.0,
+      "tau": 30,
+      "min_frac": 0.8,
+      "verdict": "FAIL"
+     },
+     "C2": {
+      "n": 120,
+      "n_within": 120,
+      "n_miss": 0,
+      "n_err_undefined": 0,
+      "frac_within": 1.0,
+      "tau": 5,
+      "min_frac": 0.8,
+      "verdict": "PASS"
+     },
+     "C3": {
+      "n": 120,
+      "n_excluded": 0,
+      "median_ratio": 1.09534014037524,
+      "band": [
+       0.9,
+       1.1
+      ],
+      "verdict": "PASS"
+     },
+     "C4": {
+      "n": 120,
+      "mean_D": -41.5,
+      "ci95": [
+       -44.20854166666667,
+       -38.783125
+      ],
+      "boot_n": 10000,
+      "boot_seed": 9350000,
+      "reading": "PASS iff the upper end < 0 (interval entirely above 0 or containing 0: FAIL)",
+      "verdict": "PASS",
+      "DESCRIPTIVE_n_forecast_closer": 120,
+      "DESCRIPTIVE_n_ties": 0,
+      "DESCRIPTIVE_frac_forecast_closer": 1.0
+     },
+     "S": {
+      "n_eligible": 120,
+      "n_eligible_miss": 0,
+      "n_both_negative": 120,
+      "frac": 1.0,
+      "min_frac": 0.8,
+      "min_abs_lag": 6,
+      "verdict": "PASS"
+     }
+    },
+    "outcome_criteria": "FAIL C1",
+    "outcome_1c_rule": "FAIL C1",
+    "registered_criteria_on_r_fc": {
+     "outcome": "FAIL L5",
+     "valid": true,
+     "n_scored": 120,
+     "L1": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 1.09534014037524
+     },
+     "L2": {
+      "verdict": "PASS",
+      "n": 120,
+      "median_ratio": 0.9930796774545916
+     },
+     "L3": {
+      "verdict": "PASS",
+      "n": 120,
+      "spearman": 0.9992568928397804
+     },
+     "L4": {
+      "verdict": "PASS",
+      "n": 120,
+      "mean_D": -0.05989435114479527,
+      "ci95": [
+       -0.06770369763944259,
+       -0.052414627501522516
+      ]
+     },
+     "L5": {
+      "verdict": "FAIL",
+      "n": 120,
+      "mean_D": 0.0008965485234304751,
+      "ci95": [
+       0.0008150892006993379,
+       0.0009770240950324903
+      ]
+     }
+    },
+    "miss_statuses": {},
+    "no_cutoff_or_late_statuses": {},
+    "n_scored_with_forecast_hit_in_extrapolated_part": 120
+   }
+  }
+ }
+}

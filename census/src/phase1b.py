@@ -323,7 +323,10 @@ def load_verified(arm_id, r):
 
 
 def make_case(arm_id, r, X):
-    """The case of one registered run (X: its verified saved array)."""
+    """The case of one registered run (X: its verified saved array).  The occupied copy's frozen row is read from the
+    frozen file (as the registered predict_one reads it); its s_switch is asserted equal to the committed CSV value up
+    to the CSV's 16-decimal rounding (prediction_inputs_audit.rel_equal)."""
+    from .prediction_inputs_audit import rel_equal
     t, arm = test_of(arm_id), arm_of(arm_id)
     if t in ("track_a", "track2a"):
         from . import track2a as T2
@@ -332,11 +335,11 @@ def make_case(arm_id, r, X):
     if t == "gelu":
         from . import gelu_transfer as G
         cf = G._frozen()[int(r.seed)]["copies"][str(int(r.copy_at_release))]
-        assert float(cf["s_switch"]) == float(r.s_switch), "frozen s_switch differs from the committed row"
+        assert rel_equal(float(cf["s_switch"]), float(r.s_switch)), "frozen s_switch differs from the committed row"
         return gelu_case(int(r.seed), cf, X[:, 2], X[:, [0, 1, 3]], G.BUDGET)
     from . import width2_asym as W
     cf = W._frozen()[int(r.seed)]["copies"][r.copy_at_release]
-    assert float(cf["s_switch"]) == float(r.s_switch_frozen), "frozen s_switch differs from the committed row"
+    assert rel_equal(float(cf["s_switch"]), float(r.s_switch_frozen)), "frozen s_switch differs from the committed row"
     return w2a_case(arm, int(r.seed), cf, json.loads(r.windings), r.copy_at_release, X[:, W.VI], X[:, W.ZI],
                     int(r.budget))
 
@@ -654,7 +657,11 @@ def _status_counts(arm_id, rows, mask_seeds, key="fc", f=None):
     c = Counter()
     for r in rows:
         if r["arm_id"] == arm_id and r["seed"] in mask_seeds:
-            c[((r.get(key) or {}).get(str(f)) or {}).get("status", "?")] += 1
+            fc = (r.get(key) or {}).get(str(f)) or {}
+            st = fc.get("status", "?")
+            if st == "ok" and fc.get("t_fc") is not None and fc.get("t_sw_fc") is None:
+                st = "crossing forecast, no forecast switch (t_sw,fc undefined: a miss by 1C's rule)"
+            c[st] += 1
     return dict(sorted(c.items()))
 
 

@@ -606,6 +606,7 @@ def main() -> None:
     prediction_inputs_audit_checks()
     phase1a_checks()
     phase1c_checks()
+    phase1b_checks()
 
     provenance_check()
 
@@ -941,6 +942,13 @@ PRODUCERS = {
     "phase1c/observed_Tp.jsonl": ("phase1c", "observe", "full", ""),
     "phase1c/scores.json": ("phase1c", "score", "full", ""),
     "phase1c_results.md": ("phase1c_report", "main", "full", ""),
+    # Phase 1B (POST HOC causal re-scoring of the registered tests; no registered verdict changes): src/phase1b.py
+    "phase1b/runs_track_a.jsonl": ("phase1b", "run", "full", ""),
+    "phase1b/runs_track2a.jsonl": ("phase1b", "run", "full", ""),
+    "phase1b/runs_gelu.jsonl": ("phase1b", "run", "full", ""),
+    "phase1b/runs_w2a.jsonl": ("phase1b", "run", "full", ""),
+    "phase1b/summary.json": ("phase1b", "summarize", "full", ""),
+    "phase1b_results.md": ("phase1b", "report", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3207,6 +3215,52 @@ def phase1c_checks() -> None:
             chk(f"P1C {arm} scored misses", float(o.get("n_scored_miss", 0)), float(n_miss), 0)
             chk(f"P1C {arm} outcome {outc}", float(o["outcome"] == outc), 1.0, 0)
         chk("P1C gate to Phase 2", float(S["phase2_gate"]["pass"] == gate), 1.0, 0)
+
+
+P1B_PIN = {   # {arm: (registered scored, scored at f, misses at f, POST HOC criteria outcome, registered outcome)}
+    "track_a/sgd": (63, 63, 0, "FAIL C3", "no combined outcome (L1 PASS, L2 PASS, L3 PASS)"),
+    "track_a/adam": (74, 74, 8, "FAIL C1+C2", "no combined outcome (L1 PASS, L2 PASS, L3 FAIL)"),
+    "track2a/adam": (75, 75, 19, "FAIL C1+C2+C3", "PASS"),
+    "gelu/random": (80, 80, 0, "PASS", "PASS"), "gelu/branch": (80, 80, 0, "PASS", "PASS"),
+    "w2a/T": (98, 98, 0, "PASS", "PASS"), "w2a/D": (120, 120, 0, "no tolerance set: raw errors only", "PASS"),
+    "w2a/Tp": (120, 120, 0, "PASS", "PASS")}
+
+
+def phase1b_checks() -> None:
+    """Phase 1B (POST HOC causal re-scoring with the frozen forecaster; no registered verdict changes): the forecaster
+    is the frozen 25aac9e file; summary.json regenerates from the committed runs files and the committed registered CSVs
+    and scores; phase1b_results.md regenerates from summary.json; every runs file holds exactly the registered scored
+    sets; no forecast read a row at or after its cutoff; every NaN recomputation identical; every path hash asserted;
+    every Adam replay bit-identical; every registered verdict reproduced from the committed predictions; counts and
+    outcomes pinned."""
+    from . import phase1b as P1B
+    print("Phase 1B: POST HOC causal re-scoring of the registered tests")
+    try:
+        ok = P1B.assert_forecaster() == P1B.FORECASTER_SHA256
+    except AssertionError:
+        ok = False
+    chk("P1B forecaster is the frozen 25aac9e file", float(ok), 1.0, 0)
+    S = json.loads((P1B.OUT / "summary.json").read_text())
+    chk("P1B summary.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(P1B.build_summary()))), 1.0, 0)
+    chk("P1B phase1b_results.md regenerates from summary.json",
+        float((R / "phase1b_results.md").read_text() == P1B.render_md(S)), 1.0, 0)
+    for fn, v in S["runs_files"].items():
+        chk(f"P1B {fn} forecasts that read a row at or after the cutoff", float(v["n_read_at_or_after_cutoff"]), 0.0, 0)
+        chk(f"P1B {fn} NaN recomputations that differ", float(v["n_nan_recompute_differs"]), 0.0, 0)
+        chk(f"P1B {fn} rows with the path hash asserted", float(v["n_path_sha256_ok"]), float(v["n_rows"]), 0)
+        chk(f"P1B {fn} Adam replays bit-identical", float(v["n_adam_replay_bit_identical"]), float(v["n_adam_rows"]), 0)
+    for arm, o in S["arms"].items():
+        chk(f"P1B {arm} registered verdict reproduced from the committed predictions",
+            float(o["registered"]["reproduced_by_registered_function"]), 1.0, 0)
+    if P1B_PIN is not None:
+        for arm, (n_reg, n_sc, n_miss, oc, reg) in P1B_PIN.items():
+            o = S["arms"][arm]
+            chk(f"P1B {arm} registered scored runs", float(o["n_registered_scored"]), float(n_reg), 0)
+            chk(f"P1B {arm} scored runs at f", float(o["at_f"]["n_scored"]), float(n_sc), 0)
+            chk(f"P1B {arm} misses at f", float(o["at_f"]["n_scored_miss"]), float(n_miss), 0)
+            chk(f"P1B {arm} POST HOC criteria outcome {oc}", float(o["at_f"]["outcome_criteria"] == oc), 1.0, 0)
+            chk(f"P1B {arm} registered outcome unchanged ({reg})", float(o["registered"]["outcome"] == reg), 1.0, 0)
 
 
 def provenance_check() -> None:
