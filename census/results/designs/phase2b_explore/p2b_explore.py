@@ -371,7 +371,9 @@ def summarise():
              "rho2_init": _q([r["rho2_init"] for r in R]), "s_init": _q([r["s_init"] for r in R]),
              "n_output_sign_changes": _q([r["n_output_sign_changes"] for r in R]), "points": {}, "onset": {}}
         for pt in POINTS:
-            rows = [(r["at"].get(pt if pt == "match_step" else "scale_" + pt), r, s) for r, s in zip(R, seeds)]
+            # adam_r1's matched step IS its step to 3 s* (the budget is defined from it)
+            key = "scale_3s*" if (pt == "match_step" and cond == "adam_r1") else (pt if pt == "match_step" else "scale_" + pt)
+            rows = [(r["at"].get(key), r, s) for r, s in zip(R, seeds)]
             reached = [(m, r, s) for m, r, s in rows if m is not None]
             d = {"n_reached": len(reached)}
             if pt != "match_step":
@@ -384,7 +386,7 @@ def summarise():
                 d[k] = _q([m[k] for m, _, _ in reached])
             d["frac_rho2_ge_q"] = (sum(m["rho2"] >= Q for m, _, _ in reached) / len(reached)) if reached else None
             if cond != "adam_r1":
-                key = pt if pt == "match_step" else "scale_" + pt
+                key = "scale_3s*" if pt == "match_step" else "scale_" + pt
                 for k in ("rho2", "acc_shuffled", "acc_reversed"):
                     diff = [m[k] - std[s]["at"][key][k] for m, _, s in reached if std.get(s, {}).get("at", {}).get(key)]
                     d[f"paired_diff_vs_adam_r1_{k}"] = _q(diff)
