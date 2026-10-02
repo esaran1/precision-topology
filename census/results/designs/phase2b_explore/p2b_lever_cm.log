@@ -1,0 +1,61 @@
+2026-10-02 10:41:55 memory gate: free 45% swap_free 725.12M -> OK
+# run: globcm 2953000
+{"cond": "globcm", "seed": 2953000, "t_scale": {"0.5s*": 407, "s*": 1030, "1.25s*": 1442, "s_F": 1587, "2s*": 3236, "3s*": 6669, "4s*": 10156}, "seconds": 6.526341915130615, "max_rss_gb": 0.374718464}
+2026-10-02 10:42:03 memory gate: free 41% swap_free 725.12M -> OK
+# run: globcm 2953001
+{"cond": "globcm", "seed": 2953001, "t_scale": {"0.5s*": 903, "s*": 1752, "1.25s*": 2167, "s_F": 2311, "2s*": 3856, "3s*": 6808, "4s*": 10421}, "seconds": 6.089335918426514, "max_rss_gb": 0.375128064}
+2026-10-02 10:42:09 memory gate: free 43% swap_free 749.12M -> OK
+# run: globcm 2953002
+{"cond": "globcm", "seed": 2953002, "t_scale": {"0.5s*": 419, "s*": 1075, "1.25s*": 1476, "s_F": 1616, "2s*": 3084, "3s*": 6106, "4s*": 9576}, "seconds": 6.463825941085815, "max_rss_gb": 0.374751232}
+2026-10-02 10:42:16 memory gate: free 36% swap_free 861.25M -> OK
+# run: globcm 2953003
+{"cond": "globcm", "seed": 2953003, "t_scale": {"0.5s*": 321, "s*": 1175, "1.25s*": 1852, "s_F": 2079, "2s*": 4469, "3s*": 6772, "4s*": 9690}, "seconds": 6.356749057769775, "max_rss_gb": 0.374472704}
+2026-10-02 10:42:23 memory gate: free 37% swap_free 861.25M -> OK
+# run: globcm 2953004
+{"cond": "globcm", "seed": 2953004, "t_scale": {"0.5s*": 563, "s*": 1342, "1.25s*": 1861, "s_F": 2043, "2s*": 3838, "3s*": 7156, "4s*": 10749}, "seconds": 6.302532196044922, "max_rss_gb": 0.37511168}
+2026-10-02 10:42:30 memory gate: free 38% swap_free 861.25M -> OK
+# run: globcm 2953005
+{"cond": "globcm", "seed": 2953005, "t_scale": {"0.5s*": 544, "s*": 1299, "1.25s*": 1653, "s_F": 1773, "2s*": 3199, "3s*": 6395, "4s*": 9928}, "seconds": 6.278609037399292, "max_rss_gb": 0.375291904}
+2026-10-02 10:42:37 memory gate: free 40% swap_free 869.25M -> OK
+# run: globcm 2953006
+{"cond": "globcm", "seed": 2953006, "t_scale": {"0.5s*": 762, "s*": 1659, "1.25s*": 2266, "s_F": 2471, "2s*": 4311, "3s*": 7680, "4s*": 11245}, "seconds": 6.358424663543701, "max_rss_gb": 0.37535744}
+2026-10-02 10:42:44 memory gate: free 41% swap_free 869.25M -> OK
+# run: globcm 2953007
+{"cond": "globcm", "seed": 2953007, "t_scale": {"0.5s*": 711, "s*": 1418, "1.25s*": 1861, "s_F": 2014, "2s*": 3614, "3s*": 6815, "4s*": 10555}, "seconds": 6.331093072891235, "max_rss_gb": 0.375209984}
+2026-10-02 10:42:51 memory gate: free 39% swap_free 869.25M -> OK
+# run: globcm 2953008
+{"cond": "globcm", "seed": 2953008, "t_scale": {"0.5s*": 766, "s*": 2130, "1.25s*": 2672, "s_F": 2878, "2s*": 4596, "3s*": 7260, "4s*": 10347}, "seconds": 6.4851648807525635, "max_rss_gb": 0.374652928}
+2026-10-02 10:42:58 memory gate: free 33% swap_free 869.25M -> OK
+# run: globcm 2953009
+{"cond": "globcm", "seed": 2953009, "t_scale": {"0.5s*": 603, "s*": 1377, "1.25s*": 1815, "s_F": 1964, "2s*": 3480, "3s*": 6730, "4s*": 10559}, "seconds": 6.523944854736328, "max_rss_gb": 0.374308864}
+2026-10-02 10:43:05 memory gate: free 39% swap_free 869.25M -> OK
+# run: globcm 2953010
+{"cond": "globcm", "seed": 2953010, "t_scale": {"0.5s*": 604, "s*": 1491, "1.25s*": 1977, "s_F": 2130, "2s*": 3677, "3s*": 6916, "4s*": 10535}, "seconds": 6.342677116394043, "max_rss_gb": 0.376815616}
+2026-10-02 10:43:12 memory gate: free 39% swap_free 869.25M -> OK
+# run: globcm 2953011
+{"cond": "globcm", "seed": 2953011, "t_scale": {"0.5s*": 1154, "s*": 1882, "1.25s*": 2296, "s_F": 2439, "2s*": 3913, "3s*": 6855, "4s*": 10471}, "seconds": 6.246834993362427, "max_rss_gb": 0.375324672}
+2026-10-02 10:43:18 memory gate: free 42% swap_free 869.25M -> OK
+# run: globcm 2953012
+{"cond": "globcm", "seed": 2953012, "t_scale": {"0.5s*": 346, "s*": 1156, "1.25s*": 1614, "s_F": 1767, "2s*": 3355, "3s*": 6175, "4s*": 9723}, "seconds": 6.251124858856201, "max_rss_gb": 0.374964224}
+2026-10-02 10:43:25 memory gate: free 41% swap_free 869.25M -> OK
+# run: globcm 2953013
+{"cond": "globcm", "seed": 2953013, "t_scale": {"0.5s*": 953, "s*": 1739, "1.25s*": 2173, "s_F": 2328, "2s*": 3962, "3s*": 7419, "4s*": 11191}, "seconds": 6.250483989715576, "max_rss_gb": 0.375177216}
+2026-10-02 10:43:32 memory gate: free 42% swap_free 877.25M -> OK
+# run: globcm 2953014
+{"cond": "globcm", "seed": 2953014, "t_scale": {"0.5s*": 378, "s*": 998, "1.25s*": 1406, "s_F": 1549, "2s*": 3094, "3s*": 6319, "4s*": 9821}, "seconds": 6.307225942611694, "max_rss_gb": 0.374816768}
+2026-10-02 10:43:39 memory gate: free 44% swap_free 877.25M -> OK
+# run: globcm 2953015
+{"cond": "globcm", "seed": 2953015, "t_scale": {"0.5s*": 749, "s*": 2137, "1.25s*": 3182, "s_F": 3557, "2s*": 6084, "3s*": 8215, "4s*": 11051}, "seconds": 6.271155118942261, "max_rss_gb": 0.375078912}
+2026-10-02 10:43:45 memory gate: free 44% swap_free 877.25M -> OK
+# run: globcm 2953016
+{"cond": "globcm", "seed": 2953016, "t_scale": {"0.5s*": 616, "s*": 1572, "1.25s*": 2157, "s_F": 2344, "2s*": 4030, "3s*": 7083, "4s*": 10654}, "seconds": 6.255047798156738, "max_rss_gb": 0.375062528}
+2026-10-02 10:43:52 memory gate: free 44% swap_free 885.25M -> OK
+# run: globcm 2953017
+{"cond": "globcm", "seed": 2953017, "t_scale": {"0.5s*": 414, "s*": 1119, "1.25s*": 1618, "s_F": 1799, "2s*": 3396, "3s*": 6276, "4s*": 9529}, "seconds": 6.295980930328369, "max_rss_gb": 0.375259136}
+2026-10-02 10:43:59 memory gate: free 45% swap_free 885.25M -> OK
+# run: globcm 2953018
+{"cond": "globcm", "seed": 2953018, "t_scale": {"0.5s*": 262, "s*": 753, "1.25s*": 1100, "s_F": 1229, "2s*": 3002, "3s*": 7651, "4s*": 9665}, "seconds": 6.299649715423584, "max_rss_gb": 0.374849536}
+2026-10-02 10:44:06 memory gate: free 43% swap_free 885.25M -> OK
+# run: globcm 2953019
+{"cond": "globcm", "seed": 2953019, "t_scale": {"0.5s*": 848, "s*": 1782, "1.25s*": 2312, "s_F": 2515, "2s*": 6152, "3s*": 7944, "4s*": 10579}, "seconds": 6.363133907318115, "max_rss_gb": 0.375259136}
+2026-10-02 10:44:13 globcm queue done

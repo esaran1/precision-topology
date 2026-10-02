@@ -71,3 +71,27 @@ the objective minus (λ/2)(‖W‖² + ‖c‖²)) at every step.
 **Test suite** (before the commit; gated, two processes, nice 15, one thread; no src/ or tests/ change): main suite
 917 passed, exit 0; `test_verify_certificates` 33 passed, exit 0 (logs `p2b_lever_suite_main.log`,
 `p2b_lever_suite_certs.log`, kept in the session scratch directory).
+
+## Second addendum (2026-10-02, after the author's decisions on the 2B page): cost-matched global arm, per-arm power
+
+**Cost-matched factor, fixed from the committed runs before the confirmation** (`p2b_lever_cm.py`).
+- r_g = median over the 20 seeds of t_glob(3 s\*)/t_std(3 s\*) = 9.4541 (lr ÷ 12.18); r_o = the same for out16 = 12.1773.
+- Model: steps-to-3 s\* ratio = G^a through (1, 1) and (12.18, r_g), so a = ln r_g/ln 12.18 = 0.8985.
+- G_cm = 12.18^(ln r_o/ln r_g) = 16.1426 → **16.14**. (The linear rescaling 12.18·r_o/r_g would give 15.69.)
+- Confirmation, `globcm` = lr 0.01/16.14 everywhere, 40,000 steps, 20 exploration seeds (`runs_lever/globcm_*`,
+  `p2b_lever_cm.json`, log `p2b_lever_cm.log`): cost to 3 s\* ×11.78 [10.95–12.22] vs std; per seed 0.97 [0.92–1.01]
+  of out16's. Paired Δρ₂ vs std: +0.004 (1.25 s\*, 15/5), −0.012 (2 s\*), −0.053 (3 s\*, 1/19); at BCE 0.1/0.03/0.01:
+  −0.013 / −0.022 / −0.010. No gain anywhere; like glob, slightly lower at 3 s\*.
+
+**Per-arm power** (`p2b_lever_power2.py` → `p2b_lever_power2.json`; seeds resampled from the 20 paired differences,
+300 simulations, inner bootstrap 1,000). Output arms: R_s (9 scale cells), R_ℓ-ρ₂ (3), R_ℓ-acc (shuffled and reversed
+at the 3 BCE levels, 6), O. Global arms: N (18 cells).
+
+| arm | on the 20 exploration seeds | P(all pass), n = 60 | n = 80 |
+|---|---|---|---|
+| out16 (v) | all pass | 1.00 | 1.00 |
+| out16b (v, b) | R_ℓ-acc FAILS (lower ends at BCE 0.1, 0.03 < 0: −0.003, −0.010 shuffled; −0.010, −0.019 reversed) | 0.16 | 0.18 |
+| glob (÷12.18) | N passes | 0.91 | 0.96 |
+| globcm (÷16.14) | N passes | 0.96 | 0.99 |
+
+**Test suite (second addendum, before its commit):** main 917 passed, exit 0; `test_verify_certificates` 33 passed, exit 0 (gated, two processes, nice 15; logs `p2b_rev_suite_*.log` in the session scratch directory).

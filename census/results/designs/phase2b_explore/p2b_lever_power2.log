@@ -1,0 +1,6 @@
+2026-10-02 10:44:19 memory gate: free 44% swap_free 885.25M -> OK
+out16 {'R_s': True, 'R_l_rho2': True, 'R_l_acc': True, 'O': True, 'all': True} {60: {'R_s': 1.0, 'R_l_rho2': 1.0, 'R_l_acc': 1.0, 'O': 1.0, 'all': 1.0}, 80: {'R_s': 1.0, 'R_l_rho2': 1.0, 'R_l_acc': 1.0, 'O': 1.0, 'all': 1.0}}
+out16b {'R_s': True, 'R_l_rho2': True, 'R_l_acc': False, 'O': True, 'all': False} {60: {'R_s': 1.0, 'R_l_rho2': 1.0, 'R_l_acc': 0.15666666666666668, 'O': 1.0, 'all': 0.15666666666666668}, 80: {'R_s': 1.0, 'R_l_rho2': 1.0, 'R_l_acc': 0.17666666666666667, 'O': 1.0, 'all': 0.17666666666666667}}
+glob {'N': True} {60: {'N': 0.91}, 80: {'N': 0.9566666666666667}}
+globcm {'N': True} {60: {'N': 0.96}, 80: {'N': 0.9933333333333333}}
+exit 0

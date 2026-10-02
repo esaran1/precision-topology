@@ -1,0 +1,88 @@
+{
+ "label": "EXPLORATORY",
+ "arms": {
+  "out16": {
+   "on_exploration_seeds": {
+    "R_s": true,
+    "R_l_rho2": true,
+    "R_l_acc": true,
+    "O": true,
+    "all": true
+   },
+   "power": {
+    "60": {
+     "R_s": 1.0,
+     "R_l_rho2": 1.0,
+     "R_l_acc": 1.0,
+     "O": 1.0,
+     "all": 1.0
+    },
+    "80": {
+     "R_s": 1.0,
+     "R_l_rho2": 1.0,
+     "R_l_acc": 1.0,
+     "O": 1.0,
+     "all": 1.0
+    }
+   },
+   "onset_above_s*": 18
+  },
+  "out16b": {
+   "on_exploration_seeds": {
+    "R_s": true,
+    "R_l_rho2": true,
+    "R_l_acc": false,
+    "O": true,
+    "all": false
+   },
+   "power": {
+    "60": {
+     "R_s": 1.0,
+     "R_l_rho2": 1.0,
+     "R_l_acc": 0.15666666666666668,
+     "O": 1.0,
+     "all": 0.15666666666666668
+    },
+    "80": {
+     "R_s": 1.0,
+     "R_l_rho2": 1.0,
+     "R_l_acc": 0.17666666666666667,
+     "O": 1.0,
+     "all": 0.17666666666666667
+    }
+   },
+   "onset_above_s*": 20
+  },
+  "glob": {
+   "on_exploration_seeds": {
+    "N": true
+   },
+   "power": {
+    "60": {
+     "N": 0.91
+    },
+    "80": {
+     "N": 0.9566666666666667
+    }
+   },
+   "onset_above_s*": 20
+  },
+  "globcm": {
+   "on_exploration_seeds": {
+    "N": true
+   },
+   "power": {
+    "60": {
+     "N": 0.96
+    },
+    "80": {
+     "N": 0.9933333333333333
+    }
+   },
+   "onset_above_s*": 20
+  }
+ },
+ "sims": 300,
+ "inner_bootstrap": 1000,
+ "rng": 20261012
+}
