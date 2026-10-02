@@ -605,6 +605,7 @@ def main() -> None:
     width2_asym_checks()
     prediction_inputs_audit_checks()
     phase1a_checks()
+    phase1c_checks()
 
     provenance_check()
 
@@ -939,6 +940,7 @@ PRODUCERS = {
     "phase1c/observed_T.jsonl": ("phase1c", "observe", "full", ""),
     "phase1c/observed_Tp.jsonl": ("phase1c", "observe", "full", ""),
     "phase1c/scores.json": ("phase1c", "score", "full", ""),
+    "phase1c_results.md": ("phase1c_report", "main", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3161,6 +3163,50 @@ def phase1a_checks() -> None:
     chk("P1A one-lag rule common f", float(S["proposal"]["f_proposed"] or -1), P1A_F, 0)
     chk("P1A minimal rule admits every f in the grid", float(S["proposal"]["f_ok_minimal"] == S["f_grid"]), 1.0, 0)
     chk("P1A primary configuration quad/0.05", float(S["primary"] == "quad/0.05"), 1.0, 0)
+
+
+P1C_PIN = ({"W1": (100, 100, 84, 0, "PASS"), "G": (80, 79, 79, 0, "PASS"), "T": (200, 101, 101, 0, "PASS"),
+            "Tp": (120, 120, 120, 0, "PASS")}, True)   # {arm: (runs, eligible, scored, misses, outcome)}, Phase 2 gate
+
+
+def phase1c_checks() -> None:
+    """Phase 1C (registered causal replication; registration 6433edc, OpenTimestamps f458c4c): the registration and the
+    committed forecasts assert; scores.json regenerates from the committed runs and observation rows with the
+    registered scoring code; phase1c_results.md regenerates from scores.json; no 1C forecast read a row at or after its
+    cutoff; every NaN recomputation identical; counts, verdicts and the Phase 2 gate pinned."""
+    from . import phase1c as P1C
+    from . import phase1c_report as P1R
+    print("Phase 1C: registered causal replication")
+    P1C.assert_registration()
+    P1C._assert_forecasts()
+    S = json.loads((P1C.OUT / "scores.json").read_text())
+    chk("P1C scores.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(P1C._jsonable(P1R.score_result())))), 1.0, 0)
+    chk("P1C phase1c_results.md regenerates from scores.json",
+        float((R / "phase1c_results.md").read_text() == P1R.render_md(S)), 1.0, 0)
+    n_bad = n_fc = n_nan = 0
+    for arm in P1C.ARMS:
+        for r in P1C._rows(P1C._runs_file(arm)):
+            for key in ("forecast", "forecast_other_f"):
+                fc = r.get(key) or {}
+                if fc.get("t_c") is None:
+                    continue
+                n_fc += 1
+                n_bad += int(max((fc.get("max_index_read") or {}).values() or [-1]) >= fc["t_c"])
+                n_nan += int(not fc.get("nan_recompute_identical"))
+    chk("P1C forecasts that read a row at or after the cutoff", float(n_bad), 0.0, 0)
+    chk("P1C forecasts whose NaN recomputation differs", float(n_nan), 0.0, 0)
+    if P1C_PIN is not None:
+        pins, gate = P1C_PIN
+        for arm, (n_runs, n_el, n_sc, n_miss, outc) in pins.items():
+            rc = P1R.run_counts(arm)
+            o = S["arms"][arm]
+            chk(f"P1C {arm} runs", float(rc["n_runs"]), float(n_runs), 0)
+            chk(f"P1C {arm} eligible runs", float(rc["n_eligible"]), float(n_el), 0)
+            chk(f"P1C {arm} scored runs", float(o.get("n_scored", 0)), float(n_sc), 0)
+            chk(f"P1C {arm} scored misses", float(o.get("n_scored_miss", 0)), float(n_miss), 0)
+            chk(f"P1C {arm} outcome {outc}", float(o["outcome"] == outc), 1.0, 0)
+        chk("P1C gate to Phase 2", float(S["phase2_gate"]["pass"] == gate), 1.0, 0)
 
 
 def provenance_check() -> None:
