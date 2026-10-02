@@ -91,4 +91,6 @@ One worker, nice 15, one thread, < 0.5 GB, with a memory gate before each job.
 8. R_ℓ-acc is a named criterion.
 9. The T_C comparison is descriptive.
 
-**Still open.** Arm 2b's expected R_ℓ-acc failure (power 0.18): keep it as is, or report it descriptively.
+10. Arm 2b keeps R_ℓ-acc as a registered criterion (author, 2026-10-02): its expected failure (power 0.18) is informative.
+
+**Still open.** None on this page. 2B registers only after Phase 2A's result.
