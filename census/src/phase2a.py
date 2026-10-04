@@ -722,7 +722,9 @@ def rss_guard():
 
 
 def _setup():
-    os.nice(15)
+    cur = os.getpriority(os.PRIO_PROCESS, 0)     # raise the niceness to 15, never lower it (the launcher may have
+    if cur < 15:                                # set it already: `nice -n 15`, and a sandbox may refuse re-nicing)
+        os.nice(15 - cur)
     import torch
     torch.set_num_threads(1)
 

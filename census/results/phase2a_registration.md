@@ -7,8 +7,8 @@ the author decides §9 and the registration commit is made. After that commit, t
 `src/causal_forecast_fold.py`, `tests/test_phase2a.py`, the frozen forecaster and the code it reaches, and the frozen
 inputs are hashed in `results/phase2a/registration.sha256` (§11).
 - **Not yet done:** no registered seed has been drawn, held or trained.
-- **Pilot:** pilot seeds only. Run at the two pilot rates that lie off the ladder; the third (2⁻¹⁶·⁵) is on the ladder and
-  was NOT run (S1). τ₁ and τ₂ are therefore not yet set (§8).
+- **Pilot:** pilot seeds only. It ran at the two pilot rates that lie off the ladder. The third (2⁻¹⁶·⁵) is on the
+  ladder and was NOT run (S1), so τ₁ and τ₂ are not yet set (§12).
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
 
 ## 1. Design reference
@@ -253,9 +253,41 @@ unmodified.
 
 **Freeze summary:** (§12).
 
-## 12. Pilot and freeze (filled after the runs)
+## 12. Pilot and freeze (2026-10-04; pilot seeds only)
 
-PENDING.
+**Seed scan** (`seed_scan.json`): 0 files match either range; 0 overlaps with any module's registered or pilot seeds;
+disjoint from the exploration seeds.
+
+**Freeze** (`frozen.json`, 5.9 s). No seed was drawn.
+- s_F = 4.767689442106793 = 1.3275·s\* (`sb_fold.fold_of("M")`).
+- M table: λ_min at 2,973 points of M's Δs = 0.001 grid, s = 1.795 … 4.767; smallest 3.64e−5 at the last point.
+- |m′c′| = 4.782108e−7 (50 points in the last 0.05 below s_F); 4.821917e−7 over the last 0.025 (25 points).
+- Λ_F = 1.509954e−3 (exploration 1.5099538e−3).
+- Release θ_M(s₀): active units 0, 1, 2; ρ₂ = 0.08406; loss 0.291498; largest gradient on (W, c, b) of the active
+  units 1.2e−12. SHA-256 95faef28….
+- Branch points at s₀ for the labels: L0, M and S2 (S has no stable point at s₀).
+- Budgets ⌈64/ρ⌉: 524,288 steps at 2⁻¹³ … 16,777,216 at 2⁻¹⁸.
+
+**Pilot holds** (60 pilot seeds, one batch, 1.0 s): M 23 (38%), L0 14, other 23. The exploration had M 40% at s₀.
+Assignment: 2,937,901 → 2⁻¹⁵·⁰⁶²⁵; 2,937,906 → 2⁻¹⁶·⁵ (**not run, S1**); 2,937,910 → 2⁻¹⁷·⁹³⁷⁵.
+
+**Pilot runs** (f = 0.95; training to t_c, forecast, then observation resumed from the hashed t_c state):
+
+| ρ | t_c | t̂_F | t_fc | delay_fc | t_F | t_obs | delay_obs | s_obs/s_F | r_obs/r_fc | e₁ (C1) | e₂ (C2) | horizon (steps, delays) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2⁻¹⁵·⁰⁶²⁵ | 513,274 | 587,302 | 608,285 | 20,983 | 586,508 | 610,369 | 23,861 | 1.01574 | 1.1937 | 0.0993 | 0.1372 | 97,095; 4.07 |
+| 2⁻¹⁶·⁵ | — | — | — | — | — | — | — | — | — | not run (S1) | not run | — |
+| 2⁻¹⁷·⁹³⁷⁵ | 3,763,915 | 4,306,693 | 4,346,931 | 40,238 | 4,300,721 | 4,343,925 | 43,204 | 1.00392 | 1.1208 | 0.0747 | 0.0737 | 580,010; 13.4 |
+
+- In both runs: the guard's last row is t_c − 1; the NaN recomputation is identical; the state at t_c matched its hash
+  bit for bit; the follow check at 0.8·s_F is on M (distance 4e−9, 4e−8); the idle unit stayed exactly 0 and the signs
+  stayed fixed to the crossing.
+- **STOP rule at 2⁻¹⁵·⁰⁶²⁵:** ε̂_F = 4.23e−4 ≤ 0.01; max χ_t on [s\*, t_c) = 0.0039 ≤ 0.1. Neither condition fires.
+  `pilot.json` records STOP only because τ is undefined: the 2⁻¹⁶·⁵ run is missing (S1).
+- **τ₁, τ₂: not set.** From the two runs alone, the rule would give τ₁ = ⌈1.5·0.0993/0.05⌉·0.05 = 0.15 and
+  τ₂ = ⌈1.5·0.1372/0.05⌉·0.05 = 0.25. The third pilot error can only raise them.
+- **Machine.** Memory gate before every job (`memory_gate.log`). Peak RSS 1.01 GB (the 2⁻¹⁷·⁹³⁷⁵ observation). Times:
+  2⁻¹⁵·⁰⁶²⁵ 31 s + 102 s; 2⁻¹⁷·⁹³⁷⁵ 228 s + 719 s.
 
 ## 13. Compute and machine rules
 
