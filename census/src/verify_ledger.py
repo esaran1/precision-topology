@@ -943,6 +943,16 @@ PRODUCERS = {
     "phase1c/observed_Tp.jsonl": ("phase1c", "observe", "full", ""),
     "phase1c/scores.json": ("phase1c", "score", "full", ""),
     "phase1c_results.md": ("phase1c_report", "main", "full", ""),
+    # Phase 2A (slow tracking on the simplicity-bias benchmark; design approved 2026-10-04): src/phase2a.py
+    "phase2a/seed_scan.json": ("phase2a", "scan", "full", ""),
+    "phase2a/frozen.json": ("phase2a", "freeze", "full", ""),
+    "phase2a/pilot.json": ("phase2a", "pilot", "full", ""),
+    "phase2a/registration.sha256": ("phase2a", "manifest", "full", ""),
+    "phase2a/holds.jsonl": ("phase2a", "run", "full", ""),
+    "phase2a/runs.jsonl": ("phase2a", "run", "full", ""),
+    "phase2a/forecasts.sha256": ("phase2a", "finalize", "full", ""),
+    "phase2a/observed.jsonl": ("phase2a", "observe", "full", ""),
+    "phase2a/scores.json": ("phase2a", "score", "full", ""),
     # Phase 1B (POST HOC causal re-scoring of the registered tests; no registered verdict changes): src/phase1b.py
     "phase1b/runs_track_a.jsonl": ("phase1b", "run", "full", ""),
     "phase1b/runs_track2a.jsonl": ("phase1b", "run", "full", ""),
