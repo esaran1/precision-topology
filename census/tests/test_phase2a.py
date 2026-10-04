@@ -31,10 +31,13 @@ def test_registered_settings_match_the_approved_page():
     assert P.LADDER_LOG2[3:] == tuple(-(15 + k / 8) for k in range(1, 25))
     assert P.LADDER_LOG2[3] == -15.125 and P.LADDER_LOG2[-1] == -18.0
     assert list(P.LADDER_LOG2) == sorted(P.LADDER_LOG2, reverse=True)            # fastest first
-    assert P.PILOT_LOG2 == (-15.0625, -16.5, -17.9375)
-    # KNOWN (STOP item for the author): the page calls the pilot rates "off the ladder", but 2^-16.5 = 2^-(15 + 12/8) is
-    # ladder rate k = 12.  The pilot refuses to run a ladder rate (test_pilot_never_runs_a_ladder_rate).
-    assert set(P.PILOT_LOG2) & set(P.LADDER_LOG2) == {-16.5}
+    # author 2026-10-04, S1 (b): the middle pilot rate moved from 2^-16.5 (= ladder k 12) to 2^-16.5625 (k 12.5)
+    assert P.PILOT_LOG2 == (-15.0625, -16.5625, -17.9375) and not set(P.PILOT_LOG2) & set(P.LADDER_LOG2)
+    assert [(-l2 - 15) * 8 for l2 in P.PILOT_LOG2] == [0.5, 12.5, 23.5]
+    # author 2026-10-04: verdicts over the 22 rates with no prior outcome; the 5 explored rates are run, descriptive
+    assert P.PREOBSERVED_LOG2 == (-13.0, -14.0, -15.0, -16.0, -17.0) and set(P.PREOBSERVED_LOG2) <= set(P.LADDER_LOG2)
+    assert P.N_SCORED == 22 and P.SCORED_LOG2 == tuple(l2 for l2 in P.LADDER_LOG2 if l2 not in P.PREOBSERVED_LOG2)
+    assert P.GATE_MIN_M == P.N_RATES == 27                                # all 27 still run, one per M seed
     assert (P.SEEDS[0], P.SEEDS[-1], len(P.SEEDS)) == (2_937_000, 2_937_119, 120)
     assert (P.PILOT_SEEDS[0], P.PILOT_SEEDS[-1], len(P.PILOT_SEEDS)) == (2_937_900, 2_937_959, 60)
     assert not set(P.SEEDS) & set(P.PILOT_SEEDS)
@@ -329,21 +332,21 @@ def test_C1_C2_within_rule():
 
 def test_no_forecast_fails_C1_C2_C4_and_no_crossing_is_not_within():
     T = [_row(l2) for l2 in P.LADDER_LOG2]
-    base = P.criteria(T, S_F, S_STAR, 0.2, 0.25)
+    base = P.criteria(T, S_F, S_STAR, 0.2, 0.25, 27)
     assert all(base[k]["verdict"] == "PASS" for k in ("F", "C1", "C2", "C3", "C4", "E")), base
     T2 = [dict(r) for r in T]
     for r in T2[:6]:
         r.update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)
-    c = P.criteria(T2, S_F, S_STAR, 0.2, 0.25)
+    c = P.criteria(T2, S_F, S_STAR, 0.2, 0.25, 27)
     assert c["C1"]["verdict"] == c["C2"]["verdict"] == "FAIL" and c["C1"]["n_no_forecast"] == 6
     assert c["C4"]["verdict"] == "FAIL" and c["C4"]["n_no_forecast"] == 6
     T3 = [dict(r) for r in T]
     T3[0].update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)
-    assert P.criteria(T3, S_F, S_STAR, 0.2, 0.25)["C4"]["verdict"] == "FAIL"    # one rate without a forecast
+    assert P.criteria(T3, S_F, S_STAR, 0.2, 0.25, 27)["C4"]["verdict"] == "FAIL"    # one rate without a forecast
     T4 = [dict(r) for r in T]
     for r in T4[:6]:
         r.update(t_obs=None, s_obs=None)
-    c = P.criteria(T4, S_F, S_STAR, 0.2, 0.25)
+    c = P.criteria(T4, S_F, S_STAR, 0.2, 0.25, 27)
     assert c["C1"]["verdict"] == "FAIL" and c["C1"]["n_err_undefined"] == 6 and c["F"]["verdict"] == "FAIL"
 
 
@@ -486,7 +489,7 @@ def test_tau_rule():
 
 
 def test_pilot_never_runs_a_ladder_rate():
-    assert P.pilot_rate_allowed(-15.0625) and P.pilot_rate_allowed(-17.9375)
+    assert all(P.pilot_rate_allowed(l2) for l2 in P.PILOT_LOG2)
     assert not P.pilot_rate_allowed(-16.5) and not P.pilot_rate_allowed(-15.0)
 
 
@@ -539,3 +542,151 @@ def test_frozen_inputs():
     ts = np.array(fr["M_table"]["s"])
     assert ts[0] <= P.S0 and ts[-1] < fr["s_F"] and (np.array(fr["M_table"]["lam_min"]) > 0).all()
     assert fr["branch_points_s0"]["M"] is not None
+
+
+# ================================================================================================ the 22 scored rates
+def _table27(**over):
+    """All 27 ladder rates, each passing every rule (the synthetic fold law of _row), with validity fields."""
+    T = []
+    for l2 in P.LADDER_LOG2:
+        r = _row(l2)
+        r.update(t_c=r["t_F_fc"] // 2, follow_in_M=True, idle_ok=True, sign_ok=True)
+        T.append(r)
+    return T
+
+
+def _break(r):
+    """Make a rate fail F, C1, C2, C3 (ratio < 1), validity and give it no forecast."""
+    r.update(s_obs=1.2 * S_STAR, t_obs=r["t_c"] - 5, has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None,
+             eps_fc=None, r_fc=None, follow_in_M=False, idle_ok=False, sign_ok=False)
+
+
+def test_split_scored_and_gate_with_all_27_run():
+    T = _table27()
+    sc, pre = P.split_scored(T)
+    assert len(sc) == 22 and len(pre) == 5 and {r["log2rho"] for r in pre} == set(P.PREOBSERVED_LOG2)
+    assert P.gate(["M"] * 27 + ["L0"] * 93)["pass"] and not P.gate(["M"] * 26 + ["L0"] * 94)["pass"]
+    pl, _ = P.plan(["M"] * 27, tuple(range(27)))
+    assert [l2 for _, l2 in pl] == list(P.LADDER_LOG2)                 # every one of the 27 rates is run
+    ST = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)
+    assert ST["outcome"] == "PASS" and ST["n_scored_rows"] == 22 and ST["n_preobserved_rows"] == 5
+    for k in ("F", "C1", "C2"):
+        assert ST["criteria"][k]["n"] == 22
+    assert ST["criteria"]["C3"]["n"] == 22 and ST["criteria"]["C4"]["n"] == 22 and ST["criteria"]["E"]["n"] == 22
+    assert ST["validity"]["n"] == 22 and ST["DESCRIPTIVE_preobserved"]["criteria"]["F"]["n"] == 5
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25, gate_ok=False)["outcome"] == "UNRESOLVED (gate)"
+
+
+def test_preobserved_rates_never_enter_a_verdict():
+    T = _table27()
+    for r in T:
+        if r["log2rho"] in P.PREOBSERVED_LOG2:
+            _break(r)                                                     # even the falsifier at a pre-observed rate
+    ST = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)
+    assert ST["outcome"] == "PASS" and not ST["criteria"]["F"]["falsified"]
+    d = ST["DESCRIPTIVE_preobserved"]
+    assert d["criteria"]["F"]["falsified"] and d["criteria"]["F"]["verdict"] == "FAIL" and not d["validity"]["ok"]
+
+
+def _scored_idx(T):
+    return [i for i, r in enumerate(T) if r["log2rho"] not in P.PREOBSERVED_LOG2]
+
+
+@pytest.mark.parametrize("k_bad,verdict", [(2, "PASS"), (3, "FAIL")])     # 20/22 = 0.909 ≥ 0.9; 19/22 = 0.864
+def test_F_over_22(k_bad, verdict):
+    T = _table27()
+    for i in _scored_idx(T)[:k_bad]:
+        T[i].update(s_obs=1.3 * S_F)                                      # outside the window, not a falsifier
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["F"]["verdict"] == verdict
+    T[_scored_idx(T)[-1]].update(s_obs=1.25 * S_STAR)                     # one scored falsifier: FAIL
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["F"]["falsified"]
+
+
+@pytest.mark.parametrize("k_bad,verdict", [(4, "PASS"), (5, "FAIL")])     # 18/22 = 0.818 ≥ 0.8; 17/22 = 0.773
+def test_C1_C2_over_22(k_bad, verdict):
+    for crit, field in (("C1", "t_fc"), ("C2", "t_F")):
+        T = _table27()
+        for i in _scored_idx(T)[:k_bad]:
+            T[i][field] = T[i][field] + (T[i]["delay_fc"] if field == "t_fc" else -T[i]["delay_fc"])
+        ST = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)
+        assert ST["criteria"][crit]["n"] == 22 and ST["criteria"][crit]["verdict"] == verdict, crit
+
+
+def test_no_forecast_at_a_scored_rate_fails_C1_C2_C4_but_not_at_a_preobserved_one():
+    T = _table27()
+    i = _scored_idx(T)[0]
+    T[i].update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)
+    c = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]
+    assert c["C4"]["verdict"] == "FAIL" and c["C1"]["n_no_forecast"] == 1 and c["C2"]["n_no_forecast"] == 1
+    assert c["C3"]["n"] == 21 and c["E"]["n"] == 21
+    T = _table27()
+    T[0].update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)    # 2^-13: pre-observed
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["C4"]["verdict"] == "PASS"
+
+
+def test_C3_over_scored_finite_ratios():
+    T = _table27()
+    sc = _scored_idx(T)
+    for i in sc[:19]:                                                     # only 3 scored rates keep a forecast
+        T[i].update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)
+    c = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["C3"]
+    assert c["n"] == 3 and c["verdict"] == "PASS"
+    T[sc[19]].update(has_fc=False, t_fc=None, t_F_fc=None, delay_fc=None, eps_fc=None, r_fc=None)
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["C3"]["verdict"] == "UNRESOLVED"
+    T = _table27()
+    j = sc[-1]
+    T[j]["s_obs"] = S_F * (1 + 0.99 * T[j]["r_fc"])                       # a scored ratio below 1: FAIL
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["C3"]["verdict"] == "FAIL"
+
+
+def test_C4_and_E_bootstraps_over_the_22():
+    T = _table27()
+    for r in T:
+        if r["log2rho"] in P.PREOBSERVED_LOG2:                            # huge D at pre-observed rates: ignored
+            r["t_fc"] = r["t_obs"] + 10 ** 7
+            r["s_obs"] = S_F * (1 + 50 * r["r_fc"])
+    c = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]
+    assert c["C4"]["n"] == 22 and c["C4"]["verdict"] == "PASS" and c["C4"]["ci95"][1] < 0
+    assert c["E"]["n"] == 22 and c["E"]["verdict"] == "PASS"
+    sc = _scored_idx(T)
+    for i in sc:                                                          # now the scored D are positive: FAIL
+        T[i]["t_F_fc"] = T[i]["t_obs"]
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["criteria"]["C4"]["verdict"] == "FAIL"
+
+
+@pytest.mark.parametrize("k_bad,ok", [(2, True), (3, False)])             # 20/22 ≥ 0.9; 19/22 < 0.9
+def test_validity_90pct_over_22(k_bad, ok):
+    for field in ("follow", "cutoff"):
+        T = _table27()
+        for i in _scored_idx(T)[:k_bad]:
+            if field == "follow":
+                T[i]["follow_in_M"] = False
+            else:
+                T[i]["t_c"] = T[i]["t_obs"]                               # not strictly before
+        v = P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["validity"]
+        assert v["n"] == 22 and v[f"{field}_ok" if field == "follow" else "cutoff_before_ok"] is ok
+        assert (P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["outcome"] == "PASS") is ok
+
+
+def test_idle_and_signs_every_scored_rate():
+    T = _table27()
+    T[_scored_idx(T)[3]]["idle_ok"] = False
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["outcome"] == "UNRESOLVED (validity)"
+    T = _table27()
+    T[_scored_idx(T)[3]]["sign_ok"] = False
+    assert P.score_tables(T, S_F, S_STAR, 0.2, 0.25)["outcome"] == "UNRESOLVED (validity)"
+
+
+PILOT = ROOT / "results" / "phase2a" / "pilot.json"
+
+
+@pytest.mark.skipif(not PILOT.exists(), reason="pilot not yet run")
+def test_pilot_sets_tau_by_the_rule_and_did_not_stop():
+    Pj = json.loads(PILOT.read_text())
+    assert [a["log2rho"] for a in Pj["assignment"]] == list(P.PILOT_LOG2)
+    assert all(a["seed"] in P.PILOT_SEEDS for a in Pj["assignment"])
+    assert sorted(float(k) for k in Pj["runs"]) == sorted(P.PILOT_LOG2)
+    assert Pj["tau1"] == P.tau_rule(Pj["errors_C1"]) == 0.15 and Pj["tau2"] == P.tau_rule(Pj["errors_C2"]) == 0.25
+    assert not Pj["stop_rule"]["stop"]
+    first = Pj["runs"]["-15.0625"]
+    assert first["forecast"]["eps_fc"] <= P.PILOT_EPS_MAX and first["chi_max_sstar_tc"] <= P.PILOT_CHI_MAX

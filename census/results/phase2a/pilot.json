@@ -740,7 +740,7 @@
   },
   {
    "seed": 2937906,
-   "log2rho": -16.5
+   "log2rho": -16.5625
   },
   {
    "seed": 2937910,
@@ -805,11 +805,6 @@
     "delay_obs": 23861
    }
   },
-  "-16.5": {
-   "seed": 2937906,
-   "log2rho": -16.5,
-   "skipped": "pilot rate lies ON the ladder (each run is deterministic given rho, so piloting it would observe a registered rate): not run; the author's decision is needed"
-  },
   "-17.9375": {
    "log2rho": -17.9375,
    "rho": 3.9835883423897314e-06,
@@ -866,25 +861,88 @@
     "r_obs": 0.00391558545699211,
     "delay_obs": 43204
    }
+  },
+  "-16.5625": {
+   "log2rho": -16.5625,
+   "rho": 1.0332149863715306e-05,
+   "budget": 6194258,
+   "t_c": 1451331,
+   "s_at_tc": 4.529305472357866,
+   "state_tc_sha256": "be91be1c0b84fb7ec556e14bc6baec5750e6e2362b432a1baa8bb1de80990df8",
+   "forecast": {
+    "status": "ok",
+    "t_c": 1451331,
+    "t_F_fc": 1660629,
+    "t_fc": 1690036,
+    "delay_fc": 29407,
+    "eps_fc": 0.00014978011646973682,
+    "r_fc": 0.006594277730668569,
+    "s_c_fc": 4.799128910421622,
+    "sdot_F_fc": 1.0782657309249544e-06,
+    "n_window": 72567,
+    "growth_rate_at_cutoff": 2.639848323242829e-07,
+    "n_extrapolated": 4742928,
+    "max_index_read": 1451330,
+    "nan_recompute_identical": true
+   },
+   "nan_recompute_identical": true,
+   "t_sstar": 776834,
+   "chi_max_sstar_tc": 0.0013743154811379193,
+   "chi_n_nan": 0,
+   "seed": 2937906,
+   "secs_run": 87.2,
+   "observed": {
+    "log2rho": -16.5625,
+    "steps_observed": 1690744,
+    "t_obs": 1690744,
+    "s_obs": 4.803927180462726,
+    "rho2_at_obs": 0.3914269219656096,
+    "rho2_release": 0.084059296719547,
+    "t_F": 1658346,
+    "s_end": 4.803927180462726,
+    "t_08": 918565,
+    "follow_in_M": true,
+    "follow_dist_M": 9.753656959161954e-10,
+    "idle_zero_to_crossing": true,
+    "idle_first_violation": null,
+    "signs_fixed_to_crossing": true,
+    "sign_first_violation": null,
+    "state_tc_hash_ok": true,
+    "secs_observe": 278.6,
+    "err_C1": 0.024075900295847927,
+    "err_C2": 0.10171047709728977,
+    "horizon": {
+     "steps": 239413,
+     "delays": 7.389746280634607
+    },
+    "r_obs": 0.007600691864678266,
+    "delay_obs": 32398
+   }
   }
  },
  "errors_C1": [
   0.09931849592527284,
-  null,
+  0.024075900295847927,
   0.07470550226154381
  ],
  "errors_C2": [
   0.13715865224229137,
-  null,
+  0.10171047709728977,
   0.07371141706844277
  ],
- "tau1": null,
- "tau2": null,
+ "tau1": 0.15,
+ "tau2": 0.25,
  "stop_rule": {
-  "stop": true,
-  "reasons": [
-   "tau undefined (a pilot run without a forecast or a crossing)"
-  ]
+  "stop": false,
+  "reasons": []
  },
- "rule": "tau = 1.5 x the largest pilot error at f = 0.95, rounded up to 0.05"
+ "rule": "tau = 1.5 x the largest pilot error at f = 0.95, rounded up to 0.05",
+ "superseded_runs": {
+  "-16.5": {
+   "seed": 2937906,
+   "log2rho": -16.5,
+   "skipped": "pilot rate lies ON the ladder (each run is deterministic given rho, so piloting it would observe a registered rate): not run; the author's decision is needed",
+   "superseded": "not a pilot rate after the author's decision of 2026-10-04 (S1 (b): 2^-16.5 -> 2^-16.5625)"
+  }
+ }
 }

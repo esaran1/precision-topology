@@ -62,10 +62,17 @@ S0 = 1.7957                                     # hold / release scale
 ETA = 1.0
 LAM = 1e-4
 LADDER_LOG2 = (-13.0, -14.0, -15.0) + tuple(-(15 + k / 8) for k in range(1, 25))       # 27 rates, fastest first
-PILOT_LOG2 = (-15.0625, -16.5, -17.9375)        # off the ladder; the STOP rule reads the first
+PILOT_LOG2 = (-15.0625, -16.5625, -17.9375)     # off the ladder (half-steps k 0.5, 12.5, 23.5; author 2026-10-04,
+                                                # S1 (b): the middle rate moved from 2^-16.5 = ladder k 12); the STOP
+                                                # rule reads the first
 SEEDS = tuple(range(2_937_000, 2_937_120))      # 120 registered seeds
 PILOT_SEEDS = tuple(range(2_937_900, 2_937_960))  # 60 pilot seeds
 N_RATES = len(LADDER_LOG2)
+# Author 2026-10-04: every VERDICT is computed over the 22 ladder rates with no prior outcome.  The 5 rates already run
+# in the exploration (p2a_explore_f, _g) are still RUN (all 27 run, one per M seed) and reported as DESCRIPTIVE only.
+PREOBSERVED_LOG2 = (-13.0, -14.0, -15.0, -16.0, -17.0)
+SCORED_LOG2 = tuple(l2 for l2 in LADDER_LOG2 if l2 not in PREOBSERVED_LOG2)
+N_SCORED = len(SCORED_LOG2)                      # 22
 GATE_MIN_M = 27                                 # gate: ≥ 27 of 120 seeds land on M
 F_CUT = 0.95                                    # registered cutoff fraction of s_F
 TIGHT_REF_LOG2, TIGHT_REF_GAP = -15.0, 0.05     # descriptive tightening cutoff 1 − f = 0.05·(ρ/2⁻¹⁵)^{2/3}
@@ -629,7 +636,7 @@ def outcome(verdicts, gate_ok=True, valid_ok=True):
     return "FAIL " + "+".join(k for k, v in verdicts.items() if v == "FAIL")
 
 
-def criteria(table, s_F, s_star, tau1, tau2, n_rates=N_RATES):
+def criteria(table, s_F, s_star, tau1, tau2, n_rates=N_SCORED):
     """F, C1-C4, E over the rate table (one row per rate: rho, has_fc, t_fc, t_F_fc, delay_fc, eps_fc, r_fc, t_obs,
     s_obs, t_F)."""
     g = {k: _arr([r.get(k) for r in table]) for k in ("rho", "t_fc", "t_F_fc", "delay_fc", "eps_fc", "r_fc", "t_obs",
@@ -644,6 +651,33 @@ def criteria(table, s_F, s_star, tau1, tau2, n_rates=N_RATES):
             "C3": criterion_C3(g["rho"], r_obs, g["r_fc"], has_fc),
             "C4": criterion_C4(g["t_fc"], g["t_F_fc"], g["t_obs"], has_fc),
             "E": criterion_E(g["eps_fc"], r_obs, has_fc)}
+
+
+def split_scored(table):
+    """(scored rows: the 22 rates with no prior outcome; pre-observed rows: the 5 explored rates, DESCRIPTIVE)."""
+    pre = {float(x) for x in PREOBSERVED_LOG2}
+    return ([r for r in table if float(r["log2rho"]) not in pre], [r for r in table if float(r["log2rho"]) in pre])
+
+
+def score_tables(T, s_F, s_star, tau1, tau2, gate_ok=True):
+    """Verdicts over the 22 SCORED rates only (F, C1, C2 fractions over 22; C3 over the scored rates with a finite
+    ratio; C4 and E bootstraps over the scored rates; the validity rules over the 22).  The 5 pre-observed rates get the
+    same statistics as DESCRIPTIVE only (denominator 5); they never enter a verdict."""
+    if not gate_ok:
+        return {"criteria": {}, "validity": {"ok": False}, "verdicts": {}, "outcome": outcome({}, False, False),
+                "DESCRIPTIVE_preobserved": None}
+    sc, pre = split_scored(T)
+
+    def val(rows, n):
+        return validity([r["follow_in_M"] for r in rows], [r["t_c"] for r in rows], [r["t_obs"] for r in rows],
+                        [r["idle_ok"] for r in rows], [r["sign_ok"] for r in rows], n)
+    crit = criteria(sc, s_F, s_star, tau1, tau2, N_SCORED)
+    v = val(sc, N_SCORED)
+    verdicts = {k: c["verdict"] for k, c in crit.items()}
+    return {"criteria": crit, "validity": v, "verdicts": verdicts, "outcome": outcome(verdicts, True, v["ok"]),
+            "n_scored_rows": len(sc), "n_preobserved_rows": len(pre),
+            "DESCRIPTIVE_preobserved": {"criteria": criteria(pre, s_F, s_star, tau1, tau2, len(PREOBSERVED_LOG2)),
+                                        "validity": val(pre, len(PREOBSERVED_LOG2))}}
 
 
 def pilot_errors(t_fc, t_F_fc, t_obs, t_F):
@@ -835,6 +869,7 @@ def freeze():
                                                                for i in (2 * k, 2 * k + 1, 8 + k)] + [16]]).max()),
           "branch_points_s0": {k: (None if v is None else [float(x) for x in v]) for k, v in bp.items()},
           "ladder_log2": list(LADDER_LOG2), "pilot_log2": list(PILOT_LOG2),
+          "scored_log2": list(SCORED_LOG2), "preobserved_log2_descriptive": list(PREOBSERVED_LOG2),
           "budgets": {f"{l2:g}": budget(rho_of(l2)) for l2 in LADDER_LOG2 + PILOT_LOG2},
           "tight_f": {f"{l2:g}": f_tight(rho_of(l2)) for l2 in LADDER_LOG2},
           "plan_rule": "holds of SEEDS in seed order (one fixed-s BFGS batch); the i-th seed labelled M takes "
@@ -876,6 +911,9 @@ def pilot():
     P["gate_like_counts"] = gate(labels)
     P["assignment"] = [{"seed": s, "log2rho": l2} for s, l2 in pl]
     P.setdefault("runs", {})
+    for key in [k for k in P["runs"] if float(k) not in {float(x) for x in PILOT_LOG2}]:
+        P.setdefault("superseded_runs", {})[key] = {**P["runs"].pop(key), "superseded": "not a pilot rate after the "
+                                                    "author's decision of 2026-10-04 (S1 (b): 2^-16.5 -> 2^-16.5625)"}
     for s, l2 in pl:
         key = f"{l2:g}"
         if key in P["runs"] and "observed" in P["runs"][key]:
@@ -1090,17 +1128,16 @@ def score():
     g = gate([h["label"] for h in holds])
     runs = _rows(OUT / "runs.jsonl"); obs = _rows(OUT / "observed.jsonl")
     T = rate_table(fr, runs, obs) if g["pass"] else []
-    crit = criteria(T, fr["s_F"], fr["s_star"], P["tau1"], P["tau2"]) if g["pass"] else {}
-    val = validity([r["follow_in_M"] for r in T], [r["t_c"] for r in T], [r["t_obs"] for r in T],
-                   [r["idle_ok"] for r in T], [r["sign_ok"] for r in T], N_RATES) if g["pass"] else {"ok": False}
-    verdicts = {k: v["verdict"] for k, v in crit.items()}
+    ST = score_tables(T, fr["s_F"], fr["s_star"], P["tau1"], P["tau2"], g["pass"])
+    crit, val, verdicts = ST["criteria"], ST["validity"], ST["verdicts"]
     tight_T = [{**r, "t_c": (r["tight"] or {}).get("t_c"), "has_fc": CFF.has_forecast(r["tight"]),
                 **{k: (r["tight"] or {}).get(k) for k in ("t_fc", "t_F_fc", "delay_fc", "eps_fc", "r_fc")}} for r in T]
-    out = {"gate": g, "validity": val, "criteria": crit, "verdicts": verdicts,
-           "outcome": outcome(verdicts, g["pass"], val.get("ok", False)), "tau1": P["tau1"], "tau2": P["tau2"],
-           "rates": T,
-           "DESCRIPTIVE_tightening_cutoff": criteria(tight_T, fr["s_F"], fr["s_star"], P["tau1"], P["tau2"])
-           if g["pass"] else None}
+    out = {"gate": g, "validity": val, "criteria": crit, "verdicts": verdicts, "outcome": ST["outcome"],
+           "scored_log2rho": list(SCORED_LOG2), "preobserved_log2rho": list(PREOBSERVED_LOG2),
+           "tau1": P["tau1"], "tau2": P["tau2"], "rates": T,
+           "DESCRIPTIVE_preobserved_rates": ST["DESCRIPTIVE_preobserved"],
+           "DESCRIPTIVE_tightening_cutoff": criteria(split_scored(tight_T)[0], fr["s_F"], fr["s_star"], P["tau1"],
+                                                     P["tau2"]) if g["pass"] else None}
     (OUT / "scores.json").write_text(json.dumps(_jsonable(out), indent=1))
     print(json.dumps(_jsonable({k: out[k] for k in ("gate", "verdicts", "outcome")}), indent=1))
 

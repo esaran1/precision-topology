@@ -1,14 +1,15 @@
 # Phase 2A registration: slow tracking on the simplicity-bias benchmark
 
-**NOT YET REGISTERED: STOPPED before the registration commit (standing rule).** The approved page leaves open details
-that touch a criterion, the gate, a validity condition or the scoring set (§9), and one approved setting contradicts
-the page itself (S1, §9). Each item has a proposed resolution, implemented and tested. Nothing here is binding until
-the author decides §9 and the registration commit is made. After that commit, the registration md, `src/phase2a.py`,
-`src/causal_forecast_fold.py`, `tests/test_phase2a.py`, the frozen forecaster and the code it reaches, and the frozen
-inputs are hashed in `results/phase2a/registration.sha256` (§11).
+**REGISTERED.** This file, the approved design page, `src/phase2a.py`, `src/causal_forecast_fold.py`,
+`tests/test_phase2a.py`, the frozen forecaster and the code it reaches, and the frozen inputs (`frozen.json`,
+`pilot.json`, `seed_scan.json` and Track 1A's branch files) are committed in one commit before any registered run.
+Their SHA-256 hashes are in `results/phase2a/registration.sha256` (§11).
 - **Not yet done:** no registered seed has been drawn, held or trained.
-- **Pilot:** pilot seeds only. It ran at the two pilot rates that lie off the ladder. The third (2⁻¹⁶·⁵) is on the
-  ladder and was NOT run (S1), so τ₁ and τ₂ are not yet set (§12).
+- **The open details:** the author decided them on 2026-10-04 (§9). S1: the middle pilot rate moved off the ladder,
+  to 2⁻¹⁶·⁵⁶²⁵. D1–D15 were approved as proposed, with ONE addition: **every verdict is computed over the 22 ladder
+  rates with no prior outcome.** The 5 rates already run in the exploration are still run and are reported as
+  descriptive (§2).
+- **Pilot:** pilot seeds only, at the three pilot rates. τ₁ = 0.15 and τ₂ = 0.25; the STOP rule did not fire (§12).
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
 
 ## 1. Design reference
@@ -18,12 +19,18 @@ inputs are hashed in `results/phase2a/registration.sha256` (§11).
   1. f = 0.95 (not 0.90). The tightening cutoff (1 − f ∝ ρ^{2/3}, equal to 0.05 at 2⁻¹⁵) and each rate's forecast
      horizon are reported descriptively only.
   2. The worker's item-2 choices: 27 distinct rates (anchors 2⁻¹³, 2⁻¹⁴, 2⁻¹⁵; new 2^−(15+k/8), k = 1…24), assigned
-     in seed order to the seeds landing on M, fastest first; three pilot rates 2⁻¹⁵·⁰⁶²⁵, 2⁻¹⁶·⁵, 2⁻¹⁷·⁹³⁷⁵; gate ≥ 27
+     in seed order to the seeds landing on M, fastest first; three pilot rates 2⁻¹⁵·⁰⁶²⁵, 2⁻¹⁶·⁵, 2⁻¹⁷·⁹³⁷⁵ (the middle one later moved to 2⁻¹⁶·⁵⁶²⁵, item 5); gate ≥ 27
      of 120 seeds on M; no forecast fails C1, C2 and C4; τ₁, τ₂ = 1.5 × the largest pilot error at f = 0.95, rounded
      up to 0.05; training stops at t_c, the state is hashed, observation resumes from it to 1.25·s_F.
   3. The fixed dataset. 2A tests ONE landscape across rates (§2), with the resampling exploration as a disclosed limit
      (§8).
   4. Everything else as revised.
+  5. **Second decision (author, 2026-10-04, after the stop of c3bf012/0c4a72f).**
+     - S1 (b): the middle pilot rate is 2⁻¹⁶·⁵⁶²⁵ (k 12.5), off the ladder like the other two.
+     - D1–D15 are approved as proposed.
+     - ADDITION: the 5 ladder rates with an exploratory outcome (2⁻¹³, 2⁻¹⁴, 2⁻¹⁵, 2⁻¹⁶, 2⁻¹⁷) are excluded from every
+       scored set. Every verdict is computed over the 22 others. All 27 rates are still run, and the 5 are reported
+       as descriptive.
 - **Inputs:** the v2 frozen inputs (`results/simplicity_bias_v2/frozen.json`: q, s\*, λ); Track 1A's branches
   (`src/sb_fold.py`, `results/sb_fold/`: M, S, L0, S2 continuation points and M's Δs = 0.001 grid; s_F = 4.767689);
   the frozen Phase 1A forecaster `src/causal_forecast.py` (25aac9e, unchanged: `extrapolate_scale`, `GuardedArray`,
@@ -33,8 +40,14 @@ inputs are hashed in `results/phase2a/registration.sha256` (§11).
 
 - **One landscape.** The fixed v3 data (800 points), tanh, width 4, λ = 1e−4, BCE, float64, full batch, no momentum,
   η = 1. s = ‖v‖₁; q = 0.3914103370; s\* = 3.5913755425 (v2 `frozen.json`). Every M release is the same point, so every
-  run is deterministic given ρ: **the rates, not the seeds, are the replicates.** Every fraction and bootstrap runs over
-  the 27 distinct rates. A seed only decides whether it lands on M and which rate it takes.
+  run is deterministic given ρ: **the rates, not the seeds, are the replicates.** A seed only decides whether it lands
+  on M and which rate it takes.
+- **The scoring set: 22 rates** (`phase2a.SCORED_LOG2`, `score_tables`).
+  - It is the ladder minus the 5 rates with a prior outcome (`PREOBSERVED_LOG2` = 2⁻¹³, 2⁻¹⁴, 2⁻¹⁵, 2⁻¹⁶, 2⁻¹⁷;
+    `p2a_explore_f` and `_g`): 2⁻¹⁵·¹²⁵ … 2⁻¹⁸ without 2⁻¹⁶ and 2⁻¹⁷.
+  - Every fraction, bootstrap and validity rule runs over these 22 distinct rates (§5, §6).
+  - The 5 pre-observed rates are RUN like the others (all 27 run, one per M seed; the gate stays ≥ 27 of 120).
+    The same statistics are reported for them as DESCRIPTIVE, with denominator 5, and never enter a verdict.
 - **Output rule (scale only).** (W, c, b) ← · − η∇; v ← v − η[(I − ââᵀ) + ρââᵀ]∇_vL, â = sign(v)/√3 on the three
   active units (the idle unit's component is 0). **Not the practitioner's knob** (the plain output learning rate leaves
   χ ≥ 3.5 at every ρ; Phase 2B tests that knob).
@@ -92,30 +105,31 @@ inputs are hashed in `results/phase2a/registration.sha256` (§11).
 - **Per run.** `run_forecast` asserts the guard's last row < t_c and recomputes with every row ≥ t_c NaN. A
   differing recomputation aborts the run (`CausalityViolation`). It is not a per-rate miss.
 
-## 5. Criteria (over the 27 rates; `phase2a.criteria`)
+## 5. Criteria (over the 22 scored rates; `phase2a.score_tables` → `criteria`)
 
 r_obs = s_obs/s_F − 1; delay_obs = t_obs − t_F, where t_F is the first step with s ≥ s_F on the observed path.
 Numbers are compared in float64, without rounding.
 
 | | statistic | PASS if |
 |---|---|---|
-| **F** | s_F ≤ s_obs ≤ 1.25·s_F (inclusive) | at ≥ 90% of the 27 rates, AND at no rate s_obs ≤ 1.25·s\* (the falsifier, inclusive) |
-| **C1** | \|t_fc − t_obs\| ≤ τ₁·delay_fc (inclusive) | at ≥ 80% of the 27 rates |
-| **C2** | \|delay_fc − delay_obs\| ≤ τ₂·delay_fc (inclusive) | at ≥ 80% of the 27 rates |
-| **C3** | Spearman(ρ, r_obs/r_fc) (average ranks) and min r_obs/r_fc | Spearman ≥ 0.8 AND r_obs/r_fc > 1 at every rate with a ratio |
+| **F** | s_F ≤ s_obs ≤ 1.25·s_F (inclusive) | at ≥ 90% of the 22 scored rates (≥ 20), AND at no scored rate s_obs ≤ 1.25·s\* (the falsifier, inclusive) |
+| **C1** | \|t_fc − t_obs\| ≤ τ₁·delay_fc (inclusive), τ₁ = 0.15 | at ≥ 80% of the 22 scored rates (≥ 18) |
+| **C2** | \|delay_fc − delay_obs\| ≤ τ₂·delay_fc (inclusive), τ₂ = 0.25 | at ≥ 80% of the 22 scored rates (≥ 18) |
+| **C3** | Spearman(ρ, r_obs/r_fc) (average ranks) and min r_obs/r_fc | Spearman ≥ 0.8 AND r_obs/r_fc > 1 at every scored rate with a ratio |
 | **C4** | D = \|t_fc − t_obs\| − \|t̂_F − t_obs\|, paired per rate | upper end of the 95% percentile bootstrap interval of mean D < 0 |
 | **E** | OLS slope of ln r_obs on ln ε̂_F | 95% CI inside [0.55, 0.80] (closed) |
 
-- **Denominators (D1).** F, C1 and C2 count all 27 rates. A rate with no forecast, or with no crossing, is not within.
-- **C3 (D2).** Over the rates with a forecast and a crossing (finite r_obs/r_fc, r_fc > 0). Fewer than 3 such rates,
-  or Spearman NaN: UNRESOLVED.
+- **Denominators (D1).** F, C1 and C2 count all 22 scored rates. A scored rate with no forecast, or with no crossing,
+  is not within.
+- **C3 (D2).** Over the scored rates with a forecast and a crossing (finite r_obs/r_fc, r_fc > 0). Fewer than 3 such
+  rates, or Spearman NaN: UNRESOLVED.
 - **C4 (D3).**
-  - Any rate with no forecast: FAIL (the page).
-  - Otherwise D runs over the rates with a crossing: 10,000 resamples with replacement, from a local
+  - Any scored rate with no forecast: FAIL (the page).
+  - Otherwise D runs over the scored rates with a crossing: 10,000 resamples with replacement, from a local
     `numpy.random.default_rng(2937000)`; the interval is the 2.5th and 97.5th percentiles.
   - PASS iff the upper end is < 0. An interval above 0, or containing 0, is FAIL. Fewer than 2 rates: UNRESOLVED.
 - **E (D4).**
-  - Over the rates with a forecast and a crossing above s_F (r_obs > 0).
+  - Over the scored rates with a forecast and a crossing above s_F (r_obs > 0).
   - The CI is the 2.5–97.5 percentile interval of the OLS slope over 10,000 rate resamples (local
     `default_rng(2937000)`). Resamples with no spread in ε̂ are dropped and counted.
   - Fewer than 3 rates: UNRESOLVED. The OLS standard error is descriptive.
@@ -130,16 +144,27 @@ Numbers are compared in float64, without rounding.
 1. **Gate:** ≥ 27 of the 120 registered seeds land on M (P = 0.997 at the Wilson low 0.335 of the exploration's 80/200
    at s₀). If it fails, no rate is trained and the outcome is "UNRESOLVED (gate)".
 2. **Validity (D5, D6).** If any condition fails, the outcome is "UNRESOLVED (validity)". The conditions:
-   - **Follow:** at ≥ 90% of the 27 rates, the state at the first step with s ≥ 0.8·s_F, minimised at its own s
+   - **Follow:** at ≥ 90% of the 22 scored rates (≥ 20), the state at the first step with s ≥ 0.8·s_F, minimised at its own s
      (`sb_fold.local_min_batch`), lies within 1e−3 of M's exact point at that s. A rate that never reaches 0.8·s_F
      fails this.
-   - **Cutoff before the crossing:** at ≥ 90% of the 27 rates, t_c < t_obs (strict). A rate with no cutoff fails
+   - **Cutoff before the crossing:** at ≥ 90% of the 22 scored rates (≥ 20), t_c < t_obs (strict). A rate with no cutoff fails
      this; a rate with a cutoff and no crossing passes it.
    - The two 90% rules are evaluated separately.
-   - **Idle unit and signs:** at every rate, the idle unit's W, c and v are exactly 0.0, and sign(v_k) is unchanged
+   - **Idle unit and signs:** at every scored rate, the idle unit's W, c and v are exactly 0.0, and sign(v_k) is unchanged
      for the three active units, at every step up to and including the crossing (to the end of observation if there
      is no crossing).
-3. Rates whose cutoff is not before the crossing stay in every criterion's denominator (D14).
+3. Scored rates whose cutoff is not before the crossing stay in every criterion's denominator (D14).
+4. The constructed tests (`tests/test_phase2a.py`, "the 22 scored rates") confirm each rule with 22 scored rates
+   among 27 run:
+   - **F:** 20/22 PASS, 19/22 FAIL, a scored falsifier FAILs.
+   - **C1 and C2:** 18/22 PASS, 17/22 FAIL.
+   - **No forecast:** at a scored rate it fails C1, C2 and C4; at a pre-observed rate it does not.
+   - **C3:** 3 finite ratios is computable, 2 is UNRESOLVED; a scored ratio below 1 FAILs.
+   - **C4 and E:** both bootstraps have n = 22, and extreme values at the pre-observed rates change nothing.
+   - **Validity:** follow and cutoff-before at 20/22 are valid and at 19/22 are not; an idle or sign violation at a
+     scored rate makes the outcome UNRESOLVED (validity).
+   - **Pre-observed rates:** breaking every rule at all 5, the falsifier included, leaves a PASS, and their
+     descriptive block shows the failure.
 
 ## 7. Descriptive (never a verdict)
 
@@ -151,6 +176,8 @@ Numbers are compared in float64, without rounding.
     cutoffs.
   - These are computed in `observe` (D15): for ρ < 2⁻¹⁵ the cutoff lies after the registered t_c.
 - Per rate: ε̂_F, r_fc, r_obs/r_fc, delay_obs/delay_fc, max χ on [s\*, t_c), and the follow-check distance.
+- **The 5 pre-observed rates** (2⁻¹³ … 2⁻¹⁷): F–E and validity over these 5 alone (denominator 5).
+- The tightening-cutoff statistics are computed over the 22 scored rates.
 - The landing counts (L0, M, S, S2, other) and the surplus M seeds.
 - C4's fraction of rates with the forecast closer than t̂_F; E's OLS standard error.
 
@@ -167,6 +194,8 @@ Numbers are compared in float64, without rounding.
   - **not named on the page:** 2⁻¹⁶ (k = 8) and 2⁻¹⁷ (k = 16), also run in `p2a_explore_g`.
   - So 5 of the 27 rates have known outcomes before registration. The 2⁻¹⁵, 2⁻¹⁶ and 2⁻¹⁷ values at f = 0.95 are the
     page's expected-outcome table.
+  - **The author's decision (2026-10-04):** these 5 are excluded from every scored set. They are run and reported as
+    descriptive (§2).
 - **The fixed dataset (disclosed limit; `p2a_explore_g`).**
   - 2A tests one landscape across rates. On resampled data from the same generator, the M branch moves: its stable
     ranges were 2.69–5.62 (seed 2,930,000) and 1.96–5.86 (seed 2,930,001).
@@ -188,30 +217,25 @@ Numbers are compared in float64, without rounding.
 - **Set by me while preparing this file (not on the page; §9):** the bootstrap generator seed 2,937,000; the step
   budget; the observation end; the readings D1–D15.
 
-## 9. STOP items and the details the approved page leaves open
+## 9. The details the approved page left open (decided by the author 2026-10-04)
 
-**S1 (an approved setting contradicts the page).**
-- The page calls the three pilot rates "off the ladder", but 2⁻¹⁶·⁵ = 2^−(15 + 12/8) is ladder rate k = 12. The other
-  two are half-steps between ladder rates: 2⁻¹⁵·⁰⁶²⁵ = k 0.5, 2⁻¹⁷·⁹³⁷⁵ = k 23.5.
-- Every run is deterministic given ρ. A pilot at 2⁻¹⁶·⁵ would therefore observe a registered rate's crossing before the
-  registration.
-- `phase2a.pilot` refuses to pilot a ladder rate (`pilot_rate_allowed`, tested), so 2⁻¹⁶·⁵ was not run, and τ₁ and τ₂
-  are not set.
-- Options for the author:
-  - (a) keep 2⁻¹⁶·⁵ and disclose a sixth pre-observed ladder rate;
-  - (b) move it off the ladder to a half-step like the other two: 2⁻¹⁶·⁵⁶²⁵ (k 12.5) or 2⁻¹⁶·⁴³⁷⁵ (k 11.5).
-- I did not run any substitute: that would choose the pilot rate after seeing its error.
+**S1 (decided: option (b)).**
+- The page called the three pilot rates "off the ladder", but 2⁻¹⁶·⁵ = 2^−(15 + 12/8) is ladder rate k = 12. Each run is
+  deterministic given ρ, so piloting it would have observed a registered rate.
+- It was never run: `phase2a.pilot` refuses a ladder rate (`pilot_rate_allowed`, tested).
+- The author moved it to **2⁻¹⁶·⁵⁶²⁵ (k 12.5)**, a half-step like 2⁻¹⁵·⁰⁶²⁵ (k 0.5) and 2⁻¹⁷·⁹³⁷⁵ (k 23.5).
+- No substitute rate had been run before this decision.
 
-**Details that touch a criterion, the gate, validity or the scoring set** (implemented as proposed; for the author's
-decision):
+**Details that touch a criterion, the gate, validity or the scoring set.** Approved as proposed (author, 2026-10-04),
+with the scoring set narrowed to the 22 rates with no prior outcome (row D16).
 
 | # | detail | proposed resolution (implemented, tested) | touches |
 |---|---|---|---|
-| D1 | Denominators of F, C1, C2 | All 27 rates. A rate with no crossing (by 1.25·s_F or the budget) is outside F's window and not within C1/C2; a rate with no forecast is not within C1/C2. | F, C1, C2 |
-| D2 | C3's rate set | Rates with a forecast and a crossing (finite ratio, r_fc > 0); "> 1 at every rate" read over these; < 3 rates or Spearman NaN: UNRESOLVED; average ranks. | C3 |
-| D3 | C4 details | Any no-forecast rate: C4 FAIL (literal reading of "fails C4"). Otherwise rates with a crossing; mean D; 10,000 resamples; default_rng(2937000); 2.5–97.5 percentiles; < 2 rates: UNRESOLVED. | C4 |
-| D4 | E's 95% CI | Percentile bootstrap of the OLS slope over rate resamples (10,000; default_rng(2937000)), closed band; rates with a forecast and r_obs > 0; < 3: UNRESOLVED. (Alternative: OLS t-interval, reported descriptively.) | E |
-| D5 | The two 90% validity rules | Evaluated separately over the 27 rates; follow check = BFGS at own s within 1e−3 of M's exact point; never reaching 0.8·s_F fails; no cutoff = not before; cutoff and no crossing = before; t_c = t_obs is not before. | validity |
+| D1 | Denominators of F, C1, C2 | All 22 scored rates. A scored rate with no crossing (by 1.25·s_F or the budget) is outside F's window and not within C1/C2; a rate with no forecast is not within C1/C2. | F, C1, C2 |
+| D2 | C3's rate set | Scored rates with a forecast and a crossing (finite ratio, r_fc > 0); "> 1 at every rate" read over these; < 3 rates or Spearman NaN: UNRESOLVED; average ranks. | C3 |
+| D3 | C4 details | Any scored no-forecast rate: C4 FAIL (literal reading of "fails C4"). Otherwise scored rates with a crossing; mean D; 10,000 resamples; default_rng(2937000); 2.5–97.5 percentiles; < 2 rates: UNRESOLVED. | C4 |
+| D4 | E's 95% CI | Percentile bootstrap of the OLS slope over scored-rate resamples (10,000; default_rng(2937000)), closed band; scored rates with a forecast and r_obs > 0; < 3: UNRESOLVED. (Alternative: OLS t-interval, reported descriptively.) | E |
+| D5 | The two 90% validity rules | Evaluated separately over the 22 scored rates (≥ 20 each); follow check = BFGS at own s within 1e−3 of M's exact point; never reaching 0.8·s_F fails; no cutoff = not before; cutoff and no crossing = before; t_c = t_obs is not before. | validity |
 | D6 | Idle unit and signs | Idle W, c, v exactly 0.0 and active sign(v_k) unchanged at every step through the crossing step (to the end of observation if none). | validity |
 | D7 | Step budget | ⌈64/ρ⌉ steps (≈ 2× the exploratory steps to 1.25·s_F). No cutoff within it: no forecast. Observation ending at the budget: no crossing. | F, C1, C2, C4, validity |
 | D8 | Observation end | Stops once the crossing and s_F are both reached (t ≥ t_c), or at s ≥ 1.25·s_F. The page says "to 1.25·s_F"; nothing after the crossing enters any rule. | none (compute) |
@@ -220,21 +244,22 @@ decision):
 | D11 | Labels at s₀ | L0, M, S and S2 points at exactly s₀ (frozen; those inside a stable range), nearest within 1e−3, else "other"; one BFGS batch in seed order. | gate |
 | D12 | Bootstrap seed | 2,937,000 (the first registered seed), as 1C used its first seed. | C4, E |
 | D13 | Init generator | A local torch.Generator reproducing v3's init_net bit for bit. The exploration's landing fractions used numpy draws of the same distributions. | gate |
-| D14 | Rates whose cutoff is not before the crossing | Kept in every criterion (the page: every fraction over the 27 rates). 1C instead left such runs unscored. | scoring set |
+| D14 | Rates whose cutoff is not before the crossing | Kept in every criterion (every fraction over the 22 scored rates). 1C instead left such runs unscored. | scoring set |
 | D15 | Tightening forecasts | Computed in `observe` (descriptive; guarded; NaN check reported). | none |
+| D16 | **The scoring set (the author's addition)** | Verdicts over the 22 rates with no prior outcome. 2⁻¹³, 2⁻¹⁴, 2⁻¹⁵, 2⁻¹⁶ and 2⁻¹⁷ are run, and reported as descriptive with denominator 5. The gate is unchanged (≥ 27 of 120; all 27 run). | all criteria, validity, scoring set |
 
 ## 10. Competing outcomes and falsifiers
 
 | outcome | reading |
 |---|---|
-| PASS (F, C1–C4, E) | The crossing comes at the fold, with a ρ^{2/3} delay forecast in advance from s before the cutoff only. |
+| PASS (F, C1–C4, E, over the 22 scored rates) | The crossing comes at the fold, with a ρ^{2/3} delay forecast in advance from s before the cutoff only. |
 | **F falsifier: a crossing at or below 1.25·s\*** | The switch, not the fold: the account is falsified. |
 | F fails, crossings between 1.25·s\* and s_F | An early exit, as in v3. |
 | F fails, no crossing by 1.25·s_F | H-F5 fails (the run does not escape into S past the fold). |
 | E fails, slope ≈ 1 | A linear lag, not the fold delay. |
 | E fails, slope ≈ 0, or C4 fails together with C1 | No rate-dependent delay, or the forecast horizon is too long. |
 | C3 fails | The leading-order fold asymptotics fail: the ratio does not fall toward 1 as ρ → 0, or the delay is overestimated. |
-| C1 or C2 fails alone | The fold arrival or the delay is mis-forecast at > τ. |
+| C1 or C2 fails alone | The fold arrival or the delay is mis-forecast beyond τ₁ = 0.15 or τ₂ = 0.25 of the forecast delay. |
 | UNRESOLVED (gate) | Fewer than 27 seeds land on M. This says nothing about the fold. |
 | UNRESOLVED (validity) | The runs leave M before 0.8·s_F, cutoffs come too late, or the idle unit or a sign moves. This says nothing about the fold. |
 
@@ -258,7 +283,8 @@ unmodified.
 **Seed scan** (`seed_scan.json`): 0 files match either range; 0 overlaps with any module's registered or pilot seeds;
 disjoint from the exploration seeds.
 
-**Freeze** (`frozen.json`, 5.9 s). No seed was drawn.
+**Freeze** (`frozen.json`). No seed was drawn. It was re-run after the decision, to record the new pilot rate and the
+scored and pre-observed sets; every other field is unchanged.
 - s_F = 4.767689442106793 = 1.3275·s\* (`sb_fold.fold_of("M")`).
 - M table: λ_min at 2,973 points of M's Δs = 0.001 grid, s = 1.795 … 4.767; smallest 3.64e−5 at the last point.
 - |m′c′| = 4.782108e−7 (50 points in the last 0.05 below s_F); 4.821917e−7 over the last 0.025 (25 points).
@@ -269,25 +295,28 @@ disjoint from the exploration seeds.
 - Budgets ⌈64/ρ⌉: 524,288 steps at 2⁻¹³ … 16,777,216 at 2⁻¹⁸.
 
 **Pilot holds** (60 pilot seeds, one batch, 1.0 s): M 23 (38%), L0 14, other 23. The exploration had M 40% at s₀.
-Assignment: 2,937,901 → 2⁻¹⁵·⁰⁶²⁵; 2,937,906 → 2⁻¹⁶·⁵ (**not run, S1**); 2,937,910 → 2⁻¹⁷·⁹³⁷⁵.
+Assignment: 2,937,901 → 2⁻¹⁵·⁰⁶²⁵; 2,937,906 → 2⁻¹⁶·⁵⁶²⁵ (after S1; the superseded 2⁻¹⁶·⁵ entry, never run, is
+kept in `pilot.json` under `superseded_runs`); 2,937,910 → 2⁻¹⁷·⁹³⁷⁵.
 
 **Pilot runs** (f = 0.95; training to t_c, forecast, then observation resumed from the hashed t_c state):
 
 | ρ | t_c | t̂_F | t_fc | delay_fc | t_F | t_obs | delay_obs | s_obs/s_F | r_obs/r_fc | e₁ (C1) | e₂ (C2) | horizon (steps, delays) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 2⁻¹⁵·⁰⁶²⁵ | 513,274 | 587,302 | 608,285 | 20,983 | 586,508 | 610,369 | 23,861 | 1.01574 | 1.1937 | 0.0993 | 0.1372 | 97,095; 4.07 |
-| 2⁻¹⁶·⁵ | — | — | — | — | — | — | — | — | — | not run (S1) | not run | — |
+| 2⁻¹⁶·⁵⁶²⁵ | 1,451,331 | 1,660,629 | 1,690,036 | 29,407 | 1,658,346 | 1,690,744 | 32,398 | 1.00760 | 1.1526 | 0.0241 | 0.1017 | 239,413; 7.39 |
 | 2⁻¹⁷·⁹³⁷⁵ | 3,763,915 | 4,306,693 | 4,346,931 | 40,238 | 4,300,721 | 4,343,925 | 43,204 | 1.00392 | 1.1208 | 0.0747 | 0.0737 | 580,010; 13.4 |
 
-- In both runs: the guard's last row is t_c − 1; the NaN recomputation is identical; the state at t_c matched its hash
-  bit for bit; the follow check at 0.8·s_F is on M (distance 4e−9, 4e−8); the idle unit stayed exactly 0 and the signs
-  stayed fixed to the crossing.
+- In all three runs:
+  - the guard's last row is t_c − 1, and the NaN recomputation is identical;
+  - the state at t_c matched its hash bit for bit;
+  - the follow check at 0.8·s_F is on M (distances 4e−9, 1e−9, 4e−8);
+  - the idle unit stayed exactly 0 and the signs stayed fixed to the crossing.
 - **STOP rule at 2⁻¹⁵·⁰⁶²⁵:** ε̂_F = 4.23e−4 ≤ 0.01; max χ_t on [s\*, t_c) = 0.0039 ≤ 0.1. Neither condition fires.
-  `pilot.json` records STOP only because τ is undefined: the 2⁻¹⁶·⁵ run is missing (S1).
-- **τ₁, τ₂: not set.** From the two runs alone, the rule would give τ₁ = ⌈1.5·0.0993/0.05⌉·0.05 = 0.15 and
-  τ₂ = ⌈1.5·0.1372/0.05⌉·0.05 = 0.25. The third pilot error can only raise them.
+  The pilot STOP rule did not fire (`pilot.json`: stop false).
+- **τ₁ = 0.15** = ⌈1.5 × 0.0993/0.05⌉·0.05: the largest e₁ is 0.0993, at 2⁻¹⁵·⁰⁶²⁵.
+- **τ₂ = 0.25** = ⌈1.5 × 0.1372/0.05⌉·0.05: the largest e₂ is 0.1372, at 2⁻¹⁵·⁰⁶²⁵.
 - **Machine.** Memory gate before every job (`memory_gate.log`). Peak RSS 1.01 GB (the 2⁻¹⁷·⁹³⁷⁵ observation). Times:
-  2⁻¹⁵·⁰⁶²⁵ 31 s + 102 s; 2⁻¹⁷·⁹³⁷⁵ 228 s + 719 s.
+  2⁻¹⁵·⁰⁶²⁵ 31 s + 102 s; 2⁻¹⁶·⁵⁶²⁵ 87 s + 279 s; 2⁻¹⁷·⁹³⁷⁵ 228 s + 719 s.
 
 ## 13. Compute and machine rules
 
