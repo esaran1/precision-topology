@@ -1,85 +1,126 @@
-Draft for checkpoint 3. Not a registration. No registered or pilot seed has been drawn.
-Exploratory numbers are in `phase2a_explore/`. ‡ marks a choice made after the exploratory data.
+Draft, revised with the author's decisions of 2026-10-04. Not a registration: it registers only after the author
+approves this page, with its OpenTimestamps proof before any run. No registered or pilot seed has been drawn; no pilot
+run. Exploratory numbers: `phase2a_explore/` (`p2a_explore_f`, `p2a_explore_g`). ‡ = set after exploratory data.
 
 # Design 2A: slow tracking on the simplicity-bias benchmark
 
-**Setting (v3, unchanged).** The same 800 points; tanh, width 4; λ = 1e−4; s = ‖v‖₁; q = 0.3914; s\* = 3.5914 (M/S
-equal loss at 3.5891); float64, full batch, no momentum.
+**Setting (v3, unchanged).** The same 800 points; tanh, width 4; λ = 1e−4; s = ‖v‖₁; q = 0.3914; s\* = 3.5914;
+float64, full batch, no momentum, η = 1.
 
 **Prediction: the fold, not the switch.**
 - Fixed-P descent never leaves a strict minimum while it exists (§14.4), so the global switch is no event on M. A run
   crosses at its own branch's first event: its switch (§13) or its fold.
-- On M (stable 1.154–4.7677), ρ₂ ≤ 0.279 < q and G₊ < 0: no switch (κ undefined). The event is M's fold,
-  s_F = 4.7677 = 1.33·s\*.
+- On M (stable 1.154–4.7677), ρ₂ ≤ 0.279 < q and G₊ < 0: no switch. The event is M's fold, s_F = 4.7677 = 1.33·s\*.
 - Past s_F the run escapes into S, where ρ₂ ≈ 0.58 (H-F5; Track 1A: 30 of 30 starts above the fold land on S).
-- **s_c = s_F(1 + Ω₀ε_F^{2/3})**, with ε_F = (ṡ_F/s_F)/(ηΛ_F) and Λ_F = (|m′c′|s_F)^{1/2}.
-- So the crossing comes after v3's band (1.25·s\*), and the delay grows as ρ^{2/3}, not as ρ.
-- Other branches: L0 (no fold below 37.5) never crosses; Mp (mirror pair only) has no prediction.
+- **s_c = s_F(1 + Ω₀ε_F^{2/3})**, ε_F = (ṡ_F/s_F)/(ηΛ_F), Λ_F = (|m′c′|s_F)^{1/2}: the delay grows as ρ^{2/3}, not ρ.
 
-**Crossing** = the first upward passage of q by ρ₂ (v3's event). It can only occur in the jump from M to S. G₊ = 0
-and the basin change are descriptive.
+**Crossing** = the first upward passage of q by ρ₂ (v3's event).
 
-**Output rate ‡.**
-- ρ on all of v slows the shares too: χ ≥ 3.5 for every ρ (exploratory crossings 1.33/0.99/0.88·s_F at ρ =
-  2⁻⁸/2⁻¹¹/2⁻¹⁴, state 0.1–0.2 off M).
-- Proposed: v ← v − η[(I − ââᵀ) + ρââᵀ]∇_vL, â = sign(v)/√3 on the active units (fixed P, §15). Then χ = 133ρ at
-  s\*, ε_F = 15ρ (|m′c′| = 4.78e−7). η = 1 (ηλ_max ≤ 0.29; s_c η-free to 2e−5).
+**Output rule.** v ← v − η[(I − ââᵀ) + ρââᵀ]∇_vL, â = sign(v)/√3 on the active units: only the output scale is
+slowed. This is not the practitioner's knob: the plain output learning rate leaves χ ≥ 3.5 at every ρ (Phase 2B tests
+that knob).
 
-**Hold, release.**
-- s₀ = 0.5·s\*: v3 init rescaled to s₀, fixed-s BFGS; label = branch within 1e−3 (exploratory, 200 seeds: M 40%,
-  L0 32%, Mp 28%). Off-M runs are counted, not trained.
-- M: Newton to M(s₀), idle unit exactly 0 ‡ (stays 0; a 1e−6 seed is recruited in ~300 steps).
-- All M releases are one point, so ρ is the replication axis ‡: ρ_i = ρ_max·2^(−3u_i), u_i = frac(0.618034(i + 1)).
+**Hold, release.** v3 init rescaled to s₀ = 1.7957, fixed-s BFGS; label = branch within 1e−3. Runs that land off M are
+counted, not trained. M runs: Newton to M(s₀), idle unit exactly 0, so **this is a three-unit test**. All M releases
+are one point; runs differ only in ρ.
 
-**Pilot rule.**
-- Train the pilot M release to t_c only. Start from ρ = 2⁻¹⁰ and halve, at most three times, until ε̂_F ≤ 0.01 and
-  max χ_t ≤ 0.1 on [s\*, t_c), with λ_min taken from the frozen table for M. If that fails, STOP.
-- The exploratory value is 2⁻¹¹ (ε̂_F = 0.0070, χ ≤ 0.065).
+**Rate ladder ‡** (27 distinct rates). Anchors, already explored: 2⁻¹³, 2⁻¹⁴, 2⁻¹⁵. New:
+2^−(15 + k/8), k = 1…24 (2⁻¹⁵·¹²⁵ … 2⁻¹⁸). The i-th seed that lands on M takes the i-th rate, fastest first.
+
+**Pilot ‡.** Three pilot rates off the ladder: 2⁻¹⁵·⁰⁶²⁵, 2⁻¹⁶·⁵, 2⁻¹⁷·⁹³⁷⁵. Each runs from a pilot seed that lands on M.
+STOP if ε̂_F > 0.01 or max χ_t > 0.1 on [s\*, t_c) at 2⁻¹⁵·⁰⁶²⁵ (λ_min from the frozen M table). τ₁ and
+τ₂ = 1.5 × the largest pilot error, rounded up to 0.05.
 
 **Cutoff, forecaster.**
-- The cutoff t_c is the first step with s ≥ 0.95·s_F.
-- `src/causal_forecast_fold.py` (new) reads s only, through a GuardedArray, using the frozen `extrapolate_scale`.
-- It gives t̂_F, ṡ̂_F → ε̂_F, ŝ_c, t_fc; the no-delay forecast is t̂_F. Its test fails on any read ≥ t_c; per run,
-  the last row read is < t_c and the NaN-after-t_c recomputation is identical.
+- t_c = the first step with s ≥ 0.90·s_F.
+- `src/causal_forecast_fold.py` (new) reads s only, through a GuardedArray, using the frozen `extrapolate_scale`
+  (quad, 5% window). It gives t̂_F, ṡ̂_F → ε̂_F, ŝ_c, t_fc; the no-delay forecast is t̂_F.
+- No ŝ ≥ ŝ_c within 1.6·s_F means no forecast, which fails C1, C2 and C4.
+- Its test fails on any read ≥ t_c; the last row read is < t_c, and recomputation with NaN after t_c is identical.
+- Training stops at t_c and the state is hashed; observation resumes from it to 1.25·s_F.
+- Horizon t_obs − t_c (exploratory):
 
-**Criteria** (PASS requires all)
-- **F**: s_F ≤ s_obs ≤ 1.25·s_F in ≥ 90% of runs, and no run at or below 1.25·s\*.
-- **C1** |t_fc − t_obs| ≤ τ₁·delay_fc, and **C2** |delay error| ≤ τ₂·delay_fc, each in ≥ 80% of runs.
-- **C3** median r_obs/r_fc ∈ [1 ± b].
-- **C4** paired-bootstrap upper end of |t_fc − t_obs| − |t̂_F − t_obs| < 0.
-- **E** slope of ln r_obs on ln ε̂_F, with its 95% CI inside [0.55, 0.80]. A linear lag would give 1.
-- τ and b are set ‡ at 1.5 × the pilot error, rounded up to 0.05.
-- Exploratory (7 rates): F 7/7 (1.03–1.11·s_F); errors ≤ 0.18 (τ ≈ 0.30); ratio 1.22–1.27 (b ≈ 0.40); C4 7/7;
-  slope 0.68.
+| ρ | 2⁻¹¹ | 2⁻¹⁴ | 2⁻¹⁵ | 2⁻¹⁶ | 2⁻¹⁷ | 2⁻¹⁸ |
+|---|---|---|---|---|---|---|
+| steps | 19,281 | 86,888 | 158,621 | 298,872 | 575,397 | ≈1.1 M (extrap.) |
+| delays | 1.8 | 4.5 | 6.7 | 10.4 | 16.2 | ≈25 |
+
+**Criteria.** Each run is deterministic given ρ, so every fraction and bootstrap runs over the 27 distinct rates
+(10,000 resamples). PASS requires all of these:
+- **F** — s_F ≤ s_obs ≤ 1.25·s_F at ≥ 90% of rates, and at no rate s_obs ≤ 1.25·s\*.
+- **C1** — |t_fc − t_obs| ≤ τ₁·delay_fc at ≥ 80% of rates.
+- **C2** — |delay_fc − delay_obs| ≤ τ₂·delay_fc at ≥ 80% of rates.
+- **C3 (asymptotic) ‡** — Spearman(ρ, r_obs/r_fc) ≥ 0.8 (positive: the ratio rises with ρ, so it falls toward 1 as
+  ρ → 0), and r_obs/r_fc > 1 at every rate.
+- **C4** — the upper end of the paired bootstrap of mean(|t_fc − t_obs| − |t̂_F − t_obs|) < 0.
+- **E** — the slope of ln r_obs on ln ε̂_F has its 95% CI inside [0.55, 0.80]. A linear lag would give 1. The band was
+  set knowing the exploratory slope, 0.683.
 
 **Validity.**
-- Gate: ≥ 25 of 120 on M (P 0.999 at the Wilson low 0.335).
-- Follow check: the state at 0.8·s_F (past s\*) in M's basin in ≥ 90% (exploratory 4/4).
-- Idle unit 0 and active signs fixed to the crossing; t_c before the crossing in ≥ 90% (earlier ones still count in F).
+- Gate: ≥ 27 of 120 seeds on M (P = 0.997 at the Wilson low, 0.335).
+- At ≥ 90% of rates: the state at 0.8·s_F lies in M's basin, and t_c comes before the crossing.
+- At every rate, the idle unit stays 0 and the active signs stay fixed up to the crossing.
+
+**Expected outcome on the new ladder (exploratory).**
+
+| ρ | 2⁻¹⁵ | 2⁻¹⁶ | 2⁻¹⁷ |
+|---|---|---|---|
+| s_obs/s_F | 1.016 | 1.010 | 1.006 |
+| C1 error/delay_fc | 0.16 | 0.33 | 0.59 |
+| C2 error/delay_fc | 0.09 | 0.07 | 0.06 |
+| C4 difference (steps) | −14,690 | −9,064 | **+6,292** |
+| r_obs/r_fc | 1.270 | 1.240 | 1.213 |
+
+- The ratio continues the explored 1.343 (2⁻¹¹) → 1.300 (2⁻¹⁴) at f = 0.90; the local slope of E is 0.70.
+- F, C2, C3 and E: expected to pass.
+- **C1 and C4: expected to fail at f = 0.90.** The error in t̂_F doubles each octave (5.4k, 10.9k, 21.8k steps), while
+  the delay grows only as ρ^{−1/3}. At f = 0.95 the C1 errors are 0.10/0.06/0.003 and C4 passes (OPEN 1).
 
 **Outcomes.**
 
-| Observed crossing | Reading |
+| Observed | Reading |
 |---|---|
-| ≤ 1.25·s\* | the switch: account falsified |
+| crossing ≤ 1.25·s\* | the switch: the account is falsified |
 | between 1.25·s\* and s_F | an early exit, as in v3 |
 | E ≈ 1 | a linear lag, not the fold delay |
-| E ≈ 0, or C4 fails | no rate-dependent delay |
+| E ≈ 0, or C4 fails with C1 | no rate-dependent delay, or the forecast horizon is too long |
+| ratio not falling toward 1 | the leading-order fold asymptotics fail |
 | no crossing by 1.25·s_F | H-F5 fails |
-| all pass | crossing at the fold, ρ^{2/3} delay forecast in advance |
+| all pass | the crossing comes at the fold, with a ρ^{2/3} delay forecast in advance |
 
-**Seeds:** 2,936,000–2,936,119; pilot 2,936,900–2,936,959 (both verified unused).
-**Compute:** ≈ 4 h, one worker, nice 15, < 0.5 GB: ~48 M runs (forecast, then observation) and ~24 pilot runs at
-0.5–3 min each.
+**Seeds** (verified unused): 2,937,000–2,937,119; pilot 2,937,900–2,937,959.
+**Compute** (one worker, nice 15, peak RSS 0.83 GB at 2⁻¹⁷, measured): each run takes 124 s at 2⁻¹⁵ and doubles each
+octave. Ladder 2.97 h; pilot 24 min; holds and freeze < 5 min; total ≈ 3.4 h.
 
-**Needs your decision.**
-1. ρ on the output scale only.
-2. Idle unit 0 (tests the 3-unit invariant subnetwork).
-3. ρ ladder (ρ_max/8 to ρ_max) as the replication axis.
-4. ρ₂, not G₊, as the event.
-5. s₀ = 1.7957 (at 2.5: M 49.5%, same s_c).
-6. BFGS for the hold.
-7. f = 0.95 (at 0.90 the crossing errors are ≤ 0.08).
-8. b ≈ 0.40 (leading-order bias), or lower ρ.
-9. Whether to train the runs that land off M.
-10. The tolerance rule and the band for E.
+**Per-seed samples: estimated, not adopted.**
+- Freeze: 13.5 s per seed, measured (continuation 7.1, validation 2.1, |m′c′| 0.4, S and s\* 3.9).
+- One rate per M seed: 2.97 h + 120 × 13.5 s ≈ 3.42 h, 1.15× the ladder alone (pilots excluded). Every seed on the
+  whole ladder (10 seeds): ≈ 30 h, 10×.
+- The cost qualifies, but on resampled data M moves: stable ranges 2.69–5.62 and 1.96–5.86, and one seed could not be
+  followed.
+- s₀ = 1.7957 is off M on both followed seeds.
+- On seed 2,930,001: |m′c′| = 6.9e−8 against 4.78e−7, and s_F/s\* = 1.09. Its run at 2⁻¹⁵ did not cross by
+  1.25·s_F.
+- So the per-seed design needs new choices that bear on criteria (OPEN 3).
+
+**Decided (author, 2026-10-04)**
+
+| # | Decision |
+|---|---|
+| 1 | Output scale only; disclosed as not the practitioner's knob |
+| 2 | Idle unit exactly 0; a three-unit test |
+| 3 | Ladder 2⁻¹⁵…2⁻¹⁸ with explored anchors; cost of per-seed samples estimated |
+| 4 | Crossing = the first upward passage of q by ρ₂ |
+| 5, 6 | s₀ = 1.7957; BFGS hold |
+| 7 | f = 0.90 |
+| 8 | C3 → asymptotic ratio test |
+| 9 | Off-M runs counted, not trained |
+| 10 | τ rule; E band [0.55, 0.80] (disclosed) |
+
+**OPEN (for the author)**
+1. Decisions 3 and 7 together are expected to fail C1 and C4 for a reason that is not the fold (above). Choose: keep
+   f = 0.90; use f = 0.95; or shrink 1 − f as ρ^{2/3}.
+2. My choices that touch criteria: 27 rates at ⅛-octave spacing; τ = 1.5 × the *largest* of three pilot errors (at
+   f = 0.90 this gives τ₁ ≈ 1.45, so C1 becomes vacuous); no forecast counts as failing; the gate is 27 of 120.
+3. Per-seed samples: the generator (random levels? i.i.d. points?), a per-seed s₀, branch identity (data homotopy), a
+   per-seed s\*, and H-F5 on each seed.
