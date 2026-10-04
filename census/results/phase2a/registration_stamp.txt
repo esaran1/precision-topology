@@ -1,0 +1,4 @@
+Phase 2A registration
+registration commit: 569b8364ec548e5c57ba961ba67ae1dd28101bd0
+sha256 results/phase2a_registration.md: 27f5d18cc66e73ff3a6737ee1678cfa7f24907bb8ae97b52bf17a9d68cb6b771
+sha256 results/phase2a/registration.sha256: 63083179b81d8ec06d86ea6ed7a5bc74bbf598895db7ed0899dcebfb6c449eb3
