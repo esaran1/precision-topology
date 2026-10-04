@@ -606,6 +606,7 @@ def main() -> None:
     prediction_inputs_audit_checks()
     phase1a_checks()
     phase1c_checks()
+    phase2a_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -953,6 +954,7 @@ PRODUCERS = {
     "phase2a/forecasts.sha256": ("phase2a", "finalize", "full", ""),
     "phase2a/observed.jsonl": ("phase2a", "observe", "full", ""),
     "phase2a/scores.json": ("phase2a", "score", "full", ""),
+    "phase2a_results.md": ("phase2a_report", "main", "full", ""),
     # Phase 1B (POST HOC causal re-scoring of the registered tests; no registered verdict changes): src/phase1b.py
     "phase1b/runs_track_a.jsonl": ("phase1b", "run", "full", ""),
     "phase1b/runs_track2a.jsonl": ("phase1b", "run", "full", ""),
@@ -3230,6 +3232,49 @@ def phase1c_checks() -> None:
             chk(f"P1C {arm} scored misses", float(o.get("n_scored_miss", 0)), float(n_miss), 0)
             chk(f"P1C {arm} outcome {outc}", float(o["outcome"] == outc), 1.0, 0)
         chk("P1C gate to Phase 2", float(S["phase2_gate"]["pass"] == gate), 1.0, 0)
+
+
+P2A_PIN = (48, True, "PASS", {"F": "PASS", "C1": "PASS", "C2": "PASS", "C3": "PASS", "C4": "PASS", "E": "PASS"},
+           True)   # (n_M, gate pass, outcome over the 22 scored rates, {criterion: verdict}, validity ok)
+
+
+def phase2a_checks() -> None:
+    """Phase 2A (registration 569b836, OpenTimestamps 45fcaed): the registration and the committed forecasts assert;
+    scores.json regenerates from the committed rows with the registered scoring code (phase2a_report.score_result);
+    phase2a_results.md regenerates from scores.json; every forecast read only rows < t_c and its NaN recomputation was
+    identical; the hashed t_c state was reproduced at every rate; 27 rates run, 22 scored, 5 pre-observed; verdicts
+    pinned."""
+    from . import phase2a as P2A
+    from . import phase2a_report as P2R
+    if not (P2A.OUT / "scores.json").exists():
+        return
+    print("Phase 2A: slow tracking on the simplicity-bias benchmark")
+    P2A.assert_registration()
+    P2A._assert_forecasts()
+    S = json.loads((P2A.OUT / "scores.json").read_text())
+    chk("P2A scores.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(P2A._jsonable(P2R.score_result())))), 1.0, 0)
+    chk("P2A phase2a_results.md regenerates from scores.json",
+        float((R / "phase2a_results.md").read_text() == P2R.render_md(S)), 1.0, 0)
+    runs = P2A._rows(P2A.OUT / "runs.jsonl"); obs = P2A._rows(P2A.OUT / "observed.jsonl")
+    chk("P2A rates run", float(len(runs)), 27.0, 0)
+    chk("P2A rates observed", float(len(obs)), 27.0, 0)
+    chk("P2A forecasts that read a row at or after the cutoff",
+        float(sum(int((r["forecast"].get("max_index_read") or -1) >= r["t_c"]) for r in runs if r["t_c"] is not None)),
+        0.0, 0)
+    chk("P2A forecasts whose NaN recomputation differs", float(sum(int(not r["nan_recompute_identical"]) for r in runs)),
+        0.0, 0)
+    chk("P2A t_c states reproduced bit for bit", float(sum(int(bool(o["state_tc_hash_ok"])) for o in obs)), 27.0, 0)
+    chk("P2A scored rates", float(S["criteria"]["F"]["n"]), 22.0, 0)
+    chk("P2A pre-observed rates (descriptive)", float(S["DESCRIPTIVE_preobserved_rates"]["criteria"]["F"]["n"]), 5.0, 0)
+    if P2A_PIN is not None:
+        n_m, gate, outc, verdicts, valid = P2A_PIN
+        chk("P2A seeds on M", float(S["gate"]["n_M"]), float(n_m), 0)
+        chk("P2A gate", float(S["gate"]["pass"] == gate), 1.0, 0)
+        chk(f"P2A outcome {outc}", float(S["outcome"] == outc), 1.0, 0)
+        for k, v in verdicts.items():
+            chk(f"P2A {k} {v}", float(S["verdicts"][k] == v), 1.0, 0)
+        chk("P2A validity", float(S["validity"]["ok"] == valid), 1.0, 0)
 
 
 P1B_PIN = {   # {arm: (registered scored, scored at f, misses at f, POST HOC criteria outcome, registered outcome)}
