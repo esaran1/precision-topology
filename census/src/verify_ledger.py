@@ -970,6 +970,12 @@ PRODUCERS = {
     "phase2c/kappa_chi_map.json": ("phase2c_map", "main", "full", ""),
     "phase2c_kappa_chi_map.md": ("phase2c_map", "main", "full", ""),
     "phase2c/sb_eps_F.json": ("phase2c_map", "sb_eps_f", "full", ""),
+    # Phase 2B (the lever: output learning rate; design approved 2026-10-02, registered after 2A): src/phase2b.py
+    "phase2b/seed_scan.json": ("phase2b", "scan", "full", ""),
+    "phase2b/frozen.json": ("phase2b", "freeze", "full", ""),
+    "phase2b/registration.sha256": ("phase2b", "manifest", "full", ""),
+    "phase2b/runs.jsonl": ("phase2b", "run", "full", ""),
+    "phase2b/scores.json": ("phase2b", "score", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
