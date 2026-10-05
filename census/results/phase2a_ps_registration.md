@@ -1,14 +1,19 @@
 # Phase 2A-PS registration: the fold prediction with a sample per seed
 
-**DRAFT — NOT REGISTERED.** Stopped before the registration commit under the standing rule: the details in §9 touch a
-criterion, the gate, validity or the scoring set and are not on the approved page. Each has a proposed resolution,
-implemented in `src/phase2a_ps.py` and tested in `tests/test_phase2a_ps.py`. **The author decides them first.**
+**REGISTERED.** The details in §9, which the approved page left open, were decided by the author on 2026-10-05:
+- **D1 = (c).** Λ_F (|m′c′|) comes from the 0.05 window, as in 2A and the exploration. The two-window agreement check
+  (0.025 vs 0.05, ≤ 5%) is **DESCRIPTIVE only**; it no longer removes seeds. This is a **CLARIFICATION MADE AT FREEZE**,
+  from landscape counts only, before any training (§9, §12).
+- **ADDED:** every criterion and validity is also reported DESCRIPTIVELY, split by agreement-check pass vs fail (§6).
+- **D2–D17:** approved as proposed.
+
+Status:
 - **Not yet done:** no registered seed has been trained. The 400 registered seeds are FROZEN only (no training; §12).
-  The gate passes at the freeze: 37 clean scoreable seeds ≥ 24 (with D1 as proposed).
+  The gate passes at the freeze: 74 clean scoreable seeds ≥ 24.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
-- **The registration commit** will hold this file, the approved page, `src/phase2a_ps.py` and its import closure,
+- **The registration commit** holds this file, the approved page, `src/phase2a_ps.py` and its import closure,
   `tests/test_phase2a_ps.py`, and the frozen inputs (`seed_scan.json`, `pilot*.json*`, `frozen_parts.jsonl`,
-  `frozen.json`: EVERY seed's status and class, and the class listing's SHA-256). Their SHA-256 hashes go in
+  `frozen.json`: EVERY seed's status and class, and the class listing's SHA-256). Their SHA-256 hashes are in
   `results/phase2a_ps/registration.sha256` (§11).
 
 ## 1. Design reference
@@ -78,8 +83,9 @@ equals a fresh one.
     within 1e−3 (function space) of M(0.9999·s_F).
 - **|m′c′| and Λ_F (rule 4).** λ_min of the training-coordinate Hessian on the fixed-s tangent of the active units
   (P = I; 2A's metric) on the Δs = 0.001 grid over the last 0.05 below s_F. 2A's estimator, λ_min² = a·d + b·d²,
-  d = s_F − s, |m′c′| = |a|/4: the value over the last 0.05, the check over the last 0.025. **Validated** iff they agree
-  within 5%. Λ_F = √(|m′c′|·s_F). **(§9 D1: a STOP item.)**
+  d = s_F − s, |m′c′| = |a|/4 over the last 0.05; Λ_F = √(|m′c′|·s_F). **D1 (c), author 2026-10-05:** the agreement
+  with the 0.025-window value (≤ 5%) is recorded per seed and is DESCRIPTIVE only. It removes no seed. "Λ_F not
+  validated" now means only that no positive finite |m′c′| could be computed.
 - **s\*** = the scale where the seed's own M and S have equal loss. S is found by the same homotopy (from Track 1A's
   stored S point nearest 4.5, same acceptance) and continuation. s\* is the bisection root (to 1e−8) on
   [max(lo_M, lo_S) + 1e−3, min(hi_M, hi_S) − 1e−3], when the loss difference changes sign there; otherwise "no s\*".
@@ -97,7 +103,7 @@ equals a fresh one.
   1. untraceable (M homotopy failed / no upper fold / homotopy point not stable / stable part does not reach the fold /
      ρ₂ ≥ q on the stable part);
   2. s_F not validated;
-  3. Λ_F not validated;
+  3. Λ_F not validated (no positive finite |m′c′|; D1 (c));
   4. no s\*;
   5. release Newton failed;
   6. ineligible;
@@ -144,12 +150,15 @@ s ≥ s_F. **PASS needs F, H, E_seed, C3, C4 and P; C1 and C2 are secondary.**
   - otherwise PASS iff all six pass; UNRESOLVED if any is UNRESOLVED; otherwise FAIL, naming each.
   - C1 and C2 are reported beside it and never change it. F's falsifier is reported in every case.
 - **Mixed seeds** enter no criterion (descriptive).
+- **DESCRIPTIVE split (added by the author 2026-10-05 with D1 (c); not a criterion):** every criterion (F, H, E_seed,
+  C3, C4, P, C1, C2) and validity is recomputed separately on the seeds whose |m′c′| agreement check passes and on those
+  where it fails (`descriptive_split`). The split never changes a verdict or the outcome.
 
 ## 7. Gate and validity
 
 - **Gate (frozen before the registration):** ≥ 24 clean scoreable seeds of the 400. If it fails, nothing is trained;
   the outcome is "UNRESOLVED (gate)". The page's power: P(gate) = 0.987 at the exploration's Wilson low 0.089 (5/25),
-  and 1.00 at 0.12 and above. With §9 D1, the exploration's clean scoreable fraction is 3/25 (§9).
+  and 1.00 at 0.12 and above. At the freeze: 74 clean scoreable seeds, so the gate passes (§12).
 - **Validity.** If any condition fails, the outcome is "UNRESOLVED (validity)":
   - at ≥ 90% of the trained clean seeds (2⁻¹⁶), the follow check lands on the seed's own M. The state at the first
     step with s ≥ 0.8·s_F is minimised at its own s and must lie within 1e−3 of the seed's M point at that s (Newton
@@ -178,11 +187,30 @@ s ≥ s_F. **PASS needs F, H, E_seed, C3, C4 and P; C1 and C2 are secondary.**
 - **P's power** (≥ 0.98 at n = 10) rests on 11 exploratory values and is optimistic.
 - **Exploratory outcomes on the registered design.** None: the exploration seeds are disjoint, and every seed has its
   own landscape. The exploration's 2⁻¹³ and 2⁻¹⁵ runs were not at the registered rates.
+- **CLARIFICATION MADE AT FREEZE (D1, author 2026-10-05).** The page's "|m′c′| from two windows agreeing ≤ 5%" was
+  first implemented as a filter.
+  - Under it, 91 frozen seeds (45 clean) were "Λ_F not validated", and 37 clean seeds were scoreable.
+  - The author then made the check DESCRIPTIVE (Λ_F from the 0.05 window, as in 2A and the exploration). The decision
+    rested on these landscape counts only, before any training; the counts under the alternatives had not been
+    computed.
+  - Every criterion and validity is reported split by the check (descriptive).
 - **Set while preparing this file (not on the page): §9.**
 
 ## 9. Details the approved page left open
 
-### Touching a criterion, the gate, validity or the scoring set: FOR THE AUTHOR (STOP)
+### Touching a criterion, the gate, validity or the scoring set: DECIDED BY THE AUTHOR (2026-10-05)
+
+- **D1: option (c).** Λ_F from the 0.05 window; the two-window agreement is DESCRIPTIVE only; and every criterion and
+  validity is reported descriptively, split by agreement pass vs fail.
+  - **This is a clarification made at freeze, from landscape counts only, before any training.** The freeze had been
+    evaluated under the proposed (a): 91 seeds were "Λ_F not validated", 45 of them clean, and 37 clean seeds were
+    scoreable. Those (a) counts were reported to the author before the decision. The counts under (b) and (c) were
+    not computed beforehand.
+  - The stored raw freeze was re-evaluated (`reevaluate`: no refreeze; every raw field kept bit for bit).
+- **D2–D17:** approved as proposed.
+
+The table below gives each detail's resolution as proposed. For D1, read "(c)" in place of "(a)".
+
 
 | # | detail | proposed resolution (implemented, tested) | touches |
 |---|---|---|---|
@@ -279,39 +307,56 @@ ran per seed.
   rate, 37 clean seeds take ≈ 9 h and 44 none/mixed runs ≈ 2.3 h, so ≈ 11 h in all (page: 7.2 h). Run time grows with
   s_F (this seed's 6.91 is above the scoreable clean median 5.88).
 
-**Freeze** (`frozen_parts.jsonl`, `frozen.json`; all 400 registered seeds, NO training; rules as proposed in §9, D1
-as (a)). 2,672 s in all (median 9.6 s per traced seed, 1.2 s per untraceable one); peak RSS 0.27 GB.
+**Freeze** (`frozen_parts.jsonl`, `frozen.json`; all 400 registered seeds, NO training). 2,672 s in all (median 9.6 s
+per traced seed, 1.2 s per untraceable one); peak RSS 0.27 GB.
+
+**As first evaluated (D1 as proposed (a); commit 0101048; reported to the author before the decision):**
+- untraceable 142; s_F not validated 3; **Λ_F not validated 91 (clean 45, none 22, mixed 24)**; no s\* 44; release
+  Newton failed 1; ineligible 16; scoreable 103 (clean 37, none 52, mixed 14); gate 37 ≥ 24.
+- Class listing SHA-256 d1f85192….
+
+**REGISTERED evaluation (D1 = (c), author 2026-10-05; `reevaluate` re-applied the rules to the same raw records,
+with no refreeze):**
 
 | status | seeds | class among them (clean / none / mixed) |
 |---|---|---|
 | **untraceable** | **142 (35.5%)**: M homotopy failed 135, no upper fold 3, ρ₂ ≥ q on the stable part 4 | – |
 | s_F not validated | 3 (λ_min not falling toward the fold) | 2 / 1 / 0 |
-| **Λ_F not validated (D1)** | **91** | **45** / 22 / 24 |
-| **no s\*** | **44** | 1 / 38 / 5 |
-| release Newton failed | 1 | 0 / 1 / 0 |
-| **ineligible** (s₀ > 0.6·s_F) | **16** | 8 / 5 / 3 |
-| **scoreable** | **103** | **37 / 52 / 14** |
+| Λ_F not validated | 0 | – |
+| **no s\*** | **57** | 6 / 43 / 8 |
+| release Newton failed | 3 | 0 / 3 / 0 |
+| **ineligible** (s₀ > 0.6·s_F) | **22** | 11 / 5 / 6 |
+| **scoreable** | **173** | **74 / 67 / 32** |
 
-- **Gate: 37 clean scoreable ≥ 24: PASS.**
-- **Plan** (frozen): all 37 clean seeds (fewer than the cap of 40) at 2⁻¹⁴ and 2⁻¹⁶; the first 30 of 52 none seeds
-  (22 counted, not trained); all 14 mixed seeds (fewer than 20). That is 118 runs.
+(Under (a), the 91 "Λ_F not validated" seeds took that status first. Under (c) they fall through to the later reasons
+or to scoreable.)
+
+- **Gate: 74 clean scoreable ≥ 24: PASS.**
+- **Plan** (frozen; caps 40/30/20 in seed order):
+  - the first 40 of 74 clean seeds (2,975,001 … 2,975,179) at 2⁻¹⁴ and 2⁻¹⁶;
+  - the first 30 of 67 none seeds and the first 20 of 32 mixed seeds at 2⁻¹⁴;
+  - 130 runs. Counted, not trained: 34 clean, 37 none, 12 mixed.
+- **Agreement check (DESCRIPTIVE):**
+  - scoreable seeds: clean 37 agree / 37 disagree, none 52 / 15, mixed 14 / 18;
+  - planned seeds: clean 16 / 24, none 23 / 7, mixed 8 / 12.
 - **Every seed's status and class are frozen.** The class listing's SHA-256 is
-  `d1f85192e036385c9c847aecbc7aab94fb20e98e51379ce4cf92a384bcf4ceb3`; `summary` asserted every stored evaluation.
+  `cb7509a7d59c37fc48af66c9b4e4d3a6344e9a29bc7b99f5701c43a9273b3b04`. `summary` asserted every stored evaluation equals a
+  fresh one.
 - **Descriptive (scoreable seeds):**
-  - s_F 4.67–8.51; s_F/s\* 1.007–1.508; Λ_F 1.9e−4–2.3e−3;
-  - among the 37 clean seeds, s_F/s\* 1.17–1.51, and 3 have s_F/s\* < 1.25 (the falsifier cannot fire on them);
+  - s_F 4.51–8.51; s_F/s\* 1.006–1.687; Λ_F 7.6e−5–2.6e−3;
+  - among the 74 clean seeds, s_F/s\* 1.17–1.69, and 10 have s_F/s\* < 1.25 (the falsifier cannot fire on them);
   - the homotopy needed 200 steps on 142 seeds (135 still failed);
   - M's contiguous stable run equals all its stable points on every traced seed.
-- **D1's weight.** Of the 93 traced clean seeds, 45 have the |m′c′| window agreement as their first failing reason. D1 shapes the
-  scoring set more than any other rule after traceability. **The counts under D1's alternatives (b) and (c) were NOT
-  computed on the registered seeds,** so the author can decide blind to them. The stored λ_min grids allow either to
-  be applied without refreezing.
+- **Pilot files** (`pilot_parts.jsonl`, committed before the decision) keep their evaluation under (a). The pilot is a
+  machine check and enters nothing.
 
 ## 13. Compute and machine rules
 
 - **Freeze:** done, 2,672 s (§12).
-- **Runs (after registration):** under the frozen plan, 37 clean × (2⁻¹⁴ + 2⁻¹⁶) plus 30 none and 14 mixed at 2⁻¹⁴.
-  That is ≈ 11 h at the pilot's rate (§12; page 7.2 h).
+- **Runs (after registration):** under the frozen plan, 40 clean × (2⁻¹⁴ + 2⁻¹⁶) plus 30 none and 20 mixed at 2⁻¹⁴,
+  130 runs.
+  - At the pilot's rate (one clean seed ≈ 15 min, a 2⁻¹⁴ run ≈ 3 min) that is ≈ 10 h + 2.5 h ≈ 11–13 h.
+  - The page said 7.2 h. Run time grows with s_F.
 - **Machine:** one process, nice 15, one thread; memory gate and disk check (§9); stop above 3 GB RSS; small files only.
 
 ## 14. Reproduce
@@ -320,6 +365,7 @@ as (a)). 2,672 s in all (median 9.6 s per traced seed, 1.2 s per untraceable one
 python -m src.phase2a_ps gate scan; python -m src.phase2a_ps scan
 python -m src.phase2a_ps gate pilot; python -m src.phase2a_ps pilot
 python -m src.phase2a_ps gate freeze; python -m src.phase2a_ps freeze        # -> frozen.json (summary)
+python -m src.phase2a_ps reevaluate     # D1 (c), author 2026-10-05: the rules re-applied to the stored raw records
 python -m src.phase2a_ps manifest       # the registration commit; then: stamp, commit, push, OpenTimestamps
 python -m src.phase2a_ps run; python -m src.phase2a_ps finalize               # commit runs.jsonl, forecasts.sha256
 python -m src.phase2a_ps observe; python -m src.phase2a_ps score

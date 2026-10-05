@@ -186,7 +186,9 @@ def _setv(r, scale, **kw):
     (lambda r: _setv(r, "1.01", n_on_M=1), "s_F not validated"),
     (lambda r: r["fold_constant"].update(coef_linear=-1e-7), "s_F not validated"),
     (lambda r: r["fold_constant"].update(lam_min_last=2e-4), "s_F not validated"),
-    (lambda r: r["fold_constant"].update(rel_diff=0.0500001), "Lambda_F not validated"),
+    (lambda r: r["fold_constant"].update(rel_diff=0.0500001), "scoreable"),      # D1 (c): descriptive only
+    (lambda r: r["fold_constant"].update(rel_diff=0.9), "scoreable"),
+    (lambda r: r["fold_constant"].update(abs_mc=0.0), "Lambda_F not validated"),
     (lambda r: r.update(s_star=None), "no s*"),
     (lambda r: r.update(release_theta=None), "release Newton failed"),
     (lambda r: r.update(u_follow=None), "release Newton failed"),
@@ -200,6 +202,48 @@ def test_evaluate_status_order(mod, status):
     assert e["status"] == status
     if status == "scoreable":
         assert e["class"] == "clean" and e["eligible"] and e["Lambda_F"] == r["fold_constant"]["Lambda_F"]
+
+
+def test_D1_c_agreement_never_removes_a_seed_and_is_recorded():
+    for rd, flag in ((0.0, True), (0.05, True), (0.0500001, False), (0.84, False)):
+        fc = dict(_raw()["fold_constant"], rel_diff=rd)
+        e = PS.evaluate(_raw(fold_constant=fc))
+        assert e["status"] == "scoreable" and e["mc_agree_DESCRIPTIVE"] is flag
+        assert e["Lambda_F"] == fc["Lambda_F"] and e["abs_mc"] == fc["abs_mc"]          # the 0.05-window value
+    rows = [{"seed": i, "evaluation": PS.evaluate(_raw(fold_constant=dict(_raw()["fold_constant"], rel_diff=rd)))}
+            for i, rd in enumerate([0.01] * 12 + [0.5] * 12)]
+    assert PS.gate(rows)["n_clean_eligible"] == 24 and PS.gate(rows)["pass"]
+    assert len(PS.plan(rows)[0]) == 48
+
+
+def test_descriptive_split_by_agreement_is_not_a_verdict():
+    T = _table()
+    for r in T:
+        r["mc_agree"] = r["seed"] % 2 == 0
+    for r in T:                                                                   # break F on the disagreeing half only
+        if r["class"] == "clean" and r["log2rho"] == -16.0 and not r["mc_agree"]:
+            r["s_obs"] = None
+    S = PS.score_tables(T)
+    assert S["verdicts"]["F"] == "FAIL"                                          # 20/40: the registered verdict
+    D = PS.descriptive_split(T)
+    assert D["agree"]["verdicts_DESCRIPTIVE"]["F"] == "PASS" and D["disagree"]["verdicts_DESCRIPTIVE"]["F"] == "FAIL"
+    assert D["agree"]["n_clean_scored"] == 20 and D["disagree"]["n_clean_scored"] == 20
+    assert D["agree"]["n_none"] + D["disagree"]["n_none"] == 30
+    assert set(D["agree"]["verdicts_DESCRIPTIVE"]) == set(PS.PRIMARY)
+    assert set(D["agree"]["secondary_verdicts_DESCRIPTIVE"]) == {"C1", "C2"} and "ok" in D["agree"]["validity_DESCRIPTIVE"]
+    T2 = _table()
+    for r in T2:
+        r["mc_agree"] = True
+    assert PS.score_tables(T2)["outcome"] == "PASS"
+    assert PS.descriptive_split(T2)["disagree"]["n_rows"] == 0
+
+
+def test_run_row_carries_the_agreement_flag():
+    fs = {"seed": 1, "class": "clean", "s_F": 5.0, "s_star": 4.0, "Lambda_F": 1e-3, "mc_agree": False}
+    rr = {"log2rho": -16.0, "t_c": 10, "forecast": {"status": "ok", "t_fc": 20, "t_F_fc": 15},
+          "forecast_fixed": {"status": "ok"}}
+    assert PS.run_row(fs, rr, {"s_obs": 5.1})["mc_agree"] is False
+    assert PS.run_row({**fs, "mc_agree": True}, rr, {})["mc_agree"] is True
 
 
 def test_evaluate_boundaries_inclusive():
@@ -614,8 +658,10 @@ def test_reproduces_the_exploratory_freeze_of_seed_2930006(frozen_2930006):
     e = r["evaluation"]
     assert e["class"] == "clean" and e["eligible"] and e["checks"]["h_half_agrees"] and e["checks"]["fold_eig_zero"]
     assert e["checks"]["none_on_M_above"] and e["checks"]["lam_min_decreasing_to_fold"]
-    # this clean seed's |m′c′| windows disagree by 9.7% (> 5%): the page's rule 4 leaves it unscored (disclosed)
-    assert e["status"] == "Lambda_F not validated" and r["fold_constant"]["rel_diff"] == pytest.approx(0.0974, abs=1e-3)
+    # this clean seed's |m′c′| windows disagree by 9.7% (> 5%): under D1 (c) (author 2026-10-05) it stays scoreable,
+    # with Λ_F from the 0.05 window, and is flagged in the descriptive split
+    assert e["status"] == "scoreable" and r["fold_constant"]["rel_diff"] == pytest.approx(0.0974, abs=1e-3)
+    assert e["mc_agree_DESCRIPTIVE"] is False and not e["checks"]["mc_windows_agree"]
     assert r["release_active_units"] == [0, 1, 2] and r["release_rho2"] < PS.Q and r["release_grad_max"] < 1e-9
     assert PS.evaluate(json.loads(json.dumps(PS._jsonable(r)))) == e                  # JSON round trip
 
@@ -763,6 +809,8 @@ def test_frozen_summary_consistent():
     pl, _ = PS.plan(rows)
     assert [(p["seed"], p["class"], p["log2rho"]) for p in fr["plan"]] == pl
     assert sum(fr["counts"]["by_status"].values()) == 400
+    assert fr["counts"]["by_status"]["Lambda_F not validated"] == 0                 # D1 (c)
+    assert fr["D1_decision"].startswith("author 2026-10-05: (c)")
 
 
 @pytest.mark.skipif(not PILOT.exists(), reason="pilot not yet run")

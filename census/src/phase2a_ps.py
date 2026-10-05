@@ -96,7 +96,8 @@ PERTURB_SEED, PERTURB_N = 0, 30                  # default_rng(0); δ = N(0, 1)�
 ON_TOL = 1e-3                                    # "on M": function-space distance ≤ 1e-3 (sb_fold.fdist)
 CLASS_SCALE = 1.01
 CLEAN_MIN = 27                                   # clean ≥ 27 of 30 with ρ₂ ≥ q; none 0; mixed 1–26
-MC_DS, MC_WINDOWS, MC_AGREE = 0.001, (0.05, 0.025), 0.05
+MC_DS, MC_WINDOWS, MC_AGREE = 0.001, (0.05, 0.025), 0.05   # D1 (c), author 2026-10-05: Λ_F from the 0.05 window;
+                                                             # the ≤ 5% agreement with 0.025 is DESCRIPTIVE only
 LOG2_SCORED, LOG2_EXPONENT, LOG2_OTHER = -16.0, -14.0, -14.0
 CAPS = {"clean": 40, "none": 30, "mixed": 20}
 GATE_MIN_CLEAN = 24
@@ -575,13 +576,14 @@ def evaluate(rec):
          "none_on_M_above": bool(val is not None and all(val[f"{f:g}"]["n_on_M"] == 0 for f in ABOVE_SCALES)),
          "mc_windows_agree": bool(fc is not None and fc["rel_diff"] is not None and fc["rel_diff"] <= MC_AGREE)}
     out["checks"] = c
+    out["mc_agree_DESCRIPTIVE"] = c["mc_windows_agree"]       # author 2026-10-05, D1 (c): descriptive only
     if fc is not None:
         out["abs_mc"], out["Lambda_F"] = fc["abs_mc"], fc["Lambda_F"]
     out["eligible"] = is_eligible(rec["s0"], s_F)
     if not (c["h_half_agrees"] and c["fold_eig_zero"] and c["lam_min_decreasing_to_fold"] and c["none_on_M_above"]):
         out["status"] = "s_F not validated"
-    elif not c["mc_windows_agree"]:
-        out["status"] = "Lambda_F not validated"
+    elif fc is None or not (fc["abs_mc"] > 0 and math.isfinite(fc["abs_mc"])):
+        out["status"] = "Lambda_F not validated"       # D1 (c): the window agreement no longer removes seeds
     elif rec.get("s_star") is None:
         out["status"] = "no s*"
     elif rec.get("release_theta") is None or rec.get("u_follow") is None:
@@ -943,7 +945,23 @@ def run_row(fs, rr, ob):
             "t_fc_fixed": fx.get("t_fc"), "t_obs": ob.get("t_obs"), "s_obs": s_obs, "t_F": ob.get("t_F"),
             "r_obs": (s_obs / fs["s_F"] - 1) if s_obs is not None else None,
             "reached_obs_end": ob.get("reached_obs_end", False), "follow_in_M": ob.get("follow_in_M", False),
-            "idle_ok": ob.get("idle_zero_to_crossing", False), "sign_ok": ob.get("signs_fixed_to_crossing", False)}
+            "idle_ok": ob.get("idle_zero_to_crossing", False), "sign_ok": ob.get("signs_fixed_to_crossing", False),
+            "mc_agree": bool(fs.get("mc_agree"))}
+
+
+def descriptive_split(rows):
+    """DESCRIPTIVE ONLY (author 2026-10-05, with D1 (c)): every criterion (F, H, E_seed, C3, C4, P, C1, C2) and
+    validity recomputed separately over the seeds whose |m′c′| two-window agreement check (0.025 vs 0.05, ≤ 5%) passes
+    and over those where it fails.  Never a verdict; the registered outcome is score_tables over all rows."""
+    out = {"label": "DESCRIPTIVE: split by the |m'c'| two-window agreement check (not a criterion)"}
+    for tag, flag in (("agree", True), ("disagree", False)):
+        sub = [r for r in rows if bool(r.get("mc_agree")) is flag]
+        st = score_tables(sub)
+        out[tag] = {"n_rows": len(sub), "n_clean_scored": st["n_clean_scored"], "n_none": st["n_none"],
+                    "verdicts_DESCRIPTIVE": st["verdicts"], "secondary_verdicts_DESCRIPTIVE": st["secondary_verdicts"],
+                    "validity_DESCRIPTIVE": st["validity"], "criteria_DESCRIPTIVE": st["criteria"],
+                    "secondary_DESCRIPTIVE": st["secondary"]}
+    return out
 
 
 def score_tables(rows, gate_ok=True):
@@ -1139,6 +1157,20 @@ def freeze():
         summary()
 
 
+def reevaluate():
+    """Re-apply the registered rules (evaluate) to the stored raw freeze records, WITHOUT refreezing: every raw field is
+    kept bit for bit and only 'evaluation' is replaced (author's decision 2026-10-05, D1 (c)); then summary()."""
+    path = OUT / "frozen_parts.jsonl"
+    rows = _rows(path)
+    new = []
+    for r in rows:
+        raw = {k: v for k, v in r.items() if k != "evaluation"}
+        new.append({**raw, "evaluation": evaluate(raw)})
+        assert {k: v for k, v in new[-1].items() if k != "evaluation"} == raw
+    path.write_text("".join(json.dumps(_jsonable(r)) + "\n" for r in new))
+    summary()
+
+
 def summary():
     """frozen.json from frozen_parts.jsonl: every seed's status and class, the counts (untraceable, constants not
     validated, no s*, ineligible, clean/none/mixed), the class listing and its SHA-256, the gate, the plan."""
@@ -1149,6 +1181,9 @@ def summary():
     for r in rows:                                    # the stored evaluation is the registered rules' evaluation
         assert evaluate(r) == r["evaluation"], f"evaluation of seed {r['seed']} differs from the stored one"
     sc = [seed_record(rows, r["seed"]) for r in rows if _st(r) == "scoreable"]
+    agree = {k: {"agree": int(sum(1 for r in sc if r["class"] == k and r["mc_agree"])),
+                 "disagree": int(sum(1 for r in sc if r["class"] == k and not r["mc_agree"]))}
+             for k in ("clean", "none", "mixed")}
     fr = {"label": "Phase 2A-PS frozen per-seed inputs (before the registration; no training)",
           **check_inputs(), "frozen_parts_sha256": _sha(OUT / "frozen_parts.jsonl"),
           "counts": counts(rows), "gate": gate(rows),
@@ -1158,6 +1193,14 @@ def summary():
           "plan_counts": {k: int(sum(1 for _, kk, l2 in pl if kk == k and (k != "clean" or l2 == LOG2_SCORED)))
                           for k in CAPS},
           "surplus_counted_not_trained": surplus,
+          "DESCRIPTIVE_mc_agreement_scoreable_by_class": agree,
+          "DESCRIPTIVE_mc_agreement_planned": {k: {"agree": int(sum(1 for s_, kk, l2 in pl if kk == k and (
+              k != "clean" or l2 == LOG2_SCORED) and seed_record(rows, s_)["mc_agree"])), "disagree": int(sum(
+              1 for s_, kk, l2 in pl if kk == k and (k != "clean" or l2 == LOG2_SCORED)
+              and not seed_record(rows, s_)["mc_agree"]))} for k in CAPS},
+          "D1_decision": "author 2026-10-05: (c) Lambda_F from the 0.05 window; the two-window agreement (<= 5%) is "
+                         "DESCRIPTIVE only; clarification made at freeze from landscape counts only, before any "
+                         "training ((a) had given Lambda_F not validated 91, clean 45)",
           "DESCRIPTIVE": {"s_F_range_scoreable": [min(r["s_F"] for r in sc), max(r["s_F"] for r in sc)] if sc else None,
                           "sF_over_sstar_range_scoreable": ([min(r["sF_over_sstar"] for r in sc),
                                                              max(r["sF_over_sstar"] for r in sc)] if sc else None),
@@ -1180,7 +1223,8 @@ def seed_record(rows, seed):
     """A seed's raw record flattened with its evaluation (status, class, Λ_F)."""
     r = next(x for x in rows if x["seed"] == seed)
     e = r["evaluation"]
-    return {**r, "status": e["status"], "class": e["class"], "Lambda_F": e["Lambda_F"], "eligible": e["eligible"]}
+    return {**r, "status": e["status"], "class": e["class"], "Lambda_F": e["Lambda_F"], "eligible": e["eligible"],
+            "mc_agree": e.get("mc_agree_DESCRIPTIVE")}
 
 
 def pilot():
@@ -1415,7 +1459,8 @@ def score():
     out = {"counts_PROMINENT": fr["counts"], "gate": fr["gate"], "outcome": ST["outcome"],
            "verdicts": ST["verdicts"], "secondary_verdicts": ST.get("secondary_verdicts"),
            "criteria": ST["criteria"], "secondary": ST.get("secondary"), "validity": ST["validity"],
-           "seed_exponents": ST.get("seed_exponents"), "rows": T, "DESCRIPTIVE": descriptive(T)}
+           "seed_exponents": ST.get("seed_exponents"), "rows": T, "DESCRIPTIVE": descriptive(T),
+           "DESCRIPTIVE_split_by_mc_agreement": descriptive_split(T) if fr["gate"]["pass"] else None}
     (OUT / "scores.json").write_text(json.dumps(_jsonable(out), indent=1))
     print(json.dumps(_jsonable({k: out[k] for k in ("counts_PROMINENT", "gate", "verdicts", "secondary_verdicts",
                                                     "outcome")}), indent=1))
@@ -1427,7 +1472,7 @@ def main(argv):
         f, w = memory_gate(" ".join(argv[2:]) or "gate")
         print(f"memory gate OK: free {f}% swap_free {w} MB disk_free {shutil.disk_usage(ROOT).free / 1024 ** 3:.1f} GB")
         return
-    fns = {"scan": scan, "pilot": pilot, "freeze": freeze, "summary": summary, "manifest": manifest, "stamp": stamp,
+    fns = {"scan": scan, "pilot": pilot, "freeze": freeze, "summary": summary, "reevaluate": reevaluate, "manifest": manifest, "stamp": stamp,
            "run": run, "finalize": finalize, "observe": observe, "score": score}
     if cmd not in fns:
         raise SystemExit(f"unknown command {cmd}")

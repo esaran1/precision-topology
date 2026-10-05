@@ -2,7 +2,7 @@
  "label": "Phase 2A-PS frozen per-seed inputs (before the registration; no training)",
  "v2_frozen_sha256": "deb8853e9c68901afc8c81bd2d649c728218ad16bd3078bff0e43ac1a806e959",
  "phase2a_frozen_sha256": "ced158430e6a9088b6883dac334eb16e3eeaa06d6fd5c7dc90925848e6e9d5e8",
- "frozen_parts_sha256": "8e022591f31f50c2444a4485e0e122ca3d34e2ee975e277021f6480a0d11e611",
+ "frozen_parts_sha256": "a412d7e7c8c9614f26d767566ce5bb427655b61331d77e9d765518e7c7392379",
  "counts": {
   "n_seeds": 400,
   "by_status": {
@@ -12,22 +12,22 @@
    "untraceable: stable part does not reach the upper fold": 0,
    "untraceable: rho2 >= q on the stable part": 4,
    "s_F not validated": 3,
-   "Lambda_F not validated": 91,
-   "no s*": 44,
-   "release Newton failed": 1,
-   "ineligible": 16,
-   "scoreable": 103
+   "Lambda_F not validated": 0,
+   "no s*": 57,
+   "release Newton failed": 3,
+   "ineligible": 22,
+   "scoreable": 173
   },
   "n_untraceable": 142,
-  "n_constants_not_validated": 94,
-  "n_no_s_star": 44,
-  "n_release_failed": 1,
-  "n_ineligible": 16,
-  "n_scoreable": 103,
+  "n_constants_not_validated": 3,
+  "n_no_s_star": 57,
+  "n_release_failed": 3,
+  "n_ineligible": 22,
+  "n_scoreable": 173,
   "scoreable_by_class": {
-   "clean": 37,
-   "none": 52,
-   "mixed": 14
+   "clean": 74,
+   "none": 67,
+   "mixed": 32
   },
   "traced_by_class_all": {
    "clean": 93,
@@ -36,18 +36,18 @@
   }
  },
  "gate": {
-  "n_clean_eligible": 37,
+  "n_clean_eligible": 74,
   "min": 24,
   "pass": true
  },
- "class_listing_sha256": "d1f85192e036385c9c847aecbc7aab94fb20e98e51379ce4cf92a384bcf4ceb3",
+ "class_listing_sha256": "cb7509a7d59c37fc48af66c9b4e4d3a6344e9a29bc7b99f5701c43a9273b3b04",
  "classes": {
   "2975000": [
-   "Lambda_F not validated",
+   "no s*",
    "mixed"
   ],
   "2975001": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975002": [
@@ -63,7 +63,7 @@
    "clean"
   ],
   "2975005": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975006": [
@@ -71,7 +71,7 @@
    "none"
   ],
   "2975007": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975008": [
@@ -103,7 +103,7 @@
    "none"
   ],
   "2975015": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975016": [
@@ -115,7 +115,7 @@
    "clean"
   ],
   "2975018": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975019": [
@@ -151,7 +151,7 @@
    "mixed"
   ],
   "2975027": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975028": [
@@ -163,7 +163,7 @@
    null
   ],
   "2975030": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975031": [
@@ -175,11 +175,11 @@
    "none"
   ],
   "2975033": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975034": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975035": [
@@ -191,7 +191,7 @@
    "clean"
   ],
   "2975037": [
-   "Lambda_F not validated",
+   "ineligible",
    "clean"
   ],
   "2975038": [
@@ -199,7 +199,7 @@
    "none"
   ],
   "2975039": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975040": [
@@ -235,11 +235,11 @@
    "clean"
   ],
   "2975048": [
-   "Lambda_F not validated",
+   "no s*",
    "clean"
   ],
   "2975049": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975050": [
@@ -251,11 +251,11 @@
    "clean"
   ],
   "2975052": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975053": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975054": [
@@ -291,7 +291,7 @@
    null
   ],
   "2975062": [
-   "Lambda_F not validated",
+   "ineligible",
    "clean"
   ],
   "2975063": [
@@ -303,7 +303,7 @@
    null
   ],
   "2975065": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975066": [
@@ -335,7 +335,7 @@
    null
   ],
   "2975073": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975074": [
@@ -355,7 +355,7 @@
    "none"
   ],
   "2975078": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975079": [
@@ -379,7 +379,7 @@
    null
   ],
   "2975084": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975085": [
@@ -387,11 +387,11 @@
    "none"
   ],
   "2975086": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975087": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975088": [
@@ -403,7 +403,7 @@
    "none"
   ],
   "2975090": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975091": [
@@ -439,7 +439,7 @@
    "clean"
   ],
   "2975099": [
-   "Lambda_F not validated",
+   "no s*",
    "none"
   ],
   "2975100": [
@@ -455,7 +455,7 @@
    "clean"
   ],
   "2975103": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975104": [
@@ -475,7 +475,7 @@
    "none"
   ],
   "2975108": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975109": [
@@ -491,7 +491,7 @@
    null
   ],
   "2975112": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975113": [
@@ -499,7 +499,7 @@
    null
   ],
   "2975114": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975115": [
@@ -511,15 +511,15 @@
    "none"
   ],
   "2975117": [
-   "Lambda_F not validated",
+   "release Newton failed",
    "none"
   ],
   "2975118": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975119": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975120": [
@@ -531,7 +531,7 @@
    "none"
   ],
   "2975122": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975123": [
@@ -543,19 +543,19 @@
    null
   ],
   "2975125": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975126": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975127": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975128": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975129": [
@@ -607,7 +607,7 @@
    "clean"
   ],
   "2975141": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975142": [
@@ -615,7 +615,7 @@
    null
   ],
   "2975143": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975144": [
@@ -647,7 +647,7 @@
    "none"
   ],
   "2975151": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975152": [
@@ -663,7 +663,7 @@
    "none"
   ],
   "2975155": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975156": [
@@ -683,7 +683,7 @@
    null
   ],
   "2975160": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975161": [
@@ -695,7 +695,7 @@
    "none"
   ],
   "2975163": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975164": [
@@ -715,7 +715,7 @@
    null
   ],
   "2975168": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975169": [
@@ -723,7 +723,7 @@
    "mixed"
   ],
   "2975170": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975171": [
@@ -731,7 +731,7 @@
    null
   ],
   "2975172": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975173": [
@@ -747,7 +747,7 @@
    "none"
   ],
   "2975176": [
-   "Lambda_F not validated",
+   "no s*",
    "clean"
   ],
   "2975177": [
@@ -791,7 +791,7 @@
    null
   ],
   "2975187": [
-   "Lambda_F not validated",
+   "no s*",
    "mixed"
   ],
   "2975188": [
@@ -799,7 +799,7 @@
    null
   ],
   "2975189": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975190": [
@@ -815,11 +815,11 @@
    "none"
   ],
   "2975193": [
-   "Lambda_F not validated",
+   "ineligible",
    "clean"
   ],
   "2975194": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975195": [
@@ -839,7 +839,7 @@
    "none"
   ],
   "2975199": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975200": [
@@ -851,7 +851,7 @@
    "none"
   ],
   "2975202": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975203": [
@@ -871,7 +871,7 @@
    "none"
   ],
   "2975207": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975208": [
@@ -895,7 +895,7 @@
    "none"
   ],
   "2975213": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975214": [
@@ -911,15 +911,15 @@
    null
   ],
   "2975217": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975218": [
-   "Lambda_F not validated",
+   "no s*",
    "none"
   ],
   "2975219": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975220": [
@@ -947,11 +947,11 @@
    "clean"
   ],
   "2975226": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975227": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975228": [
@@ -963,11 +963,11 @@
    null
   ],
   "2975230": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975231": [
-   "Lambda_F not validated",
+   "no s*",
    "clean"
   ],
   "2975232": [
@@ -991,7 +991,7 @@
    null
   ],
   "2975237": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975238": [
@@ -1055,7 +1055,7 @@
    null
   ],
   "2975253": [
-   "Lambda_F not validated",
+   "no s*",
    "none"
   ],
   "2975254": [
@@ -1063,7 +1063,7 @@
    null
   ],
   "2975255": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975256": [
@@ -1071,7 +1071,7 @@
    null
   ],
   "2975257": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975258": [
@@ -1079,7 +1079,7 @@
    null
   ],
   "2975259": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975260": [
@@ -1087,7 +1087,7 @@
    "clean"
   ],
   "2975261": [
-   "Lambda_F not validated",
+   "no s*",
    "none"
   ],
   "2975262": [
@@ -1143,7 +1143,7 @@
    "none"
   ],
   "2975275": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975276": [
@@ -1159,7 +1159,7 @@
    "mixed"
   ],
   "2975279": [
-   "Lambda_F not validated",
+   "no s*",
    "mixed"
   ],
   "2975280": [
@@ -1171,7 +1171,7 @@
    "none"
   ],
   "2975282": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975283": [
@@ -1199,11 +1199,11 @@
    "none"
   ],
   "2975289": [
-   "Lambda_F not validated",
+   "no s*",
    "clean"
   ],
   "2975290": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975291": [
@@ -1219,11 +1219,11 @@
    null
   ],
   "2975294": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975295": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975296": [
@@ -1251,7 +1251,7 @@
    null
   ],
   "2975302": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975303": [
@@ -1263,11 +1263,11 @@
    null
   ],
   "2975305": [
-   "Lambda_F not validated",
+   "ineligible",
    "mixed"
   ],
   "2975306": [
-   "Lambda_F not validated",
+   "ineligible",
    "mixed"
   ],
   "2975307": [
@@ -1303,7 +1303,7 @@
    null
   ],
   "2975315": [
-   "Lambda_F not validated",
+   "release Newton failed",
    "none"
   ],
   "2975316": [
@@ -1335,7 +1335,7 @@
    "clean"
   ],
   "2975323": [
-   "Lambda_F not validated",
+   "scoreable",
    "mixed"
   ],
   "2975324": [
@@ -1347,7 +1347,7 @@
    "mixed"
   ],
   "2975326": [
-   "Lambda_F not validated",
+   "no s*",
    "clean"
   ],
   "2975327": [
@@ -1367,7 +1367,7 @@
    "clean"
   ],
   "2975331": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975332": [
@@ -1407,11 +1407,11 @@
    null
   ],
   "2975341": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975342": [
-   "Lambda_F not validated",
+   "ineligible",
    "mixed"
   ],
   "2975343": [
@@ -1423,7 +1423,7 @@
    "none"
   ],
   "2975345": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975346": [
@@ -1431,7 +1431,7 @@
    "none"
   ],
   "2975347": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975348": [
@@ -1447,7 +1447,7 @@
    null
   ],
   "2975351": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975352": [
@@ -1467,7 +1467,7 @@
    null
   ],
   "2975356": [
-   "Lambda_F not validated",
+   "no s*",
    "none"
   ],
   "2975357": [
@@ -1491,7 +1491,7 @@
    "none"
   ],
   "2975362": [
-   "Lambda_F not validated",
+   "scoreable",
    "none"
   ],
   "2975363": [
@@ -1527,7 +1527,7 @@
    "clean"
   ],
   "2975371": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975372": [
@@ -1611,7 +1611,7 @@
    null
   ],
   "2975392": [
-   "Lambda_F not validated",
+   "scoreable",
    "clean"
   ],
   "2975393": [
@@ -1645,6 +1645,16 @@
  },
  "plan": [
   {
+   "seed": 2975001,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975001,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
    "seed": 2975003,
    "class": "clean",
    "log2rho": -14.0
@@ -1665,12 +1675,72 @@
    "log2rho": -16.0
   },
   {
+   "seed": 2975005,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975005,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975015,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975015,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
    "seed": 2975017,
    "class": "clean",
    "log2rho": -14.0
   },
   {
    "seed": 2975017,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975018,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975018,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975027,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975027,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975033,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975033,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975034,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975034,
    "class": "clean",
    "log2rho": -16.0
   },
@@ -1705,12 +1775,92 @@
    "log2rho": -16.0
   },
   {
+   "seed": 2975049,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975049,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975052,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975052,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
    "seed": 2975059,
    "class": "clean",
    "log2rho": -14.0
   },
   {
    "seed": 2975059,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975065,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975065,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975073,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975073,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975078,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975078,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975084,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975084,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975086,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975086,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975090,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975090,
    "class": "clean",
    "log2rho": -16.0
   },
@@ -1741,6 +1891,56 @@
   },
   {
    "seed": 2975106,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975108,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975108,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975118,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975118,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975119,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975119,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975122,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975122,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975125,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975125,
    "class": "clean",
    "log2rho": -16.0
   },
@@ -1785,6 +1985,46 @@
    "log2rho": -16.0
   },
   {
+   "seed": 2975155,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975155,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975160,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975160,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975163,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975163,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
+   "seed": 2975172,
+   "class": "clean",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975172,
+   "class": "clean",
+   "log2rho": -16.0
+  },
+  {
    "seed": 2975174,
    "class": "clean",
    "log2rho": -14.0
@@ -1801,216 +2041,6 @@
   },
   {
    "seed": 2975179,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975195,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975195,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975205,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975205,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975225,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975225,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975242,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975242,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975248,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975248,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975249,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975249,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975260,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975260,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975265,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975265,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975269,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975269,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975273,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975273,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975280,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975280,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975292,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975292,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975303,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975303,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975311,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975311,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975318,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975318,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975328,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975328,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975337,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975337,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975348,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975348,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975370,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975370,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975389,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975389,
-   "class": "clean",
-   "log2rho": -16.0
-  },
-  {
-   "seed": 2975395,
-   "class": "clean",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975395,
    "class": "clean",
    "log2rho": -16.0
   },
@@ -2060,6 +2090,16 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975087,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975103,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975107,
    "class": "none",
    "log2rho": -14.0
@@ -2070,12 +2110,27 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975114,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975116,
    "class": "none",
    "log2rho": -14.0
   },
   {
    "seed": 2975121,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975126,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975127,
    "class": "none",
    "log2rho": -14.0
   },
@@ -2120,6 +2175,16 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975168,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975170,
+   "class": "none",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975183,
    "class": "none",
    "log2rho": -14.0
@@ -2130,42 +2195,12 @@
    "log2rho": -14.0
   },
   {
-   "seed": 2975192,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975197,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975198,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975203,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975228,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975239,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975243,
-   "class": "none",
-   "log2rho": -14.0
-  },
-  {
    "seed": 2975002,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975007,
    "class": "mixed",
    "log2rho": -14.0
   },
@@ -2180,7 +2215,32 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975030,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975039,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975053,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975076,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975112,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975128,
    "class": "mixed",
    "log2rho": -14.0
   },
@@ -2190,7 +2250,27 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975141,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975143,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975151,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975169,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975194,
    "class": "mixed",
    "log2rho": -14.0
   },
@@ -2200,49 +2280,75 @@
    "log2rho": -14.0
   },
   {
+   "seed": 2975202,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
+   "seed": 2975227,
+   "class": "mixed",
+   "log2rho": -14.0
+  },
+  {
    "seed": 2975232,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975300,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975325,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975358,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975381,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975385,
-   "class": "mixed",
-   "log2rho": -14.0
-  },
-  {
-   "seed": 2975393,
    "class": "mixed",
    "log2rho": -14.0
   }
  ],
  "plan_counts": {
-  "clean": 37,
+  "clean": 40,
   "none": 30,
-  "mixed": 14
+  "mixed": 20
  },
  "surplus_counted_not_trained": {
-  "clean": [],
+  "clean": [
+   2975189,
+   2975195,
+   2975205,
+   2975207,
+   2975225,
+   2975226,
+   2975230,
+   2975237,
+   2975242,
+   2975248,
+   2975249,
+   2975255,
+   2975260,
+   2975265,
+   2975269,
+   2975273,
+   2975280,
+   2975290,
+   2975292,
+   2975303,
+   2975311,
+   2975318,
+   2975328,
+   2975331,
+   2975337,
+   2975345,
+   2975347,
+   2975348,
+   2975351,
+   2975370,
+   2975371,
+   2975389,
+   2975392,
+   2975395
+  ],
   "none": [
+   2975192,
+   2975197,
+   2975198,
+   2975199,
+   2975203,
+   2975213,
+   2975217,
+   2975219,
+   2975228,
+   2975239,
+   2975243,
    2975244,
    2975263,
    2975266,
@@ -2251,35 +2357,81 @@
    2975284,
    2975286,
    2975288,
+   2975294,
    2975297,
    2975299,
+   2975302,
    2975316,
    2975320,
    2975333,
    2975336,
+   2975341,
    2975344,
    2975346,
    2975354,
+   2975362,
    2975372,
    2975375,
    2975379,
    2975383,
    2975387
   ],
-  "mixed": []
+  "mixed": [
+   2975257,
+   2975259,
+   2975275,
+   2975282,
+   2975295,
+   2975300,
+   2975323,
+   2975325,
+   2975358,
+   2975381,
+   2975385,
+   2975393
+  ]
  },
+ "DESCRIPTIVE_mc_agreement_scoreable_by_class": {
+  "clean": {
+   "agree": 37,
+   "disagree": 37
+  },
+  "none": {
+   "agree": 52,
+   "disagree": 15
+  },
+  "mixed": {
+   "agree": 14,
+   "disagree": 18
+  }
+ },
+ "DESCRIPTIVE_mc_agreement_planned": {
+  "clean": {
+   "agree": 16,
+   "disagree": 24
+  },
+  "none": {
+   "agree": 23,
+   "disagree": 7
+  },
+  "mixed": {
+   "agree": 8,
+   "disagree": 12
+  }
+ },
+ "D1_decision": "author 2026-10-05: (c) Lambda_F from the 0.05 window; the two-window agreement (<= 5%) is DESCRIPTIVE only; clarification made at freeze from landscape counts only, before any training ((a) had given Lambda_F not validated 91, clean 45)",
  "DESCRIPTIVE": {
   "s_F_range_scoreable": [
-   4.668936574998718,
+   4.508514311530018,
    8.51261234044921
   ],
   "sF_over_sstar_range_scoreable": [
-   1.0074697960760148,
-   1.5081167108711657
+   1.0056099290638676,
+   1.6872001944707407
   ],
   "Lambda_F_range_scoreable": [
-   0.0001890759397400201,
-   0.0022777643318007278
+   7.628918784578916e-05,
+   0.002552835509219522
   ],
   "freeze_secs_total": 2671.5,
   "peak_rss_gb": 0.269,
