@@ -344,44 +344,47 @@ def reach_ok(D, cols, n_seeds):
 
 def criterion_lower(D, lo, crit, n_seeds, any_nonfinite):
     """R_s / R_l-rho2 / R_l-acc: PASS if every cell's lower end > 0; UNRESOLVED (overriding PASS and FAIL) if a cell is
-    reached in both arms by < 90% of the seeds or any run is non-finite; else FAIL."""
+    reached in both arms by < 90% of the seeds, or a run of an arm it uses (this arm or arm 1) is non-finite
+    (`nonfinite_used`; author's decision D5, 2026-10-05); else FAIL."""
     cols = [CELLS.index(c) for c in CRITERION_CELLS[crit]]
     ok_reach, n_both = reach_ok(D, cols, n_seeds)
     lo_c = np.asarray(lo, float)[cols]
     ok = bool(np.all(lo_c > 0))
     return {"criterion": crit, "cells": list(CRITERION_CELLS[crit]), "lower": lo_c.tolist(), "n_both": n_both,
-            "reach_ok": ok_reach, "any_nonfinite": bool(any_nonfinite), "all_lower_gt_0": ok,
+            "reach_ok": ok_reach, "nonfinite_in_used_arms": bool(any_nonfinite), "all_lower_gt_0": ok,
             "verdict": verdict(ok, ok_reach and not any_nonfinite)}
 
 
 def criterion_N(D, hi, n_seeds, any_nonfinite):
     """N (a global arm): PASS if every one of the 18 cells' upper end < δ (0.03 for ρ₂ and reversed accuracy, 0.02 for
-    shuffled accuracy); UNRESOLVED as for R; else FAIL."""
+    shuffled accuracy); UNRESOLVED as for R (reach; a non-finite run of this arm or of arm 1); else FAIL."""
     cols = [CELLS.index(c) for c in CRITERION_CELLS["N"]]
     ok_reach, n_both = reach_ok(D, cols, n_seeds)
     marg = np.array([DELTA[c.split("|")[1]] for c in CRITERION_CELLS["N"]])
     hi_c = np.asarray(hi, float)[cols]
     ok = bool(np.all(hi_c < marg))
     return {"criterion": "N", "cells": list(CRITERION_CELLS["N"]), "upper": hi_c.tolist(), "delta": marg.tolist(),
-            "n_both": n_both, "reach_ok": ok_reach, "any_nonfinite": bool(any_nonfinite), "all_upper_lt_delta": ok,
+            "n_both": n_both, "reach_ok": ok_reach, "nonfinite_in_used_arms": bool(any_nonfinite), "all_upper_lt_delta": ok,
             "verdict": verdict(ok, ok_reach and not any_nonfinite)}
 
 
 def criterion_O(onset_s, n_runs, any_nonfinite):
     """O (an output arm): t_on = the first step with ρ₂ ≥ q at every step to T_C.  PASS if ≥ 75% of the arm's runs have
-    s(t_on) > s*; a run with no such step (onset None) counts against.  UNRESOLVED if any run is non-finite."""
+    s(t_on) > s*; a run with no such step (onset None) counts against.  UNRESOLVED if a run of this arm or of arm 1
+    is non-finite (D5: every criterion compares against arm 1, so a non-finite arm-1 run voids every criterion)."""
     n_runs = int(n_runs)
     n_above = int(sum(1 for x in onset_s if x is not None and x > S_STAR))
     frac = n_above / n_runs if n_runs else float("nan")
     ok = bool(n_runs and frac >= O_MIN_FRAC)
     return {"criterion": "O", "n_runs": n_runs, "n_above_s_star": n_above,
             "n_no_onset": int(sum(1 for x in onset_s if x is None)), "frac": frac, "min_frac": O_MIN_FRAC,
-            "any_nonfinite": bool(any_nonfinite), "verdict": verdict(ok, n_runs > 0 and not any_nonfinite)}
+            "nonfinite_in_used_arms": bool(any_nonfinite), "verdict": verdict(ok, n_runs > 0 and not any_nonfinite)}
 
 
 def arm_verdicts(arm, rows_arm, rows_ref, any_nonfinite):
     """Every registered criterion of one arm vs arm 1 (rows aligned by seed).  Output arms: R_s, R_l_rho2, R_l_acc, O;
-    global arms: N.  The bootstrap runs once per arm over all 18 cells (fresh default_rng(20261002))."""
+    global arms: N.  The bootstrap runs once per arm over all 18 cells (fresh default_rng(20261002)).
+    any_nonfinite: whether a run of an arm these criteria use (this arm or arm 1) is non-finite (D5)."""
     D = paired(rows_arm, rows_ref)
     lo, hi, med = boot_ci_median(D)
     n = len(rows_arm)
@@ -449,11 +452,14 @@ def score_tables(runs):
     assert set(by) == {(a, s) for a in ARMS for s in seeds}, "every arm × every seed exactly once"
     rows = {a: [by[(a, s)] for s in seeds] for a in ARMS}
     any_nonfinite = any(not r["finite"] for r in runs)
+    # D5 (author, 2026-10-05): a non-finite run makes UNRESOLVED only the criteria that use its arm.  Every criterion of
+    # arm a uses arm a and arm 1 (the reference), so a non-finite arm-1 run voids every criterion.
+    nonfinite_arm = {a: any(not r["finite"] for r in rows[a]) for a in ARMS}
     per_arm, v = {}, {}
     for a in OUTPUT_ARMS + GLOBAL_ARMS:
-        per_arm[a] = arm_verdicts(a, rows[a], rows["std"], any_nonfinite)
+        per_arm[a] = arm_verdicts(a, rows[a], rows["std"], nonfinite_arm[a] or nonfinite_arm["std"])
         v[a] = {k: c["verdict"] for k, c in per_arm[a]["criteria"].items()}
-    return {"n_seeds": len(seeds), "any_nonfinite": any_nonfinite,
+    return {"n_seeds": len(seeds), "any_nonfinite": any_nonfinite, "nonfinite_by_arm": nonfinite_arm,
             "nonfinite_runs": [[r["arm"], r["seed"], r["t_nonfinite"]] for r in runs if not r["finite"]],
             "arms": per_arm, "verdicts": v, "outcome": outcome(v)}
 

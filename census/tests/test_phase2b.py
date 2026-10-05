@@ -369,12 +369,30 @@ def test_reach_unresolved_overrides_a_fail(fast_boot):
     assert v["out16"]["R_s"] == "UNRESOLVED"
 
 
-@pytest.mark.parametrize("bad", [("glob", 3), ("std", 0), ("out16b", 79)])
-def test_any_non_finite_run_makes_every_criterion_unresolved(fast_boot, bad):
+@pytest.mark.parametrize("bad,voided", [
+    (("glob", 3), {("glob", "N")}),                                                     # arm 3: only N(3)
+    (("globcm", 40), {("globcm", "N")}),                                                # arm 3cm: only N(3cm)
+    (("out16b", 79), {("out16b", c) for c in ("R_s", "R_l_rho2", "R_l_acc", "O")}),     # arm 2b: only 2b's
+    (("out16", 0), {("out16", c) for c in ("R_s", "R_l_rho2", "R_l_acc", "O")}),        # arm 2: only 2's
+    (("std", 0), "all")])                                                               # arm 1: every criterion
+def test_non_finite_run_voids_only_the_criteria_that_use_its_arm(fast_boot, bad, voided):
+    """D5 (author, 2026-10-05): a non-finite run makes UNRESOLVED only the criteria that use its arm; every criterion
+    compares against arm 1, so a non-finite arm-1 run voids all of them.  Every other criterion keeps its verdict."""
     S = P.score_tables(_runs(nonfinite=[bad]))
     assert S["any_nonfinite"] and S["nonfinite_runs"] == [[bad[0], 1000 + bad[1], 5]]
-    assert all(x == "UNRESOLVED" for a in S["verdicts"].values() for x in a.values())
-    assert S["outcome"]["primary"] == "UNRESOLVED"
+    assert S["nonfinite_by_arm"] == {a: a == bad[0] for a in P.ARMS}
+    for a, crits in S["verdicts"].items():
+        for c, x in crits.items():
+            expect = "UNRESOLVED" if voided == "all" or (a, c) in voided else "PASS"
+            assert x == expect, (a, c, x)
+    prim = voided == "all" or any(a in ("out16", "glob", "globcm") for a, _ in voided)
+    assert S["outcome"]["primary"] == ("UNRESOLVED" if prim else "PASS")
+
+
+def test_non_finite_run_does_not_hide_a_fail_elsewhere(fast_boot):
+    # a non-finite arm-3cm run voids N(3cm) only; arm 2's failing R_l_acc stays FAIL
+    v = _v(_runs(delta={"out16": {"bce_0.1|acc_shuffled": 0.0}}, nonfinite=[("globcm", 7)]))
+    assert v["globcm"]["N"] == "UNRESOLVED" and v["glob"]["N"] == "PASS" and v["out16"]["R_l_acc"] == "FAIL"
 
 
 def test_incomplete_or_duplicate_runs_are_refused():

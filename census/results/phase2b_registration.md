@@ -1,8 +1,11 @@
 # Phase 2B registration: the lever (output learning rate) on the simplicity-bias benchmark
 
-**DRAFT, NOT REGISTERED.** Stopped before the registration commit under the standing rule: the details in §11 are
-not on the approved page and touch a criterion, a validity condition or the scoring set. Each has a proposed
-resolution, already implemented and tested in `src/phase2b.py`; the author decides. Nothing below changes the page.
+**REGISTERED.** This file, the approved design page, `src/phase2b.py` and the code it reaches, `tests/test_phase2b.py`,
+the frozen inputs (`seed_scan.json`, `frozen.json`) and the exploration files they read are committed in one commit
+before any registered run. Their SHA-256 hashes are in `results/phase2b/registration.sha256` (§13).
+- **The open details (§11):** the author decided them on 2026-10-04/05. D1–D4 and D6–D9 were approved as proposed.
+  **D5 was changed:** a non-finite run makes UNRESOLVED only the criteria that use that run's arm. Every criterion
+  compares against arm 1, so a non-finite arm-1 run voids every criterion. The draft was 1531099.
 - **Precondition met:** 2B registers only after Phase 2A's result. That result is in: registration 569b836,
   OpenTimestamps 45fcaed, result 7b15d9f (OUTCOME PASS).
 - **Not yet done:** no registered seed (2,962,000–2,962,079) has been drawn, initialised or trained. There is no pilot
@@ -106,13 +109,16 @@ seeds resampled jointly, `default_rng(20261002)` (details in §11).
 A criterion is **UNRESOLVED**, overriding both PASS and FAIL, in either case:
 - **Reach:** fewer than 90% of the seeds reach one of its cells in both arms, i.e. fewer than 72 of 80. Applies to
   R_s, R_ℓ-ρ₂, R_ℓ-acc and N.
-- **Non-finite:** any run is non-finite (§11, D5 and D6). Applies to every criterion.
+- **Non-finite:** a run of an arm the criterion uses is non-finite (§11, D5 and D6). Arm a's criteria use arm a and
+  arm 1. So a non-finite arm-3 run voids N(3) only, a non-finite arm-2b run voids 2b's four criteria only, and a
+  non-finite arm-1 run voids every criterion.
 
 Every constructed case is tested (`tests/test_phase2b.py`):
 - PASS and FAIL for each criterion and each cell family. N for each global arm, at its margins and one-sided.
 - O at 60/80 (PASS) and 59/80 (FAIL); runs without an onset count against.
 - Reach at 72/80 (resolved) and 71/80 (UNRESOLVED), with reach counted in both arms. Reach overrides a FAIL.
-- A non-finite run in arm 1, 2b or 3 makes every criterion UNRESOLVED.
+- Non-finite runs: in arm 3 only N(3) is UNRESOLVED, in arm 3cm only N(3cm), in arm 2b only 2b's criteria, in arm 2
+  only arm 2's, and in arm 1 every criterion. All other verdicts are unchanged, including a FAIL elsewhere.
 - Incomplete or duplicated runs are refused.
 
 ## 7. Outcome rule (`phase2b.outcome`)
@@ -205,24 +211,26 @@ Every constructed case is tested (`tests/test_phase2b.py`):
     exploration verdicts: arm 2 all pass, arm 2b R_ℓ-acc FAIL, N passes for arms 3 and 3cm.
 - **One fixed dataset.** As in v3 and 2A, the data are the fixed 800 points; the seeds vary only the initialisation.
 
-## 11. The details the approved page left open (STOP items for the author)
+## 11. The details the approved page left open (decided by the author 2026-10-04/05)
 
-Each detail below is not on the page and touches a criterion, a validity condition or the scoring set. The proposed
-resolution is the one implemented and tested.
+Each detail below is not on the page and touches a criterion, a validity condition or the scoring set. The worker
+stopped before the registration commit (draft 1531099) and proposed a resolution for each.
+- **The author's decision:** D1–D4 and D6–D9 approved as proposed. **D5 changed** to the per-arm rule below.
+- Every resolution is implemented in `src/phase2b.py` and tested.
 
-| # | detail | proposed resolution | source |
+| # | detail | registered resolution | source |
 |---|---|---|---|
 | D1 | The bootstrap generator across arms | A **fresh** `default_rng(20261002)` for each compared arm (2, 2b, 3, 3cm). One 10,000 × 80 index matrix is drawn from it and used for all 18 cells of that arm, so every arm and every cell see the same resamples. | `p2b_lever_power2.py` |
 | D2 | Seeds that do not reach a cell in both arms | Excluded from that cell only: in each resample, the median is over the resampled seeds that reach it (`nanmedian`), and the point median likewise. Resampling stays over all 80 seeds. | `p2b_lever_power.ci_median` |
 | D3 | The percentile rule | numpy's default (linear interpolation) at 2.5 and 97.5. | as explored |
 | D4 | UNRESOLVED precedence | UNRESOLVED overrides PASS as well as FAIL. A criterion with < 90% reach, or with a non-finite run, is never PASS. | page: "It is UNRESOLVED if …" |
-| D5 | Scope of "if any run is non-finite" | Read literally: any of the 400 runs makes every criterion of every arm UNRESOLVED, including the primary's. The alternative would be only the runs of the two arms a criterion compares (for O, the arm's own runs). | the page's words |
+| D5 | Scope of "if any run is non-finite" | **Author's decision (changed from the literal reading proposed in the draft):** a non-finite run makes UNRESOLVED only the criteria that use that run's arm. Arm a's criteria (R_s, R_ℓ-ρ₂, R_ℓ-acc and O for an output arm; N for a global arm) use arm a and arm 1. So a non-finite arm-3 run voids N(3) only, a non-finite arm-2b run voids 2b's criteria only, and a non-finite arm-1 run voids every criterion. | author, 2026-10-04/05 |
 | D6 | What "non-finite" means | At any step 0 … T_C, a parameter, the objective or its gradient, or ρ₂ is not finite; or a metric at a recorded point is not finite. The run stops at that step. | — |
-| D7 | Reach, and the 90% count | A seed reaches a point if its first passage falls at a step in 0 … 40,000. 90% of 80 = 72, so fewer than 72 seeds reaching in both arms is UNRESOLVED. The rule has no cell for O, so O's only UNRESOLVED condition is a non-finite run. | — |
+| D7 | Reach, and the 90% count | A seed reaches a point if its first passage falls at a step in 0 … 40,000. 90% of 80 = 72, so fewer than 72 seeds reaching in both arms is UNRESOLVED. The rule has no cell for O, so O's only UNRESOLVED condition is a non-finite run of its arm or of arm 1 (D5). | — |
 | D8 | The accuracy decision at a tie | Class 1 iff z + b > 0, so z + b = 0 is class 0 (measure zero). | as explored |
 | D9 | An onset from initialisation | If ρ₂ ≥ q at every step from step 0, then t_on = 0 at s(0) ≤ 0.5·s\* < s\*. It counts against O, by the page's definition read literally. | the page's words |
 
-**Not touching a criterion** (recorded, no decision needed):
+**Not touching a criterion** (recorded; no decision was needed):
 - The run order: per seed, arm 1 first.
 - The primary-outcome grouping (arm 2 with both N; §7).
 - The file formats.
@@ -254,10 +262,10 @@ resolution is the one implemented and tested.
   - **Every arm's committed exploration run on seed 2,953,000 is reproduced bit for bit** by `run_one` over 40,000
     steps. Every difference is exactly 0: the steps to every matched point and the matched step, 56–64 metrics, the
     lasting onset, and 217–233 trajectory samples. About 6.3 s per run.
-- **SHA-256 (as of this draft):**
+- **SHA-256:**
   - `seed_scan.json` b298620f…
   - `frozen.json` 2d302633…
-- **The manifest** `results/phase2b/registration.sha256` is written at the registration commit, after the author's
+- **The manifest** `results/phase2b/registration.sha256` was written for the registration commit, after the author's
   decision on §11. It covers the import closure of `src/phase2b.py`, this file, the design page, the tests,
   `seed_scan.json`, `frozen.json`, v2's and 2A's `frozen.json`, and the exploration code, the exploration JSON and the
   100 exploration run files that the tests and the freeze read.
