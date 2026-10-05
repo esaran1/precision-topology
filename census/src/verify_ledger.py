@@ -608,6 +608,7 @@ def main() -> None:
     phase1c_checks()
     phase2a_checks()
     phase2a_posthoc_checks()
+    phase2b_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -976,6 +977,7 @@ PRODUCERS = {
     "phase2b/registration.sha256": ("phase2b", "manifest", "full", ""),
     "phase2b/runs.jsonl": ("phase2b", "run", "full", ""),
     "phase2b/scores.json": ("phase2b", "score", "full", ""),
+    "phase2b_results.md": ("phase2b_report", "main", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3332,6 +3334,47 @@ P1B_PIN = {   # {arm: (registered scored, scored at f, misses at f, POST HOC cri
     "gelu/random": (80, 80, 0, "PASS", "PASS"), "gelu/branch": (80, 80, 0, "PASS", "PASS"),
     "w2a/T": (98, 98, 0, "PASS", "PASS"), "w2a/D": (120, 120, 0, "no tolerance set: raw errors only", "PASS"),
     "w2a/Tp": (120, 120, 0, "PASS", "PASS")}
+
+
+P2B_PIN = ("PASS", {"out16": {"R_s": "PASS", "R_l_rho2": "PASS", "R_l_acc": "PASS", "O": "PASS"},
+                    "out16b": {"R_s": "PASS", "R_l_rho2": "PASS", "R_l_acc": "PASS", "O": "PASS"},
+                    "glob": {"N": "PASS"}, "globcm": {"N": "PASS"}}, 0)   # (primary outcome, verdicts, n non-finite)
+
+
+def phase2b_checks() -> None:
+    """Phase 2B (registration 9239902, stamp 90c4e90, OpenTimestamps f62b4a5): the registration asserts; 400 runs, every
+    arm x every registered seed exactly once, each T_C steps; scores.json regenerates from the committed runs with the
+    registered scoring code (phase2b_report.score_result); phase2b_results.md regenerates from scores.json; one
+    registered run re-trained reproduces its committed (s, BCE, rho2) path hash bit for bit; verdicts pinned."""
+    from . import phase2b as P2B
+    from . import phase2b_report as P2BR
+    if not (P2B.OUT / "scores.json").exists():
+        return
+    print("Phase 2B: the lever (output learning rate) on the simplicity-bias benchmark")
+    P2B.assert_registration()
+    runs = P2B._rows(P2B.OUT / "runs.jsonl")
+    chk("P2B runs", float(len(runs)), 400.0, 0)
+    chk("P2B distinct (arm, seed) = arms x registered seeds",
+        float({(r["arm"], r["seed"]) for r in runs} == {(a, s) for a in P2B.ARMS for s in P2B.SEEDS}), 1.0, 0)
+    chk("P2B runs not of T_C steps", float(sum(int(r["T"] != P2B.T_C) for r in runs)), 0.0, 0)
+    S = json.loads((P2B.OUT / "scores.json").read_text())
+    chk("P2B scores.json regenerates from the committed runs",
+        float(S == json.loads(json.dumps(P2B._jsonable(P2BR.score_result())))), 1.0, 0)
+    chk("P2B phase2b_results.md regenerates from scores.json",
+        float((R / "phase2b_results.md").read_text() == P2BR.render_md(S)), 1.0, 0)
+    chk("P2B no criterion is a forecast", float(S["no_criterion_is_a_forecast"] is True), 1.0, 0)
+    r0 = next(r for r in runs if r["arm"] == "out16" and r["seed"] == P2B.SEEDS[0])
+    t3 = next(r for r in runs if r["arm"] == "std" and r["seed"] == P2B.SEEDS[0])["t_first"].get("scale_3s*")
+    rec, _ = P2B.run_one("out16", P2B.SEEDS[0], t_match=t3)
+    chk("P2B re-trained run (arm 2, first seed) path hash identical",
+        float(rec["path_sha256"] == r0["path_sha256"] and rec["t_first"] == r0["t_first"]), 1.0, 0)
+    if P2B_PIN is not None:
+        outc, verdicts, n_nonfinite = P2B_PIN
+        chk(f"P2B primary outcome {outc}", float(S["outcome"]["primary"] == outc), 1.0, 0)
+        for a, vs in verdicts.items():
+            for k, v in vs.items():
+                chk(f"P2B arm {a} {k} {v}", float(S["verdicts"][a][k] == v), 1.0, 0)
+        chk("P2B non-finite runs", float(len(S["nonfinite_runs"])), float(n_nonfinite), 0)
 
 
 def phase1b_checks() -> None:
