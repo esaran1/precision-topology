@@ -4,6 +4,7 @@
 criterion, the gate, validity or the scoring set and are not on the approved page. Each has a proposed resolution,
 implemented in `src/phase2a_ps.py` and tested in `tests/test_phase2a_ps.py`. **The author decides them first.**
 - **Not yet done:** no registered seed has been trained. The 400 registered seeds are FROZEN only (no training; §12).
+  The gate passes at the freeze: 37 clean scoreable seeds ≥ 24 (with D1 as proposed).
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
 - **The registration commit** will hold this file, the approved page, `src/phase2a_ps.py` and its import closure,
   `tests/test_phase2a_ps.py`, and the frozen inputs (`seed_scan.json`, `pilot*.json*`, `frozen_parts.jsonl`,
@@ -250,14 +251,67 @@ s ≥ s_F. **PASS needs F, H, E_seed, C3, C4 and P; C1 and C2 are secondary.**
 `run`, `observe` and `score` assert every hash, and that the manifest and `registration_stamp.txt` are committed and
 unmodified.
 
-## 12. Scan, pilot and freeze
+## 12. Scan, pilot and freeze (2026-10-05; no registered seed trained)
 
-(Filled in below as each step completes.)
+**Seed scan** (`seed_scan.json`, commit b28ed07). Neither range matches in any text file under src, tests, results,
+paper, notes, independent, data or dist (also written with `_` or `,`). No overlap with the 17 SEEDS*/PILOT_SEEDS*
+constants of 12 registered modules. Disjoint from the exploration seeds.
+
+**Pilot** (`pilot.json`, `pilot_parts.jsonl`, commit f2dfb91; pilot seeds only). **It fixes no rule, threshold or
+criterion.** It is a machine check of the per-seed pipeline at the slowest registered rate, which the exploration never
+ran per seed.
+- Pilot seeds were frozen in order until the first scoreable clean one: 2,976,000 (Λ_F not validated, mixed),
+  2,976,001–003 (untraceable: M homotopy), 2,976,004 (scoreable, clean; s_F = 6.913).
+- 2,976,004 through `run_one` and `observe_one`:
+
+| ρ | t_c | t̂_F | t_fc | t_F | t_obs | s_obs/s_F | ε̂_F | secs (run + observe) |
+|---|---|---|---|---|---|---|---|---|
+| 2⁻¹⁴ | 663,988 | 799,612 | 857,003 | 796,999 | 853,258 | 1.0195 | 6.94e−4 | 40 + 146 |
+| 2⁻¹⁶ | 2,655,003 | 3,197,250 | 3,285,683 | 3,186,751 | 3,274,355 | 1.0077 | 1.74e−4 | 160 + 558 |
+
+- In both runs:
+  - the guard's last row is t_c − 1, and the NaN recomputation is identical (own and fixed-dataset forecasts);
+  - the t_c state matched its hash bit for bit on resume;
+  - the follow check is on the seed's own M (distances 1.4e−7, 7.8e−7);
+  - the idle unit stayed exactly 0 and the signs fixed to the crossing.
+- Peak RSS 0.70 GB.
+- **Compute.** This clean seed took ≈ 15 min (both rates). The page budgeted 400 s per clean seed. At this pilot's
+  rate, 37 clean seeds take ≈ 9 h and 44 none/mixed runs ≈ 2.3 h, so ≈ 11 h in all (page: 7.2 h). Run time grows with
+  s_F (this seed's 6.91 is above the scoreable clean median 5.88).
+
+**Freeze** (`frozen_parts.jsonl`, `frozen.json`; all 400 registered seeds, NO training; rules as proposed in §9, D1
+as (a)). 2,672 s in all (median 9.6 s per traced seed, 1.2 s per untraceable one); peak RSS 0.27 GB.
+
+| status | seeds | class among them (clean / none / mixed) |
+|---|---|---|
+| **untraceable** | **142 (35.5%)**: M homotopy failed 135, no upper fold 3, ρ₂ ≥ q on the stable part 4 | – |
+| s_F not validated | 3 (λ_min not falling toward the fold) | 2 / 1 / 0 |
+| **Λ_F not validated (D1)** | **91** | **45** / 22 / 24 |
+| **no s\*** | **44** | 1 / 38 / 5 |
+| release Newton failed | 1 | 0 / 1 / 0 |
+| **ineligible** (s₀ > 0.6·s_F) | **16** | 8 / 5 / 3 |
+| **scoreable** | **103** | **37 / 52 / 14** |
+
+- **Gate: 37 clean scoreable ≥ 24: PASS.**
+- **Plan** (frozen): all 37 clean seeds (fewer than the cap of 40) at 2⁻¹⁴ and 2⁻¹⁶; the first 30 of 52 none seeds
+  (22 counted, not trained); all 14 mixed seeds (fewer than 20). That is 118 runs.
+- **Every seed's status and class are frozen.** The class listing's SHA-256 is
+  `d1f85192e036385c9c847aecbc7aab94fb20e98e51379ce4cf92a384bcf4ceb3`; `summary` asserted every stored evaluation.
+- **Descriptive (scoreable seeds):**
+  - s_F 4.67–8.51; s_F/s\* 1.007–1.508; Λ_F 1.9e−4–2.3e−3;
+  - among the 37 clean seeds, s_F/s\* 1.17–1.51, and 3 have s_F/s\* < 1.25 (the falsifier cannot fire on them);
+  - the homotopy needed 200 steps on 142 seeds (135 still failed);
+  - M's contiguous stable run equals all its stable points on every traced seed.
+- **D1's weight.** Of the 93 traced clean seeds, 45 have the |m′c′| window agreement as their first failing reason. D1 shapes the
+  scoring set more than any other rule after traceability. **The counts under D1's alternatives (b) and (c) were NOT
+  computed on the registered seeds,** so the author can decide blind to them. The stored λ_min grids allow either to
+  be applied without refreezing.
 
 ## 13. Compute and machine rules
 
-- **Freeze:** 400 seeds, ≈ 9–10 s per traced seed and < 1 s per untraceable one (≈ 1 h).
-- **Runs (after registration):** 40 clean × (2⁻¹⁴ + 2⁻¹⁶), plus 30 none and 20 mixed at 2⁻¹⁴: ≈ 5.5 h (page).
+- **Freeze:** done, 2,672 s (§12).
+- **Runs (after registration):** under the frozen plan, 37 clean × (2⁻¹⁴ + 2⁻¹⁶) plus 30 none and 14 mixed at 2⁻¹⁴.
+  That is ≈ 11 h at the pilot's rate (§12; page 7.2 h).
 - **Machine:** one process, nice 15, one thread; memory gate and disk check (§9); stop above 3 GB RSS; small files only.
 
 ## 14. Reproduce
