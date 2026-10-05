@@ -978,6 +978,18 @@ PRODUCERS = {
     "phase2b/runs.jsonl": ("phase2b", "run", "full", ""),
     "phase2b/scores.json": ("phase2b", "score", "full", ""),
     "phase2b_results.md": ("phase2b_report", "main", "full", ""),
+    # Phase 2A-PS (the fold prediction with a sample per seed; design approved 2026-10-05): src/phase2a_ps.py
+    "phase2a_ps/seed_scan.json": ("phase2a_ps", "scan", "full", ""),
+    "phase2a_ps/pilot_parts.jsonl": ("phase2a_ps", "_freeze_seeds", "full", ""),
+    "phase2a_ps/pilot.json": ("phase2a_ps", "pilot", "full", ""),
+    "phase2a_ps/frozen_parts.jsonl": ("phase2a_ps", "_freeze_seeds", "full", ""),
+    "phase2a_ps/frozen.json": ("phase2a_ps", "summary", "full", ""),
+    "phase2a_ps/registration.sha256": ("phase2a_ps", "manifest", "full", ""),
+    "phase2a_ps/registration_stamp.txt": ("phase2a_ps", "stamp", "full", ""),
+    "phase2a_ps/runs.jsonl": ("phase2a_ps", "run", "full", ""),
+    "phase2a_ps/forecasts.sha256": ("phase2a_ps", "finalize", "full", ""),
+    "phase2a_ps/observed.jsonl": ("phase2a_ps", "observe", "full", ""),
+    "phase2a_ps/scores.json": ("phase2a_ps", "score", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
