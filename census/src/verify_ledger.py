@@ -607,6 +607,7 @@ def main() -> None:
     phase1a_checks()
     phase1c_checks()
     phase2a_checks()
+    phase2a_posthoc_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -955,6 +956,9 @@ PRODUCERS = {
     "phase2a/observed.jsonl": ("phase2a", "observe", "full", ""),
     "phase2a/scores.json": ("phase2a", "score", "full", ""),
     "phase2a_results.md": ("phase2a_report", "main", "full", ""),
+    # Phase 2A POST HOC (delay law with one correction term; no registered verdict changes): src/phase2a_posthoc.py
+    "phase2a_posthoc.json": ("phase2a_posthoc", "main", "full", ""),
+    "phase2a_posthoc.md": ("phase2a_posthoc", "main", "full", ""),
     # Phase 1B (POST HOC causal re-scoring of the registered tests; no registered verdict changes): src/phase1b.py
     "phase1b/runs_track_a.jsonl": ("phase1b", "run", "full", ""),
     "phase1b/runs_track2a.jsonl": ("phase1b", "run", "full", ""),
@@ -3275,6 +3279,44 @@ def phase2a_checks() -> None:
         for k, v in verdicts.items():
             chk(f"P2A {k} {v}", float(S["verdicts"][k] == v), 1.0, 0)
         chk("P2A validity", float(S["validity"]["ok"] == valid), 1.0, 0)
+
+
+
+P2A_POSTHOC_PIN = (0.991989, 0.803047, 0.693154)   # (A/Ω₀, C, local exponent at 2⁻¹⁸), theory-backed fit on ε̂_F, 27 rates
+
+
+def phase2a_posthoc_checks() -> None:
+    """Phase 2A POST HOC (not registered; no registered verdict changes): phase2a_posthoc.json regenerates from the
+    committed Phase 2A rows; the page regenerates from it and carries the POST HOC header; 27 rates (22 scored, 5
+    pre-observed); the theory-backed fit r = A ε^{2/3} + C ε ln(1/ε) on ε̂_F reproduces the committed relative
+    residuals; the local exponent at the slowest rate lies above 2/3; headline numbers pinned."""
+    from . import phase2a_posthoc as P2H
+    if not P2H.OUT_JSON.exists():
+        return
+    import numpy as _np
+    print("Phase 2A POST HOC: the delay law with one correction term")
+    J = json.loads(P2H.OUT_JSON.read_text())
+    chk("P2A-PH phase2a_posthoc.json regenerates from the committed rows",
+        float(J == json.loads(json.dumps(P2H.build()))), 1.0, 0)
+    md = P2H.OUT_MD.read_text()
+    chk("P2A-PH phase2a_posthoc.md regenerates from the JSON", float(md == P2H.render_md(J)), 1.0, 0)
+    chk("P2A-PH page carries the POST HOC header", float(md.startswith("# Phase 2A POST HOC") and "**POST HOC.**" in md),
+        1.0, 0)
+    rows = J["rows"]
+    chk("P2A-PH rates", float(len(rows)), 27.0, 0)
+    chk("P2A-PH scored rates", float(sum(x["status"] == "scored" for x in rows)), 22.0, 0)
+    chk("P2A-PH pre-observed rates", float(sum(x["status"] == "pre-observed" for x in rows)), 5.0, 0)
+    ks = J["fits_by_eps_source"]["eps_fc"]["fits"]["KS_eps_ln_free_A"]
+    eps = _np.array([x["eps_fc"] for x in rows]); r = _np.array([x["r_obs"] for x in rows])
+    res = P2H.model_value(ks["coef"], eps) / r - 1
+    chk("P2A-PH theory-backed fit residuals reproduce (max abs diff)",
+        float(_np.max(_np.abs(res - _np.array([ks["rel_resid"][f"{x['log2rho']:g}"] for x in rows])))), 0.0, 1e-12)
+    chk("P2A-PH local exponent at 2^-18 above 2/3", float(ks["local_slope_at_slowest"]["2^-18"] > 2 / 3), 1.0, 0)
+    if P2A_POSTHOC_PIN is not None:
+        a_, c_, s_ = P2A_POSTHOC_PIN
+        chk("P2A-PH A/Omega0 (eps_fc, 27 rates)", ks["A_over_Omega0"], a_, 1e-6)
+        chk("P2A-PH C (eps_fc, 27 rates)", ks["coef"]["eL"], c_, 1e-6)
+        chk("P2A-PH local exponent at 2^-18 (eps_fc)", ks["local_slope_at_slowest"]["2^-18"], s_, 1e-6)
 
 
 P1B_PIN = {   # {arm: (registered scored, scored at f, misses at f, POST HOC criteria outcome, registered outcome)}
