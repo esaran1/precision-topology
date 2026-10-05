@@ -1,0 +1,4 @@
+Phase 2A-PS registration
+registration commit: c819290471bc9f1b68b9abb926f2a57705ce8252
+sha256 results/phase2a_ps_registration.md: 78a808fc9dbfe167f1d8f5bf11b95b0b27c435b3e249e82abed0f0519d49d943
+sha256 results/phase2a_ps/registration.sha256: b5dbd250c3f0fae3a80062062e6962d99d2e3ed0e14d0f4f3e383c84a5f7b668
