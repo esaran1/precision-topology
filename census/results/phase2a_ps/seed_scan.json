@@ -1,0 +1,53 @@
+{
+ "ranges": {
+  "registered": [
+   2975000,
+   2975399,
+   400
+  ],
+  "pilot": [
+   2976000,
+   2976059,
+   60
+  ]
+ },
+ "dirs": [
+  "src",
+  "tests",
+  "results",
+  "paper",
+  "notes",
+  "independent",
+  "data",
+  "dist"
+ ],
+ "patterns": {
+  "registered": "(^|[^0-9.])2975[0-3][0-9][0-9]([^0-9]|$)|(^|[^0-9])2_975_[0-3][0-9][0-9]([^0-9]|$)|(^|[^0-9.,])2,975,[0-3][0-9][0-9]([^0-9,]|$)",
+  "pilot": "(^|[^0-9.])29760[0-5][0-9]([^0-9]|$)|(^|[^0-9])2_976_0[0-5][0-9]([^0-9]|$)|(^|[^0-9.,])2,976,0[0-5][0-9]([^0-9,]|$)"
+ },
+ "pattern_files": {
+  "registered": [],
+  "pilot": []
+ },
+ "registered_seed_overlap": {
+  "track_a.SEEDS": [],
+  "track2a.SEEDS": [],
+  "track2b.SEEDS": [],
+  "track2c.SEEDS": [],
+  "gelu_transfer.PILOT_SEEDS": [],
+  "gelu_transfer.SEEDS": [],
+  "width2_asym.PILOT_SEEDS": [],
+  "width2_asym.SEEDS": [],
+  "width2_asym.SEEDS_T": [],
+  "width2_asym.SEEDS_TP": [],
+  "phase1a_pilot.SEEDS": [],
+  "phase1c.SEEDS": [],
+  "phase2a.PILOT_SEEDS": [],
+  "phase2a.SEEDS": [],
+  "phase2b.SEEDS": [],
+  "simplicity_bias_v2.SEEDS": [],
+  "simplicity_bias_v3.SEEDS": []
+ },
+ "exploration_seeds_disjoint": true,
+ "unused": true
+}
