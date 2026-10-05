@@ -14,3 +14,11 @@
 Descriptive context (same file): with P at t_c − 1, Track A Adam passes C1–C4 at both f; Track A SGD passes at
 f = 0.95. The slow, branch-tracking settings (GELU-T both arms, W2-A T and T′) pass as causal forecasts, and Phase 1C
 (registration 6433edc) replicated them prospectively.
+
+## From Phase 2B (registered; registration 9239902, results 938ddd7)
+
+3. **Arm 2b's R_ℓ-acc pass is narrow** (author-requested note, 2026-10-05). Arm 2b (output weights and bias ÷16) was
+   registered with an EXPECTED FAIL on shifted-test accuracy at matched loss (power 0.18 from exploration). It passed,
+   but narrowly: the smallest lower end of the 95% interval was +0.0038 (BCE = 0.1, reversed accuracy). Report it as a
+   narrow pass against a registered expectation of failure, not as a robust effect. The primary arm (output weights
+   only) passed R_ℓ-acc with a smallest lower end of +0.031.
