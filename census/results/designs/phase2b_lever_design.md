@@ -1,7 +1,7 @@
-Draft, revised with the author's decisions of 2026-10-02 (first draft dbb7cdb). **Not a registration**: no registered
-or pilot seed drawn, no pilot run. **2B registers only after Phase 2A's result, with its OpenTimestamps proof before any
-run.** Inputs: exploration e7c53fa, 68bdf76, a8f88c9, bbf5406 and `phase2b_explore/README_lever.md` (seeds
-2,953,000–2,953,019; never registered). ‡ = set from exploratory data.
+Approved by the author 2026-10-02 (decisions 1–10 below; 5657286, fb7b41a); registered after Phase 2A's result
+(569b836/7b15d9f: PASS). It registers with `results/phase2b_registration.md`; its OpenTimestamps proof comes before any
+registered run. No registered or pilot seed drawn, no pilot run. Inputs: exploration e7c53fa, 68bdf76, a8f88c9, bbf5406
+and `phase2b_explore/README_lever.md` (seeds 2,953,000–2,953,019; never registered). ‡ = set from exploratory data.
 
 # Design 2B: the lever (output learning rate) on the simplicity-bias benchmark
 
@@ -93,4 +93,4 @@ One worker, nice 15, one thread, < 0.5 GB, with a memory gate before each job.
 
 10. Arm 2b keeps R_ℓ-acc as a registered criterion (author, 2026-10-02): its expected failure (power 0.18) is informative.
 
-**Still open.** None on this page. 2B registers only after Phase 2A's result.
+**Still open.** None on this page. Phase 2A's result is in (569b836/7b15d9f), so 2B may register.
