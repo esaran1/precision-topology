@@ -116,6 +116,9 @@ POP_KAPPA_SIGN_PAGE = {"Q": 1, "S": -1, "T4": 1}        # the page: Q κ₀ +0.0
 
 # numerics (W2-A's)
 HOLD_LR, W_MIN, W_RELAX = 1.0, 4000, 25.0
+# PROPOSED (pending the author; touches T4's gate): T4's random hold uses W ≥ 8000, the exploration's hold length on
+# which the page's T4 gate power rests (53/400 at 8000 vs 46/400 at W2-A's 4000 on exploration seeds 7,410,000-019)
+W_FLOOR = {"Q": W_MIN, "S": W_MIN, "T4": 8000}
 NEWTON_GTOL, NEWTON_ITER_TOL, ON_TOL, STATE_TOL = 1e-8, 1e-12, 1e-6, 1e-3
 DUP_TOL = 1e-6
 FOLLOW_FRAC = 0.8
@@ -869,11 +872,12 @@ def _land():
 
 
 # ------------------------------------------------------------------------------------------ rules (pure functions)
-def w_hold(lam):
-    """W2-A's hold length: max(4000, ⌈25/(1.0·λ_min)⌉), λ_min of the full H_zz at the own copy; None for λ ≤ 0."""
+def w_hold(lam, floor=W_MIN):
+    """W2-A's hold length: max(floor, ⌈25/(1.0·λ_min)⌉), λ_min of the full H_zz at the own copy; None for λ ≤ 0.
+    floor = W_FLOOR[arm] (4000, W2-A's; T4 8000, PROPOSED)."""
     if lam is None or not np.isfinite(lam) or lam <= 0:
         return None
-    return int(max(W_MIN, math.ceil(W_RELAX / (HOLD_LR * lam))))
+    return int(max(floor, math.ceil(W_RELAX / (HOLD_LR * lam))))
 
 
 def drive_steps(integral, rho, eta=ETA):
@@ -1885,7 +1889,8 @@ def freeze_seed(arm, seed, land, rho):
     for cc in (c,) + POINT_COPIES[arm]:
         rows[cc] = own_point(cc, land["copies"][cc]["z_s0"], v0, x, y)
         rows[cc]["full"] = False
-    W = rows[c]["W"] if rows[c]["point_ok"] and rows[c]["W"] is not None else W_MIN
+    lam_c = rows[c]["lam_min_s0"] if rows[c]["point_ok"] else None
+    W = w_hold(lam_c, W_FLOOR[arm]) or W_FLOOR[arm]
     z_rel, rel = release(arm, seed, rows, W, land, x, y)
     full = rows[c]["point_ok"] and (arm != T4 or rel["on_copy"])
     if full:
@@ -2103,13 +2108,13 @@ def pilot_eligible(fs):
     return True, "ok"
 
 
-def pilot_freeze(land):
+def pilot_freeze(land, arms=ARMS):
     """Pilot seeds frozen (no ρ yet; t* is recomputed per ρ): Q and S on 7,439,000-009 (branch-point starts); T4 on
     7,439,100 onward IN ORDER until 10 releases land on T4 (all drawn seeds counted)."""
     f = OUT / "pilot_frozen_parts.jsonl"
     done = {(r["arm"], r["seed"]): r for r in _rows(f)}
     out = {}
-    for arm in ARMS:
+    for arm in arms:
         rows = []
         n_on = 0
         for seed in PILOT_RANGES[arm]:
@@ -2131,18 +2136,18 @@ def pilot_freeze(land):
     return out
 
 
-def pilot():
+def pilot(arms=ARMS):
     """The pilot rules on pilot seeds only.  (1) ρ per arm: from the page's ρ, the on-copy pilot runs to t_sw (no gap
     of a state after release), q90 of V7's window max χ_t ≤ 0.1, else halve (≤ 3 halvings), else STOP.  (2) At the
     chosen ρ: the registered run_one and observe_one on the pilot runs -> τ_cross, τ_lag (1.5 × q90, rounded up to 5) and
     V6's pilot median χ at t_sw.  Resumable (pilot_parts.jsonl)."""
     _setup()
     land = _land()
-    fz = pilot_freeze(land)
+    fz = pilot_freeze(land, arms)
     parts = OUT / "pilot_parts.jsonl"
     done = {(r["kind"], r["arm"], r["seed"], r["rho"]): r for r in _rows(parts)}
     res = {}
-    for arm in ARMS:
+    for arm in arms:
         runs = {}
 
         def run_p(rho, arm=arm, runs=runs):
@@ -2201,13 +2206,15 @@ def pilot():
         else:
             entry.update(pilot_median_chi_tsw=None, tau=None)
         res[arm] = entry
+    prev = _pilot_rho() or {}
     out = {"label": "PHASE 3 pilot (pilot seeds only; no registered seed drawn)", "pilot_seeds_Q_S": list(PILOT_SEEDS),
-           "pilot_seeds_T4_range": [PILOT_SEEDS_T4[0], PILOT_SEEDS_T4[-1]], "arms": res}
+           "pilot_seeds_T4_range": [PILOT_SEEDS_T4[0], PILOT_SEEDS_T4[-1]],
+           "arms": {**prev.get("arms", {}), **res}}
     (OUT / "pilot.json").write_text(json.dumps(_jsonable(out), indent=1))
     print(json.dumps(_jsonable({a: {k: v for k, v in r.items() if k in ("rho", "rule", "tau", "pilot_median_chi_tsw",
                                                                          "n_on_copy", "n_pilot_seeds_drawn")}
                                 for a, r in res.items()}), indent=1))
-    stops = [a for a in ARMS if res[a]["rule"]["status"] != "ok" or not res[a].get("tau")
+    stops = [a for a in arms if res[a]["rule"]["status"] != "ok" or not res[a].get("tau")
              or res[a]["tau"].get("tau_cross") is None or res[a]["tau"].get("tau_lag") is None]
     if stops:
         raise SystemExit("STOP: the pilot sets no ρ or τ for " + ", ".join(stops))
@@ -2483,7 +2490,7 @@ def main(argv):
         _setup()
         landscape()
     elif cmd == "pilot":
-        pilot()
+        pilot(tuple(argv[2:]) or ARMS)
     elif cmd == "freeze":
         freeze(argv[2])
     elif cmd == "summary":
