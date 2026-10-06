@@ -1,12 +1,12 @@
 # Phase 3 registration: the lag law at width 4 on the asymmetric windows (arms Q, S, T4)
 
-**STATUS: NOT YET A REGISTRATION. STOPPED BEFORE THE REGISTRATION COMMIT for one decision of the author (§10, D1:
-T4's hold length, which touches T4's gate).** The text was committed before the pilot (747d61e). Done: the scan, the
-landscape, the Q and S pilot, the Q and S freeze and the author's budget condition (§13). Not done: the T4 pilot, the
-T4 freeze, the summary, the manifest.
-
-- **Not done:** no registered seed has been trained or observed. The Q and S seeds (7,430,000–119; 7,431,000–119) were
-  held and classified at the freeze (release information only, §4); no T4 seed (7,432,000–709) has been drawn.
+**REGISTERED.** This file, the approved page, `src/phase3_w4.py` and its import closure, `tests/test_phase3_w4.py`, and
+the frozen inputs (§12) are committed in one commit, with their SHA-256 hashes in `results/phase3/registration.sha256`.
+- **History:** the text was first committed before the pilot (747d61e). D1 (T4's hold length, §10) was decided by the
+  author on 2026-10-06 after the Q and S pilot and freeze and BEFORE any T4 pilot or registered T4 draw.
+- **Not done:** no registered seed has been trained or observed. Every registered seed was held and classified at the
+  freeze (release information only, §4); no gap or placement of any state after release has been evaluated for any
+  registered seed.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained
   (`results/phase3/registration_stamp.txt` and its `.ots`). `run` refuses to start without the proof file.
 
@@ -323,7 +323,9 @@ constants, no overlap; disjoint from the exploration).
   carries the error. With Q's lags of 41–213 steps (one −80), the no-lag forecast is often as close, so **C4 fails on
   the pilot**. This is the page's "Q's C4 risk", now seen on pilot seeds at the registered ρ. Every pilot run: the
   cutoff before the crossing, the NaN recomputation identical, the follow check passed.
-- T4: not piloted (D1).
+- **T4** (after D1; pilot seeds 7,439,100–146 drawn in order, 10 of 47 on T4; W = 8000): q90 window χ **0.044 at
+  2⁻¹⁰ → ρ = 2⁻¹⁰ kept**; τ_cross **15** (q90 \|e_cross\| 9.0), τ_lag **5** (q90 1.0); V6 median χ 0.0197. Disclosure
+  at the pilot's τ: C1–C4 PASS (C4 [−166.1, −148.9]); S (descriptive for T4) 0/10, all lags positive as κ₀ > 0.
 
 **Freeze, Q and S** (`frozen_parts.jsonl`; no training; 407 s and 389 s):
 
@@ -338,6 +340,34 @@ constants, no overlap; disjoint from the exploration).
   S 18,348–98,443.
 - W: Q 4000–27,324, S 4000–12,648 (W2-A's rule).
 
+**Freeze, T4** (710 seeds, no training; 4,636 s; W = 8000 for every seed, D1):
+- **On T4 at release: 95 of 710 → gate PASS (≥ 60).** All 95 at winding (0,0,0,0); all 95 copies valid; κ₀ 0.198–0.309
+  (none < 0); 0 over cap; t\* 10,650–23,067; B 18,976 / 26,543 / 32,360 / 37,601 (min / median / q90 / max).
+- G > 0 in the hold: 265 of 710 holds, 12 of the 95 on-T4 runs (scored and flagged; the T4 gate does not use it; the
+  descriptive sensitivity analysis excludes them).
+- The other 615 seeds are counted, not trained.
+
+**THE RANDOM-HOLD COLLAPSE (registered T4 random holds, the finding reported first; `frozen.json`):**
+
+| landing (Newton point at v₀ from the release) | holds |
+|---|---|
+| 31:+- (3+1, unplaced; 95 of them on the seed's own T4 point) | 281 |
+| 31:+- placed | 84 |
+| 4:+ (all four coincide: the width-1 function) | 105 |
+| 22:+- / 22:+- placed | 42 / 34 |
+| 22:-+ / 22:-+ placed | 11 / 27 |
+| 31:-+ / 31:-+ placed | 3 / 2 |
+| Newton not accepted | 121 |
+| **genuine four-unit (1111) unplaced** | **0** |
+| on the seed's own Q point / own S point | **0 / 0** |
+
+- All 589 accepted landings are coinciding-unit points (147 placed). **No random hold of 710 reached a genuine
+  four-unit branch, or the seed's own Q or S copy.**
+
+**frozen.json:** ρ Q 2⁻¹⁴, S 2⁻¹³, T4 2⁻¹⁰; τ (cross/lag) Q 125/5, S 50/5, T4 15/5; V6 pilot medians Q 0.0311,
+S 0.0449, T4 0.0197; the author's budget condition PASS; per-seed listing SHA-256
+`d3e2a745565f188c7bae97f3284a31cb14195a8982ad64dfbc03e40f9d166171`.
+
 ## 14. Compute and machine rules
 
 - The page's estimate: about 13 h of training and observation in jobs of at most 4 h (Q 6 h, S 2.5 h, T4 1.5 h), plus
@@ -347,6 +377,8 @@ constants, no overlap; disjoint from the exploration).
 - **Process note (a lapse, recorded):** before the S freeze the separate memory gate was CHAINED in the same background
   command as the job (after the Q freeze), not run as its own step. It passed (logged), and the freeze also gated
   before every seed inside the job.
+- **At the registration:** suite 1238 passed, exit 0; `test_verify_certificates` 33 passed, exit 0; ledger 0 findings
+  (memory gate as a separate logged step before).
 
 ## 15. Reproduce
 
