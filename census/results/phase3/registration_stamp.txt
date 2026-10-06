@@ -1,0 +1,4 @@
+Phase 3 registration
+registration commit: 7a9d7919ceb311d3e2b73135b08db7871ba5b78f
+sha256 results/phase3_registration.md: dd96a0c8942b7d525b6fed073be7904b9a6e8c91134173df488a10e081f270e7
+sha256 results/phase3/registration.sha256: 64ec1ff0f55af3845e25cd01a2a714a309ebe2e3cbb233dc2af239ee6b2f8d01
