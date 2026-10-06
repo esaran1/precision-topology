@@ -1,0 +1,16 @@
+2026-10-05 20:56:55 before p3_check0: free 31%; swap 1203.81M free; disk 27Gi avail -> OK
+2026-10-05 20:57:29 before p3_spop4 (K=2 sanity): free 32%; swap 991.25M free; disk 27Gi avail -> OK
+2026-10-05 20:57:38 before p3_spop4 (K=4 scan): free 30%; swap 985.06M free; disk 27Gi avail -> OK
+2026-10-05 20:59:11 before p3_spop4 (K=4 bisect): free 32%; swap 687.31M free; disk 27Gi avail -> OK
+2026-10-05 21:02:21 before p3_landscape pop (3 share vectors): free 38%; swap 616.56M free; disk 27Gi avail -> OK
+2026-10-05 21:07:31 before p3_unconv: free 35%; swap 904.56M free; disk 27Gi avail -> OK
+2026-10-05 21:09:14 before p3_landscape pop (wide box; s0 0.35): free 35%; swap 920.56M free; disk 27Gi avail -> OK
+2026-10-05 21:13:24 before p3_branches (box1 shares 0.1..0.4; box3 multi): free 32%; swap 649.75M free; disk 27Gi avail -> OK
+2026-10-05 21:24:48 before p3_branches (box3 multi, rerun after a print error): free 36%; swap 1485.44M free; disk 26Gi avail -> OK
+2026-10-05 21:25:36 before p3_own (seeds 7410000-7410019): free 38%; swap 1517.44M free; disk 26Gi avail -> OK
+2026-10-05 21:28:13 before p3_runs (Q pop): free 34%; swap 1538.75M free; disk 26Gi avail -> OK
+2026-10-05 21:28:32 before p3_runs (pop rho scan): free 33%; swap 1546.75M free; disk 26Gi avail -> OK
+2026-10-05 21:31:35 before p3_runs (exploration seeds 7410000-007, Q/S/T4): free 35%; swap 1489.25M free; disk 26Gi avail -> OK
+2026-10-05 21:39:20 before p3_own (seeds 7410020-059, branch-point only): free 38%; swap 647.75M free; disk 26Gi avail -> OK
+2026-10-05 21:43:33 before test suite (process 1 of 2): free 44%; swap 742.44M free; disk 25Gi avail -> OK
+2026-10-05 21:50:49 before test suite (process 2 of 2, test_verify_certificates): free 45%; swap 795.56M free; disk 25Gi avail -> OK

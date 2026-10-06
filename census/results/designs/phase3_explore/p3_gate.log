@@ -1,0 +1,21 @@
+T4 random hold, own samples 7,410,000-019 (20 x 20): 53/400 = 0.1325, Wilson 95% [0.1027, 0.1692]
+T4 random hold, population (box 1): 47/200 = 0.2350, Wilson 95% [0.1816, 0.2984]
+any T-type 31/22 unplaced, own samples: 179/400 = 0.4475, Wilson 95% [0.3995, 0.4965]
+Q branch-point start, own samples: 20/20 = 1.0000, Wilson 95% [0.8389, 1.0000]
+S branch-point start, own samples: 20/20 = 1.0000, Wilson 95% [0.8389, 1.0000]
+Q random hold, own samples: 0/400 = 0.0000, Wilson 95% [0.0000, 0.0095]
+Q random hold, population (box 3): 1/150 = 0.0067, Wilson 95% [0.0012, 0.0368]
+T4 gate >= 60 of N=400: P at low 0.1027 = 0.0020; at 0.1325 = 0.1684
+T4 gate >= 60 of N=500: P at low 0.1027 = 0.1171; at 0.1325 = 0.8125
+T4 gate >= 60 of N=600: P at low 0.1027 = 0.6073; at 0.1325 = 0.9936
+T4 gate >= 60 of N=700: P at low 0.1027 = 0.9420; at 0.1325 = 1.0000
+T4 gate >= 60 of N=800: P at low 0.1027 = 0.9970; at 0.1325 = 1.0000
+T4: smallest N (step 10) with P(>= 60) >= 0.95 at the Wilson low: 710
+T4: smallest N (step 10) with P(>= 40) >= 0.95 at the Wilson low: 490
+T-type set gate >= 60 of 200: P at low 0.3995 = 0.99862
+branch-point gate >= 108/120 at p = 0.8389: P = 0.0390
+branch-point gate >= 108/120 at p = 0.9500: P = 0.9928
+branch-point gate >= 108/120 at p = 0.9900: P = 1.0000
+-- added after the 40 extra branch-point seeds (7,410,020-059) --
+Q branch-point on copy, 60 own samples: 57/60, Wilson low 0.8630; P(>=108/120) at low 0.1466, at point 0.9928; P(>=96/120) at low 0.9797; P(>=60 of 120) at low 1.000000
+S branch-point on copy, 60 own samples: 59/60, Wilson low 0.9114; P(>=108/120) at low 0.7357, at point 1.0000; P(>=96/120) at low 1.0000; P(>=60 of 120) at low 1.000000

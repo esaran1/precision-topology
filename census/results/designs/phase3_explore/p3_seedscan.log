@@ -1,0 +1,8 @@
+{
+ "pattern_files": {
+  "7410": []
+ },
+ "registered_overlap": {}
+}
+UNUSED
+parquet check (14 files, *seed* columns): no value in 7,410,000-7,410,099

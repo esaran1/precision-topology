@@ -1,0 +1,4 @@
+2026-10-05 20:57:29 before p3_spop4 (K=2 sanity): free 32%; swap 991.25M free; disk 27Gi avail -> OK
+s=0.4 [0.4 s] status unplaced loss 0.5012060834 gmax 1.0e-09 type 11:+- shares [0.683, 0.317] G [-0.04654,-0.04654] hits 26/60 | next: 2.99e-03 11:+- G -0.102; 8.54e-03 11:+- G -0.254; 1.61e-02 11:+- G -0.442 
+s=0.5 [0.8 s] status placed loss 0.4634651218 gmax 1.3e-09 type 11:+- shares [0.357, 0.643] G [0.07462,0.07462] hits 25/60 | next: 1.29e-02 11:-+ G 0.0547; 1.72e-02 11:+- G -0.22; 2.27e-02 11:+- G -0.294 
+peak RSS GB 0.241

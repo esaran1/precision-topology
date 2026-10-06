@@ -1,0 +1,12 @@
+2026-10-05 20:56:55 before p3_check0: free 31%; swap 1203.81M free; disk 27Gi avail -> OK
+memory gate: see log header
+K=4 grad err 1.30262078901211e-10 hess err 4.148774240819719e-10
+T newton True lam(s0) 0.009709136502239969 type 11:+-
+T switch switch 0.48158619450836937 kappa0 0.048594056091296564 a [-0.13902428380039927, -0.1266229079724884] lam 0.05760260547348392 0.4 s
+D newton True type 2:+ groups ((0, 1),)
+D switch switch 5.0796369155737136 kappa0 7.674147984882236 a [-7.491828792828112, -7.491828792828112] lam 0.12813641477549248 split 0.15739597029791727 0.3 s
+grad 48 us
+hess 103 us
+gap_dense 50 us
+gap_enc 1719 us
+peak RSS GB 0.24

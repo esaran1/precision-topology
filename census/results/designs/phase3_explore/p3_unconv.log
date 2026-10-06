@@ -1,0 +1,32 @@
+2026-10-05 21:07:31 before p3_unconv: free 35%; swap 904.56M free; disk 27Gi avail -> OK
+3.0 0 False None None grad 1.1e-06 lam -8.22e-06 min|a| 0.005 groups ((0,), (1,), (2, 3)) G -0.482
+6.0 11 False None None grad 1.6e-06 lam -9.20e-06 min|a| 0.004 groups ((0,), (1,), (2, 3)) G -0.482
+8.9 12 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+11.9 17 False None None grad 1.6e-06 lam -1.92e-05 min|a| 0.008 groups ((0,), (1,), (2, 3)) G -0.483
+14.8 19 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+17.8 30 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+20.8 34 False None None grad 4.9e-07 lam -9.12e-07 min|a| 0.004 groups ((0, 1, 3), (2,)) G -0.480
+23.7 37 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+26.7 43 False None None grad 8.2e-07 lam -2.22e-06 min|a| 0.005 groups ((0, 1, 3), (2,)) G -0.481
+29.7 54 False None None grad 3.6e-07 lam -7.90e-07 min|a| 0.004 groups ((0,), (1,), (2, 3)) G -0.480
+32.7 61 False None None grad 4.0e-07 lam -6.59e-07 min|a| 0.003 groups ((0, 1, 3), (2,)) G -0.480
+35.7 62 False None None grad 1.0e-06 lam -3.32e-06 min|a| 0.006 groups ((0, 1, 3), (2,)) G -0.481
+38.7 72 True 31:+- False grad 1.1e-16 lam 9.71e-03 min|a| 1.671 groups ((0,), (1, 2, 3)) G -0.457
+41.6 84 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+44.7 85 False None None grad 6.0e-04 lam -8.66e-03 min|a| 0.148 groups ((0, 1, 3), (2,)) G -0.535
+47.7 89 False None None grad 4.7e-07 lam -1.23e-06 min|a| 0.003 groups ((0,), (1,), (2, 3)) G -0.480
+50.7 95 False None None grad 5.5e-07 lam -2.70e-06 min|a| 0.004 groups ((0,), (1,), (2, 3)) G -0.481
+53.6 109 True 4:+ False grad 1.1e-16 lam 9.59e-03 min|a| 1.642 groups ((0, 1, 2, 3),) G -0.634
+56.6 110 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+59.6 113 False None None grad 4.3e-07 lam -7.48e-07 min|a| 0.003 groups ((0, 1, 3), (2,)) G -0.480
+62.6 140 False None None grad 5.3e-07 lam -1.05e-06 min|a| 0.004 groups ((0, 1, 3), (2,)) G -0.480
+65.6 151 True 31:+- False grad 1.1e-16 lam 9.75e-03 min|a| 1.668 groups ((0, 2, 3), (1,)) G -0.276
+68.6 164 False None None grad 8.6e-07 lam -3.30e-06 min|a| 0.003 groups ((0,), (1,), (2, 3)) G -0.481
+71.6 168 False None None grad 1.8e-06 lam -1.07e-05 min|a| 0.003 groups ((0,), (1,), (2, 3)) G -0.482
+74.8 173 False None None grad 4.3e-07 lam -7.52e-07 min|a| 0.003 groups ((0, 1, 3), (2,)) G -0.480
+77.8 183 False None None grad 5.4e-07 lam -1.08e-06 min|a| 0.004 groups ((0, 1, 3), (2,)) G -0.480
+80.7 186 True 31:+- False grad 1.1e-16 lam 9.71e-03 min|a| 1.671 groups ((0,), (1, 2, 3)) G -0.457
+83.7 191 False None None grad 3.3e-07 lam -7.04e-07 min|a| 0.003 groups ((0,), (1,), (2, 3)) G -0.480
+86.7 192 False None None grad 5.7e-07 lam -1.84e-06 min|a| 0.005 groups ((0,), (1,), (2, 3)) G -0.481
+89.7 199 False None None grad 1.3e-06 lam -4.92e-06 min|a| 0.007 groups ((0, 1, 3), (2,)) G -0.482
+accepted after the long hold: 10 of 30

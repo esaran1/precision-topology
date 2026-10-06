@@ -1,0 +1,13 @@
+Q rho 2^-13: n 8; lag_obs [47, 19, -61, -192, 213, 40, 90, 36]; |err_cross| q90 33.0 -> tau_cross 50; |err_lag| q90 1.9 -> tau_lag 5; median r_obs/r_fc 1.001; q90 window max chi 0.108; t_obs 25301-90325; t_obs - t_c median 5480; time/run median 30.8 s; |lag_fc| >= 6: 8/8; sign agree 8/8; closer than no-lag 5/8
+S rho 2^-12: n 8; lag_obs [-12, -33, -49, -63, -69, -66, -9, -27]; |err_cross| q90 17.0 -> tau_cross 30; |err_lag| q90 1.0 -> tau_lag 5; median r_obs/r_fc 1.008; q90 window max chi 0.133; t_obs 9857-31573; t_obs - t_c median 2092; time/run median 11.6 s; |lag_fc| >= 6: 8/8; sign agree 8/8; closer than no-lag 8/8
+T4 rho 2^-10: n 8; lag_obs [170, 148, 124, 109, 180, 153, 168, 150]; |err_cross| q90 7.6 -> tau_cross 15; |err_lag| q90 1.0 -> tau_lag 5; median r_obs/r_fc 1.004; q90 window max chi 0.075; t_obs 7915-21117; t_obs - t_c median 1134; time/run median 8.8 s; |lag_fc| >= 6: 8/8; sign agree 8/8; closer than no-lag 8/8
+p3_own_7410000_20.json Q: valid+switch 20/20; kappa0 < 0 2; kappa/lam median 1.17 [-4.12, 5.02]; |kappa/(0.03 lam)| < 6: 0; s_switch [0.332, 0.743]; lam_s0 min 3.67e-04; branch-point on copy 20/20; hold G>0 0; max W 68064
+p3_own_7410000_20.json S: valid+switch 20/20; kappa0 < 0 19; kappa/lam median -0.90 [-2.21, 0.09]; |kappa/(0.03 lam)| < 6: 2; s_switch [0.324, 0.674]; lam_s0 min 6.73e-03; branch-point on copy 20/20; hold G>0 0; max W 4000
+p3_own_7410000_20.json T4: valid+switch 20/20; kappa0 < 0 0; kappa/lam median 4.91 [3.23, 5.93]; |kappa/(0.03 lam)| < 6: 0; s_switch [0.534, 1.005]; lam_s0 min 9.37e-03
+p3_own_7410020_40.json Q: valid+switch 37/40; kappa0 < 0 5; kappa/lam median 2.00 [-2.98, 6.97]; |kappa/(0.03 lam)| < 6: 2; s_switch [0.311, 0.802]; lam_s0 min 4.33e-04; branch-point on copy 37/40; hold G>0 0; max W 57682
+p3_own_7410020_40.json S: valid+switch 39/40; kappa0 < 0 38; kappa/lam median -1.20 [-4.39, 6.14]; |kappa/(0.03 lam)| < 6: 2; s_switch [0.308, 0.724]; lam_s0 min 3.23e-03; branch-point on copy 39/40; hold G>0 0; max W 7737
+p3_own_7410020_40.json T4: valid+switch 40/40; kappa0 < 0 0; kappa/lam median 4.72 [3.51, 5.91]; |kappa/(0.03 lam)| < 6: 0; s_switch [0.545, 1.006]; lam_s0 min 9.19e-03
+-- C4 illustration (exploration seeds; D = |t_fc - t_obs| - |t_sw,fc - t_obs|, mean and paired bootstrap 95% interval, 10,000 resamples, default_rng(0)) --
+Q D [-4, 20, -60, -192, -169, 7, -42, 2] mean -54.8 CI [-112.6, -5.6] t_sw_fc - t_sw [21, 26, 29, 40, 20, 23, 24, 19]
+S D [-12, -33, -49, -63, -69, -66, -8, -26] mean -40.8 CI [-56.8, -24.8] t_sw_fc - t_sw [14, 14, 12, 13, 17, 15, 16, 14]
+T4 D [-159, -139, -118, -102, -167, -144, -151, -141] mean -140.1 CI [-153.0, -125.5] t_sw_fc - t_sw [5, 4, 3, 3, 6, 4, 8, 4]
