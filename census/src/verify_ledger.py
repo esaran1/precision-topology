@@ -609,6 +609,7 @@ def main() -> None:
     phase2a_checks()
     phase2a_posthoc_checks()
     phase2b_checks()
+    phase2a_ps_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -990,6 +991,7 @@ PRODUCERS = {
     "phase2a_ps/forecasts.sha256": ("phase2a_ps", "finalize", "full", ""),
     "phase2a_ps/observed.jsonl": ("phase2a_ps", "observe", "full", ""),
     "phase2a_ps/scores.json": ("phase2a_ps", "score", "full", ""),
+    "phase2a_ps_results.md": ("phase2a_ps_report", "main", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3387,6 +3389,60 @@ def phase2b_checks() -> None:
             for k, v in vs.items():
                 chk(f"P2B arm {a} {k} {v}", float(S["verdicts"][a][k] == v), 1.0, 0)
         chk("P2B non-finite runs", float(len(S["nonfinite_runs"])), float(n_nonfinite), 0)
+
+
+P2APS_PIN = ("UNRESOLVED (validity)",
+             {"F": "PASS", "H": "FAIL", "E_seed": "PASS", "C3": "FAIL", "C4": "FAIL", "P": "PASS"},
+             {"C1": "FAIL", "C2": "FAIL"}, False, 130)   # (outcome, verdicts, secondary, validity ok, runs)
+
+
+def phase2a_ps_checks() -> None:
+    """Phase 2A-PS (registration c819290, stamp 9a10df4, OpenTimestamps a2065bf): the registration and forecast asserts;
+    every planned run exactly once in runs.jsonl and observed.jsonl; every forecast read only rows < t_c and its NaN
+    recomputation was identical; every observed t_c state matched its hash; scores.json regenerates from the committed
+    rows with the registered scoring code (phase2a_ps_report.score_result); phase2a_ps_results.md regenerates from
+    scores.json; the freeze counts and the class-listing hash; verdicts pinned."""
+    from . import phase2a_ps as PS
+    from . import phase2a_ps_report as PSR
+    if not (PS.OUT / "scores.json").exists():
+        return
+    print("Phase 2A-PS: the fold prediction with a sample per seed")
+    PS.assert_registration()
+    PS._assert_forecasts()
+    fr, rows = PS._frozen()
+    chk("P2A-PS class listing hash", float(fr["class_listing_sha256"] ==
+                                           "cb7509a7d59c37fc48af66c9b4e4d3a6344e9a29bc7b99f5701c43a9273b3b04"), 1.0, 0)
+    chk("P2A-PS stored evaluations = the registered rules",
+        float(all(PS.evaluate(r) == r["evaluation"] for r in rows)), 1.0, 0)
+    c = fr["counts"]
+    chk("P2A-PS untraceable seeds", float(c["n_untraceable"]), 142.0, 0)
+    chk("P2A-PS scoreable seeds", float(c["n_scoreable"]), 173.0, 0)
+    chk("P2A-PS clean scoreable (gate >= 24)", float(c["scoreable_by_class"]["clean"]), 74.0, 0)
+    runs = PS._rows(PS.OUT / "runs.jsonl")
+    obs = PS._rows(PS.OUT / "observed.jsonl")
+    plan = sorted((p["seed"], float(p["log2rho"])) for p in fr["plan"])
+    chk("P2A-PS runs = the frozen plan", float(sorted((r["seed"], r["log2rho"]) for r in runs) == plan), 1.0, 0)
+    chk("P2A-PS observations = the frozen plan", float(sorted((o["seed"], o["log2rho"]) for o in obs) == plan), 1.0, 0)
+    fcs = [r[k] for r in runs if r["t_c"] is not None for k in ("forecast", "forecast_fixed")]
+    chk("P2A-PS forecasts reading a row >= t_c",
+        float(sum(int(f["max_index_read"] >= f["t_c"]) for f in fcs)), 0.0, 0)
+    chk("P2A-PS NaN recomputations differing",
+        float(sum(int(r["nan_recompute_identical"] is False) for r in runs)), 0.0, 0)
+    chk("P2A-PS observed t_c states not matching the hash",
+        float(sum(int(o["state_tc_hash_ok"] is False) for o in obs)), 0.0, 0)
+    S = json.loads((PS.OUT / "scores.json").read_text())
+    chk("P2A-PS scores.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(PS._jsonable(PSR.score_result())))), 1.0, 0)
+    chk("P2A-PS phase2a_ps_results.md regenerates from scores.json",
+        float((R / "phase2a_ps_results.md").read_text() == PSR.render_md(S)), 1.0, 0)
+    if P2APS_PIN is not None:
+        outc, verdicts, sec, valid_ok, n_runs = P2APS_PIN
+        chk(f"P2A-PS outcome {outc}", float(S["outcome"] == outc), 1.0, 0)
+        for k, v in {**verdicts, **sec}.items():
+            got = S["verdicts"].get(k, S["secondary_verdicts"].get(k))
+            chk(f"P2A-PS {k} {v}", float(got == v), 1.0, 0)
+        chk("P2A-PS validity ok", float(S["validity"]["ok"] is valid_ok), 1.0, 0)
+        chk("P2A-PS runs", float(len(runs)), float(n_runs), 0)
 
 
 def phase1b_checks() -> None:
