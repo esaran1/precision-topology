@@ -54,3 +54,15 @@ Total compute was about 45 min (20:56–21:41, 2026-10-05).
 
 **Labels.** Q = population class 49 of `p3_land_pop_box3.json`, S = class 39 of the same file, and T4 = class 2 of
 `p3_land_pop_0.1_0.2_0.3_0.4.json`.
+
+**Added after the author's decisions (2026-10-06)**
+- `p3_budget.py`/`.log`/`.json`: the step-budget rule's input. t\* = (1/ρη)·∫ ds/D(s) along the frozen adiabatic
+  reference, with D = −sign(v)·∇_vL(z\*(v), v). Over the 32 exploratory runs the observed crossing step is 0.998–1.015
+  times t\* (median 1.0025). Population and seeds 7,410,000–007 only.
+- `p3_activity.py`: the Phase 3 activity test, active iff |v_i| ≥ θ·s with θ = 1e−8. It was introduced after the 2A-PS
+  post hoc diagnosis (2f0fb33) and applies to Phase 3 only.
+  - `test_p3_activity.py` holds constructed cases: the 2A-PS 1.2e−93 unit is inactive, genuine small units are
+    active, the threshold is inclusive and relative, and it changes â and the first-step Δs (0.1028 → 9.408e−6 at
+    2⁻¹⁴).
+  - `test_p3_activity.log`: 8 passed, exit 0. A first run failed 1 case because of float rounding in the test's own
+    construction (an inexact θ·s). That case was rewritten in exact dyadic arithmetic; the rule itself is unchanged.

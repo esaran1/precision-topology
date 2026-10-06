@@ -1,0 +1,4 @@
+2026-10-05 22:27:46 before test_p3_activity (rerun after fixing a float-rounding test construction): free 41%; swap 967.75M free; disk 26Gi avail -> OK
+........                                                                 [100%]
+8 passed in 0.06s
+exit 0

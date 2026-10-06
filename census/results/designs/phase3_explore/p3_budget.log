@@ -1,0 +1,35 @@
+2026-10-05 22:26:48 before p3_budget: free 43%; swap 1671.25M free; disk 25Gi avail -> OK
+1.7 {"copy": "Q", "sample": "pop", "rho": 0.001, "t_star": 8156.9935, "t_sw": 8029, "t_obs": 8203, "ratio_tsw": 0.9843, "ratio_tobs": 1.0056}
+1.7 {"copy": "Q", "sample": "pop", "rho": 0.0002, "t_star": 32627.9741, "t_sw": 32450, "t_obs": 32612, "ratio_tsw": 0.9945, "ratio_tobs": 0.9995}
+1.7 {"copy": "Q", "sample": "pop", "rho": 0.0001, "t_star": 65255.9482, "t_sw": 65083, "t_obs": 65216, "ratio_tsw": 0.9973, "ratio_tobs": 0.9994}
+2.4 {"copy": "S", "sample": "pop", "rho": 0.001, "t_star": 5239.7459, "t_sw": 5327, "t_obs": 5290, "ratio_tsw": 1.0167, "ratio_tobs": 1.0096}
+2.4 {"copy": "S", "sample": "pop", "rho": 0.0002, "t_star": 20958.9836, "t_sw": 21049, "t_obs": 21011, "ratio_tsw": 1.0043, "ratio_tobs": 1.0025}
+2.4 {"copy": "S", "sample": "pop", "rho": 0.0001, "t_star": 41917.9672, "t_sw": 42008, "t_obs": 41970, "ratio_tsw": 1.0021, "ratio_tobs": 1.0012}
+3.6 {"copy": "T4", "sample": "pop", "rho": 0.001, "t_star": 14436.9441, "t_sw": 14458, "t_obs": 14617, "ratio_tsw": 1.0015, "ratio_tobs": 1.0125}
+3.6 {"copy": "T4", "sample": "pop", "rho": 0.0002, "t_star": 57747.7765, "t_sw": 57770, "t_obs": 57929, "ratio_tsw": 1.0004, "ratio_tobs": 1.0031}
+4.3 {"copy": "Q", "sample": "7410000", "rho": 0.0001, "t_star": 89793.3801, "t_sw": 89714, "t_obs": 89761, "ratio_tsw": 0.9991, "ratio_tobs": 0.9996}
+4.9 {"copy": "S", "sample": "7410000", "rho": 0.0002, "t_star": 27534.8042, "t_sw": 27627, "t_obs": 27615, "ratio_tsw": 1.0033, "ratio_tobs": 1.0029}
+5.8 {"copy": "T4", "sample": "7410000", "rho": 0.001, "t_star": 15584.4168, "t_sw": 15624, "t_obs": 15794, "ratio_tsw": 1.0025, "ratio_tobs": 1.0134}
+6.3 {"copy": "Q", "sample": "7410001", "rho": 0.0001, "t_star": 37630.4135, "t_sw": 37665, "t_obs": 37684, "ratio_tsw": 1.0009, "ratio_tobs": 1.0014}
+6.7 {"copy": "S", "sample": "7410001", "rho": 0.0002, "t_star": 13766.6974, "t_sw": 13840, "t_obs": 13807, "ratio_tsw": 1.0053, "ratio_tobs": 1.0029}
+7.5 {"copy": "T4", "sample": "7410001", "rho": 0.001, "t_star": 11089.8052, "t_sw": 11093, "t_obs": 11241, "ratio_tsw": 1.0003, "ratio_tobs": 1.0136}
+7.8 {"copy": "Q", "sample": "7410002", "rho": 0.0001, "t_star": 26731.1758, "t_sw": 26800, "t_obs": 26739, "ratio_tsw": 1.0026, "ratio_tobs": 1.0003}
+8.2 {"copy": "S", "sample": "7410002", "rho": 0.0002, "t_star": 9881.4773, "t_sw": 9933, "t_obs": 9884, "ratio_tsw": 1.0052, "ratio_tobs": 1.0003}
+8.9 {"copy": "T4", "sample": "7410002", "rho": 0.001, "t_star": 8436.4098, "t_sw": 8433, "t_obs": 8557, "ratio_tsw": 0.9996, "ratio_tobs": 1.0143}
+9.2 {"copy": "Q", "sample": "7410003", "rho": 0.0001, "t_star": 25300.6787, "t_sw": 25493, "t_obs": 25301, "ratio_tsw": 1.0076, "ratio_tobs": 1.0}
+9.6 {"copy": "S", "sample": "7410003", "rho": 0.0002, "t_star": 9864.5596, "t_sw": 9920, "t_obs": 9857, "ratio_tsw": 1.0056, "ratio_tobs": 0.9992}
+10.2 {"copy": "T4", "sample": "7410003", "rho": 0.001, "t_star": 7820.8082, "t_sw": 7806, "t_obs": 7915, "ratio_tsw": 0.9981, "ratio_tobs": 1.012}
+10.9 {"copy": "Q", "sample": "7410004", "rho": 0.0001, "t_star": 88206.285, "t_sw": 87787, "t_obs": 88000, "ratio_tsw": 0.9952, "ratio_tobs": 0.9977}
+11.5 {"copy": "S", "sample": "7410004", "rho": 0.0002, "t_star": 27298.5419, "t_sw": 27417, "t_obs": 27348, "ratio_tsw": 1.0043, "ratio_tobs": 1.0018}
+12.5 {"copy": "T4", "sample": "7410004", "rho": 0.001, "t_star": 18366.9842, "t_sw": 18407, "t_obs": 18587, "ratio_tsw": 1.0022, "ratio_tobs": 1.012}
+13.0 {"copy": "Q", "sample": "7410005", "rho": 0.0001, "t_star": 47397.2061, "t_sw": 47373, "t_obs": 47413, "ratio_tsw": 0.9995, "ratio_tobs": 1.0003}
+13.5 {"copy": "S", "sample": "7410005", "rho": 0.0002, "t_star": 17225.6643, "t_sw": 17314, "t_obs": 17248, "ratio_tsw": 1.0051, "ratio_tobs": 1.0013}
+14.3 {"copy": "T4", "sample": "7410005", "rho": 0.001, "t_star": 11959.5087, "t_sw": 11968, "t_obs": 12121, "ratio_tsw": 1.0007, "ratio_tobs": 1.0135}
+15.0 {"copy": "Q", "sample": "7410006", "rho": 0.0001, "t_star": 90410.9213, "t_sw": 90235, "t_obs": 90325, "ratio_tsw": 0.9981, "ratio_tobs": 0.999}
+15.7 {"copy": "S", "sample": "7410006", "rho": 0.0002, "t_star": 31484.1203, "t_sw": 31582, "t_obs": 31573, "ratio_tsw": 1.0031, "ratio_tobs": 1.0028}
+16.7 {"copy": "T4", "sample": "7410006", "rho": 0.001, "t_star": 20903.6202, "t_sw": 20949, "t_obs": 21117, "ratio_tsw": 1.0022, "ratio_tobs": 1.0102}
+17.2 {"copy": "Q", "sample": "7410007", "rho": 0.0001, "t_star": 54675.662, "t_sw": 54651, "t_obs": 54687, "ratio_tsw": 0.9995, "ratio_tobs": 1.0002}
+17.8 {"copy": "S", "sample": "7410007", "rho": 0.0002, "t_star": 19359.2759, "t_sw": 19435, "t_obs": 19408, "ratio_tsw": 1.0039, "ratio_tobs": 1.0025}
+18.6 {"copy": "T4", "sample": "7410007", "rho": 0.001, "t_star": 12953.4966, "t_sw": 12968, "t_obs": 13118, "ratio_tsw": 1.0011, "ratio_tobs": 1.0127}
+t_obs/t*: min 0.9977 median 1.0025 max 1.0143 (n 32)
+peak RSS GB 0.242

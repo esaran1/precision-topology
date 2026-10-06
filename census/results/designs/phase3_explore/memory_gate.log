@@ -14,3 +14,8 @@
 2026-10-05 21:39:20 before p3_own (seeds 7410020-059, branch-point only): free 38%; swap 647.75M free; disk 26Gi avail -> OK
 2026-10-05 21:43:33 before test suite (process 1 of 2): free 44%; swap 742.44M free; disk 25Gi avail -> OK
 2026-10-05 21:50:49 before test suite (process 2 of 2, test_verify_certificates): free 45%; swap 795.56M free; disk 25Gi avail -> OK
+2026-10-05 22:26:48 before p3_budget: free 43%; swap 1671.25M free; disk 25Gi avail -> OK
+2026-10-05 22:27:36 before test_p3_activity: free 42%; swap 847.75M free; disk 26Gi avail -> OK
+2026-10-05 22:27:46 before test_p3_activity (rerun after fixing a float-rounding test construction): free 41%; swap 967.75M free; disk 26Gi avail -> OK
+2026-10-05 22:28:24 before test suite (process 1 of 2): free 37%; swap 1023.75M free; disk 26Gi avail -> OK
+2026-10-05 22:35:19 before test suite (process 2 of 2, test_verify_certificates): free 41%; swap 1389.38M free; disk 25Gi avail -> OK
