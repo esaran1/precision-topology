@@ -610,6 +610,7 @@ def main() -> None:
     phase2a_posthoc_checks()
     phase2b_checks()
     phase2a_ps_checks()
+    phase2a_ps_posthoc_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -3443,6 +3444,76 @@ def phase2a_ps_checks() -> None:
             chk(f"P2A-PS {k} {v}", float(got == v), 1.0, 0)
         chk("P2A-PS validity ok", float(S["validity"]["ok"] is valid_ok), 1.0, 0)
         chk("P2A-PS runs", float(len(runs)), float(n_runs), 0)
+
+
+P2APS_PH_PIN = {"excluded_outcome": "FAIL H+C3+C4", "excluded_validity_ok": True, "n_wider_changes": 21,
+                "crossed_labels": {"2975103": "S", "2975110": "S", "2975114": "S", "2975136": "other",
+                                   "2975149": "S", "2975168": "S", "2975170": "other"},
+                "diagnosis": {2975003: "LANDSCAPE", 2975052: "PIPELINE", 2975093: "LANDSCAPE", 2975179: "LANDSCAPE"}}
+
+
+def phase2a_ps_posthoc_checks() -> None:
+    """Phase 2A-PS POST HOC (not registered; no registered verdict changes): phase2a_ps_posthoc.json regenerates from
+    the parts file and the committed registered files; the page regenerates from it and carries the POST HOC header;
+    every replay reproduced the committed forecast / observation, every registered perturbed-minimum count and every
+    crossing; seed 2,975,052's first step recomputed with the registered make_step; the seed-excluded rescoring equals
+    the registered score_tables on the remaining committed rows; the registered outcome is unchanged; pins."""
+    from . import phase2a_ps as PS
+    from . import phase2a_ps_posthoc as PH
+    if not PH.OUT_JSON.exists():
+        return
+    import numpy as _np
+    print("Phase 2A-PS POST HOC: no-forecast seeds, crossing none seeds, the sign flip")
+    J = json.loads(PH.OUT_JSON.read_text())
+    chk("P2A-PS-PH phase2a_ps_posthoc.json regenerates", float(J == json.loads(json.dumps(PH.build()))), 1.0, 0)
+    md = PH.OUT_MD.read_text()
+    chk("P2A-PS-PH page regenerates from the JSON", float(md == PH.render_md(J)), 1.0, 0)
+    chk("P2A-PS-PH page carries the POST HOC header", float(md.startswith("# Phase 2A-PS POST HOC")
+                                                           and "**POST HOC.**" in md), 1.0, 0)
+    parts = PH._rows()
+    rep = [r for r in parts if r["kind"] == "nofc_replay"]
+    chk("P2A-PS-PH no-forecast replays (4 seeds x 2 rates)", float(len(rep)), 8.0, 0)
+    chk("P2A-PS-PH replays not reproducing the committed forecast or s_end",
+        float(sum(int(not (r["forecast_reproduced"] and r["observed_s_end_reproduced"])) for r in rep)), 0.0, 0)
+    nn = [r for r in parts if r["kind"] == "none"]
+    chk("P2A-PS-PH none seeds", float(len(nn)), 30.0, 0)
+    chk("P2A-PS-PH registered perturbed minima not reproduced",
+        float(sum(int(not r["registered_minima_reproduced"]) for r in nn)), 0.0, 0)
+    cr = [r["crossing"] for r in nn if "crossing" in r]
+    chk("P2A-PS-PH crossings replayed", float(len(cr)), 7.0, 0)
+    chk("P2A-PS-PH crossings not reproduced", float(sum(int(not (c["crossing_reproduced"] and c["s_obs_reproduced"]))
+                                                        for c in cr)), 0.0, 0)
+    fr, rows = PS._frozen()
+    fs = PS.seed_record(rows, PH.SIGN_SEED)
+    X, Y = PS.sample(PH.SIGN_SEED)
+    th0 = _np.array(fs["release_theta"], float)
+    _, g = PS.loss_grad(th0, X, Y)
+    sr = J["q3_sign_seed"]["cause"]
+    for k, d in sr["steps"].items():
+        th1 = PS.make_step(PS.rho_of(float(k)), fs["release_active_units"], X, Y)(th0)
+        chk(f"P2A-PS-PH seed 2975052 first step at 2^{k} recomputed (max abs diff)",
+            float(_np.max(_np.abs(th1[12:16] - _np.array(d["registered_step_v_new"])))), 0.0, 0)
+        chk(f"P2A-PS-PH seed 2975052 sign flip at step 1 at 2^{k}", float(d["sign_flips"] == [2]), 1.0, 0)
+    S = json.loads((PS.OUT / "scores.json").read_text())
+    ex = PH.score_excluding(S["rows"], [PH.SIGN_SEED])
+    chk("P2A-PS-PH seed-excluded rescoring regenerates",
+        float(json.loads(json.dumps(PS._jsonable({"o": ex["outcome"], "v": ex["verdicts"]}))) ==
+              {"o": J["q3_sign_seed"]["excluded_rescore_POST_HOC"]["outcome"],
+               "v": J["q3_sign_seed"]["excluded_rescore_POST_HOC"]["verdicts"]}), 1.0, 0)
+    chk("P2A-PS-PH registered outcome unchanged", float(S["outcome"] == "UNRESOLVED (validity)"
+                                                       and J["registered"]["outcome"] == S["outcome"]), 1.0, 0)
+    if P2APS_PH_PIN is not None:
+        P = P2APS_PH_PIN
+        chk(f"P2A-PS-PH excluded outcome {P['excluded_outcome']}",
+            float(J["q3_sign_seed"]["excluded_rescore_POST_HOC"]["outcome"] == P["excluded_outcome"]), 1.0, 0)
+        chk("P2A-PS-PH excluded validity ok",
+            float(J["q3_sign_seed"]["excluded_rescore_POST_HOC"]["validity"]["ok"] is P["excluded_validity_ok"]), 1.0, 0)
+        chk("P2A-PS-PH none seeds changing class under the wider search",
+            float(J["q2_none"]["n_wider_changes_class"]), float(P["n_wider_changes"]), 0)
+        chk("P2A-PS-PH crossing branch labels", float(J["q2_none"]["crossed"]["labels"] == P["crossed_labels"]), 1.0, 0)
+        for e in J["q1_no_forecast"]:
+            chk(f"P2A-PS-PH seed {e['seed']} diagnosis {P['diagnosis'][e['seed']]}",
+                float(all(r["diagnosis"]["label"] == P["diagnosis"][e["seed"]] for r in e["runs"].values())), 1.0, 0)
 
 
 def phase1b_checks() -> None:
