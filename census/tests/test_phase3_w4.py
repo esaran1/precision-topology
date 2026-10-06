@@ -782,7 +782,8 @@ def test_pilot_json_follows_its_rules():
     if not p.exists():
         pytest.skip("pilot.json not present")
     d = json.loads(p.read_text())["arms"]
-    for arm in P.ARMS:
+    assert set(d) <= set(P.ARMS) and d
+    for arm in d:
         a = d[arm]
         h = a["rule"]["history"]
         assert h[0]["rho"] == P.RHO_START[arm] and a["rho"] == h[-1]["rho"] and h[-1]["q90"] <= 0.1

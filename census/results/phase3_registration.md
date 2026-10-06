@@ -5,7 +5,8 @@ T4's hold length, which touches T4's gate).** The text was committed before the 
 landscape, the Q and S pilot, the Q and S freeze and the author's budget condition (§13). Not done: the T4 pilot, the
 T4 freeze, the summary, the manifest.
 
-- **Not done:** no registered seed (7,430,000–119; 7,431,000–119; 7,432,000–709) has been held, trained or observed.
+- **Not done:** no registered seed has been trained or observed. The Q and S seeds (7,430,000–119; 7,431,000–119) were
+  held and classified at the freeze (release information only, §4); no T4 seed (7,432,000–709) has been drawn.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained
   (`results/phase3/registration_stamp.txt` and its `.ots`). `run` refuses to start without the proof file.
 
