@@ -73,8 +73,9 @@ within 0.5% of the page's value and κ₀ must have the page's sign; otherwise t
 | **S** | sign test | three-function (121:+-+; {0,2},{1},{3}); switch 0.440, κ₀ < 0 | θ\*_S,pop(s₀) (branch point) | 0.03, 2⁻¹² | 120 | ≥ 96/120 on S AND no run with G > 0 in the hold |
 
 - **Hold.** v fixed at v₀; z by full-batch GD at lr 1.0 for W steps; G at the start state and after every step.
-  W = max(4000, ⌈25/λ_min⌉), λ_min of the full z-Hessian at the seed's own copy at s₀ (W2-A's rule); 4000 if the
-  own copy has no accepted point.
+  Q and S: W = max(4000, ⌈25/λ_min⌉), λ_min of the full z-Hessian at the seed's own copy at s₀ (W2-A's rule); 4000 if
+  the own copy has no accepted point. **T4: W = max(8000, ⌈25/λ_min⌉)** (author's decision D1, 2026-10-06; §10); 8000
+  if the own copy has no accepted point.
 - **Release classification** (W2-A's Newton rule + the partition + the activity test). Damped Newton at v₀ from the
   release state, accepted iff max|∇| < 1e−8 and H_zz positive definite. The run is **on copy c at winding k ∈ ℤ⁴** iff:
   - the Newton point is within 1e−6 (sup) of shift(θ\*_own,c(s₀), v₀, k);
@@ -217,12 +218,15 @@ Newton point keeps the copy's partition. One state, no gap; 0.8 < 0.95, so it re
   whose smallest share is 0.1, so it cannot fire on a Phase 3 release; it is a guard, tested on constructed cases.
 - **Set after exploratory data (‡ on the page):** the shares (0.1, 0.2, 0.3, 0.4); s₀ = 0.5·s_pop2; the ρ table;
   θ; the budget rule; the per-unit share extrapolation; the τ rule.
-- **Q's C4 risk.** In the exploration (8 seeds) Q's C4 interval was [−113, −6]: the upper end close to 0. Q's lags
-  have both signs (19–213 and −61, −192) and κ₀ < 0 on 7/57 own copies. C4 compares against the no-lag forecast, so
-  small or mixed-sign lags make it hard to pass.
-- **T4's hold length.** The exploration's random holds used W = 8000 (landing 53/400, the gate's basis). The
-  registration uses W2-A's rule, W = max(4000, ⌈25/λ_T4,own(s₀)⌉) (the page: "W2-A's setting"; W frozen per seed and
-  copy). The registered landing count is known at the freeze (§13).
+- **Q's C4: a KNOWN RISK, registered UNCHANGED (author, 2026-10-06).** In the exploration (8 seeds) Q's C4 interval
+  was [−113, −6]. **On the pilot (9 Q runs at the registered ρ = 2⁻¹⁴ and τ) C4 FAILED: interval [−74.9, +29.0].**
+  Q's crossing errors were all LATE (18–101 steps) while its lag errors were ≤ 4 steps; with lags of 41–213 steps (one
+  −80) the no-lag forecast is often about as close. C4, f and every other criterion are registered unchanged; this
+  result is recorded here before any registered run.
+- **T4's hold length (D1, author's decision 2026-10-06).** W2-A's rule would give W = 4,000 steps for every T4 copy.
+  The registration uses W = max(8000, ⌈25/λ⌉) for T4 ONLY. Both landing rates — **53/400 at 8,000 and 46/400 at
+  4,000; gate power 0.955 vs 0.624 at the Wilson low** — were measured on the exploration seeds 7,410,000–019 BEFORE
+  any T4 pilot or registered draw. The registered landing count is in §13.
 - **Exploratory runs** (8 seeds per arm; the page's table): q90 crossing error Q 33, S 17, T4 7.6 steps; q90 window χ
   Q 0.108 (above 0.1 at 2⁻¹³), S 0.133 (at 2⁻¹²), T4 0.075; C4 intervals Q [−113, −6], S [−57, −25],
   T4 [−153, −126]. These are exploration seeds, never registered seeds.
@@ -230,7 +234,7 @@ Newton point keeps the copy's partition. One state, no gap; 0.8 < 0.95, so it re
 
 ## 10. Details the page left open
 
-### D1 (PENDING THE AUTHOR; touches T4's gate): T4's hold length
+### D1 (DECIDED BY THE AUTHOR 2026-10-06: APPROVED; touches T4's gate): T4's hold length
 
 - **The issue.** The page sets T4's gate (≥ 60 of 710; P = 0.95 at the Wilson low) on the exploration's landing rate
   53/400, measured with random holds of **W = 8000** steps (p3_own). W2-A's rule, W = max(4000, ⌈25/λ⌉), gives
@@ -238,18 +242,19 @@ Newton point keeps the copy's partition. One state, no gap; 0.8 < 0.95, so it re
 - **Measured on the exploration seeds 7,410,000–019** (the same 400 draws, the registered classifier; no registered or
   pilot seed): **53/400 land on T4 at W = 8000** (the exploration's count, reproduced exactly) and **46/400 at W = 4000**.
   P(≥ 60 of 710) at the Wilson low: **0.955 at 8000, 0.624 at 4000** (1.000 and 0.997 at the point estimates).
-- **Proposed resolution (implemented, tested, NOT yet run on T4):** T4's hold W = max(**8000**, ⌈25/λ_min⌉) — the hold
-  length on which the page's gate power rests (`W_FLOOR`; `test_hold_length_rule_and_the_proposed_t4_floor`). Q and S
-  keep W2-A's rule (unchanged; their pilot and freeze are done).
-- **Alternative:** W2-A's rule as written (W = 4000; gate power ≈ 0.62 at the Wilson low).
-- No T4 pilot or registered T4 seed has been held or drawn. The T4 pilot and freeze run after the decision.
+- **Resolution (APPROVED by the author 2026-10-06):** T4's hold W = max(**8000**, ⌈25/λ_min⌉) — the hold length on
+  which the page's gate power rests (`W_FLOOR`; `test_hold_length_rule_and_the_proposed_t4_floor`). Q and S keep
+  W2-A's rule (unchanged; their pilot and freeze were done before the decision).
+- The rejected alternative: W2-A's rule as written (W = 4000; gate power ≈ 0.62 at the Wilson low).
+- The decision was made before any T4 pilot or registered T4 seed was held or drawn; the T4 pilot and freeze ran
+  after it.
 
 ### Implementation only
 
 1. **The T4 pilot range** (7,439,100–299, drawn in order until 10 land on T4). "10 seeds per arm" read as 10 on-copy
    pilot runs for T4: at the exploration's landing rate (0.13), 10 pilot seeds give about 1.3 on-copy runs, too few
    for a q90. Q and S share 7,439,000–009 (W2-A precedent).
-2. **Hold W per arm:** W2-A's rule at the arm's own copy (§3, §9).
+2. **Hold W per arm:** W2-A's rule at the arm's own copy for Q and S; T4 with the 8000 floor (D1; §3, §9).
 3. **Holds at the freeze.** Every release (Q, S, T4) is computed and hashed at the freeze, so each gate is known
    before the registration (2A-PS froze its releases). The hold is release information only.
 4. **T4 copies in full only for seeds released on T4.** The others never use the switch. Every T4 seed's own T4, Q and
@@ -339,6 +344,9 @@ constants, no overlap; disjoint from the exploration).
   the freeze and the pilot.
 - One process, nice 15, one thread; the memory gate before every job and between seeds; disk ≥ 20 GB; peak RSS ≤ 3 GB;
   per-run caps 10⁶ steps and 1 GB.
+- **Process note (a lapse, recorded):** before the S freeze the separate memory gate was CHAINED in the same background
+  command as the job (after the Q freeze), not run as its own step. It passed (logged), and the freeze also gated
+  before every seed inside the job.
 
 ## 15. Reproduce
 

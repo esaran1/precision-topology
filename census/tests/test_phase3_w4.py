@@ -813,7 +813,7 @@ def test_frozen_summary_is_consistent():
 
 
 def test_hold_length_rule_and_the_proposed_t4_floor():
-    """W2-A's W = max(4000, ⌈25/λ⌉) for Q and S; T4 (PROPOSED, pending the author): max(8000, ⌈25/λ⌉), the
+    """W2-A's W = max(4000, ⌈25/λ⌉) for Q and S; T4 (D1, approved by the author 2026-10-06): max(8000, ⌈25/λ⌉), the
     exploration's random-hold length on which the page's T4 gate power rests."""
     assert P.w_hold(0.0097) == 4000 and P.w_hold(0.0025) == 10_000 and P.w_hold(0.0) is None
     assert P.W_FLOOR == {"Q": 4000, "S": 4000, "T4": 8000}

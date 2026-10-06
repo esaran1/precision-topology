@@ -116,7 +116,7 @@ POP_KAPPA_SIGN_PAGE = {"Q": 1, "S": -1, "T4": 1}        # the page: Q κ₀ +0.0
 
 # numerics (W2-A's)
 HOLD_LR, W_MIN, W_RELAX = 1.0, 4000, 25.0
-# PROPOSED (pending the author; touches T4's gate): T4's random hold uses W ≥ 8000, the exploration's hold length on
+# D1, APPROVED by the author 2026-10-06 (T4 only): T4's random hold uses W ≥ 8000, the exploration's hold length on
 # which the page's T4 gate power rests (53/400 at 8000 vs 46/400 at W2-A's 4000 on exploration seeds 7,410,000-019)
 W_FLOOR = {"Q": W_MIN, "S": W_MIN, "T4": 8000}
 NEWTON_GTOL, NEWTON_ITER_TOL, ON_TOL, STATE_TOL = 1e-8, 1e-12, 1e-6, 1e-3
@@ -874,7 +874,7 @@ def _land():
 # ------------------------------------------------------------------------------------------ rules (pure functions)
 def w_hold(lam, floor=W_MIN):
     """W2-A's hold length: max(floor, ⌈25/(1.0·λ_min)⌉), λ_min of the full H_zz at the own copy; None for λ ≤ 0.
-    floor = W_FLOOR[arm] (4000, W2-A's; T4 8000, PROPOSED)."""
+    floor = W_FLOOR[arm] (4000, W2-A's; T4 8000, D1 approved 2026-10-06)."""
     if lam is None or not np.isfinite(lam) or lam <= 0:
         return None
     return int(max(floor, math.ceil(W_RELAX / (HOLD_LR * lam))))
