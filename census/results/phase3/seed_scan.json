@@ -1,0 +1,117 @@
+{
+ "ranges": {
+  "Q": [
+   7430000,
+   7430119,
+   120
+  ],
+  "S": [
+   7431000,
+   7431119,
+   120
+  ],
+  "T4": [
+   7432000,
+   7432709,
+   710
+  ],
+  "pilot_Q_S": [
+   7439000,
+   7439009,
+   10
+  ],
+  "pilot_T4": [
+   7439100,
+   7439299,
+   200
+  ]
+ },
+ "dirs": [
+  "src",
+  "tests",
+  "results",
+  "paper",
+  "notes",
+  "independent",
+  "data",
+  "dist"
+ ],
+ "patterns": {
+  "7430": "(^|[^0-9.])7430[0-9]{3}([^0-9]|$)|(^|[^0-9])7_430_[0-9]{3}([^0-9]|$)|(^|[^0-9.,])7,430,[0-9]{3}([^0-9,]|$)",
+  "7431": "(^|[^0-9.])7431[0-9]{3}([^0-9]|$)|(^|[^0-9])7_431_[0-9]{3}([^0-9]|$)|(^|[^0-9.,])7,431,[0-9]{3}([^0-9,]|$)",
+  "7432": "(^|[^0-9.])7432[0-9]{3}([^0-9]|$)|(^|[^0-9])7_432_[0-9]{3}([^0-9]|$)|(^|[^0-9.,])7,432,[0-9]{3}([^0-9,]|$)",
+  "7439": "(^|[^0-9.])7439[0-9]{3}([^0-9]|$)|(^|[^0-9])7_439_[0-9]{3}([^0-9]|$)|(^|[^0-9.,])7,439,[0-9]{3}([^0-9,]|$)"
+ },
+ "pattern_files": {
+  "7430": [],
+  "7431": [],
+  "7432": [],
+  "7439": []
+ },
+ "registered_seed_overlap": {
+  "asym_register.SEEDS": [],
+  "asym_register.SEEDS_EXT": [],
+  "asym_t23b.SEEDS": [],
+  "asym_t23b.SEEDS_EXT": [],
+  "asym_t23c.SEEDS": [],
+  "asym_t23c.SEEDS_EXT": [],
+  "asym_t23d.SEEDS": [],
+  "asym_t23d.SEEDS_EXT": [],
+  "band_rd.PILOT_SEEDS": [],
+  "band_rd.SEEDS": [],
+  "bisection.SEEDS": [],
+  "blockA5d.SEEDS_STAGE1": [],
+  "blockA5d.SEEDS_STAGE2": [],
+  "blockC_equivalence.PILOT_SEEDS": [],
+  "bottleneck_sweep.SEEDS": [],
+  "budget_flip.SEEDS": [],
+  "corrugation_width.SEEDS": [],
+  "cost_law.SEEDS": [],
+  "family_onsets.SEEDS": [],
+  "followup.SEEDS": [],
+  "gelu_transfer.PILOT_SEEDS": [],
+  "gelu_transfer.SEEDS": [],
+  "margin_onsets.SEEDS": [],
+  "onset_bootstrap.SEEDS": [],
+  "onset_family_b.SEEDS": [],
+  "onset_law.SEEDS": [],
+  "onset_more.SEEDS": [],
+  "onset_resume.SEEDS": [],
+  "phase1_relog.SEEDS": [],
+  "phase1a_pilot.SEEDS": [],
+  "phase1c.SEEDS": [],
+  "phase2a.PILOT_SEEDS": [],
+  "phase2a.SEEDS": [],
+  "phase2a_ps.PILOT_SEEDS": [],
+  "phase2a_ps.SEEDS": [],
+  "phase2b.SEEDS": [],
+  "phase2b_ordering.SEEDS": [],
+  "precision_divergence.SEEDS": [],
+  "ramp.PILOT_SEEDS": [],
+  "ramp.SEEDS": [],
+  "ramp2.PILOT_SEEDS": [],
+  "ramp2.SEEDS": [],
+  "ramp_boundary.SEEDS": [],
+  "sgd_family_onsets.SEEDS": [],
+  "sgd_onsets.SEEDS": [],
+  "sgd_own.SEEDS": [],
+  "simplicity_bias_v2.SEEDS": [],
+  "simplicity_bias_v3.SEEDS": [],
+  "track2a.SEEDS": [],
+  "track2b.SEEDS": [],
+  "track2c.SEEDS": [],
+  "track_a.SEEDS": [],
+  "ts_test.SEEDS": [],
+  "width2_asym.PILOT_SEEDS": [],
+  "width2_asym.SEEDS": [],
+  "width2_asym.SEEDS_T": [],
+  "width2_asym.SEEDS_TP": [],
+  "width2_nogating.PILOT_SEEDS": [],
+  "width2_nogating.SEEDS": [],
+  "width_effect.SEEDS_DEPTH6": [],
+  "width_effect.SEEDS_PRIMARY": []
+ },
+ "modules_not_importable": {},
+ "exploration_seeds_disjoint": true,
+ "unused": true
+}
