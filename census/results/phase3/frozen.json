@@ -1,0 +1,347 @@
+{
+ "label": "PHASE 3 freeze (no training of any registered seed)",
+ "s0": 0.22253970311779978,
+ "frozen_parts_sha256": "f05841367f59adb26b676d0f9e5d03b5f14b1ed7313e99c9a2d7167960c6efab",
+ "pilot_sha256": "fd0b635746f66afcc5823fd4aa89aa3ffc66e54d66118ab11cd1987475ad0c15",
+ "rho": {
+  "Q": 6.103515625e-05,
+  "S": 0.0001220703125,
+  "T4": 0.0009765625
+ },
+ "tau": {
+  "Q": {
+   "q90_abs_err_cross": 82.60000000000001,
+   "q90_abs_err_lag": 2.4000000000000004,
+   "n_cross": 9,
+   "n_lag": 9,
+   "tau_cross": 125.0,
+   "tau_lag": 5.0
+  },
+  "S": {
+   "q90_abs_err_cross": 33.1,
+   "q90_abs_err_lag": 1.0,
+   "n_cross": 10,
+   "n_lag": 10,
+   "tau_cross": 50.0,
+   "tau_lag": 5.0
+  },
+  "T4": {
+   "q90_abs_err_cross": 9.0,
+   "q90_abs_err_lag": 1.0,
+   "n_cross": 10,
+   "n_lag": 10,
+   "tau_cross": 15.0,
+   "tau_lag": 5.0
+  }
+ },
+ "pilot_median_chi_tsw": {
+  "Q": 0.03107644083950021,
+  "S": 0.04493212720431328,
+  "T4": 0.019682915095045293
+ },
+ "arms": {
+  "Q": {
+   "n_seeds": 120,
+   "n_point_ok": 115,
+   "n_on_copy_at_release": 115,
+   "n_hold_G_positive": 0,
+   "n_inactive_unit": 0,
+   "n_full_valid": 112,
+   "n_on_copy_valid": 112,
+   "n_eligible_trained": 112,
+   "not_trained_reasons": {
+    "not on the arm's copy at release (counted)": 5,
+    "the occupied copy has no validated frozen switch (counted)": 3
+   },
+   "windings_at_release": {
+    "(0, 0, 0, 0)": 115
+   },
+   "gate_at_freeze": {
+    "n_runs": 120,
+    "n_on_copy": 115,
+    "min_on_copy": 96,
+    "n_hold_G_positive": 0,
+    "count_ok": true,
+    "hold_ok": true,
+    "hold_condition_applies": true,
+    "pass": true
+   },
+   "kappa0": {
+    "n": 112,
+    "min": -0.06825202998403171,
+    "q10": -0.004412906919613863,
+    "median": 0.012521135249863707,
+    "q90": 0.02099526619083327,
+    "max": 0.038868276260789106
+   },
+   "n_kappa0_negative": 18,
+   "s_switch": {
+    "n": 112,
+    "min": 0.2860276020950977,
+    "q10": 0.35271298632792175,
+    "median": 0.4838975720199383,
+    "q90": 0.6509882974936247,
+    "max": 0.7435500130375932
+   },
+   "W": {
+    "n": 120,
+    "min": 4000.0,
+    "q10": 4360.1,
+    "median": 5669.5,
+    "q90": 8789.700000000003,
+    "max": 27324.0
+   },
+   "t_star": {
+    "n": 112,
+    "min": 27352.9253477425,
+    "q10": 61295.411997339615,
+    "median": 130567.86983021583,
+    "q90": 230462.50368180114,
+    "max": 292180.06107528205
+   },
+   "B": {
+    "n": 112,
+    "min": 44030.0,
+    "q10": 94943.70000000001,
+    "median": 198852.5,
+    "q90": 348694.20000000007,
+    "max": 441271.0
+   },
+   "n_over_cap": 0,
+   "invalid_notes": {
+    "no validated switch below 0.7715": 3,
+    "no accepted own point of the copy's type and partition at s0": 5
+   }
+  },
+  "S": {
+   "n_seeds": 120,
+   "n_point_ok": 120,
+   "n_on_copy_at_release": 120,
+   "n_hold_G_positive": 0,
+   "n_inactive_unit": 0,
+   "n_full_valid": 119,
+   "n_on_copy_valid": 119,
+   "n_eligible_trained": 119,
+   "not_trained_reasons": {
+    "the occupied copy has no validated frozen switch (counted)": 1
+   },
+   "windings_at_release": {
+    "(0, 0, 0, 0)": 120
+   },
+   "gate_at_freeze": {
+    "n_runs": 120,
+    "n_on_copy": 120,
+    "min_on_copy": 96,
+    "n_hold_G_positive": 0,
+    "count_ok": true,
+    "hold_ok": true,
+    "hold_condition_applies": true,
+    "pass": true
+   },
+   "kappa0": {
+    "n": 119,
+    "min": -0.05999321108626682,
+    "q10": -0.021894631587439272,
+    "median": -0.010648059666893922,
+    "q90": -0.0037044948788006317,
+    "max": 0.006435592873384661
+   },
+   "n_kappa0_negative": 114,
+   "s_switch": {
+    "n": 119,
+    "min": 0.31846332058860705,
+    "q10": 0.36672105927931187,
+    "median": 0.4671329513746258,
+    "q90": 0.6108718932861673,
+    "max": 0.6930272781211686
+   },
+   "W": {
+    "n": 120,
+    "min": 4000.0,
+    "q10": 4000.0,
+    "median": 4000.0,
+    "q90": 4000.0,
+    "max": 12648.0
+   },
+   "t_star": {
+    "n": 119,
+    "min": 18347.96891674742,
+    "q10": 27591.774992870756,
+    "median": 47306.44638022878,
+    "q90": 77992.1784673083,
+    "max": 98442.50658836494
+   },
+   "B": {
+    "n": 119,
+    "min": 30522.0,
+    "q10": 44388.4,
+    "median": 73960.0,
+    "q90": 119988.8,
+    "max": 150664.0
+   },
+   "n_over_cap": 0,
+   "invalid_notes": {
+    "no validated switch below 0.7036": 1
+   }
+  },
+  "T4": {
+   "n_seeds": 710,
+   "n_point_ok": 710,
+   "n_on_copy_at_release": 95,
+   "n_hold_G_positive": 265,
+   "n_inactive_unit": 0,
+   "n_full_valid": 95,
+   "n_on_copy_valid": 95,
+   "n_eligible_trained": 95,
+   "not_trained_reasons": {
+    "not on the arm's copy at release (counted)": 615
+   },
+   "windings_at_release": {
+    "(0, 0, 0, 0)": 95
+   },
+   "gate_at_freeze": {
+    "n_runs": 710,
+    "n_on_copy": 95,
+    "min_on_copy": 60,
+    "n_hold_G_positive": 265,
+    "count_ok": true,
+    "hold_ok": false,
+    "hold_condition_applies": false,
+    "pass": true
+   },
+   "kappa0": {
+    "n": 95,
+    "min": 0.19762480067473212,
+    "q10": 0.22364381739960676,
+    "median": 0.2519131925502816,
+    "q90": 0.2829888787288438,
+    "max": 0.30855053408447625
+   },
+   "n_kappa0_negative": 0,
+   "s_switch": {
+    "n": 95,
+    "min": 0.6395280913948154,
+    "q10": 0.6971822210888224,
+    "median": 0.7985979279280766,
+    "q90": 0.9066043154885997,
+    "max": 1.0044640356041878
+   },
+   "W": {
+    "n": 710,
+    "min": 8000.0,
+    "q10": 8000.0,
+    "median": 8000.0,
+    "q90": 8000.0,
+    "max": 8000.0
+   },
+   "t_star": {
+    "n": 95,
+    "min": 10650.22867916502,
+    "q10": 12361.482195512928,
+    "median": 15695.084832555844,
+    "q90": 19573.277398055186,
+    "max": 23067.225262061103
+   },
+   "B": {
+    "n": 95,
+    "min": 18976.0,
+    "q10": 21542.8,
+    "median": 26543.0,
+    "q90": 32360.4,
+    "max": 37601.0
+   },
+   "n_over_cap": 0,
+   "invalid_notes": {
+    "T4: release not on T4 (point only)": 615
+   }
+  }
+ },
+ "collapse_random_holds_T4": {
+  "n_random_holds": 710,
+  "n_newton_accepted": 589,
+  "n_genuine_four_unit_unplaced": 0,
+  "n_coinciding_unit_points": 589,
+  "n_on_T4": 95,
+  "n_on_Q_own_point": 0,
+  "n_on_S_own_point": 0,
+  "n_placed": 147,
+  "by_type": {
+   "31:+-": 281,
+   "not accepted": 121,
+   "4:+": 105,
+   "31:+- placed": 84,
+   "22:+-": 42,
+   "22:+- placed": 34,
+   "22:-+ placed": 27,
+   "22:-+": 11,
+   "31:-+": 3,
+   "31:-+ placed": 2
+  }
+ },
+ "budget_condition": {
+  "Q": {
+   "n_seeds": 120,
+   "n_with_budget": 112,
+   "n_over_cap": 0,
+   "max_allowed": 24,
+   "B_distribution": {
+    "n": 112,
+    "min": 44030.0,
+    "q10": 94943.70000000001,
+    "median": 198852.5,
+    "q90": 348694.20000000007,
+    "max": 441271.0
+   },
+   "B_uncapped_distribution": {
+    "n": 112,
+    "min": 44030.0,
+    "q10": 94943.70000000001,
+    "median": 198852.5,
+    "q90": 348694.20000000007,
+    "max": 441271.0
+   },
+   "t_star_distribution": {
+    "n": 112,
+    "min": 27352.9253477425,
+    "q10": 61295.411997339615,
+    "median": 130567.86983021583,
+    "q90": 230462.50368180114,
+    "max": 292180.06107528205
+   },
+   "ok": true
+  },
+  "S": {
+   "n_seeds": 120,
+   "n_with_budget": 119,
+   "n_over_cap": 0,
+   "max_allowed": 24,
+   "B_distribution": {
+    "n": 119,
+    "min": 30522.0,
+    "q10": 44388.4,
+    "median": 73960.0,
+    "q90": 119988.8,
+    "max": 150664.0
+   },
+   "B_uncapped_distribution": {
+    "n": 119,
+    "min": 30522.0,
+    "q10": 44388.4,
+    "median": 73960.0,
+    "q90": 119988.8,
+    "max": 150664.0
+   },
+   "t_star_distribution": {
+    "n": 119,
+    "min": 18347.96891674742,
+    "q10": 27591.774992870756,
+    "median": 47306.44638022878,
+    "q90": 77992.1784673083,
+    "max": 98442.50658836494
+   },
+   "ok": true
+  },
+  "pass": true
+ },
+ "listing_sha256": "d3e2a745565f188c7bae97f3284a31cb14195a8982ad64dfbc03e40f9d166171"
+}
