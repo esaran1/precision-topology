@@ -1,7 +1,9 @@
 # Phase 3 registration: the lag law at width 4 on the asymmetric windows (arms Q, S, T4)
 
-**STATUS: TEXT COMMITTED BEFORE THE PILOT.** The scan, the pilot and the freeze results go into §13 before the
-registration commit. Until then this file is not a registration.
+**STATUS: NOT YET A REGISTRATION. STOPPED BEFORE THE REGISTRATION COMMIT for one decision of the author (§10, D1:
+T4's hold length, which touches T4's gate).** The text was committed before the pilot (747d61e). Done: the scan, the
+landscape, the Q and S pilot, the Q and S freeze and the author's budget condition (§13). Not done: the T4 pilot, the
+T4 freeze, the summary, the manifest.
 
 - **Not done:** no registered seed (7,430,000–119; 7,431,000–119; 7,432,000–709) has been held, trained or observed.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained
@@ -225,7 +227,23 @@ Newton point keeps the copy's partition. One state, no gap; 0.8 < 0.95, so it re
   T4 [−153, −126]. These are exploration seeds, never registered seeds.
 - **The pilot** fixes ρ, τ and V6 only. Its C1–C4 at its own τ are reported as a disclosure (`pilot.json`).
 
-## 10. Details the page left open (implementation only)
+## 10. Details the page left open
+
+### D1 (PENDING THE AUTHOR; touches T4's gate): T4's hold length
+
+- **The issue.** The page sets T4's gate (≥ 60 of 710; P = 0.95 at the Wilson low) on the exploration's landing rate
+  53/400, measured with random holds of **W = 8000** steps (p3_own). W2-A's rule, W = max(4000, ⌈25/λ⌉), gives
+  **W = 4000** for every T4 copy (λ ≈ 0.0097).
+- **Measured on the exploration seeds 7,410,000–019** (the same 400 draws, the registered classifier; no registered or
+  pilot seed): **53/400 land on T4 at W = 8000** (the exploration's count, reproduced exactly) and **46/400 at W = 4000**.
+  P(≥ 60 of 710) at the Wilson low: **0.955 at 8000, 0.624 at 4000** (1.000 and 0.997 at the point estimates).
+- **Proposed resolution (implemented, tested, NOT yet run on T4):** T4's hold W = max(**8000**, ⌈25/λ_min⌉) — the hold
+  length on which the page's gate power rests (`W_FLOOR`; `test_hold_length_rule_and_the_proposed_t4_floor`). Q and S
+  keep W2-A's rule (unchanged; their pilot and freeze are done).
+- **Alternative:** W2-A's rule as written (W = 4000; gate power ≈ 0.62 at the Wilson low).
+- No T4 pilot or registered T4 seed has been held or drawn. The T4 pilot and freeze run after the decision.
+
+### Implementation only
 
 1. **The T4 pilot range** (7,439,100–299, drawn in order until 10 land on T4). "10 seeds per arm" read as 10 on-copy
    pilot runs for T4: at the exploration's landing rate (0.13), 10 pilot seeds give about 1.3 on-copy runs, too few
@@ -280,9 +298,39 @@ exploration's `w4core.py`, `p3_activity.py`, `test_p3_activity.py`, `p3_budget.p
 `p3_own.py` and README. `run`, `observe` and `score` assert every hash, that the manifest and the stamp are
 committed and unmodified, and that the OpenTimestamps proof exists.
 
-## 13. Scan, landscape, pilot and freeze
+## 13. Scan, landscape, pilot and freeze (2026-10-06; no registered seed trained)
 
-(Filled in before the registration commit.)
+**Scan** (`seed_scan.json`): every Phase 3 range unused (no hit for 7430, 7431, 7432, 7439; 61 SEEDS\*/PILOT\_SEEDS\*
+constants, no overlap; disjoint from the exploration).
+
+**Landscape** (`landscape.json`, population): Q 1111:++-- switch 0.482210, κ₀ +0.01651; S 121:+-+ switch 0.439780,
+κ₀ −0.01201; T4 31:+- switch 0.761909, κ₀ +0.2470. All validated, within 0.5% of the page, κ₀ signs as the page.
+
+**Pilot, Q and S** (`pilot.json`, `pilot_parts.jsonl`, `pilot_frozen_parts.jsonl`; seeds 7,439,000–009):
+
+| arm | on copy | q90 window χ (ρ) | ρ | τ_cross (q90 \|e_cross\|) | τ_lag (q90 \|e_lag\|) | V6 median χ | disclosure at the pilot's τ |
+|---|---|---|---|---|---|---|---|
+| Q | 9/10 (7,439,001: no own Q point) | 0.117 (2⁻¹³), 0.059 (2⁻¹⁴) | 2⁻¹⁴ | 125 (82.6) | 5 (2.4) | 0.0311 | C1–C3 PASS, **C4 FAIL [−74.9, +29.0]**, S 1/9 |
+| S | 10/10 | 0.139 (2⁻¹²), 0.070 (2⁻¹³) | 2⁻¹³ | 50 (33.1) | 5 (1.0) | 0.0449 | C1–C4 PASS ([−71.7, −31.0]), S 10/10 |
+
+- Q's crossing errors are all LATE (18–101 steps) while its lag errors are ≤ 4: the extrapolated switch, not the lag,
+  carries the error. With Q's lags of 41–213 steps (one −80), the no-lag forecast is often as close, so **C4 fails on
+  the pilot**. This is the page's "Q's C4 risk", now seen on pilot seeds at the registered ρ. Every pilot run: the
+  cutoff before the crossing, the NaN recomputation identical, the follow check passed.
+- T4: not piloted (D1).
+
+**Freeze, Q and S** (`frozen_parts.jsonl`; no training; 407 s and 389 s):
+
+| arm | seeds | own point / full valid | on copy at release | hold G > 0 | gate | κ₀ < 0 | windings | over cap | B (min / median / q90 / max) |
+|---|---|---|---|---|---|---|---|---|---|
+| Q | 120 | 115 / 112 | 115 | 0 | **PASS** (≥ 96) | 18/112 | all (0,0,0,0) | **0** | 44,030 / 198,853 / 348,694 / 441,271 |
+| S | 120 | 120 / 119 | 120 | 0 | **PASS** (≥ 96) | 114/119 | all (0,0,0,0) | **0** | 30,522 / 73,960 / 119,989 / 150,664 |
+
+- Invalid copies: Q 5 without an accepted own point of the type and partition, 3 without a validated switch; S 1
+  without a validated switch. Counted, never scored.
+- **The author's budget condition: PASS** (0 over-cap seeds in Q and in S; ≤ 24 allowed). t\*: Q 27,353–292,180,
+  S 18,348–98,443.
+- W: Q 4000–27,324, S 4000–12,648 (W2-A's rule).
 
 ## 14. Compute and machine rules
 
