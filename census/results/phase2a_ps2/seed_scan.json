@@ -1,0 +1,427 @@
+{
+ "ranges": {
+  "registered": [
+   2987000,
+   2987599,
+   600
+  ],
+  "pilot": [
+   2988000,
+   2988059,
+   60
+  ]
+ },
+ "dirs": [
+  "src",
+  "tests",
+  "results",
+  "paper",
+  "notes",
+  "independent",
+  "data",
+  "dist"
+ ],
+ "patterns": {
+  "registered": "(^|[^0-9.])2987[0-5][0-9][0-9]([^0-9]|$)|(^|[^0-9])2_987_[0-5][0-9][0-9]([^0-9]|$)|(^|[^0-9.,])2,987,[0-5][0-9][0-9]([^0-9,]|$)",
+  "pilot": "(^|[^0-9.])29880[0-5][0-9]([^0-9]|$)|(^|[^0-9])2_988_0[0-5][0-9]([^0-9]|$)|(^|[^0-9.,])2,988,0[0-5][0-9]([^0-9,]|$)"
+ },
+ "pattern_files": {
+  "registered": [],
+  "pilot": []
+ },
+ "registered_seed_overlap": {
+  "track_a.SEEDS": [],
+  "track2a.SEEDS": [],
+  "track2b.SEEDS": [],
+  "track2c.SEEDS": [],
+  "gelu_transfer.PILOT_SEEDS": [],
+  "gelu_transfer.SEEDS": [],
+  "width2_asym.PILOT_SEEDS": [],
+  "width2_asym.SEEDS": [],
+  "width2_asym.SEEDS_T": [],
+  "width2_asym.SEEDS_TP": [],
+  "phase1a_pilot.SEEDS": [],
+  "phase1c.SEEDS": [],
+  "phase2a.PILOT_SEEDS": [],
+  "phase2a.SEEDS": [],
+  "phase2b.SEEDS": [],
+  "simplicity_bias_v2.SEEDS": [],
+  "simplicity_bias_v3.SEEDS": [],
+  "phase2a_ps.PILOT_SEEDS": [],
+  "phase2a_ps.SEEDS": [],
+  "phase3_w4.PILOT_SEEDS": [],
+  "phase3_w4.PILOT_SEEDS_T4": [],
+  "phase3_w4.SEEDS": [],
+  "phase3_w4.SEEDS_Q": [],
+  "phase3_w4.SEEDS_S": [],
+  "phase3_w4.SEEDS_T4": []
+ },
+ "range_literals_checked": 663,
+ "range_literal_overlaps": [],
+ "parquet_seed_columns": [
+  [
+   "results/corrugation_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/corrugation_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/corrugation_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/linking_gelu_width3.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/linking_projected.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/linking_width3.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/parametrization_linking.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/parametrization_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/parametrization_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/parametrization_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/projection_distribution.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/protocol_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/protocol_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/protocol_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/saturation.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/saturation.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/saturation.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/threshold_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/threshold_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/threshold_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/training_dynamics.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/training_dynamics.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/training_dynamics.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/training_status.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/training_status.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/training_status.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/width_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "results/width_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "results/width_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "results/winding_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/saturation.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/saturation.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/saturation.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_dynamics.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_dynamics.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_dynamics.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_status.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_status.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/training_status.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/width_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/width_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary/results/width_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/corrugation_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/corrugation_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/corrugation_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/linking_gelu_width3.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/linking_projected.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/linking_width3.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/parametrization_linking.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/parametrization_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/parametrization_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/parametrization_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/projection_distribution.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/protocol_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/protocol_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/protocol_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/saturation.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/saturation.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/saturation.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/threshold_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/threshold_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/threshold_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_dynamics.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_dynamics.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_dynamics.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_status.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_status.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/training_status.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/width_sweep.parquet",
+   "seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/width_sweep.parquet",
+   "train_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/width_sweep.parquet",
+   "eval_data_seed",
+   0
+  ],
+  [
+   "dist/supplementary_v5/results/winding_sweep.parquet",
+   "seed",
+   0
+  ]
+ ],
+ "parquet_hits": 0,
+ "exploration_seeds_disjoint": true,
+ "ps_seeds_disjoint": true,
+ "unused": true
+}
