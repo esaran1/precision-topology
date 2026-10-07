@@ -1,0 +1,368 @@
+{
+ "label": "PILOT (pilot seeds only; a machine check: fixes no rule, threshold or criterion)",
+ "n_frozen": 5,
+ "counts": {
+  "n_seeds": 5,
+  "n_untraceable": 2,
+  "untraceable_frac": 0.4,
+  "by_status": {
+   "untraceable: M homotopy failed": 2,
+   "untraceable: no upper fold": 0,
+   "untraceable: homotopy point not stable": 0,
+   "untraceable: stable part does not reach the upper fold": 0,
+   "untraceable: rho2 >= q on the stable part": 0,
+   "s_F not validated": 0,
+   "Lambda_F not validated": 0,
+   "no s*": 1,
+   "release Newton failed": 0,
+   "inactive unit at release": 0,
+   "ineligible": 0,
+   "t* not computable": 0,
+   "stall": 0,
+   "over cap": 0,
+   "scoreable": 2
+  },
+  "class_by_status": {
+   "s_F not validated": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "Lambda_F not validated": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "no s*": {
+    "clean": 1,
+    "none": 0,
+    "mixed": 0
+   },
+   "release Newton failed": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "inactive unit at release": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "ineligible": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "t* not computable": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "stall": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "over cap": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "scoreable": {
+    "clean": 1,
+    "none": 1,
+    "mixed": 0
+   }
+  },
+  "n_scoreable": 2,
+  "scoreable_by_class": {
+   "clean": 1,
+   "none": 1,
+   "mixed": 0
+  },
+  "n_inactive_unit": 0,
+  "n_stall": 0,
+  "n_over_cap": 0,
+  "n_tstar_not_computable": 0
+ },
+ "freeze_secs": [
+  23.64,
+  2.02,
+  1.23,
+  8.59,
+  19.55
+ ],
+ "statuses": {
+  "2988000": [
+   "scoreable",
+   "none"
+  ],
+  "2988001": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2988002": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2988003": [
+   "no s*",
+   "clean"
+  ],
+  "2988004": [
+   "scoreable",
+   "clean"
+  ]
+ },
+ "runs": {
+  "clean 2988004 -14": {
+   "seed": 2988004,
+   "class": "clean",
+   "log2rho": -14.0,
+   "rho": 6.103515625e-05,
+   "budget": 363477,
+   "step_cap": 3145728,
+   "t_c": 204136,
+   "run_status": "ok",
+   "aborted": false,
+   "s_at_tc": 4.544735519835374,
+   "state_tc_sha256": "f5f791209dc8bbff0b873d668ac02fe69b3eb6c48fc26aedf379e2dddf7709f7",
+   "forecast": {
+    "status": "ok",
+    "t_c": 204136,
+    "t_F_fc": 240993,
+    "t_fc": 259220,
+    "delay_fc": 18227,
+    "eps_fc": 0.0009459910801851538,
+    "r_fc": 0.02253145058246877,
+    "s_c_fc": 4.891717304297949,
+    "sdot_F_fc": 6.116079436679911e-06,
+    "n_window": 10207,
+    "growth_rate_at_cutoff": 1.504900205840098e-06,
+    "n_extrapolated": 159341,
+    "max_index_read": 204135,
+    "nan_recompute_identical": true
+   },
+   "forecast_fixed": {
+    "status": "ok",
+    "t_c": 204136,
+    "t_F_fc": 238350,
+    "t_fc": 255149,
+    "delay_fc": 16799,
+    "eps_fc": 0.0008574440894072244,
+    "r_fc": 0.02110255296736828,
+    "s_c_fc": 4.868299861090814,
+    "sdot_F_fc": 6.172732399889469e-06,
+    "n_window": 10207,
+    "growth_rate_at_cutoff": 1.504900205840098e-06,
+    "n_extrapolated": 159341,
+    "max_index_read": 204135,
+    "nan_recompute_identical": true
+   },
+   "nan_recompute_identical": true,
+   "secs_run": 12.5,
+   "observed": {
+    "seed": 2988004,
+    "class": "clean",
+    "log2rho": -14.0,
+    "budget": 363477,
+    "steps_observed": 262332,
+    "t_obs": 262332,
+    "s_obs": 4.918480974086112,
+    "rho2_at_obs": 0.39142385590005546,
+    "rho2_release": 0.10883121385323584,
+    "t_F": 240606,
+    "s_end": 4.918480974086112,
+    "reached_obs_end": false,
+    "t_08": 111614,
+    "follow_in_M": true,
+    "follow_dist_M": 3.676954946280714e-07,
+    "idle_zero_to_crossing": true,
+    "idle_first_violation": null,
+    "signs_fixed_to_crossing": true,
+    "sign_first_violation": null,
+    "state_tc_hash_ok": true,
+    "aborted": false,
+    "secs_observe": 46.3
+   },
+   "rho_t_star": 14.667840648563965,
+   "budget_record": {
+    "rho": 6.103515625e-05,
+    "k": 1.5,
+    "t_star": 240317.901186072,
+    "B_uncapped": 363477,
+    "cap": 3145728,
+    "B": 363477,
+    "over_cap": false
+   },
+   "peak_rss_gb": 0.319,
+   "current_rss_gb_after": 0.313
+  },
+  "clean 2988004 -16": {
+   "seed": 2988004,
+   "class": "clean",
+   "log2rho": -16.0,
+   "rho": 1.52587890625e-05,
+   "budget": 1444908,
+   "step_cap": 12582912,
+   "t_c": 816037,
+   "run_status": "ok",
+   "aborted": false,
+   "s_at_tc": 4.544733675315533,
+   "state_tc_sha256": "c8e3d2ac828b3c3d78c48182421da8b938ac4afe0c0970e3132b4bcc63466d21",
+   "forecast": {
+    "status": "ok",
+    "t_c": 816037,
+    "t_F_fc": 963366,
+    "t_fc": 991692,
+    "delay_fc": 28326,
+    "eps_fc": 0.000236683308860438,
+    "r_fc": 0.008946288100228674,
+    "s_c_fc": 4.826726858910457,
+    "sdot_F_fc": 1.5302194160682348e-06,
+    "n_window": 40802,
+    "growth_rate_at_cutoff": 3.764391407171737e-07,
+    "n_extrapolated": 628871,
+    "max_index_read": 816036,
+    "nan_recompute_identical": true
+   },
+   "forecast_fixed": {
+    "status": "ok",
+    "t_c": 816037,
+    "t_F_fc": 952803,
+    "t_fc": 978968,
+    "delay_fc": 26165,
+    "eps_fc": 0.00021452494489354186,
+    "r_fc": 0.0083788225158261,
+    "s_c_fc": 4.807637065752783,
+    "sdot_F_fc": 1.5443631768974342e-06,
+    "n_window": 40802,
+    "growth_rate_at_cutoff": 3.764391407171737e-07,
+    "n_extrapolated": 628871,
+    "max_index_read": 816036,
+    "nan_recompute_identical": true
+   },
+   "nan_recompute_identical": true,
+   "secs_run": 50.2,
+   "observed": {
+    "seed": 2988004,
+    "class": "clean",
+    "log2rho": -16.0,
+    "budget": 1444908,
+    "steps_observed": 994672,
+    "t_obs": 994672,
+    "s_obs": 4.835613744030557,
+    "rho2_at_obs": 0.3914111549804876,
+    "rho2_release": 0.10883121385323584,
+    "t_F": 961796,
+    "s_end": 4.835613744030557,
+    "reached_obs_end": false,
+    "t_08": 446125,
+    "follow_in_M": true,
+    "follow_dist_M": 7.532517588296032e-07,
+    "idle_zero_to_crossing": true,
+    "idle_first_violation": null,
+    "signs_fixed_to_crossing": true,
+    "sign_first_violation": null,
+    "state_tc_hash_ok": true,
+    "aborted": false,
+    "secs_observe": 175.8
+   },
+   "rho_t_star": 14.667840648563965,
+   "budget_record": {
+    "rho": 1.52587890625e-05,
+    "k": 1.5,
+    "t_star": 961271.604744288,
+    "B_uncapped": 1444908,
+    "cap": 12582912,
+    "B": 1444908,
+    "over_cap": false
+   },
+   "peak_rss_gb": 0.323,
+   "current_rss_gb_after": 0.117
+  },
+  "none 2988000 -14": {
+   "seed": 2988000,
+   "class": "none",
+   "log2rho": -14.0,
+   "rho": 6.103515625e-05,
+   "budget": 2809721,
+   "step_cap": 3145728,
+   "t_c": 936724,
+   "run_status": "ok",
+   "aborted": false,
+   "s_at_tc": 6.926365872368668,
+   "state_tc_sha256": "d01eca23dbc75e875c582cafb3eaaa419d5f6665a4b4fd827d9ed78d3f620414",
+   "forecast": {
+    "status": "ok",
+    "t_c": 936724,
+    "t_F_fc": 1128066,
+    "t_fc": 1203829,
+    "delay_fc": 75763,
+    "eps_fc": 0.0006251946692286312,
+    "r_fc": 0.017095217707658417,
+    "s_c_fc": 7.415549955650325,
+    "sdot_F_fc": 1.722917389201939e-06,
+    "n_window": 46837,
+    "growth_rate_at_cutoff": 2.9983174507522096e-07,
+    "n_extrapolated": 1872997,
+    "max_index_read": 936723,
+    "nan_recompute_identical": true
+   },
+   "forecast_fixed": {
+    "status": "ok",
+    "t_c": 936724,
+    "t_F_fc": 936724,
+    "t_fc": 936724,
+    "delay_fc": 0,
+    "eps_fc": 0.0002884769360314755,
+    "r_fc": 0.01020794973372523,
+    "s_c_fc": 4.816357776277831,
+    "sdot_F_fc": 2.076742905643414e-06,
+    "n_window": 46837,
+    "growth_rate_at_cutoff": 2.9983174507522096e-07,
+    "n_extrapolated": 419263,
+    "max_index_read": 936723,
+    "nan_recompute_identical": true
+   },
+   "nan_recompute_identical": true,
+   "secs_run": 57.8,
+   "observed": {
+    "seed": 2988000,
+    "class": "none",
+    "log2rho": -14.0,
+    "budget": 2809721,
+    "steps_observed": 1187052,
+    "t_obs": null,
+    "s_obs": null,
+    "rho2_at_obs": null,
+    "rho2_release": 0.0770017822386911,
+    "t_F": 1124127,
+    "s_end": 9.113950543090628,
+    "reached_obs_end": true,
+    "t_08": 503776,
+    "follow_in_M": true,
+    "follow_dist_M": 1.2920363804246158e-06,
+    "idle_zero_to_crossing": true,
+    "idle_first_violation": null,
+    "signs_fixed_to_crossing": false,
+    "sign_first_violation": 1184418,
+    "state_tc_hash_ok": true,
+    "aborted": false,
+    "secs_observe": 211.3
+   },
+   "rho_t_star": 68.52344369840878,
+   "budget_record": {
+    "rho": 6.103515625e-05,
+    "k": 2.5,
+    "t_star": 1122688.1015547295,
+    "B_uncapped": 2809721,
+    "cap": 3145728,
+    "B": 2809721,
+    "over_cap": false
+   },
+   "peak_rss_gb": 0.326,
+   "current_rss_gb_after": 0.118
+  }
+ }
+}
