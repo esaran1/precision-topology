@@ -1,0 +1,22 @@
+{
+ "label": "POST HOC reproducibility check (not registered): pre-stall Q seeds recomputed with the registered run_one vs their committed runs_Q.jsonl rows, timing fields excluded",
+ "runs_Q_sha256": "61248605444829252d6c5a59bf20ab8f4817ceb7c275b88363ed040948229560",
+ "seeds": {
+  "7430009": {
+   "identical": true,
+   "differing_keys": [],
+   "secs": 38.1
+  },
+  "7430005": {
+   "identical": true,
+   "differing_keys": [],
+   "secs": 97.8
+  },
+  "7430012": {
+   "identical": true,
+   "differing_keys": [],
+   "secs": 69.7
+  }
+ },
+ "all_identical": true
+}

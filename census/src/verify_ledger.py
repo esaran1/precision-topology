@@ -611,6 +611,7 @@ def main() -> None:
     phase2b_checks()
     phase2a_ps_checks()
     phase2a_ps_posthoc_checks()
+    phase3_checks()
     phase1b_checks()
     phase2c_checks()
 
@@ -1011,6 +1012,8 @@ PRODUCERS = {
     "phase3/observed_S.jsonl": ("phase3_w4", "observe", "full", ""),
     "phase3/observed_T4.jsonl": ("phase3_w4", "observe", "full", ""),
     "phase3/scores.json": ("phase3_w4", "score", "full", ""),
+    "phase3_results.md": ("phase3_report", "main", "full", ""),
+    "phase3/repro_check.json": ("phase3_repro_check", "main", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
@@ -3470,6 +3473,57 @@ P2APS_PH_PIN = {"excluded_outcome": "FAIL H+C3+C4", "excluded_validity_ok": True
                 "diagnosis": {2975003: "LANDSCAPE", 2975052: "PIPELINE", 2975093: "LANDSCAPE", 2975179: "LANDSCAPE"}}
 
 
+# Phase 3 pins (set from the committed scores.json): {arm: (outcome, n_scored, gate n_on_copy)}
+P3_PIN = {"Q": ("PASS", 112, 115), "S": ("PASS", 119, 120), "T4": ("PASS", 95, 95)}
+
+
+def phase3_checks() -> None:
+    """Phase 3 (registration 7a9d791, stamp 2bcbda1, OpenTimestamps 16a46bb): the registration and forecast asserts;
+    every seed exactly once in each runs file; every forecast read only rows < t_c and its NaN recomputation was
+    identical; every observed t_c state matched its hash; scores.json regenerates from the committed rows with the
+    registered scoring code; phase3_results.md regenerates from scores.json; the collapse table and the verdicts pinned."""
+    from . import phase3_w4 as P3
+    from . import phase3_report as P3R
+    if not (P3.OUT / "scores.json").exists():
+        return
+    print("Phase 3: the lag law at width 4 on the asymmetric windows")
+    P3.assert_registration()
+    P3._assert_forecasts()
+    fr = json.loads((P3.OUT / "frozen.json").read_text())
+    c = fr["collapse_random_holds_T4"]
+    chk("P3 random holds reaching a genuine four-unit branch", float(c["n_genuine_four_unit_unplaced"]), 0.0, 0)
+    chk("P3 T4 random holds on T4 (gate >= 60)", float(c["n_on_T4"]), 95.0, 0)
+    n_bad_read = n_nan = n_hash = 0
+    for arm in P3.ARMS:
+        runs = P3._rows(P3._runs_file(arm))
+        chk(f"P3 {arm} runs: every seed once", float(sorted(r["seed"] for r in runs) == list(P3.SEEDS[arm])), 1.0, 0)
+        for r in runs:
+            fc = r.get("forecast") or {}
+            if r.get("t_c") is not None:
+                n_bad_read += int(max(fc["max_index_read"].values()) >= r["t_c"])
+                n_nan += int(fc.get("nan_recompute_identical") is not True)
+        n_hash += sum(int(o.get("state_tc_hash_ok") is False) for o in P3._rows(P3._obs_file(arm)))
+    chk("P3 forecasts reading a row >= t_c", float(n_bad_read), 0.0, 0)
+    chk("P3 NaN recomputations differing", float(n_nan), 0.0, 0)
+    chk("P3 observed t_c states not matching the hash", float(n_hash), 0.0, 0)
+    S = json.loads((P3.OUT / "scores.json").read_text())
+    chk("P3 scores.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(P3._jsonable(P3R.score_result())))), 1.0, 0)
+    chk("P3 phase3_results.md regenerates from scores.json",
+        float((R / "phase3_results.md").read_text() == P3R.render_md(S)), 1.0, 0)
+    rc = json.loads((P3.OUT / "repro_check.json").read_text())
+    chk("P3 repro check: pre-stall Q seeds reproduce identically", float(rc["all_identical"]), 1.0, 0)
+    chk("P3 repro check covers 3 seeds", float(len(rc["seeds"])), 3.0, 0)
+    chk("P3 repro check read the committed runs_Q.jsonl",
+        float(rc["runs_Q_sha256"] == P3._sha(P3._runs_file("Q"))), 1.0, 0)
+    if P3_PIN is not None:
+        for arm, (outc, n_sc, n_on) in P3_PIN.items():
+            a = S["arms"][arm]
+            chk(f"P3 {arm} outcome pinned", float(a["outcome"] == outc), 1.0, 0)
+            chk(f"P3 {arm} scored runs", float(a.get("n_scored", 0)), float(n_sc), 0)
+            chk(f"P3 {arm} gate on copy", float(a["gate"]["n_on_copy"]), float(n_on), 0)
+
+
 def phase2a_ps_posthoc_checks() -> None:
     """Phase 2A-PS POST HOC (not registered; no registered verdict changes): phase2a_ps_posthoc.json regenerates from
     the parts file and the committed registered files; the page regenerates from it and carries the POST HOC header;
@@ -3616,7 +3670,9 @@ def provenance_check() -> None:
         sub, _, base = art.rpartition("/")                           # OUT = RESULTS / "sub"; OUT / "base"
         if not (art in text or f'"{stem}"' in text
                 or any(stem.startswith(fp + "_") for fp in fprefixes)
-                or (sub and f'/ "{sub}"' in text and f'"{base}"' in text)):
+                or (sub and f'/ "{sub}"' in text and f'"{base}"' in text)
+                or (sub and f'/ "{sub}"' in text                       # OUT = RESULTS / "sub"; OUT / f"runs_{arm}.jsonl"
+                    and any(base.rsplit(".", 1)[0].startswith(fp + "_") for fp in fprefixes))):
             bad.append(f"{art}: src/{mod}.py never references it")
             continue
         if fn == "<module>":
