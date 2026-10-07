@@ -1,0 +1,3724 @@
+{
+ "label": "Phase 2A-PS2 frozen per-seed inputs (before the registration; no training)",
+ "v2_frozen_sha256": "deb8853e9c68901afc8c81bd2d649c728218ad16bd3078bff0e43ac1a806e959",
+ "phase2a_frozen_sha256": "ced158430e6a9088b6883dac334eb16e3eeaa06d6fd5c7dc90925848e6e9d5e8",
+ "frozen_parts_sha256": "4ba3f46e224aab96a7f597b51b096ec0e7017455cad687e19fed05124203fd7f",
+ "counts": {
+  "n_seeds": 600,
+  "n_untraceable": 206,
+  "untraceable_frac": 0.3433333333333333,
+  "by_status": {
+   "untraceable: M homotopy failed": 197,
+   "untraceable: no upper fold": 3,
+   "untraceable: homotopy point not stable": 0,
+   "untraceable: stable part does not reach the upper fold": 0,
+   "untraceable: rho2 >= q on the stable part": 6,
+   "s_F not validated": 1,
+   "Lambda_F not validated": 0,
+   "no s*": 84,
+   "release Newton failed": 1,
+   "inactive unit at release": 10,
+   "ineligible": 44,
+   "t* not computable": 0,
+   "stall": 0,
+   "over cap": 1,
+   "scoreable": 253
+  },
+  "class_by_status": {
+   "s_F not validated": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 1
+   },
+   "Lambda_F not validated": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "no s*": {
+    "clean": 18,
+    "none": 57,
+    "mixed": 9
+   },
+   "release Newton failed": {
+    "clean": 0,
+    "none": 1,
+    "mixed": 0
+   },
+   "inactive unit at release": {
+    "clean": 8,
+    "none": 2,
+    "mixed": 0
+   },
+   "ineligible": {
+    "clean": 19,
+    "none": 11,
+    "mixed": 14
+   },
+   "t* not computable": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "stall": {
+    "clean": 0,
+    "none": 0,
+    "mixed": 0
+   },
+   "over cap": {
+    "clean": 0,
+    "none": 1,
+    "mixed": 0
+   },
+   "scoreable": {
+    "clean": 113,
+    "none": 79,
+    "mixed": 61
+   }
+  },
+  "n_scoreable": 253,
+  "scoreable_by_class": {
+   "clean": 113,
+   "none": 79,
+   "mixed": 61
+  },
+  "n_inactive_unit": 10,
+  "n_stall": 0,
+  "n_over_cap": 1,
+  "n_tstar_not_computable": 0
+ },
+ "gate": {
+  "n_clean_scoreable": 113,
+  "min": 24,
+  "pass": true
+ },
+ "over_cap_check": {
+  "n_over_cap": {
+   "clean": 0,
+   "none": 1,
+   "mixed": 0
+  },
+  "max_allowed": 5,
+  "pass": true,
+  "seeds": {
+   "clean": [],
+   "none": [
+    2987012
+   ],
+   "mixed": []
+  }
+ },
+ "class_listing_sha256": "1ee7cb87ab1a6ff7a3d74020a86bea5528503c521b01dacff5f2ec2c5395cc6e",
+ "classes": {
+  "2987000": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987001": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987002": [
+   "no s*",
+   "none"
+  ],
+  "2987003": [
+   "scoreable",
+   "none"
+  ],
+  "2987004": [
+   "no s*",
+   "none"
+  ],
+  "2987005": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987006": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987007": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987008": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987009": [
+   "no s*",
+   "none"
+  ],
+  "2987010": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987011": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987012": [
+   "over cap",
+   "none"
+  ],
+  "2987013": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987014": [
+   "ineligible",
+   "clean"
+  ],
+  "2987015": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987016": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987017": [
+   "ineligible",
+   "clean"
+  ],
+  "2987018": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987019": [
+   "no s*",
+   "mixed"
+  ],
+  "2987020": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987021": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987022": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987023": [
+   "scoreable",
+   "none"
+  ],
+  "2987024": [
+   "scoreable",
+   "clean"
+  ],
+  "2987025": [
+   "scoreable",
+   "none"
+  ],
+  "2987026": [
+   "scoreable",
+   "clean"
+  ],
+  "2987027": [
+   "scoreable",
+   "none"
+  ],
+  "2987028": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987029": [
+   "scoreable",
+   "clean"
+  ],
+  "2987030": [
+   "scoreable",
+   "clean"
+  ],
+  "2987031": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987032": [
+   "scoreable",
+   "clean"
+  ],
+  "2987033": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987034": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987035": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987036": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987037": [
+   "scoreable",
+   "clean"
+  ],
+  "2987038": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987039": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987040": [
+   "scoreable",
+   "none"
+  ],
+  "2987041": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987042": [
+   "no s*",
+   "mixed"
+  ],
+  "2987043": [
+   "ineligible",
+   "none"
+  ],
+  "2987044": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987045": [
+   "scoreable",
+   "none"
+  ],
+  "2987046": [
+   "scoreable",
+   "clean"
+  ],
+  "2987047": [
+   "scoreable",
+   "clean"
+  ],
+  "2987048": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987049": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987050": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987051": [
+   "no s*",
+   "none"
+  ],
+  "2987052": [
+   "ineligible",
+   "clean"
+  ],
+  "2987053": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987054": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987055": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987056": [
+   "no s*",
+   "none"
+  ],
+  "2987057": [
+   "no s*",
+   "none"
+  ],
+  "2987058": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987059": [
+   "scoreable",
+   "clean"
+  ],
+  "2987060": [
+   "no s*",
+   "none"
+  ],
+  "2987061": [
+   "no s*",
+   "clean"
+  ],
+  "2987062": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987063": [
+   "ineligible",
+   "clean"
+  ],
+  "2987064": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987065": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987066": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987067": [
+   "no s*",
+   "clean"
+  ],
+  "2987068": [
+   "scoreable",
+   "clean"
+  ],
+  "2987069": [
+   "no s*",
+   "none"
+  ],
+  "2987070": [
+   "no s*",
+   "none"
+  ],
+  "2987071": [
+   "no s*",
+   "none"
+  ],
+  "2987072": [
+   "ineligible",
+   "clean"
+  ],
+  "2987073": [
+   "no s*",
+   "none"
+  ],
+  "2987074": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987075": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987076": [
+   "scoreable",
+   "none"
+  ],
+  "2987077": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987078": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987079": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987080": [
+   "scoreable",
+   "clean"
+  ],
+  "2987081": [
+   "scoreable",
+   "none"
+  ],
+  "2987082": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987083": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987084": [
+   "no s*",
+   "none"
+  ],
+  "2987085": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987086": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987087": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987088": [
+   "scoreable",
+   "clean"
+  ],
+  "2987089": [
+   "scoreable",
+   "none"
+  ],
+  "2987090": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987091": [
+   "scoreable",
+   "clean"
+  ],
+  "2987092": [
+   "no s*",
+   "clean"
+  ],
+  "2987093": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987094": [
+   "scoreable",
+   "none"
+  ],
+  "2987095": [
+   "no s*",
+   "none"
+  ],
+  "2987096": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987097": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987098": [
+   "scoreable",
+   "none"
+  ],
+  "2987099": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987100": [
+   "scoreable",
+   "clean"
+  ],
+  "2987101": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987102": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987103": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987104": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987105": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987106": [
+   "no s*",
+   "clean"
+  ],
+  "2987107": [
+   "no s*",
+   "none"
+  ],
+  "2987108": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987109": [
+   "scoreable",
+   "none"
+  ],
+  "2987110": [
+   "scoreable",
+   "clean"
+  ],
+  "2987111": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987112": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987113": [
+   "scoreable",
+   "none"
+  ],
+  "2987114": [
+   "scoreable",
+   "clean"
+  ],
+  "2987115": [
+   "scoreable",
+   "none"
+  ],
+  "2987116": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987117": [
+   "scoreable",
+   "clean"
+  ],
+  "2987118": [
+   "scoreable",
+   "none"
+  ],
+  "2987119": [
+   "no s*",
+   "none"
+  ],
+  "2987120": [
+   "scoreable",
+   "none"
+  ],
+  "2987121": [
+   "scoreable",
+   "none"
+  ],
+  "2987122": [
+   "scoreable",
+   "clean"
+  ],
+  "2987123": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987124": [
+   "scoreable",
+   "none"
+  ],
+  "2987125": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987126": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987127": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987128": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987129": [
+   "no s*",
+   "mixed"
+  ],
+  "2987130": [
+   "scoreable",
+   "clean"
+  ],
+  "2987131": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987132": [
+   "s_F not validated",
+   "mixed"
+  ],
+  "2987133": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987134": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987135": [
+   "scoreable",
+   "clean"
+  ],
+  "2987136": [
+   "scoreable",
+   "clean"
+  ],
+  "2987137": [
+   "scoreable",
+   "clean"
+  ],
+  "2987138": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987139": [
+   "no s*",
+   "mixed"
+  ],
+  "2987140": [
+   "no s*",
+   "none"
+  ],
+  "2987141": [
+   "scoreable",
+   "clean"
+  ],
+  "2987142": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987143": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987144": [
+   "ineligible",
+   "clean"
+  ],
+  "2987145": [
+   "ineligible",
+   "clean"
+  ],
+  "2987146": [
+   "no s*",
+   "none"
+  ],
+  "2987147": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987148": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987149": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987150": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987151": [
+   "scoreable",
+   "clean"
+  ],
+  "2987152": [
+   "scoreable",
+   "none"
+  ],
+  "2987153": [
+   "scoreable",
+   "clean"
+  ],
+  "2987154": [
+   "no s*",
+   "none"
+  ],
+  "2987155": [
+   "no s*",
+   "none"
+  ],
+  "2987156": [
+   "scoreable",
+   "none"
+  ],
+  "2987157": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987158": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987159": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987160": [
+   "scoreable",
+   "none"
+  ],
+  "2987161": [
+   "inactive unit at release",
+   "none"
+  ],
+  "2987162": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987163": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987164": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987165": [
+   "scoreable",
+   "clean"
+  ],
+  "2987166": [
+   "no s*",
+   "none"
+  ],
+  "2987167": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987168": [
+   "scoreable",
+   "clean"
+  ],
+  "2987169": [
+   "scoreable",
+   "none"
+  ],
+  "2987170": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987171": [
+   "scoreable",
+   "none"
+  ],
+  "2987172": [
+   "ineligible",
+   "none"
+  ],
+  "2987173": [
+   "no s*",
+   "none"
+  ],
+  "2987174": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987175": [
+   "scoreable",
+   "clean"
+  ],
+  "2987176": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987177": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987178": [
+   "no s*",
+   "clean"
+  ],
+  "2987179": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987180": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987181": [
+   "no s*",
+   "clean"
+  ],
+  "2987182": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987183": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987184": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987185": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987186": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987187": [
+   "no s*",
+   "none"
+  ],
+  "2987188": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987189": [
+   "scoreable",
+   "clean"
+  ],
+  "2987190": [
+   "no s*",
+   "none"
+  ],
+  "2987191": [
+   "scoreable",
+   "none"
+  ],
+  "2987192": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987193": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987194": [
+   "no s*",
+   "none"
+  ],
+  "2987195": [
+   "scoreable",
+   "clean"
+  ],
+  "2987196": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987197": [
+   "no s*",
+   "clean"
+  ],
+  "2987198": [
+   "scoreable",
+   "clean"
+  ],
+  "2987199": [
+   "scoreable",
+   "clean"
+  ],
+  "2987200": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987201": [
+   "no s*",
+   "clean"
+  ],
+  "2987202": [
+   "scoreable",
+   "clean"
+  ],
+  "2987203": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987204": [
+   "scoreable",
+   "clean"
+  ],
+  "2987205": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987206": [
+   "no s*",
+   "none"
+  ],
+  "2987207": [
+   "scoreable",
+   "none"
+  ],
+  "2987208": [
+   "no s*",
+   "none"
+  ],
+  "2987209": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987210": [
+   "no s*",
+   "none"
+  ],
+  "2987211": [
+   "scoreable",
+   "clean"
+  ],
+  "2987212": [
+   "no s*",
+   "none"
+  ],
+  "2987213": [
+   "scoreable",
+   "none"
+  ],
+  "2987214": [
+   "ineligible",
+   "clean"
+  ],
+  "2987215": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987216": [
+   "no s*",
+   "none"
+  ],
+  "2987217": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987218": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987219": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987220": [
+   "no s*",
+   "clean"
+  ],
+  "2987221": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987222": [
+   "no s*",
+   "clean"
+  ],
+  "2987223": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987224": [
+   "untraceable: no upper fold",
+   null
+  ],
+  "2987225": [
+   "scoreable",
+   "none"
+  ],
+  "2987226": [
+   "no s*",
+   "none"
+  ],
+  "2987227": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987228": [
+   "ineligible",
+   "clean"
+  ],
+  "2987229": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987230": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987231": [
+   "scoreable",
+   "none"
+  ],
+  "2987232": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987233": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987234": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987235": [
+   "scoreable",
+   "clean"
+  ],
+  "2987236": [
+   "scoreable",
+   "clean"
+  ],
+  "2987237": [
+   "scoreable",
+   "clean"
+  ],
+  "2987238": [
+   "no s*",
+   "clean"
+  ],
+  "2987239": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987240": [
+   "no s*",
+   "none"
+  ],
+  "2987241": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987242": [
+   "ineligible",
+   "clean"
+  ],
+  "2987243": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987244": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987245": [
+   "ineligible",
+   "clean"
+  ],
+  "2987246": [
+   "ineligible",
+   "none"
+  ],
+  "2987247": [
+   "no s*",
+   "none"
+  ],
+  "2987248": [
+   "scoreable",
+   "none"
+  ],
+  "2987249": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987250": [
+   "no s*",
+   "mixed"
+  ],
+  "2987251": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987252": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987253": [
+   "scoreable",
+   "clean"
+  ],
+  "2987254": [
+   "scoreable",
+   "clean"
+  ],
+  "2987255": [
+   "scoreable",
+   "none"
+  ],
+  "2987256": [
+   "scoreable",
+   "clean"
+  ],
+  "2987257": [
+   "scoreable",
+   "none"
+  ],
+  "2987258": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987259": [
+   "scoreable",
+   "none"
+  ],
+  "2987260": [
+   "ineligible",
+   "none"
+  ],
+  "2987261": [
+   "scoreable",
+   "none"
+  ],
+  "2987262": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987263": [
+   "scoreable",
+   "clean"
+  ],
+  "2987264": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987265": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987266": [
+   "scoreable",
+   "none"
+  ],
+  "2987267": [
+   "scoreable",
+   "none"
+  ],
+  "2987268": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987269": [
+   "scoreable",
+   "none"
+  ],
+  "2987270": [
+   "scoreable",
+   "clean"
+  ],
+  "2987271": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987272": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987273": [
+   "scoreable",
+   "none"
+  ],
+  "2987274": [
+   "scoreable",
+   "none"
+  ],
+  "2987275": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987276": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987277": [
+   "scoreable",
+   "clean"
+  ],
+  "2987278": [
+   "no s*",
+   "mixed"
+  ],
+  "2987279": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987280": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987281": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987282": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987283": [
+   "scoreable",
+   "clean"
+  ],
+  "2987284": [
+   "no s*",
+   "none"
+  ],
+  "2987285": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987286": [
+   "scoreable",
+   "clean"
+  ],
+  "2987287": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987288": [
+   "scoreable",
+   "clean"
+  ],
+  "2987289": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987290": [
+   "no s*",
+   "none"
+  ],
+  "2987291": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987292": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987293": [
+   "scoreable",
+   "clean"
+  ],
+  "2987294": [
+   "scoreable",
+   "clean"
+  ],
+  "2987295": [
+   "scoreable",
+   "clean"
+  ],
+  "2987296": [
+   "scoreable",
+   "clean"
+  ],
+  "2987297": [
+   "no s*",
+   "none"
+  ],
+  "2987298": [
+   "scoreable",
+   "clean"
+  ],
+  "2987299": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987300": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987301": [
+   "scoreable",
+   "clean"
+  ],
+  "2987302": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987303": [
+   "ineligible",
+   "clean"
+  ],
+  "2987304": [
+   "scoreable",
+   "clean"
+  ],
+  "2987305": [
+   "scoreable",
+   "clean"
+  ],
+  "2987306": [
+   "ineligible",
+   "none"
+  ],
+  "2987307": [
+   "no s*",
+   "none"
+  ],
+  "2987308": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987309": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987310": [
+   "scoreable",
+   "clean"
+  ],
+  "2987311": [
+   "scoreable",
+   "none"
+  ],
+  "2987312": [
+   "scoreable",
+   "clean"
+  ],
+  "2987313": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987314": [
+   "no s*",
+   "none"
+  ],
+  "2987315": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987316": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987317": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987318": [
+   "scoreable",
+   "clean"
+  ],
+  "2987319": [
+   "inactive unit at release",
+   "none"
+  ],
+  "2987320": [
+   "scoreable",
+   "clean"
+  ],
+  "2987321": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987322": [
+   "scoreable",
+   "clean"
+  ],
+  "2987323": [
+   "no s*",
+   "none"
+  ],
+  "2987324": [
+   "no s*",
+   "mixed"
+  ],
+  "2987325": [
+   "scoreable",
+   "none"
+  ],
+  "2987326": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987327": [
+   "scoreable",
+   "clean"
+  ],
+  "2987328": [
+   "scoreable",
+   "clean"
+  ],
+  "2987329": [
+   "scoreable",
+   "none"
+  ],
+  "2987330": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987331": [
+   "scoreable",
+   "none"
+  ],
+  "2987332": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987333": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987334": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987335": [
+   "ineligible",
+   "clean"
+  ],
+  "2987336": [
+   "no s*",
+   "clean"
+  ],
+  "2987337": [
+   "scoreable",
+   "none"
+  ],
+  "2987338": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987339": [
+   "scoreable",
+   "clean"
+  ],
+  "2987340": [
+   "scoreable",
+   "clean"
+  ],
+  "2987341": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987342": [
+   "scoreable",
+   "clean"
+  ],
+  "2987343": [
+   "ineligible",
+   "clean"
+  ],
+  "2987344": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987345": [
+   "scoreable",
+   "clean"
+  ],
+  "2987346": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987347": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987348": [
+   "scoreable",
+   "clean"
+  ],
+  "2987349": [
+   "scoreable",
+   "none"
+  ],
+  "2987350": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987351": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987352": [
+   "no s*",
+   "none"
+  ],
+  "2987353": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987354": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987355": [
+   "untraceable: no upper fold",
+   null
+  ],
+  "2987356": [
+   "scoreable",
+   "none"
+  ],
+  "2987357": [
+   "release Newton failed",
+   "none"
+  ],
+  "2987358": [
+   "scoreable",
+   "none"
+  ],
+  "2987359": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987360": [
+   "no s*",
+   "none"
+  ],
+  "2987361": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987362": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987363": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987364": [
+   "scoreable",
+   "clean"
+  ],
+  "2987365": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987366": [
+   "scoreable",
+   "clean"
+  ],
+  "2987367": [
+   "no s*",
+   "none"
+  ],
+  "2987368": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987369": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987370": [
+   "no s*",
+   "clean"
+  ],
+  "2987371": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987372": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987373": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987374": [
+   "scoreable",
+   "clean"
+  ],
+  "2987375": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987376": [
+   "scoreable",
+   "none"
+  ],
+  "2987377": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987378": [
+   "scoreable",
+   "none"
+  ],
+  "2987379": [
+   "scoreable",
+   "none"
+  ],
+  "2987380": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987381": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987382": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987383": [
+   "scoreable",
+   "clean"
+  ],
+  "2987384": [
+   "scoreable",
+   "clean"
+  ],
+  "2987385": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987386": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987387": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987388": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987389": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987390": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987391": [
+   "no s*",
+   "mixed"
+  ],
+  "2987392": [
+   "scoreable",
+   "clean"
+  ],
+  "2987393": [
+   "scoreable",
+   "clean"
+  ],
+  "2987394": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987395": [
+   "scoreable",
+   "clean"
+  ],
+  "2987396": [
+   "scoreable",
+   "none"
+  ],
+  "2987397": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987398": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987399": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987400": [
+   "scoreable",
+   "none"
+  ],
+  "2987401": [
+   "scoreable",
+   "clean"
+  ],
+  "2987402": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987403": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987404": [
+   "ineligible",
+   "clean"
+  ],
+  "2987405": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987406": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987407": [
+   "scoreable",
+   "none"
+  ],
+  "2987408": [
+   "scoreable",
+   "clean"
+  ],
+  "2987409": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987410": [
+   "no s*",
+   "none"
+  ],
+  "2987411": [
+   "ineligible",
+   "clean"
+  ],
+  "2987412": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987413": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987414": [
+   "scoreable",
+   "clean"
+  ],
+  "2987415": [
+   "untraceable: no upper fold",
+   null
+  ],
+  "2987416": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987417": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987418": [
+   "no s*",
+   "none"
+  ],
+  "2987419": [
+   "scoreable",
+   "none"
+  ],
+  "2987420": [
+   "scoreable",
+   "clean"
+  ],
+  "2987421": [
+   "no s*",
+   "none"
+  ],
+  "2987422": [
+   "scoreable",
+   "clean"
+  ],
+  "2987423": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987424": [
+   "scoreable",
+   "none"
+  ],
+  "2987425": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987426": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987427": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987428": [
+   "ineligible",
+   "none"
+  ],
+  "2987429": [
+   "scoreable",
+   "none"
+  ],
+  "2987430": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987431": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987432": [
+   "no s*",
+   "clean"
+  ],
+  "2987433": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987434": [
+   "scoreable",
+   "none"
+  ],
+  "2987435": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987436": [
+   "scoreable",
+   "clean"
+  ],
+  "2987437": [
+   "scoreable",
+   "clean"
+  ],
+  "2987438": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987439": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987440": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987441": [
+   "scoreable",
+   "none"
+  ],
+  "2987442": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987443": [
+   "scoreable",
+   "none"
+  ],
+  "2987444": [
+   "scoreable",
+   "clean"
+  ],
+  "2987445": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987446": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987447": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987448": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987449": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987450": [
+   "scoreable",
+   "clean"
+  ],
+  "2987451": [
+   "scoreable",
+   "none"
+  ],
+  "2987452": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987453": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987454": [
+   "scoreable",
+   "none"
+  ],
+  "2987455": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987456": [
+   "no s*",
+   "none"
+  ],
+  "2987457": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987458": [
+   "scoreable",
+   "clean"
+  ],
+  "2987459": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987460": [
+   "no s*",
+   "none"
+  ],
+  "2987461": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987462": [
+   "no s*",
+   "none"
+  ],
+  "2987463": [
+   "scoreable",
+   "none"
+  ],
+  "2987464": [
+   "scoreable",
+   "clean"
+  ],
+  "2987465": [
+   "no s*",
+   "none"
+  ],
+  "2987466": [
+   "scoreable",
+   "clean"
+  ],
+  "2987467": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987468": [
+   "ineligible",
+   "none"
+  ],
+  "2987469": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987470": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987471": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987472": [
+   "scoreable",
+   "none"
+  ],
+  "2987473": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987474": [
+   "no s*",
+   "clean"
+  ],
+  "2987475": [
+   "scoreable",
+   "clean"
+  ],
+  "2987476": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987477": [
+   "scoreable",
+   "clean"
+  ],
+  "2987478": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987479": [
+   "no s*",
+   "none"
+  ],
+  "2987480": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987481": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987482": [
+   "scoreable",
+   "clean"
+  ],
+  "2987483": [
+   "ineligible",
+   "clean"
+  ],
+  "2987484": [
+   "scoreable",
+   "clean"
+  ],
+  "2987485": [
+   "no s*",
+   "none"
+  ],
+  "2987486": [
+   "ineligible",
+   "clean"
+  ],
+  "2987487": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987488": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987489": [
+   "scoreable",
+   "clean"
+  ],
+  "2987490": [
+   "no s*",
+   "clean"
+  ],
+  "2987491": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987492": [
+   "no s*",
+   "none"
+  ],
+  "2987493": [
+   "scoreable",
+   "none"
+  ],
+  "2987494": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987495": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987496": [
+   "scoreable",
+   "clean"
+  ],
+  "2987497": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987498": [
+   "scoreable",
+   "none"
+  ],
+  "2987499": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987500": [
+   "scoreable",
+   "none"
+  ],
+  "2987501": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987502": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987503": [
+   "scoreable",
+   "none"
+  ],
+  "2987504": [
+   "scoreable",
+   "clean"
+  ],
+  "2987505": [
+   "scoreable",
+   "none"
+  ],
+  "2987506": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987507": [
+   "scoreable",
+   "clean"
+  ],
+  "2987508": [
+   "scoreable",
+   "none"
+  ],
+  "2987509": [
+   "scoreable",
+   "clean"
+  ],
+  "2987510": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987511": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987512": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987513": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987514": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987515": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987516": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987517": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987518": [
+   "scoreable",
+   "clean"
+  ],
+  "2987519": [
+   "scoreable",
+   "none"
+  ],
+  "2987520": [
+   "scoreable",
+   "none"
+  ],
+  "2987521": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987522": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987523": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987524": [
+   "no s*",
+   "none"
+  ],
+  "2987525": [
+   "ineligible",
+   "none"
+  ],
+  "2987526": [
+   "no s*",
+   "none"
+  ],
+  "2987527": [
+   "no s*",
+   "clean"
+  ],
+  "2987528": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987529": [
+   "scoreable",
+   "clean"
+  ],
+  "2987530": [
+   "no s*",
+   "none"
+  ],
+  "2987531": [
+   "scoreable",
+   "none"
+  ],
+  "2987532": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987533": [
+   "inactive unit at release",
+   "clean"
+  ],
+  "2987534": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987535": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987536": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987537": [
+   "scoreable",
+   "clean"
+  ],
+  "2987538": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987539": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987540": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987541": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987542": [
+   "scoreable",
+   "clean"
+  ],
+  "2987543": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987544": [
+   "ineligible",
+   "clean"
+  ],
+  "2987545": [
+   "scoreable",
+   "clean"
+  ],
+  "2987546": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987547": [
+   "scoreable",
+   "clean"
+  ],
+  "2987548": [
+   "scoreable",
+   "none"
+  ],
+  "2987549": [
+   "no s*",
+   "none"
+  ],
+  "2987550": [
+   "scoreable",
+   "none"
+  ],
+  "2987551": [
+   "scoreable",
+   "none"
+  ],
+  "2987552": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987553": [
+   "scoreable",
+   "none"
+  ],
+  "2987554": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987555": [
+   "scoreable",
+   "clean"
+  ],
+  "2987556": [
+   "no s*",
+   "none"
+  ],
+  "2987557": [
+   "ineligible",
+   "none"
+  ],
+  "2987558": [
+   "scoreable",
+   "none"
+  ],
+  "2987559": [
+   "no s*",
+   "none"
+  ],
+  "2987560": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987561": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987562": [
+   "scoreable",
+   "none"
+  ],
+  "2987563": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987564": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987565": [
+   "scoreable",
+   "clean"
+  ],
+  "2987566": [
+   "scoreable",
+   "none"
+  ],
+  "2987567": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987568": [
+   "no s*",
+   "mixed"
+  ],
+  "2987569": [
+   "untraceable: rho2 >= q on the stable part",
+   null
+  ],
+  "2987570": [
+   "scoreable",
+   "clean"
+  ],
+  "2987571": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987572": [
+   "scoreable",
+   "none"
+  ],
+  "2987573": [
+   "no s*",
+   "clean"
+  ],
+  "2987574": [
+   "scoreable",
+   "clean"
+  ],
+  "2987575": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987576": [
+   "scoreable",
+   "clean"
+  ],
+  "2987577": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987578": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987579": [
+   "scoreable",
+   "clean"
+  ],
+  "2987580": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987581": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987582": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987583": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987584": [
+   "scoreable",
+   "clean"
+  ],
+  "2987585": [
+   "scoreable",
+   "clean"
+  ],
+  "2987586": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987587": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987588": [
+   "ineligible",
+   "none"
+  ],
+  "2987589": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987590": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987591": [
+   "ineligible",
+   "none"
+  ],
+  "2987592": [
+   "scoreable",
+   "clean"
+  ],
+  "2987593": [
+   "scoreable",
+   "clean"
+  ],
+  "2987594": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987595": [
+   "scoreable",
+   "mixed"
+  ],
+  "2987596": [
+   "scoreable",
+   "clean"
+  ],
+  "2987597": [
+   "untraceable: M homotopy failed",
+   null
+  ],
+  "2987598": [
+   "ineligible",
+   "mixed"
+  ],
+  "2987599": [
+   "ineligible",
+   "mixed"
+  ]
+ },
+ "plan": [
+  {
+   "seed": 2987024,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 1873910
+  },
+  {
+   "seed": 2987024,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 7486640
+  },
+  {
+   "seed": 2987026,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 921275
+  },
+  {
+   "seed": 2987026,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3676100
+  },
+  {
+   "seed": 2987029,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 378690
+  },
+  {
+   "seed": 2987029,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1505757
+  },
+  {
+   "seed": 2987030,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 636758
+  },
+  {
+   "seed": 2987030,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2538031
+  },
+  {
+   "seed": 2987032,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 495560
+  },
+  {
+   "seed": 2987032,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1973237
+  },
+  {
+   "seed": 2987037,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 462897
+  },
+  {
+   "seed": 2987037,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1842586
+  },
+  {
+   "seed": 2987046,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 904194
+  },
+  {
+   "seed": 2987046,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3607774
+  },
+  {
+   "seed": 2987047,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 723806
+  },
+  {
+   "seed": 2987047,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2886223
+  },
+  {
+   "seed": 2987059,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 861152
+  },
+  {
+   "seed": 2987059,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3435606
+  },
+  {
+   "seed": 2987068,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 442629
+  },
+  {
+   "seed": 2987068,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1761515
+  },
+  {
+   "seed": 2987080,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 702544
+  },
+  {
+   "seed": 2987080,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2801175
+  },
+  {
+   "seed": 2987088,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 362665
+  },
+  {
+   "seed": 2987088,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1441660
+  },
+  {
+   "seed": 2987091,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 1092518
+  },
+  {
+   "seed": 2987091,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 4361072
+  },
+  {
+   "seed": 2987100,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 481156
+  },
+  {
+   "seed": 2987100,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1915621
+  },
+  {
+   "seed": 2987110,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 692894
+  },
+  {
+   "seed": 2987110,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2762574
+  },
+  {
+   "seed": 2987114,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 445957
+  },
+  {
+   "seed": 2987114,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1774825
+  },
+  {
+   "seed": 2987117,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 613092
+  },
+  {
+   "seed": 2987117,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2443367
+  },
+  {
+   "seed": 2987122,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 624628
+  },
+  {
+   "seed": 2987122,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2489512
+  },
+  {
+   "seed": 2987130,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 429980
+  },
+  {
+   "seed": 2987130,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1710919
+  },
+  {
+   "seed": 2987135,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 434937
+  },
+  {
+   "seed": 2987135,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1730745
+  },
+  {
+   "seed": 2987136,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 1580172
+  },
+  {
+   "seed": 2987136,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 6311687
+  },
+  {
+   "seed": 2987137,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 886256
+  },
+  {
+   "seed": 2987137,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3536024
+  },
+  {
+   "seed": 2987141,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 1975653
+  },
+  {
+   "seed": 2987141,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 7893612
+  },
+  {
+   "seed": 2987151,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 825934
+  },
+  {
+   "seed": 2987151,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3294733
+  },
+  {
+   "seed": 2987153,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 935795
+  },
+  {
+   "seed": 2987153,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3734177
+  },
+  {
+   "seed": 2987165,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 761628
+  },
+  {
+   "seed": 2987165,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3037509
+  },
+  {
+   "seed": 2987168,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 610615
+  },
+  {
+   "seed": 2987168,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2433458
+  },
+  {
+   "seed": 2987175,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 552993
+  },
+  {
+   "seed": 2987175,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2202972
+  },
+  {
+   "seed": 2987189,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 760360
+  },
+  {
+   "seed": 2987189,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3032438
+  },
+  {
+   "seed": 2987195,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 796896
+  },
+  {
+   "seed": 2987195,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3178582
+  },
+  {
+   "seed": 2987198,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 953277
+  },
+  {
+   "seed": 2987198,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3804107
+  },
+  {
+   "seed": 2987199,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 835568
+  },
+  {
+   "seed": 2987199,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3333269
+  },
+  {
+   "seed": 2987202,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 1282267
+  },
+  {
+   "seed": 2987202,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 5120067
+  },
+  {
+   "seed": 2987204,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 474721
+  },
+  {
+   "seed": 2987204,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1889883
+  },
+  {
+   "seed": 2987211,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 529735
+  },
+  {
+   "seed": 2987211,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2109937
+  },
+  {
+   "seed": 2987235,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 876767
+  },
+  {
+   "seed": 2987235,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3498068
+  },
+  {
+   "seed": 2987236,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 824764
+  },
+  {
+   "seed": 2987236,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3290056
+  },
+  {
+   "seed": 2987237,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 461086
+  },
+  {
+   "seed": 2987237,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 1835344
+  },
+  {
+   "seed": 2987253,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 864410
+  },
+  {
+   "seed": 2987253,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 3448640
+  },
+  {
+   "seed": 2987254,
+   "class": "clean",
+   "log2rho": -14.0,
+   "budget": 726341
+  },
+  {
+   "seed": 2987254,
+   "class": "clean",
+   "log2rho": -16.0,
+   "budget": 2896362
+  },
+  {
+   "seed": 2987003,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1047531
+  },
+  {
+   "seed": 2987023,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 635438
+  },
+  {
+   "seed": 2987025,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 2337636
+  },
+  {
+   "seed": 2987027,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 898924
+  },
+  {
+   "seed": 2987040,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1277794
+  },
+  {
+   "seed": 2987045,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 3013701
+  },
+  {
+   "seed": 2987076,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 2065661
+  },
+  {
+   "seed": 2987081,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 2266761
+  },
+  {
+   "seed": 2987089,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1572983
+  },
+  {
+   "seed": 2987094,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 759203
+  },
+  {
+   "seed": 2987098,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 634470
+  },
+  {
+   "seed": 2987109,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 763571
+  },
+  {
+   "seed": 2987113,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1507806
+  },
+  {
+   "seed": 2987115,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1293339
+  },
+  {
+   "seed": 2987118,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1412842
+  },
+  {
+   "seed": 2987120,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 702504
+  },
+  {
+   "seed": 2987121,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1463542
+  },
+  {
+   "seed": 2987124,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1829572
+  },
+  {
+   "seed": 2987152,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 908309
+  },
+  {
+   "seed": 2987156,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1633409
+  },
+  {
+   "seed": 2987160,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 736358
+  },
+  {
+   "seed": 2987169,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 899679
+  },
+  {
+   "seed": 2987171,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 856765
+  },
+  {
+   "seed": 2987191,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 948924
+  },
+  {
+   "seed": 2987207,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 877959
+  },
+  {
+   "seed": 2987213,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1250486
+  },
+  {
+   "seed": 2987225,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 920913
+  },
+  {
+   "seed": 2987231,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 1215069
+  },
+  {
+   "seed": 2987248,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 2120813
+  },
+  {
+   "seed": 2987255,
+   "class": "none",
+   "log2rho": -14.0,
+   "budget": 768883
+  },
+  {
+   "seed": 2987001,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 899809
+  },
+  {
+   "seed": 2987005,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 791051
+  },
+  {
+   "seed": 2987006,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 799890
+  },
+  {
+   "seed": 2987031,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 794601
+  },
+  {
+   "seed": 2987034,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 694694
+  },
+  {
+   "seed": 2987041,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 697716
+  },
+  {
+   "seed": 2987054,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 800810
+  },
+  {
+   "seed": 2987062,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 848933
+  },
+  {
+   "seed": 2987064,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 554502
+  },
+  {
+   "seed": 2987066,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 1163737
+  },
+  {
+   "seed": 2987085,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 3037442
+  },
+  {
+   "seed": 2987090,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 1135225
+  },
+  {
+   "seed": 2987093,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 888749
+  },
+  {
+   "seed": 2987128,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 577986
+  },
+  {
+   "seed": 2987143,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 919172
+  },
+  {
+   "seed": 2987150,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 802096
+  },
+  {
+   "seed": 2987157,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 1319574
+  },
+  {
+   "seed": 2987167,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 1018441
+  },
+  {
+   "seed": 2987176,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 1038318
+  },
+  {
+   "seed": 2987179,
+   "class": "mixed",
+   "log2rho": -14.0,
+   "budget": 743986
+  }
+ ],
+ "plan_counts": {
+  "clean": 40,
+  "none": 30,
+  "mixed": 20
+ },
+ "n_runs_planned": 130,
+ "plan_steps_total": 213269921,
+ "surplus_counted_not_trained": {
+  "clean": [
+   2987256,
+   2987263,
+   2987270,
+   2987277,
+   2987283,
+   2987286,
+   2987288,
+   2987293,
+   2987294,
+   2987295,
+   2987296,
+   2987298,
+   2987301,
+   2987304,
+   2987305,
+   2987310,
+   2987312,
+   2987318,
+   2987320,
+   2987322,
+   2987327,
+   2987328,
+   2987339,
+   2987340,
+   2987342,
+   2987345,
+   2987348,
+   2987364,
+   2987366,
+   2987374,
+   2987383,
+   2987384,
+   2987392,
+   2987393,
+   2987395,
+   2987401,
+   2987408,
+   2987414,
+   2987420,
+   2987422,
+   2987436,
+   2987437,
+   2987444,
+   2987450,
+   2987458,
+   2987464,
+   2987466,
+   2987475,
+   2987477,
+   2987482,
+   2987484,
+   2987489,
+   2987496,
+   2987504,
+   2987507,
+   2987509,
+   2987518,
+   2987529,
+   2987537,
+   2987542,
+   2987545,
+   2987547,
+   2987555,
+   2987565,
+   2987570,
+   2987574,
+   2987576,
+   2987579,
+   2987584,
+   2987585,
+   2987592,
+   2987593,
+   2987596
+  ],
+  "none": [
+   2987257,
+   2987259,
+   2987261,
+   2987266,
+   2987267,
+   2987269,
+   2987273,
+   2987274,
+   2987311,
+   2987325,
+   2987329,
+   2987331,
+   2987337,
+   2987349,
+   2987356,
+   2987358,
+   2987376,
+   2987378,
+   2987379,
+   2987396,
+   2987400,
+   2987407,
+   2987419,
+   2987424,
+   2987429,
+   2987434,
+   2987441,
+   2987443,
+   2987451,
+   2987454,
+   2987463,
+   2987472,
+   2987493,
+   2987498,
+   2987500,
+   2987503,
+   2987505,
+   2987508,
+   2987519,
+   2987520,
+   2987531,
+   2987548,
+   2987550,
+   2987551,
+   2987553,
+   2987558,
+   2987562,
+   2987566,
+   2987572
+  ],
+  "mixed": [
+   2987186,
+   2987188,
+   2987200,
+   2987221,
+   2987230,
+   2987232,
+   2987233,
+   2987234,
+   2987239,
+   2987241,
+   2987244,
+   2987251,
+   2987258,
+   2987262,
+   2987264,
+   2987268,
+   2987280,
+   2987281,
+   2987330,
+   2987334,
+   2987346,
+   2987353,
+   2987359,
+   2987368,
+   2987372,
+   2987381,
+   2987394,
+   2987399,
+   2987417,
+   2987431,
+   2987435,
+   2987459,
+   2987491,
+   2987494,
+   2987514,
+   2987523,
+   2987535,
+   2987541,
+   2987581,
+   2987582,
+   2987595
+  ]
+ },
+ "budgets": {
+  "clean -14": {
+   "rho_t_star": {
+    "n": 113,
+    "min": 13.754297975745686,
+    "median": 25.294100222253853,
+    "q90": 49.066538700463475,
+    "max": 84.4799912904525
+   },
+   "B": {
+    "n": 113,
+    "min": 341026.0,
+    "median": 624628.0,
+    "q90": 1208860.0,
+    "max": 2079181.0
+   },
+   "B_uncapped": {
+    "n": 113,
+    "min": 341026.0,
+    "median": 624628.0,
+    "q90": 1208860.0,
+    "max": 2079181.0
+   },
+   "n_over_cap": 0,
+   "cap": 3145728
+  },
+  "clean -16": {
+   "rho_t_star": {
+    "n": 113,
+    "min": 13.754297975745686,
+    "median": 25.294100222253853,
+    "q90": 49.066538700463475,
+    "max": 84.4799912904525
+   },
+   "B": {
+    "n": 113,
+    "min": 1355103.0,
+    "median": 2489512.0,
+    "q90": 4826437.2,
+    "max": 8307722.0
+   },
+   "B_uncapped": {
+    "n": 113,
+    "min": 1355103.0,
+    "median": 2489512.0,
+    "q90": 4826437.2,
+    "max": 8307722.0
+   },
+   "n_over_cap": 0,
+   "cap": 12582912
+  },
+  "none -14": {
+   "rho_t_star": {
+    "n": 80,
+    "min": 12.736707360789389,
+    "median": 25.750011861441067,
+    "q90": 57.28444533090492,
+    "max": 103.68427599308798
+   },
+   "B": {
+    "n": 79,
+    "min": 524696.0,
+    "median": 1049524.0,
+    "q90": 2339893.0,
+    "max": 3105196.0
+   },
+   "B_uncapped": {
+    "n": 80,
+    "min": 524696.0,
+    "median": 1057721.0,
+    "q90": 2349371.2,
+    "max": 4249908.0
+   },
+   "n_over_cap": 1,
+   "cap": 3145728
+  },
+  "mixed -14": {
+   "rho_t_star": {
+    "n": 61,
+    "min": 13.464397563084647,
+    "median": 20.546398519223047,
+    "q90": 32.07351840469527,
+    "max": 76.53474187182671
+   },
+   "B": {
+    "n": 61,
+    "min": 554502.0,
+    "median": 844581.0,
+    "q90": 1316732.0,
+    "max": 3137864.0
+   },
+   "B_uncapped": {
+    "n": 61,
+    "min": 554502.0,
+    "median": 844581.0,
+    "q90": 1316732.0,
+    "max": 3137864.0
+   },
+   "n_over_cap": 0,
+   "cap": 3145728
+  }
+ },
+ "activity": {
+  "inactive_unit_seeds": [
+   [
+    2987033,
+    "clean",
+    3.743758918374291e-87
+   ],
+   [
+    2987048,
+    "clean",
+    1.4274111843622043e-79
+   ],
+   [
+    2987104,
+    "clean",
+    3.2353913523388316e-86
+   ],
+   [
+    2987161,
+    "none",
+    1.2992683244871857e-90
+   ],
+   [
+    2987177,
+    "clean",
+    6.164912963509097e-89
+   ],
+   [
+    2987203,
+    "clean",
+    9.639902876462542e-89
+   ],
+   [
+    2987309,
+    "clean",
+    6.371656728876411e-86
+   ],
+   [
+    2987319,
+    "none",
+    1.46544633338525e-90
+   ],
+   [
+    2987403,
+    "clean",
+    3.36718756144738e-87
+   ],
+   [
+    2987533,
+    "clean",
+    4.041171987331873e-82
+   ]
+  ],
+  "smallest_live_share_scoreable": 0.10192757866691818
+ },
+ "stall_seeds": [],
+ "DESCRIPTIVE_wide_class_by_registered_class_scoreable": {
+  "mixed": {
+   "mixed": 53,
+   "clean": 8
+  },
+  "none": {
+   "mixed": 67,
+   "none": 12
+  },
+  "clean": {
+   "clean": 113
+  }
+ },
+ "DESCRIPTIVE_wide_class_by_registered_class_planned": {
+  "clean": {
+   "clean": 40,
+   "none": 0,
+   "mixed": 0
+  },
+  "none": {
+   "clean": 0,
+   "none": 6,
+   "mixed": 24
+  },
+  "mixed": {
+   "clean": 2,
+   "none": 0,
+   "mixed": 18
+  }
+ },
+ "DESCRIPTIVE": {
+  "s_F_range_scoreable": [
+   4.539307351669113,
+   8.204381537238582
+  ],
+  "sF_over_sstar_range_scoreable": [
+   1.0056290451273715,
+   1.6300779916963446
+  ],
+  "Lambda_F_range_scoreable": [
+   0.00013352949600014947,
+   0.0026720738290355794
+  ],
+  "mc_agree_scoreable_by_class": {
+   "clean": 43,
+   "none": 61,
+   "mixed": 30
+  },
+  "freeze_secs_total": 7225.0,
+  "peak_rss_gb": 0.277,
+  "homotopy_200_used": 208
+ },
+ "rules": {
+  "THETA": 1e-08,
+  "N_ACTIVE": 3,
+  "TSTAR_N": 121,
+  "TSTAR_END": 0.9999,
+  "SLOPE_DS_REL": 1e-06,
+  "K_BUDGET": {
+   "clean": 1.5,
+   "none": 2.5,
+   "mixed": 2.5
+  },
+  "BUDGET_ADD": 3000,
+  "CAP_FACTOR": 192.0,
+  "RSS_RUN_CAP": 1073741824,
+  "STATUS_ORDER": [
+   "untraceable: M homotopy failed",
+   "untraceable: no upper fold",
+   "untraceable: homotopy point not stable",
+   "untraceable: stable part does not reach the upper fold",
+   "untraceable: rho2 >= q on the stable part",
+   "s_F not validated",
+   "Lambda_F not validated",
+   "no s*",
+   "release Newton failed",
+   "inactive unit at release",
+   "ineligible",
+   "t* not computable",
+   "stall",
+   "over cap",
+   "scoreable"
+  ],
+  "CAPS": {
+   "clean": 40,
+   "none": 30,
+   "mixed": 20
+  },
+  "GATE_MIN_CLEAN": 24,
+  "H_MIN_N": 10,
+  "OVERCAP_STOP_MAX": 5
+ }
+}

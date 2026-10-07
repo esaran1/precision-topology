@@ -6,7 +6,10 @@ details in §9 that touch a criterion, the gate, validity or the scoring set: th
 Status:
 - **Registered after 2A-PS's UNRESOLVED (validity) outcome.** 2A-PS's registered verdict STAYS UNRESOLVED
   (validity). This is a new registration, not a re-scoring of 2A-PS.
-- **Not yet done:** no registered seed has been trained.
+- **Done:** scan, pilot and the freeze of all 600 registered seeds (no training; §12). The gate passes (113 clean
+  scoreable ≥ 24). **The author's over-cap check passes** (0 clean and 1 none seed over cap; ≤ 5 each).
+- **Not yet done:** no registered seed has been trained. The registration commit waits for the author's decision
+  on D1–D9 (§9).
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
 - **The registration commit** will hold this file, the approved page, `src/phase2a_ps2.py` and its import closure
   (which includes `src/phase2a_ps.py`, unchanged), `tests/test_phase2a_ps2.py`, and the frozen inputs. Their SHA-256
@@ -258,7 +261,88 @@ unmodified.
 
 ## 12. Scan, pilot and freeze (no registered seed trained)
 
-(Filled in below as the steps complete.)
+**Seed scan** (`seed_scan.json`, commit 6f3e534). Neither range is used:
+- no text match in any text file under src, tests, results, paper, notes, independent, data or dist (also written
+  with `_` or `,`);
+- no overlap with the SEEDS\*/PILOT_SEEDS\* constants of 14 registered modules (25 constants), nor with any of 663
+  integer range literals in src and tests;
+- 0 hits in 72 parquet seed columns;
+- disjoint from 2A-PS's seeds and from the exploration's.
+
+**Pilot** (`pilot.json`, `pilot_parts.jsonl`, commit 0322099; pilot seeds only). **A MACHINE check: it fixes no rule,
+threshold or criterion, and the page asks it to fix none.**
+- Pilot seeds were frozen in order until the first scoreable clean and the first scoreable none seed:
+  - 2,988,000 scoreable none (s_F 7.29, ρ·t\* 68.5, wider search none);
+  - 2,988,001–002 untraceable;
+  - 2,988,003 no s\*;
+  - 2,988,004 scoreable clean (s_F 4.78, ρ·t\* 14.7, wider search clean).
+- Runs with their frozen budgets:
+
+| run | B | t_c | t_obs | end | s_end/s_F | secs (run + observe) |
+|---|---|---|---|---|---|---|
+| clean 2,988,004, 2⁻¹⁴ | 363,477 | 204,136 | 262,332 | crossing | 1.028 | 13 + 46 |
+| clean 2,988,004, 2⁻¹⁶ | 1,444,908 | 816,037 | 994,672 | crossing | 1.011 | 50 + 176 |
+| none 2,988,000, 2⁻¹⁴ | 2,809,721 | 936,724 | none | 1.25·s_F at 1,187,052 | 1.250 | 58 + 211 |
+
+- In every run:
+  - the forecast status is ok, the guard's last row is t_c − 1, and the NaN recomputation is identical;
+  - the t_c state matched its hash on resume;
+  - the follow check lands on the seed's own M (≤ 1.3e−6).
+- The clean runs kept the idle unit at 0 and the signs fixed. The none run's signs moved, which is outside validity,
+  as in 2A-PS.
+- t_F/t\* = 1.0005–1.0013, consistent with the exploration's calibration.
+- The none run reached 1.25·s_F at 0.42·B.
+- Peak RSS 0.33 GB; ≈ 10 min.
+
+**Freeze** (`frozen_parts.jsonl`, `frozen.json`; all 600 registered seeds, NO training). 7,225 s in all; peak RSS
+0.28 GB.
+
+| status | seeds | class among them (clean / none / mixed) |
+|---|---|---|
+| **untraceable** | **206 (34.3%)**: M homotopy failed 197, no upper fold 3, ρ₂ ≥ q on the stable part 6 | – |
+| s_F not validated | 1 | 0 / 0 / 1 |
+| Λ_F not validated | 0 | – |
+| no s\* | 84 | 18 / 57 / 9 |
+| release Newton failed | 1 | 0 / 1 / 0 |
+| **inactive unit at release** | **10** (shares 1.3e−90 to 1.4e−79) | 8 / 2 / 0 |
+| ineligible | 44 | 19 / 11 / 14 |
+| t\* not computable | 0 | – |
+| stall | 0 | – |
+| **over cap** | **1** (2,987,012, ρ·t\* 103.7) | 0 / 1 / 0 |
+| **scoreable** | **253** | **113 / 79 / 61** |
+
+- **The author's over-cap check: PASS.** 0 clean and 1 none seed are over cap (≤ 5 each). One mixed seed is close to
+  the cap (B 3,137,864 of 3,145,728).
+- **Gate: 113 clean scoreable ≥ 24: PASS.** There are 79 none seeds, so H's minimum of 10 is met.
+- **Activity.** The smallest live share among scoreable releases is 0.102; the dead shares are ≤ 1.4e−79.
+- **Plan** (frozen; caps 40/30/20 in seed order; 130 runs, 213,269,921 budgeted steps in all):
+  - the first 40 of 113 clean seeds (2,987,024 … 2,987,254) at 2⁻¹⁴ and 2⁻¹⁶;
+  - the first 30 of 79 none seeds (2,987,003 … 2,987,255) and the first 20 of 61 mixed seeds (… 2,987,179) at 2⁻¹⁴;
+  - counted, not trained: 73 clean, 49 none, 41 mixed.
+- **Budgets** (scoreable; min / median / q90 / max):
+
+| | ρ·t\* | B |
+|---|---|---|
+| clean, 2⁻¹⁴ | 13.8 / 25.3 / 49.1 / 84.5 | 341,026 / 624,628 / 1,208,860 / 2,079,181 |
+| clean, 2⁻¹⁶ | (same) | 1,355,103 / 2,489,512 / 4,826,437 / 8,307,722 |
+| none, 2⁻¹⁴ | 12.7 / 25.8 / 57.3 / 103.7 (incl. the over-cap seed) | 524,696 / 1,049,524 / 2,339,893 / 3,105,196 |
+| mixed, 2⁻¹⁴ | 13.5 / 20.5 / 32.1 / 76.5 | 554,502 / 844,581 / 1,316,732 / 3,137,864 |
+
+- **Wider search (DESCRIPTIVE).** Scoreable seeds by registered class → wider-search class:
+  - clean → clean 113;
+  - none → none 12, mixed 67;
+  - mixed → mixed 53, clean 8.
+
+  Among the planned seeds: none → none 6, mixed 24; mixed → mixed 18, clean 2; clean → clean 40.
+- **Every seed's status and class are frozen.** The class listing's SHA-256 is
+  `1ee7cb87ab1a6ff7a3d74020a86bea5528503c521b01dacff5f2ec2c5395cc6e`. `summary` asserted every stored evaluation
+  equals a fresh one.
+- **Descriptive (scoreable seeds):**
+  - s_F 4.54–8.20; s_F/s\* 1.006–1.630; Λ_F 1.3e−4–2.7e−3;
+  - the |m′c′| windows agree on clean 43, none 61, mixed 30;
+  - the homotopy needed 200 steps on 208 seeds.
+- **Compute estimate for the runs** (from the pilot's per-step rates, ≈ 61 µs training and ≈ 180 µs observing): about
+  9–11 h for the 130 runs.
 
 ## 13. Reproduce
 
