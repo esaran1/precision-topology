@@ -994,6 +994,18 @@ PRODUCERS = {
     "phase2a_ps/observed.jsonl": ("phase2a_ps", "observe", "full", ""),
     "phase2a_ps/scores.json": ("phase2a_ps", "score", "full", ""),
     "phase2a_ps_results.md": ("phase2a_ps_report", "main", "full", ""),
+    # Phase 2A-PS2 (the per-seed fold test with the pipeline repaired; design approved 2026-10-07): src/phase2a_ps2.py
+    "phase2a_ps2/seed_scan.json": ("phase2a_ps2", "scan", "full", ""),
+    "phase2a_ps2/pilot_parts.jsonl": ("phase2a_ps2", "_freeze_seeds", "full", ""),
+    "phase2a_ps2/pilot.json": ("phase2a_ps2", "pilot", "full", ""),
+    "phase2a_ps2/frozen_parts.jsonl": ("phase2a_ps2", "_freeze_seeds", "full", ""),
+    "phase2a_ps2/frozen.json": ("phase2a_ps2", "summary", "full", ""),
+    "phase2a_ps2/registration.sha256": ("phase2a_ps2", "manifest", "full", ""),
+    "phase2a_ps2/registration_stamp.txt": ("phase2a_ps2", "stamp", "full", ""),
+    "phase2a_ps2/runs.jsonl": ("phase2a_ps2", "run", "full", ""),
+    "phase2a_ps2/forecasts.sha256": ("phase2a_ps2", "finalize", "full", ""),
+    "phase2a_ps2/observed.jsonl": ("phase2a_ps2", "observe", "full", ""),
+    "phase2a_ps2/scores.json": ("phase2a_ps2", "score", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
