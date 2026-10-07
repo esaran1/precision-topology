@@ -1,0 +1,107 @@
+{"seed": 2930112, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.4, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930113, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 8.6, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930114, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.0, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930115, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 8.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930116, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 21.147553716690688, "secs": 30.1, "wide": "mixed", "calib": {"rt_F": 21.23779296875, "rt_end": 27.5, "crossed": true}}
+{"seed": 2930117, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 23.86674160489665, "secs": 29.8, "wide": "mixed", "calib": {"rt_F": 23.949951171875, "rt_end": 30.640625, "crossed": true}}
+{"seed": 2930118, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 17.627188932526785, "secs": 29.3, "wide": "clean", "calib": {"rt_F": 17.810302734375, "rt_end": 23.984375, "crossed": true}}
+{"seed": 2930119, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 23.660432791757813, "secs": 29.9, "wide": "clean", "calib": {"rt_F": 23.781982421875, "rt_end": 28.078125, "crossed": true}}
+{"seed": 2930120, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 18.45704891635252, "secs": 30.7, "wide": "mixed", "calib": {"rt_F": 18.547119140625, "rt_end": 31.640625, "crossed": true}}
+{"seed": 2930121, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 19.72147063443385, "secs": 28.6, "wide": "clean", "calib": {"rt_F": 19.76806640625, "rt_end": 23.4375, "crossed": true}}
+{"seed": 2930122, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 43.73889338327573, "secs": 38.1, "wide": "mixed", "calib": {"rt_F": 43.880126953125, "rt_end": 51.647216796875, "crossed": false}}
+{"seed": 2930123, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 9.2, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930124, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 17.689364487769218, "secs": 29.5, "wide": "mixed", "calib": {"rt_F": 17.7548828125, "rt_end": 28.640625, "crossed": true}}
+{"seed": 2930125, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930126, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 32.084648478965505, "secs": 34.2, "wide": "clean", "calib": {"rt_F": 32.163818359375, "rt_end": 38.625, "crossed": true}}
+{"seed": 2930127, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930128, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 19.073901900810824, "secs": 29.6, "wide": "mixed", "calib": {"rt_F": 19.1279296875, "rt_end": 24.2060546875, "crossed": false}}
+{"seed": 2930129, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 35.03548039562152, "secs": 35.4, "wide": "clean", "calib": {"rt_F": 35.206298828125, "rt_end": 40.96875, "crossed": true}}
+{"seed": 2930130, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930131, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930132, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930133, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930134, "status": "untraceable: no upper fold", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 7.0, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930135, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 26.53840518745464, "secs": 31.2, "wide": "clean", "calib": {"rt_F": 26.63330078125, "rt_end": 32.28125, "crossed": true}}
+{"seed": 2930136, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930137, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 8.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930138, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930139, "status": "no s*", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": null, "secs": 7.3, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930140, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 2.1, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930141, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 57.25635025545448, "secs": 41.9, "wide": "mixed", "calib": {"rt_F": 57.4462890625, "rt_end": 66.915771484375, "crossed": false}}
+{"seed": 2930142, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 9.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930143, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 16.3696915450384, "secs": 27.0, "wide": "mixed", "calib": {"rt_F": 16.442626953125, "rt_end": 20.14208984375, "crossed": false}}
+{"seed": 2930144, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930145, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 18.17004304754913, "secs": 30.8, "wide": "mixed", "calib": {"rt_F": 18.22412109375, "rt_end": 34.8974609375, "crossed": false}}
+{"seed": 2930146, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.6, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930147, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930148, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 8.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930149, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930150, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.4, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930151, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 10.9236888348782, "secs": 24.5, "wide": "clean", "calib": {"rt_F": 10.959228515625, "rt_end": 14.15625, "crossed": true}}
+{"seed": 2930152, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930153, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 26.42990722318682, "secs": 30.5, "wide": "mixed", "calib": {"rt_F": 26.502197265625, "rt_end": 31.59716796875, "crossed": false}}
+{"seed": 2930154, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.4, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930155, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 15.572393129228843, "secs": 29.2, "wide": "clean", "calib": {"rt_F": 15.75, "rt_end": 22.421875, "crossed": true}}
+{"seed": 2930156, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 16.546923332835064, "secs": 29.1, "wide": "mixed", "calib": {"rt_F": 16.63916015625, "rt_end": 21.933837890625, "crossed": false}}
+{"seed": 2930157, "status": "ineligible", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": null, "secs": 9.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930158, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 52.39559407920469, "secs": 43.8, "wide": "mixed", "calib": {"rt_F": 52.5439453125, "rt_end": 67.390625, "crossed": true}}
+{"seed": 2930159, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.6, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930160, "status": "ineligible", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": null, "secs": 9.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930161, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 8.2, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930162, "status": "no s*", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": null, "secs": 8.3, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930163, "status": "scoreable", "class_registered": "clean", "n_theta_active": 2, "rho_t_star": 52.86861667181134, "secs": 22.6, "wide": "clean", "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930164, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930165, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 24.87687057599954, "secs": 31.4, "wide": "clean", "calib": {"rt_F": 24.94091796875, "rt_end": 30.78125, "crossed": true}}
+{"seed": 2930166, "status": "no s*", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": null, "secs": 7.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930167, "status": "scoreable", "class_registered": "clean", "n_theta_active": 2, "rho_t_star": 51.70828213504012, "secs": 26.3, "wide": "clean", "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930168, "status": "no s*", "class_registered": "clean", "n_theta_active": 2, "rho_t_star": null, "secs": 8.6, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930169, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 20.352599895514416, "secs": 30.9, "wide": "mixed", "calib": {"rt_F": 20.4091796875, "rt_end": 33.375, "crossed": true}}
+{"seed": 2930170, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 14.690977780259013, "secs": 27.3, "wide": "clean", "calib": {"rt_F": 14.762451171875, "rt_end": 18.125, "crossed": true}}
+{"seed": 2930171, "status": "ineligible", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": null, "secs": 10.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930172, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930173, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 9.2, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930174, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930175, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.7, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930176, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.9, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930177, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 21.81007806857228, "secs": 30.7, "wide": "clean", "calib": {"rt_F": 21.8974609375, "rt_end": 26.484375, "crossed": true}}
+{"seed": 2930178, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 27.385808946513478, "secs": 30.2, "wide": "mixed", "calib": {"rt_F": 27.471435546875, "rt_end": 33.0419921875, "crossed": false}}
+{"seed": 2930179, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 24.409852673586045, "secs": 31.5, "wide": "clean", "calib": {"rt_F": 24.5048828125, "rt_end": 30.96875, "crossed": true}}
+{"seed": 2930180, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930181, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930182, "status": "no s*", "class_registered": "none", "n_theta_active": 3, "rho_t_star": null, "secs": 9.4, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930183, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 40.56999743544773, "secs": 37.9, "wide": "mixed", "calib": {"rt_F": 40.7041015625, "rt_end": 49.872314453125, "crossed": false}}
+{"seed": 2930184, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 22.428363101547063, "secs": 30.6, "wide": "clean", "calib": {"rt_F": 22.498046875, "rt_end": 31.078125, "crossed": true}}
+{"seed": 2930185, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 90.55857199356969, "secs": 54.6, "wide": "mixed", "calib": {"rt_F": 90.873291015625, "rt_end": 107.078125, "crossed": true}}
+{"seed": 2930186, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 75.59219671555549, "secs": 51.4, "wide": "mixed", "calib": {"rt_F": 75.917724609375, "rt_end": 93.678466796875, "crossed": false}}
+{"seed": 2930187, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 47.93288116857744, "secs": 38.8, "wide": "mixed", "calib": {"rt_F": 48.0849609375, "rt_end": 54.185791015625, "crossed": false}}
+{"seed": 2930188, "status": "ineligible", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": null, "secs": 8.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930189, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930190, "status": "scoreable", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": 26.338476569091576, "secs": 32.2, "wide": "clean", "calib": {"rt_F": 26.423095703125, "rt_end": 29.796875, "crossed": true}}
+{"seed": 2930191, "status": "ineligible", "class_registered": "clean", "n_theta_active": 3, "rho_t_star": null, "secs": 8.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930192, "status": "scoreable", "class_registered": "mixed", "n_theta_active": 3, "rho_t_star": 16.190218737427283, "secs": 26.5, "wide": "mixed", "calib": {"rt_F": 16.2607421875, "rt_end": 23.078125, "crossed": true}}
+{"seed": 2930193, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 1.1, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930194, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930195, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930196, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.8, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930197, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.5, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+{"seed": 2930198, "status": "scoreable", "class_registered": "none", "n_theta_active": 3, "rho_t_star": 21.405912059632143, "secs": 33.6, "wide": "mixed", "calib": {"rt_F": 21.4873046875, "rt_end": 40.315673828125, "crossed": false}}
+{"seed": 2930199, "status": "untraceable: M homotopy failed", "class_registered": null, "n_theta_active": null, "rho_t_star": null, "secs": 0.6, "wide": null, "calib": {"rt_F": null, "rt_end": null, "crossed": null}}
+peak RSS GB 0.277
+     1373.87 real      1363.20 user         6.74 sys
+           276856832  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               60680  page reclaims
+                7059  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                2884  voluntary context switches
+              318659  involuntary context switches
+      26785752682148  instructions retired
+       5584556691151  cycles elapsed
+           201360272  peak memory footprint

@@ -1,0 +1,60 @@
+seeds 88 2930112 - 2930199
+status {'untraceable': 34, 'no s*': 13, 'scoreable': 36, 'ineligible': 5}
+scoreable registered class {'mixed': 7, 'clean': 16, 'none': 13}
+(a) releases 54; theta drops a unit on 3 [2930163, 2930167, 2930168]; smallest live share [2.0524164488287404e-89, 1.7062954345846417e-85, 2.1687669883025544e-83, 0.1286961020718875]
+    3 units active (registered rule) on 54
+(b) rho*t* (s0 -> s_F) n 36: min 10.92 med 23.76 q90 52.63 max 90.56; stall (inf/None) 0
+    2^-12 calibration: t_F/t* n 34 min 1.0024 med 1.0035 max 1.0114
+    clean: n 14 end/t* min 1.131 med 1.225 max 1.440; crossed 14; reached 1.25 0; sign change 0
+    none: n 13 end/t* min 1.130 med 1.230 max 1.921; crossed 1; reached 1.25 12; sign change 10
+    mixed: n 7 end/t* min 1.182 med 1.300 max 1.714; crossed 7; reached 1.25 0; sign change 0
+    cap rho*t 96: k 1.5: over cap 2/36
+    cap rho*t 96: k 2.5: over cap 9/36
+    cap rho*t 128: k 1.5: over cap 1/36
+    cap rho*t 128: k 2.5: over cap 6/36
+    cap rho*t 160: k 1.5: over cap 0/36
+    cap rho*t 160: k 2.5: over cap 2/36
+(c) registered vs wide: {('mixed', 'mixed'): 7, ('clean', 'clean'): 16, ('none', 'mixed'): 13}
+    S rho2 < q at 1.01 s_F (by registered class): {('mixed', False): 7, ('clean', False): 16, ('none', False): 13}
+    S first rho2>=q beyond 1.25 s_F (never in window): 0
+    (wide, registered, crossed at 2^-12): {('mixed', 'mixed', True): 7, ('clean', 'clean', True): 14, ('mixed', 'none', False): 12, ('mixed', 'none', True): 1}
+    wide clean: n 14 crossed 14
+    wide mixed: n 20 crossed 8
+    wide none: n 0 crossed 0
+    registered clean: n 14 crossed 14
+    registered mixed: n 7 crossed 7
+    registered none: n 13 crossed 1
+    secs per scoreable seed median 30.65
+2A-PS observed.jsonl (committed; seed 2,975,052 and 127 excluded: dead unit):
+    clean: n 72 end/t_F med 1.053 q90 1.110 max 1.148; > 1.5: 0
+    none: n 27 end/t_F med 1.084 q90 1.648 max 1.943; > 1.5: 6
+    mixed: n 19 end/t_F med 1.155 q90 1.316 max 1.355; > 1.5: 0
+gate arithmetic (binomial):
+    N 400 p_clean 0.15: P(clean >= 40) 0.999  P(>=24) 1.000
+    N 400 p_clean 0.185: P(clean >= 40) 1.000  P(>=24) 1.000
+    N 400 p_none 0.03: E 12; P(none >= 10) 0.762 P(>=15) 0.225 P(>=20) 0.020
+    N 400 p_none 0.05: E 20; P(none >= 10) 0.996 P(>=15) 0.901 P(>=20) 0.532
+    N 500 p_clean 0.15: P(clean >= 40) 1.000  P(>=24) 1.000
+    N 500 p_clean 0.185: P(clean >= 40) 1.000  P(>=24) 1.000
+    N 500 p_none 0.03: E 15; P(none >= 10) 0.933 P(>=15) 0.536 P(>=20) 0.121
+    N 500 p_none 0.05: E 25; P(none >= 10) 1.000 P(>=15) 0.989 P(>=20) 0.873
+    N 600 p_clean 0.15: P(clean >= 40) 1.000  P(>=24) 1.000
+    N 600 p_clean 0.185: P(clean >= 40) 1.000  P(>=24) 1.000
+    N 600 p_none 0.03: E 18; P(none >= 10) 0.986 P(>=15) 0.796 P(>=20) 0.348
+    N 600 p_none 0.05: E 30; P(none >= 10) 1.000 P(>=15) 0.999 P(>=20) 0.981
+    H power n 10 p_nocross 0.7: P(frac >= 0.8) 0.383
+    H power n 10 p_nocross 0.8: P(frac >= 0.8) 0.678
+    H power n 10 p_nocross 0.875: P(frac >= 0.8) 0.880
+    H power n 10 p_nocross 0.95: P(frac >= 0.8) 0.988
+    H power n 15 p_nocross 0.7: P(frac >= 0.8) 0.297
+    H power n 15 p_nocross 0.8: P(frac >= 0.8) 0.648
+    H power n 15 p_nocross 0.875: P(frac >= 0.8) 0.892
+    H power n 15 p_nocross 0.95: P(frac >= 0.8) 0.995
+    H power n 20 p_nocross 0.7: P(frac >= 0.8) 0.238
+    H power n 20 p_nocross 0.8: P(frac >= 0.8) 0.630
+    H power n 20 p_nocross 0.875: P(frac >= 0.8) 0.905
+    H power n 20 p_nocross 0.95: P(frac >= 0.8) 0.997
+    H power n 30 p_nocross 0.7: P(frac >= 0.8) 0.160
+    H power n 30 p_nocross 0.8: P(frac >= 0.8) 0.607
+    H power n 30 p_nocross 0.875: P(frac >= 0.8) 0.927
+    H power n 30 p_nocross 0.95: P(frac >= 0.8) 0.999
