@@ -44,3 +44,23 @@ def test_subdirectory_fstring_provenance(tmp_path, monkeypatch, src, n_bad):
     monkeypatch.setattr(vl, "REC", [])
     vl.provenance_check()
     assert vl.REC[0][1] == float(n_bad)
+
+
+# A prefix OUTSIDE the module's own results subfolder must fail: the module writes OUT = RESULTS / "sub",
+# f"runs_{arm}.jsonl", but the artifact claimed for it lives in another subfolder ("other/").
+# NOTE (documents existing behaviour, not an endorsement): a TOP-LEVEL artifact ("runs_Q.jsonl") is still accepted by the
+# OLDER flat-file branch (stem.startswith(prefix + "_"), predating Phase 3), which does not check where the module writes.
+@pytest.mark.parametrize("artifact,n_bad", [("sub/runs_Q.jsonl", 0), ("other/runs_Q.jsonl", 1), ("runs_Q.jsonl", 0)])
+def test_fstring_prefix_only_in_own_subfolder(tmp_path, monkeypatch, artifact, n_bad):
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "prod.py").write_text(FSTR_GOOD)
+    p = tmp_path / "results" / artifact
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("{}")
+    monkeypatch.setattr(vl, "__file__", str(tmp_path / "src" / "verify_ledger.py"))
+    monkeypatch.setattr(vl, "R", tmp_path / "results")
+    monkeypatch.setattr(vl, "PRODUCERS", {artifact: ("prod", "main", "full", "")})
+    monkeypatch.setattr(vl, "F", [])
+    monkeypatch.setattr(vl, "REC", [])
+    vl.provenance_check()
+    assert vl.REC[0][1] == float(n_bad)
