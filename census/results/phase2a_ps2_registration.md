@@ -1,17 +1,16 @@
 # Phase 2A-PS2 registration: the per-seed fold test, with the pipeline repaired
 
-**NOT YET REGISTERED.** This file is prepared for the registration commit. It stops before that commit for the
-details in §9 that touch a criterion, the gate, validity or the scoring set: they need the author's approval.
+**REGISTERED.** The details in §9 that touch a criterion, the gate, validity or the scoring set (D1–D9) were
+**decided by the author on 2026-10-07: approved as proposed.**
 
 Status:
 - **Registered after 2A-PS's UNRESOLVED (validity) outcome.** 2A-PS's registered verdict STAYS UNRESOLVED
   (validity). This is a new registration, not a re-scoring of 2A-PS.
 - **Done:** scan, pilot and the freeze of all 600 registered seeds (no training; §12). The gate passes (113 clean
   scoreable ≥ 24). **The author's over-cap check passes** (0 clean and 1 none seed over cap; ≤ 5 each).
-- **Not yet done:** no registered seed has been trained. The registration commit waits for the author's decision
-  on D1–D9 (§9).
+- **Not yet done:** no registered seed has been trained.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof is obtained.
-- **The registration commit** will hold this file, the approved page, `src/phase2a_ps2.py` and its import closure
+- **The registration commit** holds this file, the approved page, `src/phase2a_ps2.py` and its import closure
   (which includes `src/phase2a_ps.py`, unchanged), `tests/test_phase2a_ps2.py`, and the frozen inputs. Their SHA-256
   hashes go in `results/phase2a_ps2/registration.sha256` (§11).
 
@@ -194,9 +193,9 @@ F, H, E_seed, C3, C4 and P. C1 and C2 are secondary.**
 
 ## 9. Details the approved page left open
 
-### Touching a criterion, the gate, validity or the scoring set: FOR THE AUTHOR'S APPROVAL
+### Touching a criterion, the gate, validity or the scoring set: DECIDED BY THE AUTHOR (2026-10-07)
 
-Each is implemented and tested as proposed. The freeze stores the raw inputs, so another choice re-evaluates without
+**D1–D9 were approved by the author on 2026-10-07, as proposed.** Each is implemented and tested as below. The freeze stores the raw inputs, so another choice re-evaluates without
 refreezing (`reevaluate`).
 
 | # | detail | proposed resolution (implemented, tested) | touches |
@@ -245,7 +244,7 @@ refreezing (`reevaluate`).
 
 ## 11. Frozen files and hashes
 
-`results/phase2a_ps2/registration.sha256` (`phase2a_ps2.manifest`) will list:
+`results/phase2a_ps2/registration.sha256` (`phase2a_ps2.manifest`) lists:
 - this file and the approved page;
 - the import closure of `src/phase2a_ps2.py` (`phase2a_ps`, `phase2a_ps_posthoc`, `phase2a`, `causal_forecast_fold`,
   `causal_forecast`, `sb_fold`, …);
