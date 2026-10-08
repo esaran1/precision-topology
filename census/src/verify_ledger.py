@@ -611,6 +611,7 @@ def main() -> None:
     phase2b_checks()
     phase2a_ps_checks()
     phase2a_ps_posthoc_checks()
+    phase2a_ps2_checks()
     phase3_checks()
     phase1b_checks()
     phase2c_checks()
@@ -1006,6 +1007,7 @@ PRODUCERS = {
     "phase2a_ps2/forecasts.sha256": ("phase2a_ps2", "finalize", "full", ""),
     "phase2a_ps2/observed.jsonl": ("phase2a_ps2", "observe", "full", ""),
     "phase2a_ps2/scores.json": ("phase2a_ps2", "score", "full", ""),
+    "phase2a_ps2_results.md": ("phase2a_ps2_report", "main", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
@@ -3483,6 +3485,70 @@ P2APS_PH_PIN = {"excluded_outcome": "FAIL H+C3+C4", "excluded_validity_ok": True
                 "crossed_labels": {"2975103": "S", "2975110": "S", "2975114": "S", "2975136": "other",
                                    "2975149": "S", "2975168": "S", "2975170": "other"},
                 "diagnosis": {2975003: "LANDSCAPE", 2975052: "PIPELINE", 2975093: "LANDSCAPE", 2975179: "LANDSCAPE"}}
+
+
+# Phase 2A-PS2 pins (set from the committed scores.json): outcome, verdicts, secondary, validity, runs
+P2APS2_PIN = ("FAIL H", {"F": "PASS", "H": "FAIL", "E_seed": "PASS", "C3": "PASS", "C4": "PASS", "P": "PASS"},
+              {"C1": "FAIL", "C2": "FAIL"}, True, 130)
+
+
+def phase2a_ps2_checks() -> None:
+    """Phase 2A-PS2 (registration a1bd625, stamp 3a6f57b, OpenTimestamps b2564fa; forecasts 678f43d): the registration
+    and forecast asserts; the freeze counts, the over-cap check and the class-listing hash; every planned run exactly
+    once in runs.jsonl and observed.jsonl; every forecast read only rows < t_c and its NaN recomputation was identical;
+    every observed t_c state matched its hash; no run aborted; scores.json regenerates from the committed rows with the
+    registered scoring code (phase2a_ps2_report.score_result); phase2a_ps2_results.md regenerates; verdicts pinned."""
+    from . import phase2a_ps2 as PS2
+    from . import phase2a_ps2_report as PS2R
+    if not (PS2.OUT / "scores.json").exists():
+        return
+    print("Phase 2A-PS2: the per-seed fold test with the pipeline repaired")
+    PS2.assert_registration()
+    PS2._assert_forecasts()
+    fr, rows = PS2._frozen()
+    chk("P2A-PS2 class listing hash", float(fr["class_listing_sha256"] ==
+                                            "1ee7cb87ab1a6ff7a3d74020a86bea5528503c521b01dacff5f2ec2c5395cc6e"), 1.0, 0)
+    c = fr["counts"]
+    chk("P2A-PS2 untraceable seeds", float(c["n_untraceable"]), 206.0, 0)
+    chk("P2A-PS2 inactive-unit releases", float(c["n_inactive_unit"]), 10.0, 0)
+    chk("P2A-PS2 over-cap seeds", float(c["n_over_cap"]), 1.0, 0)
+    chk("P2A-PS2 stall seeds", float(c["n_stall"]), 0.0, 0)
+    chk("P2A-PS2 scoreable seeds", float(c["n_scoreable"]), 253.0, 0)
+    chk("P2A-PS2 clean scoreable (gate >= 24)", float(c["scoreable_by_class"]["clean"]), 113.0, 0)
+    chk("P2A-PS2 author's over-cap check passes", float(fr["over_cap_check"]["pass"]), 1.0, 0)
+    runs = PS2._rows(PS2.OUT / "runs.jsonl")
+    obs = PS2._rows(PS2.OUT / "observed.jsonl")
+    plan = sorted((p["seed"], float(p["log2rho"])) for p in fr["plan"])
+    chk("P2A-PS2 runs = the frozen plan", float(sorted((r["seed"], r["log2rho"]) for r in runs) == plan), 1.0, 0)
+    chk("P2A-PS2 observations = the frozen plan", float(sorted((o["seed"], o["log2rho"]) for o in obs) == plan),
+        1.0, 0)
+    chk("P2A-PS2 run budgets = the frozen plan's", float(
+        {(p["seed"], float(p["log2rho"])): p["budget"] for p in fr["plan"]}
+        == {(r["seed"], r["log2rho"]): r["budget"] for r in runs}), 1.0, 0)
+    fcs = [r[k] for r in runs if r["t_c"] is not None for k in ("forecast", "forecast_fixed")]
+    chk("P2A-PS2 forecasts reading a row >= t_c",
+        float(sum(int(f["max_index_read"] >= f["t_c"]) for f in fcs)), 0.0, 0)
+    chk("P2A-PS2 NaN recomputations differing",
+        float(sum(int(r["nan_recompute_identical"] is False) for r in runs)), 0.0, 0)
+    chk("P2A-PS2 observed t_c states not matching the hash",
+        float(sum(int(o["state_tc_hash_ok"] is False) for o in obs)), 0.0, 0)
+    chk("P2A-PS2 aborted runs", float(sum(int(bool(r.get("aborted"))) for r in runs + obs)), 0.0, 0)
+    S = json.loads((PS2.OUT / "scores.json").read_text())
+    chk("P2A-PS2 scores.json regenerates from the committed rows",
+        float(S == json.loads(json.dumps(PS2._jsonable(PS2R.score_result())))), 1.0, 0)
+    chk("P2A-PS2 phase2a_ps2_results.md regenerates from scores.json",
+        float((R / "phase2a_ps2_results.md").read_text() == PS2R.render_md(S)), 1.0, 0)
+    if P2APS2_PIN is not None:
+        outc, verdicts, sec, valid_ok, n_runs = P2APS2_PIN
+        chk(f"P2A-PS2 outcome {outc}", float(S["outcome"] == outc), 1.0, 0)
+        for k, v in {**verdicts, **sec}.items():
+            got = S["verdicts"].get(k, S["secondary_verdicts"].get(k))
+            chk(f"P2A-PS2 {k} {v}", float(got == v), 1.0, 0)
+        chk("P2A-PS2 validity ok", float(S["validity"]["ok"] is valid_ok), 1.0, 0)
+        chk("P2A-PS2 runs", float(len(runs)), float(n_runs), 0)
+        chk("P2A-PS2 H none seeds not crossing", float(S["criteria"]["H"]["n_no_crossing_to_1.25sF"]), 23.0, 0)
+        chk("P2A-PS2 C3 seeds with ratio > 1", float(S["criteria"]["C3"]["n_gt_1"]), 36.0, 0)
+        chk("P2A-PS2 F seeds within", float(S["criteria"]["F"]["n_within"]), 40.0, 0)
 
 
 # Phase 3 pins (set from the committed scores.json): {arm: (outcome, n_scored, gate n_on_copy)}
