@@ -1,0 +1,4 @@
+Phase 2A-PS2 registration
+registration commit: a1bd6252598addcdac25e7274fa70e0ec1ffa3b3
+sha256 results/phase2a_ps2_registration.md: e861b5cb37c194f202eafb5baa216f5ba96284936b8516d755b2856bb1d98afa
+sha256 results/phase2a_ps2/registration.sha256: 314182e7ff08adad0b5b33b92a631ae87227149db22b062c4093543b21b045ef
