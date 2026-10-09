@@ -1,0 +1,2389 @@
+{
+ "label": "EXPLORATORY (Track A design; not a registration, not a pilot)",
+ "a": 1.85,
+ "seeds": 120,
+ "seed_range": [
+  9771000,
+  9771119
+ ],
+ "crossed": 119,
+ "secs_per_seed_median": 3.1,
+ "by_f": {
+  "0.9": {
+   "ext/cut": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 3.0,
+     "q90_cross": 6.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 10.0,
+     "median_ratio": 1.268710485206915,
+     "ratio_q10": 1.0402874439116403,
+     "ratio_q90": 2.5063522924118655,
+     "C1": 0.7058823529411765,
+     "C2": 0.6974789915966386,
+     "C3_ok": false,
+     "C4_hi": -57.264367816091955,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      0.65
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 3.0,
+      "q90_cross": 5.200000000000003,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.2930055146707182,
+      "ratio_q10": 1.0725633496366846,
+      "ratio_q90": 1.977272582731407,
+      "C1": 0.6440677966101694,
+      "C2": 0.6440677966101694,
+      "C3_ok": true,
+      "C4_hi": -53.30769230769231,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 3.0,
+      "q90_cross": 7.300000000000004,
+      "max_cross": 11.0,
+      "q50_lag": 4.5,
+      "q90_lag": 10.0,
+      "median_ratio": 1.2055036387693545,
+      "ratio_q10": 1.036848598763765,
+      "ratio_q90": 2.735423127862201,
+      "C1": 0.7666666666666667,
+      "C2": 0.75,
+      "C3_ok": true,
+      "C4_hi": -56.5,
+      "PASS": false
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0770132375553656,
+      0.07731255515724489,
+      0.03314864204611134
+     ],
+     "q90_abs": [
+      0.08798408654555812,
+      0.08903702223036836,
+      0.06093779673414268
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "ext/decay": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 6.0,
+     "q90_cross": 10.0,
+     "max_cross": 45.0,
+     "q50_lag": 8.0,
+     "q90_lag": 13.400000000000006,
+     "median_ratio": 1.370442551161937,
+     "ratio_q10": 1.1279042991563986,
+     "ratio_q90": 2.5352418495666287,
+     "C1": 0.6890756302521008,
+     "C2": 0.6722689075630253,
+     "C3_ok": false,
+     "C4_hi": -54.14942528735632,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      25,
+      0.75
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 7.0,
+      "q90_cross": 10.0,
+      "max_cross": 45.0,
+      "q50_lag": 10.0,
+      "q90_lag": 14.0,
+      "median_ratio": 1.3799497821562088,
+      "ratio_q10": 1.1588711322347214,
+      "ratio_q90": 2.0630353771683905,
+      "C1": 0.6440677966101694,
+      "C2": 0.6440677966101694,
+      "C3_ok": true,
+      "C4_hi": -49.79423076923078,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 6.0,
+      "q90_cross": 10.0,
+      "max_cross": 13.0,
+      "q50_lag": 8.0,
+      "q90_lag": 13.0,
+      "median_ratio": 1.2962554617796442,
+      "ratio_q10": 1.1244530008081983,
+      "ratio_q90": 2.7969830078228295,
+      "C1": 0.8,
+      "C2": 0.8,
+      "C3_ok": true,
+      "C4_hi": -53.770833333333336,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0029453527792757672,
+      0.00299682687773406,
+      0.05821376183158544
+     ],
+     "q90_abs": [
+      0.009861661082575024,
+      0.010115186387515518,
+      0.12119387666637405
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "ext/gwin": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 9.0,
+     "median_ratio": 1.2975581070899822,
+     "ratio_q10": 1.097500544570584,
+     "ratio_q90": 2.4556669801152147,
+     "C1": 0.7226890756302521,
+     "C2": 0.7226890756302521,
+     "C3_ok": false,
+     "C4_hi": -57.32183908045977,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      0.65
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 3.0,
+      "q90_cross": 4.200000000000003,
+      "max_cross": 45.0,
+      "q50_lag": 6.0,
+      "q90_lag": 9.0,
+      "median_ratio": 1.3093140676008221,
+      "ratio_q10": 1.1187555272173257,
+      "ratio_q90": 1.9484267049902986,
+      "C1": 0.6440677966101694,
+      "C2": 0.6440677966101694,
+      "C3_ok": true,
+      "C4_hi": -53.23012820512822,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 9.0,
+      "q50_lag": 5.0,
+      "q90_lag": 9.0,
+      "median_ratio": 1.2279529431451692,
+      "ratio_q10": 1.0951031172345707,
+      "ratio_q90": 2.674800334660464,
+      "C1": 0.8,
+      "C2": 0.8,
+      "C3_ok": true,
+      "C4_hi": -56.70781250000001,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0026363310750145974,
+      0.002676243607411699,
+      0.006968831602707892
+     ],
+     "q90_abs": [
+      0.010378780092461959,
+      0.010856490763291315,
+      0.022257448167140925
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "ext/logquad": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 4.0,
+     "q90_cross": 6.0,
+     "max_cross": 45.0,
+     "q50_lag": 6.0,
+     "q90_lag": 10.0,
+     "median_ratio": 1.2996537618234956,
+     "ratio_q10": 1.097500544570584,
+     "ratio_q90": 2.616467562744366,
+     "C1": 0.7142857142857143,
+     "C2": 0.6890756302521008,
+     "C3_ok": false,
+     "C4_hi": -56.632183908045974,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      0.7000000000000001
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 4.0,
+      "q90_cross": 6.0,
+      "max_cross": 45.0,
+      "q50_lag": 6.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.3221522914642938,
+      "ratio_q10": 1.1205637624085552,
+      "ratio_q90": 1.9627950645207908,
+      "C1": 0.6440677966101694,
+      "C2": 0.6271186440677966,
+      "C3_ok": true,
+      "C4_hi": -52.41025641025641,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 4.0,
+      "q90_cross": 6.300000000000004,
+      "max_cross": 11.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.300000000000004,
+      "median_ratio": 1.2349407690462515,
+      "ratio_q10": 1.0951031172345707,
+      "ratio_q90": 2.727881189334753,
+      "C1": 0.7833333333333333,
+      "C2": 0.75,
+      "C3_ok": true,
+      "C4_hi": -56.02031250000001,
+      "PASS": false
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0014697916911357023,
+      0.0014429727276166204,
+      0.0018651533906461903
+     ],
+     "q90_abs": [
+      0.010666933904315279,
+      0.010285866188502801,
+      0.022748688115847182
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "ext/coupled": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 6.0,
+     "q90_cross": 8.0,
+     "max_cross": 46.0,
+     "q50_lag": 8.0,
+     "q90_lag": 11.0,
+     "median_ratio": 1.3438563751942256,
+     "ratio_q10": 1.137833879390883,
+     "ratio_q90": 2.4809982690420127,
+     "C1": 0.7226890756302521,
+     "C2": 0.6890756302521008,
+     "C3_ok": false,
+     "C4_hi": -55.29856321839081,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      0.7000000000000001
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 6.0,
+      "q90_cross": 7.0,
+      "max_cross": 46.0,
+      "q50_lag": 8.0,
+      "q90_lag": 11.0,
+      "median_ratio": 1.3497838337117658,
+      "ratio_q10": 1.173651739297535,
+      "ratio_q90": 1.9670554071300188,
+      "C1": 0.6440677966101694,
+      "C2": 0.6440677966101694,
+      "C3_ok": true,
+      "C4_hi": -51.12820512820513,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 6.0,
+      "q90_cross": 9.0,
+      "max_cross": 10.0,
+      "q50_lag": 7.5,
+      "q90_lag": 11.300000000000004,
+      "median_ratio": 1.2791672209179414,
+      "ratio_q10": 1.1364880917184175,
+      "ratio_q90": 2.727881189334753,
+      "C1": 0.8,
+      "C2": 0.8,
+      "C3_ok": true,
+      "C4_hi": -54.8125,
+      "PASS": true
+     }
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 4
+    }
+   },
+   "ext/coupled_sw": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 4.0,
+     "q90_cross": 6.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 10.0,
+     "median_ratio": 1.2975581070899822,
+     "ratio_q10": 1.097500544570584,
+     "ratio_q90": 2.4635472114537866,
+     "C1": 0.7226890756302521,
+     "C2": 0.6974789915966386,
+     "C3_ok": false,
+     "C4_hi": -56.7816091954023,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      0.65
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 4.0,
+      "q90_cross": 5.0,
+      "max_cross": 45.0,
+      "q50_lag": 6.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.3221522914642938,
+      "ratio_q10": 1.130552821109973,
+      "ratio_q90": 1.9481945312629092,
+      "C1": 0.6440677966101694,
+      "C2": 0.6271186440677966,
+      "C3_ok": true,
+      "C4_hi": -52.64102564102564,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 4.0,
+      "q90_cross": 6.0,
+      "max_cross": 10.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.2349407690462515,
+      "ratio_q10": 1.0951031172345707,
+      "ratio_q90": 2.727881189334753,
+      "C1": 0.8,
+      "C2": 0.7666666666666667,
+      "C3_ok": true,
+      "C4_hi": -56.083333333333336,
+      "PASS": false
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.00277599753412483,
+      0.002783603292507042,
+      0.0032023613304812404
+     ],
+     "q90_abs": [
+      0.009718446096923739,
+      0.009760171107544569,
+      0.01099764138220416
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "ext/oracle_sw": {
+    "all": {
+     "n": 119,
+     "misses": 32,
+     "q50_cross": 4.0,
+     "q90_cross": 5.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 10.0,
+     "median_ratio": 1.2975581070899822,
+     "ratio_q10": 1.097500544570584,
+     "ratio_q90": 2.4635472114537866,
+     "C1": 0.7226890756302521,
+     "C2": 0.7226890756302521,
+     "C3_ok": false,
+     "C4_hi": -56.96551724137931,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      0.65
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 20,
+      "q50_cross": 4.0,
+      "q90_cross": 5.0,
+      "max_cross": 45.0,
+      "q50_lag": 6.0,
+      "q90_lag": 9.200000000000003,
+      "median_ratio": 1.3221522914642938,
+      "ratio_q10": 1.1205637624085552,
+      "ratio_q90": 1.942366938284146,
+      "C1": 0.6440677966101694,
+      "C2": 0.6440677966101694,
+      "C3_ok": true,
+      "C4_hi": -52.92307692307692,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 12,
+      "q50_cross": 4.0,
+      "q90_cross": 5.300000000000004,
+      "max_cross": 9.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.2349407690462515,
+      "ratio_q10": 1.0951031172345707,
+      "ratio_q90": 2.72099853559195,
+      "C1": 0.8,
+      "C2": 0.8,
+      "C3_ok": true,
+      "C4_hi": -56.229166666666664,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q90_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 15,
+     "no forecast: extrapolated path not growing at the cutoff": 13,
+     "no forecast: unstable / diverged (Track 1 rule)": 3,
+     "no forecast: no predicted crossing on the extrapolated path": 1
+    }
+   },
+   "oracle/cut": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 3.0,
+     "q90_cross": 8.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 8.0,
+     "median_ratio": 1.0418828450131827,
+     "ratio_q10": 0.9568850238439384,
+     "ratio_q90": 1.1969142648920026,
+     "C1": 0.907563025210084,
+     "C2": 0.9243697478991597,
+     "C3_ok": true,
+     "C4_hi": -45.799565217391304,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.30000000000000004
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 8.0,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 8.0,
+      "median_ratio": 1.0452339687784915,
+      "ratio_q10": 0.9554481657651205,
+      "ratio_q90": 1.2227696966038548,
+      "C1": 0.9152542372881356,
+      "C2": 0.9152542372881356,
+      "C3_ok": true,
+      "C4_hi": -38.75394736842106,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 8.600000000000009,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 8.600000000000009,
+      "median_ratio": 1.0325590632222654,
+      "ratio_q10": 0.9649331197301974,
+      "ratio_q90": 1.173085123069945,
+      "C1": 0.9333333333333333,
+      "C2": 0.9333333333333333,
+      "C3_ok": true,
+      "C4_hi": -47.672413793103445,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.06516118108410174,
+      0.06582394332019004,
+      0.04138590742387982
+     ],
+     "q90_abs": [
+      0.08661401174973636,
+      0.08774033079675567,
+      0.10213909730738614
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/decay": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 6.0,
+     "q90_cross": 10.0,
+     "max_cross": 112.0,
+     "q50_lag": 6.0,
+     "q90_lag": 10.0,
+     "median_ratio": 1.10319839777576,
+     "ratio_q10": 1.0384420993788577,
+     "ratio_q90": 1.2096620023782023,
+     "C1": 0.8907563025210085,
+     "C2": 0.9243697478991597,
+     "C3_ok": true,
+     "C4_hi": -43.712826086956525,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      20,
+      20,
+      0.35000000000000003
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 6.0,
+      "q90_cross": 10.399999999999999,
+      "max_cross": 112.0,
+      "q50_lag": 6.0,
+      "q90_lag": 10.399999999999999,
+      "median_ratio": 1.1086087852884503,
+      "ratio_q10": 1.0372884217396718,
+      "ratio_q90": 1.2523532340428738,
+      "C1": 0.9152542372881356,
+      "C2": 0.9152542372881356,
+      "C3_ok": true,
+      "C4_hi": -36.64868421052632,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 6.0,
+      "q90_cross": 9.300000000000004,
+      "max_cross": 69.0,
+      "q50_lag": 6.0,
+      "q90_lag": 9.300000000000004,
+      "median_ratio": 1.0996298894989094,
+      "ratio_q10": 1.0445140255910268,
+      "ratio_q90": 1.1952920662838642,
+      "C1": 0.9333333333333333,
+      "C2": 0.9333333333333333,
+      "C3_ok": true,
+      "C4_hi": -45.809913793103455,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.00019459299815793862,
+      0.000233881612007103,
+      0.06600484458351397
+     ],
+     "q90_abs": [
+      0.006371581351924329,
+      0.010192042580449014,
+      0.11356459891521938
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/gwin": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.0461866525279295,
+     "ratio_q10": 0.9719042282646143,
+     "ratio_q90": 1.1078511586132254,
+     "C1": 0.907563025210084,
+     "C2": 0.9243697478991597,
+     "C3_ok": true,
+     "C4_hi": -46.30434782608695,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      10,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.399999999999999,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.399999999999999,
+      "median_ratio": 1.0461638284738395,
+      "ratio_q10": 0.9725900923149575,
+      "ratio_q90": 1.1350930507009898,
+      "C1": 0.8983050847457628,
+      "C2": 0.8983050847457628,
+      "C3_ok": true,
+      "C4_hi": -39.35087719298246,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 4.300000000000004,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 4.300000000000004,
+      "median_ratio": 1.0479760552350394,
+      "ratio_q10": 0.9806315768202388,
+      "ratio_q90": 1.0942207855374897,
+      "C1": 0.9166666666666666,
+      "C2": 0.9166666666666666,
+      "C3_ok": true,
+      "C4_hi": -48.13750000000001,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0002930911475049758,
+      0.0003725209328595547,
+      0.008411308327452183
+     ],
+     "q90_abs": [
+      0.08551283860023885,
+      0.07659827070701278,
+      0.027109996773868255
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/logquad": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 4.0,
+     "q90_cross": 9.600000000000009,
+     "max_cross": 112.0,
+     "q50_lag": 4.0,
+     "q90_lag": 9.600000000000009,
+     "median_ratio": 1.0571217667512658,
+     "ratio_q10": 0.9879422393554114,
+     "ratio_q90": 1.2881904779967326,
+     "C1": 0.8823529411764706,
+     "C2": 0.8907563025210085,
+     "C3_ok": true,
+     "C4_hi": -44.58239130434783,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      30,
+      30,
+      1.0
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 16.799999999999997,
+      "max_cross": 112.0,
+      "q50_lag": 4.0,
+      "q90_lag": 16.799999999999997,
+      "median_ratio": 1.058799945226309,
+      "ratio_q10": 0.9874615780140961,
+      "ratio_q90": 1.60442101267082,
+      "C1": 0.9152542372881356,
+      "C2": 0.9152542372881356,
+      "C3_ok": true,
+      "C4_hi": -36.45614035087719,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 6.0,
+      "max_cross": 70.0,
+      "q50_lag": 4.0,
+      "q90_lag": 6.0,
+      "median_ratio": 1.0555253713756274,
+      "ratio_q10": 0.9962726876836058,
+      "ratio_q90": 1.1999761964506337,
+      "C1": 0.9333333333333333,
+      "C2": 0.9333333333333333,
+      "C3_ok": true,
+      "C4_hi": -47.39655172413793,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0017321308401708757,
+      0.0015858979521656824,
+      0.004021681692054746
+     ],
+     "q90_abs": [
+      0.30098890383918,
+      0.22815474687745715,
+      0.5627137465013927
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/coupled": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 4.0,
+     "q90_cross": 7.6000000000000085,
+     "max_cross": 112.0,
+     "q50_lag": 4.0,
+     "q90_lag": 7.6000000000000085,
+     "median_ratio": 1.070286580654267,
+     "ratio_q10": 1.0,
+     "ratio_q90": 1.0876681923333487,
+     "C1": 0.9243697478991597,
+     "C2": 0.9327731092436975,
+     "C3_ok": true,
+     "C4_hi": -45.88695652173913,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.2
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 7.0,
+      "max_cross": 112.0,
+      "q50_lag": 4.0,
+      "q90_lag": 7.0,
+      "median_ratio": 1.070286580654267,
+      "ratio_q10": 1.0,
+      "ratio_q90": 1.0910974417815456,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -39.26315789473684,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 8.0,
+      "max_cross": 69.0,
+      "q50_lag": 4.0,
+      "q90_lag": 8.0,
+      "median_ratio": 1.0701085921027929,
+      "ratio_q10": 1.0,
+      "ratio_q90": 1.0858629836776132,
+      "C1": 0.9333333333333333,
+      "C2": 0.9333333333333333,
+      "C3_ok": true,
+      "C4_hi": -47.741379310344826,
+      "PASS": true
+     }
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 4
+    }
+   },
+   "oracle/coupled_sw": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.055253973516513,
+     "ratio_q10": 0.9879422393554114,
+     "ratio_q90": 1.1264190845767235,
+     "C1": 0.907563025210084,
+     "C2": 0.9243697478991597,
+     "C3_ok": true,
+     "C4_hi": -46.078043478260874,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      10,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 6.399999999999999,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 6.399999999999999,
+      "median_ratio": 1.055253973516513,
+      "ratio_q10": 0.9874615780140961,
+      "ratio_q90": 1.152473357258094,
+      "C1": 0.8983050847457628,
+      "C2": 0.8983050847457628,
+      "C3_ok": true,
+      "C4_hi": -38.98245614035088,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.0551407158909951,
+      "ratio_q10": 0.9962726876836058,
+      "ratio_q90": 1.1107747851954133,
+      "C1": 0.9166666666666666,
+      "C2": 0.9166666666666666,
+      "C3_ok": true,
+      "C4_hi": -48.03405172413794,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      5.397252019978538e-06,
+      1.1953587821134093e-05,
+      0.000476597347546015
+     ],
+     "q90_abs": [
+      0.0008628912812900901,
+      0.004134046307252115,
+      0.0034962297968934575
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/oracle_sw": {
+    "all": {
+     "n": 119,
+     "misses": 4,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.055253973516513,
+     "ratio_q10": 0.9879422393554114,
+     "ratio_q90": 1.1219578659407867,
+     "C1": 0.907563025210084,
+     "C2": 0.9243697478991597,
+     "C3_ok": true,
+     "C4_hi": -46.0954347826087,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 0,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      10,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.799999999999997,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.799999999999997,
+      "median_ratio": 1.055253973516513,
+      "ratio_q10": 0.9874615780140961,
+      "ratio_q90": 1.152473357258094,
+      "C1": 0.8983050847457628,
+      "C2": 0.8983050847457628,
+      "C3_ok": true,
+      "C4_hi": -38.98245614035088,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 60,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.0551407158909951,
+      "ratio_q10": 0.9962726876836058,
+      "ratio_q90": 1.10605654690109,
+      "C1": 0.9166666666666666,
+      "C2": 0.9166666666666666,
+      "C3_ok": true,
+      "C4_hi": -48.05172413793103,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q90_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: no predicted crossing on the extrapolated path": 1,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "horizon_steps_obs_minus_tc_q10_50_90": [
+    35.8,
+    105.0,
+    179.60000000000002
+   ],
+   "horizon_steps_tsw_minus_tc_q10_50_90": [
+    12.0,
+    40.0,
+    80.2
+   ]
+  },
+  "0.95": {
+   "ext/cut": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 4.0,
+     "q90_cross": 7.0,
+     "max_cross": 45.0,
+     "q50_lag": 4.0,
+     "q90_lag": 9.5,
+     "median_ratio": 1.177998687055597,
+     "ratio_q10": 1.036642696982756,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.788135593220339,
+     "C2": 0.7796610169491526,
+     "C3_ok": true,
+     "C4_hi": -54.020833333333336,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      1.0
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 4.0,
+      "q90_cross": 7.0,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.5,
+      "median_ratio": 1.185178280328687,
+      "ratio_q10": 1.0516096260106833,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7627118644067796,
+      "C3_ok": true,
+      "C4_hi": -47.43478260869565,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 3.5,
+      "q90_cross": 6.100000000000001,
+      "max_cross": 11.0,
+      "q50_lag": 4.0,
+      "q90_lag": 9.100000000000001,
+      "median_ratio": 1.1625118675537482,
+      "ratio_q10": 1.0356962542519819,
+      "ratio_q90": 2.036721055413292,
+      "C1": 0.847457627118644,
+      "C2": 0.847457627118644,
+      "C3_ok": true,
+      "C4_hi": -55.26,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.03829802516087344,
+      0.038273754042075336,
+      0.017184147052136334
+     ],
+     "q90_abs": [
+      0.04519062699616792,
+      0.045139019586337106,
+      0.03140033945166765
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/decay": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 6.0,
+     "q90_cross": 9.0,
+     "max_cross": 45.0,
+     "q50_lag": 6.0,
+     "q90_lag": 11.0,
+     "median_ratio": 1.2213484649490347,
+     "ratio_q10": 1.0764616226385737,
+     "ratio_q90": 2.3808873970294884,
+     "C1": 0.7796610169491526,
+     "C2": 0.7796610169491526,
+     "C3_ok": false,
+     "C4_hi": -52.385416666666664,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 6.0,
+      "q90_cross": 9.0,
+      "max_cross": 45.0,
+      "q50_lag": 7.0,
+      "q90_lag": 11.0,
+      "median_ratio": 1.227045063457514,
+      "ratio_q10": 1.090112738495161,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7627118644067796,
+      "C3_ok": true,
+      "C4_hi": -45.80434782608695,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 5.0,
+      "q90_cross": 9.0,
+      "max_cross": 12.0,
+      "q50_lag": 6.0,
+      "q90_lag": 11.0,
+      "median_ratio": 1.1955992912642168,
+      "ratio_q10": 1.074334445740429,
+      "ratio_q90": 2.036721055413292,
+      "C1": 0.847457627118644,
+      "C2": 0.847457627118644,
+      "C3_ok": true,
+      "C4_hi": -53.719500000000004,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0005763603147508345,
+      0.0005994625108558527,
+      0.02915620606336633
+     ],
+     "q90_abs": [
+      0.002586645355331019,
+      0.002819372336653503,
+      0.05421388462430028
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/gwin": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 4.0,
+     "q90_cross": 6.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 9.5,
+     "median_ratio": 1.1922244284047248,
+     "ratio_q10": 1.065307462135626,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.8050847457627118,
+     "C2": 0.788135593220339,
+     "C3_ok": true,
+     "C4_hi": -53.833333333333336,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      15,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 4.5,
+      "q90_cross": 6.5,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.1945305599844722,
+      "ratio_q10": 1.0683702890778182,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7457627118644068,
+      "C3_ok": true,
+      "C4_hi": -47.32554347826088,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 4.0,
+      "q90_cross": 6.0,
+      "max_cross": 10.0,
+      "q50_lag": 4.0,
+      "q90_lag": 8.200000000000003,
+      "median_ratio": 1.1761136237212981,
+      "ratio_q10": 1.0650466333696884,
+      "ratio_q90": 1.9843229352227896,
+      "C1": 0.847457627118644,
+      "C2": 0.8305084745762712,
+      "C3_ok": true,
+      "C4_hi": -55.14,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.00041443390306517003,
+      0.0004308314809109426,
+      0.0030441316284950393
+     ],
+     "q90_abs": [
+      0.0024345925211932276,
+      0.0031150653577039404,
+      0.017410221096158952
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/logquad": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 4.0,
+     "q90_cross": 7.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 9.5,
+     "median_ratio": 1.1922244284047248,
+     "ratio_q10": 1.065307462135626,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.7966101694915254,
+     "C2": 0.788135593220339,
+     "C3_ok": true,
+     "C4_hi": -53.625,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 5.0,
+      "q90_cross": 7.0,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.5,
+      "median_ratio": 1.1945305599844722,
+      "ratio_q10": 1.0734734530826096,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7627118644067796,
+      "C3_ok": true,
+      "C4_hi": -47.06467391304349,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 4.0,
+      "q90_cross": 6.100000000000001,
+      "max_cross": 11.0,
+      "q50_lag": 5.0,
+      "q90_lag": 9.100000000000001,
+      "median_ratio": 1.1761136237212981,
+      "ratio_q10": 1.0650466333696884,
+      "ratio_q90": 1.9918680379664218,
+      "C1": 0.847457627118644,
+      "C2": 0.847457627118644,
+      "C3_ok": true,
+      "C4_hi": -54.86,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0007940894517430852,
+      0.0007945023800401962,
+      0.0006237456243296524
+     ],
+     "q90_abs": [
+      0.005299535396726986,
+      0.005634443297179459,
+      0.01100676869650013
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/coupled": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 6.0,
+     "q90_cross": 8.5,
+     "max_cross": 46.0,
+     "q50_lag": 7.0,
+     "q90_lag": 10.5,
+     "median_ratio": 1.209348911513644,
+     "ratio_q10": 1.1027359409628485,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.8050847457627118,
+     "C2": 0.788135593220339,
+     "C3_ok": false,
+     "C4_hi": -52.416666666666664,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 6.0,
+      "q90_cross": 8.0,
+      "max_cross": 46.0,
+      "q50_lag": 7.0,
+      "q90_lag": 10.0,
+      "median_ratio": 1.2127134141104765,
+      "ratio_q10": 1.1122762354286095,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7457627118644068,
+      "C3_ok": true,
+      "C4_hi": -46.17391304347826,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 6.0,
+      "q90_cross": 9.0,
+      "max_cross": 10.0,
+      "q50_lag": 7.0,
+      "q90_lag": 10.100000000000001,
+      "median_ratio": 1.1923834481130435,
+      "ratio_q10": 1.1027876906599365,
+      "ratio_q90": 1.9843229352227896,
+      "C1": 0.847457627118644,
+      "C2": 0.8305084745762712,
+      "C3_ok": true,
+      "C4_hi": -53.679500000000004,
+      "PASS": true
+     }
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/coupled_sw": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 4.0,
+     "q90_cross": 7.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 9.5,
+     "median_ratio": 1.1922244284047248,
+     "ratio_q10": 1.065307462135626,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.7966101694915254,
+     "C2": 0.788135593220339,
+     "C3_ok": true,
+     "C4_hi": -53.65625,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 5.0,
+      "q90_cross": 7.0,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.5,
+      "median_ratio": 1.1945305599844722,
+      "ratio_q10": 1.0734734530826096,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7627118644067796,
+      "C3_ok": true,
+      "C4_hi": -47.06521739130435,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 4.0,
+      "q90_cross": 6.100000000000001,
+      "max_cross": 11.0,
+      "q50_lag": 5.0,
+      "q90_lag": 9.100000000000001,
+      "median_ratio": 1.1761136237212981,
+      "ratio_q10": 1.0650466333696884,
+      "ratio_q90": 1.9843229352227896,
+      "C1": 0.847457627118644,
+      "C2": 0.847457627118644,
+      "C3_ok": true,
+      "C4_hi": -54.92,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.000515890906382932,
+      0.00046129953598517126,
+      0.0007190145779387702
+     ],
+     "q90_abs": [
+      0.002379045779782274,
+      0.0022083271205623144,
+      0.002843483345541165
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "ext/oracle_sw": {
+    "all": {
+     "n": 118,
+     "misses": 22,
+     "q50_cross": 4.0,
+     "q90_cross": 7.0,
+     "max_cross": 45.0,
+     "q50_lag": 5.0,
+     "q90_lag": 9.5,
+     "median_ratio": 1.1922244284047248,
+     "ratio_q10": 1.065307462135626,
+     "ratio_q90": 2.357189234141904,
+     "C1": 0.7966101694915254,
+     "C2": 0.788135593220339,
+     "C3_ok": true,
+     "C4_hi": -53.71848958333334,
+     "PASS": false
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      20,
+      1.05
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 13,
+      "q50_cross": 4.5,
+      "q90_cross": 7.0,
+      "max_cross": 45.0,
+      "q50_lag": 5.0,
+      "q90_lag": 10.5,
+      "median_ratio": 1.1945305599844722,
+      "ratio_q10": 1.0734734530826096,
+      "ratio_q90": 2.4818913085124414,
+      "C1": 0.7627118644067796,
+      "C2": 0.7627118644067796,
+      "C3_ok": true,
+      "C4_hi": -47.19565217391305,
+      "PASS": false
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 9,
+      "q50_cross": 4.0,
+      "q90_cross": 6.0,
+      "max_cross": 11.0,
+      "q50_lag": 4.5,
+      "q90_lag": 9.100000000000001,
+      "median_ratio": 1.1761136237212981,
+      "ratio_q10": 1.0650466333696884,
+      "ratio_q90": 1.9843229352227896,
+      "C1": 0.847457627118644,
+      "C2": 0.847457627118644,
+      "C3_ok": true,
+      "C4_hi": -54.96,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q90_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "crossing forecast, no forecast switch": 7,
+     "no forecast: extrapolated path not growing at the cutoff": 12,
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/cut": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 3.0,
+     "q90_cross": 6.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 6.0,
+     "median_ratio": 1.0452339687784915,
+     "ratio_q10": 0.9761362333520942,
+     "ratio_q90": 1.15773995611019,
+     "C1": 0.923728813559322,
+     "C2": 0.940677966101695,
+     "C3_ok": true,
+     "C4_hi": -46.54782608695652,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.30000000000000004
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.0,
+      "q90_cross": 7.300000000000004,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 7.300000000000004,
+      "median_ratio": 1.0444039847182967,
+      "ratio_q10": 0.970439072865889,
+      "ratio_q90": 1.201999925901068,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -38.55129310344828,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 6.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 6.0,
+      "median_ratio": 1.0470345671204784,
+      "ratio_q10": 0.9964570127540665,
+      "ratio_q90": 1.1392758477222371,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -49.31535087719299,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.03330597817063341,
+      0.0332838336070716,
+      0.020361734199287385
+     ],
+     "q90_abs": [
+      0.0443594313144148,
+      0.04433220683536985,
+      0.04771829647122998
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/decay": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 4.0,
+     "q90_cross": 7.6000000000000085,
+     "max_cross": 112.0,
+     "q50_lag": 4.0,
+     "q90_lag": 7.6000000000000085,
+     "median_ratio": 1.0809457641359888,
+     "ratio_q10": 1.013446657712653,
+     "ratio_q90": 1.170506618172791,
+     "C1": 0.923728813559322,
+     "C2": 0.940677966101695,
+     "C3_ok": true,
+     "C4_hi": -45.39108695652174,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.30000000000000004
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 4.0,
+      "q90_cross": 8.0,
+      "max_cross": 112.0,
+      "q50_lag": 4.0,
+      "q90_lag": 8.0,
+      "median_ratio": 1.0855588213122522,
+      "ratio_q10": 1.0118185302920868,
+      "ratio_q90": 1.2401955096222113,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -37.5,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 7.0,
+      "max_cross": 69.0,
+      "q50_lag": 4.0,
+      "q90_lag": 7.0,
+      "median_ratio": 1.0799615801956544,
+      "ratio_q10": 1.034404119771581,
+      "ratio_q90": 1.1453264459692956,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -48.07017543859649,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      8.135357383043385e-05,
+      0.00010928608624738434,
+      0.03176833790931233
+     ],
+     "q90_abs": [
+      0.002780937830883089,
+      0.0010465723498986207,
+      0.05355618015923334
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/gwin": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.0523378428654404,
+     "ratio_q10": 0.9879422393554114,
+     "ratio_q90": 1.111278648450094,
+     "C1": 0.923728813559322,
+     "C2": 0.940677966101695,
+     "C3_ok": true,
+     "C4_hi": -46.60847826086957,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      10,
+      10,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.0,
+      "q90_cross": 6.300000000000004,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 6.300000000000004,
+      "median_ratio": 1.0527562589218478,
+      "ratio_q10": 0.984188188202895,
+      "ratio_q90": 1.1796034516684648,
+      "C1": 0.9152542372881356,
+      "C2": 0.9152542372881356,
+      "C3_ok": true,
+      "C4_hi": -38.810344827586206,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.0523378428654404,
+      "ratio_q10": 1.0,
+      "ratio_q90": 1.1016804898471864,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -49.228070175438596,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      7.889681521305869e-05,
+      0.00011047265791114258,
+      0.0032048223931959163
+     ],
+     "q90_abs": [
+      0.03980968990282742,
+      0.03131302893074797,
+      0.01100298278912607
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/logquad": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 3.0,
+     "q90_cross": 6.6000000000000085,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 6.6000000000000085,
+     "median_ratio": 1.0555956922008534,
+     "ratio_q10": 0.9930952959822997,
+     "ratio_q90": 1.2037353977843368,
+     "C1": 0.9152542372881356,
+     "C2": 0.9322033898305084,
+     "C3_ok": true,
+     "C4_hi": -45.982608695652175,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.45
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.0,
+      "q90_cross": 8.300000000000004,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 8.300000000000004,
+      "median_ratio": 1.057295150853591,
+      "ratio_q10": 0.9965476479911499,
+      "ratio_q90": 1.3554868861647607,
+      "C1": 0.9152542372881356,
+      "C2": 0.9152542372881356,
+      "C3_ok": true,
+      "C4_hi": -37.827586206896555,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.054685739581137,
+      "ratio_q10": 0.9950302502448077,
+      "ratio_q90": 1.1321466383825636,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -48.80657894736843,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0003876005136606575,
+      0.000329072286170351,
+      0.0010255189174124268
+     ],
+     "q90_abs": [
+      0.15185590068023866,
+      0.03994453313259036,
+      0.1712183745523568
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/coupled": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 4.0,
+     "q90_cross": 7.0,
+     "max_cross": 112.0,
+     "q50_lag": 4.0,
+     "q90_lag": 7.0,
+     "median_ratio": 1.070286580654267,
+     "ratio_q10": 1.0,
+     "ratio_q90": 1.0880576022930495,
+     "C1": 0.940677966101695,
+     "C2": 0.9491525423728814,
+     "C3_ok": true,
+     "C4_hi": -46.43478260869565,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.2
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.5,
+      "q90_cross": 7.0,
+      "max_cross": 112.0,
+      "q50_lag": 3.5,
+      "q90_lag": 7.0,
+      "median_ratio": 1.068600687299395,
+      "ratio_q10": 1.0,
+      "ratio_q90": 1.0925045496299164,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -38.96551724137931,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 4.0,
+      "q90_cross": 8.0,
+      "max_cross": 69.0,
+      "q50_lag": 4.0,
+      "q90_lag": 8.0,
+      "median_ratio": 1.0705088592346619,
+      "ratio_q10": 1.00626792664294,
+      "ratio_q90": 1.0859646225857527,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -48.92982456140351,
+      "PASS": true
+     }
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/coupled_sw": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.0554672590617784,
+     "ratio_q10": 0.9930952959822997,
+     "ratio_q90": 1.1264190845767235,
+     "C1": 0.923728813559322,
+     "C2": 0.940677966101695,
+     "C3_ok": true,
+     "C4_hi": -46.52173913043478,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.0,
+      "q90_cross": 7.0,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 7.0,
+      "median_ratio": 1.0553606162891458,
+      "ratio_q10": 0.987719223503197,
+      "ratio_q90": 1.1738398372295151,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -38.68922413793104,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.0555956922008534,
+      "ratio_q10": 1.0085162607977076,
+      "ratio_q90": 1.1063526365396026,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -49.175438596491226,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      2.2804043087742976e-06,
+      4.853845545715885e-06,
+      0.00021090958284541994
+     ],
+     "q90_abs": [
+      0.0008031712930636536,
+      0.0014087505432706536,
+      0.0013429915179591352
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "oracle/oracle_sw": {
+    "all": {
+     "n": 118,
+     "misses": 3,
+     "q50_cross": 3.0,
+     "q90_cross": 5.0,
+     "max_cross": 112.0,
+     "q50_lag": 3.0,
+     "q90_lag": 5.0,
+     "median_ratio": 1.0554672590617784,
+     "ratio_q10": 0.9930952959822997,
+     "ratio_q90": 1.1264190845767235,
+     "C1": 0.923728813559322,
+     "C2": 0.940677966101695,
+     "C3_ok": true,
+     "C4_hi": -46.530434782608694,
+     "PASS": true
+    },
+    "skipped": {
+     "no_cross": 1,
+     "cutoff_not_before": 1,
+     "no_tsw": 0
+    },
+    "split": {
+     "tol_from_first_half": [
+      15,
+      15,
+      0.25
+     ],
+     "first_half": {
+      "n": 59,
+      "misses": 1,
+      "q50_cross": 3.0,
+      "q90_cross": 7.0,
+      "max_cross": 112.0,
+      "q50_lag": 3.0,
+      "q90_lag": 7.0,
+      "median_ratio": 1.0553606162891458,
+      "ratio_q10": 0.987719223503197,
+      "ratio_q90": 1.1738398372295151,
+      "C1": 0.9322033898305084,
+      "C2": 0.9322033898305084,
+      "C3_ok": true,
+      "C4_hi": -38.68922413793104,
+      "PASS": true
+     },
+     "second_half": {
+      "n": 59,
+      "misses": 2,
+      "q50_cross": 3.0,
+      "q90_cross": 5.0,
+      "max_cross": 69.0,
+      "q50_lag": 3.0,
+      "q90_lag": 5.0,
+      "median_ratio": 1.0555956922008534,
+      "ratio_q10": 1.0085162607977076,
+      "ratio_q90": 1.1063526365396026,
+      "C1": 0.9491525423728814,
+      "C2": 0.9491525423728814,
+      "C3_ok": true,
+      "C4_hi": -49.175438596491226,
+      "PASS": true
+     }
+    },
+    "P_relerr_vs_true_tsw": {
+     "median_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q90_abs": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "coords": [
+      "w1",
+      "b1",
+      "b2"
+     ]
+    },
+    "miss_status": {
+     "no forecast: unstable / diverged (Track 1 rule)": 3
+    }
+   },
+   "horizon_steps_obs_minus_tc_q10_50_90": [
+    30.0,
+    83.0,
+    142.0
+   ],
+   "horizon_steps_tsw_minus_tc_q10_50_90": [
+    7.0,
+    20.0,
+    37.89999999999999
+   ]
+  }
+ }
+}
