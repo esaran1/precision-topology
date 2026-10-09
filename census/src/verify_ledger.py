@@ -613,6 +613,7 @@ def main() -> None:
     phase2a_ps_posthoc_checks()
     phase2a_ps2_checks()
     final_posthoc_checks()
+    fold_next_order_checks()
     phase3_checks()
     phase1b_checks()
     phase2c_checks()
@@ -1013,6 +1014,8 @@ PRODUCERS = {
     "final_posthoc_parts.jsonl": ("final_posthoc", "job_dist", "full", ""),
     "final_posthoc.json": ("final_posthoc", "main", "full", ""),
     "final_posthoc.md": ("final_posthoc", "main", "full", ""),
+    # Track C: next-order fold-passage delay (math note §18; prediction from frozen landscape quantities): src/fold_next_order.py
+    "fold_next_order.json": ("fold_next_order", "predict", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
@@ -3721,6 +3724,53 @@ def final_posthoc_checks() -> None:
         chk("FINAL-PH pooled C, per-seed A_s (eps_fc)", fc["pooled_fits"]["free_A"]["C"], P["C_free_A"], 1e-6)
         chk("FINAL-PH 2A-PS2 smallest Holm p", P2["ps2"]["comparison"]["min_p_holm"], P["ps2_min_holm"], 1e-6)
         chk("FINAL-PH 2A-PS smallest Holm p", P2["ps"]["comparison"]["min_p_holm"], P["ps_min_holm"], 1e-6)
+
+
+FOLD_NO_PIN = {"A": 0.038348, "B": -0.050964, "K": -3.032594, "D": 528.496206, "J": 494.058505,
+               "slope_2m18": 0.701287, "r_pred_2m18": 0.003850}
+
+
+def fold_next_order_checks() -> None:
+    """Track C (math note §18): the next-order fold-passage delay.  fold_next_order.json (the PREDICTION, from frozen
+    landscape quantities only) is internally consistent: the Airy constants recompute; A, B, K, D and every row (r_pred,
+    local slope) recompute from the stored normal-form coefficients and J; the refined fold equals the frozen s_F; g₁ = 3p;
+    |m′c′| agrees with the frozen fit within 2 %; J's two Richardson pairs agree; no observation key; pins."""
+    from . import fold_next_order as FN
+    if not FN.OUT_JSON.exists():
+        return
+    print("Track C: next-order fold-passage delay (prediction)")
+    J = json.loads(FN.OUT_JSON.read_text())
+    a = FN.airy_constants()
+    chk("FOLD-NO c_A recomputes", abs(a["c_A"] - FN.C_A), 0.0, 1e-14)
+    chk("FOLD-NO c_B = 1/2", abs(a["c_B"] - 0.5), 0.0, 1e-14)
+    nf, KD = J["normal_form"], J["expansion_sigma"]
+    A, B = FN.inner_AB(nf["p"], nf["q"], nf["f3"], nf["f11"], nf["g0"], nf["g1"], discrete=True)
+    chk("FOLD-NO A, B recompute", float(A == J["inner"]["A"] and B == J["inner"]["B"]), 1.0, 0)
+    chk("FOLD-NO K, D recompute", float(FN.coefficients(nf["p"], nf["q"], nf["g0"], A, B, J["escape"]["J"]) == KD), 1.0, 0)
+    s_F = J["frozen_inputs"]["s_F"]
+    bad = 0
+    for r in J["rows"]:
+        ex = FN.expansion(r["rho"], nf["p"], nf["q"], nf["g0"], KD["K"], KD["D"])
+        bad += int(r["r_pred"] != ex["sigma"] / s_F or r["slope_pred"] != ex["slope"])
+    chk("FOLD-NO rows recompute (mismatches)", float(bad), 0.0, 0)
+    chk("FOLD-NO rows", float(len(J["rows"])), 27.0, 0)
+    chk("FOLD-NO refined fold equals frozen s_F", abs(J["fold"]["s_F_minus_frozen"]), 0.0, 1e-12)
+    chk("FOLD-NO g1 = 3p", abs(nf["g1_over_3p"] - 1), 0.0, 1e-9)
+    chk("FOLD-NO |m'c'| vs frozen fit within 2 %", float(abs(nf["abs_mc"] / J["frozen_inputs"]["abs_mc_frozen"] - 1) < 0.02),
+        1.0, 0)
+    chk("FOLD-NO J Richardson pairs agree within 0.5", float(J["escape"]["J_numerical_uncertainty"] < 0.5), 1.0, 0)
+    t = json.dumps(J)
+    chk("FOLD-NO prediction holds no observation key", float(not any(k in t for k in ('"r_obs"', '"s_obs"', '"t_obs"'))),
+        1.0, 0)
+    P = FOLD_NO_PIN
+    chk("FOLD-NO A", J["inner"]["A"], P["A"], 1e-6)
+    chk("FOLD-NO B", J["inner"]["B"], P["B"], 1e-6)
+    chk("FOLD-NO K", KD["K"], P["K"], 1e-6)
+    chk("FOLD-NO D", KD["D"], P["D"], 1e-6)
+    chk("FOLD-NO J", KD["D_J"], P["J"], 1e-6)
+    last = J["rows"][-1]
+    chk("FOLD-NO local slope at 2^-18 (prediction)", last["slope_pred"], P["slope_2m18"], 1e-6)
+    chk("FOLD-NO r_pred at 2^-18", last["r_pred"], P["r_pred_2m18"], 1e-6)
 
 
 def phase1b_checks() -> None:

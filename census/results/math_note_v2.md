@@ -1456,6 +1456,8 @@ comes first. The global threshold enters only through which branch is occupied.
   - the statement for the discrete map (checked numerically: F2–F4);
   - the momentum and Adam cases.
 
+- **Forward reference (2026-10-09).** The next-order terms (ε ln ε and ε, with their coefficients) are derived in §18.
+
 ### 14.6 Numerical checks (`theory_checks_fold.json`; not part of any proof)
 
 - **F0.** Ω₀ = 2.33810741045976703848919725245 (mpmath: −a₁).
@@ -1974,3 +1976,216 @@ conditional minimiser at s < s_W has |w₁| > W.
 - **Width 2 is not covered.** Directions with ṽᵢ → 0 and αᵢ → ∞ keep φ bounded, so Lemma C3's spreading argument does
   not bound the parameters. §10.1's width-2 selection keeps its compactness assumption.
 - **Non-balanced data** would change C1 (the b-term no longer drops). Every object used in the paper is balanced.
+
+## 18. The next-order term of the fold-passage delay, from the normal form (Track C; 2026-10-09)
+
+**Status, stated per part.**
+- **§18.2–18.4 (the expansion through O(ε)): derived by formal matched asymptotics, every algebraic step checked; it is
+  NOT a theorem** (no remainder estimate is proved). It is checked against direct numerical integration of constructed
+  normal forms, flow and map, where the error divided by ε goes to 0 and every dropped term leaves an O(1) error/ε
+  (`tests/test_fold_next_order.py`).
+- **§18.5–18.6 (Phase 2A's landscape): a PREDICTION computed from frozen landscape quantities only** (`src/fold_next_order.py
+  predict` → `results/fold_next_order.json`). No run, observation or score file is read. It is committed before any
+  comparison. The 2A data had been seen before this derivation began (the post hoc fit r = A ε^{2/3} + C ε ln(1/ε),
+  `results/phase2a_posthoc.md`), so the comparison that follows in a later commit is labelled "derived after the data
+  were seen".
+- The reduction of the n-dimensional map to the planar system (§14.3) is used as there: derived, not proved.
+
+### 18.1 Setting
+
+- After the centre-manifold reduction of §14.3, take coordinates x along the fold's null vector e (|e| = 1 in the metric
+  P = I of the fast coordinates) and σ = s − s_F. Orient e so that escape is toward x → +∞.
+- One training step is the map
+  - x_{n+1} = x_n + F(x_n, σ_n), F = pσ + qx² + f₃x³ + f₁₁xσ + (higher order),
+  - σ_{n+1} = σ_n + ρ·G(x_n, σ_n), G = g₀ + g₁x + (higher order),
+  - with p, q, g₀ > 0. The branch x = −(−pσ/q)^{1/2} attracts for σ < 0, and ρ is the slow rate.
+- **The coefficients, in landscape terms** (η the fast step, H the fast Hessian at the fold, T = ∇³L, Q = ∇⁴L,
+  H⁺ the pseudo-inverse on e⊥, b = ∂_s∇L):
+  - q = −η·½T[e,e,e], p = −η·eᵀb (these are §14.1's c′, m′ with the escape orientation; pq = η²|m′c′|);
+  - f₃ = −η(Q[e,e,e,e]/6 − ½T_eeᵀH⁺T_ee), f₁₁ = −η(∂_sH[e,e] − T_eeᵀH⁺b), with T_ee = T[e,e,·]. These are the cubic
+    coefficients of the centre-manifold reduced gradient: the centre manifold is w = −H⁺(½T_ee x² + bσ) + …, and
+    eᵀH w = 0 at the fold, so w enters F first through T[e,e,w]·x.
+  - g₀ = ṡ/ρ at the fold point; g₁ = eᵀ∇G.
+  - For Phase 2A's scale-only rule, G = −3η∂L/∂s (s = Σ|v| = √3·â·v; â·v moves with step ηρ). Then
+    g₁ = −3η eᵀ∂_s∇L = **3p**: the coupling of x into ṡ is the same mixed derivative as the coupling of s into ẋ.
+- **The crossing event** is a finite threshold, not the blow-up: the first step at which an observable (2A: ρ₂ ≥ q)
+  is reached. Along the escape this happens at some x_q = O(1).
+
+### 18.2 The inner problem at first order
+
+- **Scaling.** Use σ as the independent variable: dx/dσ = F/(ρG). Set x = λX, σ = μT with
+  μ = (g₀ρ)^{2/3}(pq)^{−1/3} and λ = (g₀ρp)^{1/3}q^{−2/3}. Then μλq = ρg₀ and pμ = qλ², and
+  - dX/dT = T + X² + λ·(A X³ + B X T) + O(λ²),
+  - **A = f₃/q − g₁/g₀, B = f₁₁/p − g₁/g₀** (flow). The −g₁/g₀ comes from 1/G = (1 − (g₁/g₀)x + …)/g₀ multiplying T + X².
+  - Every other term is O(λ²) relative: x²σ, σ², g₂σ, x⁴.
+- **Zeroth order** is Theorem F: X₀ = Ai′(−T)/Ai(−T) = −u′/u, u = Ai(−T).
+- **First order.** X = X₀ + λX₁ with X₁′ = 2X₀X₁ + AX₀³ + BTX₀. The integrating factor is u⁻², so
+  - X₁(T) = u(T)⁻² ∫_{−∞}^{T} u²(AX₀³ + BtX₀) dt.
+  - This is the unique solution without the homogeneous part u⁻², which grows like exp((4/3)|T|^{3/2}) as T → −∞.
+    So it is the one attached to the attracting slow manifold.
+- **Near the blow-up** T = Ω₀ − τ, τ ↓ 0. Here u = kτ(1 + O(τ²)) with k = Ai′(a₁) = 0.70121…, and X₀ = 1/τ + O(τ).
+  - So u²X₀³ = k²/τ + O(τ): the A-integral diverges logarithmically. The B-integral converges.
+  - Hence ∫ = −Ak² ln τ + k²c₁ + O(τ²), with **c₁ = A·c_A + B·c_B**:
+    - **c_A** = lim_{τ→0}[∫_{a₁+τ}^{∞} Ai′(z)³/Ai(z) dz + k² ln τ]/k² = **−1.0087907567050538** (mpmath, 30 digits;
+      the integrand minus k²/(z − a₁) is integrated on [a₁, a₁ + 1]).
+    - **c_B** = −∫_{a₁}^{∞} z·Ai(z)Ai′(z) dz/k² = **1/2 exactly**. The proof: ∫ z Ai Ai′ dz = ½zAi² − ½∫Ai² dz, and
+      ∫Ai² dz = zAi² − Ai′², so ∫ z Ai Ai′ dz = ½Ai′². Evaluated from a₁ to ∞ this is −½k².
+  - Inverting X = 1/τ + λ(−A ln τ + c₁)/τ² + … gives the inner time at which X is reached:
+    - **T(X) = Ω₀ − 1/X − λ(A ln X + c₁) + O(λ², X⁻³)**, for 1 ≪ X ≪ 1/λ.
+  - **The log is local.** Near the blow-up, dX/dT ≈ X²(1 + λAX), whose time to reach X is −1/X − λA ln X + const.
+    The cubic part of the escape field sets it, not the far past.
+
+### 18.3 The escape region and the matching
+
+- For x = O(1), σ stays within O(μ) of 0 during the escape. To O(ρ),
+  σ_q = σ_m + ρ·Σ_{steps from x_m to the threshold} G, evaluated with σ frozen at 0.
+  - The σ-dependence of F there is relatively O(μ/x²). It matches the inner region's O(X⁻³) terms and contributes at
+    O(ρμ) only.
+- For a flow, Σ G becomes ∫_{x_m}^{x_q} G/F(x, 0) dx. Its small-x_m behaviour is g₀/(q x_m) + (g₀A/q) ln x_m + J + o(1).
+  The 1/x coefficient of G/F is (g₁ − g₀f₃/q)/q = −g₀A/q, the same A as the inner one.
+- This defines the **regularised escape sum**
+  **J = lim_{x_m→0}[Σ_{x_m → threshold} G − g₀/(q x_m) − (g₀A/q) ln x_m]**.
+  It is the only global quantity: it depends on the whole escape path to the threshold and on the observable.
+- **Matching** at an intermediate x_m = λX_m, with the inner σ_m = μT(X_m):
+  - the 1/x_m terms cancel, since μλ/x_m = ρg₀/(q x_m);
+  - the ln x_m terms cancel, since μλ = ρg₀/q.
+  - What remains:
+
+  **σ_q = Ω₀μ + (ρg₀/q)(A ln λ − c₁) + ρJ + o(ρ).**
+
+- Writing ln λ = ⅓ ln ρ + ln λ̂ with λ̂ = (g₀p)^{1/3}q^{−2/3}:
+
+  **σ_q = Ω₀(g₀ρ)^{2/3}(pq)^{−1/3} + K·ρ ln(1/ρ) + D·ρ + O(ρ^{4/3} ln²ρ),**
+  **K = −A g₀/(3q),  D = (g₀/q)(A ln λ̂ − A c_A − B/2) + J (+ g₀/2 for a map, §18.4).**
+
+- **Agreement with [KS01].** Remark 2.11 states that the next term is O(ε ln ε), referring to [MR80]. Here that term is
+  K·ρ ln(1/ρ), with **K set by the local cubic data alone**. The O(ε) term is not local: J carries the escape map to
+  the threshold.
+
+### 18.4 The discrete step (gradient descent)
+
+- The map is the time-1 flow of the modified field F̃ = F − ½(F_xF + F_σ·ρG) + O(F²). Two terms matter at this order.
+  - −½F_xF = −q²x³ − pq·xσ + …, so **f₃ → f₃ − q² and f₁₁ → f₁₁ − pq** in A and B.
+  - −½F_σρG = −½pρg₀ is a constant forcing, equivalent to σ → σ − ½ρg₀. It adds **+½g₀ to D**.
+  - The G-equation's correction −½ρG_xF is O(λ²) relative and is dropped.
+- In the escape region, J is evaluated with the map itself (the frozen-σ step count). Its regularisation uses the map's
+  A, and the Euler–Maclaurin boundary terms are part of J.
+- **The threshold is detected at an integer step.** The first-crossing rule adds a jitter of at most one step's
+  ρG(x_q) to σ_q. That is ≤ 0.02 % of 2A's Dρ, and it is reported, not modelled.
+- **Hyperbolic modes enter at no lower order.** At the fold eᵀHw = 0. The O(ρ) lag of the fast modes behind the centre
+  manifold therefore enters F only multiplied by x or σ, which is O(λ²) relative. Its size is ≈ (inner rate qλ)/λ₂
+  times the first-order terms, which is large when λ₂ is small (§18.6).
+
+### 18.5 What sets each coefficient
+
+| order in σ_q | coefficient | set by |
+|---|---|---|
+| ρ^{2/3} | Ω₀(g₀)^{2/3}(pq)^{−1/3} | the fold constant pq = η²\|m′c′\| and the drift g₀ (§14) |
+| ρ ln(1/ρ) | K = −A g₀/(3q) | local: the reduced cubic f₃ (Q₄ and T_eeᵀH⁺T_ee), the drift slope g₁ (= 3p for the scale-only rule), q; discrete −q² |
+| ρ | D = (g₀/q)(A ln λ̂ − A c_A − B/2) + J + g₀/2 | local: A, B (f₁₁ via ∂_sH[e,e] and T_eeᵀH⁺b), λ̂; universal c_A, c_B; **global: J (escape to the threshold)**; discrete ½g₀ |
+
+- Nothing at these orders is left undetermined. Every coefficient is a derivative of the loss at the fold, a universal
+  Airy constant, or J. J is a deterministic, regularised escape computation on the frozen landscape, not a fitted
+  constant.
+- In r and ε units (r = σ_q/s_F, ε = (ρg₀/s_F)/(ηΛ_F), Λ_F = (|m′c′|s_F)^{1/2}, ρ = κε with κ = s_FηΛ_F/g₀):
+  r = Ω₀ε^{2/3} + K_r ε ln(1/ε) + D_r ε, with K_r = Kκ/s_F and D_r = (D − K ln κ)κ/s_F.
+- **The local exponent** is d ln r/d ln ε = d ln σ_q/d ln ρ = [⅔Ω₀μ + Kρ(ln(1/ρ) − 1) + Dρ]/σ_q, since ε ∝ ρ exactly.
+- **Checks** (`tests/test_fold_next_order.py`): two polynomial flows and a map with η = 0.25, integrated to 1e-13. For
+  the flow case (p, q, f₃, f₁₁, g₀, g₁) = (1, 1, 0.3, −0.4, 1, 0.5), x_q = 1:
+  - error/ε at ε = 1e-3, 1e-4, 1e-5, 1e-6 is 0.0177, 0.0070, 0.0023, 0.0002 (o(1), falling like ε^{1/3});
+  - the leading term alone leaves error/ε −0.324, −0.181, −0.033, +0.119. This drifts by K ln 10 = 0.1535 per decade,
+    the log coefficient measured.
+  - **FAIL cases:** dropping c₁, flipping K, using flow A, B on a map, or dropping the half step each leave an O(1)
+    error/ε. The half step leaves exactly ½g₀.
+
+### 18.6 Phase 2A's landscape: coefficients and the PREDICTION (before comparison)
+
+**Inputs.** `results/phase2a/frozen.json` gives s_F, q and the ladder. The sb_fold continuation gives the M branch at
+s_F − 0.002.
+
+**Fold.** A Moore–Spence Newton solve in the 12 fast coordinates (W, c, v⊥â on the 3 active units, and b) gives
+s_F = 4.7676894421067875. That is the frozen s_F to 4e−15. ρ₂ at the fold is 0.2801. The fast Hessian's eigenvalues
+are 0, **λ₂ = 1.806e−4**, 3.96e−4, 4.75e−4, 5.77e−4, 3.7e−3, ….
+
+| quantity | value |
+|---|---|
+| p = η\|m′\|, q = η\|c′\| | 1.06523e−3, 4.55732e−4 (\|m′c′\| = 4.8546e−7; frozen fit 4.7821e−7, −1.5 %) |
+| Q₄/6, ½T_eeᵀH⁺T_ee → f₃ | 1.04793e−4, 1.35947e−4 → f₃ = 3.1154e−5 |
+| ∂_sH[e,e], T_eeᵀH⁺b → f₁₁ | 6.3159e−4, 6.0927e−4 → f₁₁ = −2.2318e−5 |
+| g₀ = −3η∂_sL, g₁ | 0.108120, 3.19569e−3 (= 3p to 1e−14) |
+| A = f₃/q − q − g₁/g₀ | 0.068360 − 0.000456 − 0.029557 = **0.038348** |
+| B = f₁₁/p − q − g₁/g₀ | −0.020952 − 0.000456 − 0.029557 = **−0.050964** |
+| λ̂, c₁ = Ac_A + B/2 | 8.2157, −0.064167 |
+| J (escape sum to ρ₂ ≥ q) | **494.06** (numerical ±0.03) |
+| **K** | **−3.0326** |
+| **D** = inner + J + ½g₀ | 34.38 + 494.06 + 0.054 = **528.50** |
+| in ε units: K_r, D_r | **−0.0427, 7.32** |
+
+- **J.** Frozen-s gradient descent (the scale-only rule at ρ = 0) starts at the centre-manifold point
+  x = 0.005 and runs 442,408 steps until ρ₂ ≥ q, which is reached at x = 5.27.
+  - The regularised tail sums at x_m = 0.4, 0.2, 0.1, 0.05, 0.025, 0.018, 0.0125, 0.009 converge linearly in x_m.
+  - Two-point Richardson on (0.018, 0.009) gives 494.059, and (0.025, 0.0125) gives 494.030.
+  - The run itself checks f₃ and g₁: (Δx − qx²)/x³ → f₃ to 2 %, and (G − g₀)/x = g₁ to 1e−4.
+- **Consequences, stated before comparison.**
+  - **The ε ln(1/ε) coefficient is small and NEGATIVE** (K_r = −0.043). At this order the derivation does NOT support
+    reading the post hoc C = +0.80 as the ε ln ε term.
+  - **The correction is carried by the O(ε) escape term.** About 93 % of D is J: the threshold ρ₂ = q lies far along the
+    escape (x ≈ 5.3, ~4,570 steps of s-drift at g₀).
+- **A priori limits** (computed from the landscape, per rate below):
+  - δ₁ = λ|A| measures the first-order inner terms.
+  - δ₂ = |f₄|λ²/q measures the second-order quartic term. f₄ ≈ −4.1e−4 is read off the escape run's increments; it is
+    a diagnostic, not an input.
+  - qλ/λ₂ measures the slow hyperbolic mode.
+  - **δ₂ > δ₁ at every 2A rate, and qλ/λ₂ runs from 0.32 to 1.03.** So the formally neglected O(ρ^{4/3}) terms are not
+    small at these rates. The expansion is expected to hold best at the slow end and not at all near 2⁻¹³ (qλ/λ₂ ≈ 1).
+
+**Prediction table** (‡ = 2A's pre-observed rates). The ε column uses the exact Λ_F. The log term is Kρ ln(1/ρ)/s_F and
+the linear term is Dρ/s_F.
+
+| ρ | ε_F (exact Λ_F) | r: leading Ω₀ε^{2/3} | log term | linear term | r_pred | local slope d ln r/d ln ε | δ₁ = λ\|A\| | δ₂ = \|f₄\|λ²/q | qλ/λ₂ |
+|---|---|---|---|---|---|---|---|---|---|
+| 2^-13‡ | 1.8196e-03 | 0.034848 | -0.000700 | 0.013531 | 0.047680 | 0.7580 | 0.0156 | 0.1494 | 1.028 |
+| 2^-14‡ | 9.0981e-04 | 0.021953 | -0.000377 | 0.006766 | 0.028342 | 0.7432 | 0.0124 | 0.0941 | 0.816 |
+| 2^-15‡ | 4.5490e-04 | 0.013830 | -0.000202 | 0.003383 | 0.017011 | 0.7301 | 0.0098 | 0.0593 | 0.648 |
+| 2^-15.125 | 4.1715e-04 | 0.013053 | -0.000187 | 0.003102 | 0.015969 | 0.7286 | 0.0096 | 0.0560 | 0.629 |
+| 2^-15.25 | 3.8253e-04 | 0.012321 | -0.000173 | 0.002845 | 0.014993 | 0.7272 | 0.0093 | 0.0528 | 0.611 |
+| 2^-15.375 | 3.5078e-04 | 0.011629 | -0.000160 | 0.002609 | 0.014078 | 0.7257 | 0.0090 | 0.0499 | 0.594 |
+| 2^-15.5 | 3.2166e-04 | 0.010977 | -0.000147 | 0.002392 | 0.013221 | 0.7243 | 0.0088 | 0.0471 | 0.577 |
+| 2^-15.625 | 2.9497e-04 | 0.010361 | -0.000136 | 0.002194 | 0.012418 | 0.7229 | 0.0085 | 0.0444 | 0.561 |
+| 2^-15.75 | 2.7049e-04 | 0.009779 | -0.000126 | 0.002011 | 0.011664 | 0.7215 | 0.0083 | 0.0419 | 0.545 |
+| 2^-15.875 | 2.4804e-04 | 0.009230 | -0.000116 | 0.001845 | 0.010958 | 0.7202 | 0.0080 | 0.0396 | 0.529 |
+| 2^-16‡ | 2.2745e-04 | 0.008712 | -0.000108 | 0.001691 | 0.010296 | 0.7189 | 0.0078 | 0.0373 | 0.514 |
+| 2^-16.125 | 2.0857e-04 | 0.008223 | -0.000099 | 0.001551 | 0.009675 | 0.7176 | 0.0076 | 0.0353 | 0.499 |
+| 2^-16.25 | 1.9126e-04 | 0.007762 | -0.000092 | 0.001422 | 0.009092 | 0.7163 | 0.0074 | 0.0333 | 0.485 |
+| 2^-16.375 | 1.7539e-04 | 0.007326 | -0.000085 | 0.001304 | 0.008545 | 0.7151 | 0.0072 | 0.0314 | 0.471 |
+| 2^-16.5 | 1.6083e-04 | 0.006915 | -0.000078 | 0.001196 | 0.008032 | 0.7139 | 0.0070 | 0.0296 | 0.458 |
+| 2^-16.625 | 1.4748e-04 | 0.006527 | -0.000073 | 0.001097 | 0.007551 | 0.7127 | 0.0068 | 0.0280 | 0.445 |
+| 2^-16.75 | 1.3524e-04 | 0.006160 | -0.000067 | 0.001006 | 0.007099 | 0.7116 | 0.0066 | 0.0264 | 0.432 |
+| 2^-16.875 | 1.2402e-04 | 0.005815 | -0.000062 | 0.000922 | 0.006675 | 0.7104 | 0.0064 | 0.0249 | 0.420 |
+| 2^-17‡ | 1.1373e-04 | 0.005488 | -0.000057 | 0.000846 | 0.006277 | 0.7093 | 0.0062 | 0.0235 | 0.408 |
+| 2^-17.125 | 1.0429e-04 | 0.005180 | -0.000053 | 0.000776 | 0.005903 | 0.7082 | 0.0060 | 0.0222 | 0.396 |
+| 2^-17.25 | 9.5632e-05 | 0.004890 | -0.000049 | 0.000711 | 0.005552 | 0.7072 | 0.0059 | 0.0210 | 0.385 |
+| 2^-17.375 | 8.7695e-05 | 0.004615 | -0.000045 | 0.000652 | 0.005222 | 0.7061 | 0.0057 | 0.0198 | 0.374 |
+| 2^-17.5 | 8.0416e-05 | 0.004356 | -0.000042 | 0.000598 | 0.004912 | 0.7051 | 0.0055 | 0.0187 | 0.364 |
+| 2^-17.625 | 7.3742e-05 | 0.004112 | -0.000038 | 0.000548 | 0.004622 | 0.7041 | 0.0054 | 0.0176 | 0.353 |
+| 2^-17.75 | 6.7622e-05 | 0.003881 | -0.000036 | 0.000503 | 0.004348 | 0.7032 | 0.0052 | 0.0166 | 0.343 |
+| 2^-17.875 | 6.2009e-05 | 0.003663 | -0.000033 | 0.000461 | 0.004091 | 0.7022 | 0.0051 | 0.0157 | 0.333 |
+| 2^-18 | 5.6863e-05 | 0.003457 | -0.000030 | 0.000423 | 0.003850 | 0.7013 | 0.0049 | 0.0148 | 0.324 |
+
+Two-point slopes between adjacent rates are in the JSON (`two_point`). Compute: one process, nice 15, one thread; peak
+RSS 0.28 GB; 77 s. The memory gate was logged before the job.
+
+### 18.7 Citations (records checked on Crossref, 2026-10-09)
+
+- **[KS01]** Krupa & Szmolyan, *SIAM J. Math. Anal.* 33(2):286–314, 2001, doi:10.1137/S0036141099360919 (record
+  matches). Used only as in §14.5:
+  - Theorem 2.1 (the planar fold, leading O(ε^{2/3}));
+  - Remark 2.11, "the next term in the expansion is O(ε ln ε)", which refers to [MR80].
+  §18 derives that term's coefficient formally. It does not use a statement of [KS01] beyond the existence of the order.
+- **[MR80]** Mishchenko & Rozov, *Differential Equations with Small Parameters and Relaxation Oscillations*, Springer US,
+  1980, doi:10.1007/978-1-4615-9047-7 (record matches). **Not read; nothing here relies on it.**
+- **R. Haberman**, "Slowly varying jump and transition phenomena associated with algebraic bifurcation problems",
+  *SIAM J. Appl. Math.* 37(1):69–106, 1979, doi:10.1137/0137006 (record matches; abstract: interior nonlinear transition
+  layers at the critical point, solutions that either grow algebraically or explode, "jump phenomena"). This is the
+  classical source for this matched-asymptotics setting. **Not read beyond the abstract; nothing here relies on it.**
+- Diminnie & Haberman (a saddle-centre passage) is not used.
