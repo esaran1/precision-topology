@@ -1,0 +1,7 @@
+# 2026-10-09 17:37:33 run: 1 fix std 2.994e+06 40000
+Traceback (most recent call last):
+  File "/Users/Evan/precision-topology/census/results/designs/trackL_alpha_explore/A_explore.py", line 142, in <module>
+    run(Path(a[0]) if os.path.isabs(a[0]) else HERE / a[0], float(a[1]), a[2], a[3], int(a[4]),
+                                                                                     ^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '2.994e+06'
+exit 1 on 1 fix std 2.994e+06 40000
