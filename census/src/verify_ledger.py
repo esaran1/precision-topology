@@ -612,6 +612,7 @@ def main() -> None:
     phase2a_ps_checks()
     phase2a_ps_posthoc_checks()
     phase2a_ps2_checks()
+    final_posthoc_checks()
     phase3_checks()
     phase1b_checks()
     phase2c_checks()
@@ -1008,6 +1009,10 @@ PRODUCERS = {
     "phase2a_ps2/observed.jsonl": ("phase2a_ps2", "observe", "full", ""),
     "phase2a_ps2/scores.json": ("phase2a_ps2", "score", "full", ""),
     "phase2a_ps2_results.md": ("phase2a_ps2_report", "main", "full", ""),
+    # Final POST HOC checks (author 2026-10-08; no registered verdict changes): src/final_posthoc.py
+    "final_posthoc_parts.jsonl": ("final_posthoc", "job_dist", "full", ""),
+    "final_posthoc.json": ("final_posthoc", "main", "full", ""),
+    "final_posthoc.md": ("final_posthoc", "main", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
@@ -3664,6 +3669,58 @@ def phase2a_ps_posthoc_checks() -> None:
         for e in J["q1_no_forecast"]:
             chk(f"P2A-PS-PH seed {e['seed']} diagnosis {P['diagnosis'][e['seed']]}",
                 float(all(r["diagnosis"]["label"] == P["diagnosis"][e["seed"]] for r in e["runs"].values())), 1.0, 0)
+
+
+FINAL_PH_PIN = {"slope_median": 0.704885, "n_below": 7, "spearman": -0.278424, "C_free_A": 0.881644,
+                "ps2_min_holm": 0.003478, "ps_min_holm": 0.251547}   # eps_fc; Holm minima of the 7-vs-23 comparisons
+
+
+def final_posthoc_checks() -> None:
+    """Final POST HOC checks (author 2026-10-08; not registered; no registered verdict changes): final_posthoc.json
+    regenerates from the committed registered files, the cited phase2a_posthoc.json and the distance parts; the page
+    regenerates from it and carries the POST HOC header; the per-seed slopes equal the registered 2A-PS2 seed
+    exponents; the cited 2A numbers equal phase2a_posthoc.json; every re-drawn wider search reproduced the frozen
+    (2A-PS2) or POST HOC (2A-PS) counts; 7 crossers per phase; the registered outcomes are unchanged; pins."""
+    from . import final_posthoc as FP
+    if not FP.OUT_JSON.exists():
+        return
+    import numpy as _np
+    print("Final POST HOC checks: per-seed delay law; crossing vs non-crossing none seeds")
+    J = json.loads(FP.OUT_JSON.read_text())
+    chk("FINAL-PH final_posthoc.json regenerates", float(J == json.loads(json.dumps(FP.build()))), 1.0, 0)
+    md = FP.OUT_MD.read_text()
+    chk("FINAL-PH page regenerates from the JSON", float(md == FP.render_md(J)), 1.0, 0)
+    chk("FINAL-PH page carries the POST HOC header", float(md.startswith("# Final POST HOC checks")
+                                                          and "**POST HOC.**" in md), 1.0, 0)
+    P1 = J["part1_delay_law"]
+    S2 = json.loads((R / "phase2a_ps2" / "scores.json").read_text())
+    chk("FINAL-PH clean seeds with two rates", float(P1["n_seeds"]), 40.0, 0)
+    chk("FINAL-PH per-seed slope equals the registered seed exponent (max abs diff)",
+        float(_np.max(_np.abs(_np.array([x["slope_eps_fc"] for x in P1["per_seed"]]) -
+                              _np.array(S2["seed_exponents"], float)))), 0.0, 0)
+    ks = json.loads((R / "phase2a_posthoc.json").read_text())["fits_by_eps_source"]["eps_fc"]["fits"][
+        "KS_eps_ln_free_A"]
+    chk("FINAL-PH cited 2A numbers equal phase2a_posthoc.json",
+        float(P1["two_A"]["A_over_Omega0"] == ks["A_over_Omega0"] and P1["two_A"]["C"] == ks["coef"]["eL"]
+              and P1["two_A"]["local_slope_at_slowest"] == ks["local_slope_at_slowest"]), 1.0, 0)
+    P2 = J["part2_crossers"]
+    for ph in ("ps2", "ps"):
+        chk(f"FINAL-PH {ph} distance rows", float(P2[ph]["n_dist_rows"]), 30.0, 0)
+        chk(f"FINAL-PH {ph} wider searches reproduced", float(P2[ph]["n_wide_reproduced"]), 30.0, 0)
+        chk(f"FINAL-PH {ph} crossers", float(P2[ph]["comparison"]["n_crossers"]), 7.0, 0)
+        chk(f"FINAL-PH {ph} peak RSS of the distance job below 1 GB", float(P2[ph]["max_peak_rss_gb"] < 1.0), 1.0, 0)
+    chk("FINAL-PH registered outcomes unchanged",
+        float(S2["outcome"] == "FAIL H" and json.loads((R / "phase2a_ps" / "scores.json").read_text())["outcome"]
+              == "UNRESOLVED (validity)"), 1.0, 0)
+    if FINAL_PH_PIN is not None:
+        P = FINAL_PH_PIN
+        fc = P1["by_eps_source"]["eps_fc"]
+        chk("FINAL-PH per-seed slope median (eps_fc)", fc["slope"]["median"], P["slope_median"], 1e-6)
+        chk("FINAL-PH per-seed slopes below 2/3 (eps_fc)", float(fc["n_below_2_3"]), float(P["n_below"]), 0)
+        chk("FINAL-PH Spearman slope vs eps16 (eps_fc)", fc["spearman_slope_vs_eps16"]["rho"], P["spearman"], 1e-6)
+        chk("FINAL-PH pooled C, per-seed A_s (eps_fc)", fc["pooled_fits"]["free_A"]["C"], P["C_free_A"], 1e-6)
+        chk("FINAL-PH 2A-PS2 smallest Holm p", P2["ps2"]["comparison"]["min_p_holm"], P["ps2_min_holm"], 1e-6)
+        chk("FINAL-PH 2A-PS smallest Holm p", P2["ps"]["comparison"]["min_p_holm"], P["ps_min_holm"], 1e-6)
 
 
 def phase1b_checks() -> None:
