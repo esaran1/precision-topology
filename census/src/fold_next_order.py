@@ -479,11 +479,65 @@ def predict():
     return out
 
 
+# ============================================================================================ comparison (later commit)
+OBSERVED = RESULTS / "phase2a" / "observed.jsonl"
+OUT_COMPARE = RESULTS / "fold_next_order_compare.json"
+
+
+def compare_build():
+    """DERIVED AFTER THE DATA WERE SEEN: the committed prediction (fold_next_order.json, d31cedc) against 2A's
+    committed observations (s_obs per rate).  Since ε ∝ ρ exactly, observed slopes are Δ ln r_obs / Δ ln ρ."""
+    P = json.loads(OUT_JSON.read_text())
+    s_F = P["frozen_inputs"]["s_F"]
+    obs = {json.loads(l)["log2rho"]: json.loads(l) for l in OBSERVED.read_text().splitlines() if l.strip()}
+    rows = []
+    for r in P["rows"]:
+        o = obs[r["log2rho"]]
+        r_obs = o["s_obs"] / s_F - 1
+        sig_obs, sig_pred = r_obs * s_F, r["r_pred"] * s_F
+        rows.append({"log2rho": r["log2rho"], "status": r["status"], "r_obs": r_obs, "r_pred": r["r_pred"],
+                     "r_lead": r["r_lead"], "ratio_obs_pred": r_obs / r["r_pred"], "ratio_obs_lead": r_obs / r["r_lead"],
+                     "excess_steps_obs": (sig_obs - r["r_lead"] * s_F) / (r["rho"] * P["normal_form"]["g0"]),
+                     "excess_steps_pred": (sig_pred - r["r_lead"] * s_F) / (r["rho"] * P["normal_form"]["g0"]),
+                     "resid_sigma_over_rho43": (sig_obs - sig_pred) / r["rho"] ** (4 / 3),
+                     "slope_pred_local": r["slope_pred"]})
+    pairs = []
+    for a, b, tp in zip(rows[:-1], rows[1:], P["two_point"]):
+        so = math.log(a["r_obs"] / b["r_obs"]) / ((a["log2rho"] - b["log2rho"]) * math.log(2))
+        pairs.append({"pair": [a["log2rho"], b["log2rho"]], "slope_obs": so, "slope_pred": tp["two_point_slope_pred"],
+                      "diff_pred_minus_obs": tp["two_point_slope_pred"] - so})
+    sc = [x for x in rows if x["status"] == "scored"]
+    ratios = np.array([x["ratio_obs_pred"] for x in sc])
+    lead = np.array([x["ratio_obs_lead"] for x in sc])
+    q43 = np.array([x["resid_sigma_over_rho43"] for x in rows])
+    summ = {"ratio_obs_pred_scored_range": [float(ratios.min()), float(ratios.max())],
+            "ratio_obs_lead_scored_range": [float(lead.min()), float(lead.max())],
+            "ratio_obs_pred_at_2m18": rows[-1]["ratio_obs_pred"], "ratio_obs_pred_at_2m13": rows[0]["ratio_obs_pred"],
+            "slope_obs_last_pair": pairs[-1]["slope_obs"], "slope_pred_last_pair": pairs[-1]["slope_pred"],
+            "slope_diff_range": [float(min(p["diff_pred_minus_obs"] for p in pairs)),
+                                 float(max(p["diff_pred_minus_obs"] for p in pairs))],
+            "resid_over_rho43_range": [float(q43.min()), float(q43.max())],
+            "resid_over_rho43_scored_range": [float(min(x["resid_sigma_over_rho43"] for x in sc)),
+                                              float(max(x["resid_sigma_over_rho43"] for x in sc))]}
+    return {"label": "DERIVED AFTER THE DATA WERE SEEN: committed prediction (d31cedc) vs Phase 2A's committed "
+                     "observations; no fit", "prediction_commit": "d31cedc", "rows": rows, "two_point": pairs,
+            "summary": summ}
+
+
+def compare():
+    out = compare_build()
+    OUT_COMPARE.write_text(json.dumps(out, indent=1))
+    print(json.dumps(out["summary"], indent=1))
+    return out
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     cmd = argv[0] if argv else "predict"
     if cmd == "predict":
         predict()
+    elif cmd == "compare":
+        compare()
     else:
         raise SystemExit(f"unknown command {cmd}")
 

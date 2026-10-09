@@ -1016,6 +1016,7 @@ PRODUCERS = {
     "final_posthoc.md": ("final_posthoc", "main", "full", ""),
     # Track C: next-order fold-passage delay (math note §18; prediction from frozen landscape quantities): src/fold_next_order.py
     "fold_next_order.json": ("fold_next_order", "predict", "full", ""),
+    "fold_next_order_compare.json": ("fold_next_order", "compare", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
@@ -3762,6 +3763,13 @@ def fold_next_order_checks() -> None:
     t = json.dumps(J)
     chk("FOLD-NO prediction holds no observation key", float(not any(k in t for k in ('"r_obs"', '"s_obs"', '"t_obs"'))),
         1.0, 0)
+    if FN.OUT_COMPARE.exists():
+        C = json.loads(FN.OUT_COMPARE.read_text())
+        chk("FOLD-NO comparison regenerates from the committed prediction and observations",
+            float(C == json.loads(json.dumps(FN.compare_build()))), 1.0, 0)
+        chk("FOLD-NO comparison labelled derived after the data", float(C["label"].startswith("DERIVED AFTER")), 1.0, 0)
+        chk("FOLD-NO r_obs/r_pred at 2^-18", C["summary"]["ratio_obs_pred_at_2m18"], 0.986968, 1e-6)
+        chk("FOLD-NO slope pred - obs, last pair", C["two_point"][-1]["diff_pred_minus_obs"], 0.008356, 1e-6)
     P = FOLD_NO_PIN
     chk("FOLD-NO A", J["inner"]["A"], P["A"], 1e-6)
     chk("FOLD-NO B", J["inner"]["B"], P["B"], 1e-6)

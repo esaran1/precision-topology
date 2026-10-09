@@ -130,6 +130,16 @@ def test_prediction_reads_no_observation():
     text = json.dumps(d)
     for key in ("r_obs", "s_obs", "t_obs", "\"observed"):
         assert key not in text
-    src = FN.__file__ and open(FN.__file__).read().split("def compare")[0]
+    src = FN.__file__ and open(FN.__file__).read().split("comparison (later commit)")[0]
     for name in ("observed.jsonl", "runs.jsonl", "scores.json", "phase2a_posthoc"):
         assert name not in src
+
+
+def test_comparison_regenerates_and_is_labelled():
+    if not FN.OUT_COMPARE.exists():
+        pytest.skip("comparison not produced")
+    C = json.loads(FN.OUT_COMPARE.read_text())
+    assert C == json.loads(json.dumps(FN.compare_build()))
+    assert C["label"].startswith("DERIVED AFTER THE DATA WERE SEEN")
+    assert len(C["rows"]) == 27 and len(C["two_point"]) == 26
+    assert all(r["ratio_obs_pred"] < 1 for r in C["rows"])

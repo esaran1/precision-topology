@@ -2189,3 +2189,34 @@ RSS 0.28 GB; 77 s. The memory gate was logged before the job.
   layers at the critical point, solutions that either grow algebraically or explode, "jump phenomena"). This is the
   classical source for this matched-asymptotics setting. **Not read beyond the abstract; nothing here relies on it.**
 - Diminnie & Haberman (a saddle-centre passage) is not used.
+
+### 18.8 Comparison with Phase 2A (DERIVED AFTER THE DATA WERE SEEN; prediction committed first in d31cedc)
+
+`python -m src.fold_next_order compare` → `results/fold_next_order_compare.json`. It reads the committed prediction and
+2A's committed s_obs per rate (`results/phase2a/observed.jsonl`). Nothing is fitted. Because ε ∝ ρ exactly, observed
+slopes are Δ ln r_obs/Δ ln ρ.
+
+**Size of the delay.**
+- The leading term alone under-predicts: r_obs/r_lead runs from 1.099 to 1.170 over the 22 scored rates (1.225 at 2⁻¹³).
+- With the next-order terms, r_obs/r_pred runs from 0.956 to 0.987 over the scored rates (0.895 at 2⁻¹³).
+- The error shrinks monotonically toward the slow end: −1.3 % at 2⁻¹⁸.
+- Measured in steps of drift at g₀, the observed excess over the leading term is 2,831 (2⁻¹³) rising to 3,958 (2⁻¹⁸).
+  The predicted excess is 4,635 falling to 4,538.
+
+**Local slope.** The prediction overshoots the observed two-point slope at every pair. The difference falls from 0.055
+(2⁻¹³|2⁻¹⁴) to **0.0084 at 2⁻¹⁷·⁸⁷⁵|2⁻¹⁸**, where the prediction is 0.7017 and the observation 0.6934. Both lie above 2/3.
+
+**The residual has the size and scaling of the neglected order (post hoc observation).** The residual
+σ_obs − σ_pred, divided by ρ^{4/3}, is −3,926 to −4,013 across all 27 rates, almost constant over 5 octaves of ρ. This
+fits the O(ρ^{4/3} ln²ρ) remainder of §18.3 with a large negative coefficient. It also fits the a priori diagnostics of
+§18.6: δ₂ > δ₁, and qλ/λ₂ is up to 1.
+
+**Reading.**
+- The derivation closes through O(ε), and its prediction is about 4× closer to the data than the leading term at the
+  slow end (−1.3 % vs +9.9 %).
+- It does NOT reproduce the observed local exponents to better than 0.008–0.055 at these rates, because the next
+  neglected order is numerically large here.
+- The post hoc fit's C = +0.80 (`results/phase2a_posthoc.md`) is not the ε ln(1/ε) coefficient, which the normal form
+  sets at −0.043. The data's curvature in ln r against ln ε comes from the O(ε) escape term (D_r = 7.32) together with a
+  negative O(ε^{4/3}) remainder.
+- No registered verdict is affected.
