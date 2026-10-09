@@ -66,3 +66,8 @@ too slow; relaunched with cap 60,000; the stopped run wrote nothing).
 `nice -n 15`: 3 failures, all `PermissionError` from registered code calling `os.nice(15)` (band_rd, ramp2), exit 1
 (`L_suite_main_nice15.log`; certificates 33 passed, `L_suite_certs_nice15.log`). Design page:
 `results/designs/trackL_dominoes_design.md`.
+
+**Addendum (2026-10-09, author's decisions applied to the page; still a DRAFT).** The page was trimmed; the full
+SHA-256 values are in `L_data_check.log`. Suite rerun before that commit (memory gate first, two processes, no outer
+nice): main 1336 passed, exit 0 (`L_suite_main.log`); certificates 33 passed, exit 0 (`L_suite_certs.log`). The
+b08843d suite logs are kept as `L_suite_main_b08843d.log` and `L_suite_certs_b08843d.log`.

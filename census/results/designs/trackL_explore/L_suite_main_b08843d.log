@@ -1,4 +1,4 @@
-2026-10-09 17:26:06 memory gate: free 46% swap_free 1354.69M disk_free 39G -> OK
+2026-10-09 16:43:46 memory gate: free 43% swap_free 1019.56M disk_free 39G -> OK
 ........................................................................ [  5%]
 ........................................................................ [ 10%]
 ........................................................................ [ 16%]
@@ -62,5 +62,5 @@ tests/test_simplicity_bias_v3.py::test_init_rule_caps_output_scale
     s = float(out.weight.abs().sum())
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-1336 passed, 17 warnings in 527.08s (0:08:47)
+1336 passed, 17 warnings in 493.83s (0:08:13)
 exit 0

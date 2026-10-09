@@ -1,113 +1,114 @@
-DRAFT for the author, 2026-10-09 — NOT a registration and not approved. Inputs: exploration
-`trackL_explore/` (README, `L_tables.md`; seeds 2,991,000–2,991,099, never to be registered). ‡ = set after
-exploratory data. **The L2 gate passed, but the exploration predicts R FAILS (power 0.00): see decision 1 first.**
+DRAFT, 2026-10-09: the author's decisions are applied; this is NOT a registration. The author reviews this page
+before anything is registered. Inputs: the exploration in `trackL_explore/` (README, `L_tables.md`), run on seeds
+2,991,000–2,991,099, which are never to be registered (b08843d). ‡ = set after exploratory data.
 
 # Track L: the output-layer lever on MNIST-CIFAR dominoes
 
-**Data (on-disk copies only; no download).** `src/mnist_data.py`, `src/cifar_data.py` caches. Recorded SHA-256
-(`data/*/SHA256SUMS`) equal the published values:
-- MNIST train-images `440fcabf73cc546fa21475e81ea370265605f56be210a4024d2ca8f203523609`
-- MNIST train-labels `3552534a0a558bbed6aed32b30c495cca23d567ec52cac8be1a0730e8010255c`
-- MNIST t10k-images `8d422c7b0a1c1c79245a5bcf07fe86e33eeafee792b84584aec276f5a2dbc4e6`
-- MNIST t10k-labels `f7ae60f92e00ec6debd23a6088c31dbd2371eca3ffa0defaefb259924204aec6`
-- CIFAR-10 tarball `6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce`
+**Predicted outcome, stated up front: R FAILS and N PASSES.** These are predictions from the exploration: R has
+power 0.00 at every seed count, and N has power 0.98 at n = 40 under SGD. The criteria are the ones drafted before
+this prediction. The track registers this predicted null.
 
-The archives are not on disk, so the `.npy` files actually read are hashed too (`L_data.verify`; e.g. mnist/train_images c5b45806…,
-cifar10/train_images 304a769a…).
+**Data.**
+- On-disk caches only (`src/mnist_data.py`, `src/cifar_data.py`); nothing is downloaded.
+- The recorded SHA-256 values equal the published ones: MNIST train-images 440fcabf, train-labels 3552534a,
+  t10k-images 8d422c7b, t10k-labels f7ae60f9; CIFAR-10 tarball 6d958be0.
+- The full values, and the hashes of the `.npy` files actually read, are in `trackL_explore/L_data_check.log`
+  (checked by `L_data.verify`).
 
-**Construction** (Shah et al. 2020 released code, as summarised by the author; not re-read here, no network). Class 0
-= MNIST 0 + CIFAR automobile, class 1 = MNIST 1 + CIFAR truck; MNIST padded to 32×32, three channels, on top →
-3×64×32 in [0, 1], no normalisation; random one-to-one pairing within class, truncated to the smallest count: **10,000
-train, 1,960 test**. The paper's text says 50,000 / 10,000; the code gives these counts. Fixed construction seed
-20261009 (one dataset for all seeds‡).
-- **p = 0.8‡** of each training class has the matching digit; the other 20% the other digit (Kirichenko et al. 2023 use
-  100/99/95%). The CIFAR half is always correct. MNIST then separates the class means but only 80% of points (its Bayes
-  BCE floor is 0.500); CIFAR separates every point.
-- **Why 0.8:** the gate passed with the largest margin (randomised accuracy 0.487 → +0.198, 5/5 seeds). It passed
-  narrowly at 0.9 (+0.109), failed at 0.95 (+0.062), and at 1.0 CIFAR was never used (0.478 throughout, as Shah).
-- **Tests:** *orig* (true digit); *rand* (the 1,960 MNIST halves under one fixed permutation; MNIST-only score 0.479);
-  *rev* (each class paired with the other class's test digits).
+**Construction** (follows the author's summary of Shah et al.'s released code; the code was not re-read here because
+there is no network access).
+- Class 0 is MNIST 0 with a CIFAR automobile. Class 1 is MNIST 1 with a CIFAR truck.
+- MNIST is padded to 32×32, repeated to 3 channels and placed on top: 3×64×32, values in [0, 1], no normalisation.
+- Images are paired one-to-one at random within each class, and each class is truncated to the smallest count. This
+  gives **10,000 train and 1,960 test** images.
+- **Discrepancy:** Shah et al.'s text says 50,000 / 10,000.
+- **One fixed dataset** is built, with construction seed 20261009.
+- **p = 0.8‡** (following Kirichenko et al. 2023, who use 100/99/95%):
+  - 80% of each training class carries the matching digit and 20% carries the other digit. CIFAR is always correct.
+  - So MNIST separates the class means but not every point: its BCE floor is 0.500. CIFAR separates every point.
+- **Why p = 0.8:** the L2 gate passed with the largest margin there.
+  - Standard training's randomised accuracy rose from 0.487 to +0.198 (5/5 seeds).
+  - At 0.9 the rise was +0.109, a narrow pass. At 0.95 it was +0.062, a fail.
+  - At 1.0 CIFAR was never used.
+- **Tests:**
+  - *orig*: the true digit.
+  - *rand*: the MNIST halves under one fixed permutation, so MNIST is independent of the label. An MNIST-only
+    classifier scores 0.479.
+  - *rev*: each class is paired with the other class's digits.
 
-**Network, optimiser.** MLP 6144 → 256 → 256 → 1, ReLU, PyTorch default init (drawn inside `fork_rng`). BCE. SGD,
-momentum 0.9, lr 0.01‡, batch 128, no weight decay. Runs stop at train BCE ≤ 0.002. Full-train BCE is checked every 5
-steps to 500, then every 2%. No CNN was explored.
+**Network and optimiser.**
+- MLP 6144 → 256 → 256 → 1, ReLU, PyTorch default initialisation drawn inside `fork_rng`, BCE loss.
+- SGD with momentum 0.9, lr 0.01‡, batch 128, no weight decay. A run stops at train BCE ≤ 0.002.
+- Full-train BCE is checked every 5 steps up to step 500, then every 2% of the step count.
 
 **Arms.**
-
-| arm | learning rates |
-|---|---|
-| 1 standard | 0.01 everywhere |
-| 2 output | 0.01/F on the output weight (bias at 0.01) |
-| 3 global | 0.01/F everywhere |
-| 3cm | 0.01/G_cm everywhere, cost-matched to arm 2's steps to 0.03 (2B's G^a rule) |
-
-**Pilot rule for F (proposed).** F is the smallest of 2, 4, …, 1024 whose median arm-2 step cost to ℓ₁ is ≥ 2 on 10
-pilot seeds. If no F qualifies, the lever has no handle and the track stops. In the exploration no F qualified: ÷1024
-cost only ×1.33.
+- **Arm 1, standard:** lr 0.01 everywhere.
+- **Arm 2, output:** lr 0.01/16 on the output **weight**; the output bias stays at 0.01.
+- **Arm 3, global:** lr 0.01/16 everywhere.
+- **F = 16 is fixed a priori**, as in 2B. It replaces the proposed pilot rule (arm-2 step cost ≥ 2), which no F up to
+  1024 met in the exploration, so that rule would have stopped the track.
+- **Arm 3cm is dropped:** with arm 2's step cost ≈ 1, the cost-matched factor G_cm ≈ 1.
 
 **Matching.**
-- Matched loss is the first check with train BCE ≤ ℓ, for ℓ ∈ {0.6, 0.3, 0.03}‡: the MNIST stage, then below the
-  MNIST floor, then late. Arm 1's randomised accuracy at these levels was 0.487, 0.649 and 0.683.
-- Also reported descriptively: matched steps and convergence, with step costs. **No endpoint advantage is claimed.**
+- Each matched point is the first check with train BCE ≤ ℓ, for ℓ ∈ {0.6, 0.3, 0.03}‡.
+- The three levels are the MNIST stage, below the MNIST floor, and late. Arm 1's *rand* accuracy there was 0.487, 0.649
+  and 0.683.
+- Matched steps and convergence are reported descriptively, with step costs. **No endpoint advantage is claimed.**
 
-**Measures.** Primary: *rand* accuracy. Secondary: *rev*. Descriptive: *orig*, and train accuracy on the flipped 20%.
+**Measures.**
+- Primary: *rand* accuracy.
+- Secondary: *rev* accuracy.
+- Descriptive: *orig* accuracy, and train accuracy on the flipped 20%.
 
-**Criteria.** Δ = arm − arm 1, same seed. Each cell uses a 95% percentile bootstrap of the median Δ (10,000
-resamples).
-- **R:** arm 2's lower end is > 0 at all three levels.
-- **N:** for arms 3 and 3cm, each upper end is < δ = 0.02‡ at all three levels.
+**Criteria.**
+- Δ = arm − arm 1 on the same seed.
+- Each Δ gets a 95% percentile bootstrap interval of the median, from 10,000 resamples.
+- **R (arm 2):** the lower end is > 0 at all three levels.
+- **N (arm 3):** the upper end is < δ = 0.02‡ at all three levels.
 
-**Validity.**
-- UNRESOLVED if fewer than 90% of seeds reach a level in both arms, or if a run of an arm used is non-finite (2B's D5).
-- Arm 2's realised cost at ℓ₁ is reported.
+**Validity: UNRESOLVED if** fewer than 90% of seeds reach a level in both arms, or a run in an arm the criterion uses
+is non-finite (2B's D5). Arm 2's realised step cost is reported.
 
-**Exploration (5 seeds unless noted; `L_tables.md`).**
-- Arm 2 had no effect anywhere: |median Δrand| ≤ 0.020, with no consistent sign. This held for factors 4–1024, SGD and
-  Adam, ReLU and tanh, widths 256 and 16, and an output init ×0.01 (2–5 seeds each).
-- ÷16 cost ×1.33, 1.34 and 0.98 at the three levels (2B: ×7–16). The readout ends smaller (‖v‖₂ 1.44 against 3.88)
-  while the hidden layers carry the scale. ‖v‖₁ ≈ 8 at default init; 2B started at ≤ 0.5 s\*.
-- Arm 3 ÷16 cost ×3.3–7, with Δrand −0.005 to +0.001. Under Adam it was +0.010 to +0.014 (5/0).
-- G_cm degenerates to about 1, because arm 2 costs about 1.
+**Exploration (`L_tables.md`).**
+- Arm 2's |median Δ*rand*| was ≤ 0.020 everywhere, with no consistent sign. This held for factors 4–1024, SGD and
+  Adam, ReLU and tanh, widths 256 and 16, and an output initialisation scaled by 0.01.
+- ÷16 costs ×1.33, ×1.34 and ×0.98 the standard arm's steps to the three levels; 2B's arm cost ×7–16.
+- The readout ends smaller under ÷16 (‖v‖₂ 1.44 against 3.88), but the hidden layers carry the scale.
+- Arm 3 costs ×3.3–7, with Δ*rand* between −0.005 and +0.001.
 
-**Seeds, power** (exploration's paired differences resampled; 300 simulations, inner bootstrap 1,000; crude, since
-they rest on 5 seeds):
+**Seeds and power.**
+- **40 registered seeds:** 2,992,000–2,992,039. The seed scan is clean.
+- **Pilot seeds 2,993,000–2,993,009 are unused** unless a machine check needs them; any such use would be stated.
+- Power, from resampling the 5 exploration seeds (crude): R 0.00 and N 0.98 at n = 40.
 
-| criterion | n = 20 | 40 | 80 |
-|---|---|---|---|
-| R (÷16) | 0.00 | 0.00 | 0.00 |
-| N, arm 3 (SGD) | 0.89 | 0.98 | 1.00 |
-| N, arm 3 (Adam) | 0.15 | 0.31 | 0.56 |
-
-Proposed: 40 registered seeds, 2,992,000–2,992,039, and pilot seeds 2,993,000–2,993,009 (the scan of 2,992,000–099
-and 2,993,000–019 is clean).
-
-**Compute.** About 20 s per arm-1 or arm-2 run and 75 s per arm-3 run, at a peak RSS of 1.1 GB. That is about 2.4 min
-per seed: 1.6 h for 40 seeds, 3.2 h for 80. This is far below 24 h on one worker.
+**Compute.**
+- About 20 s per arm-1 or arm-2 run and 75 s per arm-3 run.
+- About 2 min per seed, so **about 1.3 h** for all 40 seeds on one worker.
+- Peak RSS 1.1 GB.
 
 **Outcomes.**
-- R PASS, N PASS: the lever transfers.
-- R FAIL, N PASS (expected): in a wide ReLU MLP the readout's rate does not set feature use.
-- N FAIL: global slowing helps.
-- Arm 2 below arm 1: the lever hurts.
+- **R FAIL, N PASS (predicted):** in this MLP the readout's learning rate does not decide which feature is used.
+- **R PASS:** the lever transfers, against the prediction.
+- **N FAIL:** global slowing helps.
+- **Arm 2 below arm 1:** the lever hurts.
 
-**Strict causal rule.** No criterion is a forecast. Every criterion compares observed outcomes after all runs end, so
-no cutoff applies.
+**Strict causal rule.** No criterion is a forecast. All criteria compare observed outcomes after every run has ended,
+so no cutoff applies.
 
 **OTS guard.** The registered `run` refuses to start until the registration's OpenTimestamps proof file exists.
 
-**Needs your decision.**
-1. **Whether to register at all.** The exploration gives R a power of 0.00 at every n, and the proposed pilot rule
-   would stop the track. The options are:
-   - (a) Register as a predicted negative: the boundary of the lever.
-   - (b) Change the network so that the readout must grow, for example a small output init. That needs more
-     exploration; ×0.01 was null on 3 seeds.
-   - (c) Report the null descriptively and stop Track L.
-2. p = 0.8 rather than 0.9.
-3. SGD rather than Adam. Both were null, and Adam threatens N.
-4. Arm 2 slows the weight only, as 2B's primary arm did.
-5. The pilot rule for F, or F = 16 fixed a priori.
-6. Arm 3cm: drop it, or clamp G_cm ≥ 1 (it equals arm 1 here).
-7. The levels {0.6, 0.3, 0.03} and δ = 0.02.
-8. One fixed dataset, or a per-seed pairing.
-9. The CNN: drop it, or explore it (not timed).
-10. The seed count.
+**Decided (author, 2026-10-09).**
+1. Register the predicted null, with the criteria unchanged.
+2. p = 0.8.
+3. SGD; Adam is dropped.
+4. Arm 2 slows the output weight only.
+5. F = 16, fixed a priori.
+6. Arm 3cm is dropped; N applies to arm 3 only.
+7. Levels {0.6, 0.3, 0.03} and δ = 0.02.
+8. One fixed dataset.
+9. The CNN is dropped.
+10. 40 seeds.
+
+**Still open:**
+- Whether the secondary *rev* measure gets its own criterion. Proposed: descriptive only.
+- The registration text will carry the full hashes and tables.
