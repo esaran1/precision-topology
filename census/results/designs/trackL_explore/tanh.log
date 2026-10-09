@@ -1,0 +1,50 @@
+# 2026-10-09 15:59:43 run: 0.8 std 2991000 0.001 256 400000 adam tanh
+exit 143 on 0.8 std 2991000 0.001 256 400000 adam tanh
+# 2026-10-09 16:10:28 stopped by hand (run too slow at cap 400000; relaunched with cap 60000 and progress lines)
+# 2026-10-09 16:10:28 run: 0.8 std 2991000 0.001 256 60000 adam tanh
+  t 245 loss 0.4419 rand 0.5286 3s
+  t 495 loss 0.4402 rand 0.5730 6s
+  t 1282 loss 0.3795 rand 0.5867 11s
+  t 3406 loss 0.2660 rand 0.6520 18s
+  t 9131 loss 0.1652 rand 0.6429 35s
+  t 24531 loss 0.0294 rand 0.6342 74s
+p0.8|std|2991000|lr0.001|w256|adam|tanh steps 60962 secs 164.0 final loss 0.037969812750816345 rand 0.6158163547515869 rss 1.05
+# 2026-10-09 16:13:13 run: 0.8 out16 2991000 0.001 256 60000 adam tanh
+  t 245 loss 0.4521 rand 0.5000 3s
+  t 495 loss 0.4304 rand 0.5561 6s
+  t 1282 loss 0.4131 rand 0.5663 11s
+  t 3406 loss 0.3294 rand 0.6056 18s
+  t 9131 loss 0.1694 rand 0.6485 35s
+  t 24531 loss 0.0913 rand 0.6342 74s
+p0.8|out16|2991000|lr0.001|w256|adam|tanh steps 60962 secs 163.6 final loss 0.030716707929968834 rand 0.6270408034324646 rss 1.091
+# 2026-10-09 16:15:58 run: 0.8 glob16 2991000 0.001 256 60000 adam tanh
+  t 245 loss 0.4299 rand 0.5388 3s
+  t 495 loss 0.4181 rand 0.5954 6s
+  t 1282 loss 0.3922 rand 0.6010 11s
+  t 3406 loss 0.3046 rand 0.6403 18s
+  t 9131 loss 0.0367 rand 0.6526 35s
+p0.8|glob16|2991000|lr0.001|w256|adam|tanh steps 14383 secs 48.5 final loss 0.0018574345158413053 rand 0.6510204076766968 rss 1.09
+# 2026-10-09 16:16:48 run: 0.8 std 2991001 0.001 256 60000 adam tanh
+  t 245 loss 0.4596 rand 0.5607 3s
+  t 495 loss 0.4191 rand 0.5592 6s
+  t 1282 loss 0.3737 rand 0.6204 11s
+  t 3406 loss 0.3102 rand 0.6128 18s
+  t 9131 loss 0.1351 rand 0.6378 35s
+  t 24531 loss 0.0629 rand 0.6413 74s
+p0.8|std|2991001|lr0.001|w256|adam|tanh steps 60962 secs 164.4 final loss 0.03582184761762619 rand 0.6326530575752258 rss 1.091
+# 2026-10-09 16:19:34 run: 0.8 out16 2991001 0.001 256 60000 adam tanh
+  t 245 loss 0.4591 rand 0.5582 3s
+  t 495 loss 0.4088 rand 0.5633 6s
+  t 1282 loss 0.3817 rand 0.6398 11s
+  t 3406 loss 0.3027 rand 0.6235 18s
+  t 9131 loss 0.1532 rand 0.6541 35s
+  t 24531 loss 0.0925 rand 0.6393 74s
+p0.8|out16|2991001|lr0.001|w256|adam|tanh steps 60962 secs 163.6 final loss 0.04185979440808296 rand 0.6260204315185547 rss 1.09
+# 2026-10-09 16:22:19 run: 0.8 glob16 2991001 0.001 256 60000 adam tanh
+  t 245 loss 0.4361 rand 0.5347 3s
+  t 495 loss 0.4114 rand 0.5592 6s
+  t 1282 loss 0.3779 rand 0.6214 11s
+  t 3406 loss 0.2984 rand 0.6352 18s
+  t 9131 loss 0.0329 rand 0.6566 35s
+p0.8|glob16|2991001|lr0.001|w256|adam|tanh steps 13825 secs 47.0 final loss 0.0017428463324904442 rand 0.6622449159622192 rss 0.959
+# 2026-10-09 16:23:08 done

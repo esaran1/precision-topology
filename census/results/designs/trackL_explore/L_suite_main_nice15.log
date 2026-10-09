@@ -1,0 +1,213 @@
+2026-10-09 16:34:34 memory gate: free 49% swap_free 963.56M disk_free 39G -> OK
+........................................................................ [  5%]
+.............FF......................................................... [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 70%]
+..F..................................................................... [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 91%]
+........................................................................ [ 97%]
+........................................                                 [100%]
+=================================== FAILURES ===================================
+____________________________ test_score_end_to_end _____________________________
+
+tmp_path = PosixPath('/private/var/folders/xt/frj6v9fs1dqbtg98wt94095r0000gp/T/pytest-of-Evan/pytest-567/test_score_end_to_end0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x12799bd10>
+
+    def test_score_end_to_end(tmp_path, monkeypatch):
+        monkeypatch.setattr(B, "OUT", tmp_path)
+        lines = []
+        for arm, seeds, d in (("primary", (889_900, 889_901), 2), ("primary", (889_900, 889_901), 1),
+                              ("secondary", (889_910, 889_911), 2)):
+            p0 = _p0(2, 0.03, 2) if d == 2 else _p0(2, 0.0, 2)[:, :4]          # d = 1: placed at init (no crossing)
+            rec, tr = B.train_batch(1.30, d, seeds, 400, p0=p0, s_half=1.0)
+            np.savez_compressed(tmp_path / f"traces_{arm}_d{d}_a1.30.npz", trace=tr, seeds=np.array(seeds))
+            lines += [json.dumps({"arm": arm, **r}, default=float) for r in rec]
+        (tmp_path / "runs.jsonl").write_text("\n".join(lines) + "\n")
+        ref = {"1.30": {"q1": 0.035, "q3": 0.15}, "1.50": {"q1": 0.07, "q3": 0.18}}
+        (tmp_path / "width1_reference.json").write_text(json.dumps(ref)); B._freeze("width1_reference.json")
+        pd.DataFrame({"a": [1.3, 1.3], "seed": [889_900, 889_901], "w2_own": [5.0, 5.1]}).to_csv(
+            tmp_path / "own_x1_frozen.csv", index=False)
+        B._freeze("own_x1_frozen.csv")
+        V, D = B.score()
+        assert set(V.P1) == {"UNRESOLVED"}                                  # 2 or 4 runs per cell < 30
+        assert list(V.arm) == ["primary", "primary", "secondary"] and list(V.d) == [1, 2, 2]
+        assert V[V.arm == "secondary"].n_runs.iloc[0] == 4                  # pooled: primary + secondary seeds
+        assert V[V.arm == "secondary"].P2b.iloc[0] == "not scored (secondary)"
+        assert (tmp_path / "scored_runs.csv").exists() and (tmp_path / "verdicts.json").exists()
+        sr = pd.read_csv(tmp_path / "scored_runs.csv")
+        assert (sr[sr.crossed].G_numpy_at_cross > 0).all()
+        assert D[(D.arm == "primary") & (D.d == 1)].n_crossing.iloc[0] == 0
+        # tampering with a frozen input stops scoring
+        (tmp_path / "own_x1_frozen.csv").write_text("a,seed,w2_own\n1.3,889900,4.0\n")
+        with pytest.raises(AssertionError):
+            B.score()
+        with pytest.raises(AssertionError):
+>           B.run()
+
+tests/test_band_rd.py:278: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def run():
+        """Registered runs, in this order: primary (40 seeds; d = 2, 4 and the descriptive width-1 control d = 1), then the
+        secondary arm (80 further seeds; d = 2, 4).  Resumable: an (arm, d, a) cell already in runs.jsonl is skipped;
+        traces go to traces_{arm}_d{d}_a{a}.npz."""
+>       os.nice(15)
+E       PermissionError: [Errno 1] Operation not permitted
+
+src/band_rd.py:629: PermissionError
+----------------------------- Captured stdout call -----------------------------
+      arm  d   a                                     role  n_runs  n_placed_at_init  n_crossing         P1        P2a                    P2b
+  primary  1 1.3 descriptive width-1 control (not scored)       2                 2           0 UNRESOLVED UNRESOLVED             UNRESOLVED
+  primary  2 1.3                       registered primary       2                 0           2 UNRESOLVED UNRESOLVED             UNRESOLVED
+secondary  2 1.3  registered secondary (pooled 120 seeds)       4                 0           4 UNRESOLVED UNRESOLVED not scored (secondary)
+                                       0           1           2
+arm                              primary     primary   secondary
+d                                      1           2           2
+a                                    1.3         1.3         1.3
+n_runs                                 2           2           4
+n_crossing                             0           2           4
+rho_init_q25                         0.0    0.036507    0.036507
+rho_init_median                      0.0    0.036507    0.036507
+rho_init_q75                         0.0    0.036507    0.036507
+rho_half_q25                         0.0    0.024193    0.024045
+rho_half_median                      0.0    0.024342    0.024342
+rho_half_q75                         0.0     0.02449    0.024638
+rho_cross_q25                        NaN     0.00083    0.000754
+rho_cross_median                     NaN    0.000938    0.000959
+rho_cross_q75                        NaN    0.001045    0.004016
+n_not_crossed                          0           0           0
+n_not_crossed_rho_end_gt_1             0           0           0
+not_crossed_w1_end_median            NaN         NaN         NaN
+not_crossed_wnoise_end_median        NaN         NaN         NaN
+not_crossed_s_end_median             NaN         NaN         NaN
+n_cross_rho_ge_0.05                  NaN         0.0         0.0
+max_rho_cross                        NaN    0.001153    0.012606
+noise_delay_steps_median             NaN         3.0         3.0
+noise_delay_steps_q75                NaN         3.0         3.0
+noise_delay_steps_max                NaN         3.0         3.0
+noise_delay_scale_median             NaN    0.002343    0.003503
+frac_cross_same_step_as_G1           NaN         0.0         0.0
+widening_rel_median                  NaN    0.002344    0.002397
+widening_rel_max                     NaN    0.002882    0.031515
+crossing_step_median                 NaN         3.0         3.0
+crossing_step_max                    NaN         3.0         3.0
+median_r_pop                         NaN     0.10297    0.104246
+median_obs_r_own                     NaN    0.082589    0.082589
+median_pred_r                        NaN         NaN         NaN
+median_chi                           NaN         NaN         NaN
+winding_counts                       NaN  {"0.0": 2}  {"0.0": 4}
+n_mirror                             NaN         0.0         0.0
+median_branch_wnoise_l2              NaN    0.011314    0.009683
+median_relax_full_over_sig           NaN    0.997051    0.999672
+frac_rho_below_0.1_before_cross      NaN         0.0         0.0
+t_rho_0.1_over_t_cross_median        NaN         NaN         NaN
+______________________ test_branch_switch_job_constructed ______________________
+
+    def test_branch_switch_job_constructed():
+        p = _p0(1, 0.0, 2)[0, :4]                                         # d = 1: the R^d and G1 switches coincide
+>       r = B._branch_switch_job(("t", 1, 1.30, 889_700, json.dumps(list(p))))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_band_rd.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('t', 1, 1.3, 889700, '[-0.82176164, 3.81952138, 5.453812572316766, -17.73569729]')
+
+    def _branch_switch_job(args):
+        """POST HOC: the switch of the run's own-sample R^d branch.  From the crossing state, damped Newton in all hidden
+        coordinates at w₂ = ±s (branch_rd); continuation in s in 1% steps (down if the branch is placed at s_c, up if not)
+        until the branch's R^d gap changes sign, then bisection to 1e-6 relative.  Also the branch's G1 switch (the switch
+        of the x₁-direction gap on the same branch).  Continuation is abandoned if a solve does not converge (grad > 1e-8)
+        or the branch jumps (> 0.5 in any coordinate)."""
+>       os.nice(15)
+E       PermissionError: [Errno 1] Operation not permitted
+
+src/band_rd.py:772: PermissionError
+____ test_branch_switch_from_crossing_state_matches_the_ramp_posthoc_value _____
+
+    def test_branch_switch_from_crossing_state_matches_the_ramp_posthoc_value():
+        """Continuation from a crossing state (ramp2._branch_job) finds the same switch as the committed ramp post hoc, which
+        continued up from the branch point at s₀ (results/ramp/posthoc_branch_switch.csv)."""
+        import pandas as pd
+        from src import ramp as R
+        d = R.read_runs(); b = pd.read_csv(R.OUT / "posthoc_branch_switch.csv")
+        for a, seed in ((1.5, 860000), (1.3, 860003)):
+            r = d[(d.a.round(2) == a) & (d.seed == seed) & (d.opt == "sgd") & (d.cell == 0) & (d.winding == (0 if a == 1.5 else -1))].iloc[0]
+            want = b[(b.a.round(2) == a) & (b.seed == seed) & (b.winding == r.winding)].s_branch.iloc[0]
+>           got = R2._branch_job((a, seed, r.w1, r.b1, r.b2, r.s_cross))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ramp2.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (1.5, 860000, np.float64(1.0137050993484111), np.float64(-2.289029227790635), np.float64(9.12340691049731), np.float64(3.0967240401070217))
+
+    def _branch_job(args):
+        """The switch of the branch a run tracks: Newton on its own sample at its crossing state and scale (lag_law.branch_point),
+        then continuation in s (down if that branch point is placed, up if not; 1% steps) to the gap's sign change, bisected
+        to 1e-6 relative."""
+>       os.nice(15)
+E       PermissionError: [Errno 1] Operation not permitted
+
+src/ramp2.py:116: PermissionError
+=============================== warnings summary ===============================
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: overflow encountered in scalar power
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: invalid value encountered in scalar add
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:78: RuntimeWarning: overflow encountered in scalar power
+    g = np.array([z[0] ** 2 - (C - s) - 0.3 * (z[1] - 0.3 * z[0]), z[1] - 0.3 * z[0], z[2]])
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:77: RuntimeWarning: invalid value encountered in scalar subtract
+    L = z[0] ** 3 / 3 - (C - s) * z[0] + 0.5 * (z[1] - 0.3 * z[0]) ** 2 + 0.5 * z[2] ** 2
+
+tests/test_act_fold.py::test_independent_fold_check_pass_and_fail
+  /Users/Evan/precision-topology/census/tests/test_act_fold.py:78: RuntimeWarning: invalid value encountered in scalar subtract
+    g = np.array([z[0] ** 2 - (C - s) - 0.3 * (z[1] - 0.3 * z[0]), z[1] - 0.3 * z[0], z[2]])
+
+tests/test_gelu_transfer.py::test_L4_fails_when_the_prediction_is_no_closer_than_s_glob
+tests/test_gelu_transfer.py::test_V5_q90_kappa_chi
+tests/test_phase1c.py::test_registered_arms_pass[G-80-80]
+tests/test_phase1c.py::test_g_hold_positive_does_not_fail_the_random_gate
+tests/test_phase1c.py::test_registered_v6_unchanged_and_late_cutoffs_unscored
+tests/test_ramp.py::test_score_setting_cases
+tests/test_track2a.py::test_secondary_closed_form_is_reported_not_scored
+  /Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[:, None]
+
+tests/test_gelu_transfer.py::test_L4_fails_when_the_prediction_is_no_closer_than_s_glob
+tests/test_gelu_transfer.py::test_V5_q90_kappa_chi
+tests/test_ramp.py::test_score_setting_cases
+tests/test_track2a.py::test_secondary_closed_form_is_reported_not_scored
+  /Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[None, :]
+
+tests/test_simplicity_bias_v3.py::test_init_rule_caps_output_scale
+  /Users/Evan/precision-topology/census/tests/test_simplicity_bias_v3.py:57: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+  Consider using tensor.detach() first. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:823.)
+    s = float(out.weight.abs().sum())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_band_rd.py::test_score_end_to_end - PermissionError: [Errno...
+FAILED tests/test_band_rd.py::test_branch_switch_job_constructed - Permission...
+FAILED tests/test_ramp2.py::test_branch_switch_from_crossing_state_matches_the_ramp_posthoc_value
+3 failed, 1333 passed, 17 warnings in 496.45s (0:08:16)
+exit 1

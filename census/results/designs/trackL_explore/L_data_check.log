@@ -1,0 +1,23 @@
+{
+ "recorded": {
+  "train-images-idx3-ubyte.gz": "440fcabf73cc546fa21475e81ea370265605f56be210a4024d2ca8f203523609",
+  "train-labels-idx1-ubyte.gz": "3552534a0a558bbed6aed32b30c495cca23d567ec52cac8be1a0730e8010255c",
+  "t10k-images-idx3-ubyte.gz": "8d422c7b0a1c1c79245a5bcf07fe86e33eeafee792b84584aec276f5a2dbc4e6",
+  "t10k-labels-idx1-ubyte.gz": "f7ae60f92e00ec6debd23a6088c31dbd2371eca3ffa0defaefb259924204aec6",
+  "cifar-10-python.tar.gz": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+ },
+ "npy": {
+  "mnist/train_images.npy": "c5b45806d970e809a5f376f9b8461b7ca3b3e0a321282d72d06d00ab6c6c418f",
+  "mnist/train_labels.npy": "5dd4d822cab3e20099239bc9d433d587ae3ce00e084d191079dd30b38380b336",
+  "mnist/test_images.npy": "4acfa5c2911a2f95015eda9a9b825fbd6bec0f6a6f66942979b1473d33943a11",
+  "mnist/test_labels.npy": "ff7e84b144c037e7215dfa787d6773550c5db83029d9a4e7bae6e90f605f081d",
+  "cifar10/train_images.npy": "304a769ab0682c43bbdc4f766303066aef2073d37441d820ecc2666ccb3432b3",
+  "cifar10/train_labels.npy": "9e2ee9261f6a7c6509b35aaa7161bf15d6d99673bbcac04130702d12a6da88d3",
+  "cifar10/test_images.npy": "efbfa3b24c4f91c6febe8a57d87b6448f2c1226d8b2aa24d14db1eea85ad46c6",
+  "cifar10/test_labels.npy": "fc48d9ecfdbeacce2dacf004498170f2df12e75e3485475017d2663b587a92f3"
+ }
+}
+{'Xtr': ((10000, 6144), 'float32'), 'ytr': ((10000,), 'int64'), 'flip': ((10000,), 'bool'), 'n_train_per_class': 5000, 'Xorig': ((1960, 6144), 'float32'), 'Xrand': ((1960, 6144), 'float32'), 'Xrev': ((1960, 6144), 'float32'), 'yte': ((1960,), 'int64'), 'n_test_per_class': 980, 'rand_mnist_agrees': 0.4785714285714286}
+flip fraction 0.05 Xtr range 0.0 1.0
+        0.78 real         0.29 user         0.25 sys
+           974372864  maximum resident set size

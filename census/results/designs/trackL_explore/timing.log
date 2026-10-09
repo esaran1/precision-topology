@@ -1,0 +1,6 @@
+# 2026-10-09 15:03:20 run: 0.95 std 2991000 0.01 256
+/Users/Evan/precision-topology/census/results/designs/trackL_explore/L_explore.py:105: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:823.)
+  rec["outw"].append(float(net[4].weight.norm()))
+p0.95|std|2991000|lr0.01|w256 steps 6032 secs 18.4 final loss 0.001309115788899362 rand 0.5525510311126709 rss 1.045
+# 2026-10-09 15:03:40 done
