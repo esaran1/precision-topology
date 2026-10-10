@@ -730,10 +730,15 @@ def assert_registration():
     assert_rules_frozen()
 
 
+TOLERANCES = {"tau_cross": 10, "tau_lag": 10, "band": 0.10}   # approved by the author 2026-10-09 (the pilot rule's output)
+
+
 def tolerances():
-    """The registered tolerances: the pilot rule's output in the hashed pilot.json."""
+    """The registered tolerances: TOLERANCES, asserted equal to the pilot rule's output in the hashed pilot.json."""
     t = json.loads((OUT / "pilot.json").read_text())["tolerances"]
-    return {k: t[k] for k in ("tau_cross", "tau_lag", "band")}
+    t = {k: t[k] for k in ("tau_cross", "tau_lag", "band")}
+    assert t == TOLERANCES, ("pilot.json tolerances differ from the approved ones", t, TOLERANCES)
+    return dict(TOLERANCES)
 
 
 # ------------------------------------------------------------------------------------------ run / finalize / observe / score

@@ -383,3 +383,19 @@ def test_pilot_tolerances_recompute_from_the_committed_pilot_runs():
     assert {k: t[k] for k in ("tau_cross", "tau_lag", "band")} == {k: d["tolerances"][k] for k in ("tau_cross", "tau_lag",
                                                                                                    "band")}
     assert d["rule_sha256"] == CA.rule_hashes()
+
+
+def test_registered_tolerances_are_the_approved_values():
+    """Author 2026-10-09: τ_cross 10, τ_lag 10, b 0.10 (thin b margin a known risk); equal to pilot.json's rule output."""
+    assert T.TOLERANCES == {"tau_cross": 10, "tau_lag": 10, "band": 0.10}
+    assert T.tolerances() == T.TOLERANCES
+
+
+def test_observed_lag_measured_as_1c_width1():
+    """D8 (author's condition): t_sw = the first step with s ≥ the cutoff's s*_run, s_sw = s*_run, r_obs = s_obs/s_sw − 1,
+    lag_obs = t_obs − t_sw, as src/phase1c.py observe_one (W1) and score_arm_1c."""
+    import inspect
+    src = inspect.getsource(T.observe_one)
+    assert 'rec.get("cutoff_s_run")' in src and "LR._first_ge(s, s_run)" in src and '"s_sw": s_run' in src
+    assert 'R["s_obs"] / R["s_sw"] - 1' in inspect.getsource(T.score_track_a)
+    assert "(t_obs - t_sw)" in inspect.getsource(T.criteria)

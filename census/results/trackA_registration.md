@@ -1,7 +1,12 @@
 # Track A registration: the causal Adam per-run forecast at a = 1.77
 
-**DRAFT. NOT YET REGISTERED.** The pilot tolerances (§7) and the open details (§9) await the author's approval before
-the registration commit. Everything else below is the text to be registered.
+**REGISTERED.** This file, the approved design page, the code, the tests, the frozen rules, the landscape, the seed scan,
+the frozen per-seed files and the pilot are committed in one commit before any registered run. Their SHA-256 hashes are
+in `results/trackA/registration.sha256` (§10).
+- **Author's approval (2026-10-09):**
+  - The pilot tolerances τ_cross 10, τ_lag 10 and b 0.10 (§7), with the thin b margin recorded as a known risk (§7.1).
+  - The "1.77 unused" rule (`A_HITS_REVIEWED`, §2).
+  - D1–D8 (§9). D8 is approved on condition that it measures the observed lag exactly as 1C's width-1 arm did (§9.1).
 - **Not yet done:** no registered seed has been trained or frozen for training, and no gap, placement or crossing of any
   run of a registered seed has been evaluated.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof
@@ -133,17 +138,18 @@ t_obs − t_c.
 
 ## 7. Tolerances (pilot rule; pilot seeds only)
 
-**PENDING: the pilot numbers go to the author before registration.**
+**Registered tolerances (approved by the author 2026-10-09): τ_cross = 10, τ_lag = 10, b = 0.10.** They are
+`trackA_causal.TOLERANCES`, asserted equal to the pilot rule's output in the hashed `pilot.json` (tested).
 
 - **Rule:** τ_cross = 1.5 × the pilot q90 of |t_fc − t_obs|, and τ_lag = 1.5 × the pilot q90 of |lag_fc − lag_obs|,
   each rounded up to a multiple of 5. b = |median r_obs/r_fc − 1| + 2SE, rounded up to 0.05, with
   SE = 1.2533·(IQR/1.349)/√n (Phase 1A's pilot rule; D3).
 - **Pilot set:** the pilot runs with s\*_frozen, a crossing, t_c < t_obs and t_sw defined. The errors are taken over those
   with a forecast. Percentiles use numpy's linear interpolation.
-- **Source:** `results/trackA/pilot.json` (`trackA_causal.pilot_summary`), from `pilot_runs.jsonl`. `score` reads the
-  tolerances from that hashed file.
+- **Source:** `results/trackA/pilot.json` (`trackA_causal.pilot_summary`), from `pilot_runs.jsonl`. `score` uses
+  `TOLERANCES` after asserting that they equal that hashed file's values.
 
-**Pilot result (40/40 pilot seeds; PENDING the author's approval):**
+**Pilot result (40/40 pilot seeds; approved by the author 2026-10-09):**
 
 | τ_cross | τ_lag | b |
 |---|---|---|
@@ -165,6 +171,14 @@ t_obs − t_c.
   - f = 0.95: 0 misses, q90 4 / 3, median 0.966.
 - **Horizon:** t_obs − t_c has q10 34, median 115 and q90 167 steps.
 
+### 7.1 Known risk: the thin b margin (disclosed before any registered run)
+
+- The pilot median r_obs/r_fc, 0.9515, lies inside [0.90, 1.10] by only about 0.05.
+- The exploration's median at a = 1.85 was 0.94 (114 runs with a forecast), inside the band by 0.04. Its split-rule b
+  was 0.20.
+- A registered median below 0.90 fails C3, and with it the outcome, even if C1, C2 and C4 pass.
+- The author approved b = 0.10 with this risk recorded.
+
 ## 8. Landscape at a = 1.77
 
 - `results/trackA/landscape.json` (`trackA_causal.landscape`, Track A's function unchanged): continuation from the 1.60
@@ -176,7 +190,7 @@ t_obs − t_c.
 - **Frozen s\*_frozen:** registered 100/100 (range 1.054–2.014), `frozen_registered.jsonl`; pilot 40/40 (1.228–1.704),
   `frozen_pilot.jsonl`.
 
-## 9. Open details (implementation choices not fixed by the page)
+## 9. Open details (implementation choices not fixed by the page; D1–D8 APPROVED by the author 2026-10-09)
 
 | # | detail | implemented as | touches |
 |---|---|---|---|
@@ -188,6 +202,18 @@ t_obs − t_c.
 | D6 | NaN recomputation raising | Counts as not identical. An exception in the guarded forecast itself stops the job; it is not scored as a miss. | validity |
 | D7 | window when t_c − t_R < 3 | 3 points, reaching before t_R (the exploration's max(3, …)). | forecast |
 | D8 | r_obs | s_obs/s\*_run − 1, with s\*_run the cutoff's (1C's D10). | C3 |
+
+### 9.1 D8: the observed lag is measured exactly as 1C's width-1 arm did (the author's condition)
+
+| quantity | Track A (`src/trackA_causal.py`) | 1C W1 (`src/phase1c.py`) |
+|---|---|---|
+| cutoff and s\*_run | `causal_forecast.w1_cutoff_on_s_run` (`harness_cutoff`) | the same function (`harness_cutoff`) |
+| t_sw | `LR._first_ge(s, s_run)`, s_run = the cutoff's `cutoff_s_run` (`observe_one`) | the same, lines 873–880 |
+| s_sw | s_run | s_run, lines 873–880 |
+| r_obs | s_obs/s_sw − 1 (`score_track_a`) | the same, line 297 |
+| lag_obs | t_obs − t_sw (`criteria`) | the same, line 228 |
+
+`test_observed_lag_measured_as_1c_width1` checks this.
 
 ## 10. Manifest
 
