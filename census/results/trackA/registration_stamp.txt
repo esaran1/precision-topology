@@ -1,0 +1,4 @@
+Track A (causal Adam) registration
+registration commit: 173a6121d58b1c2810a3a524cf864f4f551d2348
+sha256 results/trackA_registration.md: 99cc8d76f01418ff637ebd914beefc0950bf1ae42a8a3f2b95560ed774307349
+sha256 results/trackA/registration.sha256: 917593103f33dc0dac2faf1da37751322ca36c8633fb1cb97e54514ec77f5406
