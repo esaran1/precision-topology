@@ -1090,7 +1090,7 @@ PRODUCERS = {
     "trackA/runs.jsonl": ("trackA_causal", "run", "full", ""),
     "trackA/forecasts.sha256": ("trackA_causal", "finalize", "full", ""),
     "trackA/observed.jsonl": ("trackA_causal", "observe", "full", ""),
-    "trackA/scores.json": ("trackA_causal", "score", "full", ""),
+    "trackA/scores.json": ("trackA_score", "score", "full", ""),   # post-registration plumbing fix (author 2026-10-10)
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",

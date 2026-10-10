@@ -1,0 +1,95 @@
+{
+ "n_scored": 40,
+ "n_scored_miss": 0,
+ "valid": false,
+ "validity": {
+  "min_60_crossings": false,
+  "min_60_scored": false,
+  "cutoff_before_crossing_90pct": true,
+  "actual_switch_defined": true,
+  "nan_recomputation_identical": true
+ },
+ "criteria": {
+  "C1": {
+   "frac_within": 0.975,
+   "n_within": 39,
+   "n_miss": 0,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C2": {
+   "frac_within": 0.975,
+   "n_within": 39,
+   "n_miss": 0,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C3": {
+   "frac_within": null,
+   "n_within": null,
+   "n_miss": null,
+   "median_ratio": 0.9515434836200464,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C4": {
+   "frac_within": null,
+   "n_within": null,
+   "n_miss": null,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": [
+    -63.725,
+    -47.325
+   ],
+   "n": 40
+  }
+ },
+ "reference": {
+  "C1": {
+   "frac_within": 0.975,
+   "n_within": 39,
+   "n_miss": 0,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C2": {
+   "frac_within": 0.975,
+   "n_within": 39,
+   "n_miss": 0,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C3": {
+   "frac_within": null,
+   "n_within": null,
+   "n_miss": null,
+   "median_ratio": 0.9515434836200464,
+   "verdict": "PASS",
+   "ci95": null,
+   "n": 40
+  },
+  "C4": {
+   "frac_within": null,
+   "n_within": null,
+   "n_miss": null,
+   "median_ratio": null,
+   "verdict": "PASS",
+   "ci95": [
+    -63.725,
+    -47.325
+   ],
+   "n": 40
+  }
+ },
+ "identical": true
+}
