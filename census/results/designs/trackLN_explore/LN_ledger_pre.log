@@ -1,0 +1,2848 @@
+T1/T2 monotonic zero
+  ok  total runs: artifact=5580.0 ledger=5580.0
+  ok  separations: artifact=0.0 ledger=0.0
+pooled R union (abstract numbers)
+  ok  pooled runs: artifact=3150.0 ledger=3150.0
+  ok  optimisers: artifact=3.0 ledger=3.0
+  ok  runs below R=0.30: artifact=2285.0 ledger=2285.0
+  ok  solved below R=0.30: artifact=0.0 ledger=0.0
+  ok  runs above R=0.50: artifact=461.0 ledger=461.0
+  ok  solved above R=0.50: artifact=460.0 ledger=460.0
+T56 per-placement theorem check
+  ok  solvers checked: artifact=66.0 ledger=66.0
+  ok  per-placement violations: artifact=0.0 ledger=0.0
+  ok  solvers with w2<0: artifact=22.0 ledger=22.0
+  ok  median slack: artifact=1.2487923145810385 ledger=1.2488
+T57 placement/bias decomposition
+  ok  identity disagreements: artifact=0.0 ledger=0.0
+  ok  placement failures: artifact=1664.0 ledger=1664.0
+  ok  bias failures: artifact=306.0 ledger=306.0
+  ok  median solved rho: artifact=0.9674305277654667 ledger=0.9674
+  ok  rho>0.9 all solve: artifact=1.0 ledger=1.0
+T43 budget law
+  ok  bracketed cells: artifact=6.0 ledger=6.0
+  ok  onset exponent: artifact=-0.7339552423351158 ledger=-0.734
+  ok  alpha (1k-160k): artifact=1.1171970322618294 ledger=1.1172
+  ok  rate at 80k: artifact=1.0 ledger=1.0
+T44 four-family
+  ok  q0.667 exponent: artifact=-0.4999999999999996 ledger=-0.5
+  ok  q1 exponent: artifact=-0.6521299940856459 ledger=-0.6521
+  ok  q2 exponent: artifact=-0.6749304581024035 ledger=-0.6749
+  ok  q4 exponent: artifact=-0.8304820237218402 ledger=-0.8305
+T47 cross-optimizer
+  ok  q4 SGD bracketed: artifact=4.0 ledger=4.0
+  ok  q4 SGD exponent: artifact=0.005550780526277733 ledger=0.0056
+  ok  family A SGD exponent: artifact=-0.3254583840815924 ledger=-0.3255
+T38/T43 CIFAR
+  ok  GELU adv at 2ep: artifact=750.375 ledger=750.4
+  ok  GELU adv at 12ep: artifact=150.625 ledger=150.6
+T41 exclusion table
+  ok  min zero-basin grad norm: artifact=0.0192137943034059 ledger=0.0192
+  ok  negative lambda_min count: artifact=6.0 ledger=6.0
+T58 scaling limit
+  ok  dip depth 4sqrt2/3: artifact=1.885618083164127 ledger=1.885618
+  ok  K: artifact=0.579454926 ledger=0.5794549
+  ok  kappa_0: artifact=0.3073023806749118 ledger=0.307302
+  ok  kappa(1.02) vs kappa_0 (%): artifact=-0.383990980346971 ledger=-0.38
+  ok  R_glob^inf (frozen 0.005 grid): artifact=0.19991194947 ledger=0.19991
+  ok  R_glob^inf certified lower: artifact=0.19737683416875 ledger=0.1974
+  ok  R_glob^inf certified upper: artifact=0.1991876308125 ledger=0.1992
+  ok  K certified (exact extrema) lower: artifact=0.5794557826009681 ledger=0.5794558
+  ok  K certified (exact extrema) upper: artifact=0.5794951414335255 ledger=0.5794951
+  ok  R_glob^inf certified with K interval, lower: artifact=0.1973771259484547 ledger=0.19738
+  ok  R_glob^inf certified with K interval, upper: artifact=0.1992014548677744 ledger=0.1992
+  ok  frozen grid value lies above the certified interval: artifact=1.0 ledger=1.0
+  ok  R_spin^inf == R_glob^inf (no window): artifact=0.0 ledger=0.0
+  ok  R_solve^inf: artifact=0.30711111078 ledger=0.30711
+  ok  R_glob dev all positive: artifact=1.0 ledger=1.0
+  ok  R_glob dev monotone: artifact=1.0 ledger=1.0
+  ok  R_glob dev at a=1.60 (%): artifact=14.289859198482313 ledger=14.29
+  ok  R_glob corr(eps,dev): artifact=0.9865511751268556 ledger=0.9866
+  ok  R_glob log-log slope (frozen grid, superseded): artifact=0.9471682610651405 ledger=0.947
+  ok  c1: artifact=0.2309865643916588 ledger=0.23099
+  ok  c1 fit max residual: artifact=0.0013298449697511927 ledger=0.00133
+T58 refit on certified intervals (rglob_refit)
+  ok  log-log slope, midpoints: artifact=0.8294780062456384 ledger=0.829
+  ok  log-log slope, min over certified box: artifact=0.7144969634848524 ledger=0.714
+  ok  log-log slope, max over certified box: artifact=0.954904894704638 ledger=0.955
+  ok  slope range inside registered band [0.5, 2]: artifact=1.0 ledger=1.0
+  ok  one-term law R_inf(1 + c1 eps) feasible within all certified intervals: artifact=0.0 ledger=0.0
+  ok  two-term law (eps and eps^2) feasible within all certified intervals: artifact=1.0 ledger=1.0
+  ok  two-term law: c1 = m/R_inf min over feasible: artifact=0.2430328635507966 ledger=0.243
+  ok  two-term law: c1 max over feasible: artifact=0.3212758301919963 ledger=0.321
+  ok  two-term law: q max over feasible: artifact=-0.0069160577222381 ledger=-0.0069
+  ok  limit-free intercept min over box: artifact=0.2001545803546032 ledger=0.2002
+  ok  limit-free intercept range overlaps certified limit: artifact=0.0 ledger=0.0
+  ok  dev all positive (worst corner): artifact=1.0 ledger=1.0
+  ok  dev monotone in a, midpoints: artifact=1.0 ledger=1.0
+  ok  R_solve dev all negative (S-3 falsified): artifact=1.0 ledger=1.0
+  ok  R_solve mean dev (%): artifact=-0.2937153766816377 ledger=-0.29
+T59 Block E intervention
+  ok  hold_low kept: artifact=0.0 ledger=0.0
+  ok  hold_low n: artifact=37.0 ledger=37.0
+  ok  hold_high kept: artifact=33.0 ledger=33.0
+  ok  hold_high n: artifact=37.0 ledger=37.0
+  ok  noise_floor kept: artifact=37.0 ledger=37.0
+  ok  hold_high placed /40: artifact=33.0 ledger=33.0
+  ok  hold_high solved /40: artifact=0.0 ledger=0.0
+  ok  control placed /40: artifact=37.0 ledger=37.0
+  ok  jump placed /40: artifact=9.0 ledger=9.0
+  ok  cold_high placed /40: artifact=2.0 ledger=2.0
+  ok  cold_low placed /40: artifact=0.0 ledger=0.0
+  ok  hold_low max steps to lose: artifact=50.0 ledger=50.0
+  ok  hold_high held R: artifact=0.2466264170318214 ledger=0.24663
+  ok  held R above R_glob: artifact=1.0 ledger=1.0
+  ok  held R below R_solve: artifact=1.0 ledger=1.0
+Block E stall: per-arm verdicts
+  ok  jump grad frac of control: artifact=0.00072036180612417 ledger=0.00072
+  ok  jump placed at 60k: artifact=7.0 ledger=7.0
+  ok  cold_high grad frac of control: artifact=0.0003160205284606271 ledger=0.00032
+  ok  cold_high placed at 60k: artifact=3.0 ledger=3.0
+  ok  jump meets S-A budget (>25%): artifact=1.0 ledger=1.0
+  ok  cold_high FAILS S-A budget (>25%): artifact=0.0 ledger=0.0
+  ok  cold_high 60k rate: artifact=0.2 ledger=0.2
+T60 R_spin dropped
+  ok  R_glob == R_spin, all a: artifact=1.0 ledger=1.0
+  ok  every window 1 grid step: artifact=1.0 ledger=1.0
+  ok  a=1.60 window width: artifact=0.001114532124729506 ledger=0.00111
+  ok  R_glob drift (%): artifact=4.4592480126424805 ledger=4.5
+  ok  corr(measured, R_glob): artifact=0.9964719658165837 ledger=0.9965
+  ok  mean offset measured/R_glob: artifact=1.1152662846733485 ledger=1.1153
+T61 Block G transfer
+  ok  a=1.3 CV(R): artifact=0.2189380256817343 ledger=0.2189
+  ok  a=1.3 CV(|w2|): artifact=0.7357805238132376 ledger=0.7358
+  ok  a=1.3 CV(R) < CV(w2)/2: artifact=1.0 ledger=1.0
+  ok  a=1.5 CV(R): artifact=0.23040143017493284 ledger=0.2304
+  ok  a=1.5 CV(|w2|): artifact=0.6925318421015897 ledger=0.6925
+  ok  a=1.5 CV(R) < CV(w2)/2: artifact=1.0 ledger=1.0
+  ok  G-4 windows within 3%: artifact=5.0 ledger=5.0
+  ok  G-4 worst error (%): artifact=0.8075055393563568 ledger=0.808
+  ok  kappa_0 spread (x): artifact=8.077000320177424 ledger=8.077
+T62 Block K family B
+  ok  box/norm ratio at alpha=-0.5: artifact=7.999999999999998 ledger=8.0
+  ok  Ghat_norm exponent in |alpha|: artifact=0.9999999999999996 ledger=1.0
+  ok  cells with AUC(R_B)==AUC(prod): artifact=5.0 ledger=5.0
+  ok  cells at AUC 1.0: artifact=4.0 ledger=4.0
+  ok  band runs at alpha=-1.00: artifact=2.0 ledger=2.0
+  ok  alpha=-1 separation gap (unsolved max): artifact=0.2952185250823724 ledger=0.295219
+  ok  alpha=-1 separation gap (solved min): artifact=7.258799479477602 ledger=7.258799
+  ok  pooled AUC(R_B): artifact=0.9990119549353056 ledger=0.999
+  ok  pooled AUC(|w2|): artifact=0.9901236491251086 ledger=0.9901
+  ok  AUC margin under registered 0.10: artifact=1.0 ledger=1.0
+T63 Block F optimisers
+  ok  Adam cross R: artifact=0.2309411248698374 ledger=0.23094
+  ok  AdamW cross R: artifact=0.22979924104016758 ledger=0.2298
+  ok  SGD cross R: artifact=0.2288761997913897 ledger=0.22888
+  ok  F-1 ordering holds: artifact=1.0 ledger=1.0
+  ok  rate spread (Adam/SGD): artifact=3.9163299864915446 ledger=3.917
+  ok  SGD offset (%): artifact=8.647203926416847 ledger=8.645
+  ok  SGD predicted offset (%): artifact=2.4582762264947564 ledger=2.458
+  ok  F-2 SGD error exceeds 4pp: artifact=1.0 ledger=1.0
+  ok  offset spread (pp): artifact=0.9802169744838487 ledger=0.981
+  ok  P(full ordering) below 0.5: artifact=1.0 ledger=1.0
+T64 kappa certified
+  ok  max certificate rel width (%): artifact=0.08548380919711 ledger=0.0855
+  ok  all widths under 0.2%: artifact=1.0 ledger=1.0
+  ok  certified kappa lower: artifact=0.3077466184139805 ledger=0.307747
+  ok  certified kappa upper: artifact=0.3176163157039157 ledger=0.317616
+  ok  certified width (%): artifact=3.2070855370564866 ledger=3.207
+  ok  excludes T50 lower endpoint: artifact=1.0 ledger=1.0
+  ok  boundary below interior, all: artifact=1.0 ledger=1.0
+  ok  K certified lower: artifact=0.5794549768265793 ledger=0.579454977
+  ok  K rel width (%): artifact=0.08559767709934718 ledger=0.0856
+T65 one Ghat everywhere
+  ok  certified/restricted min (%): artifact=0.1313301198941241 ledger=0.1313
+  ok  certified/restricted max (%): artifact=0.8398844572202968 ledger=0.8399
+  ok  certified: n below 0.30: artifact=2281.0 ledger=2281.0
+  ok  certified: solved below 0.30: artifact=0.0 ledger=0.0
+  ok  certified: n above 0.50: artifact=463.0 ledger=463.0
+  ok  certified: solved above 0.50: artifact=461.0 ledger=461.0
+  ok  certified CV(R) across a: artifact=0.03235672862870622 ledger=0.0324
+  ok  O1 still met: artifact=1.0 ledger=1.0
+T66 nu
+  ok  corr(eps, alpha): artifact=-0.9943449851207836 ledger=-0.9943
+  ok  alpha spread: artifact=0.16922028982540915 ledger=0.1692
+  ok  fixed-budget nu mean: artifact=-0.06261349447233881 ledger=-0.0626
+  ok  fixed-budget nu sign inconsistent: artifact=1.0 ledger=1.0
+T67 pathwise distance
+  ok  n runs: artifact=400.0 ledger=400.0
+  ok  median init distance: artifact=5.22336472553029 ledger=5.2234
+  ok  median min-along-path: artifact=4.877312300870191 ledger=4.8773
+  ok  median ratio min/init: artifact=0.9918293476294671 ledger=0.9918
+  ok  step 1 reproduced from regenerated init: artifact=400.0 ledger=400.0
+  ok  median distance at true init: artifact=5.225932727699516 ledger=5.2259
+  ok  median min incl. step 0: artifact=4.875478644616853 ledger=4.8755
+  ok  minimum at initialisation (runs): artifact=114.0 ledger=114.0
+  ok  runs > 5% closer: artifact=112.0 ledger=112.0
+  ok  largest approach (%): artifact=23.426805389419748 ledger=23.43
+T55 exceptions above 0.50
+  ok  n exceptions: artifact=2.0 ledger=2.0
+  ok  seed13 placement G: artifact=0.768428 ledger=0.768428
+  ok  seed13 placement ok: artifact=1.0 ledger=1.0
+  ok  seed13 bias miss: artifact=0.010958 ledger=0.010958
+  ok  seed13 outer violations: artifact=11.0 ledger=11.0
+  ok  seed13 sample errors: artifact=1.0 ledger=1.0
+  ok  seed82 placement G: artifact=-0.216202 ledger=-0.216202
+  ok  seed82 placement fails: artifact=1.0 ledger=1.0
+  ok  seed82 w1 near zero: artifact=1.0 ledger=1.0
+  ok  seed82 total violations: artifact=3847.0 ledger=3847.0
+  ok  seed82 sample errors: artifact=185.0 ledger=185.0
+  ok  seed82 new entrant (was below 0.50): artifact=1.0 ledger=1.0
+  ok  seed82 R certified: artifact=0.500886 ledger=0.500886
+T66 alpha(eps)
+  ok  alpha min: artifact=1.1718669177689125 ledger=1.1719
+  ok  alpha max: artifact=1.3410872075943217 ledger=1.3411
+  ok  alpha median over onset region: artifact=1.2796742098775378 ledger=1.2797
+T68 our link construction
+  ok  Gauss linking number: artifact=-0.9999999999999996 ledger=-1.0
+  ok  core separation = R: artifact=0.9999999999999998 ledger=1.0
+  ok  no core self-intersection: artifact=1.0 ledger=1.0
+  ok  tubes disjoint (2rho < sep): artifact=1.0 ledger=1.0
+  ok  tube embedded (rho < reach): artifact=1.0 ledger=1.0
+T69 S2uS2 budget sweep (WITHDRAWN -- overlapping regions; numbers checked only as the record)
+  ok  S2 gap at 1k: artifact=0.013750001788139343 ledger=0.0138
+  ok  S2 gap at 64k: artifact=0.04022499620914466 ledger=0.0402
+  ok  S2 gap widens monotonically: artifact=1.0 ledger=1.0
+  ok  S2-1 falsified (gap grew): artifact=1.0 ledger=1.0
+  ok  ReLU flat across 64x budget: artifact=0.008375003933906555 ledger=0.0084
+  ok  ReLU perfect runs, all budgets: artifact=0.0 ledger=0.0
+  ok  GELU perfect at 64k: artifact=8.0 ledger=8.0
+  ok  both non-decreasing in budget: artifact=1.0 ledger=1.0
+T73 optimiser equivalence (Block C in-band population, a = 1.25)
+  ok  pairs equivalent: artifact=3.0 ledger=3.0
+  ok  adam - adamw diff: artifact=-0.0007991728484869 ledger=-0.0008
+  ok  adam - sgd diff: artifact=0.0029236487031997 ledger=0.0029
+  ok  adamw - sgd diff: artifact=0.0037228215516867 ledger=0.0037
+T74 cross-family follow-up (Y1)
+  ok  comparisons within tol: artifact=8.0 ledger=8.0
+  ok  max |q2 - A|: artifact=0.0021525450000001 ledger=0.00215
+  ok  q2 share outside domain: artifact=0.0 ledger=0.0
+  ok  domain condition at all a: artifact=4.0 ledger=4.0
+  ok  Z1: q1 beyond two steps (8 comparisons): artifact=8.0 ledger=8.0
+  ok  Z1: min q1-A steps, R_glob: artifact=34.999999999999986 ledger=35.0
+  ok  Z1: min q1-A steps, R_solve: artifact=4.999999999999962 ledger=5.0
+  ok  Z1: q1 share outside domain: artifact=0.0 ledger=0.0
+  ok  Z1 gate passes at a = 1.30: artifact=2.0 ledger=2.0
+T75 Block A5d at k = 1
+  ok  runs: artifact=880.0 ledger=880.0
+  ok  A1: perfect at a <= 1: artifact=0.0 ledger=0.0
+  ok  A1: min uniform errors at a <= 1: artifact=22.0 ledger=22.0
+  ok  A4: perfect at a = 3.0, 64k: artifact=7.0 ledger=7.0
+  ok  max perfect fraction (no onset): artifact=0.35 ledger=0.35
+  ok  post hoc: smallest a with any perfect at 1k: artifact=3.0 ledger=3.0
+  ok  post hoc: smallest a with any perfect at 4k-64k: artifact=1.35 ledger=1.35
+  ok  post hoc: 50% onset reached at any budget: artifact=0.0 ledger=0.0
+  ok  no perfect run at a <= 1.2: artifact=0.0 ledger=0.0
+T76 global Ĝ certificate
+  ok  all a converged: artifact=13.0 ledger=13.0
+  ok  max relative enclosure width: artifact=0.0009900369575043 ledger=0.00099
+  ok  committed Ghat vs global lo, max rel diff: artifact=8.356381792236501e-05 ledger=8.4e-05
+  ok  committed Ghat above global hi (count): artifact=0.0 ledger=0.0
+  ok  argmax w1 <= a/1.4 (count): artifact=13.0 ledger=13.0
+T77 per-a table, certified Ĝ
+  ok  R_glob(1.30): artifact=0.2152544846944479 ledger=0.2153
+  ok  R_solve(1.30): artifact=0.3078139131130606 ledger=0.3078
+  ok  crossing R median of cell medians (1.30): artifact=0.2338411571792871 ledger=0.2338
+  ok  crossing R (1.60): artifact=0.2579534995726019 ledger=0.258
+  ok  crossings total: artifact=974.0 ledger=974.0
+  ok  CV(R) certified, 6 a: artifact=0.0323567286287062 ledger=0.0324
+  ok  CV(|w2|), 6 a: artifact=0.2821033620678236 ledger=0.2821
+  ok  crossing counts match blockA_crossings: artifact=30.0 ledger=30.0
+T78 registration census
+  ok  registered predictions (headline convention: one row per prediction): artifact=278.0 ledger=278.0
+  ok  first-round rows (2026-09-23): artifact=164.0 ledger=164.0
+  ok  third-round rows (2026-09-25): artifact=41.0 ledger=41.0
+  ok  discussion-phase rows (2026-09-29): artifact=27.0 ledger=27.0
+  ok  discussion-phase rows: PASS, all by registered rule: artifact=20.0 ledger=20.0
+  ok  discussion-phase rows: UNRESOLVED, all by registered rule: artifact=7.0 ledger=7.0
+  ok  discussion-phase rows (2026-09-30, Test W2-A): artifact=15.0 ledger=15.0
+  ok  W2-A rows: PASS by registered rule: artifact=15.0 ledger=15.0
+  ok  registered units (appendix convention: per a): artifact=338.0 ledger=338.0
+  ok  units, all: PASS: artifact=169.0 ledger=169.0
+  ok  units, all: FAIL: artifact=99.0 ledger=99.0
+  ok  units, all: PARTIAL: artifact=13.0 ledger=13.0
+  ok  units, all: UNRESOLVED: artifact=57.0 ledger=57.0
+  ok  all: PASS: artifact=138.0 ledger=138.0
+  ok  all: FAIL: artifact=72.0 ledger=72.0
+  ok  all: PARTIAL: artifact=21.0 ledger=21.0
+  ok  all: UNRESOLVED: artifact=47.0 ledger=47.0
+  ok  existing 64 rows: artifact=64.0 ledger=64.0
+  ok  64: PASS: artifact=27.0 ledger=27.0
+  ok  64: FAIL: artifact=24.0 ledger=24.0
+  ok  64: PARTIAL: artifact=1.0 ledger=1.0
+  ok  64: UNRESOLVED: artifact=12.0 ledger=12.0
+  ok  scored by registered rules: n/PASS/FAIL/PARTIAL/UNRES: artifact=47008066135256.0 ledger=47008066135256.0
+  ok  assigned post hoc in the census: n/PASS/FAIL/PARTIAL/UNRES: artifact=13006003022.0 ledger=13006003022.0
+  ok  since 2026-09-23: scored by registered rules: n/PASS/FAIL/PARTIAL/UNRES: artifact=17000019069105.0 ledger=17000019069105.0
+  ok  since 2026-09-23: assigned post hoc: n/PASS/FAIL/PARTIAL/UNRES: artifact=9000000009.0 ledger=9000000009.0
+  ok  by registered unit: scored by registered rules: n/PASS/FAIL/PARTIAL/UNRES: artifact=57008093166324.0 ledger=57008093166324.0
+  ok  by registered unit: assigned post hoc in the census: n/PASS/FAIL/PARTIAL/UNRES: artifact=5006003014.0 ledger=5006003014.0
+  ok  by registered unit: since 2026-09-23: scored by registered rules: n/PASS/FAIL/PARTIAL/UNRES: artifact=27000046100173.0 ledger=27000046100173.0
+  ok  by registered unit: since 2026-09-23: assigned post hoc: n/PASS/FAIL/PARTIAL/UNRES: artifact=1000000001.0 ledger=1000000001.0
+  ok  since 2026-09-23: validity gates (not predictions; not in the headline): n/PASS/FAIL/PARTIAL/UNRES: artifact=20020.0 ledger=20020.0
+  ok  E-2 as registered is FAIL: artifact=1.0 ledger=1.0
+  ok  E-2 kept: artifact=33.0 ledger=33.0
+  ok  E-2 intervened: artifact=37.0 ledger=37.0
+T79 metric check, certified Ĝ
+  ok  restricted continuous 10% reproduces 0.055: artifact=0.0544709177676543 ledger=0.055
+  ok  restricted continuous 90% reproduces 0.307: artifact=0.3068262579346285 ledger=0.307
+  ok  zero-rate share, certified (%): artifact=76.21574968598512 ledger=76.2
+  ok  certified binary 10%: artifact=0.3304682779456193 ledger=0.33
+  ok  certified binary 90%: artifact=0.4291891891891892 ledger=0.429
+  ok  certified continuous 90%: artifact=0.3417737524612313 ledger=0.342
+  ok  certified ratio: artifact=2.901195337120424 ledger=2.9
+T57 phase 1 reconciliation
+  ok  float32 placement: artifact=1664.0 ledger=1664.0
+  ok  float32 bias: artifact=306.0 ledger=306.0
+  ok  float32 solved: artifact=430.0 ledger=430.0
+  ok  pooled solved: artifact=870.0 ledger=870.0
+  ok  pooled runs: artifact=4800.0 ledger=4800.0
+T80 branch tracking
+  ok  median before crossing: artifact=0.8338867453427694 ledger=0.834
+  ok  median after crossing: artifact=0.0017074318984032 ledger=0.0017
+  ok  median overall: artifact=0.0065063943944473 ledger=0.0065
+  ok  n before / after: artifact=197211.0 ledger=197211.0
+T48 MNIST pilots (driver)
+  ok  pilot rows regenerated: artifact=210.0 ledger=210.0
+  ok  max |test acc diff|: artifact=1.1102230246251563e-16 ledger=0.0
+  ok  narrow pilot rows (no a = 0.5): artifact=75.0 ledger=75.0
+T41 margins and MEP (produced 2026-09-23)
+  ok  a=1.5 solvers: artifact=81.0 ledger=81.0
+  ok  a=1.5 below constructed margin: artifact=17.0 ledger=17.0
+  ok  a=1.5 min margin: artifact=0.0017055087584552 ledger=0.0017
+  ok  a=1.45 below constructed margin: artifact=18.0 ledger=18.0
+  ok  exclusion-table MEP paths: artifact=60.0 ledger=60.0
+  ok  barrier.csv distinct a: artifact=13.0 ledger=13.0
+AdamW default weight decay (Block F) equals Block C's explicit 0.01
+  ok  torch AdamW default weight_decay: artifact=0.01 ledger=0.01
+T41 exclusion configurations
+  ok  string images: artifact=41.0 ledger=41.0
+  ok  MEP barrier max over all rows: artifact=0.0 ledger=0.0
+  ok  found rows: artifact=4.0 ledger=4.0
+T63 Block F definitions
+  ok  rate spread Adam/SGD (measured medians): artifact=3.9163299864915446 ledger=3.92
+  ok  registered-rate ratio 0.00207/0.00075: artifact=2.76 ledger=2.76
+V4 Block 1 (conditional audit)
+  ok  1a candidates: artifact=16468.0 ledger=16468.0
+  ok  1a scales: artifact=358.0 ledger=358.0
+  ok  1a frozen reproduced at all scales: artifact=1.0 ledger=1.0
+  ok  1a discarded candidates below the retained loss: artifact=0.0 ledger=0.0
+  ok  1a max retained gradient norm <= 2.3e-6: artifact=1.0 ledger=1.0
+  ok  1e strict vs frozen, max |loss diff| <= 2e-16: artifact=1.0 ledger=1.0
+  ok  1c R_glob(1.30) lower: artifact=0.2131019398475035 ledger=0.2131
+  ok  1c R_glob(1.30) upper: artifact=0.2136400760592396 ledger=0.21364
+  ok  1c R_solve(1.30) lower: artifact=0.3056613682661162 ledger=0.30566
+  ok  1c R_solve(1.30) upper: artifact=0.3061995044778522 ledger=0.3062
+  ok  1c frozen within one step, all 12: artifact=1.0 ledger=1.0
+  ok  1c all converged, none unresolved: artifact=1.0 ledger=1.0
+  ok  1c min separation of certified intervals >= 1.3e-8: artifact=1.0 ledger=1.0
+  ok  1c argmin separation min: artifact=0.0001457169955097 ledger=0.00015
+  ok  1c argmin separation max: artifact=0.0011246311666304 ledger=0.0011
+  ok  1c scan: one sign change: artifact=1.0 ledger=1.0
+  ok  1c scan: sign change between 4.5 and 5.0: artifact=1.0 ledger=1.0
+  ok  1c scan: competitor margin min: artifact=0.0030954892002749 ledger=0.0031
+  ok  1c scan: competitor margin max: artifact=0.012555185408093 ledger=0.0126
+  ok  1c scan: all competitor bounds converged: artifact=1.0 ledger=1.0
+  ok  1d a=1.3: median own/pop: artifact=1.0628152332912988 ledger=1.063
+  ok  1d a=1.3: population quantile: artifact=0.32 ledger=0.32
+  ok  1d a=1.45: median own/pop: artifact=1.0630399136069113 ledger=1.063
+  ok  1d a=1.45: population quantile: artifact=0.3 ledger=0.3
+  ok  1d a=1.6: median own/pop: artifact=1.059190031152648 ledger=1.059
+  ok  1d a=1.6: population quantile: artifact=0.32 ledger=0.32
+  ok  1d: IQR low min: artifact=0.9881384110970994 ledger=0.988
+  ok  1d: IQR high max: artifact=1.1207439596469102 ledger=1.121
+  ok  1d: range min: artifact=0.8732476012461058 ledger=0.873
+  ok  1d: range max: artifact=1.2223270842332614 ledger=1.222
+  ok  1d: seeds with >1 sign change: artifact=0.0 ledger=0.0
+  ok  1d: 50 seeds per a: artifact=50.0 ledger=50.0
+V4 first-order coefficient (math_note_v2 s8)
+  ok  switch_krawczyk_ok: artifact=1.0 ledger=1.0
+  ok  active_set_unique: artifact=1.0 ledger=1.0
+  ok  vertex_krawczyk_ok: artifact=1.0 ledger=1.0
+  ok  other_pieces_dominated: artifact=1.0 ledger=1.0
+  ok  strict_local_max: artifact=1.0 ledger=1.0
+  ok  vertex_in_bnb_enclosure: artifact=1.0 ledger=1.0
+  ok  c1 lo: artifact=0.2852299861201777 ledger=0.28523
+  ok  c1 hi: artifact=0.2852302997512185 ledger=0.2852303
+  ok  A'/A* lo: artifact=0.662154709395519 ledger=0.6621547
+  ok  k1: artifact=-0.3769247232753412 ledger=-0.37692472
+  ok  A* (Krawczyk): artifact=0.6854452375756535 ledger=0.68544523757565
+  ok  R_glob^inf sharp lo: artifact=0.19859263779939 ledger=0.1985926
+  ok  corner: pieces: artifact=400.0 ledger=400.0
+  ok  corner: eps range: artifact=0.1 ledger=0.1
+  ok  corner: all certified (Krawczyk, active set, strict max): artifact=1.0 ledger=1.0
+  ok  corner: min barycentric weight: artifact=0.0043399470893497 ledger=0.00434
+  ok  corner free check: fixed value inside free enclosure, all: artifact=1.0 ledger=1.0
+  ok  corner free check: kept cells within 3e-6: artifact=1.0 ledger=1.0
+  ok  corner tracking: eps values: artifact=79.0 ledger=79.0
+  ok  corner tracking: one active set throughout: artifact=1.0 ledger=1.0
+  ok  corner tracking: min outer inactive margin: artifact=0.9649752957495502 ledger=0.97
+  ok  corner vertex = B&B sup at all checked eps: artifact=1.0 ledger=1.0
+  ok  decomposition a=1.60: excess: artifact=-0.0378566666202562 ledger=-0.038
+  ok  decomposition a=1.60: product term: artifact=-0.0601354112171976 ledger=-0.06
+  ok  decomposition a=1.60: A higher order: artifact=-0.0369788435935987 ledger=-0.037
+  ok  decomposition a=1.60: K higher order: artifact=0.05925758819054 ledger=0.059
+  ok  switch active pair unchanged: artifact=1.0 ledger=1.0
+V4 own-seed thresholds (S3)
+  ok  S3 a=1.30: excess: artifact=0.0573770491803278 ledger=0.0574
+  ok  S3 a=1.30: S3a: artifact=1.0 ledger=1.0
+  ok  S3 a=1.30: rho: artifact=0.8768262772042666 ledger=0.877
+  ok  S3 a=1.30: offset vs own: artifact=0.0308202601508781 ledger=0.0308
+  ok  S3 a=1.30: offset vs pop: artifact=0.091609195448931 ledger=0.0916
+  ok  S3 a=1.30: verdict: artifact=1.0 ledger=1.0
+  ok  S3 a=1.50: excess: artifact=0.0555555555555555 ledger=0.0556
+  ok  S3 a=1.50: S3a: artifact=0.0 ledger=0.0
+  ok  S3 a=1.50: rho: artifact=0.8805823592093852 ledger=0.881
+  ok  S3 a=1.50: offset vs own: artifact=0.0639698043413252 ledger=0.064
+  ok  S3 a=1.50: offset vs pop: artifact=0.1189398744349707 ledger=0.1189
+  ok  S3 a=1.50: verdict: artifact=0.0 ledger=0.0
+  ok  S1 own-rule agreement: artifact=0.8939226519337017 ledger=0.8939
+  ok  S1 pop-rule agreement: artifact=0.7602209944751381 ledger=0.7602
+  ok  S1 n replays: artifact=2715.0 ledger=2715.0
+  ok  S1 verdict: artifact=0.0 ledger=0.0
+  ok  S2 x50 64k: artifact=1.0453947368421053 ledger=1.0454
+  ok  S2 median own/pop: artifact=1.0359394703656997 ledger=1.0359
+  ok  S2 verdict: artifact=1.0 ledger=1.0
+  ok  Q1 preserved: artifact=0.0 ledger=0.0
+  ok  Q2 preserved: artifact=0.0 ledger=0.0
+  ok  competing outcome preserved: artifact=1.0 ledger=1.0
+  ok  horizon x50_4k: artifact=1.0457964601769911 ledger=1.0458
+  ok  horizon x50_16k: artifact=1.045 ledger=1.045
+  ok  horizon x50_64k: artifact=1.0453947368421053 ledger=1.0454
+  ok  frac 0.9 at 64k: artifact=0.0147329650092081 ledger=0.0147
+  ok  frac 0.95 at 64k: artifact=0.0939226519337016 ledger=0.0939
+  ok  amended reproduction check: artifact=1.0 ledger=1.0
+  ok  0.9x endpoints: seven, all placed at 64k: artifact=1.0 ledger=1.0
+  ok  0.9x endpoints: strict local minima: artifact=1.0 ledger=1.0
+  ok  0.9x endpoints: global minimum in G<=0: artifact=1.0 ledger=1.0
+  ok  0.9x endpoints: loss gap min: artifact=0.0081889040264301 ledger=0.008
+  ok  0.9x endpoints: loss gap max: artifact=0.0639636058320068 ledger=0.064
+  ok  0.9x endpoints: mirror (opposite w1 sign): artifact=1.0 ledger=1.0
+  ok  0.9x endpoints: barrier = log 2: artifact=0.6931451633454924 ledger=0.693147
+  ok  mirror: on-global agreement: artifact=0.9928469241773964 ledger=0.9928
+  ok  mirror: on-global disagreements: artifact=15.0 ledger=15.0
+  ok  mirror: on-mirror replays: artifact=618.0 ledger=618.0
+  ok  mirror: on-mirror agreement: artifact=0.558252427184466 ledger=0.5583
+  ok  mirror: placed below own at 0.9/0.95 all on mirror: artifact=1.0 ledger=1.0
+  ok  census preferred: 15 disagreements: artifact=15.0 ledger=15.0
+  ok  census preferred: no third basin: artifact=0.0 ledger=0.0
+  ok  census preferred: plateau cases: artifact=8.0 ledger=8.0
+  ok  census preferred: non-plateau within 0.35% of own threshold: artifact=1.0 ledger=1.0
+  ok  size test a=1.3: N1: artifact=1.0 ledger=1.0
+  ok  size test a=1.3: N2: artifact=0.0 ledger=0.0
+  ok  size test a=1.3: N3: artifact=0.0 ledger=0.0
+  ok  size test a=1.3: competing: artifact=1.0 ledger=1.0
+  ok  size test a=1.5: N1: artifact=1.0 ledger=1.0
+  ok  size test a=1.5: N2: artifact=1.0 ledger=1.0
+  ok  size test a=1.5: N3: artifact=0.0 ledger=0.0
+  ok  size test a=1.5: competing: artifact=0.0 ledger=0.0
+  ok  size test 1.3/400: own excess: artifact=0.042244640605296 ledger=0.0422
+  ok  size test 1.3/400: free offset: artifact=0.0706079644141755 ledger=0.0706
+  ok  size test 1.3/6400: own excess: artifact=0.011979823455233 ledger=0.012
+  ok  size test 1.3/6400: free offset: artifact=0.0421472787023153 ledger=0.0421
+  ok  size test 1.5/400: own excess: artifact=0.0444444444444442 ledger=0.0444
+  ok  size test 1.5/400: free offset: artifact=0.1062000439181078 ledger=0.1062
+  ok  size test 1.5/6400: own excess: artifact=0.011111111111111 ledger=0.0111
+  ok  size test 1.5/6400: free offset: artifact=0.0747911573814197 ledger=0.0748
+  ok  size test: certified contradictions: artifact=0.0 ledger=0.0
+  ok  mirror: init match B45: artifact=0.4971751412429379 ledger=0.4972
+  ok  mirror: pooled init match: artifact=0.5138339920948617 ledger=0.5138
+  ok  mirror S1: starting-branch agreement: artifact=0.9941068139963168 ledger=0.9941
+  ok  mirror S1: init-branch agreement: artifact=0.7443830570902394 ledger=0.7444
+  ok  mirror S1: replays end on starting branch: artifact=1.0 ledger=1.0
+  ok  mirror S3 1.30: crossing-branch rho: artifact=0.99742819401394 ledger=0.9974
+  ok  mirror S3 1.50: crossing-branch residual: artifact=0.0625340039536272 ledger=0.0625
+  ok  mirror S3 1.30: init-branch rho: artifact=0.1296711716117189 ledger=0.1297
+  ok  mirror gap median: artifact=0.106280193236715 ledger=0.1063
+  ok  mirror gap exceeds distance: artifact=281.0 ledger=281.0
+  ok  mirror gap vs n 1.3/400: artifact=0.0971635485817742 ledger=0.0972
+  ok  mirror gap vs n 1.3/6400: artifact=0.0365541171606614 ledger=0.0366
+  ok  mirror gap vs n 1.5/400: artifact=0.0992909188713383 ledger=0.0993
+  ok  mirror gap vs n 1.5/6400: artifact=0.036452220130661 ledger=0.0365
+  ok  lag a=1.3: L1: artifact=1.0 ledger=1.0
+  ok  lag a=1.3: L2: artifact=0.0 ledger=0.0
+  ok  lag a=1.3: competing: artifact=0.0 ledger=0.0
+  ok  lag a=1.5: L1: artifact=1.0 ledger=1.0
+  ok  lag a=1.5: L2: artifact=0.0 ledger=0.0
+  ok  lag a=1.5: competing: artifact=0.0 ledger=0.0
+  ok  lag residual 1.3/0.25: artifact=0.0047314235115121 ledger=0.00473
+  ok  lag residual 1.3/1.0: artifact=0.0310530517860225 ledger=0.03105
+  ok  lag residual 1.5/0.25: artifact=0.0106895977517869 ledger=0.01069
+  ok  lag residual 1.5/1.0: artifact=0.0655941636033743 ledger=0.06559
+  ok  lag confound: plateau steps 1.30/0.25: artifact=1308.5 ledger=1308.5
+  ok  lag diag: dist 1.30/0.25: artifact=0.0012573531775252 ledger=0.001257
+  ok  own validation: agreement (registered): artifact=0.65 ledger=0.65
+  ok  own validation at 1e-11: consistent: artifact=6.0 ledger=6.0
+V4 Block 2 (math note checks)
+  ok  B(24): artifact=0.3879735830867899 ledger=0.38797358
+  ok  B_full: artifact=0.4773856262211096 ledger=0.47738563
+  ok  uniform branch loss sup on [0.66, 0.72]: artifact=0.3768942002519616 ledger=0.3768942
+  ok  uniform margin vs B(24): artifact=0.0110793828348284 ledger=0.0111
+  ok  uniform margin vs B_full: artifact=0.100491425969148 ledger=0.1005
+  ok  wider range [0.60, 0.76] not certified: artifact=0.0 ledger=0.0
+  ok  wider range overshoot: artifact=-0.0032479160703897 ledger=-0.0032
+  ok  U: Hessian PD on all sub-boxes: artifact=1.0 ledger=1.0
+  ok  U: lambda_min lower bound: artifact=0.0473459104529066 ledger=0.0473
+  ok  U: S_U: artifact=4.856874844129166 ledger=4.857
+  ok  Taylor constant M0: artifact=5.216999949824911 ledger=5.217
+  ok  Taylor constant M1: artifact=13.507279275172383 ledger=13.507
+  ok  Taylor constant M2: artifact=16.37526212522245 ledger=16.375
+  ok  Taylor constant M3: artifact=13.384347457055725 ledger=13.384
+  ok  A* bracket lower: artifact=0.6812499999999999 ledger=0.68125
+  ok  A* bracket upper: artifact=0.6875 ledger=0.6875
+  ok  rounding: max |float - interval| <= 1.2e-16: artifact=1.0 ledger=1.0
+  ok  H2': all validated (b, PD, unique active set): artifact=1.0 ledger=1.0
+  ok  H2': dG/dA min: artifact=1.666435924395437 ledger=1.666
+  ok  H2': dG/dA max: artifact=1.7045769969537414 ledger=1.705
+  ok  H2': lambda_min lower: artifact=0.1470069631867066 ledger=0.147
+  ok  solve limit: sign fails then solves: artifact=1.0 ledger=1.0
+  ok  solve limit: A_solve lo: artifact=1.05875 ledger=1.05875
+  ok  solve limit: A_solve hi: artifact=1.06 ledger=1.06
+  ok  solve limit: dmargin/dA min: artifact=0.5324260721958063 ledger=0.532
+  ok  solve limit: dmargin/dA max: artifact=0.5357649560781426 ledger=0.536
+  ok  solve limit: lambda_min: artifact=0.1369133348935407 ledger=0.1369
+  ok  certv2 annulus: covered, all certified, PD and b validated: artifact=1.0 ledger=1.0
+  ok  certv2 annulus: min outer margin: artifact=0.0001002366442341 ledger=0.0001
+  ok  certv2 annulus: min ring gradient bound: artifact=0.0032786344759717 ledger=0.00328
+  ok  certv2 annulus: max branch upper < B(24): artifact=0.3580445932238794 ledger=0.358045
+  ok  certv2 solve: covered, all certified, PD and b validated: artifact=1.0 ledger=1.0
+  ok  certv2 solve: min outer margin: artifact=0.0001475931769911 ledger=0.000148
+  ok  certv2 solve: min ring gradient bound: artifact=0.0084666179603771 ledger=0.00847
+  ok  certv2 solve: max branch upper < B(24): artifact=0.2811660341796915 ledger=0.281166
+  ok  c1 test: registered verdict INCONCLUSIVE: artifact=1.0 ledger=1.0
+  ok  c1 test: feasible lo: artifact=0.22521299568830147 ledger=0.22521
+  ok  c1 test: feasible hi: artifact=0.3301972796842516 ledger=0.3302
+  ok  c1 test: all four competing values excluded: artifact=1.0 ledger=1.0
+  ok  c1 test: k1 component PASS: artifact=1.0 ledger=1.0
+  ok  c1 test: k1 feasible width: artifact=0.0012985424315036798 ledger=0.0013
+  ok  c1 supplementary: feasible lo: artifact=0.2845957216374172 ledger=0.284596
+  ok  c1 supplementary: feasible hi: artifact=0.2858950355987757 ledger=0.285895
+  ok  c1 supplementary: all certified, prediction inside: artifact=1.0 ledger=1.0
+  ok  c1 test: Ghat converged at all four a: artifact=1.0 ledger=1.0
+  ok  prospective own: all 16 registered comparisons pass (primary + sensitivity): artifact=1.0 ledger=1.0
+  ok  prospective own P1 a=1.3 stat: artifact=-0.06962774809550945 ledger=-0.0696
+  ok  prospective own P1 a=1.3 lo: artifact=-0.08519249919523392 ledger=-0.0852
+  ok  prospective own P1 a=1.3 hi: artifact=-0.05652097384446599 ledger=-0.0565
+  ok  prospective own P2a a=1.3 stat: artifact=-0.013628095674493614 ledger=-0.0136
+  ok  prospective own P2a a=1.3 lo: artifact=-0.025608602043777188 ledger=-0.0256
+  ok  prospective own P2a a=1.3 hi: artifact=-0.0016393349671368837 ledger=-0.0016
+  ok  prospective own P3 a=1.3 stat: artifact=-0.044753369468768414 ledger=-0.0448
+  ok  prospective own P3 a=1.3 lo: artifact=-0.055274547827573656 ledger=-0.0553
+  ok  prospective own P3 a=1.3 hi: artifact=-0.033366146713059486 ledger=-0.0334
+  ok  prospective own P1 a=1.5 stat: artifact=-0.06950518629956245 ledger=-0.0695
+  ok  prospective own P1 a=1.5 lo: artifact=-0.08638686601945116 ledger=-0.0864
+  ok  prospective own P1 a=1.5 hi: artifact=-0.056168483292016284 ledger=-0.0562
+  ok  prospective own P2b a=1.5 stat: artifact=0.022622841692239427 ledger=0.0226
+  ok  prospective own P2b a=1.5 lo: artifact=0.009139329763366975 ledger=0.0091
+  ok  prospective own P2b a=1.5 hi: artifact=0.03625195569943464 ledger=0.0363
+  ok  prospective own P3 a=1.5 stat: artifact=-0.031809604419663406 ledger=-0.0318
+  ok  prospective own P3 a=1.5 lo: artifact=-0.043564429761974666 ledger=-0.0436
+  ok  prospective own P3 a=1.5 hi: artifact=-0.01959619597198617 ledger=-0.0196
+  ok  prospective own P4 a=1.3: artifact=0.04187084544725583 ledger=0.0419
+  ok  prospective own P4 a=1.5: artifact=0.08667418748315588 ledger=0.0867
+  ok  prospective own validation: 0 contradictions of 48: artifact=1.0 ledger=1.0
+  ok  S-early match 1.30: artifact=0.8695652173913043 ledger=0.8696
+  ok  S-early match 1.50: artifact=0.8782608695652174 ledger=0.8783
+  ok  S-early all expectations consistent: artifact=1.0 ledger=1.0
+  ok  prospective own non-crossers per a: artifact=20.0 ledger=20.0
+  ok  lag2 primary: L1' fails at both a: artifact=1.0 ledger=1.0
+  ok  lag2 primary: L2' fails at both a: artifact=1.0 ledger=1.0
+  ok  lag2 primary: competing (no dependence) not met: artifact=1.0 ledger=1.0
+  ok  lag2 primary: all verdict cells sufficient: artifact=1.0 ledger=1.0
+  ok  lag2 primary ratio 0.25 a=1.3: artifact=0.8936793017613073 ledger=0.894
+  ok  lag2 primary ratio 0.25 a=1.5: artifact=0.8589194841605255 ledger=0.859
+  ok  lag2 primary ratio 0.5 a=1.3: artifact=0.973914101417786 ledger=0.974
+  ok  lag2 primary ratio 0.5 a=1.5: artifact=0.958279203195934 ledger=0.958
+  ok  lag2 primary residual a=1.3 phi=0.25: artifact=0.0277514696376903 ledger=0.0278
+  ok  lag2 primary residual a=1.3 phi=1.0: artifact=0.0310530517860225 ledger=0.0311
+  ok  lag2 primary residual a=1.5 phi=0.25: artifact=0.0563401051661514 ledger=0.0563
+  ok  lag2 primary residual a=1.5 phi=1.0: artifact=0.0655941636033743 ledger=0.0656
+  ok  lag2 tstar residual a=1.3 phi=0.25: artifact=0.0071072157301235 ledger=0.0071
+  ok  lag2 tstar residual a=1.5 phi=0.25: artifact=0.0163828299668764 ledger=0.0164
+  ok  lag2 primary: no plateau re-entry in any cell: artifact=0.0 ledger=0.0
+  ok  lag2: 192 phi=1 continuations: artifact=192.0 ledger=192.0
+  ok  per-window A*: 9 windows, all converged, ends certified minus/plus: artifact=1.0 ledger=1.0
+  ok  per-window A*: localised windows: artifact=7.0 ledger=7.0
+  ok  per-window A*: G1, G4 not localised: artifact=1.0 ledger=1.0
+  ok  per-window A*: H10 flagged (unresolved stop): artifact=1.0 ledger=1.0
+  ok  per-window A*: base A* bracket contains sharp A*: artifact=1.0 ledger=1.0
+  ok  per-window R_inf lo base: artifact=0.1981014456767059 ledger=0.1981
+  ok  per-window R_inf hi base: artifact=0.1990203626360764 ledger=0.199
+  ok  per-window R_inf lo G2_narrow_gap: artifact=0.1230074720018913 ledger=0.123
+  ok  per-window R_inf hi G2_narrow_gap: artifact=0.1232362578725424 ledger=0.1232
+  ok  per-window R_inf lo H10: artifact=0.1863848423318433 ledger=0.1864
+  ok  per-window R_inf hi H10: artifact=0.1875221861726257 ledger=0.1875
+  ok  per-window R_inf lo H65: artifact=0.1989477192777542 ledger=0.1989
+  ok  per-window R_inf hi H65: artifact=0.2001924016175957 ledger=0.2002
+V4 patch (WRITER_INPUTS_v4_patch.md)
+  ok  WP-1: 16 settings + 2 per-a rows: artifact=18.0 ledger=18.0
+  ok  WP-1: mean U_own - U reproduces registered P1 at a=1.3: artifact=-0.0696277480955095 ledger=-0.06962774809550945
+  ok  WP-1: mean C_own - C reproduces registered P3 at a=1.3: artifact=-0.04475336946876839 ledger=-0.044753369468768414
+  ok  WP-1: mean U_own - U reproduces registered P1 at a=1.5: artifact=-0.0695051862995624 ledger=-0.06950518629956245
+  ok  WP-1: mean C_own - C reproduces registered P3 at a=1.5: artifact=-0.0318096044196635 ledger=-0.031809604419663406
+  ok  WP-1: crossers per a: artifact=920.0 ledger=920.0
+  ok  WP-2: 4 H + 8 V windows: artifact=12.0 ledger=12.0
+  ok  WP-3: loss > log 2 at and beyond W at every certified bracket end: artifact=1.0 ledger=1.0
+  ok  WP-3: 24 bracket ends checked: artifact=24.0 ledger=24.0
+  ok  WP-3: min loss at/beyond W: artifact=4.337109749406809 ledger=4.337
+  ok  WP-3: W at a=1.30 glob lo: artifact=2.907710007189527 ledger=2.9077
+  ok  WP-4: by-block rows sum to 278: artifact=278.0 ledger=278.0
+  ok  WP-4: by-file rows sum to 278: artifact=278.0 ledger=278.0
+  ok  width-2 verdict listed as a registered decision rule, not a prediction: artifact=1.0 ledger=1.0
+  ok  WP-5: 7 figures, all <= 5.5 in wide: artifact=1.0 ledger=1.0
+  ok  WP-5: tallest figure height: artifact=3.123 ledger=3.123
+Block 4b (registered: residual_mechanism_design.md)
+  ok  4b: every validity check passed: artifact=1.0 ledger=1.0
+  ok  4b a=1.3: verdict competing (neither removes half): artifact=1.0 ledger=1.0
+  ok  4b a=1.5: verdict competing (neither removes half): artifact=1.0 ledger=1.0
+  ok  4b a=1.3 control residual: artifact=0.0310530517860224 ledger=0.031053
+  ok  4b a=1.3 teleport residual: artifact=0.0307872432482699 ledger=0.030787
+  ok  4b a=1.5 reset residual: artifact=0.0672189009094192 ledger=0.067219
+  ok  4b a=1.3 teleport+reset residual: artifact=0.0312223526359702 ledger=0.031222
+  ok  4b a=1.5 teleport+reset residual: artifact=0.0660116650135517 ledger=0.066012
+Crossing-detection audit (POST HOC: crossing_audit.md)
+  ok  audit: every rerun reproduced bit for bit (160): artifact=1.0 ledger=1.0
+  ok  audit: phase 2b stored runs located (228): artifact=228.0 ledger=228.0
+  ok  audit phase 2b a=1.3 median_residual_check: artifact=0.0313001358767782 ledger=0.0313
+  ok  audit phase 2b a=1.3 median_residual_interp_check: artifact=0.0310909195814265 ledger=0.0311
+  ok  audit phase 2b a=1.5 median_residual_check: artifact=0.0660602082848682 ledger=0.0661
+  ok  audit phase 2b a=1.5 median_residual_interp_check: artifact=0.0657611673878323 ledger=0.0658
+  ok  audit phase 2b a=1.6 growth_over_interval_rel_max: artifact=0.0044355330965561 ledger=0.0044
+  ok  audit size test a=1.3 median_residual_check: artifact=0.0315650845494337 ledger=0.0316
+  ok  audit size test a=1.3 median_residual_interp_check: artifact=0.0311047838744389 ledger=0.0311
+  ok  audit size test a=1.5 median_residual_check: artifact=0.0667856643930159 ledger=0.0668
+  ok  audit size test a=1.5 median_residual_interp_check: artifact=0.0659385767447811 ledger=0.0659
+  ok  audit size test a=1.3 growth_one_step_rel_median: artifact=0.0005813111682732 ledger=0.00058
+  ok  audit size test a=1.5 growth_one_step_rel_median: artifact=0.0014860931869048 ledger=0.00149
+  ok  audit Block G base a=1.3 growth_over_interval_rel_median: artifact=0.0239971540749072 ledger=0.024
+  ok  audit Block G base a=1.5 growth_over_interval_rel_median: artifact=0.0490738682851991 ledger=0.0491
+  ok  audit Block G base a=1.3 median_shift_check_minus_interp_check: artifact=0.0138023198038642 ledger=0.0138
+  ok  audit Block G base a=1.5 median_shift_check_minus_interp_check: artifact=0.0191315827687187 ledger=0.0191
+  ok  audit Block 3 a=1.3 median_residual_check: artifact=0.0857988570516764 ledger=0.0858
+  ok  audit Block 3 a=1.3 median_residual_interp_check: artifact=0.074581025632254 ledger=0.0746
+  ok  audit Block 3 a=1.5 median_residual_check: artifact=0.1304318900922105 ledger=0.1304
+  ok  audit Block 3 a=1.5 median_residual_interp_check: artifact=0.1168978896411917 ledger=0.1169
+  ok  audit Block 3 a=1.5 growth_over_interval_rel_max: artifact=0.2110617205300056 ledger=0.2111
+  ok  audit Block 3 a=1.5 max_shift_check_minus_interp_check: artifact=0.162833439285509 ledger=0.1628
+  ok  audit prospective own-seed a=1.3 median_residual_check: artifact=0.0430159076171862 ledger=0.043
+  ok  audit prospective own-seed a=1.3 median_residual_interp_check: artifact=0.0296711191060776 ledger=0.0297
+  ok  audit prospective own-seed a=1.5 median_residual_check: artifact=0.0800900776404394 ledger=0.0801
+  ok  audit prospective own-seed a=1.5 median_residual_interp_check: artifact=0.061836413536305 ledger=0.0618
+Scale limits, tanh (registered: scale_limits_tanh_prediction.md)
+  ok  tanh: registered outcome 'neither': artifact=1.0 ledger=1.0
+  ok  tanh: validation passed at every A: artifact=1.0 ledger=1.0
+  ok  tanh: box maxima < 1 and rising: artifact=1.0 ledger=1.0
+  ok  tanh: boundary condition fails only at A = 40: artifact=1.0 ledger=1.0
+  ok  tanh: min max|alpha|/A at A = 40: artifact=0.9908317637737568 ledger=0.9908
+  ok  tanh: 1 - max at A = 40: artifact=4.0962803149469096e-09 ledger=4.1e-09
+  ok  tanh: selected (pair) G+ at A = 5.0: artifact=0.7615939333459172 ledger=0.7616
+  ok  tanh: selected (pair) G+ at A = 10.0: artifact=0.96402755434038 ledger=0.964
+  ok  tanh: selected (pair) G+ at A = 20.0: artifact=0.9993292992891156 ledger=0.99933
+  ok  tanh: selected (pair) G+ at A = 40.0: artifact=0.9999997749295498 ledger=0.9999998
+  ok  tanh: selected member is the symmetric pair at every A: artifact=1.0 ledger=1.0
+  ok  tanh: single units unplaced at every A: artifact=1.0 ledger=1.0
+  ok  tanh: A = 40 near-maximisers off the boundary: artifact=9.0 ledger=9.0
+  ok  tanh: A = 40 tie-set size: artifact=1107.0 ledger=1107.0
+WP-6: 50-step rerun and cadence sensitivity (POST HOC)
+  ok  full rerun: replays: artifact=1998.0 ledger=1998.0
+  ok  full rerun: every replay reproduced: artifact=1.0 ledger=1.0
+  ok  own-seed residual a=1.3 check: artifact=0.0411683168027297 ledger=0.0412
+  ok  own-seed residual a=1.3 interp: artifact=0.0290706051961993 ledger=0.0291
+  ok  own-seed residual a=1.5 check: artifact=0.0878370229335874 ledger=0.0878
+  ok  own-seed residual a=1.5 interp: artifact=0.0621737313951564 ledger=0.0622
+  ok  Block 3 residual vs U a=1.3 check: artifact=0.0875833465698572 ledger=0.0876
+  ok  Block 3 residual vs U a=1.3 interp: artifact=0.0732306393061925 ledger=0.0732
+  ok  Block 3 residual vs U a=1.5 check: artifact=0.1420509214782059 ledger=0.1421
+  ok  Block 3 residual vs U a=1.5 interp: artifact=0.1154317489034704 ledger=0.1154
+  ok  lambda a=1.3 check: artifact=1.1148657085990012 ledger=1.1149
+  ok  lambda a=1.3 interp: artifact=1.0978848539542865 ledger=1.0979
+  ok  lambda a=1.5 check: artifact=1.1644021378607483 ledger=1.1644
+  ok  lambda a=1.5 interp: artifact=1.1297586708540857 ledger=1.1298
+  ok  B2 check: artifact=0.2280329273471252 ledger=0.228
+  ok  B2 interp: artifact=0.2260362786864853 ledger=0.226
+  ok  P2b a=1.50 check interval above 0: artifact=1.0 ledger=1.0
+  ok  P2b a=1.50 interp interval includes 0: artifact=1.0 ledger=1.0
+  ok  every own-seed criterion passes both ways: artifact=1.0 ledger=1.0
+  ok  Block 3 cadence-matched: every comparison excludes 0: artifact=1.0 ledger=1.0
+  ok  Block 3 registered preds: C - B2 upper interp: artifact=0.0052961752643403 ledger=0.0053
+WP-7: Ghat enclosures and G* best lower bound
+  ok  G* best lower above Ghat_cert at nine a: artifact=9.0 ledger=9.0
+  ok  G* best lower - Ghat_cert, max relative: artifact=8.357080140640824e-05 ledger=8.36e-05
+  ok  G* best lower - Ghat_cert, max relative at a = 1.10: artifact=1.1 ledger=1.1
+  ok  G* best lower - Ghat_cert, absolute at a = 1.10: artifact=1.4768590952014826e-06 ledger=1.48e-06
+  ok  G* best lower - Ghat_cert, max absolute: artifact=7.089258260317699e-06 ledger=7.09e-06
+  ok  G* best lower - Ghat_cert, max absolute at a = 1.60: artifact=1.6 ledger=1.6
+  ok  G* best lower - Ghat_cert, relative at a = 1.60: artifact=3.1597663904537936e-05 ledger=3.16e-05
+WP-8: unplaced region at small scale
+  ok  single-unit gap within 0.1-2% of prediction: artifact=1.0 ledger=1.0
+  ok  lowest unplaced local minimum is a single unit at every scale: artifact=1.0 ledger=1.0
+  ok  its G+ range lo: artifact=-3.654602377308377 ledger=-3.65
+  ok  its G+ range hi: artifact=-3.337364106046211 ledger=-3.34
+  ok  boundary drop within 0.2-3% of prediction: artifact=1.0 ledger=1.0
+  ok  all best-unplaced on the boundary: artifact=1.0 ledger=1.0
+  ok  |c| min: artifact=0.433568981391098 ledger=0.43
+  ok  |c| max: artifact=0.5125863113280602 ledger=0.51
+  ok  min margin at R2 = 0.001: artifact=9.921359334086333e-08 ledger=9.9e-08
+WP-9/10 inputs
+  ok  width 1: G range lo (a = 1.30): artifact=-3.6616244677823646 ledger=-3.662
+  ok  width 1: G range hi (a = 1.60): artifact=-3.349143562408436 ledger=-3.349
+  ok  4a a=1.3 displacement rho (post hoc): artifact=0.6753148067737734 ledger=0.675
+  ok  4a a=1.5 displacement rho (post hoc): artifact=0.6680416847590099 ledger=0.668
+  ok  4a a=1.3 sqrt vhat(w2) rho (post hoc): artifact=-0.4662396873643074 ledger=-0.466
+  ok  4a a=1.5 sqrt vhat(w2) rho (post hoc): artifact=-0.4802431610942249 ledger=-0.48
+  ok  direct check: every landed scale placed, cancelling pair: artifact=1.0 ledger=1.0
+  ok  direct check: no finished restart below the retained minimiser (landed scales): artifact=1.0 ledger=1.0
+K domain lemma (math note s8)
+  ok  K domain: identity max relative error: artifact=1.4230502156393245e-12 ledger=1.4e-12
+  ok  K domain: G0 <= 0 on the excluded region (u > 0 max): artifact=-0.001192818666666 ledger=-0.00119
+  ok  K domain: excluded points checked: artifact=4035775.0 ledger=4035775.0
+  ok  K domain: region inside the certified box: artifact=1.0 ledger=1.0
+  ok  K domain: K argmax inside the region: artifact=1.0 ledger=1.0
+W0 scan coverage (never registered)
+  ok  W0 a=1.50: 9 grid points completed: artifact=9.0 ledger=9.0
+  ok  W0 a=1.50: R2 = 0.02..0.10: artifact=1.0 ledger=1.0
+  ok  W0 a=1.50: placed and audit passed at every point: artifact=1.0 ledger=1.0
+  ok  W0 a=1.50: none validated: artifact=1.0 ledger=1.0
+  ok  W0 a=1.30: no point completed: artifact=0.0 ledger=0.0
+Direct check (complete)
+  ok  direct check: 8 scales: artifact=8.0 ledger=8.0
+  ok  direct check: placed and the cancelling pair at all 8: artifact=1.0 ledger=1.0
+  ok  direct check: every validation passed at all 8: artifact=1.0 ledger=1.0
+  ok  direct check: min G+ at a = 1.30: artifact=0.8894736056836365 ledger=0.8895
+  ok  direct check: min G+ at a = 1.50: artifact=1.0263364446340466 ledger=1.0263
+Block 2: limit-switch status checks
+  ok  limit check A_lo passes: artifact=1.0 ledger=1.0
+  ok  limit check A_hi passes: artifact=1.0 ledger=1.0
+  ok  limit check A_lo losing leaves: artifact=72075.0 ledger=72075.0
+  ok  limit check A_hi losing leaves: artifact=69102.0 ledger=69102.0
+Block 2: finite-a certificates, independent checker
+  ok  Block 2: 12 finite-a certificates pass: artifact=1.0 ledger=1.0
+Block 2: Ghat enclosure certificates (certificate_audit.md)
+  ok  Ghat certificates checked (a = 1.02-3.0): artifact=13.0 ledger=13.0
+  ok  Ghat: structure passes at every a (hashes, tiling, domain, Ghat_cert <= hi): artifact=1.0 ledger=1.0
+  ok  Ghat: max |published - rigorous| endpoint discrepancy <= 1.1e-15 (a >= 1.05; a = 1.02 <= 1.4e-16): artifact=1.0 ledger=1.0
+  ok  Ghat(1.05) leaves: artifact=18041202.0 ledger=18041202.0
+Scale limits (registered: scale_limits_prediction.md)
+  ok  alpha*: artifact=1.7913244396241543 ledger=1.7913244
+  ok  width 1: selected dmu-maximiser G <= 0 at all six a: artifact=1.0 ledger=1.0
+  ok  width 2: validation (ladder, independent, pair attains max, pair Var minimal): artifact=1.0 ledger=1.0
+  ok  width 2: selected G at a=1.30: artifact=0.8896102874451803 ledger=0.8896
+  ok  width 2: selected G at a=1.50: artifact=1.0264734085905922 ledger=1.0265
+  ok  verdict: no placement threshold for f_a at width 2: artifact=1.0 ledger=1.0
+  ok  certv2 annulus: 40 sub-intervals over [0.66, 0.71]: artifact=40.0 ledger=40.0
+  ok  certv2 solve: PD lambda_min: artifact=0.0208517042825712 ledger=0.0209
+  ok  solve finite: 12 bracket ends: artifact=12.0 ledger=12.0
+  ok  solve finite: fails at lower ends: artifact=1.0 ledger=1.0
+  ok  solve finite: solves at upper ends: artifact=1.0 ledger=1.0
+  ok  solve finite: b validated: artifact=1.0 ledger=1.0
+V4 Block 3 (prospective)
+  ok  C - B1 mean: artifact=-0.2572935964742627 ledger=-0.257
+  ok  C - B1 ci lo: artifact=-0.3704173469970752 ledger=-0.37
+  ok  C - B1 ci hi: artifact=-0.1311636151791475 ledger=-0.131
+  ok  C - B2 mean: artifact=-0.0549835824564511 ledger=-0.055
+  ok  C - B2 ci lo: artifact=-0.102681916218885 ledger=-0.103
+  ok  C - B2 ci hi: artifact=-0.010476685014828 ledger=-0.01
+  ok  C - U mean: artifact=-0.0857743962886273 ledger=-0.086
+  ok  C - U ci lo: artifact=-0.111090024794726 ledger=-0.111
+  ok  C - U ci hi: artifact=-0.0629935237670406 ledger=-0.063
+  ok  secondary: C - B3 (MAE of placed fraction) mean: artifact=-0.0441666666666666 ledger=-0.044
+  ok  secondary: C - B3 (MAE of placed fraction) ci lo: artifact=-0.0681944444444444 ledger=-0.068
+  ok  secondary: C - B3 (MAE of placed fraction) ci hi: artifact=-0.0181232638888889 ledger=-0.018
+  ok  C max abs log error: artifact=0.0365751343935467 ledger=0.037
+  ok  crossed min: artifact=86.0 ledger=86.0
+  ok  crossed max: artifact=88.0 ledger=88.0
+  ok  U inside registered range: artifact=7.0 ledger=7.0
+  ok  U under-predicts everywhere: artifact=1.0 ledger=1.0
+  ok  U log(obs/U) min: artifact=0.0767284215039196 ledger=0.077
+  ok  U log(obs/U) max: artifact=0.1509158961386875 ledger=0.151
+  ok  C over-predicts everywhere: artifact=1.0 ledger=1.0
+  ok  lambda(1.30): artifact=1.1148657085990012 ledger=1.115
+  ok  lambda(1.50): artifact=1.1644021378607483 ledger=1.164
+  ok  C mean signed log error: artifact=0.022348233317429005 ledger=0.022
+  ok  window bootstrap C - B1 lo: artifact=-0.413762487892199 ledger=-0.414
+  ok  window bootstrap C - B1 hi: artifact=-0.069339840591976 ledger=-0.069
+  ok  window bootstrap C - B2 lo: artifact=-0.0983577189732 ledger=-0.098
+  ok  window bootstrap C - B2 hi: artifact=-0.0116094459397021 ledger=-0.012
+  ok  signed error setting-level lo: artifact=0.0145482395642182 ledger=0.0145
+  ok  signed error setting-level hi: artifact=0.0294547922104358 ledger=0.0295
+V4 Block 4 (fixed scale)
+  ok  replays: artifact=8688.0 ledger=8688.0
+  ok  decisions preserved, all: artifact=1.0 ledger=1.0
+  ok  k = 1 check max diff: artifact=0.0 ledger=0.0
+  ok  checkpoints: artifact=543.0 ledger=543.0
+  ok  fraction at 0.6: artifact=0.0 ledger=0.0
+  ok  fraction at 0.8: artifact=0.0 ledger=0.0
+  ok  fraction at 0.9: artifact=0.012891344383057 ledger=0.013
+  ok  fraction at 1.0: artifact=0.3093922651933701 ledger=0.309
+  ok  fraction at 1.1: artifact=0.6998158379373849 ledger=0.7
+  ok  fraction at 1.25: artifact=0.9668508287292816 ledger=0.967
+  ok  fraction at 1.5: artifact=0.988950276243094 ledger=0.989
+  ok  fraction at 2.0: artifact=0.988950276243094 ledger=0.989
+  ok  x50 preserved: artifact=1.0488207547169812 ledger=1.049
+  ok  monotone violations, both variants: artifact=0.0 ledger=0.0
+  ok  D1 pass, both: artifact=1.0 ledger=1.0
+  ok  D2 pass, any: artifact=0.0 ledger=0.0
+V4 Block 5 (fixed scale)
+  ok  replays: artifact=2832.0 ledger=2832.0
+  ok  decisions preserved, all: artifact=1.0 ledger=1.0
+  ok  k = 1 check max diff: artifact=0.0 ledger=0.0
+  ok  checkpoints: artifact=177.0 ledger=177.0
+  ok  fraction at 0.6: artifact=0.0 ledger=0.0
+  ok  fraction at 0.8: artifact=0.0 ledger=0.0
+  ok  fraction at 0.9: artifact=0.0169491525423728 ledger=0.017
+  ok  fraction at 1.0: artifact=0.2033898305084746 ledger=0.203
+  ok  fraction at 1.1: artifact=0.6440677966101694 ledger=0.644
+  ok  fraction at 1.25: artifact=0.9661016949152542 ledger=0.966
+  ok  fraction at 1.5: artifact=1.0 ledger=1.0
+  ok  fraction at 2.0: artifact=1.0 ledger=1.0
+  ok  x50 preserved: artifact=1.0673076923076923 ledger=1.067
+  ok  monotone violations, both variants: artifact=0.0 ledger=0.0
+  ok  x50 reset: artifact=1.068125 ledger=1.068
+  ok  location in [0.9, 1.1], both: artifact=1.0 ledger=1.0
+  ok  width 10-90: artifact=0.2746650717703349 ledger=0.27
+  ok  split widths min: artifact=0.2596825396825397 ledger=0.26
+  ok  split widths max: artifact=0.2832738095238094 ledger=0.28
+  ok  split x50 range: artifact=0.03025210084033625 ledger=0.03
+V4 exploratory: critical slowing (post hoc)
+  ok  predicted offset at 1.30 (%): artifact=1.0768974149925723 ledger=1.08
+  ok  observed offset at 1.30 (%): artifact=9.593688206407602 ledger=9.59
+WP-12 mechanism (A1)
+  ok  A1 identity: max abs err, data points: artifact=1.0 ledger=1.0
+  ok  A1 identity: max abs err, continuous windows: artifact=1.0 ledger=1.0
+  ok  A1 alpha* (data): artifact=1.7913244396241543 ledger=1.7913244
+  ok  A1 alpha* (continuous): artifact=1.792291661591741 ledger=1.7922917
+  ok  A1 |D*| (data): artifact=1.571067292044562 ledger=1.571067
+  ok  A1 1.4 alpha*: artifact=2.5078542154738157 ledger=2.50785
+  ok  A1 s0(1.30): artifact=0.3421175471806649 ledger=0.342
+  ok  A1 s0(1.50): artifact=0.274423826780514 ledger=0.274
+  ok  A1 s1_data(1.30): artifact=163.78577798875048 ledger=163.8
+  ok  A1 s1_data(1.50): artifact=80.52621056777807 ledger=80.5
+  ok  A1 R1 = log(n/log 2): artifact=7.0511246482495915 ledger=7.05
+  ok  A1 every certified bracket inside [s0, s1]: artifact=1.0 ledger=1.0
+  ok  A1 G at theta* (1.30): artifact=-3.661624598408883 ledger=-3.66
+  ok  A1 G at theta* (1.50): artifact=-3.4533040087875375 ledger=-3.45
+  ok  A1 bound check at s0 (1.30): L*(theta*) below placed lower bound: artifact=1.0 ledger=1.0
+  ok  A1 window s1 defined for a >= 1.05: artifact=1.0 ledger=1.0
+WP-12 scaling and Adam (A2)
+  ok  A2 w2 first order (1.02): artifact=245.55083971926388 ledger=245.6
+  ok  A2 w2 limit (1.02): artifact=242.34148781088408 ledger=242.3
+  ok  A2 w2 limit, A* lower end (1.02): artifact=240.8582473416674 ledger=240.9
+  ok  A2 first order vs certified, max rel: artifact=0.0271841193444943 ledger=0.027
+  ok  A2 first order vs certified, min rel: artifact=0.0088550763947121 ledger=0.009
+  ok  A2 N_min at 1.02: artifact=3966.0 ledger=3966.0
+  ok  A2 N at lr per step, 1.02: artifact=24456.0 ledger=24456.0
+  ok  A2 B_inf: artifact=7.270291799999695 ledger=7.2703
+  ok  A2 reachable |w2| at 2000 steps: artifact=106.92684484100027 ledger=106.93
+  ok  A2 max B_t over 2000 steps: artifact=6.760980778417591 ledger=6.76
+  ok  A2 bound attained (t = 400): artifact=1.0 ledger=1.0
+  ok  A2 a=1.02: runs: artifact=200.0 ledger=200.0
+  ok  A2 a=1.02: solved: artifact=0.0 ledger=0.0
+  ok  A2 a=1.02: median terminal |w2|: artifact=1.8538510203361511 ledger=1.85
+  ok  A2 a=1.02: max terminal |w2|: artifact=3.916680812835694 ledger=3.92
+  ok  A2 worst-case a_min at 2000: artifact=1.0350428927144637 ledger=1.035
+  ok  A2 lr-rate a_min at 2000: artifact=1.1069023045115225 ledger=1.107
+  ok  A2 worst-case a_min at 128000: artifact=1.0017643738218691 ledger=1.0018
+WP-14 census by relevance (A4)
+  ok  A4 FAIL registered central: artifact=31.0 ledger=31.0
+  ok  A4 FAIL registered peripheral: artifact=35.0 ledger=35.0
+  ok  A4 FAIL post hoc central: artifact=2.0 ledger=2.0
+  ok  A4 FAIL post hoc peripheral: artifact=4.0 ledger=4.0
+  ok  A4 PASS registered central: artifact=88.0 ledger=88.0
+  ok  A4 PASS registered peripheral: artifact=47.0 ledger=47.0
+  ok  A4 PARTIAL registered central: artifact=1.0 ledger=1.0
+  ok  A4 UNRESOLVED registered central: artifact=22.0 ledger=22.0
+  ok  A4 rows: artifact=278.0 ledger=278.0
+Track 4 (SGD own thresholds, registered)
+  ok  Track 4 G1 a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 G2 a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 crossed a=1.30: artifact=30.0 ledger=30.0
+  ok  Track 4 G1 a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 G2 a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 crossed a=1.50: artifact=30.0 ledger=30.0
+  ok  Track 4 G1 lo a=1.30: artifact=-0.0737665320445972 ledger=-0.0738
+  ok  Track 4 G1 hi a=1.30: artifact=-0.0171695839653442 ledger=-0.0172
+  ok  Track 4 G1 lo a=1.50: artifact=-0.0726691044778104 ledger=-0.0727
+  ok  Track 4 G1 hi a=1.50: artifact=-0.0148299944617771 ledger=-0.0148
+  ok  Track 4 G1 mean a=1.30: artifact=-0.0458976046684687 ledger=-0.0459
+  ok  Track 4 G1 mean a=1.50: artifact=-0.0438667219573897 ledger=-0.0439
+  ok  Track 4 Spearman a=1.30: artifact=0.6738622830108527 ledger=0.674
+  ok  Track 4 Spearman a=1.50: artifact=0.684029043030212 ledger=0.684
+  ok  Track 4 residual vs own a=1.30: artifact=2.95180460143398 ledger=2.95
+  ok  Track 4 residual vs own a=1.50: artifact=6.433223976164371 ledger=6.43
+  ok  Track 4 residual vs pop a=1.30: artifact=9.44680692196691 ledger=9.45
+  ok  Track 4 residual vs pop a=1.50: artifact=12.743307081613661 ledger=12.74
+  ok  Track 4 EXT a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 EXT a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 EXT pred a=1.30: artifact=0.0251335314998299 ledger=0.0251
+  ok  Track 4 EXT pred a=1.50: artifact=0.0530296008967976 ledger=0.053
+  ok  Track 4 EXT obs a=1.30: artifact=0.0295180460143398 ledger=0.0295
+  ok  Track 4 EXT obs a=1.50: artifact=0.0643322397616437 ledger=0.0643
+  ok  Track 4 EXT tol a=1.50: artifact=0.0132574002241994 ledger=0.0133
+  ok  Track 4 SGD replays reproduce: artifact=1.0 ledger=1.0
+  ok  Track 4 budget: artifact=32000.0 ledger=32000.0
+  ok  Track 4 sens G1 a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 sens G2 a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 sens EXT a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 4 sens G1 a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 sens G2 a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 sens EXT a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 4 sens noncrosser final/own a=1.30: artifact=0.1512442447733992 ledger=0.15
+  ok  Track 4 sens noncrosser final/own a=1.50: artifact=0.2964245721853885 ledger=0.3
+  ok  Track 4 sens Spearman a=1.30: artifact=0.5016653424919602 ledger=0.502
+  ok  Track 4 sens Spearman a=1.50: artifact=0.5067330072024776 ledger=0.507
+Track 2 (asymmetric windows, registered)
+  ok  Track 2 T2-1 PASS: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-2 PASS: artifact=1.0 ledger=1.0
+  ok  Track 2 s_lo: artifact=0.43714448126110894 ledger=0.4371
+  ok  Track 2 s_hi: artifact=0.4531583637600818 ledger=0.4532
+  ok  Track 2 T2-3 FAIL: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-3 frac above: artifact=93.67088607594937 ledger=93.7
+  ok  Track 2 T2-3 median ratio: artifact=3.287386127697415 ledger=3.29
+  ok  Track 2 T2-3 CI lo: artifact=1.893704394551889 ledger=1.89
+  ok  Track 2 T2-3 CI hi: artifact=2.5631255832693918 ledger=2.56
+  ok  Track 2 T2-3 crossed: artifact=79.0 ledger=79.0
+  ok  Track 2 T2-3 placed at init: artifact=1.0 ledger=1.0
+  ok  Track 2 validation both ends: artifact=1.0 ledger=1.0
+  ok  Track 2 posthoc replays reproduce: artifact=1.0 ledger=1.0
+  ok  Track 2 posthoc single-unit at crossing: artifact=0.0 ledger=0.0
+  ok  Track 2 posthoc pair at crossing: artifact=76.0 ledger=76.0
+  ok  Track 2 posthoc single branch switch lo: artifact=4.869675251658631 ledger=4.87
+  ok  Track 2 posthoc single branch switch hi: artifact=5.623413251903491 ledger=5.62
+  ok  Track 2 posthoc width-1 threshold: artifact=5.0936752167801345 ledger=5.09
+  ok  Track 2 posthoc frac below single branch: artifact=97.46835443037975 ledger=97.5
+  ok  Track 2 posthoc median branch switch: artifact=0.439096921177498 ledger=0.439
+  ok  Track 2 posthoc branch minus glob hi: artifact=0.014961628575129157 ledger=0.015
+  ok  Track 2 posthoc Spearman branch: artifact=0.2959934802040065 ledger=0.3
+  ok  Track 2 posthoc median crossing: artifact=1.437062703497252 ledger=1.44
+  ok  Track 2 T2-3b UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-3b phi2: artifact=0.00930572040929699 ledger=0.009306
+  ok  Track 2 T2-3b median ratio at crossing: artifact=6.8187242931004255e-06 ledger=6.8e-06
+  ok  Track 2 T2-3b frac above: artifact=56.33802816901409 ledger=56.3
+  ok  Track 2 T2-3b median crossing ratio: artifact=10.438131255437893 ledger=10.4
+  ok  Track 2 T2-3c UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-3c phi2: artifact=0.01778279410038923 ledger=0.01778
+  ok  Track 2 T2-3c median ratio at crossing: artifact=1.3197951155564757e-05 ledger=1.32e-05
+  ok  Track 2 T2-3c frac above: artifact=47.0 ledger=47.0
+  ok  Track 2 T2-3c median crossing ratio: artifact=10.843424663455647 ledger=10.8
+  ok  Track 2 expl own median: artifact=0.44536749464083475 ledger=0.445
+  ok  Track 2 expl cross over own: artifact=4.111427960851363 ledger=4.11
+  ok  Track 2 expl Spearman own: artifact=-0.7439162686493072 ledger=-0.74
+  ok  Track 2 expl ratio median: artifact=2.72969995589355 ledger=2.73
+  ok  Track 2 expl ratio Spearman within: artifact=-0.23870865976129133 ledger=-0.24
+Track 7 (no-gating, registered)
+  ok  Track 7 no-gating FAIL a=1.30: artifact=1.0 ledger=1.0
+  ok  Track 7 no-gating FAIL a=1.50: artifact=1.0 ledger=1.0
+  ok  Track 7 placed 0.003 a=1.30: artifact=0.4625 ledger=0.4625
+  ok  Track 7 placed 0.003 a=1.50: artifact=0.4625 ledger=0.4625
+  ok  Track 7 placed 0.1 a=1.30: artifact=0.9875 ledger=0.9875
+  ok  Track 7 placed 0.1 a=1.50: artifact=0.975 ledger=0.975
+  ok  Track 7 positive control: artifact=0.0 ledger=0.0
+  ok  Track 7 H: artifact=16000.0 ledger=16000.0
+Task B (timescale prospective test, registered)
+  ok  Task B TS-1 a=1.45: artifact=1.0 ledger=1.0
+  ok  Task B TS-2 a=1.45: artifact=1.0 ledger=1.0
+  ok  Task B TS-1 a=1.60: artifact=1.0 ledger=1.0
+  ok  Task B TS-2 a=1.60: artifact=1.0 ledger=1.0
+  ok  Task B pred a=1.45: artifact=0.0456231050851075 ledger=0.0456
+  ok  Task B obs a=1.45: artifact=0.053241618109256 ledger=0.0532
+  ok  Task B pred a=1.60: artifact=0.081805606516249 ledger=0.0818
+  ok  Task B obs a=1.60: artifact=0.0808758976288116 ledger=0.0809
+  ok  Task B crossed: artifact=160.0 ledger=160.0
+  ok  Task B own thresholds frozen: artifact=160.0 ledger=160.0
+Task C (mechanism figure)
+  ok  Task C w1 at smallest a=1.30: artifact=1.751088335787397 ledger=1.751
+  ok  Task C crossings below bound: artifact=1.0 ledger=1.0
+  ok  Task C figure audit: artifact=1.0 ledger=1.0
+Item 1 (timescale consistency, post hoc)
+  ok  Item 1 arms within tolerance: artifact=28.0 ledger=28.0
+  ok  Item 1 misses are the phi=0.25 arms: artifact=1.0 ledger=1.0
+  ok  Item 1 within-a slope a=1.30: artifact=4.689824006786448 ledger=4.69
+  ok  Item 1 within-a slope a=1.50: artifact=3.0904282677694512 ledger=3.09
+  ok  Item 1 partial Spearman: artifact=0.5052328481531605 ledger=0.51
+  ok  Item 1 replays reproduce: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-3d FAIL: artifact=1.0 ledger=1.0
+  ok  Track 2 T2-3d median err: artifact=0.019227810157313556 ledger=0.019
+  ok  Track 2 T2-3d diff hi: artifact=0.006424760167217728 ledger=0.0064
+  ok  Track 2 T2-3d bimodal: artifact=31.0 ledger=31.0
+Block 4b correction and state audit
+  ok  Block 4b corrected ID FAIL: artifact=1.0 ledger=1.0
+  ok  Block 4b corrected OM FAIL: artifact=1.0 ledger=1.0
+  ok  State audit clean arms: artifact=256.0 ledger=256.0
+  ok  State audit positive control: artifact=1.0 ledger=1.0
+Item 2 (width-2 diagnosis, post hoc)
+  ok  Item 2 gate STOP: artifact=1.0 ledger=1.0
+  ok  Item 2 selected P5: artifact=1.0 ledger=1.0
+  ok  Item 2 P5 T2-3 error: artifact=1.170547591475091 ledger=1.17
+  ok  Item 2 P3 T2-3b error: artifact=0.0152557088398601 ledger=0.015
+  ok  Item 2 P3 T2-3c error: artifact=0.0107802693611573 ledger=0.011
+Track 3 (residual timescale, post hoc)
+  ok  Track 3 Spearman pooled: artifact=0.6340201247838323 ledger=0.634
+  ok  Track 3 Spearman CI lo: artifact=0.5417300417961157 ledger=0.542
+  ok  Track 3 Spearman CI hi: artifact=0.7208598962942014 ledger=0.721
+  ok  Track 3 Spearman within a=1.30: artifact=0.4542546048883705 ledger=0.454
+  ok  Track 3 Spearman within a=1.50: artifact=0.5073769769145214 ledger=0.507
+  ok  Track 3 runs: artifact=384.0 ledger=384.0
+  ok  Track 3 replays reproduce: artifact=1.0 ledger=1.0
+  ok  Track 3 fit alpha: artifact=0.015717781678334056 ledger=0.0157
+  ok  Track 3 fit beta: artifact=2.6584244574981573 ledger=2.658
+Track 6 (stronger baselines, post hoc)
+  ok  Track 6 reproduction checks: artifact=1.0 ledger=1.0
+  ok  Track 6 C mean abs log err: artifact=0.022348233317428787 ledger=0.0223
+  ok  Track 6 PL mean abs log err: artifact=0.023062702933104896 ledger=0.0231
+  ok  Track 6 PL5 mean abs log err: artifact=0.0274081186348999 ledger=0.0274
+  ok  Track 6 RK mean abs log err: artifact=0.10985131857322403 ledger=0.1099
+  ok  Track 6 RG mean abs log err: artifact=0.10467786607484952 ledger=0.1047
+  ok  Track 6 C - PL lo: artifact=-0.0088051038418157 ledger=-0.0088
+  ok  Track 6 C - PL hi: artifact=0.0073761646104635 ledger=0.0074
+  ok  Track 6 C - RK hi: artifact=-0.0746205991752054 ledger=-0.0746
+Track 5 (independent certificate checks)
+  ok  Track 5 K check passes (published hi): artifact=1.0 ledger=1.0
+  ok  Track 5 K check passes (tight hi): artifact=1.0 ledger=1.0
+  ok  Track 5 c1_krawczyk passes: artifact=1.0 ledger=1.0
+  ok  Track 5 pd_glob_neighbourhood passes: artifact=1.0 ledger=1.0
+  ok  Track 5 pd_solve_neighbourhood passes: artifact=1.0 ledger=1.0
+  ok  Track 5 ring_glob_annulus passes: artifact=1.0 ledger=1.0
+  ok  Track 5 ring_solve_annulus passes: artifact=1.0 ledger=1.0
+  ok  Track 5 Krawczyk A* lo: artifact=0.6854452375756532 ledger=0.68544523757565
+  ok  Track 5 Krawczyk A1/A lo: artifact=0.6621547824344876 ledger=0.6621548
+  ok  Track 5 ring glob boxes: artifact=21600.0 ledger=21600.0
+Track 1A (lag law, no refit)
+  ok  1A arms within tolerance: artifact=36.0 ledger=36.0
+  ok  1A arms: artifact=36.0 ledger=36.0
+  ok  1A slope/kappa a=1.30: artifact=0.8907969260119675 ledger=0.89
+  ok  1A slope/kappa a=1.45: artifact=0.8318349724693388 ledger=0.83
+  ok  1A slope/kappa a=1.50: artifact=0.914944475413474 ledger=0.91
+  ok  1A slope/kappa a=1.60: artifact=0.8176428365543659 ledger=0.82
+  ok  1A kappa_Adam a=1.30: artifact=7.610543288947747 ledger=7.61
+  ok  1A kappa_Adam a=1.45: artifact=4.587957720370811 ledger=4.59
+  ok  1A kappa_Adam a=1.50: artifact=4.046049844154416 ledger=4.05
+  ok  1A kappa_Adam a=1.60: artifact=3.2937168140378037 ledger=3.29
+  ok  1A committed predictions hash: artifact=1.0 ledger=1.0
+  ok  1A predicted runs: artifact=1750.0 ledger=1750.0
+  ok  1A mirror runs: artifact=875.0 ledger=875.0
+  ok  1A low arms are the four early-slowed phi=0.25 arms: artifact=4.0 ledger=4.0
+  ok  1A obs/pred min (other 32 arms): artifact=0.9051987523508552 ledger=0.91
+  ok  1A obs/pred max (other 32 arms): artifact=1.1249776250520578 ledger=1.13
+  ok  1A obs/pred min (four low arms): artifact=0.6962680838124188 ledger=0.7
+  ok  1A obs/pred max (four low arms): artifact=0.7611658168139956 ledger=0.76
+  ok  1A obs/pred min (primary-rule phi=0.25): artifact=1.034620499929664 ledger=1.03
+  ok  1A obs/pred max (primary-rule phi=0.25): artifact=1.0725330026158306 ledger=1.07
+  ok  1A winding check a=1.30 k=0 chi=0.003 predicted: artifact=-0.0223158246589878 ledger=-0.0223
+  ok  1A winding check a=1.30 k=0 chi=0.003 measured: artifact=-0.0214582833752492 ledger=-0.0215
+  ok  1A winding check a=1.30 k=-1 chi=0.003 predicted: artifact=0.0228589452045665 ledger=0.0229
+  ok  1A winding check a=1.30 k=-1 chi=0.003 measured: artifact=0.0236034540691176 ledger=0.0236
+  ok  1A winding check a=1.30 k=1 chi=0.003 predicted: artifact=-0.0674905945225422 ledger=-0.0675
+  ok  1A winding check a=1.30 k=1 chi=0.003 measured: artifact=-0.0607229086353688 ledger=-0.0607
+  ok  1A winding check a=1.50 k=0 chi=0.002 predicted: artifact=0.0081487816723696 ledger=0.0081
+  ok  1A winding check a=1.50 k=0 chi=0.002 measured: artifact=0.0081844820593561 ledger=0.0082
+  ok  1A winding check a=1.50 k=0 chi=0.005 predicted: artifact=0.0203719541809241 ledger=0.0204
+  ok  1A winding check a=1.50 k=0 chi=0.005 measured: artifact=0.0207265899428319 ledger=0.0207
+  ok  1A relaxation steps min: artifact=7.793836015815112 ledger=7.8
+  ok  1A relaxation steps max: artifact=16.16081086639357 ledger=16.2
+Track 1B (ramp, registered) and R4
+  ok  1B registered R1 adam 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered R2 adam 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered R3 adam 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered slope adam 1.30 k=-1: artifact=-7.118507590834304 ledger=-7.12
+  ok  1B crossed adam 1.30 k=-1: artifact=240.0 ledger=240.0
+  ok  1B registered R1 sgd 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered R2 sgd 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered R3 sgd 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B registered slope sgd 1.30 k=-1: artifact=0.7790769626922271 ledger=0.78
+  ok  1B crossed sgd 1.30 k=-1: artifact=240.0 ledger=240.0
+  ok  1B registered R1 adam 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R2 adam 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R3 adam 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered slope adam 1.30 k=0: artifact=9.10283017687785 ledger=9.1
+  ok  1B crossed adam 1.30 k=0: artifact=240.0 ledger=240.0
+  ok  1B registered R1 sgd 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R2 sgd 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R3 sgd 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered slope sgd 1.30 k=0: artifact=1.3003245362333535 ledger=1.3
+  ok  1B crossed sgd 1.30 k=0: artifact=240.0 ledger=240.0
+  ok  1B registered R1 adam 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R2 adam 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R3 adam 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered slope adam 1.50 k=0: artifact=-9.98735041308209 ledger=-9.99
+  ok  1B crossed adam 1.50 k=0: artifact=240.0 ledger=240.0
+  ok  1B registered R1 sgd 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R2 sgd 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered R3 sgd 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B registered slope sgd 1.50 k=0: artifact=-0.1047707019806791 ledger=-0.1
+  ok  1B crossed sgd 1.50 k=0: artifact=240.0 ledger=240.0
+  ok  1B registered R1 SGD 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B slowest median SGD 1.50: artifact=-0.02330870381339928 ledger=-0.0233
+  ok  1B post hoc R1 sgd 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope sgd 1.30 k=-1: artifact=1.2352182161 ledger=1.24
+  ok  1B post hoc R1 sgd 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope sgd 1.30 k=0: artifact=0.8969425814 ledger=0.9
+  ok  1B post hoc R1 sgd 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope sgd 1.50 k=0: artifact=1.1388083787 ledger=1.14
+  ok  1B post hoc R1 adam 1.30 k=-1: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope adam 1.30 k=-1: artifact=0.5205804267 ledger=0.52
+  ok  1B post hoc R1 adam 1.30 k=0: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope adam 1.30 k=0: artifact=1.485370866 ledger=1.49
+  ok  1B post hoc R1 adam 1.50 k=0: artifact=1.0 ledger=1.0
+  ok  1B post hoc slope adam 1.50 k=0: artifact=0.9010434288 ledger=0.9
+  ok  1B post hoc R1 SGD 1.50: artifact=1.0 ledger=1.0
+  ok  1B post hoc SGD ratio 4 slowest min: artifact=0.9886320999999999 ledger=0.99
+  ok  1B post hoc SGD ratio 4 slowest max: artifact=1.061478754918494 ledger=1.06
+  ok  1B post hoc SGD ratio fifth min: artifact=0.9684278382415774 ledger=0.97
+  ok  1B post hoc SGD ratio fifth max: artifact=1.1115004758354379 ledger=1.11
+  ok  1B post hoc SGD ratio fastest min: artifact=0.8748876479999999 ledger=0.87
+  ok  1B post hoc SGD ratio fastest max: artifact=1.2618480049999998 ledger=1.26
+  ok  1B post hoc Adam ratio min (1.3, -1): artifact=0.3511266134540505 ledger=0.35
+  ok  1B post hoc Adam ratio max (1.3, -1): artifact=0.9436567605354566 ledger=0.94
+  ok  1B post hoc Adam ratio min (1.3, 0): artifact=1.3995637857590832 ledger=1.4
+  ok  1B post hoc Adam ratio max (1.3, 0): artifact=1.8548887110103798 ledger=1.85
+  ok  1B post hoc Adam ratio min (1.5, 0): artifact=-0.3945030330004569 ledger=-0.39
+  ok  1B post hoc Adam ratio max (1.5, 0): artifact=0.6709215510453653 ledger=0.67
+  ok  1B branch off own a=1.30: artifact=0.35 ledger=0.35
+  ok  1B branch off own a=1.50: artifact=0.675 ledger=0.675
+  ok  1B Adam contrast v ratio min: artifact=7.748342733390951 ledger=8.0
+  ok  1B Adam contrast v ratio max: artifact=88.14994566644644 ledger=88.0
+  ok  1B Adam contrast ramp relax min: artifact=0.1698104648752146 ledger=0.17
+  ok  1B Adam contrast ramp relax max: artifact=0.190769955763972 ledger=0.19
+  ok  1B Adam contrast free relax min: artifact=7.769069428898475 ledger=7.8
+  ok  1B Adam contrast free relax max: artifact=14.971622629707197 ledger=15.0
+  ok  1B Adam contrast ramp steps min: artifact=238.5 ledger=238.5
+  ok  1B Adam contrast ramp steps max: artifact=623.5 ledger=623.5
+  ok  1B Adam contrast free steps min: artifact=1679.5 ledger=1679.5
+  ok  1B Adam contrast free steps max: artifact=3265.5 ledger=3265.5
+  ok  1B Adam contrast growth ratio min: artifact=2.283295459196057 ledger=2.3
+  ok  1B Adam contrast growth ratio max: artifact=2.695462560001295 ledger=2.7
+  ok  ramp2 no admissible gamma: artifact=-1.0 ledger=-1.0
+  ok  ramp2 slow eta*lambda min: artifact=4.3702553897472125 ledger=4.4
+  ok  ramp2 slow eta*lambda max: artifact=11.53420184960022 ledger=11.5
+  ok  ramp2 fast crossings max: artifact=3.0 ledger=3.0
+  ok  GELU rule earliest crossing: artifact=0.0042587489883689 ledger=0.0043
+  ok  GELU rule runs starting below: artifact=0.0 ledger=0.0
+  ok  GELU rule init median w2: artifact=0.5372717380523682 ledger=0.54
+  ok  GELU rule final at init: artifact=34.0 ledger=34.0
+  ok  GELU rule final at init pct: artifact=25.757575757575758 ledger=26.0
+  ok  GELU rule infeasible: artifact=0.0 ledger=0.0
+  ok  R4 a=1.30: artifact=1.0 ledger=1.0
+  ok  R4 median a=1.30 eta=0.01: artifact=0.02962789685442302 ledger=0.0296
+  ok  R4 crossed a=1.30 eta=0.01: artifact=39.0 ledger=39.0
+  ok  R4 median a=1.30 eta=0.005: artifact=0.030423740510516106 ledger=0.0304
+  ok  R4 crossed a=1.30 eta=0.005: artifact=39.0 ledger=39.0
+  ok  R4 median a=1.30 eta=0.0025: artifact=0.030838532257009943 ledger=0.0308
+  ok  R4 crossed a=1.30 eta=0.0025: artifact=39.0 ledger=39.0
+  ok  R4 a=1.50: artifact=1.0 ledger=1.0
+  ok  R4 median a=1.50 eta=0.01: artifact=0.06190758351450909 ledger=0.0619
+  ok  R4 crossed a=1.50 eta=0.01: artifact=39.0 ledger=39.0
+  ok  R4 median a=1.50 eta=0.005: artifact=0.06252783066295997 ledger=0.0625
+  ok  R4 crossed a=1.50 eta=0.005: artifact=39.0 ledger=39.0
+  ok  R4 median a=1.50 eta=0.0025: artifact=0.06468221756259318 ledger=0.0647
+  ok  R4 crossed a=1.50 eta=0.0025: artifact=39.0 ledger=39.0
+Track 3A (non-sine activations)
+  ok  3A gelu T-a FAIL: artifact=1.0 ledger=1.0
+  ok  3A gelu T-b FAIL: artifact=1.0 ledger=1.0
+  ok  3A gelu primary UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  3A gelu frac at or above s_lo: artifact=0.4772727272727273 ledger=0.477
+  ok  3A gelu T-b obs: artifact=-0.018277605419234 ledger=-0.0183
+  ok  3A gelu T-b pred: artifact=0.0022608873791639 ledger=0.0023
+  ok  3A gelu crossing: artifact=132.0 ledger=132
+  ok  3A gelu never cross: artifact=60.0 ledger=60
+  ok  3A silu T-a FAIL: artifact=1.0 ledger=1.0
+  ok  3A silu T-b FAIL: artifact=1.0 ledger=1.0
+  ok  3A silu primary UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  3A silu frac at or above s_lo: artifact=0.6222222222222222 ledger=0.622
+  ok  3A silu T-b obs: artifact=0.0352560488426529 ledger=0.0353
+  ok  3A silu T-b pred: artifact=-0.0324263179953427 ledger=-0.0324
+  ok  3A silu crossing: artifact=135.0 ledger=135
+  ok  3A silu never cross: artifact=65.0 ledger=65
+  ok  3A mish T-a FAIL: artifact=1.0 ledger=1.0
+  ok  3A mish T-b FAIL: artifact=1.0 ledger=1.0
+  ok  3A mish primary UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  3A mish frac at or above s_lo: artifact=0.7037037037037037 ledger=0.704
+  ok  3A mish T-b obs: artifact=0.065762119976823 ledger=0.0658
+  ok  3A mish T-b pred: artifact=-0.0393268709999612 ledger=-0.0393
+  ok  3A mish crossing: artifact=135.0 ledger=135
+  ok  3A mish never cross: artifact=65.0 ledger=65
+  ok  3A GELU T-a: artifact=1.0 ledger=1.0
+  ok  3A SiLU T-b: artifact=1.0 ledger=1.0
+  ok  3A Mish crossing: artifact=135.0 ledger=135.0
+  ok  3A gelu bracket lo: artifact=6.611690262414816 ledger=6.6117
+  ok  3A gelu bracket hi: artifact=6.671427180413496 ledger=6.6714
+  ok  3A gelu kappa: artifact=0.14728024799375017 ledger=0.1473
+  ok  3A gelu validated both ends: artifact=1.0 ledger=1.0
+  ok  3A silu bracket lo: artifact=3.6190430562520115 ledger=3.619
+  ok  3A silu bracket hi: artifact=3.651741272548377 ledger=3.6517
+  ok  3A silu kappa: artifact=-0.14440281624528617 ledger=-0.1444
+  ok  3A silu validated both ends: artifact=1.0 ledger=1.0
+  ok  3A mish bracket lo: artifact=3.1908489806291085 ledger=3.1908
+  ok  3A mish bracket hi: artifact=3.2196784442513793 ledger=3.2197
+  ok  3A mish kappa: artifact=-0.1538774944249218 ledger=-0.1539
+  ok  3A mish validated both ends: artifact=1.0 ledger=1.0
+  ok  3A GELU bracket lo: artifact=6.611690262414816 ledger=6.6117
+  ok  3A criterion verdicts: artifact=1.0 ledger=1.0
+  ok  3A post hoc sine chi arm-median max: artifact=0.0248597716032564 ledger=0.0249
+  ok  3A post hoc sine chi run max: artifact=0.0637163178704653 ledger=0.064
+  ok  3A post hoc sine chi run min: artifact=0.000102624099267 ledger=0.0001
+  ok  3A post hoc sine chi run q95: artifact=0.021399583284705204 ledger=0.021
+  ok  3A post hoc gelu chi_median: artifact=0.0136622045911807 ledger=0.0137
+  ok  3A post hoc gelu with_branch_switch: artifact=117.0 ledger=117
+  ok  3A post hoc gelu obs_branch_median: artifact=0.0016815949871900049 ledger=0.0017
+  ok  3A post hoc gelu pred_median: artifact=0.0020905208863954265 ledger=0.0021
+  ok  3A post hoc gelu frac_at_or_above_branch: artifact=0.9316239316239316 ledger=0.93
+  ok  3A post hoc gelu n_no_switch_on_branch: artifact=15.0 ledger=15
+  ok  3A post hoc gelu no_switch_s_cross_max: artifact=0.4543893397977507 ledger=0.45
+  ok  3A post hoc gelu branch_over_pop_q10: artifact=0.8791993676752813 ledger=0.88
+  ok  3A post hoc gelu branch_over_pop_q90: artifact=1.1730069336705915 ledger=1.17
+  ok  3A post hoc gelu validity_met: artifact=1.0 ledger=1.0
+  ok  3A post hoc gelu within: artifact=1.0 ledger=1.0
+  ok  3A post hoc silu chi_median: artifact=0.2241715929024881 ledger=0.2242
+  ok  3A post hoc silu with_branch_switch: artifact=134.0 ledger=134
+  ok  3A post hoc silu obs_branch_median: artifact=0.014245838068665861 ledger=0.0142
+  ok  3A post hoc silu pred_median: artifact=-0.03242631799534272 ledger=-0.0324
+  ok  3A post hoc silu validity_met: artifact=0.0 ledger=0.0
+  ok  3A post hoc silu within: artifact=0.0 ledger=0.0
+  ok  3A post hoc silu branch_over_pop_q10: artifact=0.83243221473789 ledger=0.83
+  ok  3A post hoc silu branch_over_pop_q90: artifact=1.1919753031906815 ledger=1.19
+  ok  3A post hoc mish chi_median: artifact=0.2555725978443791 ledger=0.2556
+  ok  3A post hoc mish with_branch_switch: artifact=134.0 ledger=134
+  ok  3A post hoc mish obs_branch_median: artifact=0.03419362921759961 ledger=0.0342
+  ok  3A post hoc mish pred_median: artifact=-0.03932035937501177 ledger=-0.0393
+  ok  3A post hoc mish validity_met: artifact=0.0 ledger=0.0
+  ok  3A post hoc mish within: artifact=0.0 ledger=0.0
+  ok  3A post hoc mish branch_over_pop_q10: artifact=0.837287098341554 ledger=0.84
+  ok  3A post hoc mish branch_over_pop_q90: artifact=1.1998188049257614 ledger=1.2
+  ok  3A post hoc gelu frac chi <= arm max: artifact=0.81 ledger=0.81
+  ok  3A post hoc gelu frac chi <= run max: artifact=0.94 ledger=0.94
+  ok  3A post hoc gelu frac |rb| <= 0.01: artifact=0.96 ledger=0.96
+  ok  3A post hoc silu frac chi <= arm max: artifact=0.01 ledger=0.01
+  ok  3A post hoc silu frac chi <= run max: artifact=0.05 ledger=0.05
+  ok  3A post hoc silu frac |rb| <= 0.01: artifact=0.31 ledger=0.31
+  ok  3A post hoc mish frac chi <= arm max: artifact=0.0 ledger=0.0
+  ok  3A post hoc mish frac chi <= run max: artifact=0.02 ledger=0.02
+  ok  3A post hoc mish frac |rb| <= 0.01: artifact=0.28 ledger=0.28
+  ok  3A gelu Ghat: artifact=0.03754728719027985 ledger=0.037547
+  ok  3A silu Ghat: artifact=0.05091244854677461 ledger=0.050912
+  ok  3A mish Ghat: artifact=0.05477201312967803 ledger=0.054772
+Track 4 (run populations)
+  ok  T4 float32 runs: artifact=2400.0 ledger=2400
+  ok  T4 float32 solved: artifact=430.0 ledger=430
+  ok  T4 float32 placement: artifact=1664.0 ledger=1664
+  ok  T4 float32 bias: artifact=306.0 ledger=306
+  ok  T4 float64 runs: artifact=2400.0 ledger=2400
+  ok  T4 float64 solved: artifact=440.0 ledger=440
+  ok  T4 float64 placement: artifact=1633.0 ledger=1633
+  ok  T4 float64 bias: artifact=327.0 ledger=327
+  ok  T4 pooled runs: artifact=4800.0 ledger=4800
+  ok  T4 pooled solved: artifact=870.0 ledger=870
+  ok  T4 pooled placement: artifact=3297.0 ledger=3297
+  ok  T4 pooled bias: artifact=633.0 ledger=633
+  ok  T4 pooled counts: artifact=4800.0 ledger=4800.0
+  ok  T4 sign agreement: artifact=48.583333333333336 ledger=48.6
+  ok  T4 failure class agreement: artifact=72.83333333333334 ledger=72.8
+  ok  T4 solve agreement: artifact=85.25 ledger=85.25
+  ok  T4 median rel diff w2: artifact=0.44198158211694916 ledger=0.44
+  ok  T4 float32 equals sweep: artifact=1.0 ledger=1.0
+  ok  T4 a=1.02 float32: artifact=0.0 ledger=0.0
+  ok  scoreboard Task B within/total: artifact=202.0 ledger=202.0
+  ok  scoreboard SGD within/total: artifact=202.0 ledger=202.0
+  ok  scoreboard learning rate within/total: artifact=404.0 ledger=404.0
+  ok  scoreboard other activations within/total: artifact=3.0 ledger=3.0
+  ok  scoreboard R^2 within/total: artifact=2.0 ledger=2.0
+  ok  scoreboard own-sample threshold within/total: artifact=202.0 ledger=202.0
+  ok  scoreboard early branch within/total: artifact=202.0 ledger=202.0
+  ok  scoreboard early branch, lag-corrected within/total: artifact=202.0 ledger=202.0
+  ok  scoreboard held-out windows within/total: artifact=708.0 ledger=708.0
+  ok  T4 float32 per-a rows: artifact=12.0 ledger=12.0
+  ok  T4 float32 per-a sums: artifact=431664306.0 ledger=431664306.0
+  ok  T4 float32 200 per a: artifact=1.0 ledger=1.0
+  ok  T4 a=1.02 float32 median w2: artifact=1.8538510203361511 ledger=1.85
+  ok  T4 a=1.02 float32 max w2: artifact=3.916680812835694 ledger=3.92
+  ok  T4 a=1.02 float64 median w2: artifact=1.9151785009612499 ledger=1.92
+  ok  T4 a=1.02 float64 max w2: artifact=3.940096115893667 ledger=3.94
+Track 3B (band task in R^d)
+  ok  3B d=2 a=1.30 crossings: artifact=36.0 ledger=36.0
+  ok  3B d=2 a=1.30 P1: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.30 P1 frac: artifact=0.9722222222222222 ledger=0.972
+  ok  3B d=2 a=1.30 P2a FAIL: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.30 median r_pop: artifact=0.1816714585814323 ledger=0.182
+  ok  3B d=2 a=1.30 P2b FAIL: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.30 r_own: artifact=0.1474054898017944 ledger=0.147
+  ok  3B d=2 a=1.30 pred: artifact=0.0238241951322219 ledger=0.024
+  ok  3B d=4 a=1.30 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  3B d=4 a=1.30 crossings: artifact=29.0 ledger=29.0
+  ok  3B d=2 a=1.50 crossings: artifact=36.0 ledger=36.0
+  ok  3B d=2 a=1.50 P1: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.50 P1 frac: artifact=0.9722222222222222 ledger=0.972
+  ok  3B d=2 a=1.50 P2a FAIL: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.50 median r_pop: artifact=0.206564241295813 ledger=0.207
+  ok  3B d=2 a=1.50 P2b FAIL: artifact=1.0 ledger=1.0
+  ok  3B d=2 a=1.50 r_own: artifact=0.187294032188063 ledger=0.187
+  ok  3B d=2 a=1.50 pred: artifact=0.049048760468208 ledger=0.049
+  ok  3B d=4 a=1.50 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  3B d=4 a=1.50 crossings: artifact=29.0 ledger=29.0
+  ok  3B P1 d=2: artifact=1.0 ledger=1.0
+  ok  3B P2a d=2: artifact=1.0 ledger=1.0
+  ok  3B P2b d=2: artifact=1.0 ledger=1.0
+  ok  3B d=4 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  TA census L3 adam FAIL registered: artifact=1.0 ledger=1.0
+  ok  TA census L3 sgd PASS registered: artifact=1.0 ledger=1.0
+  ok  3B secondary d=2 a=1.30 crossings: artifact=112.0 ledger=112
+  ok  3B secondary d=2 a=1.30 P1 frac: artifact=0.9464285714285714 ledger=0.946
+  ok  3B secondary d=2 a=1.30 median r_pop: artifact=0.1892263349643587 ledger=0.189
+  ok  3B secondary d=2 a=1.50 crossings: artifact=112.0 ledger=112
+  ok  3B secondary d=2 a=1.50 P1 frac: artifact=0.9642857142857144 ledger=0.964
+  ok  3B secondary d=2 a=1.50 median r_pop: artifact=0.225932507468306 ledger=0.226
+  ok  3B secondary d=4 a=1.30 crossings: artifact=90.0 ledger=90
+  ok  3B secondary d=4 a=1.30 P1 frac: artifact=1.0 ledger=1.0
+  ok  3B secondary d=4 a=1.30 median r_pop: artifact=0.527949304819139 ledger=0.528
+  ok  3B secondary d=4 a=1.50 crossings: artifact=93.0 ledger=93
+  ok  3B secondary d=4 a=1.50 P1 frac: artifact=1.0 ledger=1.0
+  ok  3B secondary d=4 a=1.50 median r_pop: artifact=0.5531810115795148 ledger=0.553
+  ok  3B post hoc obs/pred range: artifact=0.8352982502871292 ledger=0.84
+  ok  3B post hoc obs/pred max: artifact=1.1002076770264118 ledger=1.1
+  ok  3B post hoc all within tol: artifact=1.0 ledger=1.0
+  ok  3B post hoc branch/own d=2 min: artifact=1.1180923598906118 ledger=1.118
+  ok  3B post hoc branch/own d=2 max: artifact=1.1201055823820347 ledger=1.12
+  ok  3B post hoc branch/own d=4 min: artifact=1.4013997358223609 ledger=1.401
+  ok  3B post hoc branch/own d=4 max: artifact=1.411625355301101 ledger=1.412
+Track 2 (width 2, post hoc)
+  ok  T2 2B T2-3b n: artifact=53.0 ledger=53
+  ok  T2 2B T2-3b within: artifact=0.660377358490566 ledger=0.66
+  ok  T2 2B T2-3b median obs: artifact=-0.0048592800754084 ledger=-0.0049
+  ok  T2 2B T2-3c n: artifact=54.0 ledger=54
+  ok  T2 2B T2-3c within: artifact=0.8333333333333334 ledger=0.83
+  ok  T2 2B T2-3c median obs: artifact=5.140361166855456e-05 ledger=5e-05
+  ok  T2 2B T2-3d n: artifact=58.0 ledger=58
+  ok  T2 2B T2-3d within: artifact=0.8103448275862069 ledger=0.81
+  ok  T2 2B T2-3d median obs: artifact=-0.0012187996262724 ledger=-0.0012
+  ok  T2 2B slowed within: artifact=0.7696969696969697 ledger=0.77
+  ok  T2 2B slowed n: artifact=165.0 ledger=165.0
+  ok  T2 2B T2-3 three runs obs/pred: artifact=1.0415657933732485 ledger=1.04
+  ok  T2 2B T2-3 three runs n: artifact=3.0 ledger=3.0
+  ok  T2 2B T2-3 three runs dist: artifact=0.0659766350095694 ledger=0.066
+  ok  T2 2B T2-3 chi_c median: artifact=0.9946262629382497 ledger=0.99
+  ok  T2 2B T2-3 chi_c max: artifact=3.0481306909975077 ledger=3.05
+  ok  T2 2B slowed branch defined: artifact=191.0 ledger=191.0
+  ok  T2 2B slowed crossers: artifact=230.0 ledger=230.0
+  ok  T2 2A Morse-Bott: artifact=265.0 ledger=265.0
+  ok  T2 2A strict: artifact=0.0 ledger=0.0
+  ok  T2 2A placed found: artifact=58.0 ledger=58.0
+  ok  T2 2A stuck lowest: artifact=108.0 ledger=108.0
+  ok  T2 2A lowest is placed: artifact=18.0 ledger=18.0
+  ok  T2 2A gap median: artifact=-0.0027298344504964 ledger=-0.0027
+  ok  T2 2A stuck lower: artifact=37.0 ledger=37.0
+  ok  T2 2A tanh saddles: artifact=9.0 ledger=9.0
+  ok  T2 reconcile own loss matched: artifact=265.0 ledger=265.0
+  ok  T2 reconcile compared: artifact=190.0 ledger=190.0
+  ok  T2 reconcile all above population global: artifact=190.0 ledger=190.0
+  ok  T2 reconcile same s and placed: artifact=1.0 ledger=1.0
+  ok  T2 reconcile gap min: artifact=1.0901619691749964e-05 ledger=1.1e-05
+  ok  T2 reconcile gap max: artifact=0.00027916619647927465 ledger=0.00028
+  ok  T2 reconcile gap median: artifact=3.502465258775622e-05 ledger=3.5e-05
+  ok  T2 reconcile not comparable: artifact=75.0 ledger=75.0
+  ok  T2 final gate FAIL: artifact=1.0 ledger=1.0
+  ok  T2 final gate accuracy: artifact=0.8117154811715481 ledger=0.812
+  ok  T2 final gate runs: artifact=239.0 ledger=239.0
+  ok  T2 final gate late median |log err|: artifact=0.01392085316993011 ledger=0.014
+  ok  T2 final gate late n: artifact=174.0 ledger=174.0
+  ok  T2 final gate confusion: artifact=54003042140.0 ledger=54003042140.0
+  ok  T2 final gate correct T2-3b: artifact=66.0 ledger=66.0
+  ok  T2 final gate runs T2-3b: artifact=80.0 ledger=80.0
+  ok  T2 final gate correct T2-3c: artifact=69.0 ledger=69.0
+  ok  T2 final gate runs T2-3c: artifact=80.0 ledger=80.0
+  ok  T2 final gate correct T2-3d: artifact=59.0 ledger=59.0
+  ok  T2 final gate runs T2-3d: artifact=79.0 ledger=79.0
+  ok  T2 2C STOP: artifact=1.0 ledger=1.0
+  ok  T2 2C earliest crossing: artifact=0.0163958288960502 ledger=0.0164
+  ok  T2 2C max available: artifact=0.7782426778242678 ledger=0.778
+  ok  T2 2C max available below earliest: artifact=0.0753138075313807 ledger=0.075
+c1 follow-up (registered)
+  ok  c1 follow-up PASS: artifact=1.0 ledger=1.0
+  ok  c1 follow-up lo: artifact=0.2653108379516405 ledger=0.26531
+  ok  c1 follow-up hi: artifact=0.3068692996638286 ledger=0.30687
+  ok  c1 follow-up width: artifact=0.04155846171218808 ledger=0.0416
+  ok  c1 follow-up contains derived: artifact=1.0 ledger=1.0
+  ok  c1 follow-up added certified: artifact=5.0 ledger=5.0
+  ok  c1 follow-up original n: artifact=4.0 ledger=4.0
+  ok  c1 follow-up independently checked: artifact=10.0 ledger=10.0
+  ok  c1 follow-up not checked: artifact=0.0 ledger=0.0
+  ok  c1 follow-up excluded by checker: artifact=0.0 ledger=0.0
+Linear response (post hoc)
+  ok  LR predictions hash: artifact=1.0 ledger=1.0
+  ok  LR runs: artifact=1750.0 ledger=1750.0
+  ok  LR predicted full 0.7: artifact=1708.0 ledger=1708.0
+  ok  LR diff branch 0.7: artifact=0.0 ledger=0.0
+  ok  LR diff branch 0.5: artifact=0.0 ledger=0.0
+  ok  LR s* off global own > 1%: artifact=0.228 ledger=0.228
+  ok  LR no-momentum unstable (Adam): artifact=1240.0 ledger=1240.0
+  ok  LR full_7 slope a=1.30: artifact=1.0188079849942064 ledger=1.02
+  ok  LR full_7 slope a=1.45: artifact=1.0300742929345768 ledger=1.03
+  ok  LR full_7 slope a=1.50: artifact=1.0374520393885005 ledger=1.04
+  ok  LR full_7 slope a=1.60: artifact=1.0465376624257077 ledger=1.05
+  ok  LR full_5 slope a=1.30: artifact=1.0188438455689472 ledger=1.02
+  ok  LR full_5 slope a=1.45: artifact=1.0300742929345768 ledger=1.03
+  ok  LR full_5 slope a=1.50: artifact=1.03746543688898 ledger=1.04
+  ok  LR full_5 slope a=1.60: artifact=1.0465376624257077 ledger=1.05
+  ok  LR 1A_global_ref slope a=1.30: artifact=0.8907671120501848 ledger=0.89
+  ok  LR 1A_global_ref slope a=1.45: artifact=0.8318349724693387 ledger=0.83
+  ok  LR 1A_global_ref slope a=1.50: artifact=0.9147737931596396 ledger=0.91
+  ok  LR 1A_global_ref slope a=1.60: artifact=0.8176428365543658 ledger=0.82
+  ok  LR kchi_branch_ref slope a=1.30: artifact=1.021317749060387 ledger=1.02
+  ok  LR kchi_branch_ref slope a=1.45: artifact=1.0058458615966173 ledger=1.01
+  ok  LR kchi_branch_ref slope a=1.50: artifact=0.9801001529267592 ledger=0.98
+  ok  LR kchi_branch_ref slope a=1.60: artifact=0.8980334917076309 ledger=0.9
+  ok  LR slaved_own slope a=1.30: artifact=1.0084433914802549 ledger=1.01
+  ok  LR slaved_own slope a=1.45: artifact=0.9879873939280194 ledger=0.99
+  ok  LR slaved_own slope a=1.50: artifact=0.9620104139100254 ledger=0.96
+  ok  LR slaved_own slope a=1.60: artifact=0.8960357118380662 ledger=0.9
+  ok  LR full model ratio: artifact=1.0188079849942064 ledger=1.02
+  ok  LR arm ratio min: artifact=1.000000000000005 ledger=1.0
+  ok  LR arm ratio max: artifact=1.0464643724432905 ledger=1.05
+  ok  LR exact gradient reproduces start 0.7: artifact=1.0 ledger=1.0
+  ok  LR exact gradient reproduces start 0.5: artifact=1.0 ledger=1.0
+Track B (statistics)
+  ok  TB closed form within10 arms: artifact=36.0 ledger=36.0
+  ok  TB closed form runs within10: artifact=88.22857142857143 ledger=88.2
+  ok  TB closed form runs within20: artifact=97.77142857142857 ledger=97.8
+  ok  TB registered ref arms within10: artifact=31.0 ledger=31.0
+  ok  TB registered ref runs within10: artifact=63.65714285714286 ledger=63.7
+  ok  TB registered ref arms within20: artifact=32.0 ledger=32.0
+  ok  TB traj runs within10: artifact=99.88290398126463 ledger=99.9
+  ok  TB traj runs within20: artifact=100.0 ledger=100.0
+  ok  TB collapse low-chi ratio min: artifact=0.6709215486844468 ledger=0.67
+  ok  TB collapse low-chi ratio max: artifact=1.3995637877033256 ledger=1.4
+  ok  TB collapse width2 max: artifact=33.61556871846379 ledger=34.0
+  ok  TB collapse resolved: artifact=102.0 ledger=102.0
+  ok  TB sample size dynamic a=1.30 n=400: artifact=0.029684216386816 ledger=0.0297
+  ok  TB sample size dynamic a=1.30 n=1600: artifact=0.0293091937934154 ledger=0.0293
+  ok  TB sample size dynamic a=1.30 n=6400: artifact=0.0305806599722065 ledger=0.0306
+  ok  TB sample size dynamic a=1.50 n=400: artifact=0.0620365883161632 ledger=0.062
+  ok  TB sample size dynamic a=1.50 n=1600: artifact=0.0618699018917746 ledger=0.0619
+  ok  TB sample size dynamic a=1.50 n=6400: artifact=0.0635325331121529 ledger=0.0635
+  ok  TB kappa inputs rows: artifact=8.0 ledger=8.0
+Theorem 1 hypotheses (checked)
+  ok  D1 attainment: artifact=1.0 ledger=1.0
+  ok  D1 attainment a values: artifact=9.0 ledger=9.0
+  ok  D1 attainment margin min: artifact=0.09835307922425396 ledger=0.098
+  ok  D1 quadratic growth: artifact=1.0 ledger=1.0
+  ok  D1 quadratic growth constant: artifact=2.454033960984327 ledger=2.454
+  ok  D1 continuous alpha*: artifact=1.7922916709499246 ledger=1.7922917
+  ok  D1 alias: artifact=1.0 ledger=1.0
+  ok  D1 remainder: artifact=0.005208390956294668 ledger=0.0052084
+  ok  D1 alias excluded above s: artifact=7.237520644959872e-06 ledger=7.24e-06
+Track T (pilot, exploratory)
+  ok  TT gate FAIL: artifact=1.0 ledger=1.0
+  ok  TT G1: artifact=1.0 ledger=1.0
+  ok  TT G2: artifact=0.0 ledger=0.0
+  ok  TT G3: artifact=0.0 ledger=0.0
+  ok  TT G4: artifact=0.0 ledger=0.0
+  ok  TT switch A: artifact=4.699300733022733 ledger=4.699
+  ok  TT switch B: artifact=4.38874404756076 ledger=4.389
+  ok  TT agreement: artifact=7.076208639566921 ledger=7.1
+  ok  TT ladder fail: artifact=29.0 ledger=29.0
+  ok  TT points: artifact=60.0 ledger=60.0
+  ok  TT hidden weight median: artifact=69160.48542695981 ledger=69000.0
+Track A (registered, a = 1.65)
+  ok  TA predictions hash: artifact=1.0 ledger=1.0
+  ok  TA adam crossings: artifact=76.0 ledger=76.0
+  ok  TA adam valid: artifact=1.0 ledger=1.0
+  ok  TA adam L1: artifact=1.0 ledger=1.0
+  ok  TA adam L1 ratio: artifact=1.0650932556464947 ledger=1.065
+  ok  TA adam L2: artifact=1.0 ledger=1.0
+  ok  TA adam L2 ratio: artifact=1.0454504462626704 ledger=1.045
+  ok  TA adam L3: artifact=1.0 ledger=1.0
+  ok  TA adam L3 spearman: artifact=0.2484561273602369 ledger=0.25
+  ok  TA sgd crossings: artifact=64.0 ledger=64.0
+  ok  TA sgd valid: artifact=1.0 ledger=1.0
+  ok  TA sgd L1: artifact=1.0 ledger=1.0
+  ok  TA sgd L1 ratio: artifact=1.0555267302534392 ledger=1.056
+  ok  TA sgd L2: artifact=1.0 ledger=1.0
+  ok  TA sgd L2 ratio: artifact=1.0237915919988754 ledger=1.024
+  ok  TA sgd L3: artifact=1.0 ledger=1.0
+  ok  TA sgd L3 spearman: artifact=0.9945276497695852 ledger=0.995
+Test 2A (registered, a = 1.85)
+  ok  2A predictions hash: artifact=1.0 ledger=1.0
+  ok  2A s*_pop: artifact=1.2971778846018998 ledger=1.29718
+  ok  2A landscape validated: artifact=1.0 ledger=1.0
+  ok  2A runs: artifact=80.0 ledger=80.0
+  ok  2A crossed: artifact=79.0 ledger=79.0
+  ok  2A t_sw before crossing: artifact=78.0 ledger=78.0
+  ok  2A t_sw before crossing %: artifact=98.73417721518987 ledger=98.7
+  ok  2A scored: artifact=75.0 ledger=75.0
+  ok  2A scored rule not before crossing: artifact=0.0 ledger=0.0
+  ok  2A tsw-before without primary prediction: artifact=3.0 ledger=3.0
+  ok  2A valid: artifact=1.0 ledger=1.0
+  ok  2A unscored crossing run is 1850066: artifact=1.0 ledger=1.0
+  ok  2A A1 spearman: artifact=0.932176386913229 ledger=0.93
+  ok  2A A1 PASS: artifact=1.0 ledger=1.0
+  ok  2A A2 fraction: artifact=0.7733333333333333 ledger=0.773
+  ok  2A A2 %: artifact=77.33333333333333 ledger=77.0
+  ok  2A A2 PASS: artifact=1.0 ledger=1.0
+  ok  2A A3 median ratio: artifact=1.057862422999403 ledger=1.058
+  ok  2A A3 median ratio (2 d.p.): artifact=1.057862422999403 ledger=1.06
+  ok  2A A3 PASS: artifact=1.0 ledger=1.0
+  ok  2A outcome PASS: artifact=1.0 ledger=1.0
+  ok  2A closed form spearman: artifact=0.6312660028449502 ledger=0.63
+  ok  2A closed form within10 fraction: artifact=0.5066666666666667 ledger=0.51
+  ok  2A closed form median ratio: artifact=0.9632874584214729 ledger=0.963
+  ok  2A median r_obs: artifact=0.1360403469053577 ledger=0.136
+  ok  2A median r_pred: artifact=0.1282314345512931 ledger=0.128
+  ok  2A r_obs_q10_q90_scored lo: artifact=0.11064222342035598 ledger=0.111
+  ok  2A r_obs_q10_q90_scored hi: artifact=0.16332741537189302 ledger=0.163
+  ok  2A r_traj_q10_q90_scored lo: artifact=0.09919207406021956 ledger=0.099
+  ok  2A r_traj_q10_q90_scored hi: artifact=0.15740657955124607 ledger=0.157
+  ok  2A ratio q10: artifact=1.0000000000000004 ledger=1.0
+  ok  2A ratio q90: artifact=1.1250170130756383 ledger=1.125
+  ok  2A median steps t_sw to crossing: artifact=56.0 ledger=56.0
+  ok  2A median steps rule to crossing: artifact=221.0 ledger=221.0
+  ok  2A winding rule agrees: artifact=78.0 ledger=78.0
+  ok  2A Track A rule spearman: artifact=0.36409672830725465 ledger=0.36
+  ok  2A Track A rule within10 fraction: artifact=0.17333333333333334 ledger=0.17
+  ok  2A Track A rule median ratio: artifact=1.314334807714979 ledger=1.31
+  ok  2A within 10% count: artifact=58.0 ledger=58.0
+  ok  2A above 1.1: artifact=15.0 ledger=15.0
+  ok  2A below 0.9: artifact=2.0 ledger=2.0
+  ok  2A closed form within10 count: artifact=38.0 ledger=38.0
+  ok  2A Track A rule within10 count: artifact=13.0 ledger=13.0
+  ok  2A non-crossing run is 1850015: artifact=1.0 ledger=1.0
+  ok  2A no-primary seeds: artifact=1.0 ledger=1.0
+  ok  2A branches (runs with s*_run): artifact=78.0 ledger=78.0
+  ok  2A min passing A2 count for 75 scored: artifact=57.0 ledger=57.0
+Test 2B (registered; C1 PASS, C2 UNRESOLVED)
+  ok  2B predictions hash: artifact=1.0 ledger=1.0
+  ok  2B registered hash results/track2b/design.csv: artifact=1.0 ledger=1.0
+  ok  2B registered hash results/track2b/frozen_switches.csv: artifact=1.0 ledger=1.0
+  ok  2B registered hash results/track2b_registration.md: artifact=1.0 ledger=1.0
+  ok  2B C1 PASS: artifact=1.0 ledger=1.0
+  ok  2B C2 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  2B C1 cells invalid: artifact=0.0 ledger=0.0
+  ok  2B C2 cells invalid: artifact=4.0 ledger=4.0
+  ok  2B kx* a=1.30: artifact=0.2 ledger=0.2
+  ok  2B kx* a=1.50: artifact=0.2 ledger=0.2
+  ok  2B runs: artifact=480.0 ledger=480.0
+  ok  2B crossed: artifact=413.0 ledger=413.0
+  ok  2B (1.3, 0.02) crossings: artifact=36.0 ledger=36.0
+  ok  2B (1.3, 0.02) median ratio: artifact=1.0461676869341685 ledger=1.046
+  ok  2B (1.3, 0.02) ratio q25: artifact=1.003246086506418 ledger=1.003
+  ok  2B (1.3, 0.02) ratio q75: artifact=1.104262993977481 ledger=1.104
+  ok  2B (1.3, 0.02) chi_own/target: artifact=1.0061179755852798 ledger=1.006
+  ok  2B (1.3, 0.02) max realised eta*lambda: artifact=0.853126880667466 ledger=0.853
+  ok  2B (1.3, 0.02) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.02) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.3, 0.02) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.02) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.05) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.3, 0.05) median ratio: artifact=1.1019171293982866 ledger=1.102
+  ok  2B (1.3, 0.05) ratio q25: artifact=1.0482445286033093 ledger=1.048
+  ok  2B (1.3, 0.05) ratio q75: artifact=1.2065677206102 ledger=1.207
+  ok  2B (1.3, 0.05) chi_own/target: artifact=1.0070689891454814 ledger=1.007
+  ok  2B (1.3, 0.05) max realised eta*lambda: artifact=0.8887858687636511 ledger=0.889
+  ok  2B (1.3, 0.05) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.05) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.3, 0.05) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.05) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.1) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.3, 0.1) median ratio: artifact=1.2091010966821647 ledger=1.209
+  ok  2B (1.3, 0.1) ratio q25: artifact=1.1455011148128817 ledger=1.146
+  ok  2B (1.3, 0.1) ratio q75: artifact=1.3438033661819127 ledger=1.344
+  ok  2B (1.3, 0.1) chi_own/target: artifact=1.0070689891454814 ledger=1.007
+  ok  2B (1.3, 0.1) max realised eta*lambda: artifact=0.9699364979269041 ledger=0.97
+  ok  2B (1.3, 0.1) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.1) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.3, 0.1) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.1) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.2) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.3, 0.2) median ratio: artifact=1.556995061500031 ledger=1.557
+  ok  2B (1.3, 0.2) ratio q25: artifact=1.4655047296005208 ledger=1.466
+  ok  2B (1.3, 0.2) ratio q75: artifact=1.8049857462060568 ledger=1.805
+  ok  2B (1.3, 0.2) chi_own/target: artifact=1.0070689891454814 ledger=1.007
+  ok  2B (1.3, 0.2) max realised eta*lambda: artifact=1.135230143556677 ledger=1.135
+  ok  2B (1.3, 0.2) runs violating: artifact=21.0 ledger=21.0
+  ok  2B (1.3, 0.2) valid: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.2) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.2) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.3) crossings: artifact=27.0 ledger=27.0
+  ok  2B (1.3, 0.3) median ratio: artifact=2.481769836087998 ledger=2.482
+  ok  2B (1.3, 0.3) ratio q25: artifact=2.184688990019173 ledger=2.185
+  ok  2B (1.3, 0.3) ratio q75: artifact=2.8165686806467916 ledger=2.817
+  ok  2B (1.3, 0.3) chi_own/target: artifact=0.9870408898545917 ledger=0.987
+  ok  2B (1.3, 0.3) max realised eta*lambda: artifact=5.902275656145775 ledger=5.9
+  ok  2B (1.3, 0.3) runs violating: artifact=39.0 ledger=39.0
+  ok  2B (1.3, 0.3) valid: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.3) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.3) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.4) crossings: artifact=33.0 ledger=33.0
+  ok  2B (1.3, 0.4) median ratio: artifact=5.100690273186588 ledger=5.101
+  ok  2B (1.3, 0.4) ratio q25: artifact=4.74848484530497 ledger=4.748
+  ok  2B (1.3, 0.4) ratio q75: artifact=5.4915446226806575 ledger=5.492
+  ok  2B (1.3, 0.4) chi_own/target: artifact=1.0034963313379806 ledger=1.003
+  ok  2B (1.3, 0.4) max realised eta*lambda: artifact=22.25843788601463 ledger=22.3
+  ok  2B (1.3, 0.4) runs violating: artifact=40.0 ledger=40.0
+  ok  2B (1.3, 0.4) valid: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.4) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.3, 0.4) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.02) crossings: artifact=32.0 ledger=32.0
+  ok  2B (1.5, 0.02) median ratio: artifact=0.9903363159918352 ledger=0.99
+  ok  2B (1.5, 0.02) ratio q25: artifact=0.9409471159622677 ledger=0.941
+  ok  2B (1.5, 0.02) ratio q75: artifact=1.050718761038649 ledger=1.051
+  ok  2B (1.5, 0.02) chi_own/target: artifact=0.9853816451812287 ledger=0.985
+  ok  2B (1.5, 0.02) max realised eta*lambda: artifact=0.5726122319449258 ledger=0.573
+  ok  2B (1.5, 0.02) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.02) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.5, 0.02) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.02) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.05) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.5, 0.05) median ratio: artifact=1.0464803338043644 ledger=1.046
+  ok  2B (1.5, 0.05) ratio q25: artifact=0.9839739101812136 ledger=0.984
+  ok  2B (1.5, 0.05) ratio q75: artifact=1.1030542442875086 ledger=1.103
+  ok  2B (1.5, 0.05) chi_own/target: artifact=0.9977462439612853 ledger=0.998
+  ok  2B (1.5, 0.05) max realised eta*lambda: artifact=0.6213717424219154 ledger=0.621
+  ok  2B (1.5, 0.05) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.05) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.5, 0.05) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.05) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.1) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.5, 0.1) median ratio: artifact=1.1393387318746002 ledger=1.139
+  ok  2B (1.5, 0.1) ratio q25: artifact=1.0534775079911403 ledger=1.053
+  ok  2B (1.5, 0.1) ratio q75: artifact=1.2016023957771038 ledger=1.202
+  ok  2B (1.5, 0.1) chi_own/target: artifact=0.9977462439612853 ledger=0.998
+  ok  2B (1.5, 0.1) max realised eta*lambda: artifact=0.6863193071845322 ledger=0.686
+  ok  2B (1.5, 0.1) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.1) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.5, 0.1) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.1) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.2) crossings: artifact=40.0 ledger=40.0
+  ok  2B (1.5, 0.2) median ratio: artifact=1.4096665644684316 ledger=1.41
+  ok  2B (1.5, 0.2) ratio q25: artifact=1.264999742035776 ledger=1.265
+  ok  2B (1.5, 0.2) ratio q75: artifact=1.507765130311952 ledger=1.508
+  ok  2B (1.5, 0.2) chi_own/target: artifact=0.9977462439612853 ledger=0.998
+  ok  2B (1.5, 0.2) max realised eta*lambda: artifact=0.9116670321756366 ledger=0.912
+  ok  2B (1.5, 0.2) runs violating: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.2) valid: artifact=1.0 ledger=1.0
+  ok  2B (1.5, 0.2) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.2) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.3) crossings: artifact=39.0 ledger=39.0
+  ok  2B (1.5, 0.3) median ratio: artifact=1.9754078081093562 ledger=1.975
+  ok  2B (1.5, 0.3) ratio q25: artifact=1.6916399969017522 ledger=1.692
+  ok  2B (1.5, 0.3) ratio q75: artifact=2.2803148578574954 ledger=2.28
+  ok  2B (1.5, 0.3) chi_own/target: artifact=0.9973374347783537 ledger=0.997
+  ok  2B (1.5, 0.3) max realised eta*lambda: artifact=1.9537850712799731 ledger=1.95
+  ok  2B (1.5, 0.3) runs violating: artifact=17.0 ledger=17.0
+  ok  2B (1.5, 0.3) valid: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.3) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.3) winding changed: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.4) crossings: artifact=6.0 ledger=6.0
+  ok  2B (1.5, 0.4) median ratio: artifact=2.676034383262027 ledger=2.676
+  ok  2B (1.5, 0.4) ratio q25: artifact=2.297673784279776 ledger=2.298
+  ok  2B (1.5, 0.4) ratio q75: artifact=3.147144320185994 ledger=3.147
+  ok  2B (1.5, 0.4) chi_own/target: artifact=0.9521978832575141 ledger=0.952
+  ok  2B (1.5, 0.4) max realised eta*lambda: artifact=2.7899271432928305 ledger=2.79
+  ok  2B (1.5, 0.4) runs violating: artifact=40.0 ledger=40.0
+  ok  2B (1.5, 0.4) valid: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.4) placed in held phase: artifact=0.0 ledger=0.0
+  ok  2B (1.5, 0.4) winding changed: artifact=0.0 ledger=0.0
+  ok  2B C2 cells failing V1: artifact=2.0 ledger=2.0
+  ok  2B C2 cells failing V3: artifact=4.0 ledger=4.0
+  ok  2B C1 max realised eta*lambda: artifact=0.9699364979269041 ledger=0.97
+  ok  2B eta_cell = 0.3 cells: artifact=9.0 ledger=9.0
+  ok  2B eta_cell a=1.30 kx=0.2: artifact=0.2766199788244994 ledger=0.2766
+  ok  2B eta_cell a=1.30 kx=0.3: artifact=0.2629657514568374 ledger=0.263
+  ok  2B eta_cell a=1.30 kx=0.4: artifact=0.25777164006418274 ledger=0.2578
+  ok  2B a=1.3 kx=0.02 non-crossers = a-priori ruled-out seeds: artifact=1.0 ledger=1.0
+  ok  2B a=1.3 kx=0.02 ruled out: artifact=4.0 ledger=4.0
+  ok  2B a=1.5 kx=0.02 non-crossers = a-priori ruled-out seeds: artifact=1.0 ledger=1.0
+  ok  2B a=1.5 kx=0.02 ruled out: artifact=8.0 ledger=8.0
+  ok  2B posthoc (1.3, 0.2) s_viol/s_branch: artifact=1.2647083527426923 ledger=1.265
+  ok  2B posthoc (1.3, 0.2) lambda ratio: artifact=1.232560161515959 ledger=1.233
+  ok  2B posthoc (1.3, 0.2) violating step fraction: artifact=0.007434848865787894 ledger=0.007
+  ok  2B posthoc (1.3, 0.2) violations before switch: artifact=0.0 ledger=0.0
+  ok  2B posthoc (1.3, 0.3) s_viol/s_branch: artifact=1.2523094374882822 ledger=1.252
+  ok  2B posthoc (1.3, 0.3) lambda ratio: artifact=1.3197471965569274 ledger=1.32
+  ok  2B posthoc (1.3, 0.3) violating step fraction: artifact=0.060050976538508785 ledger=0.06
+  ok  2B posthoc (1.3, 0.3) violations before switch: artifact=0.0 ledger=0.0
+  ok  2B posthoc (1.3, 0.4) s_viol/s_branch: artifact=1.1984491367788914 ledger=1.198
+  ok  2B posthoc (1.3, 0.4) lambda ratio: artifact=1.380172896835059 ledger=1.38
+  ok  2B posthoc (1.3, 0.4) violating step fraction: artifact=0.0938356304445626 ledger=0.094
+  ok  2B posthoc (1.3, 0.4) violations before switch: artifact=0.0 ledger=0.0
+  ok  2B posthoc (1.5, 0.3) s_viol/s_branch: artifact=1.5278205961095401 ledger=1.528
+  ok  2B posthoc (1.5, 0.3) lambda ratio: artifact=1.5074385017152294 ledger=1.507
+  ok  2B posthoc (1.5, 0.3) violating step fraction: artifact=0.004615604867573371 ledger=0.005
+  ok  2B posthoc (1.5, 0.3) violations before switch: artifact=0.0 ledger=0.0
+  ok  2B posthoc (1.5, 0.4) s_viol/s_branch: artifact=1.534422451188656 ledger=1.534
+  ok  2B posthoc (1.5, 0.4) lambda ratio: artifact=1.5580972457230602 ledger=1.558
+  ok  2B posthoc (1.5, 0.4) violating step fraction: artifact=0.03633544063796431 ledger=0.036
+  ok  2B posthoc (1.5, 0.4) violations before switch: artifact=0.0 ledger=0.0
+  ok  2B posthoc violating runs: artifact=157.0 ledger=157.0
+Test 2C (registered; PASS at a = 1.50, UNRESOLVED (V3) at a = 1.30)
+  ok  2C predictions hash: artifact=1.0 ledger=1.0
+  ok  2C seed-cells: artifact=240.0 ledger=240.0
+  ok  2C s_own,d validated: artifact=240.0 ledger=240.0
+  ok  2C x1-only thresholds defined: artifact=120.0 ledger=120.0
+  ok  2C d=2 a=1.3 median s_own,d/s_own,x1: artifact=1.0748455664943792 ledger=1.075
+  ok  2C d=2 a=1.3 other mirror within 5%: artifact=23.0 ledger=23.0
+  ok  2C d=2 a=1.5 median s_own,d/s_own,x1: artifact=1.078005848424385 ledger=1.078
+  ok  2C d=2 a=1.5 other mirror within 5%: artifact=21.0 ledger=21.0
+  ok  2C d=4 a=1.3 median s_own,d/s_own,x1: artifact=1.3593624237097688 ledger=1.359
+  ok  2C d=4 a=1.3 other mirror within 5%: artifact=14.0 ledger=14.0
+  ok  2C d=4 a=1.5 median s_own,d/s_own,x1: artifact=1.354720133667502 ledger=1.355
+  ok  2C d=4 a=1.5 other mirror within 5%: artifact=15.0 ledger=15.0
+  ok  2C kappa a=1.30 k=-1: artifact=7.610543288947747 ledger=7.611
+  ok  2C kappa a=1.50 k=0: artifact=4.046049844154416 ledger=4.046
+  ok  2C predictions rows: artifact=240.0 ledger=240.0
+  ok  2C predictions ok: artifact=219.0 ledger=219.0
+  ok  2C d2_a1.30 crossings: artifact=57.0 ledger=57.0
+  ok  2C d2_a1.30 scored: artifact=50.0 ledger=50.0
+  ok  2C d2_a1.30 rho below 0.05 all: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.30 V1: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.30 V2: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.30 V3: artifact=0.0 ledger=0.0
+  ok  2C d2_a1.30 C1 median |log err|: artifact=0.003168382772921265 ledger=0.0032
+  ok  2C d2_a1.30 C2 median ratio: artifact=0.9563035075986388 ledger=0.956
+  ok  2C d2_a1.30 C3 ci lo: artifact=-0.13221883380062457 ledger=-0.132
+  ok  2C d2_a1.30 C3 ci hi: artifact=-0.09422498325817223 ledger=-0.094
+  ok  2C d2_a1.30 outcome: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.30 placed at init: artifact=0.0 ledger=0.0
+  ok  2C d2_a1.50 crossings: artifact=57.0 ledger=57.0
+  ok  2C d2_a1.50 scored: artifact=53.0 ledger=53.0
+  ok  2C d2_a1.50 rho below 0.05 all: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 V1: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 V2: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 V3: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 C1 median |log err|: artifact=0.007617341025541817 ledger=0.0076
+  ok  2C d2_a1.50 C2 median ratio: artifact=0.9403268887734108 ledger=0.94
+  ok  2C d2_a1.50 C3 ci lo: artifact=-0.15822344891772772 ledger=-0.158
+  ok  2C d2_a1.50 C3 ci hi: artifact=-0.12080585079954358 ledger=-0.121
+  ok  2C d2_a1.50 outcome: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 placed at init: artifact=0.0 ledger=0.0
+  ok  2C d4_a1.30 crossings: artifact=51.0 ledger=51.0
+  ok  2C d4_a1.30 scored: artifact=41.0 ledger=41.0
+  ok  2C d4_a1.30 rho below 0.05 all: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.30 V1: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.30 V2: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.30 V3: artifact=0.0 ledger=0.0
+  ok  2C d4_a1.30 C1 median |log err|: artifact=0.006756472956482322 ledger=0.0068
+  ok  2C d4_a1.30 C2 median ratio: artifact=1.0097890169024613 ledger=1.01
+  ok  2C d4_a1.30 C3 ci lo: artifact=-0.3937166031862768 ledger=-0.394
+  ok  2C d4_a1.30 C3 ci hi: artifact=-0.3095711950399577 ledger=-0.31
+  ok  2C d4_a1.30 outcome: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.30 placed at init: artifact=0.0 ledger=0.0
+  ok  2C d4_a1.50 crossings: artifact=53.0 ledger=53.0
+  ok  2C d4_a1.50 scored: artifact=48.0 ledger=48.0
+  ok  2C d4_a1.50 rho below 0.05 all: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 V1: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 V2: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 V3: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 C1 median |log err|: artifact=0.009115178689109469 ledger=0.0091
+  ok  2C d4_a1.50 C2 median ratio: artifact=1.071251969782333 ledger=1.071
+  ok  2C d4_a1.50 C3 ci lo: artifact=-0.4032116712400005 ledger=-0.403
+  ok  2C d4_a1.50 C3 ci hi: artifact=-0.33216833428086256 ledger=-0.332
+  ok  2C d4_a1.50 outcome: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 placed at init: artifact=0.0 ledger=0.0
+  ok  2C d2 a1.30 V3 fraction %: artifact=87.71929824561403 ledger=87.7
+  ok  2C d4 a1.30 V3 fraction %: artifact=80.3921568627451 ledger=80.4
+  ok  2C d2_a1.30 mirror-matched scored: artifact=56.0 ledger=56.0
+  ok  2C d2_a1.30 mirror-matched C1: artifact=0.0026639206976781446 ledger=0.0027
+  ok  2C d2_a1.30 mirror-matched C2: artifact=0.9475411929125718 ledger=0.948
+  ok  2C d2_a1.30 mirror-matched C3 hi: artifact=-0.10576925744545893 ledger=-0.106
+  ok  2C d2_a1.30 mirror-matched outcome: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.50 mirror-matched scored: artifact=57.0 ledger=57.0
+  ok  2C d2_a1.50 mirror-matched C1: artifact=0.0067112623098943705 ledger=0.0067
+  ok  2C d2_a1.50 mirror-matched C2: artifact=0.9224893548214953 ledger=0.922
+  ok  2C d2_a1.50 mirror-matched C3 hi: artifact=-0.1252975378947688 ledger=-0.125
+  ok  2C d2_a1.50 mirror-matched outcome: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.30 mirror-matched scored: artifact=42.0 ledger=42.0
+  ok  2C d4_a1.30 mirror-matched C1: artifact=0.004879857836551771 ledger=0.0049
+  ok  2C d4_a1.30 mirror-matched C2: artifact=0.979528946347964 ledger=0.98
+  ok  2C d4_a1.30 mirror-matched C3 hi: artifact=-0.29794811886923056 ledger=-0.298
+  ok  2C d4_a1.30 mirror-matched outcome: artifact=1.0 ledger=1.0
+  ok  2C d4_a1.50 mirror-matched scored: artifact=52.0 ledger=52.0
+  ok  2C d4_a1.50 mirror-matched C1: artifact=0.007581652612350359 ledger=0.0076
+  ok  2C d4_a1.50 mirror-matched C2: artifact=1.064072926728664 ledger=1.064
+  ok  2C d4_a1.50 mirror-matched C3 hi: artifact=-0.3234460780661428 ledger=-0.323
+  ok  2C d4_a1.50 mirror-matched outcome: artifact=1.0 ledger=1.0
+  ok  2C d2_a1.30 rule mirror is global: artifact=43.0 ledger=43.0
+  ok  2C d2_a1.30 crossing below s_own,d: artifact=7.0 ledger=7.0
+  ok  2C d2_a1.50 rule mirror is global: artifact=42.0 ledger=42.0
+  ok  2C d2_a1.50 crossing below s_own,d: artifact=4.0 ledger=4.0
+  ok  2C d4_a1.30 rule mirror is global: artifact=41.0 ledger=41.0
+  ok  2C d4_a1.30 crossing below s_own,d: artifact=10.0 ledger=10.0
+  ok  2C d4_a1.50 rule mirror is global: artifact=43.0 ledger=43.0
+  ok  2C d4_a1.50 crossing below s_own,d: artifact=5.0 ledger=5.0
+  ok  2C max rho at crossing: artifact=0.0449039417641076 ledger=0.045
+  ok  2C non-crossers: artifact=22.0 ledger=22.0
+  ok  2C POST HOC unscored total: artifact=26.0 ledger=26.0
+  ok  2C POST HOC unscored on the other mirror: artifact=17.0 ledger=17.0
+  ok  2C POST HOC other-mirror obs/switch min: artifact=1.0105837440815817 ledger=1.011
+  ok  2C POST HOC other-mirror obs/switch max: artifact=1.0897901565820955 ledger=1.09
+  ok  2C POST HOC global-mirror obs/s_own min: artifact=0.962353568441442 ledger=0.962
+  ok  2C POST HOC global-mirror obs/s_own max: artifact=0.999233344752403 ledger=0.9992
+  ok  2C POST HOC unscored obs/s_own min: artifact=0.8132106181583195 ledger=0.813
+  ok  2C diag 3B crossing runs: artifact=22.0 ledger=22.0
+  ok  2C diag global within 0.5%: artifact=16.0 ledger=16.0
+  ok  2C diag run mirror within 0.5%: artifact=22.0 ledger=22.0
+Track T v2 (gate PASS; registration stopped at its gradient check)
+  ok  TT2 gate PASS: artifact=1.0 ledger=1.0
+  ok  TT2 lambda: artifact=0.0001 ledger=0.0001
+  ok  TT2 q: artifact=0.3914103370353161 ledger=0.3914
+  ok  TT2 s_q: artifact=3.5913755424683727 ledger=3.5914
+  ok  TT2 agreement: artifact=0.0 ledger=0.0
+  ok  TT2 all attained: artifact=1.0 ledger=1.0
+  ok  TT2 max norm: artifact=16.52574276545699 ledger=16.5
+  ok  TT2 bound: artifact=117.74100225154747 ledger=117.7
+  ok  TT2 rho2 below jump: artifact=0.1820901543592347 ledger=0.182
+  ok  TT2 rho2 above jump: artifact=0.4482191227502973 ledger=0.448
+  ok  TT2 rho2 at 1.53: artifact=0.0849064078022975 ledger=0.085
+  ok  TT2 rho2 large s: artifact=0.7828206708209657 ledger=0.783
+  ok  TT2 gradient check failed: artifact=1.0 ledger=1.0
+  ok  TT2 gradient autograd vs central: artifact=0.033203476768530873 ledger=0.033
+  ok  TT2 gradient central vs one-sided: artifact=0.05496068507166287 ledger=0.055
+Track T v3 (registered; UNRESOLVED)
+  ok  TT3 frozen inputs hash: artifact=1.0 ledger=1.0
+  ok  TT3 C1 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  TT3 C2 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  TT3 unresolved by both: artifact=1.0 ledger=1.0
+  ok  TT3 runs: artifact=40.0 ledger=40.0
+  ok  TT3 crossings: artifact=22.0 ledger=22.0
+  ok  TT3 median chi: artifact=7.426658095868612 ledger=7.43
+  ok  TT3 would-be C1 fraction: artifact=0.7272727272727273 ledger=0.727
+  ok  TT3 would-be C2 ratio: artifact=2.85952308041271 ledger=2.86
+  ok  TT3 rho2 init >= q: artifact=31.0 ledger=31.0
+  ok  TT3 census rows UNRESOLVED registered: artifact=1.0 ledger=1.0
+Boundary test (registered) and Adam diagnostic (post hoc)
+  ok  BT B1 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  BT B2 UNRESOLVED: artifact=1.0 ledger=1.0
+  ok  BT cell (1.3, 0.03) crossings: artifact=40.0 ledger=40.0
+  ok  BT cell (1.3, 0.03) valid: artifact=1.0 ledger=1.0
+  ok  BT cell (1.3, 0.03) median ratio: artifact=1.674145595791964 ledger=1.674
+  ok  BT cell (1.3, 0.06) crossings: artifact=28.0 ledger=28.0
+  ok  BT cell (1.3, 0.06) valid: artifact=0.0 ledger=0.0
+  ok  BT cell (1.3, 0.06) median ratio: artifact=3.8913494373442807 ledger=3.891
+  ok  BT cell (1.5, 0.03) crossings: artifact=40.0 ledger=40.0
+  ok  BT cell (1.5, 0.03) valid: artifact=1.0 ledger=1.0
+  ok  BT cell (1.5, 0.03) median ratio: artifact=1.2190912852422828 ledger=1.219
+  ok  BT cell (1.5, 0.06) crossings: artifact=40.0 ledger=40.0
+  ok  BT cell (1.5, 0.06) valid: artifact=1.0 ledger=1.0
+  ok  BT cell (1.5, 0.06) median ratio: artifact=1.670599136189045 ledger=1.671
+  ok  BT cell (1.3, 0.4) crossings: artifact=15.0 ledger=15.0
+  ok  BT cell (1.3, 0.4) valid: artifact=0.0 ledger=0.0
+  ok  BT cell (1.3, 0.4) median ratio: artifact=1.5431428492046804 ledger=1.543
+  ok  BT cell (1.5, 0.4) crossings: artifact=6.0 ledger=6.0
+  ok  BT cell (1.5, 0.4) valid: artifact=0.0 ledger=0.0
+  ok  BT cell (1.5, 0.4) median ratio: artifact=3.2533761149302185 ledger=3.253
+  ok  BT cell (1.5, 0.2) crossings: artifact=0.0 ledger=0.0
+  ok  BT cell (1.5, 0.2) valid: artifact=0.0 ledger=0.0
+  ok  BT valid cells: artifact=3.0 ledger=3.0
+  ok  KX arm median min: artifact=0.0067954048469365 ledger=0.007
+  ok  KX arm median max: artifact=0.0818810477227851 ledger=0.082
+  ok  KX run q05: artifact=0.010006709286914045 ledger=0.01
+  ok  KX run q95: artifact=0.08105331178030918 ledger=0.081
+  ok  KX run max: artifact=0.2098635074985289 ledger=0.21
+  ok  KX arms: artifact=36.0 ledger=36.0
+  ok  BT census rows UNRESOLVED registered: artifact=1.0 ledger=1.0
+  ok  AD registered reproduced: artifact=1.0 ledger=1.0
+  ok  AD p_cross spearman: artifact=0.9899000370233245 ledger=0.99
+  ok  AD p_cross within10: artifact=100.0 ledger=100.0
+  ok  AD p_switch spearman: artifact=0.9483450573861532 ledger=0.95
+  ok  AD p_switch within10: artifact=90.54054054054053 ledger=90.5
+  ok  AD p_switch before crossing: artifact=74.0 ledger=74.0
+  ok  AD registered within10: artifact=21.62162162162162 ledger=21.6
+  ok  AD p_cross ratio q10: artifact=1.0248025351401526 ledger=1.02
+  ok  AD p_cross ratio q90: artifact=1.0723211127211394 ledger=1.07
+Final checks (a = 1.65 appendix numbers; post hoc predictor comparison)
+  ok  FC adam trajectory median_obs: artifact=0.093779246704978 ledger=0.0938
+  ok  FC adam trajectory median_pred: artifact=0.07989672847059315 ledger=0.0799
+  ok  FC adam trajectory median_ratio: artifact=1.0650932556464938 ledger=1.065
+  ok  FC adam trajectory frac_within_10: artifact=0.21621621621621623 ledger=0.216
+  ok  FC adam trajectory median_abs_err: artifact=0.022898084505106452 ledger=0.0229
+  ok  FC adam trajectory spearman: artifact=0.2484561273602369 ledger=0.25
+  ok  FC adam closed_form median_obs: artifact=0.093779246704978 ledger=0.0938
+  ok  FC adam closed_form median_pred: artifact=0.08865653271671844 ledger=0.0887
+  ok  FC adam closed_form median_ratio: artifact=1.0454504462626697 ledger=1.045
+  ok  FC adam closed_form frac_within_10: artifact=0.2972972972972973 ledger=0.297
+  ok  FC adam closed_form median_abs_err: artifact=0.014592109145848048 ledger=0.0146
+  ok  FC adam closed_form spearman: artifact=0.5518104405775638 ledger=0.55
+  ok  FC sgd trajectory median_obs: artifact=0.0937622908317581 ledger=0.0938
+  ok  FC sgd trajectory median_pred: artifact=0.0898602457473596 ledger=0.0899
+  ok  FC sgd trajectory median_ratio: artifact=1.0555267302534384 ledger=1.056
+  ok  FC sgd trajectory frac_within_10: artifact=1.0 ledger=1.0
+  ok  FC sgd trajectory median_abs_err: artifact=0.004731581323971293 ledger=0.0047
+  ok  FC sgd trajectory spearman: artifact=0.9945276497695852 ledger=0.995
+  ok  FC sgd closed_form median_obs: artifact=0.0937622908317581 ledger=0.0938
+  ok  FC sgd closed_form median_pred: artifact=0.0884126701611265 ledger=0.0884
+  ok  FC sgd closed_form median_ratio: artifact=1.023791591998875 ledger=1.024
+  ok  FC sgd closed_form frac_within_10: artifact=0.6190476190476191 ledger=0.619
+  ok  FC sgd closed_form median_abs_err: artifact=0.006952094493844499 ledger=0.007
+  ok  FC sgd closed_form spearman: artifact=0.8081317204301075 ledger=0.808
+  ok  FC adam fit mae: artifact=0.010405908736467316 ledger=0.0104
+  ok  FC adam fit within10: artifact=0.44594594594594594 ledger=0.446
+  ok  FC adam fit spearman: artifact=0.4979340984820436 ledger=0.5
+  ok  FC adam constant mae: artifact=0.0595033118937178 ledger=0.0595
+  ok  FC adam constant within10: artifact=0.0 ledger=0.0
+  ok  FC sgd fit mae: artifact=0.0058132744424629484 ledger=0.0058
+  ok  FC sgd fit within10: artifact=0.746031746031746 ledger=0.746
+  ok  FC sgd fit spearman: artifact=0.8081317204301075 ledger=0.808
+  ok  FC sgd constant mae: artifact=0.05156265477119795 ledger=0.0516
+  ok  FC sgd constant within10: artifact=0.0 ledger=0.0
+  ok  FC adam constant ratio: artifact=2.736008433362115 ledger=2.74
+  ok  FC sgd constant ratio: artifact=2.2218743947744253 ledger=2.22
+Track 1A v3 fold (POST HOC)
+  ok  1A s_fold: artifact=4.767689442106793 ledger=4.767689
+  ok  1A s_fold/s*: artifact=1.3275385394059718 ledger=1.3275
+  ok  1A halving change: artifact=1.0 ledger=1.0
+  ok  1A equal-loss L0_to_M: artifact=1.489554312564433 ledger=1.4896
+  ok  1A equal-loss M_to_S: artifact=3.5890571781620375 ledger=3.5891
+  ok  1A equal-loss S_to_S2: artifact=8.616578748412433 ledger=8.6166
+  ok  1A fold M_bwd: artifact=1.153974587312307 ledger=1.154
+  ok  1A fold S_bwd: artifact=1.916377665341787 ledger=1.916
+  ok  1A fold S_fwd: artifact=9.397765782716728 ledger=9.398
+  ok  1A fold S2_bwd: artifact=0.31593026084954684 ledger=0.316
+  ok  1A search below 1% on M: artifact=27.0 ledger=27.0
+  ok  1A search below 0.1% on M: artifact=18.0 ledger=18.0
+  ok  1A search above on M: artifact=0.0 ledger=0.0
+  ok  1A Newton fails above: artifact=1.0 ledger=1.0
+  ok  1A late n: artifact=16.0 ledger=16.0
+  ok  1A late leave/fold median: artifact=0.6593622466338172 ledger=0.66
+  ok  1A late leave within 15%: artifact=1.0 ledger=1.0
+  ok  1A late cross/fold median: artifact=2.1655243671701605 ledger=2.17
+  ok  1A all min distance median: artifact=0.17755053292778217 ledger=0.18
+  ok  1A never on a branch (late): artifact=0.0 ledger=0.0
+  ok  1A |m'c'| P=I: artifact=4.995635006649009e-07 ledger=5e-07
+  ok  1A |m'c'| Adam P: artifact=0.0035650285627726467 ledger=0.0036
+  ok  1A eps_F: artifact=5.576446053782798 ledger=5.6
+width-2 fold (POST HOC, T2-3)
+  ok  W2F runs: artifact=79.0 ledger=79.0
+  ok  W2F folds: artifact=0.0 ledger=0.0
+  ok  W2F switches: artifact=77.0 ledger=77.0
+  ok  W2F switch s median: artifact=0.48638097810405484 ledger=0.486
+  ok  W2F cross/switch median: artifact=2.7907108896434387 ledger=2.79
+  ok  W2F within 15%: artifact=3.0 ledger=3.0
+  ok  W2F basin placed / pop: artifact=1.0599631846064006 ledger=1.06
+  ok  W2F placed before cross: artifact=75.0 ledger=75.0
+GELU fold (POST HOC, Track 3A non-early crossers)
+  ok  AF gelu analysed: artifact=114.0 ledger=114.0
+  ok  AF gelu reproduced: artifact=114.0 ledger=114.0
+  ok  AF gelu folds: artifact=0.0 ledger=0.0
+  ok  AF gelu cross/switch: artifact=1.0016935424490123 ledger=1.0017
+  ok  AF gelu within 15%: artifact=1.0 ledger=1.0
+  ok  AF gelu within 1%: artifact=98.24561403508771 ledger=98.2
+  ok  AF gelu halving: artifact=114.0 ledger=114.0
+  ok  AF gelu pre85: artifact=1.0 ledger=1.0
+math note §14/§15 checks
+  ok  §14 Omega0: artifact=2.338107410459767 ledger=2.338107
+  ok  §15 L1 bounds hold: artifact=1.0 ledger=1.0
+  ok  §15 L2 residual/chi^2: artifact=-0.9288834913405041 ledger=-0.929
+  ok  §15 L3 eta spread %: artifact=0.6418042520132269 ledger=0.6
+math note §16 (Theorem G)
+  ok  §16 holds: artifact=1.0 ledger=1.0
+  ok  §16 eps0: artifact=1.4e-12 ledger=1.4e-12
+  ok  §16 outer margin: artifact=0.0001002366442341 ledger=0.0001
+  ok  §16 outer perturbation: artifact=7.825338870390626e-05 ledger=7.8e-05
+  ok  §16 subintervals: artifact=110.0 ledger=110.0
+  ok  §16 switch A lo: artifact=0.6849452375756537 ledger=0.684945
+  ok  §16 switch A hi: artifact=0.6859452375756536 ledger=0.685945
+math note §17 (small-scale compactness)
+  ok  §17 C spread count (population, interval 0.8): artifact=200.0 ledger=200.0
+  ok  §17 C spread fraction F (population): artifact=0.75 ledger=0.75
+  ok  §17 C alias alpha = pi/q: artifact=623613.9957192078 ledger=623614.0
+  ok  §17 C Wc population a=1.30: artifact=2345103.6685029333 ledger=2345000.0
+  ok  §17 C s1 population a=1.30: artifact=2.17545126695263e-06 ledger=2.18e-06
+  ok  §17 C Wc continuous a=1.30: artifact=10.77237870796418 ledger=10.8
+  ok  §17 C Wc continuous a=1.60: artifact=11.895848195709512 ledger=11.9
+  ok  §17 C s1 continuous a=1.30: artifact=0.6781966017161658 ledger=0.68
+  ok  §17 C s1 continuous a=1.60: artifact=0.6461182573565069 ledger=0.65
+  ok  §17 C samples min |m| (seeds 0-49): artifact=0.003201647849637085 ledger=0.0032
+  ok  §17 C samples median |m| (seeds 0-49): artifact=0.07503501055805828 ledger=0.075
+  ok  §17 C identity max abs err: artifact=1.7763568394002505e-15 ledger=1.8e-15
+Track 4 (independent outer-exclusion and solve-bracket checks)
+  ok  T4 timing sample passes: artifact=1.0 ledger=1.0
+  ok  T4 timing sample A lo: artifact=0.66 ledger=0.66
+  ok  T4 timing sample evaluations: artifact=2060.0 ledger=2060.0
+  ok  T4 timing sample seconds: artifact=38.81938028335571 ledger=39.0
+  ok  T4 extrapolated total h: artifact=1.9484437598784765 ledger=1.95
+  ok  T4 actual total h: artifact=1.927252720594406 ledger=1.93
+  ok  T4 finite sample (a=1.45 hi) check s: artifact=451.2814199924469 ledger=451.0
+  ok  T4 outer annulus passes: artifact=1.0 ledger=1.0
+  ok  T4 outer annulus sub-intervals passed: artifact=40.0 ledger=40.0
+  ok  T4 outer annulus fail + unresolved: artifact=0.0 ledger=0.0
+  ok  T4 outer annulus min certified margin: artifact=0.00010061395582954581 ledger=0.0001006
+  ok  T4 outer annulus min margin at A lo 0.68625: artifact=0.68625 ledger=0.68625
+  ok  T4 outer annulus min margin >= Theorem G's 1.0024e-4: artifact=1.0 ledger=1.0
+  ok  T4 outer annulus every margin >= 1e-4: artifact=1.0 ledger=1.0
+  ok  T4 outer annulus max branch upper: artifact=0.3580445922238794 ledger=0.35805
+  ok  T4 outer B(24) lower: artifact=0.38797358308678964 ledger=0.38797
+  ok  T4 outer annulus evaluations: artifact=82686.0 ledger=82686.0
+  ok  T4 outer annulus max depth: artifact=6.0 ledger=6.0
+  ok  T4 outer annulus seconds: artifact=1577.353172302246 ledger=1577.0
+  ok  T4 outer annulus per-interval s min: artifact=38.774442195892334 ledger=39.0
+  ok  T4 outer annulus per-interval s max: artifact=41.308582067489624 ledger=41.0
+  ok  T4 outer solve passes: artifact=1.0 ledger=1.0
+  ok  T4 outer solve certified margin: artifact=0.00016486519240916492 ledger=0.0001649
+  ok  T4 outer solve branch upper: artifact=0.2811660331796916 ledger=0.28117
+  ok  T4 outer solve evaluations: artifact=2161.0 ledger=2161.0
+  ok  T4 producer's solve outer margin: artifact=0.0001475931769911 ledger=0.0001476
+  ok  T4 outer solve seconds: artifact=40.79925608634949 ledger=41.0
+  ok  T4 limit solve ends pass: artifact=1.0 ledger=1.0
+  ok  T4 limit solve chain links: artifact=1.0 ledger=1.0
+  ok  T4 limit solve ring boxes: artifact=540.0 ledger=540.0
+  ok  T4 limit solve ring grad lower: artifact=0.008203877319297401 ledger=0.0082
+  ok  T4 limit solve PD boxes: artifact=100.0 ledger=100.0
+  ok  T4 limit solve seconds: artifact=7.425904035568237 ledger=7.4
+  ok  T4 limit solve A lo sign fails: artifact=1.0 ledger=1.0
+  ok  T4 limit solve A hi sign solves: artifact=1.0 ledger=1.0
+  ok  T4 limit solve margin 1.05875 lo: artifact=-0.0005003732549172874 ledger=-0.000500373
+  ok  T4 limit solve margin 1.05875 hi: artifact=-0.0005003665964169071 ledger=-0.000500367
+  ok  T4 limit solve margin 1.06 lo: artifact=0.0001671436778003974 ledger=0.000167144
+  ok  T4 limit solve margin 1.06 hi: artifact=0.00016715034180077258 ledger=0.00016715
+  ok  T4 limit solve Krawczyk + in box: artifact=1.0 ledger=1.0
+  ok  T4 limit solve margins inside published: artifact=1.0 ledger=1.0
+  ok  T4 finite solve ends checked: artifact=12.0 ledger=12.0
+  ok  T4 finite solve ends pass: artifact=12.0 ledger=12.0
+  ok  T4 finite signs equal published: artifact=1.0 ledger=1.0
+  ok  T4 finite lo ends fail / hi ends solve: artifact=1.0 ledger=1.0
+  ok  T4 finite leaves min: artifact=15432.0 ledger=15432.0
+  ok  T4 finite leaves max: artifact=23292.0 ledger=23292.0
+  ok  T4 finite kept leaves min: artifact=44.0 ledger=44.0
+  ok  T4 finite kept leaves max: artifact=52.0 ledger=52.0
+  ok  T4 finite check s min: artifact=358.81831192970276 ledger=359.0
+  ok  T4 finite check s max: artifact=519.0101521015167 ledger=519.0
+  ok  T4 finite export s min (11 ends): artifact=6.996201038360596 ledger=7.0
+  ok  T4 finite export s max (11 ends): artifact=14.496081113815308 ledger=14.5
+  ok  T4 finite Arb evaluations min: artifact=33394.0 ledger=33394.0
+  ok  T4 finite Arb evaluations max: artifact=37588.0 ledger=37588.0
+  ok  T4 finite subdivision depth max: artifact=3.0 ledger=3.0
+  ok  T4 finite every kept leaf decided: artifact=1.0 ledger=1.0
+  ok  T4 finite losing region all pass: artifact=1.0 ledger=1.0
+  ok  T4 finite losing cells min: artifact=3270.0 ledger=3270.0
+  ok  T4 finite losing cells max: artifact=3972.0 ledger=3972.0
+  ok  T4 finite losing depth max: artifact=4.0 ledger=4.0
+  ok  T4 finite losing s min: artifact=48.16361999511719 ledger=48.0
+  ok  T4 finite losing s max: artifact=65.38237309455872 ledger=65.0
+  ok  T4 finite losing s (a=1.45 hi): artifact=52.78823208808899 ledger=53.0
+  ok  T4 manifest rows for solve certificates: artifact=24.0 ledger=24.0
+  ok  T4 solve certificates MB: artifact=41.439385 ledger=41.4
+  ok  T4 solve npz MB min: artifact=2.296235 ledger=2.3
+  ok  T4 solve npz MB max: artifact=5.290428 ledger=5.3
+Track 5 rows restated in certificate_audit.md
+  ok  T5 K seconds (published hi): artifact=22.874890089035034 ledger=23.0
+  ok  T5 K seconds (tight hi): artifact=81.57913494110107 ledger=82.0
+  ok  T5 K tight target: artifact=0.5794559217445248 ledger=0.5794559217
+  ok  T5 Krawczyk A* lo: artifact=0.6854452375756532 ledger=0.6854452375756532
+  ok  T5 Krawczyk A* hi: artifact=0.6854452375756537 ledger=0.6854452375756537
+  ok  T5 Krawczyk A1/A lo: artifact=0.6621547824344876 ledger=0.66215478
+  ok  T5 Krawczyk A1/A hi: artifact=0.6621549498240902 ledger=0.66215495
+  ok  T5 PD glob boxes: artifact=500.0 ledger=500.0
+  ok  T5 PD solve boxes: artifact=100.0 ledger=100.0
+  ok  T5 PD glob lambda margin: artifact=0.0473 ledger=0.0473
+  ok  T5 PD solve lambda margin: artifact=0.0209 ledger=0.0209
+  ok  T5 PD glob seconds: artifact=6.655309200286865 ledger=6.7
+  ok  T5 PD solve seconds: artifact=1.6751458644866943 ledger=1.7
+  ok  T5 ring solve boxes: artifact=540.0 ledger=540.0
+  ok  T5 ring glob seconds: artifact=198.68782019615173 ledger=199.0
+  ok  T5 ring solve seconds: artifact=5.75019907951355 ledger=5.8
+GELU-T (registered, GELU, free SGD, two arms)
+  ok  GT predictions hash: artifact=1.0 ledger=1.0
+  ok  GT landscape validated: artifact=1.0 ledger=1.0
+  ok  GT s0: artifact=3.3228165485787935 ledger=3.322817
+  ok  GT s_glob: artifact=6.641491558765203 ledger=6.641492
+  ok  GT frozen copies valid: artifact=180.0 ledger=180.0
+  ok  GT follow points valid: artifact=360.0 ledger=360.0
+  ok  GT kappa mirror recomputation max |diff|: artifact=0.0 ledger=0.0
+  ok  GT kappa transforms max |diff|: artifact=0.0 ledger=0.0
+  ok  GT negative kappa copies: artifact=13.0 ledger=13.0
+  ok  GT negative kappa target copies: artifact=4.0 ledger=4.0
+  ok  GT negative kappa mirror copies: artifact=9.0 ledger=9.0
+  ok  GT most negative kappa: artifact=-0.16770348823508718 ledger=-0.168
+  ok  GT least negative kappa: artifact=-0.004264515202096271 ledger=-0.004
+  ok  GT rho: artifact=1.0 ledger=1.0
+  ok  GT pilot q90 kappa chi: artifact=0.003739966370321044 ledger=0.0037
+  ok  GT pilot median chi random: artifact=0.02240823925619795 ledger=0.0224
+  ok  GT pilot median chi branch: artifact=0.022998963954963272 ledger=0.023
+  ok  GT pilot window q90: artifact=0.045896990155686206 ledger=0.046
+  ok  GT pilot window median: artifact=0.03602447244400121 ledger=0.036
+  ok  GT pilot whole-path q90: artifact=0.2738969756509928 ledger=0.274
+  ok  GT pilot whole-path median: artifact=0.1988419575487118 ledger=0.199
+  ok  GT pilot follow state distance min: artifact=0.012422875077027162 ledger=0.012
+  ok  GT pilot follow state distance max: artifact=0.02749357774830874 ledger=0.028
+  ok  GT pilot runs following: artifact=20.0 ledger=20.0
+  ok  GT headline PASS: artifact=1.0 ledger=1.0
+  ok  GT random gate pass: artifact=1.0 ledger=1.0
+  ok  GT random on-branch at release: artifact=80.0 ledger=80.0
+  ok  GT random G>0 in hold: artifact=6.0 ledger=6.0
+  ok  GT random neither/off target: artifact=0.0 ledger=0.0
+  ok  GT random crossed: artifact=80.0 ledger=80.0
+  ok  GT random not following: artifact=0.0 ledger=0.0
+  ok  GT random scored: artifact=80.0 ledger=80.0
+  ok  GT random kappa<0 scored: artifact=8.0 ledger=8.0
+  ok  GT random valid (all V1-V7): artifact=1.0 ledger=1.0
+  ok  GT random V2 fraction: artifact=0.9305555555555556 ledger=0.931
+  ok  GT random V4 median lag steps: artifact=40.64534383217253 ledger=40.6
+  ok  GT random V5 q90 kappa chi: artifact=0.0039175418940066015 ledger=0.0039
+  ok  GT random V6 median chi: artifact=0.0222119638327039 ledger=0.0222
+  ok  GT random V7 q90 window: artifact=0.05973216935795255 ledger=0.06
+  ok  GT random L1 ratio: artifact=1.0000000000000087 ledger=1.0
+  ok  GT random L2 ratio: artifact=0.9767926950175866 ledger=0.977
+  ok  GT random L3 spearman: artifact=0.9985935302391 ledger=0.999
+  ok  GT random L4 mean D: artifact=-0.10392272944913838 ledger=-0.104
+  ok  GT random L4 ci lo: artifact=-0.12074759641108386 ledger=-0.121
+  ok  GT random L4 ci hi: artifact=-0.08779772658254702 ledger=-0.088
+  ok  GT random L5 mean D: artifact=-0.003087191954903969 ledger=-0.0031
+  ok  GT random L5 ci lo: artifact=-0.0036295132140841506 ledger=-0.0036
+  ok  GT random L5 ci hi: artifact=-0.0026196465568317988 ledger=-0.0026
+  ok  GT random L1 PASS: artifact=1.0 ledger=1.0
+  ok  GT random L2 PASS: artifact=1.0 ledger=1.0
+  ok  GT random L3 PASS: artifact=1.0 ledger=1.0
+  ok  GT random L4 PASS: artifact=1.0 ledger=1.0
+  ok  GT random L5 PASS: artifact=1.0 ledger=1.0
+  ok  GT random outcome PASS: artifact=1.0 ledger=1.0
+  ok  GT branch gate pass: artifact=1.0 ledger=1.0
+  ok  GT branch on-branch at release: artifact=80.0 ledger=80.0
+  ok  GT branch G>0 in hold: artifact=0.0 ledger=0.0
+  ok  GT branch neither/off target: artifact=0.0 ledger=0.0
+  ok  GT branch crossed: artifact=80.0 ledger=80.0
+  ok  GT branch not following: artifact=0.0 ledger=0.0
+  ok  GT branch scored: artifact=80.0 ledger=80.0
+  ok  GT branch kappa<0 scored: artifact=2.0 ledger=2.0
+  ok  GT branch valid (all V1-V7): artifact=1.0 ledger=1.0
+  ok  GT branch V2 fraction: artifact=0.9358974358974359 ledger=0.936
+  ok  GT branch V4 median lag steps: artifact=42.586191394794355 ledger=42.6
+  ok  GT branch V5 q90 kappa chi: artifact=0.00379086572104862 ledger=0.0038
+  ok  GT branch V6 median chi: artifact=0.02079007008881515 ledger=0.0208
+  ok  GT branch V7 q90 window: artifact=0.05296226458043858 ledger=0.053
+  ok  GT branch L1 ratio: artifact=1.000000000000006 ledger=1.0
+  ok  GT branch L2 ratio: artifact=0.9845260812124985 ledger=0.985
+  ok  GT branch L3 spearman: artifact=0.9987576183778716 ledger=0.999
+  ok  GT branch L4 mean D: artifact=-0.10299180984614349 ledger=-0.103
+  ok  GT branch L4 ci lo: artifact=-0.11943593900886508 ledger=-0.119
+  ok  GT branch L4 ci hi: artifact=-0.08713292809692869 ledger=-0.087
+  ok  GT branch L5 mean D: artifact=-0.002611804875908421 ledger=-0.0026
+  ok  GT branch L5 ci lo: artifact=-0.0028670100700221653 ledger=-0.0029
+  ok  GT branch L5 ci hi: artifact=-0.0023449938850628148 ledger=-0.0023
+  ok  GT branch L1 PASS: artifact=1.0 ledger=1.0
+  ok  GT branch L2 PASS: artifact=1.0 ledger=1.0
+  ok  GT branch L3 PASS: artifact=1.0 ledger=1.0
+  ok  GT branch L4 PASS: artifact=1.0 ledger=1.0
+  ok  GT branch L5 PASS: artifact=1.0 ledger=1.0
+  ok  GT branch outcome PASS: artifact=1.0 ledger=1.0
+  ok  GT sensitivity scored: artifact=74.0 ledger=74.0
+  ok  GT sensitivity outcome PASS: artifact=1.0 ledger=1.0
+  ok  GT sensitivity L1: artifact=1.0000000000000087 ledger=1.0
+  ok  GT sensitivity L2: artifact=0.9767926950175866 ledger=0.977
+  ok  GT sensitivity L3: artifact=0.9986079229914844 ledger=0.999
+  ok  GT sensitivity L4 mean D: artifact=-0.09999533186794744 ledger=-0.1
+  ok  GT sensitivity L4 ci: artifact=-0.11797671598266472 ledger=-0.118
+  ok  GT sensitivity L4 ci hi: artifact=-0.08339433972049115 ledger=-0.083
+  ok  GT sensitivity L5 mean D: artifact=-0.0031613649219783806 ledger=-0.0032
+  ok  GT sensitivity L5 ci: artifact=-0.003726146990259561 ledger=-0.0037
+  ok  GT sensitivity L5 ci hi: artifact=-0.002657245172074962 ledger=-0.0027
+  ok  GT random placed at init: artifact=2.0 ledger=2.0
+  ok  GT random target copies: artifact=38.0 ledger=38.0
+  ok  GT random mirror copies: artifact=42.0 ledger=42.0
+  ok  GT random median r_obs: artifact=0.002745416454033145 ledger=0.00275
+  ok  GT random median steps t_sw to crossing: artifact=39.0 ledger=39.0
+  ok  GT random follow check at/after crossing: artifact=0.0 ledger=0.0
+  ok  GT branch median r_obs: artifact=0.0029022420343098876 ledger=0.0029
+  ok  GT branch median steps t_sw to crossing: artifact=41.5 ledger=41.5
+  ok  GT branch follow check at/after crossing: artifact=0.0 ledger=0.0
+  ok  GT distinct path hashes: artifact=152.0 ledger=152.0
+  ok  GT random predicted step = observed: artifact=36.0 ledger=36.0
+  ok  GT random within 1 step: artifact=60.0 ledger=60.0
+  ok  GT random within 3 steps: artifact=68.0 ledger=68.0
+  ok  GT random observed never after predicted: artifact=0.0 ledger=0.0
+  ok  GT random most negative step difference: artifact=-191.0 ledger=-191.0
+  ok  GT random kappa<0 runs: artifact=8.0 ledger=8.0
+  ok  GT random kappa<0 crossed before switch: artifact=8.0 ledger=8.0
+  ok  GT random kappa<0 crossed before t_sw: artifact=8.0 ledger=8.0
+  ok  GT random kappa<0 predicted early (r_traj<0): artifact=8.0 ledger=8.0
+  ok  GT random kappa<0 |r_obs| > |r_traj| (POST HOC reading): artifact=8.0 ledger=8.0
+  ok  GT random V3 regime fraction: artifact=1.0 ledger=1.0
+  ok  GT random V2 count: artifact=67.0 ledger=67.0
+  ok  GT random kappa>0 runs: artifact=72.0 ledger=72.0
+  ok  GT branch predicted step = observed: artifact=42.0 ledger=42.0
+  ok  GT branch within 1 step: artifact=65.0 ledger=65.0
+  ok  GT branch within 3 steps: artifact=75.0 ledger=75.0
+  ok  GT branch observed never after predicted: artifact=0.0 ledger=0.0
+  ok  GT branch most negative step difference: artifact=-19.0 ledger=-19.0
+  ok  GT branch kappa<0 runs: artifact=2.0 ledger=2.0
+  ok  GT branch kappa<0 crossed before switch: artifact=2.0 ledger=2.0
+  ok  GT branch kappa<0 crossed before t_sw: artifact=2.0 ledger=2.0
+  ok  GT branch kappa<0 predicted early (r_traj<0): artifact=2.0 ledger=2.0
+  ok  GT branch kappa<0 |r_obs| > |r_traj| (POST HOC reading): artifact=2.0 ledger=2.0
+  ok  GT branch V3 regime fraction: artifact=1.0 ledger=1.0
+  ok  GT branch V2 count: artifact=73.0 ledger=73.0
+  ok  GT branch kappa>0 runs: artifact=78.0 ledger=78.0
+W2-A (registered, width 2, asymmetric windows, arms T / D / T')
+  ok  W2A predictions hash: artifact=1.0 ledger=1.0
+  ok  W2A landscape validated: artifact=1.0 ledger=1.0
+  ok  W2A s0: artifact=0.22253970311779978 ledger=0.2225397
+  ok  W2A population switch D: artifact=5.07963691573929 ledger=5.079637
+  ok  W2A population kappa0 D: artifact=7.674147944392522 ledger=7.674
+  ok  W2A population switch Dp: artifact=4.970592143291591 ledger=4.970592
+  ok  W2A population kappa0 Dp: artifact=8.9198188319624 ledger=8.92
+  ok  W2A population switch T: artifact=0.48158619450836937 ledger=0.481586
+  ok  W2A population kappa0 T: artifact=0.048594056068913996 ledger=0.0486
+  ok  W2A population switch Tp: artifact=0.3271666370541715 ledger=0.327167
+  ok  W2A population kappa0 Tp: artifact=-0.056389677023076866 ledger=-0.0564
+  ok  W2A T winding coef a1: artifact=-0.13902428375550627 ledger=-0.139
+  ok  W2A T winding coef a2: artifact=-0.12662290793159964 ledger=-0.127
+  ok  W2A frozen seeds: artifact=330.0 ledger=330.0
+  ok  W2A frozen full copies: artifact=600.0 ledger=600.0
+  ok  W2A frozen full copies valid: artifact=600.0 ledger=600.0
+  ok  W2A frozen points accepted: artifact=920.0 ledger=920.0
+  ok  W2A frozen T copies: artifact=210.0 ledger=210.0
+  ok  W2A frozen T kappa min: artifact=-0.00605976440972594 ledger=-0.0061
+  ok  W2A frozen T kappa max: artifact=0.15283051617876445 ledger=0.1528
+  ok  W2A frozen T kappa<0: artifact=3.0 ledger=3.0
+  ok  W2A frozen Tp copies: artifact=130.0 ledger=130.0
+  ok  W2A frozen Tp kappa min: artifact=-0.078167810524879 ledger=-0.0782
+  ok  W2A frozen Tp kappa max: artifact=-0.008362249583430171 ledger=-0.0084
+  ok  W2A frozen Tp kappa<0: artifact=130.0 ledger=130.0
+  ok  W2A frozen D copies: artifact=130.0 ledger=130.0
+  ok  W2A frozen D kappa min: artifact=6.350919897303242 ledger=6.351
+  ok  W2A frozen D kappa max: artifact=9.380986351392963 ledger=9.381
+  ok  W2A frozen D kappa<0: artifact=0.0 ledger=0.0
+  ok  W2A frozen Dp copies: artifact=130.0 ledger=130.0
+  ok  W2A frozen Dp kappa min: artifact=7.177258264437739 ledger=7.177
+  ok  W2A frozen Dp kappa max: artifact=12.987324901384621 ledger=12.987
+  ok  W2A frozen Dp kappa<0: artifact=0.0 ledger=0.0
+  ok  W2A pilot rho D: artifact=1.0 ledger=1.0
+  ok  W2A pilot q90 D: artifact=0.03424259155401216 ledger=0.0342
+  ok  W2A pilot median chi D: artifact=0.0038754558065711665 ledger=0.00388
+  ok  W2A pilot on-branch D: artifact=10.0 ledger=10.0
+  ok  W2A pilot rho T: artifact=0.0009765625 ledger=0.0009765625
+  ok  W2A pilot q90 T: artifact=0.06994754145732864 ledger=0.0699
+  ok  W2A pilot median chi T: artifact=0.025867348566115944 ledger=0.0259
+  ok  W2A pilot on-branch T: artifact=5.0 ledger=5.0
+  ok  W2A pilot rho Tp: artifact=0.000244140625 ledger=0.000244140625
+  ok  W2A pilot q90 Tp: artifact=0.07260510120279953 ledger=0.0726
+  ok  W2A pilot median chi Tp: artifact=0.016168347744418696 ledger=0.0162
+  ok  W2A pilot on-branch Tp: artifact=10.0 ledger=10.0
+  ok  W2A pilot T' q90 at 2^-10: artifact=0.2898246221612934 ledger=0.29
+  ok  W2A pilot T' q90 at 2^-11: artifact=0.14511863073443165 ledger=0.145
+  ok  W2A headline T PASS: artifact=1.0 ledger=1.0
+  ok  W2A T gate pass: artifact=1.0 ledger=1.0
+  ok  W2A T runs: artifact=200.0 ledger=200.0
+  ok  W2A T on-branch at release: artifact=98.0 ledger=98.0
+  ok  W2A T G>0 in hold: artifact=1.0 ledger=1.0
+  ok  W2A T crossed: artifact=139.0 ledger=139.0
+  ok  W2A T not following: artifact=0.0 ledger=0.0
+  ok  W2A T scored: artifact=98.0 ledger=98.0
+  ok  W2A T kappa<=0 scored: artifact=1.0 ledger=1.0
+  ok  W2A T L5 eligible: artifact=92.0 ledger=92.0
+  ok  W2A T valid (all V1-V7): artifact=1.0 ledger=1.0
+  ok  W2A T V2 fraction: artifact=0.9690721649484536 ledger=0.969
+  ok  W2A T V4 median |lag| steps: artifact=24.763172974645897 ledger=24.8
+  ok  W2A T V5 q90 |kappa chi|: artifact=0.0016703426658108398 ledger=0.00167
+  ok  W2A T V6 median chi: artifact=0.0283713212399814 ledger=0.0284
+  ok  W2A T V7 q90 window: artifact=0.07669635704901395 ledger=0.077
+  ok  W2A T L1 ratio: artifact=1.000000000000049 ledger=1.0
+  ok  W2A T L2 ratio: artifact=1.0086669030409947 ledger=1.009
+  ok  W2A T L3 spearman: artifact=0.9999234932960999 ledger=1.0
+  ok  W2A T L4 mean D: artifact=-0.109018581771878 ledger=-0.109
+  ok  W2A T L4 ci lo: artifact=-0.12482764557803061 ledger=-0.125
+  ok  W2A T L4 ci hi: artifact=-0.09367937129864262 ledger=-0.094
+  ok  W2A T L5 mean D: artifact=-0.001207388270077351 ledger=-0.00121
+  ok  W2A T L5 ci lo: artifact=-0.001285533548760318 ledger=-0.00129
+  ok  W2A T L5 ci hi: artifact=-0.001128970114118048 ledger=-0.00113
+  ok  W2A T L1 PASS: artifact=1.0 ledger=1.0
+  ok  W2A T L2 PASS: artifact=1.0 ledger=1.0
+  ok  W2A T L3 PASS: artifact=1.0 ledger=1.0
+  ok  W2A T L4 PASS: artifact=1.0 ledger=1.0
+  ok  W2A T L5 PASS: artifact=1.0 ledger=1.0
+  ok  W2A T outcome PASS: artifact=1.0 ledger=1.0
+  ok  W2A T median r_obs: artifact=0.0011608769763740145 ledger=0.00116
+  ok  W2A T median steps t_sw to crossing: artifact=24.0 ledger=24.0
+  ok  W2A T undecided steps: artifact=0.0 ledger=0.0
+  ok  W2A D gate pass: artifact=1.0 ledger=1.0
+  ok  W2A D runs: artifact=120.0 ledger=120.0
+  ok  W2A D on-branch at release: artifact=120.0 ledger=120.0
+  ok  W2A D G>0 in hold: artifact=0.0 ledger=0.0
+  ok  W2A D crossed: artifact=120.0 ledger=120.0
+  ok  W2A D not following: artifact=0.0 ledger=0.0
+  ok  W2A D scored: artifact=120.0 ledger=120.0
+  ok  W2A D kappa<=0 scored: artifact=0.0 ledger=0.0
+  ok  W2A D L5 eligible: artifact=120.0 ledger=120.0
+  ok  W2A D valid (all V1-V7): artifact=1.0 ledger=1.0
+  ok  W2A D V2 fraction: artifact=1.0 ledger=1.0
+  ok  W2A D V4 median |lag| steps: artifact=202.42664578036542 ledger=202.4
+  ok  W2A D V5 q90 |kappa chi|: artifact=0.035883998153214185 ledger=0.0359
+  ok  W2A D V6 median chi: artifact=0.004107354368202349 ledger=0.00411
+  ok  W2A D V7 q90 window: artifact=0.006422795121466131 ledger=0.0064
+  ok  W2A D L1 ratio: artifact=1.0209549796592823 ledger=1.021
+  ok  W2A D L2 ratio: artifact=1.0080118141961394 ledger=1.008
+  ok  W2A D L3 spearman: artifact=0.9972984235016318 ledger=0.997
+  ok  W2A D L4 mean D: artifact=-0.07663414923513755 ledger=-0.077
+  ok  W2A D L4 ci lo: artifact=-0.08848694462780168 ledger=-0.088
+  ok  W2A D L4 ci hi: artifact=-0.0653532587087799 ledger=-0.065
+  ok  W2A D L5 mean D: artifact=-0.030701971487745568 ledger=-0.0307
+  ok  W2A D L5 ci lo: artifact=-0.031360348531173025 ledger=-0.0314
+  ok  W2A D L5 ci hi: artifact=-0.030034192632127903 ledger=-0.03
+  ok  W2A D L1 PASS: artifact=1.0 ledger=1.0
+  ok  W2A D L2 PASS: artifact=1.0 ledger=1.0
+  ok  W2A D L3 PASS: artifact=1.0 ledger=1.0
+  ok  W2A D L4 PASS: artifact=1.0 ledger=1.0
+  ok  W2A D L5 PASS: artifact=1.0 ledger=1.0
+  ok  W2A D outcome PASS: artifact=1.0 ledger=1.0
+  ok  W2A D median r_obs: artifact=0.03197253390283661 ledger=0.032
+  ok  W2A D median steps t_sw to crossing: artifact=206.0 ledger=206.0
+  ok  W2A D undecided steps: artifact=0.0 ledger=0.0
+  ok  W2A Tp gate pass: artifact=1.0 ledger=1.0
+  ok  W2A Tp runs: artifact=120.0 ledger=120.0
+  ok  W2A Tp on-branch at release: artifact=120.0 ledger=120.0
+  ok  W2A Tp G>0 in hold: artifact=0.0 ledger=0.0
+  ok  W2A Tp crossed: artifact=120.0 ledger=120.0
+  ok  W2A Tp not following: artifact=0.0 ledger=0.0
+  ok  W2A Tp scored: artifact=120.0 ledger=120.0
+  ok  W2A Tp kappa<=0 scored: artifact=120.0 ledger=120.0
+  ok  W2A Tp L5 eligible: artifact=120.0 ledger=120.0
+  ok  W2A Tp valid (all V1-V7): artifact=1.0 ledger=1.0
+  ok  W2A Tp V4 median |lag| steps: artifact=43.29659079405742 ledger=43.3
+  ok  W2A Tp V5 q90 |kappa chi|: artifact=0.00141671443720037 ledger=0.00142
+  ok  W2A Tp V6 median chi: artifact=0.01649140005404285 ledger=0.0165
+  ok  W2A Tp V7 q90 window: artifact=0.07524103132409052 ledger=0.075
+  ok  W2A Tp L1 ratio: artifact=1.0000000000000038 ledger=1.0
+  ok  W2A Tp L2 ratio: artifact=0.9930796774544781 ledger=0.993
+  ok  W2A Tp L3 spearman: artifact=0.9999861101465378 ledger=1.0
+  ok  W2A Tp L4 mean D: artifact=-0.06167568771060645 ledger=-0.062
+  ok  W2A Tp L4 ci lo: artifact=-0.06950116601342757 ledger=-0.07
+  ok  W2A Tp L4 ci hi: artifact=-0.05418706511340799 ledger=-0.054
+  ok  W2A Tp L5 mean D: artifact=-0.000884788042380631 ledger=-0.00088
+  ok  W2A Tp L5 ci lo: artifact=-0.0009507832081251228 ledger=-0.00095
+  ok  W2A Tp L5 ci hi: artifact=-0.0008215843174522302 ledger=-0.00082
+  ok  W2A Tp L1 PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp L2 PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp L3 PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp L4 PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp L5 PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp outcome PASS: artifact=1.0 ledger=1.0
+  ok  W2A Tp median r_obs: artifact=-0.0008421858620455414 ledger=-0.00084
+  ok  W2A Tp median steps t_sw to crossing: artifact=-43.5 ledger=-43.5
+  ok  W2A Tp undecided steps: artifact=0.0 ledger=0.0
+  ok  W2A T sensitivity scored: artifact=97.0 ledger=97.0
+  ok  W2A T sensitivity outcome PASS: artifact=1.0 ledger=1.0
+  ok  W2A T sensitivity L2: artifact=1.0082507695412146 ledger=1.008
+  ok  W2A T release Newton type T: artifact=100.0 ledger=100.0
+  ok  W2A T release Newton type D: artifact=58.0 ledger=58.0
+  ok  W2A T release Newton type not accepted: artifact=24.0 ledger=24.0
+  ok  W2A T release Newton type Tp: artifact=15.0 ledger=15.0
+  ok  W2A T release Newton type Dp: artifact=3.0 ledger=3.0
+  ok  W2A T observed step == predicted: artifact=97.0 ledger=97.0
+  ok  W2A T within 1 step: artifact=98.0 ledger=98.0
+  ok  W2A T step diff min: artifact=-1.0 ledger=-1.0
+  ok  W2A T step diff max: artifact=0.0 ledger=0.0
+  ok  W2A Tp observed step == predicted: artifact=118.0 ledger=118.0
+  ok  W2A Tp within 1 step: artifact=120.0 ledger=120.0
+  ok  W2A Tp step diff min: artifact=0.0 ledger=0.0
+  ok  W2A Tp step diff max: artifact=1.0 ledger=1.0
+  ok  W2A D observed step == predicted: artifact=0.0 ledger=0.0
+  ok  W2A D within 1 step: artifact=14.0 ledger=14.0
+  ok  W2A D step diff min: artifact=1.0 ledger=1.0
+  ok  W2A D step diff max: artifact=6.0 ledger=6.0
+  ok  W2A T' runs crossing before their switch: artifact=120.0 ledger=120.0
+  ok  W2A D within 3 steps: artifact=28.0 ledger=28.0
+  ok  W2A T off-branch runs that crossed: artifact=41.0 ledger=41.0
+Prediction-inputs audit (W2-A, GELU-T, Test 2A, Track A a = 1.65)
+  ok  PIA cited code lines that no longer hold: artifact=0.0 ledger=0.0
+  ok  PIA md citations without a token check: artifact=0.0 ledger=0.0
+  ok  PIA JSON regenerates from the committed CSVs and replay rows: artifact=1.0 ledger=1.0
+  ok  PIA width2_asym predictions.csv hash: artifact=1.0 ledger=1.0
+  ok  PIA gelu_transfer predictions.csv hash: artifact=1.0 ledger=1.0
+  ok  PIA track2a predictions.csv hash: artifact=1.0 ledger=1.0
+  ok  PIA track_a predictions.csv hash: artifact=1.0 ledger=1.0
+  ok  PIA replay rows w2a: artifact=338.0 ledger=338.0
+  ok  PIA truncated rows w2a: artifact=338.0 ledger=338.0
+  ok  PIA replay rows gelu: artifact=160.0 ledger=160.0
+  ok  PIA truncated rows gelu: artifact=160.0 ledger=160.0
+  ok  PIA replay rows track_a: artifact=137.0 ledger=137.0
+  ok  PIA truncated rows track_a: artifact=137.0 ledger=137.0
+  ok  PIA replay rows track2a: artifact=75.0 ledger=75.0
+  ok  PIA truncated rows track2a: artifact=75.0 ledger=75.0
+  ok  PIA W2-A T path hashes verified: artifact=98.0 ledger=98.0
+  ok  PIA W2-A T MASKED: every field reproduced: artifact=98.0 ledger=98.0
+  ok  PIA W2-A T TRUNCATED r_traj reproduced: artifact=98.0 ledger=98.0
+  ok  PIA W2-A T TRUNCATED r_cf reproduced: artifact=98.0 ledger=98.0
+  ok  PIA W2-A T causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T L_traj vs t_obs n_at (replay = CSV): artifact=95.0 ledger=95.0
+  ok  PIA W2-A T L_traj vs t_obs n_strictly_after (replay = CSV): artifact=3.0 ledger=3.0
+  ok  PIA W2-A T L_traj vs t_obs max_steps_after (replay = CSV): artifact=3.0 ledger=3.0
+  ok  PIA W2-A D path hashes verified: artifact=120.0 ledger=120.0
+  ok  PIA W2-A D MASKED: every field reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A D TRUNCATED r_traj reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A D TRUNCATED r_cf reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A D causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D L_traj vs t_obs n_at (replay = CSV): artifact=0.0 ledger=0.0
+  ok  PIA W2-A D L_traj vs t_obs n_strictly_after (replay = CSV): artifact=0.0 ledger=0.0
+  ok  PIA W2-A D L_traj vs t_obs max_steps_after (replay = CSV): artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp path hashes verified: artifact=120.0 ledger=120.0
+  ok  PIA W2-A Tp MASKED: every field reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A Tp TRUNCATED r_traj reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A Tp TRUNCATED r_cf reproduced: artifact=120.0 ledger=120.0
+  ok  PIA W2-A Tp causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp L_traj vs t_obs n_at (replay = CSV): artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp L_traj vs t_obs n_strictly_after (replay = CSV): artifact=120.0 ledger=120.0
+  ok  PIA W2-A Tp L_traj vs t_obs max_steps_after (replay = CSV): artifact=83.0 ledger=83.0
+  ok  PIA GELU-T random path hashes verified: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T random MASKED: every field reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T random TRUNCATED r_traj reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T random TRUNCATED r_cf reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T random causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random L_traj vs t_obs n_at (replay = CSV): artifact=36.0 ledger=36.0
+  ok  PIA GELU-T random L_traj vs t_obs n_strictly_after (replay = CSV): artifact=44.0 ledger=44.0
+  ok  PIA GELU-T random L_traj vs t_obs max_steps_after (replay = CSV): artifact=191.0 ledger=191.0
+  ok  PIA GELU-T branch path hashes verified: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T branch MASKED: every field reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T branch TRUNCATED r_traj reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T branch TRUNCATED r_cf reproduced: artifact=80.0 ledger=80.0
+  ok  PIA GELU-T branch causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch L_traj vs t_obs n_at (replay = CSV): artifact=42.0 ledger=42.0
+  ok  PIA GELU-T branch L_traj vs t_obs n_strictly_after (replay = CSV): artifact=38.0 ledger=38.0
+  ok  PIA GELU-T branch L_traj vs t_obs max_steps_after (replay = CSV): artifact=19.0 ledger=19.0
+  ok  PIA Track A adam path hashes verified: artifact=74.0 ledger=74.0
+  ok  PIA Track A adam MASKED: every field reproduced: artifact=74.0 ledger=74.0
+  ok  PIA Track A adam TRUNCATED r_traj reproduced: artifact=74.0 ledger=74.0
+  ok  PIA Track A adam TRUNCATED r_cf reproduced: artifact=74.0 ledger=74.0
+  ok  PIA Track A adam causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA Track A adam L_traj vs t_obs n_at (replay = CSV): artifact=1.0 ledger=1.0
+  ok  PIA Track A adam L_traj vs t_obs n_strictly_after (replay = CSV): artifact=33.0 ledger=33.0
+  ok  PIA Track A adam L_traj vs t_obs max_steps_after (replay = CSV): artifact=140.0 ledger=140.0
+  ok  PIA Track A sgd path hashes verified: artifact=63.0 ledger=63.0
+  ok  PIA Track A sgd MASKED: every field reproduced: artifact=63.0 ledger=63.0
+  ok  PIA Track A sgd TRUNCATED r_traj reproduced: artifact=63.0 ledger=63.0
+  ok  PIA Track A sgd TRUNCATED r_cf reproduced: artifact=63.0 ledger=63.0
+  ok  PIA Track A sgd causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA Track A sgd L_traj vs t_obs n_at (replay = CSV): artifact=1.0 ledger=1.0
+  ok  PIA Track A sgd L_traj vs t_obs n_strictly_after (replay = CSV): artifact=4.0 ledger=4.0
+  ok  PIA Track A sgd L_traj vs t_obs max_steps_after (replay = CSV): artifact=181.0 ledger=181.0
+  ok  PIA Test 2A adam path hashes verified: artifact=75.0 ledger=75.0
+  ok  PIA Test 2A adam MASKED: every field reproduced: artifact=75.0 ledger=75.0
+  ok  PIA Test 2A adam TRUNCATED r_traj reproduced: artifact=75.0 ledger=75.0
+  ok  PIA Test 2A adam TRUNCATED r_cf reproduced: artifact=75.0 ledger=75.0
+  ok  PIA Test 2A adam causal: no run without a prediction: artifact=0.0 ledger=0.0
+  ok  PIA Test 2A adam L_traj vs t_obs n_at (replay = CSV): artifact=2.0 ledger=2.0
+  ok  PIA Test 2A adam L_traj vs t_obs n_strictly_after (replay = CSV): artifact=8.0 ledger=8.0
+  ok  PIA Test 2A adam L_traj vs t_obs max_steps_after (replay = CSV): artifact=53.0 ledger=53.0
+  ok  PIA W2-A T r_traj all inputs: at t_obs: artifact=95.0 ledger=95.0
+  ok  PIA W2-A T r_traj all inputs: after t_obs: artifact=3.0 ledger=3.0
+  ok  PIA W2-A T r_traj all inputs: max steps after: artifact=3.0 ledger=3.0
+  ok  PIA W2-A T r_traj recursion: at t_obs: artifact=97.0 ledger=97.0
+  ok  PIA W2-A T r_traj recursion: after t_obs: artifact=1.0 ledger=1.0
+  ok  PIA W2-A T r_traj recursion: max steps after: artifact=1.0 ledger=1.0
+  ok  PIA W2-A T t_sw: at t_obs: artifact=2.0 ledger=2.0
+  ok  PIA W2-A T t_sw: after t_obs: artifact=2.0 ledger=2.0
+  ok  PIA W2-A T t_sw: max steps after: artifact=3.0 ledger=3.0
+  ok  PIA W2-A D r_traj all inputs: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D r_traj all inputs: after t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D r_traj all inputs: max steps after: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D t_sw: after t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D t_sw: max steps after: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T' r_traj all inputs: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T' r_traj all inputs: after t_obs: artifact=120.0 ledger=120.0
+  ok  PIA W2-A T' r_traj all inputs: max steps after: artifact=83.0 ledger=83.0
+  ok  PIA W2-A T' r_traj recursion: at t_obs: artifact=118.0 ledger=118.0
+  ok  PIA W2-A T' r_traj recursion: after t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T' r_traj recursion: max steps after: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T' t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T' t_sw: after t_obs: artifact=120.0 ledger=120.0
+  ok  PIA W2-A T' t_sw: max steps after: artifact=83.0 ledger=83.0
+  ok  PIA GELU-T random r_traj: at t_obs: artifact=36.0 ledger=36.0
+  ok  PIA GELU-T random r_traj: after t_obs: artifact=44.0 ledger=44.0
+  ok  PIA GELU-T random r_traj: max steps after: artifact=191.0 ledger=191.0
+  ok  PIA GELU-T random t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random t_sw: after t_obs: artifact=13.0 ledger=13.0
+  ok  PIA GELU-T random t_sw: max steps after: artifact=310.0 ledger=310.0
+  ok  PIA GELU-T random kappa<0 t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random kappa<0 t_sw: after t_obs: artifact=8.0 ledger=8.0
+  ok  PIA GELU-T random kappa<0 t_sw: max steps after: artifact=310.0 ledger=310.0
+  ok  PIA GELU-T branch r_traj: at t_obs: artifact=42.0 ledger=42.0
+  ok  PIA GELU-T branch r_traj: after t_obs: artifact=38.0 ledger=38.0
+  ok  PIA GELU-T branch r_traj: max steps after: artifact=19.0 ledger=19.0
+  ok  PIA GELU-T branch t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch t_sw: after t_obs: artifact=7.0 ledger=7.0
+  ok  PIA GELU-T branch t_sw: max steps after: artifact=60.0 ledger=60.0
+  ok  PIA GELU-T branch kappa<0 t_sw: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch kappa<0 t_sw: after t_obs: artifact=2.0 ledger=2.0
+  ok  PIA GELU-T branch kappa<0 t_sw: max steps after: artifact=60.0 ledger=60.0
+  ok  PIA Track A Adam r_traj all inputs: at t_obs: artifact=1.0 ledger=1.0
+  ok  PIA Track A Adam r_traj all inputs: after t_obs: artifact=33.0 ledger=33.0
+  ok  PIA Track A Adam r_traj all inputs: max steps after: artifact=140.0 ledger=140.0
+  ok  PIA Track A Adam r_traj recursion: at t_obs: artifact=1.0 ledger=1.0
+  ok  PIA Track A Adam r_traj recursion: after t_obs: artifact=32.0 ledger=32.0
+  ok  PIA Track A Adam r_traj recursion: max steps after: artifact=66.0 ledger=66.0
+  ok  PIA Track A Adam r_cf all inputs: at t_obs: artifact=0.0 ledger=0.0
+/Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/Evan/precision-topology/census/.venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+  ok  PIA Track A Adam r_cf all inputs: after t_obs: artifact=4.0 ledger=4.0
+  ok  PIA Track A Adam r_cf all inputs: max steps after: artifact=140.0 ledger=140.0
+  ok  PIA Track A SGD r_traj all inputs: at t_obs: artifact=1.0 ledger=1.0
+  ok  PIA Track A SGD r_traj all inputs: after t_obs: artifact=4.0 ledger=4.0
+  ok  PIA Track A SGD r_traj all inputs: max steps after: artifact=181.0 ledger=181.0
+  ok  PIA Track A SGD r_traj recursion: at t_obs: artifact=1.0 ledger=1.0
+  ok  PIA Track A SGD r_traj recursion: after t_obs: artifact=0.0 ledger=0.0
+  ok  PIA Track A SGD r_traj recursion: max steps after: artifact=0.0 ledger=0.0
+  ok  PIA Track A SGD r_cf all inputs: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA Track A SGD r_cf all inputs: after t_obs: artifact=4.0 ledger=4.0
+  ok  PIA Track A SGD r_cf all inputs: max steps after: artifact=181.0 ledger=181.0
+  ok  PIA Test 2A r_traj all inputs: at t_obs: artifact=2.0 ledger=2.0
+  ok  PIA Test 2A r_traj all inputs: after t_obs: artifact=8.0 ledger=8.0
+  ok  PIA Test 2A r_traj all inputs: max steps after: artifact=53.0 ledger=53.0
+  ok  PIA Test 2A r_traj recursion: at t_obs: artifact=3.0 ledger=3.0
+  ok  PIA Test 2A r_traj recursion: after t_obs: artifact=7.0 ledger=7.0
+  ok  PIA Test 2A r_traj recursion: max steps after: artifact=4.0 ledger=4.0
+  ok  PIA Test 2A r_cf all inputs: at t_obs: artifact=0.0 ledger=0.0
+  ok  PIA Test 2A r_cf all inputs: after t_obs: artifact=1.0 ledger=1.0
+  ok  PIA Test 2A r_cf all inputs: max steps after: artifact=53.0 ledger=53.0
+  ok  PIA W2-A T t_traj = t_obs (s_traj identical): artifact=97.0 ledger=97.0
+  ok  PIA W2-A D t_traj = t_obs (s_traj identical): artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp t_traj = t_obs (s_traj identical): artifact=118.0 ledger=118.0
+  ok  PIA GELU-T random t_traj = t_obs (s_traj identical): artifact=36.0 ledger=36.0
+  ok  PIA GELU-T branch t_traj = t_obs (s_traj identical): artifact=42.0 ledger=42.0
+  ok  PIA 2A P read at t_sw after t_R: artifact=75.0 ledger=75.0
+  ok  PIA Track A Adam replay bit-identical: artifact=74.0 ledger=74.0
+  ok  PIA 2A Adam replay bit-identical: artifact=75.0 ledger=75.0
+  ok  PIA W2-A T causal t_traj changed (POST HOC): artifact=0.0 ledger=0.0
+  ok  PIA W2-A T follow check before the crossing: artifact=0.0 ledger=0.0
+  ok  PIA W2-A T on-branch runs excluded by the follow check: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D causal t_traj changed (POST HOC): artifact=0.0 ledger=0.0
+  ok  PIA W2-A D follow check before the crossing: artifact=0.0 ledger=0.0
+  ok  PIA W2-A D on-branch runs excluded by the follow check: artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp causal t_traj changed (POST HOC): artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp follow check before the crossing: artifact=0.0 ledger=0.0
+  ok  PIA W2-A Tp on-branch runs excluded by the follow check: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random causal t_traj changed (POST HOC): artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random follow check before the crossing: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T random on-branch runs excluded by the follow check: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch causal t_traj changed (POST HOC): artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch follow check before the crossing: artifact=0.0 ledger=0.0
+  ok  PIA GELU-T branch on-branch runs excluded by the follow check: artifact=0.0 ledger=0.0
+Phase 1A: causal forecaster, pilot-seed error estimate
+  ok  P1A summary.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P1A error_estimate.md regenerates from summary.json: artifact=1.0 ledger=1.0
+  ok  P1A forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1A forecast rows with a cutoff: artifact=5221.0 ledger=5221.0
+  ok  P1A pilot seeds that are registered or pilot seeds of a test: artifact=0.0 ledger=0.0
+  ok  P1A pilot seed prefixes found in src/tests/results/paper: artifact=0.0 ledger=0.0
+  ok  P1A a-column values in [1.575, 1.585] other than corner_tracking's 1.575 (landscape table): artifact=0.0 ledger=0.0
+  ok  P1A files with the token 1.58 other than sb_fold/branch_losses.csv (s-grid) and this ledger: artifact=0.0 ledger=0.0
+  ok  P1A landscape at a = 1.58 validated: artifact=1.0 ledger=1.0
+  ok  P1A fixture gelu_random hash: artifact=1.0 ledger=1.0
+  ok  P1A fixture w2a_T hash: artifact=1.0 ledger=1.0
+  ok  P1A w1_sgd est eligible runs: artifact=40.0 ledger=40.0
+  ok  P1A w1_sgd_run est eligible runs: artifact=40.0 ledger=40.0
+  ok  P1A gelu_random est eligible runs: artifact=19.0 ledger=19.0
+  ok  P1A w2a_T est eligible runs: artifact=26.0 ledger=26.0
+  ok  P1A w2a_Tp est eligible runs: artifact=20.0 ledger=20.0
+  ok  P1A one-lag rule common f: artifact=0.8 ledger=0.8
+  ok  P1A minimal rule admits every f in the grid: artifact=1.0 ledger=1.0
+  ok  P1A primary configuration quad/0.05: artifact=1.0 ledger=1.0
+Phase 1C: registered causal replication
+  ok  P1C scores.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P1C phase1c_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P1C forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1C forecasts whose NaN recomputation differs: artifact=0.0 ledger=0.0
+  ok  P1C W1 runs: artifact=100.0 ledger=100.0
+  ok  P1C W1 eligible runs: artifact=100.0 ledger=100.0
+  ok  P1C W1 scored runs: artifact=84.0 ledger=84.0
+  ok  P1C W1 scored misses: artifact=0.0 ledger=0.0
+  ok  P1C W1 outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1C G runs: artifact=80.0 ledger=80.0
+  ok  P1C G eligible runs: artifact=79.0 ledger=79.0
+  ok  P1C G scored runs: artifact=79.0 ledger=79.0
+  ok  P1C G scored misses: artifact=0.0 ledger=0.0
+  ok  P1C G outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1C T runs: artifact=200.0 ledger=200.0
+  ok  P1C T eligible runs: artifact=101.0 ledger=101.0
+  ok  P1C T scored runs: artifact=101.0 ledger=101.0
+  ok  P1C T scored misses: artifact=0.0 ledger=0.0
+  ok  P1C T outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1C Tp runs: artifact=120.0 ledger=120.0
+  ok  P1C Tp eligible runs: artifact=120.0 ledger=120.0
+  ok  P1C Tp scored runs: artifact=120.0 ledger=120.0
+  ok  P1C Tp scored misses: artifact=0.0 ledger=0.0
+  ok  P1C Tp outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1C gate to Phase 2: artifact=1.0 ledger=1.0
+Phase 2A: slow tracking on the simplicity-bias benchmark
+  ok  P2A scores.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P2A phase2a_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P2A rates run: artifact=27.0 ledger=27.0
+  ok  P2A rates observed: artifact=27.0 ledger=27.0
+  ok  P2A forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P2A forecasts whose NaN recomputation differs: artifact=0.0 ledger=0.0
+  ok  P2A t_c states reproduced bit for bit: artifact=27.0 ledger=27.0
+  ok  P2A scored rates: artifact=22.0 ledger=22.0
+  ok  P2A pre-observed rates (descriptive): artifact=5.0 ledger=5.0
+  ok  P2A seeds on M: artifact=48.0 ledger=48.0
+  ok  P2A gate: artifact=1.0 ledger=1.0
+  ok  P2A outcome PASS: artifact=1.0 ledger=1.0
+  ok  P2A F PASS: artifact=1.0 ledger=1.0
+  ok  P2A C1 PASS: artifact=1.0 ledger=1.0
+  ok  P2A C2 PASS: artifact=1.0 ledger=1.0
+  ok  P2A C3 PASS: artifact=1.0 ledger=1.0
+  ok  P2A C4 PASS: artifact=1.0 ledger=1.0
+  ok  P2A E PASS: artifact=1.0 ledger=1.0
+  ok  P2A validity: artifact=1.0 ledger=1.0
+Phase 2A POST HOC: the delay law with one correction term
+  ok  P2A-PH phase2a_posthoc.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P2A-PH phase2a_posthoc.md regenerates from the JSON: artifact=1.0 ledger=1.0
+  ok  P2A-PH page carries the POST HOC header: artifact=1.0 ledger=1.0
+  ok  P2A-PH rates: artifact=27.0 ledger=27.0
+  ok  P2A-PH scored rates: artifact=22.0 ledger=22.0
+  ok  P2A-PH pre-observed rates: artifact=5.0 ledger=5.0
+  ok  P2A-PH theory-backed fit residuals reproduce (max abs diff): artifact=0.0 ledger=0.0
+  ok  P2A-PH local exponent at 2^-18 above 2/3: artifact=1.0 ledger=1.0
+  ok  P2A-PH A/Omega0 (eps_fc, 27 rates): artifact=0.9919885135432944 ledger=0.991989
+  ok  P2A-PH C (eps_fc, 27 rates): artifact=0.8030472749581873 ledger=0.803047
+  ok  P2A-PH local exponent at 2^-18 (eps_fc): artifact=0.6931540597660302 ledger=0.693154
+Phase 2B: the lever (output learning rate) on the simplicity-bias benchmark
+  ok  P2B runs: artifact=400.0 ledger=400.0
+  ok  P2B distinct (arm, seed) = arms x registered seeds: artifact=1.0 ledger=1.0
+  ok  P2B runs not of T_C steps: artifact=0.0 ledger=0.0
+  ok  P2B scores.json regenerates from the committed runs: artifact=1.0 ledger=1.0
+  ok  P2B phase2b_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P2B no criterion is a forecast: artifact=1.0 ledger=1.0
+  ok  P2B re-trained run (arm 2, first seed) path hash identical: artifact=1.0 ledger=1.0
+  ok  P2B primary outcome PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16 R_s PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16 R_l_rho2 PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16 R_l_acc PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16 O PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16b R_s PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16b R_l_rho2 PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16b R_l_acc PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm out16b O PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm glob N PASS: artifact=1.0 ledger=1.0
+  ok  P2B arm globcm N PASS: artifact=1.0 ledger=1.0
+  ok  P2B non-finite runs: artifact=0.0 ledger=0.0
+Phase 2A-PS: the fold prediction with a sample per seed
+  ok  P2A-PS class listing hash: artifact=1.0 ledger=1.0
+  ok  P2A-PS stored evaluations = the registered rules: artifact=1.0 ledger=1.0
+  ok  P2A-PS untraceable seeds: artifact=142.0 ledger=142.0
+  ok  P2A-PS scoreable seeds: artifact=173.0 ledger=173.0
+  ok  P2A-PS clean scoreable (gate >= 24): artifact=74.0 ledger=74.0
+  ok  P2A-PS runs = the frozen plan: artifact=1.0 ledger=1.0
+  ok  P2A-PS observations = the frozen plan: artifact=1.0 ledger=1.0
+  ok  P2A-PS forecasts reading a row >= t_c: artifact=0.0 ledger=0.0
+  ok  P2A-PS NaN recomputations differing: artifact=0.0 ledger=0.0
+  ok  P2A-PS observed t_c states not matching the hash: artifact=0.0 ledger=0.0
+  ok  P2A-PS scores.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P2A-PS phase2a_ps_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P2A-PS outcome UNRESOLVED (validity): artifact=1.0 ledger=1.0
+  ok  P2A-PS F PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS H FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS E_seed PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS C3 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS C4 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS P PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS C1 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS C2 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS validity ok: artifact=1.0 ledger=1.0
+  ok  P2A-PS runs: artifact=130.0 ledger=130.0
+Phase 2A-PS POST HOC: no-forecast seeds, crossing none seeds, the sign flip
+  ok  P2A-PS-PH phase2a_ps_posthoc.json regenerates: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH page regenerates from the JSON: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH page carries the POST HOC header: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH no-forecast replays (4 seeds x 2 rates): artifact=8.0 ledger=8.0
+  ok  P2A-PS-PH replays not reproducing the committed forecast or s_end: artifact=0.0 ledger=0.0
+  ok  P2A-PS-PH none seeds: artifact=30.0 ledger=30.0
+  ok  P2A-PS-PH registered perturbed minima not reproduced: artifact=0.0 ledger=0.0
+  ok  P2A-PS-PH crossings replayed: artifact=7.0 ledger=7.0
+  ok  P2A-PS-PH crossings not reproduced: artifact=0.0 ledger=0.0
+  ok  P2A-PS-PH seed 2975052 first step at 2^-14 recomputed (max abs diff): artifact=0.0 ledger=0.0
+  ok  P2A-PS-PH seed 2975052 sign flip at step 1 at 2^-14: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed 2975052 first step at 2^-16 recomputed (max abs diff): artifact=0.0 ledger=0.0
+  ok  P2A-PS-PH seed 2975052 sign flip at step 1 at 2^-16: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed-excluded rescoring regenerates: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH registered outcome unchanged: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH excluded outcome FAIL H+C3+C4: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH excluded validity ok: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH none seeds changing class under the wider search: artifact=21.0 ledger=21.0
+  ok  P2A-PS-PH crossing branch labels: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed 2975003 diagnosis LANDSCAPE: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed 2975052 diagnosis PIPELINE: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed 2975093 diagnosis LANDSCAPE: artifact=1.0 ledger=1.0
+  ok  P2A-PS-PH seed 2975179 diagnosis LANDSCAPE: artifact=1.0 ledger=1.0
+Phase 2A-PS2: the per-seed fold test with the pipeline repaired
+  ok  P2A-PS2 class listing hash: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 untraceable seeds: artifact=206.0 ledger=206.0
+  ok  P2A-PS2 inactive-unit releases: artifact=10.0 ledger=10.0
+  ok  P2A-PS2 over-cap seeds: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 stall seeds: artifact=0.0 ledger=0.0
+  ok  P2A-PS2 scoreable seeds: artifact=253.0 ledger=253.0
+  ok  P2A-PS2 clean scoreable (gate >= 24): artifact=113.0 ledger=113.0
+  ok  P2A-PS2 author's over-cap check passes: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 runs = the frozen plan: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 observations = the frozen plan: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 run budgets = the frozen plan's: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 forecasts reading a row >= t_c: artifact=0.0 ledger=0.0
+  ok  P2A-PS2 NaN recomputations differing: artifact=0.0 ledger=0.0
+  ok  P2A-PS2 observed t_c states not matching the hash: artifact=0.0 ledger=0.0
+  ok  P2A-PS2 aborted runs: artifact=0.0 ledger=0.0
+  ok  P2A-PS2 scores.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 phase2a_ps2_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 outcome FAIL H: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 F PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 H FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 E_seed PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 C3 PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 C4 PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 P PASS: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 C1 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 C2 FAIL: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 validity ok: artifact=1.0 ledger=1.0
+  ok  P2A-PS2 runs: artifact=130.0 ledger=130.0
+  ok  P2A-PS2 H none seeds not crossing: artifact=23.0 ledger=23.0
+  ok  P2A-PS2 C3 seeds with ratio > 1: artifact=36.0 ledger=36.0
+  ok  P2A-PS2 F seeds within: artifact=40.0 ledger=40.0
+Final POST HOC checks: per-seed delay law; crossing vs non-crossing none seeds
+  ok  FINAL-PH final_posthoc.json regenerates: artifact=1.0 ledger=1.0
+  ok  FINAL-PH page regenerates from the JSON: artifact=1.0 ledger=1.0
+  ok  FINAL-PH page carries the POST HOC header: artifact=1.0 ledger=1.0
+  ok  FINAL-PH clean seeds with two rates: artifact=40.0 ledger=40.0
+  ok  FINAL-PH per-seed slope equals the registered seed exponent (max abs diff): artifact=0.0 ledger=0.0
+  ok  FINAL-PH cited 2A numbers equal phase2a_posthoc.json: artifact=1.0 ledger=1.0
+  ok  FINAL-PH ps2 distance rows: artifact=30.0 ledger=30.0
+  ok  FINAL-PH ps2 wider searches reproduced: artifact=30.0 ledger=30.0
+  ok  FINAL-PH ps2 crossers: artifact=7.0 ledger=7.0
+  ok  FINAL-PH ps2 peak RSS of the distance job below 1 GB: artifact=1.0 ledger=1.0
+  ok  FINAL-PH ps distance rows: artifact=30.0 ledger=30.0
+  ok  FINAL-PH ps wider searches reproduced: artifact=30.0 ledger=30.0
+  ok  FINAL-PH ps crossers: artifact=7.0 ledger=7.0
+  ok  FINAL-PH ps peak RSS of the distance job below 1 GB: artifact=1.0 ledger=1.0
+  ok  FINAL-PH registered outcomes unchanged: artifact=1.0 ledger=1.0
+  ok  FINAL-PH per-seed slope median (eps_fc): artifact=0.704884834406891 ledger=0.704885
+  ok  FINAL-PH per-seed slopes below 2/3 (eps_fc): artifact=7.0 ledger=7.0
+  ok  FINAL-PH Spearman slope vs eps16 (eps_fc): artifact=-0.27842401500938085 ledger=-0.278424
+  ok  FINAL-PH pooled C, per-seed A_s (eps_fc): artifact=0.881644208752657 ledger=0.881644
+  ok  FINAL-PH 2A-PS2 smallest Holm p: artifact=0.003477748305334512 ledger=0.003478
+  ok  FINAL-PH 2A-PS smallest Holm p: artifact=0.2515473032714412 ledger=0.251547
+Track C: next-order fold-passage delay (prediction)
+  ok  FOLD-NO c_A recomputes: artifact=0.0 ledger=0.0
+  ok  FOLD-NO c_B = 1/2: artifact=0.0 ledger=0.0
+  ok  FOLD-NO A, B recompute: artifact=1.0 ledger=1.0
+  ok  FOLD-NO K, D recompute: artifact=1.0 ledger=1.0
+  ok  FOLD-NO rows recompute (mismatches): artifact=0.0 ledger=0.0
+  ok  FOLD-NO rows: artifact=27.0 ledger=27.0
+  ok  FOLD-NO refined fold equals frozen s_F: artifact=4.440892098500626e-15 ledger=0.0
+  ok  FOLD-NO g1 = 3p: artifact=7.549516567451064e-15 ledger=0.0
+  ok  FOLD-NO |m'c'| vs frozen fit within 2 %: artifact=1.0 ledger=1.0
+  ok  FOLD-NO J Richardson pairs agree within 0.5: artifact=1.0 ledger=1.0
+  ok  FOLD-NO prediction holds no observation key: artifact=1.0 ledger=1.0
+  ok  FOLD-NO comparison regenerates from the committed prediction and observations: artifact=1.0 ledger=1.0
+  ok  FOLD-NO comparison labelled derived after the data: artifact=1.0 ledger=1.0
+  ok  FOLD-NO r_obs/r_pred at 2^-18: artifact=0.9869675042299275 ledger=0.986968
+  ok  FOLD-NO slope pred - obs, last pair: artifact=0.008356385429985291 ledger=0.008356
+  ok  FOLD-NO A: artifact=0.03834755676963798 ledger=0.038348
+  ok  FOLD-NO B: artifact=-0.050964347627427416 ledger=-0.050964
+  ok  FOLD-NO K: artifact=-3.032594407445067 ledger=-3.032594
+  ok  FOLD-NO D: artifact=528.4962060355714 ledger=528.496206
+  ok  FOLD-NO J: artifact=494.0585052086012 ledger=494.058505
+  ok  FOLD-NO local slope at 2^-18 (prediction): artifact=0.701286951988541 ledger=0.701287
+  ok  FOLD-NO r_pred at 2^-18: artifact=0.0038499884942910637 ledger=0.00385
+Phase 3: the lag law at width 4 on the asymmetric windows
+  ok  P3 random holds reaching a genuine four-unit branch: artifact=0.0 ledger=0.0
+  ok  P3 T4 random holds on T4 (gate >= 60): artifact=95.0 ledger=95.0
+  ok  P3 Q runs: every seed once: artifact=1.0 ledger=1.0
+  ok  P3 S runs: every seed once: artifact=1.0 ledger=1.0
+  ok  P3 T4 runs: every seed once: artifact=1.0 ledger=1.0
+  ok  P3 forecasts reading a row >= t_c: artifact=0.0 ledger=0.0
+  ok  P3 NaN recomputations differing: artifact=0.0 ledger=0.0
+  ok  P3 observed t_c states not matching the hash: artifact=0.0 ledger=0.0
+  ok  P3 scores.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P3 phase3_results.md regenerates from scores.json: artifact=1.0 ledger=1.0
+  ok  P3 repro check: pre-stall Q seeds reproduce identically: artifact=1.0 ledger=1.0
+  ok  P3 repro check covers 3 seeds: artifact=3.0 ledger=3.0
+  ok  P3 repro check read the committed runs_Q.jsonl: artifact=1.0 ledger=1.0
+  ok  P3 Q outcome pinned: artifact=1.0 ledger=1.0
+  ok  P3 Q scored runs: artifact=112.0 ledger=112.0
+  ok  P3 Q gate on copy: artifact=115.0 ledger=115.0
+  ok  P3 S outcome pinned: artifact=1.0 ledger=1.0
+  ok  P3 S scored runs: artifact=119.0 ledger=119.0
+  ok  P3 S gate on copy: artifact=120.0 ledger=120.0
+  ok  P3 T4 outcome pinned: artifact=1.0 ledger=1.0
+  ok  P3 T4 scored runs: artifact=95.0 ledger=95.0
+  ok  P3 T4 gate on copy: artifact=95.0 ledger=95.0
+Phase 1B: POST HOC causal re-scoring of the registered tests
+  ok  P1B forecaster is the frozen 25aac9e file: artifact=1.0 ledger=1.0
+  ok  P1B summary.json regenerates from the committed rows: artifact=1.0 ledger=1.0
+  ok  P1B phase1b_results.md regenerates from summary.json: artifact=1.0 ledger=1.0
+  ok  P1B runs_track_a.jsonl forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1B runs_track_a.jsonl NaN recomputations that differ: artifact=0.0 ledger=0.0
+  ok  P1B runs_track_a.jsonl rows with the path hash asserted: artifact=137.0 ledger=137.0
+  ok  P1B runs_track_a.jsonl Adam replays bit-identical: artifact=74.0 ledger=74.0
+  ok  P1B runs_track2a.jsonl forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1B runs_track2a.jsonl NaN recomputations that differ: artifact=0.0 ledger=0.0
+  ok  P1B runs_track2a.jsonl rows with the path hash asserted: artifact=75.0 ledger=75.0
+  ok  P1B runs_track2a.jsonl Adam replays bit-identical: artifact=75.0 ledger=75.0
+  ok  P1B runs_gelu.jsonl forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1B runs_gelu.jsonl NaN recomputations that differ: artifact=0.0 ledger=0.0
+  ok  P1B runs_gelu.jsonl rows with the path hash asserted: artifact=160.0 ledger=160.0
+  ok  P1B runs_gelu.jsonl Adam replays bit-identical: artifact=0.0 ledger=0.0
+  ok  P1B runs_w2a.jsonl forecasts that read a row at or after the cutoff: artifact=0.0 ledger=0.0
+  ok  P1B runs_w2a.jsonl NaN recomputations that differ: artifact=0.0 ledger=0.0
+  ok  P1B runs_w2a.jsonl rows with the path hash asserted: artifact=338.0 ledger=338.0
+  ok  P1B runs_w2a.jsonl Adam replays bit-identical: artifact=0.0 ledger=0.0
+  ok  P1B track_a/sgd registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B track_a/adam registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B track2a/adam registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B gelu/random registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B gelu/branch registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B w2a/T registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B w2a/D registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B w2a/Tp registered verdict reproduced from the committed predictions: artifact=1.0 ledger=1.0
+  ok  P1B track_a/sgd registered scored runs: artifact=63.0 ledger=63.0
+  ok  P1B track_a/sgd scored runs at f: artifact=63.0 ledger=63.0
+  ok  P1B track_a/sgd misses at f: artifact=0.0 ledger=0.0
+  ok  P1B track_a/sgd POST HOC criteria outcome FAIL C3: artifact=1.0 ledger=1.0
+  ok  P1B track_a/sgd registered outcome unchanged (no combined outcome (L1 PASS, L2 PASS, L3 PASS)): artifact=1.0 ledger=1.0
+  ok  P1B track_a/adam registered scored runs: artifact=74.0 ledger=74.0
+  ok  P1B track_a/adam scored runs at f: artifact=74.0 ledger=74.0
+  ok  P1B track_a/adam misses at f: artifact=8.0 ledger=8.0
+  ok  P1B track_a/adam POST HOC criteria outcome FAIL C1+C2: artifact=1.0 ledger=1.0
+  ok  P1B track_a/adam registered outcome unchanged (no combined outcome (L1 PASS, L2 PASS, L3 FAIL)): artifact=1.0 ledger=1.0
+  ok  P1B track2a/adam registered scored runs: artifact=75.0 ledger=75.0
+  ok  P1B track2a/adam scored runs at f: artifact=75.0 ledger=75.0
+  ok  P1B track2a/adam misses at f: artifact=19.0 ledger=19.0
+  ok  P1B track2a/adam POST HOC criteria outcome FAIL C1+C2+C3: artifact=1.0 ledger=1.0
+  ok  P1B track2a/adam registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+  ok  P1B gelu/random registered scored runs: artifact=80.0 ledger=80.0
+  ok  P1B gelu/random scored runs at f: artifact=80.0 ledger=80.0
+  ok  P1B gelu/random misses at f: artifact=0.0 ledger=0.0
+  ok  P1B gelu/random POST HOC criteria outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1B gelu/random registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+  ok  P1B gelu/branch registered scored runs: artifact=80.0 ledger=80.0
+  ok  P1B gelu/branch scored runs at f: artifact=80.0 ledger=80.0
+  ok  P1B gelu/branch misses at f: artifact=0.0 ledger=0.0
+  ok  P1B gelu/branch POST HOC criteria outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1B gelu/branch registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+  ok  P1B w2a/T registered scored runs: artifact=98.0 ledger=98.0
+  ok  P1B w2a/T scored runs at f: artifact=98.0 ledger=98.0
+  ok  P1B w2a/T misses at f: artifact=0.0 ledger=0.0
+  ok  P1B w2a/T POST HOC criteria outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1B w2a/T registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+  ok  P1B w2a/D registered scored runs: artifact=120.0 ledger=120.0
+  ok  P1B w2a/D scored runs at f: artifact=120.0 ledger=120.0
+  ok  P1B w2a/D misses at f: artifact=0.0 ledger=0.0
+  ok  P1B w2a/D POST HOC criteria outcome no tolerance set: raw errors only: artifact=1.0 ledger=1.0
+  ok  P1B w2a/D registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+  ok  P1B w2a/Tp registered scored runs: artifact=120.0 ledger=120.0
+  ok  P1B w2a/Tp scored runs at f: artifact=120.0 ledger=120.0
+  ok  P1B w2a/Tp misses at f: artifact=0.0 ledger=0.0
+  ok  P1B w2a/Tp POST HOC criteria outcome PASS: artifact=1.0 ledger=1.0
+  ok  P1B w2a/Tp registered outcome unchanged (PASS): artifact=1.0 ledger=1.0
+Phase 2C: κχ at the crossing in standard training (DESCRIPTIVE)
+  ok  P2C kappa_chi_map.json regenerates from the committed sources: artifact=1.0 ledger=1.0
+  ok  P2C phase2c_kappa_chi_map.md regenerates from the JSON: artifact=1.0 ledger=1.0
+  ok  P2C ε_F (median P) reproduces fold_constant_adam.json: artifact=0.0 ledger=0.0
+  ok  P2C λ_min path (median P) max rel diff: artifact=0.0 ledger=0.0
+  ok  P2C pooled width-1 sine | Adam n: artifact=408.0 ledger=408.0
+  ok  P2C pooled width-1 sine | SGD n: artifact=207.0 ledger=207.0
+  ok  P2C pooled width-1 GELU | Adam n: artifact=114.0 ledger=114.0
+  ok  P2C pooled band task in R^d | Adam n: artifact=705.0 ledger=705.0
+  ok  P2C pooled width 2 | Adam n: artifact=75.0 ledger=75.0
+  ok  P2C κχ cells for the simplicity-bias benchmark: artifact=0.0 ledger=0.0
+PROVENANCE: every artifact backing a reported number has a producing function
+  ok  artifacts with no valid producer: artifact=0.0 ledger=0.0
+  ok  artifacts with only a partial producer: artifact=0.0 ledger=0.0
+Digit stability under the rigorous Ĝ
+  delta = 8.398e-14; 1155 printed-number checks, 0 unstable; 28 machine-precision checks (8 move in their last digits); 1536 exact or non-numeric
+
+0 finding(s)
+exit 0

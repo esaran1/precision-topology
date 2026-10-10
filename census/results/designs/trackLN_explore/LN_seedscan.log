@@ -1,0 +1,3 @@
+{"disjoint": true, "text_hits": {"LN_exploration": []}, "range_literals_checked": 715, "range_overlaps": [], "jsonl_files_checked": 105, "clean": true}
+parquet seed columns: 72 jsonl files with seed keys: 102
+nice -n 15 env OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1     175.77s user 2.25s system 97% cpu 3:02.34 total
