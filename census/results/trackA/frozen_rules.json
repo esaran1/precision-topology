@@ -1,0 +1,17 @@
+{
+ "rules": {
+  "extrapolation": "slin_20",
+  "preconditioner": "coupled_sw"
+ },
+ "sha256": {
+  "slin_extrapolate": "4e4f148f4e1c5dfd5dfbefceda19e27b83fd01274792c4b64e9c76a3ecb2a3b6",
+  "coupled_vhat": "1c803421f0dd0eba133e633087257acd6e6c9d1ee335ab46c1250dc398fb2c11",
+  "coupled_sw_vhat": "c38861c3ddb5e5711915c63025e5157656f90a086f4fcd2dffeccad60105ab20",
+  "all_with_constants": "bc03480a0013d6c7011b7c20662d4a165b47c2a6765f9bbbd9bb4b05db189683"
+ },
+ "functions": [
+  "slin_extrapolate",
+  "coupled_vhat",
+  "coupled_sw_vhat"
+ ]
+}

@@ -1077,6 +1077,20 @@ PRODUCERS = {
     "certificate_checks/solve_limit_ends.json": ("verify_certificates", "track4_solve_limit", "full", ""),
     "certificate_checks/solve_finite_checks.json": ("track4_certs", "finite", "full", ""),
     "certificate_checks/track4_summary.json": ("track4_certs", "summary", "full", ""),
+    # Track A (causal Adam per-run forecast at a = 1.77; page approved 2026-10-09): src/trackA_causal.py
+    "trackA/seed_scan.json": ("trackA_causal", "scan", "full", ""),
+    "trackA/landscape.json": ("trackA_causal", "landscape", "full", ""),
+    "trackA/frozen_rules.json": ("trackA_causal", "freeze_rules", "full", ""),
+    "trackA/frozen_pilot.jsonl": ("trackA_causal", "freeze", "full", ""),
+    "trackA/frozen_registered.jsonl": ("trackA_causal", "freeze", "full", ""),
+    "trackA/pilot_runs.jsonl": ("trackA_causal", "pilot", "full", ""),
+    "trackA/pilot.json": ("trackA_causal", "pilot_summary", "full", ""),
+    "trackA/registration.sha256": ("trackA_causal", "manifest", "full", ""),
+    "trackA/registration_stamp.txt": ("trackA_causal", "stamp", "full", ""),
+    "trackA/runs.jsonl": ("trackA_causal", "run", "full", ""),
+    "trackA/forecasts.sha256": ("trackA_causal", "finalize", "full", ""),
+    "trackA/observed.jsonl": ("trackA_causal", "observe", "full", ""),
+    "trackA/scores.json": ("trackA_causal", "score", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
