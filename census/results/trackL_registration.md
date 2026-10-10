@@ -1,11 +1,11 @@
 # Track L registration: the output-layer lever on MNIST-CIFAR dominoes
 
-**NOT YET REGISTERED: STOPPED BEFORE THE REGISTRATION COMMIT.** This text implements the approved page rule by rule.
-Eight details that the page leaves open touch a criterion, a validity condition or the scoring set (§14, D1–D8). Each
-has a proposed resolution, implemented in `src/trackL.py` and tested in `tests/test_trackL.py`. **They need the
-author's decision before the registration commit.** The proposals carry over 2B's approved D1–D4 and D6–D8 (2B
-registration, §11) unchanged in substance.
-- **Not yet done:** no registered seed (2,992,000–2,992,039) and no pilot seed (2,993,000–2,993,009) has been drawn,
+**REGISTERED (author's approval of D1–D8 as proposed, 2026-10-10).** This text implements the approved page rule by
+rule. The eight details the page left open that touch a criterion, a validity condition or the scoring set (§14,
+D1–D8) were brought to the author before the registration commit and **approved as proposed** (2026-10-10), with
+δ = 0.02 and the §15 disclosure of the N risk unchanged. They carry over 2B's approved D1–D4 and D6–D8 (2B
+registration, §11) unchanged in substance; D8 is new and descriptive only.
+- **At registration:** no registered seed (2,992,000–2,992,039) and no pilot seed (2,993,000–2,993,009) has been drawn,
   initialised or trained.
 - **At registration:** this file, the approved page, `src/trackL.py`, `tests/test_trackL.py`, the frozen inputs
   (`results/trackL/seed_scan.json`, `results/trackL/frozen.json`), the data checksums and the exploration files they
@@ -251,9 +251,9 @@ Track L verdict.
 
 ## 14. The details the approved page left open
 
-### Touching a criterion, a validity condition or the scoring set: PROPOSED, pending the author
+### Touching a criterion, a validity condition or the scoring set: APPROVED as proposed by the author (2026-10-10)
 
-Each is implemented and tested as proposed. Each carries over 2B's approved resolution (2B registration §11, decided
+Each is implemented and tested as proposed and approved. Each carries over 2B's approved resolution (2B registration §11, decided
 2026-10-04/05) unless stated.
 
 | # | detail | proposed resolution | source |
