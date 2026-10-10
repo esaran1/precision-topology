@@ -1,0 +1,21 @@
+{
+ "verdicts": {
+  "R": "FAIL",
+  "N": "PASS"
+ },
+ "outcome": {
+  "verdicts": {
+   "R": "FAIL",
+   "N": "PASS"
+  },
+  "predicted": {
+   "R": "FAIL",
+   "N": "PASS"
+  },
+  "matches_prediction": true,
+  "outcome": "R FAIL, N PASS",
+  "statements": [
+   "R FAIL, N PASS (predicted): in this MLP the readout's learning rate does not decide which feature is used."
+  ]
+ }
+}
