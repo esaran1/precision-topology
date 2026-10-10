@@ -279,9 +279,44 @@ Each is implemented and tested as proposed. Each carries over 2B's approved reso
 
 ## 15. Seed scan and freeze
 
-**Seed scan** (`trackL.scan` → `results/trackL/seed_scan.json`): to be filled.
+**Seed scan, 2026-10-09** (`trackL.scan` → `results/trackL/seed_scan.json`): **the registered seeds
+2,992,000–2,992,039 and the pilot seeds 2,993,000–2,993,009 are unused.**
+- No such number, also written with `_` or `,`, in any text file under src, tests, results, paper, notes, independent,
+  data and dist.
+- Skipped: Track L's own three files, and the six files that name the candidate ranges (the design page,
+  `L_seedscan.py`/`.json`, `A_seedscan.py`/`.json`, the α README).
+- No overlap with any of 705 `range(…)` literals in src/ and tests/, and 0 values in the 72 parquet seed columns.
+- Disjoint from the exploration seeds (2,991,000–2,991,099 and 2,994,000–2,994,099).
 
-**Freeze** (`trackL.freeze` → `results/trackL/frozen.json`; no registered or pilot seed): to be filled.
+**Freeze, 2026-10-09** (`trackL.freeze` → `results/trackL/frozen.json`). No registered or pilot seed was drawn; the
+freeze used exploration seed 2,991,000 only. Peak RSS 1.36 GB.
+- **Data:** every cache hash matches (§3). The dataset hash is `6867910b…` = the exploration's. Counts: 10,000 / 1,960,
+  5,000 / 980 per class, 1,000 flips per class, *rand* agreement 0.4786.
+- **Exact reproduction** of the committed exploration runs on seed 2,991,000, all three arms, every check step and every
+  recorded value (5 decimals) equal:
+
+  | arm | steps | values compared | unequal | final parameter SHA-256 |
+  |---|---|---|---|---|
+  | 1 `std` | 7,064 | 1,896 | 0 | `cb29c21b965d05c5fad6cf2436fdf12aecee0e53d69038943884aacc99960fd7` |
+  | 2 `out16` | 8,110 | 1,952 | 0 | `16c6ee7aa00eccbbc7da35ad8ebd45aa422df2fac14fb890f4ab161eb480bf5a` |
+  | 3 `glob16` | 42,691 | 2,624 | 0 | `6d7f6c46c97d657441f9bb0cf53a93d78a293b8926f50517a75d4f4098bb71b4` |
+
+- **The registered scoring applied to the 5 exploration seeds** (2,991,000–004; a DISCLOSURE, never a verdict):
+
+  | arm | level | median Δ*rand* | 95% interval | up/down |
+  |---|---|---|---|---|
+  | 2 | 0.6 | +0.0046 | [−0.0005, +0.0153] | 3/1 |
+  | 2 | 0.3 | −0.0015 | [−0.0347, +0.0255] | 1/4 |
+  | 2 | 0.03 | +0.0041 | [−0.0015, +0.0133] | 3/2 |
+  | 3 | 0.6 | +0.0005 | [−0.0061, +0.0077] | 3/2 |
+  | 3 | 0.3 | −0.0051 | [−0.0357, +0.0219] | 2/3 |
+  | 3 | 0.03 | −0.0051 | [−0.0281, +0.0112] | 1/4 |
+
+  At n = 5 this gives R FAIL and **N FAIL**: N's upper end at 0.3 is 0.0219 ≥ 0.02. This is a property of 5 seeds,
+  where the interval is wide. N's estimated power at n = 40 is 0.98 (§13). It is disclosed because the registered
+  prediction is N PASS.
+- **Timing:** the freeze's runs took 41 s, 46 s and 148 s, about twice the exploration's 19–74 s on a busier machine.
+  At that speed the 120 registered runs take about 2.5 h rather than 1.3 h.
 
 ## 16. Frozen files and hashes
 
