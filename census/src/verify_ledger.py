@@ -1037,6 +1037,13 @@ PRODUCERS = {
     "phase3/scores.json": ("phase3_w4", "score", "full", ""),
     "phase3_results.md": ("phase3_report", "main", "full", ""),
     "phase3/repro_check.json": ("phase3_repro_check", "main", "full", ""),
+    # Track L (the output-layer lever on MNIST-CIFAR dominoes; page approved 2026-10-09): src/trackL.py
+    "trackL/seed_scan.json": ("trackL", "scan", "full", ""),
+    "trackL/frozen.json": ("trackL", "freeze", "full", ""),
+    "trackL/registration.sha256": ("trackL", "manifest", "full", ""),
+    "trackL/registration_stamp.txt": ("trackL", "stamp", "full", ""),
+    "trackL/runs.jsonl": ("trackL", "run", "full", ""),
+    "trackL/scores.json": ("trackL", "score", "full", ""),
     # registered test 2B (the validity boundary of the lag law in κχ, redesigned)
     "track2b/scores.json": ("track2b", "observe", "full", ""),
     "track2b/observed_runs.csv": ("track2b", "observe", "full", ""),
