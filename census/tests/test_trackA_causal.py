@@ -265,9 +265,9 @@ def test_pilot_errors_use_the_scored_definition_and_forecasts_only():
 def test_a_pattern():
     import re
     rx = re.compile(T.A_PATTERN)
-    for s in ("a = 1.77", "1.77,", "1.7700", "x 1.769999 y"):
+    for s in ("a = 1.77", "1.77,", "1.7700", "x 1.769999 y", "1.7699999999,"):
         assert rx.search(s), s
-    for s in ("1.775", "11.77", "1.7", "1.78", "1.177"):
+    for s in ("1.775", "11.77", "1.7", "1.78", "1.177", "131.769999755892", "1.7699"):
         assert not rx.search(s), s
 
 
@@ -369,3 +369,17 @@ def test_forecast_rows_hold_no_observed_quantity(run_1p85):
     p = fcs["0.9"]["primary"]
     assert p["P_source"] in ("coupled", "visible", "decay") and p["ext"] == "slin_20" and p["P_rule"] == "coupled_sw"
     assert set(fcs["0.9"]) >= {"primary", "P_cut", "ext_1c"} and "P_cut" not in fcs["0.95"]
+
+
+def test_pilot_tolerances_recompute_from_the_committed_pilot_runs():
+    """pilot.json's tolerances = the pilot rule on pilot_runs.jsonl (pilot seeds only), with the frozen rule hashes."""
+    d = json.loads((T.OUT / "pilot.json").read_text())
+    rows = T._rows(T.OUT / "pilot_runs.jsonl")
+    assert sorted(r["seed"] for r in rows) == list(T.PILOT_SEEDS)
+    assert not set(r["seed"] for r in rows) & set(T.SEEDS)
+    obs = [r["observed_PILOT_ONLY"] for r in rows if r.get("observed_PILOT_ONLY")]
+    err = T.pilot_errors(T.table(rows, obs, T.F, "primary"))
+    t = T.pilot_tolerances(err)
+    assert {k: t[k] for k in ("tau_cross", "tau_lag", "band")} == {k: d["tolerances"][k] for k in ("tau_cross", "tau_lag",
+                                                                                                   "band")}
+    assert d["rule_sha256"] == CA.rule_hashes()

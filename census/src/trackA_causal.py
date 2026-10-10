@@ -120,8 +120,8 @@ def rss_guard():
 
 
 def _setup():
-    if os.nice(0) < 15:
-        os.nice(15 - os.nice(0))
+    if os.getpriority(os.PRIO_PROCESS, 0) < 15:
+        os.setpriority(os.PRIO_PROCESS, 0, 15)
     import torch
     torch.set_num_threads(1)
 
@@ -232,7 +232,22 @@ SCAN_SKIP_FILES = ("causal_adam.py", "trackA_causal.py", "test_trackA_causal.py"
                    "trackA_causal_adam_design.md")
 SCAN_SKIP_SUFFIX = (".npz", ".npy", ".pdf", ".png", ".pt", ".pkl", ".ots", ".bak", ".gz", ".zip", ".pyc", ".jpg",
                     ".parquet")
-A_PATTERN = r"(^|[^0-9])1\.770*([^0-9]|$)|1\.769999"
+A_PATTERN = r"(^|[^0-9])1\.(770*|769999[0-9]*)([^0-9]|$)"
+# Every file where the token occurs, reviewed (2026-10-09): none is an activation value.  {file: (matching lines, what)}
+A_HITS_REVIEWED = {
+    "src/verify_ledger.py": (1, "Track A's own PRODUCERS comment ('at a = 1.77')"),
+    "tests/test_phase2a_posthoc.py": (1, "EPS = 1.77e-3 (a step size)"),
+    "results/phase2b_results.md": (1, "a bootstrap interval bound [1.77–2.43]"),
+    "results/phase1b_results.md": (1, "a ratio quantile 1.77 / 2.01 / 2.39"),
+    "results/designs/phase3_explore/p3_spop4_scan.log": (1, "gap values 'G 1.77' (Phase 3 exploration log)"),
+    "results/sb_fold/branch_losses.csv": (1, "the scale grid s = 1.77 of the simplicity-bias landscape (no sin activation)"),
+    "results/phase2b_checkpoints.csv": (4, "the R column (a ratio) 1.769999…; its a column holds only 1.3, 1.35, 1.4, "
+                                           "1.45, 1.5, 1.6 (gitignored 2.7 GB per-step log)"),
+    "results/phase2a_ps/freeze.log": (1, "a timing 'secs': 1.77"),
+    "results/phase2a_ps/frozen_parts.jsonl": (1, "a timing 'secs': 1.77"),
+    "results/phase2a_ps2/freeze.log": (2, "timings 'secs': 1.77"),
+    "results/phase2a_ps2/frozen_parts.jsonl": (2, "timings 'secs': 1.77"),
+}
 
 
 def _scan_tree(patterns, chunk=16 * 1024 * 1024, overlap=256):
@@ -295,15 +310,32 @@ def scan():
                    rf"|(^|[^0-9.,]){p[0]},{p[1:4]},[0-9]{{3}}([^0-9,]|$)")
     pats["a_1.77"] = A_PATTERN
     hits = _scan_tree(pats)
+    import re
+    rx = re.compile(A_PATTERN.encode())
+    a_ctx = {}
+    for rel in hits["a_1.77"]:
+        lines = []
+        with open(ROOT / rel, "rb") as fh:
+            for i, ln in enumerate(fh):
+                m = rx.search(ln)
+                if m:
+                    lines.append([i + 1, ln[max(0, m.start() - 60):m.end() + 30].decode(errors="replace")])
+        a_ctx[rel] = {"n_lines": len(lines), "lines": lines[:5],
+                      "reviewed": A_HITS_REVIEWED.get(rel, (None, None))[1]}
+    a_ok = all(rel in A_HITS_REVIEWED and A_HITS_REVIEWED[rel][0] == c["n_lines"] for rel, c in a_ctx.items())
     ov = registered_overlap()
     out = {"ranges": {"registered": [SEEDS[0], SEEDS[-1], len(SEEDS)],
                       "pilot": [PILOT_SEEDS[0], PILOT_SEEDS[-1], len(PILOT_SEEDS)]},
            "a": A, "patterns": pats, "dirs": list(SCAN_TOPS), "skipped_own_files": list(SCAN_SKIP_FILES),
            "pattern_files": hits, "registered_seed_overlap": ov,
            "seeds_unused": bool(not hits["registered"] and not hits["pilot"] and not any(ov.values())),
-           "a_unused": bool(not hits["a_1.77"])}
+           "a_token_hits": a_ctx,
+           "a_rule": "a = 1.77 unused iff every file with the token is in A_HITS_REVIEWED (reviewed: not an activation "
+                     "value) with the same number of matching lines",
+           "a_unused": bool(a_ok)}
     (OUT / "seed_scan.json").write_text(json.dumps(_jsonable(out), indent=1))
-    print(json.dumps(_jsonable({k: out[k] for k in ("pattern_files", "seeds_unused", "a_unused")}), indent=1))
+    print(json.dumps(_jsonable({k: out[k] for k in ("pattern_files", "a_token_hits", "seeds_unused", "a_unused")}),
+                     indent=1))
     if not (out["seeds_unused"] and out["a_unused"]):
         raise SystemExit("STOP: a Track A seed range or a = 1.77 is not unused")
     return out

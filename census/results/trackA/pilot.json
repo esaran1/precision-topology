@@ -1,0 +1,424 @@
+{
+ "label": "TRACK A PILOT (pilot seeds 9,774,000-039 only; NOT registered data)",
+ "a": 1.77,
+ "f": 0.9,
+ "rule_sha256": {
+  "slin_extrapolate": "4e4f148f4e1c5dfd5dfbefceda19e27b83fd01274792c4b64e9c76a3ecb2a3b6",
+  "coupled_vhat": "1c803421f0dd0eba133e633087257acd6e6c9d1ee335ab46c1250dc398fb2c11",
+  "coupled_sw_vhat": "c38861c3ddb5e5711915c63025e5157656f90a086f4fcd2dffeccad60105ab20",
+  "all_with_constants": "bc03480a0013d6c7011b7c20662d4a165b47c2a6765f9bbbd9bb4b05db189683"
+ },
+ "primary": {
+  "ext": "slin_20",
+  "P_rule": "coupled_sw"
+ },
+ "pilot_error": {
+  "n_seeds": 40,
+  "n_frozen_ok": 40,
+  "n_crossed": 40,
+  "n_cutoff_before": 40,
+  "n_pilot_set": 40,
+  "n_with_forecast": 40,
+  "n_miss": 0,
+  "miss_status": {},
+  "nan_identical_all": true,
+  "abs_err_cross": {
+   "q50": 3.5,
+   "q90": 6.0,
+   "max": 13.0
+  },
+  "abs_err_lag": {
+   "q50": 2.5,
+   "q90": 4.0,
+   "max": 12.0
+  },
+  "ratio_r_obs_over_r_fc": {
+   "n": 40,
+   "q10": 0.7737270463256022,
+   "q25": 0.8649559766212662,
+   "median": 0.9515434836200464,
+   "q75": 1.0049527364195872,
+   "q90": 1.0180253790944862,
+   "sd": 0.12322890200481991
+  }
+ },
+ "tolerances": {
+  "tau_cross": 10,
+  "tau_lag": 10,
+  "band": 0.1,
+  "se_median": 0.020565111970850876,
+  "se_rule": "1.2533 \u00d7 (IQR / 1.349) / \u221an (Phase 1A's pilot rule)"
+ },
+ "alternatives_DISCLOSURE_ONLY": {
+  "band_with_sd_se": 0.1,
+  "se_sd": 0.024419548104200516,
+  "phase1a_floors": {
+   "tau_lag": 10,
+   "band": 0.1
+  }
+ },
+ "primary_with_criteria": {
+  "n_seeds": 40,
+  "n_frozen_ok": 40,
+  "n_crossed": 40,
+  "n_cutoff_before": 40,
+  "n_pilot_set": 40,
+  "n_with_forecast": 40,
+  "n_miss": 0,
+  "miss_status": {},
+  "nan_identical_all": true,
+  "abs_err_cross": {
+   "q50": 3.5,
+   "q90": 6.0,
+   "max": 13.0
+  },
+  "abs_err_lag": {
+   "q50": 2.5,
+   "q90": 4.0,
+   "max": 12.0
+  },
+  "ratio_r_obs_over_r_fc": {
+   "n": 40,
+   "q10": 0.7737270463256022,
+   "q25": 0.8649559766212662,
+   "median": 0.9515434836200464,
+   "q75": 1.0049527364195872,
+   "q90": 1.0180253790944862,
+   "sd": 0.12322890200481991
+  },
+  "criteria_at_pilot_tolerances_IN_SAMPLE": {
+   "C1": {
+    "frac_within": 0.975,
+    "n_within": 39,
+    "n_miss": 0,
+    "median_ratio": null,
+    "verdict": "PASS",
+    "ci95": null,
+    "n": 40
+   },
+   "C2": {
+    "frac_within": 0.975,
+    "n_within": 39,
+    "n_miss": 0,
+    "median_ratio": null,
+    "verdict": "PASS",
+    "ci95": null,
+    "n": 40
+   },
+   "C3": {
+    "frac_within": null,
+    "n_within": null,
+    "n_miss": null,
+    "median_ratio": 0.9515434836200464,
+    "verdict": "PASS",
+    "ci95": null,
+    "n": 40
+   },
+   "C4": {
+    "frac_within": null,
+    "n_within": null,
+    "n_miss": null,
+    "median_ratio": null,
+    "verdict": "PASS",
+    "ci95": [
+     -63.725,
+     -47.325
+    ],
+    "n": 40
+   }
+  },
+  "P_hat_relerr_vs_P_at_actual_t_sw": {
+   "coords": [
+    "w1",
+    "b1",
+    "b2"
+   ],
+   "median_abs": [
+    0.0012847281608718841,
+    0.0012822210697467917,
+    0.0021792829088149723
+   ],
+   "q90_abs": [
+    0.0032744347926960135,
+    0.003978980574977143,
+    0.0062068832759070176
+   ]
+  }
+ },
+ "DESCRIPTIVE": {
+  "P_cut": {
+   "n_seeds": 40,
+   "n_frozen_ok": 40,
+   "n_crossed": 40,
+   "n_cutoff_before": 40,
+   "n_pilot_set": 40,
+   "n_with_forecast": 40,
+   "n_miss": 0,
+   "miss_status": {},
+   "nan_identical_all": true,
+   "abs_err_cross": {
+    "q50": 3.0,
+    "q90": 8.0,
+    "max": 14.0
+   },
+   "abs_err_lag": {
+    "q50": 2.0,
+    "q90": 5.0,
+    "max": 13.0
+   },
+   "ratio_r_obs_over_r_fc": {
+    "n": 40,
+    "q10": 0.8445469130961428,
+    "q25": 0.8908953750000612,
+    "median": 0.947665692183326,
+    "q75": 0.9672478129291342,
+    "q90": 0.9753482692763299,
+    "sd": 0.11305135974090029
+   },
+   "criteria_at_pilot_tolerances_IN_SAMPLE": {
+    "C1": {
+     "frac_within": 0.95,
+     "n_within": 38,
+     "n_miss": 0,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C2": {
+     "frac_within": 0.975,
+     "n_within": 39,
+     "n_miss": 0,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C3": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": 0.947665692183326,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C4": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": [
+      -64.075625,
+      -47.05
+     ],
+     "n": 40
+    }
+   },
+   "P_hat_relerr_vs_P_at_actual_t_sw": {
+    "coords": [
+     "w1",
+     "b1",
+     "b2"
+    ],
+    "median_abs": [
+     0.06750364361825006,
+     0.06748390794689935,
+     0.04351309810999299
+    ],
+    "q90_abs": [
+     0.08189097783628028,
+     0.08183754462594216,
+     0.08284459161612807
+    ]
+   }
+  },
+  "ext_1c": {
+   "n_seeds": 40,
+   "n_frozen_ok": 40,
+   "n_crossed": 40,
+   "n_cutoff_before": 40,
+   "n_pilot_set": 40,
+   "n_with_forecast": 29,
+   "n_miss": 11,
+   "miss_status": {
+    "no forecast: no forecast switch on the extrapolated path": 6,
+    "no forecast: extrapolated path not growing at the cutoff": 5
+   },
+   "nan_identical_all": true,
+   "abs_err_cross": {
+    "q50": 3.0,
+    "q90": 5.0,
+    "max": 7.0
+   },
+   "abs_err_lag": {
+    "q50": 5.0,
+    "q90": 6.599999999999998,
+    "max": 9.0
+   },
+   "ratio_r_obs_over_r_fc": {
+    "n": 29,
+    "q10": 1.101157063257266,
+    "q25": 1.1162866087493268,
+    "median": 1.169480699928911,
+    "q75": 1.3220357972517711,
+    "q90": 1.6150199695474223,
+    "sd": 0.26005510934423454
+   },
+   "criteria_at_pilot_tolerances_IN_SAMPLE": {
+    "C1": {
+     "frac_within": 0.725,
+     "n_within": 29,
+     "n_miss": 11,
+     "median_ratio": null,
+     "verdict": "FAIL",
+     "ci95": null,
+     "n": 40
+    },
+    "C2": {
+     "frac_within": 0.725,
+     "n_within": 29,
+     "n_miss": 11,
+     "median_ratio": null,
+     "verdict": "FAIL",
+     "ci95": null,
+     "n": 40
+    },
+    "C3": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": 1.169480699928911,
+     "verdict": "FAIL",
+     "ci95": null,
+     "n": 29
+    },
+    "C4": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": [
+      -73.55258620689655,
+      -58.689655172413794
+     ],
+     "n": 29
+    }
+   },
+   "P_hat_relerr_vs_P_at_actual_t_sw": {
+    "coords": [
+     "w1",
+     "b1",
+     "b2"
+    ],
+    "median_abs": [
+     0.0012875896977229129,
+     0.0012911467570619894,
+     0.0018222750172534052
+    ],
+    "q90_abs": [
+     0.004594967009971329,
+     0.004620980188475298,
+     0.0055642339579225365
+    ]
+   }
+  },
+  "f_0.95_primary_rule": {
+   "n_seeds": 40,
+   "n_frozen_ok": 40,
+   "n_crossed": 40,
+   "n_cutoff_before": 40,
+   "n_pilot_set": 40,
+   "n_with_forecast": 40,
+   "n_miss": 0,
+   "miss_status": {},
+   "nan_identical_all": true,
+   "abs_err_cross": {
+    "q50": 3.0,
+    "q90": 4.0,
+    "max": 5.0
+   },
+   "abs_err_lag": {
+    "q50": 2.0,
+    "q90": 3.0,
+    "max": 4.0
+   },
+   "ratio_r_obs_over_r_fc": {
+    "n": 40,
+    "q10": 0.7924027779720143,
+    "q25": 0.9217259636778008,
+    "median": 0.9660549110629582,
+    "q75": 1.0111987310036403,
+    "q90": 1.0221411250494103,
+    "sd": 0.10925984472637124
+   },
+   "criteria_at_pilot_tolerances_IN_SAMPLE": {
+    "C1": {
+     "frac_within": 1.0,
+     "n_within": 40,
+     "n_miss": 0,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C2": {
+     "frac_within": 1.0,
+     "n_within": 40,
+     "n_miss": 0,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C3": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": 0.9660549110629582,
+     "verdict": "PASS",
+     "ci95": null,
+     "n": 40
+    },
+    "C4": {
+     "frac_within": null,
+     "n_within": null,
+     "n_miss": null,
+     "median_ratio": null,
+     "verdict": "PASS",
+     "ci95": [
+      -64.05,
+      -48.0
+     ],
+     "n": 40
+    }
+   },
+   "P_hat_relerr_vs_P_at_actual_t_sw": {
+    "coords": [
+     "w1",
+     "b1",
+     "b2"
+    ],
+    "median_abs": [
+     0.0006372813557189994,
+     0.000547008696272111,
+     0.00044570074675576166
+    ],
+    "q90_abs": [
+     0.0015208823653955156,
+     0.0014568932540508506,
+     0.002590402404808024
+    ]
+   }
+  }
+ },
+ "secs_run_total": 214.6,
+ "max_abs_forecaster_minus_harness_s_run": 0.0,
+ "horizon_steps_t_obs_minus_t_c": {
+  "q10": 33.9,
+  "median": 115.0,
+  "q90": 167.4
+ }
+}

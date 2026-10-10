@@ -1,0 +1,62 @@
+{
+ "a": 1.77,
+ "s_star_pop": 1.465379564263153,
+ "theta_star": [
+  -1.1934257436011837,
+  -2.1435598591262073,
+  4.022327650551748
+ ],
+ "H": [
+  [
+   1.2281190773569168,
+   0.04100899252580581,
+   -0.13233694927056397
+  ],
+  [
+   0.04100899252580581,
+   0.8476433352025529,
+   0.08290550233078003
+  ],
+  [
+   -0.13233694927056397,
+   0.08290550233078003,
+   0.1751469228481502
+  ]
+ ],
+ "tangent": [
+  0.12942760753155122,
+  -0.13595522712222652,
+  3.1256240623396425
+ ],
+ "gradG": [
+  0.6008058488493617,
+  -2.265624651887066,
+  0.0
+ ],
+ "grad_residual": 1.4630185951602925e-13,
+ "H_pd": true,
+ "winding_shift_from_1p60_copy": 0,
+ "b1_principal": -2.1435598591262073,
+ "kappa_sgd": 2.5620760808786667,
+ "validation_global_min": {
+  "0.995": {
+   "global_min_w1": -1.1943779906431737,
+   "global_min_b1": 4.140625797959861,
+   "global_min_G": -0.0028410899563069414,
+   "branch_w1": -1.1943779906430334,
+   "branch_b1": -2.142559509219938,
+   "same_branch_mod_mirror_2pi": true
+  },
+  "1.005": {
+   "global_min_w1": -1.1924813531451448,
+   "global_min_b1": 4.138633504639243,
+   "global_min_G": 0.002812251070577698,
+   "branch_w1": -1.192481353144578,
+   "branch_b1": -2.144551802540202,
+   "same_branch_mod_mirror_2pi": true
+  }
+ },
+ "validated": true,
+ "certified_bracket": "none exists at a = 1.65; validated by continuation + own_threshold.global_min",
+ "built_by": "src/track_a.py landscape() (registered, unchanged) via track2a.load_track_a(A=1.77, OUT=results/trackA)"
+}

@@ -1,0 +1,215 @@
+{
+ "ranges": {
+  "registered": [
+   9776000,
+   9776099,
+   100
+  ],
+  "pilot": [
+   9774000,
+   9774039,
+   40
+  ]
+ },
+ "a": 1.77,
+ "patterns": {
+  "registered": "(^|[^0-9.])9776[0-9]{3}([^0-9]|$)|9_776_[0-9]{3}|(^|[^0-9.,])9,776,[0-9]{3}([^0-9,]|$)",
+  "pilot": "(^|[^0-9.])9774[0-9]{3}([^0-9]|$)|9_774_[0-9]{3}|(^|[^0-9.,])9,774,[0-9]{3}([^0-9,]|$)",
+  "a_1.77": "(^|[^0-9])1\\.(770*|769999[0-9]*)([^0-9]|$)"
+ },
+ "dirs": [
+  "src",
+  "tests",
+  "results",
+  "paper",
+  "notes",
+  "independent",
+  "data"
+ ],
+ "skipped_own_files": [
+  "causal_adam.py",
+  "trackA_causal.py",
+  "test_trackA_causal.py",
+  "trackA_registration.md",
+  "trackA_causal_adam_design.md"
+ ],
+ "pattern_files": {
+  "registered": [],
+  "pilot": [],
+  "a_1.77": [
+   "src/verify_ledger.py",
+   "tests/test_phase2a_posthoc.py",
+   "results/phase2b_results.md",
+   "results/phase2b_checkpoints.csv",
+   "results/phase1b_results.md",
+   "results/designs/phase3_explore/p3_spop4_scan.log",
+   "results/sb_fold/branch_losses.csv",
+   "results/phase2a_ps/freeze.log",
+   "results/phase2a_ps/frozen_parts.jsonl",
+   "results/phase2a_ps2/freeze.log",
+   "results/phase2a_ps2/frozen_parts.jsonl"
+  ]
+ },
+ "registered_seed_overlap": {
+  "track_a.SEEDS": [],
+  "track2a.SEEDS": [],
+  "track2b.SEEDS": [],
+  "track2c.SEEDS": [],
+  "gelu_transfer.PILOT_SEEDS": [],
+  "gelu_transfer.SEEDS": [],
+  "width2_asym.PILOT_SEEDS": [],
+  "width2_asym.SEEDS": [],
+  "width2_asym.SEEDS_T": [],
+  "width2_asym.SEEDS_TP": [],
+  "phase1a_pilot.SEEDS": [],
+  "phase1c.SEEDS": [],
+  "phase2a.PILOT_SEEDS": [],
+  "phase2a.SEEDS": [],
+  "phase2a_ps.PILOT_SEEDS": [],
+  "phase2a_ps.SEEDS": [],
+  "phase2a_ps2.PILOT_SEEDS": [],
+  "phase2a_ps2.SEEDS": [],
+  "phase2b.SEEDS": [],
+  "phase3_w4.PILOT_SEEDS": [],
+  "phase3_w4.PILOT_SEEDS_T4": [],
+  "phase3_w4.SEEDS": [],
+  "phase3_w4.SEEDS_Q": [],
+  "phase3_w4.SEEDS_S": [],
+  "phase3_w4.SEEDS_T4": []
+ },
+ "seeds_unused": true,
+ "a_token_hits": {
+  "src/verify_ledger.py": {
+   "n_lines": 1,
+   "lines": [
+    [
+     1080,
+     "    # Track A (causal Adam per-run forecast at a = 1.77; page approved 2026-10-09): sr"
+    ]
+   ],
+   "reviewed": "Track A's own PRODUCERS comment ('at a = 1.77')"
+  },
+  "tests/test_phase2a_posthoc.py": {
+   "n_lines": 1,
+   "lines": [
+    [
+     10,
+     "EPS = 1.77e-3 * 2.0 ** -np.r_[0.0, 1.0, 2"
+    ]
+   ],
+   "reviewed": "EPS = 1.77e-3 (a step size)"
+  },
+  "results/phase2b_results.md": {
+   "n_lines": 1,
+   "lines": [
+    [
+     76,
+     "0.212\u2013-0.179] 0/80 | -0.285 [-0.324\u2013-0.251] 1/79 | 2.00 [1.77\u20132.43] |\n"
+    ]
+   ],
+   "reviewed": "a bootstrap interval bound [1.77\u20132.43]"
+  },
+  "results/phase2b_checkpoints.csv": {
+   "n_lines": 4,
+   "lines": [
+    [
+     6858995,
+     "9696303969904,72.0720469910429,0.14389678993383814,True,True,1.769999367700205,0.9511701656546236,11408,0.017"
+    ],
+    [
+     7457649,
+     "9696303969904,72.0720469910429,0.14389678993383814,True,True,1.769999367700205,0.9511701656546236,11408,0.017"
+    ],
+    [
+     11857458,
+     "095977286801,48.35588188894685,0.21281253206886408,True,True,1.7699991642649446,0.9547169047276345,8764,0.0183"
+    ],
+    [
+     12999228,
+     "095977286801,48.35588188894685,0.21281253206886408,True,True,1.7699991642649446,0.9547169047276345,8764,0.0183"
+    ]
+   ],
+   "reviewed": "the R column (a ratio) 1.769999\u2026; its a column holds only 1.3, 1.35, 1.4, 1.45, 1.5, 1.6 (gitignored 2.7 GB per-step log)"
+  },
+  "results/phase1b_results.md": {
+   "n_lines": 1,
+   "lines": [
+    [
+     76,
+     ".0 [-71.7, -68.4], 63/63 | 115 / 152 / 197 | 51 / 78 / 111 | 1.77 / 2.01 / 2.39 |\n"
+    ]
+   ],
+   "reviewed": "a ratio quantile 1.77 / 2.01 / 2.39"
+  },
+  "results/designs/phase3_explore/p3_spop4_scan.log": {
+   "n_lines": 1,
+   "lines": [
+    [
+     10,
+     "3] G [1.771,1.771] hits 163/200 | next: 1.58e-09 1111:+--+ G 1.77; 3.98e-09 1111:+-+- G 1.77; 8."
+    ]
+   ],
+   "reviewed": "gap values 'G 1.77' (Phase 3 exploration log)"
+  },
+  "results/sb_fold/branch_losses.csv": {
+   "n_lines": 1,
+   "lines": [
+    [
+     144,
+     "1.77,0.2946630959742219,,0.30023788"
+    ]
+   ],
+   "reviewed": "the scale grid s = 1.77 of the simplicity-bias landscape (no sin activation)"
+  },
+  "results/phase2a_ps/freeze.log": {
+   "n_lines": 1,
+   "lines": [
+    [
+     14,
+     "ble: M homotopy failed\", \"class\": null, \"s_F\": null, \"secs\": 1.77, \"rss_gb\": 0.269}\n"
+    ]
+   ],
+   "reviewed": "a timing 'secs': 1.77"
+  },
+  "results/phase2a_ps/frozen_parts.jsonl": {
+   "n_lines": 1,
+   "lines": [
+    [
+     14,
+     "001, \"homotopy_min_eig\": null, \"accepted\": false}]}, \"secs\": 1.77, \"peak_rss_gb\": 0.269, \"evalua"
+    ]
+   ],
+   "reviewed": "a timing 'secs': 1.77"
+  },
+  "results/phase2a_ps2/freeze.log": {
+   "n_lines": 2,
+   "lines": [
+    [
+     2,
+     "null, \"s_F\": null, \"rho_t_star\": null, \"wide\": null, \"secs\": 1.77, \"rss_gb\": 0.269}\n"
+    ],
+    [
+     582,
+     "null, \"s_F\": null, \"rho_t_star\": null, \"wide\": null, \"secs\": 1.77, \"rss_gb\": 0.277}\n"
+    ]
+   ],
+   "reviewed": "timings 'secs': 1.77"
+  },
+  "results/phase2a_ps2/frozen_parts.jsonl": {
+   "n_lines": 2,
+   "lines": [
+    [
+     1,
+     "2\": {\"ps_status\": \"untraceable: M homotopy failed\"}, \"secs\": 1.77, \"evaluation\": {\"status\": \"unt"
+    ],
+    [
+     581,
+     "2\": {\"ps_status\": \"untraceable: M homotopy failed\"}, \"secs\": 1.77, \"evaluation\": {\"status\": \"unt"
+    ]
+   ],
+   "reviewed": "timings 'secs': 1.77"
+  }
+ },
+ "a_rule": "a = 1.77 unused iff every file with the token is in A_HITS_REVIEWED (reviewed: not an activation value) with the same number of matching lines",
+ "a_unused": true
+}

@@ -1,7 +1,7 @@
 # Track A registration: the causal Adam per-run forecast at a = 1.77
 
-**DRAFT. NOT YET REGISTERED.** The tolerances (§7) come from the pilot and go to the author before the registration
-commit. Everything else below is the text to be registered.
+**DRAFT. NOT YET REGISTERED.** The pilot tolerances (§7) and the open details (§9) await the author's approval before
+the registration commit. Everything else below is the text to be registered.
 - **Not yet done:** no registered seed has been trained or frozen for training, and no gap, placement or crossing of any
   run of a registered seed has been evaluated.
 - **Before any registered training:** the registration commit is pushed and its OpenTimestamps proof
@@ -32,10 +32,19 @@ commit. Everything else below is the text to be registered.
 | landscape | Track A's construction (`src/track_a.py`, byte-identical to its registered version, through `track2a.load_track_a` with a, the seeds and OUT rebound): continuation in a from the certified 1.60 switch point, principal copy, switch s\*_pop; validated by `own_threshold.global_min` (unplaced at 0.995·s\*_pop, placed at 1.005·s\*_pop, same branch up to the mirror and 2π). A failure stops before the pilot. Result: §8 |
 | s\*_frozen | per seed, before training: Newton from the landscape switch point onto the own sample, continued (grid [0.3, 1.7]·s\*_pop, spacing 0.002·s\*_pop); its switch (Track A's R0). `results/trackA/frozen_registered.jsonl` |
 
-**a = 1.77 is unused.** `results/trackA/seed_scan.json` (`trackA_causal.scan`): no token `1.77`, `1.770…` or
-`1.769999` in any text file under src/, tests/, results/, paper/, notes/, independent/ or data/ (Track A's own files
-excepted). The page's scan also lists the a values with training or crossing data (1.5–2.2) and notes that 1.75 and
-1.775 appear only in landscape tables.
+**a = 1.77 is unused.** `results/trackA/seed_scan.json` (`trackA_causal.scan`): no occurrence of `1.77`, `1.770…` or
+`1.769999…` in any text file under src/, tests/, results/, paper/, notes/, independent/ or data/ (Track A's own files
+excepted) is an activation value.
+- **Disclosed: the page's claim needed a reviewed list.** The page says "1.77" occurs nowhere. The token scan in fact
+  matches 11 files, and every hit was reviewed (`A_HITS_REVIEWED`; contexts in `seed_scan.json`). None is an activation
+  value. The hits are Track A's own ledger comment, a step size 1.77e−3, an interval bound, a ratio quantile, gap values
+  in an exploration log, a scale grid point of the simplicity-bias landscape, timings ("secs": 1.77), and an R-column
+  ratio 1.769999… in the gitignored `phase2b_checkpoints.csv`, whose a column holds only 1.3–1.6.
+- **The rule:** a is unused iff every file with the token is on the reviewed list, with the same count of matching lines.
+- The first pattern (`1.769999` without a boundary) also matched `131.769999…` in that CSV. It was given a boundary
+  before the recorded scan.
+- The page's scan also lists the a values with training or crossing data (1.5–2.2), and notes that 1.75 and 1.775
+  appear only in landscape tables.
 
 ## 3. Seeds
 
@@ -134,13 +143,38 @@ t_obs − t_c.
 - **Source:** `results/trackA/pilot.json` (`trackA_causal.pilot_summary`), from `pilot_runs.jsonl`. `score` reads the
   tolerances from that hashed file.
 
+**Pilot result (40/40 pilot seeds; PENDING the author's approval):**
+
 | τ_cross | τ_lag | b |
 |---|---|---|
-| PENDING | PENDING | PENDING |
+| **10** (1.5 × q90 6 = 9 → 10) | **10** (1.5 × q90 4 = 6 → 10) | **0.10** (\|0.9515 − 1\| + 2 × 0.0206 = 0.090 → 0.10) |
+
+- **Pilot set:** 40 of 40 pilot seeds have s\*_frozen and cross. All 40 have t_c < t_obs and t_sw defined, and all 40
+  have a forecast (0 misses). The NaN recomputation is identical in all 40.
+- **Pilot errors:** \|t_fc − t_obs\| has median 3.5, q90 6 and max 13. The lag error has median 2.5, q90 4 and max 12.
+  r_obs/r_fc has median 0.9515, q10 0.774 and q90 1.018 (IQR 0.865–1.005).
+- **Robustness:** the alternatives give the same three numbers. These are the exploration's SE (1.2533·sd/√n = 0.0244,
+  giving b = 0.10) and Phase 1A's floors (τ_lag 10, b 0.10).
+- **In sample (descriptive, not a test):** at these tolerances the pilot has C1 39/40, C2 39/40 and C3 median 0.9515.
+  C4's interval is [−63.7, −47.3].
+- **P̂ error against P(t_sw):** median 0.13%, 0.13% and 0.22% (w₁, b₁, b₂); q90 0.33%, 0.40% and 0.62%. coupled_sw
+  took v̂(t_sw,fc) from the coupled carry in 40 of 40 runs (D2's fallback was never used).
+- **Descriptive variants on the pilot:**
+  - P at t_c − 1 (slin_20): 0 misses, q90 8 / 5, median 0.948. P error is about 6.7%.
+  - 1C's extrapolation: 11 misses (6 no forecast switch, 5 not growing), C1 0.725, median 1.169.
+  - f = 0.95: 0 misses, q90 4 / 3, median 0.966.
+- **Horizon:** t_obs − t_c has q10 34, median 115 and q90 167 steps.
 
 ## 8. Landscape at a = 1.77
 
-PENDING (step c).
+- `results/trackA/landscape.json` (`trackA_causal.landscape`, Track A's function unchanged): continuation from the 1.60
+  switch point gives winding shift 0. Principal copy: b₁ = −2.14356.
+- **s\*_pop = 1.465380.** θ\* = (−1.19343, −2.14356, 4.02233). Gradient residual 1.5e−13; H is positive definite;
+  κ_SGD = 2.562.
+- **VALIDATED** by `own_threshold.global_min`. At 0.995·s\*_pop the global minimum has G = −0.00284 (unplaced); at
+  1.005·s\*_pop it has G = +0.00281 (placed). It lies on the same branch, up to the mirror and 2π, at both levels.
+- **Frozen s\*_frozen:** registered 100/100 (range 1.054–2.014), `frozen_registered.jsonl`; pilot 40/40 (1.228–1.704),
+  `frozen_pilot.jsonl`.
 
 ## 9. Open details (implementation choices not fixed by the page)
 
