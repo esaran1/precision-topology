@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/Evan/precision-topology/census/src/trackA_causal.py", line 831, in <module>
+    main(sys.argv)
+  File "/Users/Evan/precision-topology/census/src/trackA_causal.py", line 825, in main
+    fn[cmd]()
+  File "/Users/Evan/precision-topology/census/src/trackA_causal.py", line 806, in score
+    res = score_track_a(table(rows, obs, F, "primary"), tol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Evan/precision-topology/census/src/trackA_causal.py", line 456, in score_track_a
+    R = {k: (P1._arr(v, bool) if k in bool_keys else P1._arr(v)) for k, v in R.items()}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Evan/precision-topology/census/src/trackA_causal.py", line 456, in <dictcomp>
+    R = {k: (P1._arr(v, bool) if k in bool_keys else P1._arr(v)) for k, v in R.items()}
+                                                     ^^^^^^^^^^
+  File "/Users/Evan/precision-topology/census/src/phase1c.py", line 98, in _arr
+    return np.array([np.nan if (dt is float and x is None) else x for x in v], dtype=dt) if isinstance(v, list) \
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: 'ok'
