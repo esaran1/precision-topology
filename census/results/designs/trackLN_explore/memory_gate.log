@@ -31,3 +31,14 @@
 2026-10-10 20:19:38 run glob16 2995007 free=53% swap_free=1263.19MB disk_free=32.7GB OK
 2026-10-10 20:21:01 memory gate: free 50% swap_free 1359.19M disk_free 32G -> OK
 2026-10-10 20:34:35 memory gate: free 54% swap_free 1291.12M disk_free 31G -> OK
+Sun Oct 11 00:53:04 EDT 2026
+gate for LN decision commit
+System-wide memory free percentage: 32%
+vm.swapusage: total = 15360.00M  used = 15042.38M  free = 317.62M  (encrypted)
+/dev/disk3s1s1   460Gi    11Gi    35Gi    25%    453k  363M    0%   /
+Sun Oct 11 00:53:11 EDT 2026 suite started in error after a FAILED gate (swap 317 MB < 500); stopped by coordinator
+Sun Oct 11 00:53:29 EDT 2026
+gate for LN decision commit (retry)
+System-wide memory free percentage: 43%
+vm.swapusage: total = 16384.00M  used = 15611.19M  free = 772.81M  (encrypted)
+/dev/disk3s1s1   460Gi    11Gi    34Gi    26%    453k  352M    0%   /

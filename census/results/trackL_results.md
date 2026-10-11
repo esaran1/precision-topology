@@ -241,6 +241,26 @@ differences vs alpha 1", which equals `A_summary.json` `vs_alpha1` (4 decimals a
 
 It is EXPLORATORY and descriptive only.
 
+## 5. The LayerNorm variant, Track LN (EXPLORED NEGATIVE; motivated by the Track L null; NOT registered)
+
+After Track L's registered null the author asked for one gated variant: the same setting, arms and matched loss levels,
+with a LayerNorm without affine parameters on the penultimate features, so that the readout alone governs output scale.
+It was explored on seeds 2,995,000–007 (3 arms, 24 runs), with both gate rules committed before training (a485d0f);
+results 2ac570d; everything in `results/designs/trackLN_explore/`. The author made registering conditional on both
+gates holding.
+
+| gate | rule | value | reading |
+|---|---|---|---|
+| (1) the readout controls output scale | median arm-2/arm-1 step cost ≥ 2.0 at each of BCE 0.6, 0.3, 0.03 (proposed; accepted by the author 2026-10-11) | ×1.00 / ×1.00 / ×1.09 (Track L: ×1.33 / ×1.32 / ×1.00) | **FAILS** |
+| (2) MNIST early, CIFAR later | Track L's L2 rule on arm 1 | rand 0.515 early, +0.168 later (8/8 seeds), end 0.682 | passes |
+
+- **Outcome: gate (1) fails, so Track LN is not registered; the author stopped it here with no further follow-up.**
+- DESCRIPTIVE (8 exploration seeds, no verdict): arm-2 Δrand +0.012 / +0.012 / +0.0005, every descriptive bootstrap
+  interval containing 0; arm 3 (÷16 everywhere) reached each level in ×0.50–0.64 of arm 1's steps.
+- **UNTESTED observation:** at BCE 0.03 the mean |f| (8.5 std, 6.5 out16) is well under the LayerNorm bound 16‖v‖₂
+  (33, 16), which suggests the hidden layers still change the output's size by aligning the normalised features with the
+  readout. This was not tested and is not a mechanism claim.
+
 ## 4. Provenance
 
 | table / statement on this page | producer | committed output (commit) |
@@ -252,6 +272,7 @@ It is EXPLORATORY and descriptive only.
 | §2.1–2.4 descriptive tables | `src/trackL.py` `descriptive` (called by `score`) | `results/trackL/scores.json` key `DESCRIPTIVE` (a36c702) |
 | §2.1 exploration step costs ×1.33 / ×1.34 / ×0.98, §2.4 reference | — (quoted) | `results/trackL_registration.md` §13, from `trackL_explore/L_tables.md` (b08843d) |
 | §3 all numbers | `results/designs/trackL_alpha_explore/A_summary.py` | `A_tables.md`, `A_summary.json`, README (df2b365) |
+| §5 all numbers | `results/designs/trackLN_explore/LN_summary.py` | `LN_tables.md`, `LN_summary.json`, README (2ac570d) |
 
 **Display rounding.**
 - §1–2 values were rounded from the unrounded floats in `scores.json`: 4 decimals for accuracies, differences and
@@ -263,4 +284,4 @@ It is EXPLORATORY and descriptive only.
 - No criterion, registered file, run, score or manifest entry was changed.
 - Nothing under `paper/` was edited.
 - Nothing in this page is post hoc except the labelled §3, which the registration planned (§12) and which predates the
-  registration.
+  registration, and the labelled §5 (Track LN, explored after the registered result, 2026-10-10/11, not registered).

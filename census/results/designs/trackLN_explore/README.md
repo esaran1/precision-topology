@@ -1,7 +1,8 @@
 # Track LN: Track L with a LayerNorm (no affine) before the readout (EXPLORATORY, NOT a registration, no design page)
 
 Requested by the author 2026-10-10. Exploration only: no registered or pilot seed exists, and none of the seeds
-below may ever be registered. Whether to register is the author's decision, later, and only if both gates below hold.
+below may ever be registered. **Outcome (author, 2026-10-11): gate (1) fails under the accepted 2× bar; not registered;
+stopped; recorded as an explored negative (see the end of this file).**
 
 ## Setting (the author's request)
 
@@ -112,6 +113,15 @@ out16, 48 s glob16); peak RSS 1.13 GB.
 
 Track LN is not registered and no registration is proposed here. Gate (1) is the precondition the author named, and
 by the proposed rule it fails; whether to register, and whether the gate-(1) rule itself stands, is the author's call.
+
+## Author's decision (2026-10-11)
+
+- **Gate (1) rule: the 2× bar is ACCEPTED as proposed** (median arm-2/arm-1 step cost ≥ 2.0 at each of BCE 0.6, 0.3,
+  0.03). Under it gate (1) FAILS (×1.00 / ×1.00 / ×1.09), so the author's precondition for registering is not met.
+- **Stop here. Track LN is NOT registered and there is no further follow-up.** It is recorded as an EXPLORED NEGATIVE
+  beside Track L's registered null (`results/trackL_results.md` §5).
+- Finding 5 (the hidden layers change |f| by aligning the normalised features with v) is an **UNTESTED observation**
+  from 8 exploration seeds, not a tested mechanism. Finding 4 (lr 0.01 above the efficient rate here) is not followed up.
 
 ## Suite before the exploration commit
 
