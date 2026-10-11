@@ -1,0 +1,51 @@
+# 2026-10-10 19:55:58 start: 2995000:std 2995000:out16 2995000:glob16 2995001:std 2995001:out16 2995001:glob16 2995002:std 2995002:out16 2995002:glob16 2995003:std 2995003:out16 2995003:glob16 2995004:std 2995004:out16 2995004:glob16 2995005:std 2995005:out16 2995005:glob16 2995006:std 2995006:out16 2995006:glob16 2995007:std 2995007:out16 2995007:glob16
+2026-10-10 19:55:58 jobs 24, to do 23
+dataset_sha256 6867910ba670acfced6154d198fdf509edeb350afa5e936735ea5fbe082b332f matches Track L: True rss 0.982
+2026-10-10 19:55:59 run 2995000 out16
+{"seed": 2995000, "arm": "out16", "steps": 9881, "stop": "loss", "finite": true, "secs": 98.85, "max_rss_gb": 1.032} {'bce_0.6': 25, 'bce_0.3': 2349, 'bce_0.03': 7796}
+2026-10-10 19:57:41 run 2995000 glob16
+{"seed": 2995000, "arm": "glob16", "steps": 5466, "stop": "loss", "finite": true, "secs": 71.01, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1056, 'bce_0.03': 4229}
+2026-10-10 19:58:52 run 2995001 std
+{"seed": 2995001, "arm": "std", "steps": 8952, "stop": "loss", "finite": true, "secs": 97.32, "max_rss_gb": 1.032} {'bce_0.6': 20, 'bce_0.3': 2171, 'bce_0.03': 7064}
+2026-10-10 20:00:29 run 2995001 out16
+{"seed": 2995001, "arm": "out16", "steps": 10078, "stop": "loss", "finite": true, "secs": 99.38, "max_rss_gb": 1.032} {'bce_0.6': 15, 'bce_0.3': 2214, 'bce_0.03': 7644}
+2026-10-10 20:02:08 run 2995001 glob16
+{"seed": 2995001, "arm": "glob16", "steps": 5254, "stop": "loss", "finite": true, "secs": 48.65, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1056, 'bce_0.03': 4147}
+2026-10-10 20:02:57 run 2995002 std
+{"seed": 2995002, "arm": "std", "steps": 9131, "stop": "loss", "finite": true, "secs": 53.29, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1786, 'bce_0.03': 6791}
+2026-10-10 20:03:50 run 2995002 out16
+{"seed": 2995002, "arm": "out16", "steps": 8952, "stop": "loss", "finite": true, "secs": 44.52, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 1786, 'bce_0.03': 7205}
+2026-10-10 20:04:35 run 2995002 glob16
+{"seed": 2995002, "arm": "glob16", "steps": 5575, "stop": "loss", "finite": true, "secs": 49.61, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1141, 'bce_0.03': 4229}
+2026-10-10 20:05:25 run 2995003 std
+{"seed": 2995003, "arm": "std", "steps": 8605, "stop": "loss", "finite": true, "secs": 67.66, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 1931, 'bce_0.03': 6528}
+2026-10-10 20:06:32 run 2995003 out16
+{"seed": 2995003, "arm": "out16", "steps": 8777, "stop": "loss", "finite": true, "secs": 66.97, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1931, 'bce_0.03': 7064}
+2026-10-10 20:07:39 run 2995003 glob16
+{"seed": 2995003, "arm": "glob16", "steps": 5575, "stop": "loss", "finite": true, "secs": 49.42, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1036, 'bce_0.03': 4486}
+2026-10-10 20:08:29 run 2995004 std
+{"seed": 2995004, "arm": "std", "steps": 8437, "stop": "loss", "finite": true, "secs": 64.32, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 2171, 'bce_0.03': 6152}
+2026-10-10 20:09:33 run 2995004 out16
+{"seed": 2995004, "arm": "out16", "steps": 9499, "stop": "loss", "finite": true, "secs": 70.52, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 2008, 'bce_0.03': 7205}
+2026-10-10 20:10:44 run 2995004 glob16
+{"seed": 2995004, "arm": "glob16", "steps": 5466, "stop": "loss", "finite": true, "secs": 48.2, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1036, 'bce_0.03': 4575}
+2026-10-10 20:11:32 run 2995005 std
+{"seed": 2995005, "arm": "std", "steps": 7951, "stop": "loss", "finite": true, "secs": 62.97, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 2048, 'bce_0.03': 6528}
+2026-10-10 20:12:35 run 2995005 out16
+{"seed": 2995005, "arm": "out16", "steps": 9313, "stop": "loss", "finite": true, "secs": 70.31, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 2171, 'bce_0.03': 7644}
+2026-10-10 20:13:45 run 2995005 glob16
+{"seed": 2995005, "arm": "glob16", "steps": 5254, "stop": "loss", "finite": true, "secs": 47.6, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1036, 'bce_0.03': 4066}
+2026-10-10 20:14:33 run 2995006 std
+{"seed": 2995006, "arm": "std", "steps": 7644, "stop": "loss", "finite": true, "secs": 61.57, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1588, 'bce_0.03': 6400}
+2026-10-10 20:15:35 run 2995006 out16
+{"seed": 2995006, "arm": "out16", "steps": 8777, "stop": "loss", "finite": true, "secs": 66.76, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1469, 'bce_0.03': 7644}
+2026-10-10 20:16:41 run 2995006 glob16
+{"seed": 2995006, "arm": "glob16", "steps": 5359, "stop": "loss", "finite": true, "secs": 47.79, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 1163, 'bce_0.03': 4147}
+2026-10-10 20:17:29 run 2995007 std
+{"seed": 2995007, "arm": "std", "steps": 8110, "stop": "loss", "finite": true, "secs": 62.52, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 1857, 'bce_0.03': 6400}
+2026-10-10 20:18:32 run 2995007 out16
+{"seed": 2995007, "arm": "out16", "steps": 8777, "stop": "loss", "finite": true, "secs": 66.28, "max_rss_gb": 1.032} {'bce_0.6': 10, 'bce_0.3': 1786, 'bce_0.03': 6791}
+2026-10-10 20:19:38 run 2995007 glob16
+{"seed": 2995007, "arm": "glob16", "steps": 5359, "stop": "loss", "finite": true, "secs": 47.58, "max_rss_gb": 1.032} {'bce_0.6': 5, 'bce_0.3': 1119, 'bce_0.03': 4575}
+2026-10-10 20:20:26 done
+# 2026-10-10 20:20:26 exit 0

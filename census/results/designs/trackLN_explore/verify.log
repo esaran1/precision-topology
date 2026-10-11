@@ -1,0 +1,7 @@
+# 2026-10-10 19:54:11 start: 2995000:std
+2026-10-10 19:54:11 jobs 1, to do 1
+dataset_sha256 6867910ba670acfced6154d198fdf509edeb350afa5e936735ea5fbe082b332f matches Track L: True rss 1.006
+2026-10-10 19:54:12 run 2995000 std
+{"seed": 2995000, "arm": "std", "steps": 9131, "stop": "loss", "finite": true, "secs": 89.08, "max_rss_gb": 1.134} {'bce_0.6': 25, 'bce_0.3': 2303, 'bce_0.03': 7064}
+2026-10-10 19:55:43 done
+# 2026-10-10 19:55:44 exit 0
