@@ -2220,3 +2220,118 @@ fits the O(ρ^{4/3} ln²ρ) remainder of §18.3 with a large negative coefficien
   sets at −0.043. The data's curvature in ln r against ln ε comes from the O(ε) escape term (D_r = 7.32) together with a
   negative O(ε^{4/3}) remainder.
 - No registered verdict is affected.
+
+## 19. Track G, step G1: does the account apply to lazy-to-rich grokking? (derivation only, no compute; 2026-10-12)
+
+**Status labels.** *Proved* means proved here, in full, from the stated model; the identities in (19.1) were also
+checked symbolically (sympy; a seconds-long check, no training). *Argued* means a supporting argument that is not a
+proof. *Literature* means a claim about published work, from the sources named, not re-proved here.
+
+**Setting (G0).** Lyu, Jin, Li, Du, Lee and Hu, ICLR 2024, quoted from arXiv 2311.18817, whose numbering may differ from
+the proceedings: the diagonal linear network f(θ, x) = ⟨u⊙u − v⊙v, x⟩, θ = (u, v) ∈ ℝ^d × ℝ^d, initialised at
+θ(0) = α(1, 1); gradient flow on L_λ(θ) = L(θ) + (λ/2)‖θ‖² with the exponential loss L = (1/n)Σ_i exp(−y_i⟨w, x_i⟩),
+w := u⊙u − v⊙v; separable data (sparse linear classification, n < d). Theorem 3.4 / Corollary 3.6: up to
+(1−c)λ⁻¹ ln α the predictor is the max-L2-margin classifier; Theorem 3.5 / Corollary 3.7: by (1+c)λ⁻¹ ln α it is a
+KKT point of min ‖θ‖² s.t. y_i f_i ≥ 1 (max-L1-margin). Both are limits α → ∞ with λ = Θ(α^{−p}).
+
+### 19.1 Exact reduction (proved)
+
+Write r := −∇_w L = (1/n)Σ_i y_i x_i e^{−y_i⟨w,x_i⟩}. Then u̇_k = (2r_k − λ)u_k and v̇_k = (−2r_k − λ)v_k, so u_k, v_k
+stay positive and
+
+1. **The product is an exact clock:** d(u_k v_k)/dt = −2λ u_k v_k, so u_k v_k = β(t) := α² e^{−2λt} for every k and
+   every t, independent of the data and of the trajectory.
+2. Since (u_k² + v_k²)² − (u_k² − v_k²)² = 4u_k²v_k², u_k² + v_k² = √(w_k² + 4β²), so ‖θ‖² = Σ_k √(w_k² + 4β²).
+3. **The dynamics is an exact preconditioned gradient flow of a fixed-β landscape:**
+   ẇ_k = 4r_k(u_k² + v_k²) − 2λw_k = −4 D_k ∂_k J_β(w), with D_k = √(w_k² + 4β²) and
+   J_β(w) := L(w) + (λ/2) Σ_k √(w_k² + 4β²), evaluated at β = β(t).
+4. J_β is L_λ restricted to the level set {u_k v_k = β ∀k}, written in w. It is strictly convex in w (L is convex,
+   √(w² + c) is strictly convex for c > 0) and coercive for λ > 0, so it has a **unique** minimiser w*(β).
+5. Limits (with Rosset, Zhu and Hastie 2004 for the regularisation paths; *literature*): for β ≫ |w|,
+   J_β ≈ L + λβd + (λ/8β)‖w‖² (ridge, coefficient → 0 as β → ∞), whose minimiser's direction tends to the
+   max-L2-margin classifier; as β → 0, J_β → L + (λ/2)‖w‖₁ (lasso), whose direction tends to the max-L1-margin
+   classifier as λ → 0. These match Corollaries 3.6 and 3.7.
+
+So the account's structure holds **exactly**, with one change: the slow "scale" is the conserved product β = u⊙v, not the
+norm s = ‖θ‖. Its drift β̇/β = −2λ is imposed and exactly known, with no feedback from w.
+
+### 19.2 The account's switch, as originally stated (scale s = ‖θ‖): exists, but is not grokking (proved / argued)
+
+At fixed s, ‖w‖₁ ≤ Σ(u_k² + v_k²) = s², and every w with ‖w‖₁ ≤ s² is attained at norm exactly s (add equal mass to u_k
+and v_k). So the fixed-s conditional minimiser is the L1-constrained problem min{L(w) : ‖w‖₁ ≤ s²} (*proved*). Along
+s it runs from the single coordinate most correlated with the labels (small s) to the max-L1-margin direction
+(large s), with breakpoints where coordinates enter (*argued*, by the KKT conditions of the constrained problem). The
+fixed-s minimiser is never the kernel-phase *parameter* (*proved*: for separable data ∇L ≠ 0, so the minimum is on
+‖w‖₁ = s², which forces u_k v_k = 0 for every k, while the kernel phase has u_k v_k = β ≫ 0); as a *predictor* it is
+not the max-L2-margin classifier in this data (*argued*: it is L1-constrained and sparse at small s). In the setting's data (x uniform on {±1}^d, labels from a 3-sparse rule) the small-s minimiser
+already uses a true coordinate. **The fixed-s switch exists but is a single-coordinate → sparse transition, at small
+scale. It is not the kernel → rich transition, and training under weight decay does not move through it.** The kernel
+phase is far from every fixed-s minimiser.
+
+### 19.3 The fixed-β switch, and why the account cannot predict the grokking time from it
+
+**Prediction it would give.** If training tracked w*(β(t)) quasi-statically, grokking would occur when β(t) passes β*,
+the β at which w*(β)'s test error falls below the stated level: t_grok = (1/2λ) ln(α²/β*) + lag, i.e.
+λ t_grok = ln α − ½ ln β* + λ·lag. β* comes from convex solves only (no restart ladder needed: the minimiser is unique).
+This would add a computable O(1/λ) term to Lyu et al.'s leading (1/λ) ln α.
+
+**Validity fails where it matters.**
+- *Proved:* for the linearised flow δẇ = −4 D H_J δw (H_J = ∇²J_β at w*), the relaxation rates are the eigenvalues of
+  the symmetric matrix A = 4 D^{1/2} H_J D^{1/2}. On the subspace S = {y : X D^{1/2} y = 0} (X the n × d data matrix;
+  dim S ≥ d − n), the loss term vanishes and yᵀAy = Σ_k y_k² · 8λβ²/(w_k² + 4β²) ≤ 2λ‖y‖². By Courant–Fischer, at least
+  d − n relaxation rates are ≤ 2λ at every β. The drift rate of the slow variable is exactly |β̇/β| = 2λ. So the
+  adiabatic ratio (drift rate / relaxation rate) is **≥ 1 on a subspace of dimension ≥ d − n, for every λ**. Making λ
+  smaller does not help: both rates scale with λ.
+- *Argued:* that subspace carries the transition. The kernel predictor lies in the row space of X; the sparse predictor
+  does not, and the change in test predictions is a change in the components that the training data do not constrain.
+  In the row-space directions relaxation is fast (rate ≈ 8β × the loss curvature in the kernel phase), which is why the
+  training fit tracks; it is the generalising change that does not.
+- Consequence: the lag in §19.3's formula is O(1/λ), the same order as the −½ ln β* term it would correct. The
+  quasi-static prediction is therefore **not sharp**. An exact finite-α time does follow from the exact solution
+  w_k(t) = 2β(t) sinh(4ρ_k(t)), ρ_k = ∫₀ᵗ r_k (from 19.1), but that is the mirror-flow analysis already used in this
+  literature (hypentropy; Woodworth et al. 2020; Lyu et al.'s proofs), not a prediction of the account.
+
+**Literature (relevant prior work, from the sources named in the G1 report):** Boursier, Pesme and Dragomir (NeurIPS 2025,
+arXiv 2505.20172) prove, for general losses as λ → 0, a fast phase to the critical manifold followed at time ≈ 1/λ by a
+Riemannian gradient flow minimising ‖θ‖₂, and attribute grokking to it; their validation is on regression, and their
+assumption (convergence of the unregularised flow) does not hold for the exponential loss on separable data. Kumar,
+Bordelon, Gershman and Pehlevan (ICLR 2024) attribute grokking to the lazy → rich transition. The slow phase is a drift,
+not quasi-static tracking of a fixed-scale minimiser, consistent with 19.3.
+
+### 19.4 Alternative 1: grokking as the onset of tracking (no)
+
+- With the validity measure of 19.3, there is no onset: on S the adiabatic ratio is ≥ 1 at every t (*proved*), and
+  in the row space it is small throughout (*argued*). Nothing switches on at the grokking time.
+- With a norm-based measure (the slack ‖θ‖² − ‖w‖₁ = 2Σ_k min(u_k², v_k²) small against ‖w‖₁, i.e. θ near the fixed-s
+  minimiser manifold), the slack of an inactive coordinate is ≈ 2β(t), so onset needs 2dβ(t) ≪ ‖w‖₁, giving
+  t ≈ (1/2λ) ln(2dα²/‖w‖₁) = (1/λ) ln α + (1/2λ) ln(2d/‖w‖₁) (*argued*). This carries a + (1/2λ) ln d term, so it falls
+  after the leading-order grokking time by about (1/2λ) ln(2d/‖w‖₁) (illustrative arithmetic only: ≈ 3.5/λ at d = 10⁴ if ‖w‖₁ ≈ 20, a value not computed here). It is not the grokking time; it is when the unused
+  coordinates have decayed.
+- **No sharp prediction beyond (1/λ) ln α.**
+
+### 19.5 Alternative 2: small initialisation, no weight decay, staged coordinate learning (no new prediction)
+
+- With λ = 0, β = α² is constant (19.1), and ẇ = −4D∇L is the hypentropy mirror flow. For α → 0, coordinates
+  activate in stages.
+- *Literature:* Pesme and Flammarion (NeurIPS 2023, arXiv 2304.00488) characterise, for regression, the visited saddles
+  and the jump times through a LARS-like recursion; the times are of order ln(1/α). I have not verified a published
+  classification (exponential-loss) analogue; for separable data the flow converges in direction to max-L1-margin
+  (Woodworth et al. 2020; Moroshko et al. 2020).
+- The account's premise fails here. There is no imposed slow parameter: the time-scale separation comes from the
+  exponential escape from near-zero coordinates, not from slow drift through a landscape, and the fixed-s path's
+  breakpoints (19.2) are crossed by the loss-driven growth of s itself. Lag corrections would be O(1) against the
+  O(ln 1/α) leading term, which the saddle-to-saddle analysis already gives.
+- **No sharp prediction not already implied by existing results** (for regression); for classification, at most a
+  re-derivation of the leading order, unverified as new.
+
+### 19.6 Conclusion of G1
+
+1. The account's switch with s = ‖θ‖ exists but is not the grokking transition (19.2).
+2. Lyu et al.'s setting maps exactly onto the account's form with the conserved product β = u⊙v as the slow variable
+   (19.1), an exact and possibly useful reduction; the fixed-β minimiser does switch from kernel-like to sparse.
+3. But the generalising change happens in directions whose relaxation rate is never faster than the drift
+   (19.3, proved bound), so the account's quasi-static prediction of the grokking time is not sharp. Its correction to
+   (1/λ) ln α is the same order as the lag it ignores.
+4. Neither alternative gives a sharp, testable prediction beyond existing results (19.4, 19.5).
+
+Per the program's rule, Track G stops here: no G2 exploration, no design page.
