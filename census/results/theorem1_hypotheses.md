@@ -103,3 +103,27 @@ constructed pass and fail cases, and checks the committed results.
 - **Continuous windows:** the same holds with |w₁| ≤ 12 for s < 0.64, given the computer-checked maximiser scan.
 - **Training samples** (m ≠ 0): compactness fails (Proposition C′). The minimisers are nevertheless unplaced at small
   scale (Corollary C3).
+
+## Addendum (2026-10-15): small-scale compactness at width 1 proved on all three objectives (math note §21, Track K)
+
+Record correction only; the rows above are kept as written. Source: math note §21 (commit 526b606), producer
+`src/small_scale_k.py` → `results/small_scale_k.json`, tests `tests/test_small_scale_k.py`.
+
+- **Row "C, s → 0" and the 2026-09-28 addendum's "continuous windows … given the computer-checked maximiser scan":
+  superseded.** On the continuous windows small-scale compactness is now **PROVED**, with constants certified in Arb
+  ball arithmetic: at every tabulated a (1.02–1.60), s₁ ≥ 0.643 and |w₁| ≤ W ≤ 11.93 (W ≤ 14.29 by a cruder bound
+  that needs no scan). Minimisers exist at every s (Lemma K2, uniform coercivity in w₁).
+- **Row A2 (attainment of sup Δμ on the continuous windows), "CHECKED": partly superseded.** Every class-mean maximiser
+  is now proved to lie in [1.784407, 1.800158] (certified). Its **uniqueness** is still not proved.
+- **The 800-point quadrature as evaluated in float64:** §17's float caveat is closed in exact rational arithmetic
+  (every point is k/2⁶⁰): s₁ ≥ 3.7455·10⁻¹⁹ and W ≤ 1.3621·10¹⁹. Valid, but of no use at practical scales.
+- **Exact equally spaced population:** the alias is forced (Lemma K4: |D| = 2 implies |α| ≥ π/q), so any compact set
+  must contain the aliased maximiser: every admissible W ≥ 623,614, and the best W lies in [623,614, 2,345,104].
+  On a finite quadrature, the s → 0 limit is the alias, not the cosine at α*; the clean limit holds on the continuous
+  windows only.
+- **Still open:** width 2 (the spreading lemma C3 does not exclude a unit with output weight → 0 and input weight → ∞;
+  partial Lemma K6 only); quadratic growth (row Q) at the aliases; uniqueness of the continuous-window maximiser; the
+  explicit scale in the alias corollary. On training samples compactness still fails (Proposition C′).
+- **Say / Do not say, updated.** Say: "At width 1, small-scale compactness is proved on the continuous windows
+  (certified constants), and on the quadrature with the aliased maximiser included." Do not say: "All hypotheses of
+  Theorem 1 are proved" (width 2, quadratic growth at the aliases and maximiser uniqueness remain open).
