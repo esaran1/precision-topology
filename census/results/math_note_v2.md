@@ -2941,3 +2941,474 @@ minimiser on P_c. Then:
     small, a wrong centre); agreement of the constants with §17's formulas, and their monotonicity; the exact
     spreading count, dyadic lattice, symmetry (with a one-ulp fail case) and gap facts on constructed data; and the
     committed numbers.
+
+## 22. Track K follow-up: width 2, the escaping unit's ramp limit; compactness on the symmetric windows, non-attainment on the asymmetric windows (2026-10-15)
+
+**Status, stated per part.** Theory only; no training, no seeds. Every number below is from `src/small_scale_w2.py` →
+`results/small_scale_w2.json` (the `ledger` block); tests in `tests/test_small_scale_w2.py`. Labels as in §21:
+**proved** (by hand, every step written here), **certified** (a finite computation in `arb` ball arithmetic at 128 bits,
+rigorous integrals by `acb.integral`, or exact rationals), **argued** (not used for any conclusion), **exploratory**
+(float, not part of any proof). When this work started §20 (Track U1) was not yet in the note; U1 committed it
+concurrently (042691a), so §22 is appended after §21, the last section.
+- **The ramp limit (Lemma K7; proved).** A unit with ṽ₂ → 0, |α₂| → ∞, ṽ₂α₂ → γ converges, uniformly in x, to the
+  linear term γx plus a constant. Its bias only adds a constant (absorbed by b). Its sine part is bounded by a|ṽ₂| and
+  vanishes in the limit **on every objective, finite or continuous; aliasing does not change the limit**. The limit
+  configuration is **φ̄ = γx + σf_a(αx + β)**: one unit carrying all the ℓ₁ weight, plus a free linear term.
+  - Aliasing changes the **approach**, not the limit. On the continuous windows the escaping sine part changes the loss
+    by O(sε/|α₂|) (Lemma K9, explicit), where ε = |ṽ₂|. On the quadratures it does not average out, and it can itself
+    sit on an alias with |D| = 2.
+- **(1) Symmetric continuous windows P_c: width-2 compactness PROVED (Theorem K11), constants certified.**
+  - For every tabulated a and every s ≤ s₂(a), with s₂ ≥ 0.0066 at every a and s₂ = 0.01 at a = 1.30: conditional
+    minimisers exist, both weights are nonzero, and both |αᵢ| ≤ W₂(a) (≤ 8.84 at every a; 6.37 at a = 1.30).
+  - **The ramp limit itself is not strictly worse.** At a class-mean maximiser, with γ cancelling the slope, it is
+    exactly the cancelling pair's function, so it ties at every s.
+  - **What is strictly worse (proved):**
+    - every finite approach to a ramp limit. The first-order cost is sε·aD\*/4: the ℓ₁ weight the escaping unit uses.
+    - every ramp limit whose slope lies outside the "mirror range" |c̄| ≤ |α|. Inside that range the ramp limit is
+      realised by a compact configuration (Lemma K8).
+  - **Consequences (proved; uniqueness of the maximiser is now certified).**
+    - The s → 0 limit is the cancelling-pair function const − a·cos(α̂x), where α̂ is the unique maximiser of |D_c|.
+      This is §10.1's second-order selection, obtained without the quadratic-growth hypothesis (row Q) and without
+      Lemma 1's remainder constant K.
+    - It is placed: G₊ ≥ 0.887 at a = 1.30 (registered value 0.890).
+    - So every width-2 conditional minimiser on P_c is placed for all s below some s\* > 0. s\* is not computed.
+- **Symmetric quadratures P_ex, P_fl: NOT proved.** Two steps fail (22.3):
+  - Lemma K9 has no analogue there: aliasing.
+  - There is an exact unbounded symmetry, the alias translations (Proposition K10). It moves every minimiser whose
+    weight ratio is rational along an unbounded orbit.
+- **(2) Asymmetric continuous windows P_a (Δ = 0.4): YES, PROVED (Theorem K12), constants certified.**
+  - Take every tabulated a and every s ≤ s_a(a), with s_a ≥ 0.0071 at every a and s_a = 0.0076 at a = 1.30. Then the
+    infimum of the width-2 conditional loss equals the minimum over ramp limits and is **not attained** by any finite
+    configuration.
+  - Every minimising sequence escapes: one weight → 0, its |α| → ∞, and a subsequence converges to a ramp-limit
+    minimiser.
+  - Theorem 1 is restated on the extended space Θ̂ = Θ₂ ∪ R in 22.5. Which conclusions survive:
+    - **survive:** existence; the C1, Lemma 1 and K1 identities; "unplaced at small scale" (Proposition K13, explicit
+      s_u = 0.0202 at a = 1.30);
+    - **fails even on Θ̂:** Corollary 1(i) in raw coordinates, because the slope still diverges like κ\*/s;
+    - **holds in rescaled coordinates** (proved): κ = s·c̄ → κ\* = 0.2825 (the logistic-regression slope), and the sine
+      part maximises a residual-weighted class gap Γ;
+    - **not examined:** Corollary 1(ii) and the large-s side (Lemma 2).
+- **Exploratory (float; Track 2's registered 800-point landscape).**
+  - At both T2-1 bracket ends, and at every scanned s ≥ 0.178, the ramp-limit minimum equals T2-1's registered
+    retained loss to ≤ 1.7·10⁻¹⁵, with slope inside the mirror range.
+  - At s = 0.1 and 0.133 it lies below the registered retained loss, by 1.14·10⁻³ and 3.4·10⁻⁴.
+  - Every such point is unplaced, so **no registered status or verdict changes** (22.6).
+
+### 22.0 Setting
+
+- **Width 2 as in §10.**
+  - φ_θ = ṽ₁f_a(α₁x + β₁) + ṽ₂f_a(α₂x + β₂), with |ṽ₁| + |ṽ₂| = 1. The logits are sφ + b, with s = ‖v‖₁ and b profiled.
+  - Θ₂ = {ṽ} × ℝ² × (ℝ/2πℤ)². βᵢ is taken mod 2π by (W) of §21.0: shifting βᵢ by 2π adds the constant 2πṽᵢ to φ.
+  - K_W := {|α₁|, |α₂| ≤ W} ⊂ Θ₂ is compact.
+- **Convention.** f_a(t) = t + a sin t, as in §§1, 11 and 21. The author's t − a sin t equals f_a(t + π) − π. That is the
+  same family with each β shifted by π, so nothing below depends on the choice.
+- **Decomposition.** φ = cx + κ₀ + o(x), with:
+  - c = ṽ₁α₁ + ṽ₂α₂, the slope;
+  - κ₀ a constant;
+  - o = aΣᵢṽᵢ sin(αᵢx + βᵢ), so |o| ≤ a.
+- **Class-mean gap.** On a balanced objective, Δμ = c·m + aΣᵢṽᵢA(αᵢ, βᵢ), where m = E_O x − E_I x and
+  A(α, β) := E_O sin(αx + β) − E_I sin(αx + β), so |A| ≤ 2. On class-symmetric data, m = 0 and A = sin β·D(α) (§11 Step 1).
+- **Objectives.**
+  - P_c, P_ex and P_fl are as in §21.0.
+  - **P_a**, the continuous version of Track 2's windows (`asym_registration.md`): ½U(I) + ½U(O_Δ), with Δ = 0.4 and
+    O_Δ = [−2, −1.2] ∪ [1.2, 2.4]. The densities are 5/16 on I and 1/4 on O_Δ.
+    - Exact (certified in rationals): m = 11/25, Var x = 11917/7500 = 1.588933, E|x| = 53/50.
+  - **P_an**, Track 2's 800-point population (`asym_pilot.population(0.4)`): 400 + 400 points. m = 0.44 to float
+    rounding, and Var x = 1.589903 (exact rationals of the binary64 points).
+- **Five facts used throughout (proved).**
+  - **(F1)** L*(φ; s) does not change when a constant is added to φ, and |L*(φ; s) − L*(ψ; s)| ≤ s·sup|φ − ψ| on the
+    support. This holds because ℓ is 1-Lipschitz in z and the minimum over b preserves that.
+  - **(F2)** L* ≥ log 2 − (s/4)Δμ, with no remainder (§11 Proposition (i)).
+  - **(F3)** L* ≤ log 2 − (s/4)Δμ + (s²/8)Var φ (Lemma C1 with ψ ≤ z²/8).
+  - **(F4) (new)** V_s(θ) ≥ (s²/8)Var φ − (s⁴/192)·R(φ)⁴, where R(φ) = sup φ − inf φ on the support.
+    - Lemma C2's inequality log cosh u ≥ u²/2 − u⁴/12 holds for every u, so ψ(z) ≥ z²/8 − z⁴/192 for every z.
+    - The minimising c lies in [inf φ, sup φ], since ψ is even and increasing in |z|. So E(φ − c)⁴ ≤ R⁴.
+    - Also E(φ − c)² ≥ Var φ.
+  - **(F5) (scale derivative)** For fixed φ, g(t) := L*(φ; t) has g′(0) = −Δμ/4 and 0 ≤ g″ ≤ Var(φ)/4. Hence
+    g′(t) ≤ −Δμ/4 + t·Var(φ)/4.
+    - Here g″ = E σ′(z)(φ − m_w)², with m_w the σ′-weighted mean (§10.1). This is ≤ ¼E(φ − Eφ)².
+
+### 22.1 The escaping unit's limit, the mirror fold, and averaging
+
+**Lemma K7 (the ramp limit; proved).** Let θⁿ ∈ Θ₂ satisfy:
+- ṽ₂ⁿ → 0, |α₂ⁿ| → ∞ and ṽ₂ⁿα₂ⁿ → γ ∈ ℝ;
+- (ṽ₁ⁿ, α₁ⁿ, β₁ⁿ) → (σ, α, β), with σ = ±1.
+
+Then, uniformly on every bounded x-set,
+
+  **φ_{θⁿ} − ṽ₂ⁿβ₂ⁿ → φ̄ := γx + σf_a(αx + β),**
+
+and L*_P(θⁿ; s) → L*_P(φ̄; s) for every objective P (continuous or finite) and every s.
+- *Proof.* Expand the escaping unit: ṽ₂f_a(α₂x + β₂) = (ṽ₂α₂)x + ṽ₂β₂ + aṽ₂ sin(α₂x + β₂).
+  - The sine term is bounded by a|ṽ₂| uniformly on ℝ, whatever α₂ and β₂ are.
+  - ṽ₂β₂ is a constant.
+  - The linear term converges uniformly on bounded sets.
+  - Unit 1 converges uniformly on bounded sets by continuity. Then apply (F1). ∎
+- **The ramp-limit set** is R := {γx + σf_a(αx + β)} ≅ ℝ × {±1} × ℝ × ℝ/2πℤ. Equivalently, φ̄ = c̄x + const +
+  σa sin(αx + β), with a free total slope c̄ = γ + σα.
+- **The approach (the correction at first order in ε = |ṽ₂|).**
+  - *Continuous windows* (P_c, P_a): the sine part averages out. By Lemma K9 its effect on the loss is at most
+    sεaK₁/|α₂|.
+  - *Quadratures:* it does not average out. On P_ex every x is a multiple of q, so sin(α₂xᵢ + β₂) is 2π/q-periodic in
+    α₂. The escaping unit's class-mean contribution εa·sin β₂·D_ex(α₂) does not tend to 0. It equals ±2εa on the
+    aliases α₂ ∈ (2k + 1)π/q, so the escaping unit can itself be a class-mean maximiser. On P_fl the same holds with
+    period 2π·2⁶⁰.
+- **Configurations that do not converge uniformly** (both weights bounded away from 0, both |αᵢ| → ∞, slopes
+  cancelling) are not needed:
+  - Theorem K11 excludes them at small s by Lemma K6(ii);
+  - Theorem K12 excludes them by the bound in its proof of (c).
+
+**Lemma K8 (the mirror fold; proved).** For every (α, β), the units (α, β) and (−α, π − β) have the same sine part,
+because sin(π − (αx + β)) = sin(αx + β).
+- With weights pσ and qσ (p, q ≥ 0, p + q = 1): φ = σ(p − q)αx + const + σa sin(αx + β).
+- So every element of R with |c̄| ≤ |α| is the function of a configuration in K_{|α|}.
+- The cancelling pair of §10.1 is the case p = q, β = ±π/2.
+- Units (α, β) and (α, β + π) with weights of opposite signs give the same family. Track 2's registered retained
+  points have this form.
+
+**Lemma K9 (fast oscillation; proved).** Let P be piecewise uniform: density ρ_J on finitely many intervals J, with
+class label y_J on J. Let z be absolutely continuous on each J. Then for every α ≠ 0 and every β,
+
+  |E_P[(σ(z) − y)·sin(αx + β)]| ≤ Σ_J ρ_J(2 + ¼∫_J|z′|)/|α|.
+
+- *Proof.* Integrate by parts on each J: ∫_J G sin(αx + β) = [−G cos(αx + β)/α]_J + (1/α)∫_J G′cos(αx + β), with
+  G = σ(z) − y_J ∈ (−1, 1) and |G′| ≤ ¼|z′|. ∎
+- The tests check it on smooth G (pass), and on a square wave locked to the sine. There the bound without its
+  variation term fails.
+
+**Proposition K10 (alias translations on the quadratures; proved).** On P_ex, the map
+(α₁, α₂) ↦ (α₁ + 2πk₁/q, α₂ + 2πk₂/q), with kᵢ ∈ ℤ, changes φ on the data by the ramp 2π(ṽ₁k₁ + ṽ₂k₂)x/q and by
+nothing else.
+- *Proof.* xᵢ = nᵢq, so the sines are unchanged. Each linear term ṽⱼαⱼxᵢ changes by 2πṽⱼkⱼnᵢ. ∎
+- **Consequence.** Suppose ṽ₁k₁ + ṽ₂k₂ = 0 for some (k₁, k₂) ≠ 0, i.e. ṽ₁/ṽ₂ ∈ ℚ. An example is the cancelling pair
+  ṽ = (½, ½) with k₂ = −k₁. Then L*_{P_ex} is exactly constant along an unbounded orbit.
+  - So if any width-2 minimiser on P_ex has a rational weight ratio, the minimiser set is unbounded in Θ₂, and no
+    K_W contains it.
+  - On P_fl the same holds with 2π/q replaced by 2π·2⁶⁰.
+  - Whether the minimisers have rational ratios is not determined here.
+
+### 22.2 The symmetric continuous windows P_c (proved; constants certified)
+
+**Constants (certified).**
+- D_lo = 1.5732418725 and 2A₀ ≤ 4.767226 (§21).
+- On the maximiser box α₀ ± 0.01, which contains every maximiser of |D_c| (Lemma K3), Var(cos αx) ≤ V̄c = 0.661956.
+  So V_p := a²V̄c bounds the variance of the cancelling pair at any maximiser.
+- **Localisation threshold.** Every α > 0 with |D_c(α)| ≥ D_lo − 0.05 has α ≥ α_L = 1.589473. This is certified by
+  bisection: 59 cells cleared, 6,748 kept, none unresolved; (0, ½] is cleared by the bound (32/15)α².
+- **Uniqueness (certified, new).** D_c″ > 0 on the whole box: its lower end is 2.47. With D_c < 0 there, D_c is
+  strictly convex on the box. So |D_c| has **exactly one maximiser α̂ > 0** (up to the sign of α). This upgrades row A2's
+  "unique, computer-checked" to certified.
+
+**Theorem K11 (width 2 on P_c; proved, constants certified).** For each tabulated a and every s ∈ (0, s₂(a)]:
+- **(a) Compactness.** Width-2 conditional minimisers exist. Every one has both weights nonzero and |α₁|, |α₂| ≤ W₂(a).
+  Every θ outside K_{W₂}, and every θ with a zero weight, has L* strictly above the minimum.
+- **(b) The limit.** Every s → 0 limit point has slope c = 0, and every unit of nonzero weight has |αᵢ| = α̂ with
+  ṽᵢ sin βᵢ·D_c(α̂) = |ṽᵢ||D_c(α̂)|. So the limit function is **const − a·cos(α̂x)**, the cancelling pair's function.
+- **(c) Placement.** That limit is placed: G₊ ≥ a·g_lo with g_lo = 0.6823. Hence there is s\* > 0 (not computed) such
+  that every width-2 conditional minimiser at s < s\* is placed.
+
+| a | s₂ (verified) | W₂ | G₊ of the limit ≥ |
+|---|---|---|---|
+| 1.02 | 0.016 | 8.84 | 0.696 |
+| 1.30 | 0.01 | 6.37 | 0.887 |
+| 1.40 | 0.0087 | 6.04 | 0.955 |
+| 1.50 | 0.0075 | 5.78 | 1.023 |
+| 1.60 | 0.0066 | 5.61 | 1.092 |
+
+- All nine a are in the JSON. s₂ ranges over 0.0066–0.016, and W₂ ≤ 8.84 at every a.
+
+**Proof.**
+- **Notation.** θ_pair is the cancelling pair at the maximiser α̂. By (F3),
+  L*(θ_pair) ≤ log 2 − (s/4)aD\* + (s²/8)V_p, with D\* = |D_c(α̂)|. Let Λ_s := {θ : L*(θ; s) ≤ L*(θ_pair; s)}.
+- **Step 0 (facts on Λ_s, for s ≤ s₂).**
+  - (i) Lemma K1 with θ′ = θ_pair gives Σᵢ(|ṽᵢ|D\* − ṽᵢ sin βᵢ D_c(αᵢ)) ≤ η₀ := sV_p/(2a). This uses only
+    L*(θ) ≤ L*(θ′). Every term of the sum is ≥ 0.
+  - (ii) A unit with |αᵢ| ≥ 2A₀ has |D_c(αᵢ)| ≤ D_lo/2 by the decay bound. So its weight is ≤ ε̄ := sV_p/(aD_lo)
+    (Lemma K6(ii) with V_p). At s₂, 2ε̄ < 1, so at most one unit has |αᵢ| ≥ 2A₀.
+  - (iii) |c| ≤ c̄ := (a + √(1.2V_p/F))/τ, by Lemma K6(i) with V_p (this needs s < √(8Fψ(2)/V_p)). Hence
+    R(φ) ≤ 4c̄ + 2a.
+  - (iv) Label the units so that either ṽ₂ = 0, or both weights are nonzero and |α₂| ≥ 2A₀ (then, by (ii), |α₂| is
+    the larger). Put ε := |ṽ₂| and σ := sign ṽ₁.
+    - Then u₁ := σ sin β₁·D_c(α₁) ≥ D\* − η₁, with η₁ := η₀/(1 − ε̄).
+    - So |D_c(α₁)| ≥ D_lo − η₁ > D_lo − 0.05, hence |α₁| ≥ α_L.
+    - |α₁| < 2A₀ when ε > 0, by (ii).
+    - cos²β₁ ≤ k_c := 1 − (1 − η₁/D_lo)².
+- **Step 1 (Case 2: |c| ≥ (1 − ε)|α₁|).** This case includes every configuration with a zero weight, and every ramp
+  limit with |c̄| ≥ |α|.
+  - *Competitor θ″:* the cancelling pair at the same |α₁|, with sin β = sign D_c(α₁). Then Δμ(θ″) = a|D_c(α₁)| and
+    Var φ_{θ″} = a²Var(cos α₁x) =: T ≤ a².
+  - Δμ(θ) ≤ a[(1 − ε)|D_c(α₁)| + ε|D_c(α₂)|] ≤ a|D_c(α₁)|, since |D_c(α₂)| ≤ D_lo/2 < |D_c(α₁)|.
+  - Write φ − const = X + Y + r, with:
+    - X = cx + B sin α₁x, which is odd, and B = (1 − ε)aσ cos β₁;
+    - Y = A cos α₁x, which is even, and A = (1 − ε)aσ sin β₁;
+    - r = ṽ₂a sin(α₂x + β₂).
+  - Cov(X, Y) = 0, because P_c is symmetric. Put M := (c̄√Var x + a)² + a² ≥ Var X + Var Y. Then:
+    - Var φ ≥ Var X + Var Y − 2εa√M;
+    - Var X = E X² ≥ P := ((1 − ε̄)α_L√Var x − a√k_c)₊²;
+    - Var Y − T ≥ −a²(2ε̄ + k_c).
+  - By C1 with (F4) for θ, and (F3) for θ″:
+    L*(θ) − L*(θ″) ≥ (s²/8)[P − a²(2ε̄ + k_c) − 2ε̄a√M − s²R⁴/24].
+  - The bracket is certified positive at s₂ for every a (for example 3.020 − 2.938 at a = 1.30). θ″ ∈ K_{2A₀}.
+- **Step 2 (Case 1: |c| < (1 − ε)|α₁|, so ε > 0; and |α₂| > W₁).**
+  - *Competitor θ′:* the mirror fold (Lemma K8) at (α₁, β₁) with slope c′ := c/(1 − ε), where |c′| < |α₁|. So
+    φ′ = c′x + σa sin(α₁x + β₁) + const, and **exactly φ_θ = (1 − ε)φ′ + r + const**.
+  - ℓ is convex in z, so at z₀ = s(1 − ε)φ′ + b_θ: L*(θ; s) ≥ g(s(1 − ε)) + s·E[(σ(z₀) − y)r], with g(t) := L*(φ′; t).
+  - By Lemma K9 with |z₀′| ≤ 2sA₀(1 + a): |E[(σ(z₀) − y)r]| ≤ εaK₁/|α₂|, with K₁ := 15/8 + sA₀(1 + a)/2.
+  - By (F5): g(s(1 − ε)) − g(s) ≥ sε(Δμ(φ′) − s·Var φ′)/4, with Δμ(φ′) = au₁/(1 − ε) ≥ a(D_lo − η₁) and
+    Var φ′ ≤ (2A₀√Var x + a)².
+  - Hence L*(θ) − L*(θ′) ≥ sε[(a(D_lo − η₁) − s(2A₀√Var x + a)²)/4 − aK₁/|α₂|]. This is > 0 for |α₂| > W₁, where
+    W₁ := 4aK₁/(a(D_lo − η₁) − s(2A₀√Var x + a)²). Also θ′ ∈ K_{2A₀}.
+  - **This is the precise sense in which escape loses.** The escaping unit uses ε of the ℓ₁ budget, which costs
+    sε·aD\*/4 at first order in Δμ. Its ramp can be produced for nothing by the mirror fold. The averaging of its sine
+    part gives back only O(sε/|α₂|).
+- **Step 3 (existence; proof of (a)).** Put W₂ := max(2A₀, W₁(s₂)).
+  - L* is continuous on the compact K_{W₂}, so it attains its minimum there, at some θ_m.
+  - Every θ ∉ Λ_s has L*(θ) > L*(θ_pair) ≥ L*(θ_m).
+  - Every θ ∈ Λ_s that lies outside K_{W₂}, or has a zero weight, is strictly beaten by a point of K_{W₂} (Steps 1–2).
+    ∎(a)
+- **Monotonicity in s.** Every quantity in Steps 0–2 (η₀, ε̄, η₁, k_c, the R-term, K₁) increases with s, and every
+  margin decreases. So the verification at s₂ covers all of (0, s₂], and W₁(s) ≤ W₁(s₂). The tests re-verify at s₂/10,
+  and check that Step 1 fails at 3s₂.
+- **(b)** Take minimisers θ_n at s_n → 0. They lie in K_{W₂}, so a subsequence converges in Θ₂ to some θ̄.
+  - Step 0(i) gives Δμ(θ̄) = aD\*. With uniqueness, every unit of nonzero limit weight has |αᵢ| = α̂ and cos βᵢ = 0,
+    with the stated alignment. So φ̄ = c̄x + const − a cos(α̂x), since D_c(α̂) < 0.
+  - Comparing θ_n with θ_pair through C1 and (F4): (s²/8)Var φ_n − s⁴R⁴/192 ≤ (s²/8)a²Var(cos α̂x), since
+    Δμ(θ_n) ≤ aD\*. So Var φ_n ≤ a²Var(cos α̂x) + s_n²R⁴/24.
+  - Cov(x, cos α̂x) = 0, so Var φ̄ = c̄²Var x + a²Var(cos α̂x). In the limit this forces c̄ = 0. ∎(b)
+- **(c)** For α in the box, 0.8α < π and 1.2α < π < 2α < 2π (checked). So min_I cos(αx) = cos(0.8α), and max_O cos(αx)
+  is attained at |x| = 1.2 or 2.
+  - Hence G₊(−a cos αx) = a[cos 0.8α − max(cos 1.2α, cos 2α)] ≥ a·g_lo. This is enclosed over 400 cells of the box,
+    which also certify D_c < 0.
+  - G is continuous on Θ₂. If unplaced minimisers existed along some s_n → 0, they would have an unplaced limit point.
+    That contradicts (b). ∎
+
+**Answer to question (1).**
+- **The ramp limit is not strictly worse as a limit object.**
+  - The point (σ, α̂, β = ∓π/2, γ = −σα̂) of R is exactly the cancelling pair's function, so it ties at every s.
+  - More generally, R ∩ {|c̄| ≤ |α|} is realised inside K_{|α|} (Lemma K8).
+- **What is strictly worse at small s** is everything else that escapes:
+  - every finite configuration with an escaping unit (Step 2);
+  - every ramp limit with |c̄| ≥ |α| (Step 1, with ε = 0).
+- That is what compactness needs.
+- **Float illustration (exploratory; not part of the proof).** At s = 0.005 and a = 1.30, take the escaping sequence:
+  unit 1 at α\* with weight 1 − ε, and unit 2 carrying the cancelling slope. Its loss exceeds the pair's by
+  2.55·10⁻⁴, 2.55·10⁻⁵ and 2.55·10⁻⁶ at ε = 0.1, 0.01 and 0.001. The first-order prediction sεaD\*/4 gives 2.56·10⁻⁴,
+  2.56·10⁻⁵ and 2.56·10⁻⁶.
+
+### 22.3 The symmetric quadratures P_ex and P_fl: where the argument fails
+
+- **Step 0(ii) fails.** Lemma K6(ii) uses the decay of D_c. On P_ex, D_ex is 2π/q-periodic and equals −2 on every odd
+  alias. So a large α carries no penalty at all, and units at large |α| need not have small weight.
+- **Step 2 fails.** Lemma K9 has no analogue. The escaping unit's sine part does not average out, and its first-order
+  cost of escape can be zero: it can sit on an alias.
+- **There is an exact non-compact symmetry** (Proposition K10).
+- So **width-2 compactness on P_ex and P_fl is not proved**. The natural statement would be compactness modulo the alias
+  lattice; it is not attempted. §11's correction stands: state the width-2 small-scale selection on the continuous
+  windows (Theorem K11), or for s above about 10⁻¹¹.
+
+### 22.4 The asymmetric continuous windows P_a: the infimum is a ramp limit and is not attained (proved; constants certified)
+
+**Constants (certified).**
+- m, Var x and E|x| are exact (22.0). F_τ := 1 − (largest mass of a closed interval of length 2τ) = ½ at τ = 1. This is
+  exact: the mass is piecewise linear in the interval's start, so it is maximised at a breakpoint.
+- **Logistic regression.** L₀ := min_{κ,b} E ℓ(κx + b, y). Its unique minimiser (κ\*, b\*) lies within 5.7·10⁻¹⁶ of
+  (0.2825488448, −0.0621292115).
+  - Certified: the gradient is enclosed by rigorous integration (‖∇‖ ≤ 1.2·10⁻¹⁶), and the objective is λ-strongly
+    convex with λ ≥ 0.2036 on a ball of radius 10⁻⁶.
+  - Also L₀ ≤ log 2 − m²/(8Var x) = 0.677917. This is exact, from ℓ ≤ log 2 + (½ − y)z + z²/8.
+- **The residual-weighted sine gap** is Γ(ω) := E[(y − σ(κ\*x + b\*))·ω(x)].
+  - For ω₀ = a sin(α₀x + β₀), with α₀ = 1.687111 and β₀ = −1.689795 (the float maximiser), Γ(ω₀) ≥ aγ₀ with
+    **γ₀ = 0.38020445** (certified).
+  - By Lemma K9, Γ(a sin(αx + β)) → 0 as |α| → ∞.
+
+**Lemma K12a (the scale profile of a sine part; proved).** For ω = σa sin(αx + β), let
+h_ω(t) := min_{κ,b} E ℓ(κx + tω + b, y).
+- h_ω is convex on ℝ, because it is a partial minimisation of a jointly convex function.
+- It is differentiable, with h_ω′(t) = E[(σ(z_t) − y)ω], by Danskin's theorem (the minimiser is unique).
+- h_ω(0) = L₀ and h_ω′(0) = −Γ(ω).
+- h_ω′ is (a²/4)-Lipschitz. For all t and δ, h(t + δ) ≤ h(t) + δh′(t) + δ²Eω²/8; for a convex differentiable function,
+  that uniform quadratic upper bound implies a Lipschitz derivative.
+- Hence, for all t ≥ 0:
+
+  **L₀ − tΓ(ω) ≤ h_ω(t) ≤ L₀ − tΓ(ω) + t²a²/8.** (22.4a)
+
+- For φ̄ ∈ R with sine part ω, L*(φ̄; s) ≥ h_ω(s), with equality at the optimal slope. So L̂(s) := inf_R L* = inf_ω h_ω(s).
+
+**Lemma K12b (the slope bound; proved).** If L*(θ; s) ≤ log 2, for θ ∈ Θ₂ or θ ∈ R, then
+s|c| ≤ κ̄(s) := max(sa/τ, [F log 2 + sa(1 + F)/2]/(Fτ/2 − m/4)), with τ = 1 and F = ½.
+- *Proof.* Use C1; Δμ ≤ |c|m + 2a; C3's spreading (mass at least F lies outside an interval of length 2τ, and has
+  |φ − c₀| ≥ τ|c| − a there); and ψ(z) ≥ |z|/2 − log 2. ∎
+- κ̄ = 2.52–2.54 at s_a.
+
+**Theorem K12 (non-attainment; proved, constants certified).** For each tabulated a and every s ∈ (0, s_a(a)], put
+K₁ := 13/8 + κ̄/4 and W_a := 2K₁/(γ₀ − 7sa/8). Then:
+- **(a)** inf_{Θ₂} L*_{P_a}(·; s) = L̂(s), and L̂(s) is **attained on R**, at points with |α| ≤ W_R := K₁/(γ₀ − sa/8)
+  and s|c̄| ≤ κ̄.
+- **(b)** **No θ ∈ Θ₂ attains it**: L*(θ; s) > L̂(s) for every θ ∈ Θ₂.
+- **(c)** Every minimising sequence θⁿ in Θ₂ escapes to the ramp limit. After relabelling the units:
+  - ṽ₂ⁿ → 0 and |α₂ⁿ| → ∞;
+  - a subsequence converges in the sense of Lemma K7 to a minimiser on R.
+
+| a | s_a (verified) | W_a | W_R | s_u (P_a) | s_u (P_an) |
+|---|---|---|---|---|---|
+| 1.02 | 0.0082 | 12.10 | 5.95 | 0.0258 | 0.0258 |
+| 1.30 | 0.0076 | 12.15 | 5.96 | 0.0202 | 0.0202 |
+| 1.40 | 0.0074 | 12.17 | 5.96 | 0.0188 | 0.0188 |
+| 1.50 | 0.0072 | 12.18 | 5.96 | 0.0175 | 0.0175 |
+| 1.60 | 0.0071 | 12.20 | 5.96 | 0.0165 | 0.0164 |
+
+**Proof.**
+- **The comparison point.** Let U(s) := h_{ω₀}(s). Then U(s) ≥ L̂(s), and by (22.4a), U(s) ≤ L₀ − saγ₀ + s²a²/8.
+- **The assumption.** Let θ ∈ Θ₂ with L*(θ; s) ≤ L̂(s); a minimiser would satisfy this.
+  - Then L*(θ) ≤ L₀ ≤ log 2, so s|c| ≤ κ̄ (Lemma K12b).
+  - Units of zero weight do not affect φ. Put W := W_a(s).
+- **Case A: every unit of nonzero weight has |αᵢ| ≤ W.**
+  - Then |c| ≤ W and Δμ ≤ Wm + 2a.
+  - By (F2), L*(θ) ≥ log 2 − (s/4)(Wm + 2a) > log 2 − m²/(8Var x) ≥ L₀ ≥ U(s) ≥ L̂(s). Contradiction.
+  - The strict inequality is the certified condition at s_a, and it is monotone in s.
+- **Case B: the nonzero-weight unit with the largest |α| (call it unit 2) has |α₂| > W.** Put ε := |ṽ₂| ∈ (0, 1].
+  - **(B1) ε = 1.** Then φ = cx + r + const, with r = ±a sin(α₂x + β₂).
+    - By convexity at z₀ = scx + b_θ, and Lemma K9 with |z₀′| ≤ κ̄: L*(θ) ≥ L₀ − saK₁/|α₂|.
+    - This is > L₀ − saγ₀ + s²a²/8 ≥ U(s), since |α₂| > W ≥ W_R. Contradiction.
+  - **(B2) ε < 1.** Unit 1 has weight 1 − ε and sine part ω = σa sin(α₁x + β₁), with σ = sign ṽ₁. So
+    φ = cx + (1 − ε)ω + r + const.
+    - By convexity at z₀ = scx + s(1 − ε)ω + b_θ (with |z₀′| ≤ κ̄ + sa|α₁| ≤ κ̄ + sa|α₂|), and Lemma K9:
+
+      L*(θ) ≥ h_ω(s(1 − ε)) − e, with e := sεa(K₁/|α₂| + sa/4). (22.4b)
+
+    - From L*(θ) ≤ U(s): h_ω(s(1 − ε)) ≤ U(s) + e.
+    - By convexity, h_ω′(0) ≤ (h_ω(s(1 − ε)) − L₀)/(s(1 − ε)) ≤ (U(s) + e − L₀)/s. The numerator is negative, by the
+      same condition as below.
+    - With Lemma K12a: −h_ω′(s) ≥ (L₀ − U(s) − e)/s − sa²/4 ≥ aγ₀ − sa²/8 − a(K₁/|α₂| + sa/4) − sa²/4.
+    - Convexity once more: h_ω(s(1 − ε)) ≥ h_ω(s) − sε·h_ω′(s). With (22.4b):
+
+      **L*(θ) − h_ω(s) ≥ sε[−h_ω′(s) − a(K₁/|α₂| + sa/4)] ≥ sεa[γ₀ − 7sa/8 − 2K₁/|α₂|] > 0** for |α₂| > W_a.
+
+    - h_ω(s) ≥ L̂(s), because it is the loss of the ramp-limit point with sine part ω and the optimal slope. So
+      L*(θ) > L̂(s). Contradiction.
+  - So no θ ∈ Θ₂ has L*(θ) ≤ L̂(s). ∎(b)
+- **(a)**
+  - *inf over Θ₂ ≤ L̂(s).* Every φ̄ ∈ R is the limit of a sequence as in Lemma K7: ṽ₂ = 1/n, α₂ = nγ, ṽ₁ = σ(1 − 1/n).
+    L* converges along it by (F1). With (b), inf_{Θ₂} = L̂(s).
+  - *Attainment on R.* Take φ̄ ∈ R with sine part ω and |α| > W_R. Then L*(φ̄) ≥ h_ω(s) ≥ L₀ − sΓ(ω) ≥ L₀ − saK₁/|α|,
+    which is > U(s). This uses Lemma K9 at z = κ\*x + b\*, with |κ\*| ≤ κ̄.
+  - Also s|c̄| ≤ κ̄ on {L* ≤ log 2}. So L̂(s) is an infimum over the compact set {s|c̄| ≤ κ̄, |α| ≤ W_R, β mod 2π, σ},
+    on which L* is continuous. It is attained. ∎(a)
+- **(c)** Let L*(θⁿ) ≤ L̂(s) + δ_n with δ_n → 0.
+  - If every unit of nonzero weight had |αᵢⁿ| ≤ W_a along a subsequence, Case A would give
+    L* ≥ log 2 − (s/4)(W_a m + 2a), a fixed margin above L̂. So eventually |α₂ⁿ| > W_a.
+  - Repeating (B2) with δ_n: sε_n·a[γ₀ − 7sa/8 − 2K₁/|α₂ⁿ|] ≤ 2δ_n. So ε_n → 0.
+  - |α₁ⁿ| stays bounded. Otherwise both sine parts are fast, and by Lemma K9 twice with (22.4a),
+    L*(θⁿ) ≥ L₀ − sa(2K₁/|α₁ⁿ| + sa/4) → L₀ − s²a²/4. That is > U(s), since γ₀ > 3sa/8.
+  - Then ṽ₂ⁿα₂ⁿ = cⁿ − ṽ₁ⁿα₁ⁿ is bounded, because s|cⁿ| ≤ κ̄. So a subsequence converges, and Lemma K7 applies.
+  - By (F1) the limit φ̄ ∈ R has L*(φ̄) = L̂(s). ∎
+- **Monotonicity.** κ̄, K₁ and W_a increase with s, and Case A's margin decreases. So the verification at s_a covers
+  (0, s_a]. The tests re-verify at s_a/10 and check failure at 2s_a.
+- **Float illustration (exploratory).** At s = 0.005 and a = 1.30, take unit 1 at the float ramp-limit optimum
+  (α = 1.70) and unit 2 forced by the optimal slope. Then L* − L̂ = 2.46·10⁻⁴, 2.46·10⁻⁵, 2.47·10⁻⁶ and 7.5·10⁻⁷ at
+  ε = 0.1, 0.01, 0.001 and 0.0003. The first-order prediction sεaγ gives 2.47·10⁻⁴·(ε/0.1). The loss decreases
+  linearly to the infimum and never reaches it.
+
+**Proposition K13 (unplaced at small scale on asymmetric data; proved, explicit).** Take any balanced objective with
+m ≠ 0 whose windows have −2, 2 ∈ O and ±0.8 ∈ I: P_a, P_an, or a Track 2 training set. At width 1 or 2, for points of
+Θ₂ ∪ R:
+- **(i) (the domain lemma at width 2.)** G₊ and G₋ are both ≤ 2a − 2.8|c|. So |c| ≥ a/1.4 implies unplaced.
+  - *Proof:* for c > 0, G₊ ≤ φ(−2) − φ(0.8) and G₋ ≤ φ(−0.8) − φ(2), and |o(u) − o(v)| ≤ 2a. The case c < 0 is the
+    mirror image. ∎
+- **(ii)** inf L* ≤ log 2 − m²/(8Var x) at every s > 0. Use the pure ramp: units (c, β) and (c, β + π) with weights ½
+  and ½ give φ = cx + const. Take c = m/(s·Var x) and apply (F3).
+- **(iii)** Every θ with |c| < a/1.4, in particular every placed θ, has L* ≥ log 2 − (s/4)(a|m|/1.4 + 2a), by (F2).
+  - So for s < **s_u := m²/(2Var x·(a|m|/1.4 + 2a))**, every placed point lies above the infimum by at least
+    m²/(8Var x) − (s/4)(a|m|/1.4 + 2a) > 0.
+- s_u is given in the table above (0.0202 at a = 1.30, on both P_a and P_an).
+- This is the width-2 analogue of §11's s₀, and it needs neither attainment nor compactness.
+- It is consistent with T2-1, whose registered switch lies at s ∈ [0.437, 0.453], above s_u.
+
+### 22.5 Theorem 1 on the extended space Θ̂ := Θ₂ ∪ R (P_a)
+
+- **The topology.** Θ₂ keeps its own topology, and θⁿ → φ̄ ∈ R as in Lemma K7. L* extends continuously, by (F1).
+- **What Theorem K12 gives.** At each s ≤ s_a:
+  - the minimum over Θ̂ exists and lies on R;
+  - every minimising sequence in Θ₂ has a subsequence converging in Θ̂ to a minimiser. The proof of (c) shows that
+    {L* ≤ L̂ + δ} is relatively sequentially compact in Θ̂ for small δ.
+
+| ingredient of Theorem 1 | on Θ₂ (P_a) | on Θ̂ (P_a) |
+|---|---|---|
+| a conditional minimiser exists at fixed small s | **fails** (K12(b), s ≤ s_a) | **holds** (K12(a)) |
+| C1 decomposition; Lemma 1's expansion; Lemma K1 | hold | hold: they are statements about φ |
+| Corollary 1(i): limit points maximise Δμ (needs S < ∞ and compactness) | **fails**: S = +∞ (c·m is unbounded), and minimisers leave every K_W (Proposition C′) | **still fails** in raw coordinates: s·c̄ → κ\* > 0, so \|c̄\| → ∞ |
+| Corollary 1(i), rescaled (new) | — | **holds** (proved below): in the coordinates (κ = s·c̄, σ, α, β) on R, limit points have κ = κ\* = 0.2825 and (σ, α, β) maximising Γ |
+| Corollary 1(ii) (variance selection) | not examined | not examined: the first-order selection is Γ, and its tie structure is not studied |
+| Corollary 2 / "unplaced at small scale" | **holds** (K13; s_u explicit) | **holds** (K13 applies on R) |
+| Lemma 2 (large s: Γ_n attained, compactness) | not examined here; T2-1 found placed minimisers for s ≥ 0.453 (registered, numerical) | **open**: whether ramp limits raise the large-s gap supremum is not examined |
+| the criterion (gating iff unplaced at small scale) | small-scale side holds (K13); large-scale side is T2-1's registered result | small-scale side holds; large-scale side open |
+
+**Rescaled Corollary 1(i) on R (proved).** Let φ_s ∈ R be minimisers, with sine parts ω_s.
+- By (22.4a), h_{ω_s}(s) ≥ L₀ − sΓ(ω_s), and L̂(s) ≤ L₀ − sΓ\* + s²a²/8, where Γ\* := sup Γ.
+- Γ\* is attained: Γ(σa sin(αx + β)) is continuous in (α, β), and tends to 0 as |α| → ∞ by Lemma K9.
+- So Γ(ω_s) ≥ Γ\* − sa²/8. Hence |α_s| ≤ K₁/(Γ\*/a − sa/8) stays bounded, and limit points maximise Γ.
+- κ_s = s·c̄_s minimises the strictly convex E ℓ(κx + sω_s + b). That differs from the logistic objective by at most
+  sa in sup norm. By uniform convergence on compacts and uniqueness of (κ\*, b\*), κ_s → κ\*. ∎
+- **So on asymmetric windows the small-scale limit is a statement in rescaled coordinates:** the logistic-regression
+  ramp κ\*x/s, plus the full-weight sine selected by the residual-weighted gap Γ.
+  - The float maximiser is α₀ = 1.687, against α\* = 1.792 for D_c on the symmetric windows.
+  - In raw coordinates nothing converges.
+
+### 22.6 Exploratory: Track 2's registered landscape P_an (float; not part of any proof)
+
+- **Method.** The ramp-limit minimum on P_an at a = 1.30: a 2-D Newton solve in (κ, b) for each (α, β) on a 150 × 72
+  grid, then pattern refinement. This is a scratch computation; it is not committed.
+- **At the registered scales s ≥ 0.178** (0.178, 0.237, 0.316, 0.422 and 0.562, and both T2-1 bracket ends 0.43714 and
+  0.45316):
+  - the ramp-limit minimum equals T2-1's registered retained loss (`asym_parts/scan.csv`, `validate.csv`) to
+    ≤ 1.7·10⁻¹⁵;
+  - its slope is inside the mirror range (|c̄| = 1.48 down to 0.42, against |α| = 1.686).
+  - So there the registered minimiser **is** the ramp-limit minimiser, realised compactly (Lemma K8).
+- **At s = 0.1 and 0.1334** the ramp-limit minimum is lower than the registered retained loss, by 1.14·10⁻³ and
+  3.4·10⁻⁴. Its slope is |c̄| = 2.71 and 2.01, both above |α|.
+  - So there the registered "conditional minimiser" is not the infimum.
+  - By analogy with Theorem K12 the infimum is presumably not attained there (**argued**). P_an is a finite set, where
+    K12 is not proved.
+  - Both ramp-limit points have |c̄| > a/1.4 = 0.93, so they are unplaced (K13(i)).
+- **T2-1's status at every scanned scale, and its verdict (PASS), are unchanged.** No registered number is altered.
+
+### 22.7 Summary: what is proved, and what fails
+
+- **Proved:**
+  - the ramp limit (K7);
+  - the mirror fold (K8);
+  - averaging on piecewise-uniform measures (K9);
+  - the exact alias translations (K10);
+  - width-2 compactness on P_c, with certified constants, the cancelling-pair limit and its placement (K11);
+  - non-attainment and escape on P_a, with certified constants (K12);
+  - unplaced at small scale on asymmetric data (K13);
+  - the rescaled Corollary 1(i) on Θ̂.
+- **Certified (new):** uniqueness of the class-mean maximiser on P_c (D_c″ > 0 on the maximiser box), and the
+  logistic-regression optimum and residual gap on P_a.
+- **Fails, or is not proved:**
+  - width-2 compactness on the quadratures P_ex and P_fl (22.3: aliasing and K10);
+  - non-attainment on the finite P_an (K9 fails on a finite set, so it is only argued, 22.6);
+  - Corollary 1(i) on asymmetric windows in raw coordinates, on Θ₂ and on Θ̂ alike;
+  - the large-s side of Theorem 1 on Θ̂;
+  - Corollary 1(ii) on P_a.
+- s\* in Theorem K11(c) is not quantified.
+- **Producer and tests.**
+  - The run is one process at nice 15: about 2 s of CPU and 0.27 GB peak RSS.
+  - Tests cover:
+    - the mirror-fold identity, with a wrong-mirror fail case;
+    - the ramp limit's uniform error a·ε;
+    - Lemma K9 on smooth G, and a square-wave fail case without the variation term;
+    - the localisation pass, with two fail cases (a threshold above the maximum, and one too low for the small-α
+      clearance);
+    - Theorem K11's conditions passing at s₂ and s₂/10 and failing at 3s₂, plus an α_L fail case;
+    - the closed form of D_c″ against finite differences, and the uniqueness certificate with a wide-box fail case;
+    - the pair-variance box against floats;
+    - placement on the box, with a shifted-box fail case;
+    - exact moments and interval masses on constructed measures;
+    - the logistic certificate, with a perturbed-start fail case;
+    - γ₀, with an opposite-phase fail case;
+    - Theorem K12's conditions passing at s_a and s_a/10 and failing at 2s_a, plus no-gap and symmetric-window fail
+      cases;
+    - the s_u formula;
+    - the committed numbers.

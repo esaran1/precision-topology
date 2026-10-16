@@ -1073,6 +1073,8 @@ PRODUCERS = {
     "small_scale_compactness.json": ("small_scale", "main", "full", ""),
     # Track K (math note §21, small-scale compactness on all three objectives; 2026-10-15): src/small_scale_k.py
     "small_scale_k.json": ("small_scale_k", "main", "full", ""),
+    # Track K follow-up (math note §22, width-2 ramp limit; 2026-10-15): src/small_scale_w2.py
+    "small_scale_w2.json": ("small_scale_w2", "main", "full", ""),
     # discussion phase, Track 4: independent outer-exclusion and solve-bracket checks
     "certificate_checks/outer_glob_annulus.json": ("verify_certificates", "track4_outer", "full", ""),
     "certificate_checks/outer_solve.json": ("verify_certificates", "track4_outer", "full", ""),
@@ -2936,6 +2938,26 @@ def discussion_phase_checks() -> None:
                       ("K exact spread count", 200, 0), ("K exact inner gap", 796, 0), ("K exact outer gap", 798, 0),
                       ("K exact max float deviation", 1.40e-16, 6e-19)]:
         chk(f"§21 {k}", float(SK[k]), float(v), tol)
+
+    print("math note §22 (Track K follow-up: width-2 ramp limit, compactness and non-attainment)")
+    SW = json.loads((R / "small_scale_w2.json").read_text())["ledger"]
+    for k, v, tol in [("W2 D_lo", 1.5732418725, 1e-10), ("W2 var cos upper box", 0.661956, 6e-7),
+                      ("W2 localisation ok", 1, 0), ("W2 alpha_L", 1.589473, 6e-7), ("W2 uniqueness ok", 1, 0),
+                      ("W2 D2 lower on box", 2.47, 0.006), ("W2 two A0", 4.767226, 6e-7),
+                      ("W2 s2 a=1.30", 0.01, 0), ("W2 bound a=1.30", 6.37, 0.006),
+                      ("W2 s2 a=1.60", 0.0066, 0), ("W2 bound a=1.60", 5.61, 0.006),
+                      ("W2 s2 min over a", 0.0066, 0), ("W2 bound max over a", 8.84, 0.006),
+                      ("W2 placement g lower", 0.6823, 6e-5), ("W2 placement ok all a", 1, 0),
+                      ("W2 G_plus lower a=1.30", 0.887, 6e-4),
+                      ("W2 Pa m", 0.44, 0), ("W2 Pa Var x", 1.588933, 6e-7), ("W2 Pa F tau=1", 0.5, 0),
+                      ("W2 Pa kappa*", 0.2825488448, 6e-11), ("W2 Pa b*", -0.0621292115, 6e-11),
+                      ("W2 Pa logistic certified", 1, 0), ("W2 Pa logistic radius", 5.7e-16, 6e-18),
+                      ("W2 Pa alpha0", 1.687111, 6e-7), ("W2 Pa gamma0 lower", 0.38020445, 6e-9),
+                      ("W2 Pa s_a a=1.30", 0.0076, 0), ("W2 Pa W_a a=1.30", 12.15, 0.006),
+                      ("W2 Pa s_a a=1.60", 0.0071, 0), ("W2 Pa W_a a=1.60", 12.20, 0.006),
+                      ("W2 Pa s_u a=1.30", 0.0202, 6e-5), ("W2 Pa s_u a=1.60", 0.0165, 6e-5),
+                      ("W2 Pan m", 0.44, 1e-12), ("W2 Pan s_u a=1.30", 0.0202, 6e-5)]:
+        chk(f"§22 {k}", float(SW[k]), float(v), tol)
 
 
 def track4_certificate_checks() -> None:
