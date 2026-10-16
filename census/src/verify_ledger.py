@@ -1075,6 +1075,8 @@ PRODUCERS = {
     "small_scale_k.json": ("small_scale_k", "main", "full", ""),
     # Track K follow-up (math note §22, width-2 ramp limit; 2026-10-15): src/small_scale_w2.py
     "small_scale_w2.json": ("small_scale_w2", "main", "full", ""),
+    # ramp-limit crossover check (post hoc, exploratory; 2026-10-16): src/ramp_crossover.py
+    "ramp_crossover.json": ("ramp_crossover", "main", "full", ""),
     # discussion phase, Track 4: independent outer-exclusion and solve-bracket checks
     "certificate_checks/outer_glob_annulus.json": ("verify_certificates", "track4_outer", "full", ""),
     "certificate_checks/outer_solve.json": ("verify_certificates", "track4_outer", "full", ""),
@@ -2958,6 +2960,20 @@ def discussion_phase_checks() -> None:
                       ("W2 Pa s_u a=1.30", 0.0202, 6e-5), ("W2 Pa s_u a=1.60", 0.0165, 6e-5),
                       ("W2 Pan m", 0.44, 1e-12), ("W2 Pan s_u a=1.30", 0.0202, 6e-5)]:
         chk(f"§22 {k}", float(SW[k]), float(v), tol)
+
+    print("ramp-limit crossover check (post hoc, exploratory; results/ramp_crossover_check.md)")
+    RCJ = json.loads((R / "ramp_crossover.json").read_text())["ledger"]
+    for k, v, tol in [("RC s_ramp lo", 0.1576358, 6e-8), ("RC s_ramp hi", 0.1576364, 6e-8),
+                      ("RC bisection rel width", 4.4e-6, 6e-8), ("RC bisection all agree", 1, 0),
+                      ("RC committed all agree", 1, 0), ("RC gap s=0.1", 1.144e-3, 6e-7),
+                      ("RC gap s=0.1334", 3.352e-4, 6e-8), ("RC regpath gap lo*0.95", 3.487e-5, 6e-9),
+                      ("RC regpath gap lo*0.99", 1.388e-6, 6e-10), ("RC regpath gap hi*1.01", 0, 0),
+                      ("RC regpath gap hi*1.05", 1.1e-16, 6e-18), ("RC max abs gap 0.178 to 7.5", 1.1e-16, 6e-18),
+                      ("RC gap s=10", -2.099e-4, 6e-8), ("RC min mirror margin above", 0.202, 6e-4),
+                      ("RC regpath gap s0", 0, 0), ("RC mirror margin s0", 0.518, 6e-4),
+                      ("RC ramp loss s0", 0.574415, 6e-7), ("RC s0 over s_ramp", 1.41, 6e-3),
+                      ("RC quantities below", 0, 0)]:
+        chk(f"RC {k}", float(RCJ[k]), float(v), tol)
 
 
 def track4_certificate_checks() -> None:
