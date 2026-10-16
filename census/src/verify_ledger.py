@@ -1071,6 +1071,8 @@ PRODUCERS = {
     "theory_checks_lag.json": ("theory_checks", "<module>", "full", ""),
     "local_global.json": ("local_global", "main", "full", ""),
     "small_scale_compactness.json": ("small_scale", "main", "full", ""),
+    # Track K (math note §21, small-scale compactness on all three objectives; 2026-10-15): src/small_scale_k.py
+    "small_scale_k.json": ("small_scale_k", "main", "full", ""),
     # discussion phase, Track 4: independent outer-exclusion and solve-bracket checks
     "certificate_checks/outer_glob_annulus.json": ("verify_certificates", "track4_outer", "full", ""),
     "certificate_checks/outer_solve.json": ("verify_certificates", "track4_outer", "full", ""),
@@ -2879,6 +2881,24 @@ def discussion_phase_checks() -> None:
                       ("C s1 continuous a=1.60", 0.65, 0.006), ("C samples min |m| (seeds 0-49)", 0.0032, 6e-5),
                       ("C samples median |m| (seeds 0-49)", 0.075, 6e-4), ("C identity max abs err", 1.8e-15, 6e-17)]:
         chk(f"§17 {k}", float(SS[k]), float(v), tol)
+
+    print("math note §21 (Track K: small-scale compactness, three objectives)")
+    SK = json.loads((R / "small_scale_k.json").read_text())["ledger"]
+    for k, v, tol in [("K D_lo continuous", 1.5732418725, 1e-10), ("K A0 continuous", 2.3836131, 1e-6),
+                      ("K localisation ok", 1, 0), ("K cleared cells", 385, 0), ("K kept cells", 274, 0),
+                      ("K kept span lo", 1.784407, 6e-7), ("K kept span hi", 1.800158, 6e-7),
+                      ("K Wc continuous box a=1.30", 10.81, 0.006), ("K s1 continuous box a=1.30", 0.675, 6e-4),
+                      ("K Wc continuous box a=1.60", 11.93, 0.006), ("K s1 continuous box a=1.60", 0.643, 6e-4),
+                      ("K Wc continuous crude a=1.30", 13.11, 0.006), ("K s1 continuous crude a=1.30", 0.517, 6e-4),
+                      ("K Wc continuous crude a=1.60", 14.29, 0.006), ("K s1 continuous crude a=1.60", 0.496, 6e-4),
+                      ("K float dyadic exponent", 60, 0), ("K float gcd", 1, 0), ("K float symmetric", 1, 0),
+                      ("K float spread count", 200, 0), ("K float half period (units 1e18)", 3.6220097, 6e-8),
+                      ("K Wc float a=1.30 (units 1e19)", 1.3621, 6e-5), ("K s1 float a=1.30", 3.7455e-19, 6e-24),
+                      ("K float 2 + D(pi/q) upper", 1.5e-21, 6e-23),
+                      ("K Wc exact a=1.30", 2345103.67, 0.006), ("K s1 exact a=1.30", 2.17545e-6, 6e-11),
+                      ("K exact spread count", 200, 0), ("K exact inner gap", 796, 0), ("K exact outer gap", 798, 0),
+                      ("K exact max float deviation", 1.40e-16, 6e-19)]:
+        chk(f"§21 {k}", float(SK[k]), float(v), tol)
 
 
 def track4_certificate_checks() -> None:

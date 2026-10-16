@@ -2335,3 +2335,251 @@ not quasi-static tracking of a fixed-scale minimiser, consistent with 19.3.
 4. Neither alternative gives a sharp, testable prediction beyond existing results (19.4, 19.5).
 
 Per the program's rule, Track G stops here: no G2 exploration, no design page.
+
+## 21. Track K: small-scale compactness for Theorem 1, sine family, width 1, on all three objectives (2026-10-15)
+
+**Status, stated per part.** Theory only; no training, no seeds. Every number below is from `src/small_scale_k.py` →
+`results/small_scale_k.json` (the `ledger` block); tests in `tests/test_small_scale_k.py`. Labels: **proved** (by hand,
+every step written here), **certified** (a finite computation in ball arithmetic, python-flint `arb` at 128 bits, or in
+exact rationals), **argued** (not used for any conclusion).
+- **PROVED, on all three objectives** (continuous windows; the 800-point quadrature as the code evaluates it, in
+  float64; the exact linspace population of §17): for every a in the tables, there are s₁ > 0 and W such that for
+  every s ∈ (0, s₁) conditional minimisers exist and every one has |w₁| ≤ W. This is Theorem 1's small-scale
+  compactness hypothesis (§10 Corollary 1), in the sense fixed in 21.0.
+- **New relative to §17.**
+  - Continuous windows: upgraded from CHECKED (conditional on a float scan) to **proved with certified constants**,
+    and also with a cruder set that needs no scan at all.
+  - Float quadrature: §17's "float caveat" is **closed**. The constants are astronomically weak (W ≈ 1.4·10¹⁹,
+    s₁ ≈ 3.7·10⁻¹⁹), and they are what the aliasing forces, not slack.
+  - Exact population: the alias is **forced**. Every admissible W satisfies W ≥ π/q = 623,613.996, and the minimisers
+    tend to |w₁| ≥ π/q as s → 0 (proved). So on a finite quadrature the compact set must contain the aliased maximiser.
+  - Corollary 1(i) is re-proved **without the remainder lemma** (Lemma K1). Nothing in this section uses Lemma 1's
+    remainder constant K (§10 Lemma 1; in this note K is given only with a proof sketch, `theorem1_hypotheses.md` row R).
+- **Not proved:** width 2. The step that fails is stated in 21.6, with a partial result (proved).
+- **Unchanged:** training samples fail (§17, Proposition C′). Corollary 1(ii) on the finite objectives is not examined.
+
+### 21.0 The statement being proved
+
+- **Objectives P.** All three are balanced (class masses ½) and class-symmetric about x = 0.
+  - **P_c, the continuous windows:** ½ uniform on I = [−0.8, 0.8] plus ½ uniform on O = ±[1.2, 2].
+  - **P_fl, the 800-point quadrature as evaluated:** the float64 points of `blockB_landscape.population_data`. The
+    objective is the exact mean over these 800 binary64 numbers, read as exact rationals.
+  - **P_ex, the exact linspace population:** the same 800 points in exact arithmetic, x = n·q, q = 0.4/79,401 (§17.4).
+- **Parameters.** θ = (w₁, b₁, σ₂) with σ₂ = sign w₂; s = |w₂| > 0; the output bias b is profiled. So
+  φ_θ = σ₂ f_a(w₁x + b₁), f_a(t) = t + a sin t, and L*_P(θ; s) = min_b E_P ℓ(sφ_θ + b, y).
+- **Symmetries (proved; each is exact).**
+  - (W) b₁ ↦ b₁ + 2πk. Since f_a(t + 2πk) = f_a(t) + 2πk, φ shifts by the constant σ₂·2πk, which b absorbs. So L*
+    is invariant, and so are Δμ and Var(φ).
+  - (R1) (w₁, b₁, σ₂) ↦ (−w₁, −b₁, −σ₂). f_a is odd, so φ is unchanged pointwise.
+  - (R2) w₁ ↦ −w₁ at fixed b₁ (the reflection p ↦ −p of the rescaled coordinates). This maps φ(x) to φ(−x), so L*
+    is invariant on class-symmetric data. All three objectives are class-symmetric; for P_fl this is checked exactly
+    (21.4).
+- **The parameter space** is the quotient Θ̄ = ℝ × (ℝ/2πℤ) × {±1}. L*(·; s) is a continuous function on Θ̄: the
+  loss is jointly continuous in (θ, b), strictly convex and coercive in b because both classes are present and φ is
+  bounded on the support, so the profiled minimum is continuous (Berge).
+- **"A common compact set"** means K_W := {|w₁| ≤ W} ⊂ Θ̄. K_W is compact and invariant under R1 and R2, so no
+  further quotient is needed. In raw coordinates: every conditional minimiser has |w₁| ≤ W, and its winding
+  representative b₁ mod 2π lies in [0, 2π).
+- **Statement (Theorem K).** For P ∈ {P_c, P_fl, P_ex} and each tabulated a, with S_P = sup Δμ < ∞:
+  - (a) for every s ∈ (0, s₁), minimisers of L*_P(·; s) exist. Every θ ∉ K_W has L*_P(θ; s) > min L*_P(·; s)
+    (strictly), so every minimiser lies in K_W.
+  - (b) every limit point in Θ̄ of minimisers θ_s, as s → 0, maximises Δμ. In fact Δμ(θ_s) ≥ S_P − sV/2.
+  - (c) the limit's location:
+    - P_c: |w₁| ∈ [1.784407, 1.800158] and |sin b₁| = 1;
+    - P_ex: |w₁| ≥ π/q, and no W < π/q is admissible;
+    - P_fl: not located, but a maximiser exists with |w₁| ≤ π·2⁶⁰.
+
+### 21.1 What §17 proved, re-checked; and what it left open
+
+- **Re-checked, every step.** Lemma C1 (exact decomposition), Lemma C2 (the three ψ bounds, including
+  f″ = u² − tanh²u ≥ 0), Lemma C3 (spreading), Theorem C (steps 1–5) and Proposition C′ are correct as written.
+  Lemma C3 and Theorem C hold verbatim for a probability measure in place of n points: "at least F·n points"
+  becomes "mass at least F".
+- **Two facts §17 used without stating them; both are needed below.**
+  - **Remark K0 (monotonicity in V; proved).** In Theorem C, V₁ = Var(φ_{θ₁}) enters only through step 1's upper
+    bound L*(θ₁; s) ≤ log 2 − (s/4)S + (s²/8)V₁. So the theorem holds with V₁ replaced by any V ≥ V₁. Then
+    s₁ = √(8Fψ(2)/V) decreases and W_c = (a + √(1.2V/F))/τ increases, so the statement stays valid, only weaker.
+  - **Strict exclusion (proved).** For s < s₁ and |w₁| > W_c, steps 2–5 give
+    L*(θ; s) − L*(θ₁; s) ≥ (s/4)(S − Δμ(θ)) + V_s(θ) − s²V/8 > 0. So every θ outside K_{W_c} is strictly beaten by θ₁.
+- **Left open by §17:**
+  - (i) on P_c, the input "S is attained at α\*_c with Var 5.66–6.23" rested on a float Lipschitz scan;
+  - (ii) on P_fl, the float caveat (§17.4);
+  - (iii) whether the alias really has to be inside the compact set, or is just inside the one Theorem C produces;
+  - (iv) width 2.
+  §21 closes (i)–(iii). For (iv) it identifies the failing step and proves a partial result.
+
+### 21.2 Two lemmas valid on any balanced objective
+
+**Lemma K1 (first-order selection, no remainder; proved).** For every θ′, every s > 0 and every conditional minimiser
+θ_s:  Δμ(θ_s) ≥ Δμ(θ′) − (s/2)·Var(φ_{θ′}).
+- *Proof.* By C1, L*(θ_s; s) = log 2 − (s/4)Δμ(θ_s) + V_s(θ_s) ≥ log 2 − (s/4)Δμ(θ_s), since V_s ≥ 0.
+- By C1 and ψ(z) ≤ z²/8 with c = mean φ_{θ′}: L*(θ′; s) ≤ log 2 − (s/4)Δμ(θ′) + (s²/8)Var(φ_{θ′}).
+- Minimality gives L*(θ_s; s) ≤ L*(θ′; s). Combine the three and divide by s/4. ∎
+- **Corollary 1(i) of §10, re-proved.** Suppose the θ_s lie in a fixed K_W. Δμ is continuous on Θ̄ (it is invariant
+  under (W)). Take θ′ = θ₁, an attaining point. Then any limit point θ̄ has Δμ(θ̄) = lim Δμ(θ_{s_n}) ≥ S, so it
+  maximises Δμ.
+  - This replaces the "O(s³)" step of §10's proof, which needed Lemma 1's remainder to be uniform. That remainder's
+    constant K is still a sketch (`theorem1_hypotheses.md`, row R). It is not used here.
+
+**Lemma K2 (uniform coercivity in w₁, and existence; proved).** Let F = 1 − N_τ/n, with N_τ the largest mass in a
+closed x-interval of length 2τ = 0.8. Then for every θ with τ|w₁| > a and every s > 0:
+
+  L*(θ; s) ≥ log 2 − (s/4)S + F·ψ(s(τ|w₁| − a)).
+
+- *Proof.* This is C1 with Δμ ≤ S, plus §17 step 3 (C3 and the monotonicity of ψ). ∎
+- ψ(z) → ∞ as |z| → ∞. So for each s > 0, L*(·; s) → ∞ as |w₁| → ∞, uniformly in (b₁, σ₂).
+- A sublevel set of L*(·; s) is therefore closed and contained in some K_W, hence compact. L* is continuous, so it
+  attains its minimum. **Conditional minimisers exist at every s > 0** on all three objectives, since S < ∞ there.
+  - S < ∞ because Δμ = σ₂ a sin b₁ D(w₁) with |D| ≤ 2 (§11 Step 1; it needs class symmetry).
+- Lemma K2 is the author's suggested "uniformly coercive outside a fixed ball" route. With Remark K0 it is Theorem C.
+
+### 21.3 The continuous windows P_c (proved, with certified constants)
+
+**Lemma K3 (attainment and localisation of the class-mean maximiser).** On P_c,
+D_c(α) = [sin 2α − sin 1.2α − sin 0.8α]/(0.8α) (§11 Step 1), and D_c is even.
+1. **D_c → 0 at both ends (proved).**
+   - The numerator's linear terms cancel (2 − 1.2 − 0.8 = 0), and |sin u − u| ≤ |u|³/6. So
+     |D_c(α)| ≤ (8 + 1.728 + 0.512)α³/(6·0.8α) = (32/15)α².
+   - Also |D_c(α)| ≤ 3/(0.8α).
+   - So |D_c| extends continuously to α = 0 with value 0, and tends to 0 as α → ∞. Hence sup|D_c| > 0 is
+     **attained** at some α₁ > 0.
+   - Δμ = σ₂ a sin b₁ D_c(w₁), so S = a·max|D_c|. It is attained exactly when |w₁| = α₁ maximises |D_c| and
+     σ₂ sin b₁ = sign D_c(α₁); in particular cos b₁ = 0.
+2. **A certified lower bound (certified).** D_lo := 1.5732418725 ≤ |D_c(1.7922917)| (ball enclosure at the exact
+   rational 17,922,917/10⁷). So max|D_c| ≥ D_lo.
+3. **Every maximiser has |α₁| ≤ A₀ := 3/(0.8·D_lo) ≤ 2.3836131 (proved).** For α > A₀, |D_c| ≤ 3/(0.8α) < D_lo.
+4. **No maximiser in (0, ½] (proved).** There |D_c| ≤ (32/15)/4 = 8/15 < D_lo.
+5. **Localisation on [½, A₀] (certified).**
+   - Adaptive bisection. A cell is cleared when the ball enclosure of |D_c| has upper end < D_lo; it is kept only if
+     it lies inside [α₀ − 0.01, α₀ + 0.01], α₀ = 1.7922917, and has width ≤ 10⁻⁴. Otherwise it is bisected
+     (depth ≤ 40).
+   - Result: 385 cells cleared, 274 kept, none unresolved (maximum depth 15).
+   - **Every maximiser lies in [1.784407, 1.800158]** (the span of the kept cells).
+   - The test point's own cell is among the kept ones. Requiring kept cells to be narrow means a D_lo above the true
+     maximum would clear everything; this is a tested fail case.
+6. **The variance at any maximiser (proved formula; certified bound).**
+   - With cos b₁ = 0, φ = σ₂[α₁x + b₁ + a sin b₁·cos(α₁x)].
+   - Cov(x, cos α₁x) = E[x cos α₁x] = 0, because the integrand is odd and P_c is symmetric with E x = 0. So
+     V(α₁) = α₁²·Var(x) + a²·Var(cos α₁x), with Var(x) = ½(0.64/3 + 6.272/2.4) = 106/75 exactly.
+   - Var(cos αx) = ½ + ½C(2α) − C(α)², with C(β) = ½·sin(0.8β)/(0.8β) + ½·(sin 2β − sin 1.2β)/(0.8β).
+   - V is enclosed over the whole box α₀ ± 0.01 on 400 sub-cells, giving V̄(a) ≥ Var(φ_{θ₁}) for every maximiser θ₁.
+   - **Crude alternative (no scan; proved plus the one evaluation in step 2):** V ≤ A₀²·106/75 + a².
+7. **F = 3/4 exactly (proved).** P_c has density ½/1.6 = 0.3125 on I and on O, so a closed interval of length 0.8 has
+   mass ≤ 0.25.
+
+**Theorem K-c (proved; constants certified).** For s < s₁, every conditional minimiser on P_c has |w₁| ≤ W
+(Theorem C with Remark K0, τ = 0.4).
+
+| a | V̄ (box) | s₁ ≥ (box) | W ≤ (box) | V (crude, no scan) | s₁ ≥ (crude) | W ≤ (crude) |
+|---|---|---|---|---|---|---|
+| 1.30 | 5.7096 | 0.675 | 10.81 | 9.720 | 0.517 | 13.11 |
+| 1.60 | 6.2855 | 0.643 | 11.93 | 10.590 | 0.496 | 14.29 |
+
+- All nine a (1.02–1.60) are in the JSON. The box W ranges over 9.82–11.93, and s₁ ≥ 0.643 at every a.
+- **Against §17's float-scan values** (10.77 and 0.678 at a = 1.30; 11.90 and 0.646 at 1.60): the rigorous ones
+  are slightly weaker, because V̄ covers the whole box rather than the float maximiser. They agree to within 0.5%.
+- **Consequence (proved).** By Lemma K1 and Lemma K3(5), every s → 0 limit point has |w₁| ∈ [1.784407, 1.800158].
+  By §11 Step 2 it is unplaced (G ≤ 2a − 2.8|w₁| < 0) for every a < 1.4·1.784407 = 2.498.
+- **Not certified here:** uniqueness of the maximiser inside the box, and quadratic growth (row Q of
+  `theorem1_hypotheses.md`, still float-checked). Neither is needed for compactness.
+
+### 21.4 The float quadrature P_fl, as evaluated (proved; exact arithmetic)
+
+**Lemma K5 (exact facts about the 800 binary64 points; certified in exact rationals).**
+- Every x_i = k_i/2⁶⁰ with k_i ∈ ℤ, and gcd(k_i) = 1.
+- Each class is exactly symmetric about 0: the sorted values satisfy x_(j) = −x_(n+1−j). Hence m = E_O x − E_I x = 0
+  exactly.
+- N_τ = 200 (exact Fraction sliding count, closed interval of length exactly 4/5), so F = 3/4.
+- Var(x) = 1.414136010… (exact rational).
+
+**Theorem K-fl (proved).**
+1. By class symmetry, §11 Step 1 holds exactly on P_fl: Δμ = σ₂ a sin b₁ D_fl(w₁), and Cov(x, cos αx) = 0.
+2. cos(α k_i/2⁶⁰) is 2π·2⁶⁰-periodic in α, and D_fl is even and continuous. So sup|D_fl| is attained at some α₁ with
+   0 < α₁ ≤ π·2⁶⁰ ≤ 3.6220097·10¹⁸.
+3. Take θ₁ = (α₁, b₁, σ₂) with cos b₁ = 0. Then Var(φ_{θ₁}) = α₁²Var(x) + a²Var(cos) ≤ (π·2⁶⁰)²·Var(x) + a² ≤ 1.8552·10³⁷.
+4. Theorem C with Remark K0 then gives, for every tabulated a (the a-dependence is below the printed digits):
+   **s₁ ≥ 3.7455·10⁻¹⁹ and W ≤ 1.3621·10¹⁹.** ∎
+
+- **What this is, and what it is not.**
+  - This is a proof of the hypothesis as stated, for the objective the code actually evaluates.
+  - It says nothing at any practically relevant scale. The constants are this weak because the true maximiser of
+    |D_fl| is not located: a lattice of mesh 2⁻⁶⁰ has only the trivial period bound.
+- **Diagnostic (certified).** The alias π/q of the exact lattice is still a near-maximiser on the float data:
+  2 − |D_fl(π/q)| ≤ 1.5·10⁻²¹ (ball arithmetic over the 800 binary64 points; the floats sit within 1.40·10⁻¹⁶ of n·q).
+  - So S_fl ≥ 2a(1 − 7.5·10⁻²²).
+  - The float objective's s → 0 limit is therefore an aliased weight as well: every maximiser has
+    |D_fl| ≥ 2 − 1.5·10⁻²¹, far above |D_fl| ≈ 1.571 at α\*.
+  - Its location, which may lie beyond π/q, is not computed.
+
+### 21.5 The exact linspace population P_ex: the alias is forced (proved)
+
+- **§17's constants, recomputed** in ball arithmetic from exact rationals, agree: W ≤ 2,345,103.67 and
+  s₁ ≥ 2.17545·10⁻⁶ at a = 1.30. Here V = (π/q)²·Var(x) + a² is exact at the alias, and Var(cos) = 1 there.
+  N_τ = 200 exactly.
+
+**Lemma K4 (the alias is the smallest class-mean maximiser; proved).** On P_ex, |D(α)| = 2 implies α = 0 or
+|α| ≥ π/q. Since D(0) = 0, every maximiser of Δμ has |w₁| ≥ π/q, and |w₁| = π/q is one (§17.4).
+- *Proof.* Both class means of cos lie in [−1, 1]. So |D| = 2 forces cos(αx) = c on every inner point and −c on
+  every outer point, with c = ±1.
+- If cos u = cos v = ±1, then u, v ∈ πℤ with the same parity, so u − v ∈ 2πℤ.
+- Consecutive inner points differ by exactly 796q, and consecutive outer points on the same side by exactly 798q
+  (certified in integers: the only gaps are 796 and 798).
+- Hence α·796q ∈ 2πℤ and α·798q ∈ 2πℤ. Subtracting, α·2q ∈ 2πℤ, i.e. αq ∈ πℤ. ∎
+
+**Corollary K4′ (proved; not quantitative).** For every δ > 0 there is s_δ > 0 such that every conditional minimiser
+at s < s_δ has |w₁| > π/q − δ. Consequently every admissible W (one for which, for some s′ > 0, all minimisers at all
+s < s′ lie in K_W) satisfies **W ≥ π/q = 623,613.996**. Together with Theorem C: **the best W lies in
+[623,614, 2,345,104].**
+- *Proof.* Suppose not: then s_n → 0 with minimisers θ_n (they exist by K2) satisfying |w₁| ≤ π/q − δ.
+- By Theorem C they lie in K_{W_c}, so a subsequence converges in Θ̄ to some θ̄ with |w̄₁| ≤ π/q − δ.
+- By Lemma K1 and continuity, θ̄ maximises Δμ. That contradicts Lemma K4.
+- The bound on W follows because minimisers exist at every s. ∎
+- **Consistency with the earlier numbers.**
+  - The localisation lemma (§5.0) excludes |w₁| ≥ π/q for s > 7.24·10⁻⁶.
+  - The 40-digit crossover puts the alias ahead of θ\* only below s ≈ 2·10⁻¹² (`theorem1_checks.json`).
+  - So s_δ is somewhere at or below that scale. K4′ does not compute it.
+
+### 21.6 Width 2: the step that fails, and what still holds
+
+- **Setting.** φ = Σᵢ ṽᵢ f_a(αᵢx + βᵢ), ‖ṽ‖₁ = 1 (§10), on P_c.
+- **The step that fails is Lemma C3.** Spreading bounds the slope of the linear part, c = Σᵢ ṽᵢαᵢ, and not the αᵢ.
+  A unit with ṽᵢ → 0 and αᵢ → ∞ at bounded ṽᵢαᵢ keeps φ bounded and V_s small. So V_s gives no bound on the αᵢ, and
+  K_W has no width-2 analogue from this argument.
+- Whether width-2 minimisers actually escape is **neither proved nor disproved**.
+
+**Lemma K6 (partial; proved).** Let s < √(8Fψ(2))/a (= 1.24 at a = 1.30), and let θ_s be a width-2 conditional
+minimiser on P_c. Then:
+- (i) |c| ≤ (a + √(1.2a²/F))/τ = a(1 + √1.6)/0.4 ≤ 5.67a;
+- (ii) every unit with |αᵢ| ≥ 2A₀ = 4.767 carries weight |ṽᵢ| ≤ s·a/D_lo.
+
+*Proof.*
+- **The competitor.** The cancelling pair (ṽ = (½, ½), α = (α₁, −α₁), equal βᵢ with sin βᵢ = ±1, α₁ a maximiser
+  of |D_c|) has φ = β + a sin β·cos(α₁x). So it attains S = a·max|D_c| with Var ≤ a².
+- **(i)** As in Theorem C, V_s(θ_s) ≤ s²a²/8. Here |φ − c₀| ≥ |cx + const − c₀| − a, since the oscillatory part is
+  bounded by a·‖ṽ‖₁ = a. Steps 3–5 of Theorem C then apply with |w₁| replaced by |c|.
+- **(ii)**
+  - The linear parts drop out of Δμ by symmetry, so Δμ = a Σᵢ ṽᵢ sin βᵢ D_c(αᵢ) ≤ a Σᵢ|ṽᵢ||D_c(αᵢ)|.
+  - Lemma K1 with the pair gives a Σᵢ|ṽᵢ|(max|D_c| − |D_c(αᵢ)|) ≤ s a²/2.
+  - For |αᵢ| ≥ 2A₀: |D_c(αᵢ)| ≤ D_lo/2 ≤ max|D_c|/2. So |ṽᵢ|·max|D_c|/2 ≤ s a/2. ∎
+- So at width 2 at most an O(s) weight can sit on large input weights. Compactness in parameter space would need a
+  second-order argument showing that such a unit never lowers L*. That is not done.
+
+### 21.7 What this means for Theorem 1 (width 1)
+
+- **The small-scale compactness hypothesis now holds, proved, on every objective the paper uses for the population.**
+  Corollary 1(i) follows without the remainder lemma (K1).
+- **On the continuous windows** the compact set is modest: |w₁| ≤ 12 for s < 0.64 at every tabulated a. The limit is
+  the ramp-plus-cosine at |w₁| ∈ [1.7844, 1.8002], which is unplaced.
+- **On either 800-point quadrature** the hypothesis holds only with the alias inside the compact set, and this is
+  forced on P_ex (W ≥ 623,614). The literal s → 0 limit is an aliased weight, not α\*.
+  - The alias is unplaced too, so the width-1 verdict is unchanged.
+  - The paper's limit statement "the small-scale minimiser is the cosine at α\*" needs "on the continuous windows",
+    or "for s above ≈ 10⁻¹¹" (unchanged from `theorem1_hypotheses.md`).
+- **Training samples** (m ≠ 0): compactness fails (§17, C′). The unplaced conclusion still holds (C3).
+- **Producer and tests.**
+  - The run is one process at nice 15, under a second of CPU and well under 1 GB.
+  - Tests cover: the D_c enclosure against the closed form and against quadrature; the small-α and decay bounds; the
+    Var(cos) enclosure; the localisation pass and three constructed fail cases (D_lo above the maximum, a box too
+    small, a wrong centre); agreement of the constants with §17's formulas, and their monotonicity; the exact
+    spreading count, dyadic lattice, symmetry (with a one-ulp fail case) and gap facts on constructed data; and the
+    committed numbers.
