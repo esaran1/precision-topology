@@ -1,0 +1,38 @@
+{
+ "certified": true,
+ "A": [
+  0.66625,
+  0.6675
+ ],
+ "eps0": 4.1e-06,
+ "branch_upper0": 0.3566661054580964,
+ "L1_branch": 0.08004549888639088,
+ "C_branch": 2.6603482556872926,
+ "BU_eps0": 0.3566664336893623,
+ "P_iso": 18.75,
+ "full_ok": true,
+ "rounds": 4,
+ "peak_cells": 39072,
+ "final_h": 0.015625,
+ "stats": {
+  "iso": 8547,
+  "full": 17472,
+  "pert": 13146,
+  "iso_cell": 0,
+  "sep": 0,
+  "fav": 21,
+  "in_box": 18
+ },
+ "min_D_pert": 0.00018080186079436988,
+ "tau": 1e-07,
+ "seconds": 1.8765308856964111,
+ "k": 5,
+ "eps_in_G2_range": true,
+ "n_leaves": 39186,
+ "leaves_array_sha256": "bb44de0fc43f6bd03678927cdb790671ec99092c4dcbc01f07990b19beaee940",
+ "inputs_sha256": {
+  "certv2_annulus_parts.csv": "972372bf8b900c7acd8ccfafa0c30a38ceaa9646d0707eea0c49ffa50719cb74",
+  "mn2_bounds.csv": "9719bb91b018924c606d9eee332b42c56fa538bfa818a5fdbb9c84b1355720ce",
+  "uniform_eps/constants.json": "a4c34408e67155d52bb37cf58bf2466d8c8b3ed0b069bf0c1e444ebe8d28c285"
+ }
+}

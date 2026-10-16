@@ -2336,6 +2336,364 @@ not quasi-static tracking of a fixed-scale minimiser, consistent with 19.3.
 
 Per the program's rule, Track G stops here: no G2 exploration, no design page.
 
+## 20. Track U, step U1: the rescaled loss to second order, the margin near the switch, and an explicit ε₀ (2026-10-15)
+
+**Status (checkpoint 1; no training, no seeds, paper untouched).**
+- **Lemma U1** (φ_ε to second order, with derivatives): **PROVED**. Spot-checked in interval arithmetic at 80 digits.
+- **Lemma U2** (the profiled loss to second order, |R₂| ≤ ε²C): **PROVED**.
+- **Margin near the switch** (task 2): read off the committed limit certificates. It is **certified** by the producer
+  (float branch and bound with a 10⁻⁹ allowance) and checked independently in Arb.
+- **ε₀ for the task as posed** (one margin against a uniform bound on the perturbation of the difference): **PROVED** given
+  that margin. It gives **ε₀ = 1.5·10⁻¹²**, the same order as §16's 1.4·10⁻¹². §20.4 explains why.
+- **Theorem U1** (cell by cell): **ε₀ = 4.1·10⁻⁶**, about 2.9·10⁶ times §16's value. It has the same conclusions as
+  Theorem G, for every A ∈ [0.66, 0.71]. Its status is mixed:
+  - **certified, float with allowance**: the ε-uniform outer exclusion, a new branch and bound held to the producer
+    standard of `certificates_v2.outer_exclusion`;
+  - **proved**: the ring and PD links, from §16's first-order bounds;
+  - **certified (interval arithmetic)**: the switch Krawczyk, with the second-order inflation of Lemma U1′.
+  - **Not yet independently checked in Arb.** That is U3. §20.8 lists what it needs.
+- **The binding link is now PD**, not the outer exclusion: §16's first-order Hessian bound limits it to ε < 5.17·10⁻⁶. The
+  ring limit is 7.38·10⁻⁶. The outer link by itself certifies up to at least 6·10⁻³ (exploratory scan, §20.6).
+- **A sharper localisation SET (finite ε, uniform in ε) of isotonic type is NOT available** (§20.2): B(P) falls below
+  the branch loss at P ≈ 18, and the set that survives still has |σ| up to 75. What works instead is ε-uniform exclusion
+  **cell by cell**, with exact bounds that do not use the expansion where |σ| is large (§20.5).
+- **Producer:** `src/uniform_eps.py` → `results/uniform_eps/`:
+  - `constants.json` (Lemmas U1–U2 constants, the margin, the uniform ε₀, the B(P) table, Lemma G2's ε-range);
+  - `outer_eps_4.1e-6_k00.json` … `_k39.json`, with leaf files `…_k19_leaves.npz` and `…_k20_leaves.npz`;
+  - `links_eps_4.1e-6.json`, `summary.json`, `outer_scan_19.json` (exploratory).
+- **Runtime**, one process, nice 15, one thread, ≤ 0.5 GB:
+  - constants 15 s;
+  - outer exclusion 73 s for all 40 A-sub-intervals (1.5–2 s each);
+  - links 452 s (the 110 Krawczyk boxes);
+  - exploratory scan 13 s.
+- **Tests:** `tests/test_uniform_eps.py` (11).
+
+### 20.1 The rescaled conditional loss, exactly, and its expansion
+
+**The exact loss.** f_a(π + u) − π = u + a·sin(π + u) = u − a·sin u. So with a = 1 + ε, u = √ε·σ and σ = px + q,
+the rescaled feature and the loss are, exactly,
+
+  φ_ε(σ) = [f_{1+ε}(π + √ε σ) − π]/ε^{3/2} = (u − (1 + ε) sin u)/ε^{3/2},
+  L_ε(p, q, b; A) = (1/n) Σᵢ ℓ(A φ_ε(σᵢ) + b, yᵢ),   L\*_ε(p, q; A) = min_b L_ε.
+
+φ_ε is entire in ε (§8). Its expansion is in integer powers of ε, so the remainder after the first-order term is
+O(ε²), not O(ε^{3/2}).
+
+**Lemma U1 (pointwise, all real σ, all ε > 0).** With h = −σ + σ³/6 and r = σ³/6 − σ⁵/120:
+- φ_ε = h + εr + ε²ρ₀ with |ρ₀(σ)| ≤ m₂(|σ|) := |σ|⁷/5040 + |σ|⁵/120;
+- (U1′) φ_ε′ = h′ + εr′ + ε²ρ₁ with |ρ₁| ≤ m₂₁ := σ⁶/720 + σ⁴/24;
+- (U1′) φ_ε″ = h″ + εr″ + ε²ρ₂ with |ρ₂| ≤ m₂₂ := |σ|⁵/120 + |σ|³/6.
+
+*Proof.* Use the Lagrange remainders of sin and cos, valid for all real u since |sin|, |cos| ≤ 1:
+- |u − sin u − u³/6 + u⁵/120| ≤ |u|⁷/5040;
+- |sin u − u + u³/6| ≤ |u|⁵/120;
+- |1 − cos u − u²/2 + u⁴/24| ≤ u⁶/720;
+- |cos u − 1 + u²/2| ≤ u⁴/24;
+- |sin u − u + u³/6 − u⁵/120| ≤ |u|⁷/5040, and |sin u − u| ≤ |u|³/6.
+
+Then:
+- φ_ε = [u − sin u]/ε^{3/2} − ε sin u/ε^{3/2}. Expanding both terms gives h + εr, plus remainders bounded by ε²|σ|⁷/5040
+  and ε·|u|⁵/(120ε^{3/2}) = ε²|σ|⁵/120.
+- φ_ε′ = (1 − cos u)/ε − cos u = (σ²/2 − εσ⁴/24 + O₁) + (−1 + εσ²/2 + O₂), with |O₁| ≤ ε²σ⁶/720 and |O₂| ≤ ε²σ⁴/24.
+- φ_ε″ = (1 + ε) sin u/√ε = (σ − εσ³/6 + O₃) + ε(σ + O₄), with |O₃| ≤ ε²|σ|⁵/120 and |O₄| ≤ ε|σ|³/6. ∎
+
+*Checks.*
+- 4,000 random (σ, ε) with σ ∈ [−100, 100] and ε ∈ [10⁻⁸, 0.6], in mpmath interval arithmetic at 80 digits: the largest
+  ratio |remainder|/(ε²m₂) is 0.9999991.
+- At 30 digits the remainder is lost to cancellation near ε = 10⁻⁸, so the check runs at 80.
+- Tests: 1,500 + 1,000 random points at 60 digits for U1 and U1′.
+- **Constructed fail:** m₂/2 fails at σ = 1, because the leading remainder there is ε²(σ⁷/5040 − σ⁵/120) = −0.00813ε².
+  Dropping the εr′ term also violates the U1′ bound.
+
+**Lemma U2 (the profiled loss to second order).** Fix θ = (p, q) and A. Let b₀ = b\*_0(θ; A) and zᵢ = A h(σᵢ) + b₀. Let
+eᵢ = s(zᵢ) − yᵢ, with s the logistic function, so that mean eᵢ = 0. Define
+
+  **L₁(θ; A) := A·mean_i eᵢ·r(σᵢ)**   (= ∂_ε L\*_ε at ε = 0, by the envelope theorem).
+
+Then for every constant c, with mᵢ = m₂(|σᵢ|) and tᵢ = |r(σᵢ) − c| + ε mᵢ,
+
+  −ε²[A·mean mᵢ + ¼A²·maxᵢ tᵢ·mean tᵢ]  ≤  L\*_ε − L\*_0 − εL₁  ≤  ε²[A·mean mᵢ + ⅛A²·mean tᵢ²].
+
+So |R₂| ≤ ε²C(θ; A, ε) with **C = A·mean mᵢ + ¼A²·maxᵢ tᵢ·mean tᵢ**, which is nondecreasing in ε. Also
+|L₁| ≤ A·mean|r(σᵢ) − c| for every c.
+
+*Proof.*
+1. **Constants are absorbed.** Let Δᵢ = A(φ_ε(σᵢ) − h(σᵢ)) = εA rᵢ + ε²A ρ₀ᵢ. Since b is minimised over,
+   L\*_ε = min_b mean ℓ(zᵢ(b) + δᵢ) with δᵢ = Δᵢ − εAc, for any c. Also mean eᵢδᵢ = mean eᵢΔᵢ = εL₁ + ε²A·mean eᵢρ₀ᵢ,
+   and |eᵢ| ≤ 1.
+2. **Upper bound.** Take b = b₀. Then ℓ(z + δ) ≤ ℓ(z) + ℓ′(z)δ + δ²/8, since ℓ″ ≤ ¼.
+3. **Lower bound.**
+   - Convexity gives ℓ(z + δ) ≥ ℓ(z) + ℓ′(z)δ. So L_ε(b) ≥ L_0(b) + mean ℓ′ᵢ(b)δᵢ ≥ L\*_0 + mean eᵢδᵢ − ¼|b − b₀|·mean|δᵢ|.
+     This uses L_0(b) ≥ L\*_0 and |ℓ′ᵢ(b) − ℓ′ᵢ(b₀)| ≤ ¼|b − b₀|.
+   - The minimiser b_ε of the shifted problem is the root of the monotone F(b) = mean s(zᵢ(b) + δᵢ) − ȳ. Shifting
+     every argument by at most ‖δ‖_∞ moves that root by at most ‖δ‖_∞, so |b_ε − b₀| ≤ ‖δ‖_∞.
+4. **Collect.** |δᵢ| ≤ εA·tᵢ, and mean δ² ≤ ‖δ‖_∞·mean|δ|. ∎
+
+*Checks.*
+- At θ_c, 12 random θ in [0, 6] × [−8, 8], A ∈ {0.66, 0.6854, 0.71} and ε ∈ {10⁻⁴, 10⁻³, 10⁻²}, the exact L\*_ε satisfies the
+  bound.
+- **Constructed fail:** omitting L₁, i.e. |L\*_ε − L\*_0| ≤ ε²C, fails at θ_c for ε = 10⁻³, because L₁ = 0.083 there.
+
+**Constants** (`constants.json`; floats with the 10⁻⁹ allowance, the producer standard).
+- **At the branch centre θ_c**, A ∈ [0.68375, 0.68625]: L₁ = 0.08254 to 0.08292, and C ≤ 2.744 for ε ≤ 10⁻³. The branch
+  therefore rises with ε at first order.
+- **Uniform on each set**: S = sup|σ|; C here takes c = 0 and |rᵢ| ≤ r_max(S), with ε ≤ 10⁻³.
+
+| set | S | m₂(S) | r_max(S) = max_{\|σ\|≤S}\|r\| | C (uniform) |
+|---|---|---|---|---|
+| θ_c | 4.707 | 29.4 | 2.771 | 23.8 |
+| 0.05 box U | 4.857 | 35.2 | 3.427 | 29.7 |
+| 0.15 box | 5.157 | 49.6 | 7.535 | 61.0 |
+| K(24) | 98.83 | 1.84·10¹⁰ | 7.84·10⁷ | 3.6·10¹⁵ |
+
+- **The closed form for r_max.** |r| = |σ|³|20 − σ²|/120. It has an interior maximum 12^{3/2}·8/120 = 2.7713 at σ² = 12,
+  vanishes at σ² = 20, and increases beyond. A test checks this on a grid.
+
+### 20.2 Localisation, uniformly in ε, and where a sharper localisation set fails
+
+**Lemma G2 holds uniformly for ε ≤ 0.0462** (`G2_range`).
+- Its condition (a) is 4W(s, a) + u₀ < 2π − β, with s ≥ 0.66ε^{−3/2} and u₀ < 2√2√ε. Both sides are monotone in ε: W
+  increases (s falls and a rises) and 2π − β decreases. So the condition holds on all of (0, ε] once it holds at ε.
+- On a grid of step 10⁻⁴ the last pass is ε = 0.0462: 4W + u₀ = 5.98441 < 5.98489. W is the §5.0 formula, evaluated
+  in floats.
+- Condition (b) at ε₀ is §20.5's localisation slack.
+- **So for every such ε, every global minimiser lies in K(24) relative to the fold centre its t-range meets.**
+- **The isotonic bounds are themselves exact for every such ε.** The dropped points have |σ| < u₀/√ε < 2√2 at every ε
+  (G2 step 4), so B(P), B_full and the per-cell versions below need no expansion.
+
+**A sharper localisation set does not follow, and here is exactly where it fails.**
+- Exact PAVA (`B_table`) gives:
+
+| P | 18 | 18.25 | 18.5 | 19 | 20 | 22 | 24 |
+|---|---|---|---|---|---|---|---|
+| B(P) | 0.35296 | 0.35478 | 0.35660 | 0.36020 | 0.36731 | 0.37949 | 0.38797 |
+
+- The branch upper bound near the switch is 0.35287 on k = 19 and 0.35260 on k = 20. So B(P) excludes |p| ≥ P only for
+  P ≥ 18.0, and only barely: by 9·10⁻⁵ on k = 19. (Earlier exploration: B(16) = 0.336 and B(12) = 0.275 lie below the
+  branch.)
+- The set left, {|p| < 18, some |σᵢ| < 2√2}, has |q| < 2√2 + 36 and so **|σ| up to 4·18 + 2√2 = 74.8**. That is
+  m₂ ≈ 2.6·10⁹ and r_max ≈ 1.9·10⁷.
+- A q-dependent version, the drop window at its actual position (the per-cell PAVA of §20.5), does not give a smaller
+  SET either. At (p, q) = (17.87, 32.90) and (17.99, 38.83), the isotonic bound on the retained points is below the
+  branch value, while σ runs up to 69 and 75.
+- The true limit loss there is 1,877 and 2,800, so these points are far from competitive. No monotone-fit bound sees
+  this, because a monotone fit discards the size of the logits.
+- **So the large-|σ| part of K(24) cannot be removed by a localisation set of this type.** It has to be handled region
+  by region, with bounds that do not pay ε·|σ|⁵.
+
+### 20.3 Task 2: the certified loss margin near the switch
+
+The switch box Z of §16.3 has A-range [0.684945, 0.685945]. It meets the annulus sub-intervals k = 19 and 20, so
+J_Z = [0.68375, 0.68625]. On these two sub-intervals the certified outer-exclusion margin is (`margin`):
+
+| k | A | producer margin (lower end) | Arb re-check | upper end |
+|---|---|---|---|---|
+| 19 | [0.68375, 0.685] | 1.1035·10⁻⁴ | 2.755·10⁻⁴ | 4.7294·10⁻³ |
+| 20 | [0.685, 0.68625] | **1.0301·10⁻⁴** | 2.706·10⁻⁴ | **4.7027·10⁻³** |
+
+- **m ∈ [1.0301·10⁻⁴, 4.7027·10⁻³]**, with min over k = 19, 20 at each end. The margin is
+  m = inf over θ ∈ K(24) ∖ (0.15 box) and A ∈ J of [L\*_0(θ; A) − L\*_0(θ_c; A)].
+- **Source**: `certv2_annulus_parts.csv` rows 19–20 (`certificates_v2.outer_exclusion`), checked independently by
+  `certificate_checks/outer_glob_annulus.json`, whose fresh Arb branch and bound gives ≥ 2.706·10⁻⁴.
+- **The lower end is not a property of the problem.** It is the producer's stopping target (MARGIN = 10⁻⁴) plus slack:
+  the search stops refining once every cell clears 10⁻⁴.
+- **The upper end is attained.** It is a competitor the producer evaluated (outer_attained at A_c) minus the branch
+  upper bound, plus 10⁻⁹. So the true margin is at least 1.0301·10⁻⁴ and at most 4.70·10⁻³.
+
+### 20.4 Task 3 as posed: one margin against a uniform perturbation of the difference
+
+**Decision rule** (`decide`, tests on constructed pass / fail / undecided inputs). The difference between a competitor
+θ′ and the branch θ_c is
+
+  Δ(ε) = L\*_ε(θ′) − L\*_ε(θ_c) ∈ [m_lo + ε d₁,lo − ε²c₂, m_hi + ε d₁,hi + ε²c₂],
+
+where d₁ encloses L₁(θ′) − L₁(θ_c), the first-order shift of the DIFFERENCE, and c₂ = C(θ′) + C(θ_c). The verdict is:
+- **pass** if the lower end is > 0;
+- **fail** if the upper end is < 0;
+- **undecided** otherwise.
+
+**Uniform version.** Bound the competitor's L₁ over all of K(24) ∖ box and keep the branch's L₁ exact:
+- L₁(θ′) ≥ −A·r_max(98.83) = −0.68625 × 7.840·10⁷ = −5.38·10⁷;
+- L₁(θ_c) ≤ 0.08292;
+- C_K ≤ A·m₂(S_K) + ¼A²(2r_max(S_K) + εm₂(S_K))² (conservative), which is 2.9·10¹⁵ at ε₀;
+- C(θ_c) = 2.744.
+
+Then D(ε) = 1.0301·10⁻⁴ − 5.38·10⁷·ε − (2.9·10¹⁵ + 2.7)·ε².
+- **Root 1.9143·10⁻¹², so ε₀ = 1.5·10⁻¹²** (0.8 × root, 2 significant figures; decision "pass").
+- The first-order term is 99.99% of the perturbation at the root. The ε² remainder is irrelevant here.
+- With the Arb margin 2.706·10⁻⁴, the root is 5.03·10⁻¹² and ε₀ = 4·10⁻¹².
+
+**Compared with §16's 1.4·10⁻¹².** The order is the same because the binding quantity is the same: a margin of order 10⁻⁴
+against A·|σ|⁵/120 at |σ| = 98.8. The small differences are:
+- (i) the margin near the switch, 1.0301·10⁻⁴, rather than the global minimum 1.0024·10⁻⁴;
+- (ii) A ≤ 0.68625 rather than 0.71;
+- (iii) r_max(S) = S³(S² − 20)/120 = 7.840·10⁷, where §16 bounds the perturbation of the loss by m₀(S) = S⁵/120 + S³/6
+  = 7.934·10⁷. The two terms of r partly cancel;
+- (iv) the branch's own first-order shift enters exactly (+0.083) rather than as 0.71·ε·m₀(4.707);
+- (v) §16's 0.8 safety factor, which is used here too.
+
+**Why including L₁ does not help in this form.** Including the first-order shift of the difference is necessary, and it
+is included. But with one uniform margin, the competitor's L₁ can only be bounded by sup|r| over K(24). Only a
+region-by-region bound can use the fact that cells with large |σ| also have large margins. That is §20.5.
+
+### 20.5 Theorem U1: the cell-by-cell version, ε₀ = 4.1·10⁻⁶
+
+**Theorem U1.** Let 0 < ε ≤ ε₀ = 4.1·10⁻⁶, a = 1 + ε, and the 800-point quadrature objective. Then for every
+A ∈ [0.66, 0.71]:
+- **(i)** L\*_ε(·; A) has a unique global minimiser, up to p ↦ −p and the windings b₁ ↦ b₁ + 2πk. It lies in the 0.05 box U
+  around θ_c and is the continued branch.
+- **(ii)** The branch's gap changes sign exactly once in [0.66, 0.71], at A_ε in Z's A-range [0.684945, 0.685945].
+- **(iii)** Hence **s_glob(ε) = s_br(ε) = A_ε ε^{−3/2}**, with A_ε = A\*(1 + c_s ε + O(ε²)), A\* = 0.685445237… and
+  c_s ∈ [0.6621547, 0.6621550]. Eq. (5)'s s-form therefore holds for the global threshold on (0, 4.1·10⁻⁶].
+- The R-form is still not covered, for the reason given in §16.5.
+
+**Proof.** The four-link chain of §16.2, with link 2 replaced and the §16.3 Krawczyk part re-run at ε₀.
+
+**Link 1, localisation.**
+- Lemma G2 holds at ε₀, since ε₀ ≤ 0.0462.
+- The branch upper bound at ε₀ is max over the 40 sub-intervals of BU = bu₀ + ε₀·max(L₁,0) + ε₀²C. It sits below
+  min(B(24), B_full, log 2) by **0.02993**.
+
+**Link 2, ε-uniform outer exclusion (new).** We prove L\*_ε(θ; A) > L\*_ε(θ_c; A) for every θ ∈ K(24) ∩ {p ≥ 0} outside the
+0.15 box, every A in the sub-interval, and every ε ∈ [0, ε₀].
+- **Branch side.** L\*_ε(θ_c; ·) is convex in A for every ε (z is jointly linear in (A, b)). So its sup over the
+  sub-interval is at an endpoint, where Lemma U2 bounds it by L\*_0 + εL₁ + ε²C.
+- **Competitor side.** The search is the producer's quadtree from 0.25 cells. A cell is excluded if ANY of the following
+  holds. Each test holds for every ε ≤ ε₀ (BU is the branch bound above, and τ = 10⁻⁷ sits on top of the 10⁻⁹ rounding
+  allowance).
+  - **(iso)** p_lo ≥ P_k with B(P_k) > BU + τ. Exact, by Lemma G2. Here P_iso = 18.0.
+  - **(full)** every point has |σᵢ| ≥ 2√2 on the whole cell, and B_full > BU + τ. Exact: no point is dropped and the
+    logit is monotone in x (G2 step 3).
+  - **(pert)** D(0) > τ and D(ε₀) > τ, where D(ε) = lb₀ − bu₀ + ε(L₁,lo − L₁,bu) − ε²(C_cell + C_bu).
+    - lb₀ is the producer's limit cell bound (§3(c) link 2, the same formula).
+    - L₁,lo = max(centre value − Lipschitz terms, −A·mean|r − c|). The Lipschitz constants are
+      |∂_θL₁| ≤ ½A²·maxⱼ|h′ⱼ∂σⱼ|·mean|rᵢ − c| + A·mean|r′ᵢ∂σᵢ| and |∂_A L₁| ≤ mean|r − c|·(1 + A·maxᵢ|hᵢ − c_h|).
+      Both follow from ∂b\* being a weighted mean of −∂zᵢ, and mean s′(∂zᵢ + ∂b\*) = 0.
+    - C_cell uses the cell's σ-ranges.
+    - D is concave in ε, because C is evaluated at ε₀ and is nondecreasing. So its minimum on [0, ε₀] is at an end.
+    - This is where **the first-order shift of the difference** enters. Near the box the competitor's L₁ is close to the
+      branch's, and the centre-plus-Lipschitz bound sees that.
+  - **(sep)** a class-1 outer window lies entirely below the inner window on the φ_ε scale, by a gap g > 0. Each point's
+    φ_ε is enclosed by [min h − ε₀m₀, max h + ε₀m₀] over its σ-interval (Lemma G1). Then L\* ≥ π·softplus(A_lo g/2), which
+    is §5.0's separation argument.
+  - **(fav)** the favourable-logit profile: zᵢ ≤ (class 1) or ≥ (class 0) the corner of A_lo, A_hi times that φ_ε
+    enclosure.
+    - ℓ(·, 1) decreases and ℓ(·, 0) increases, so L\* ≥ min_b mean ℓ(z_fav + b).
+    - The minimum is bounded below by the tangent at the left end of a bisection bracket (convexity).
+    - This is exact in ε and needs no expansion. It is the test that disposes of cells where |σ| is large but the loss is
+      far above the branch. Examples: (9.2, 10.8), where L\*_0 ≈ 92; or the band p ≈ 17.9, q ≈ 33.
+  - **(iso-cell)** the cell's own dropped set (points that can reach |σ| < 2√2 on the cell), with exact PAVA on the
+    retained points.
+- **Result at ε₀ = 4.1·10⁻⁶** (`summary.json`): **all 40 sub-intervals are certified**.
+  - At most 4 rounds and a peak of 39,072 cells, against a cap of 1.5M; 1,567,287 leaves in total.
+  - Leaves by test: iso 375,661, full 690,828, pert 499,931, fav 867, sep 0, iso-cell 0.
+  - The smallest D over pert-excluded cells is 8.4·10⁻⁷ (k = 34). On the switch sub-intervals it is 5.41·10⁻⁵ (k = 19)
+    and 9.89·10⁻⁵ (k = 20).
+  - These are stopping values, not margins: a cell is accepted once D > τ.
+
+**Link 3, ring.** §16.2's gradient bound (Lemma G1, first order) against the certified ring margin 3.2786·10⁻³ (the
+minimum over the 40 sub-intervals). The perturbation at ε₀ is 1.822·10⁻³, so the **slack is 1.456·10⁻³**. The bound
+holds up to ε = 7.38·10⁻⁶.
+
+**Link 4, PD.** §16.2's Hessian bound against λ_min ≥ 0.04735. The perturbation at ε₀ is 0.03753, so the **slack is
+0.00981**. The bound holds up to **ε = 5.17·10⁻⁶. This is the binding link.**
+
+**ε₀ rule.** ε₀ = 0.8 × min(ring limit, PD limit) = 0.8 × 5.17·10⁻⁶, rounded to 2 significant figures: **4.1·10⁻⁶**
+(`eps0_matches_rule`).
+
+**Part (ii)** (`links_eps_4.1e-6.json`, `switch`). This is §16.3 re-run at ε₀ with the **second-order inflation** of
+Lemmas U1/U1′: φ ∈ h + [0, ε₀]·r + [−1, 1]ε₀²m₂, and likewise for φ′ and φ″ (`Inflated2`). It encloses φ_ε for every
+ε ∈ [0, ε₀]. The gap's extrema allowance keeps Lemma G1's first-order term.
+- The switch box Z (radii (6, 6, 2, 5)·10⁻⁴, as in §16.3) passes the 4-variable Krawczyk test.
+- The active pair (inner 0.8, outer −1.2) is valid on Z. The critical-point clearance is 0.01 + 2√2ε₀.
+- 110 A-boxes cover [0.66, 0.71]: 31 left of Z, 50 inside and 29 right. Every 3-variable Krawczyk test passes with its
+  box in U.
+  - The largest gap upper bound on the left is −2.30·10⁻⁴.
+  - The smallest gap lower bound on the right is +7.36·10⁻⁴.
+  - Every inside box lies in Z's θ-range.
+- So the sign changes exactly once, as in §16.3.
+- For comparison, the first-order inflation also passes the Z test at 4.5·10⁻⁶, and the second-order one up to at least
+  3·10⁻⁵ (exploration). So this part does not bind.
+
+**Part (iii)** is as in §16.4. ∎
+
+### 20.6 Why ε₀ grew by 2.9·10⁶, and what now limits it
+
+**Why ε₀ grew.**
+- In §16 and §20.4, ONE margin (10⁻⁴, a stopping target) is set against the WORST perturbation over K(24)
+  (A|σ|⁵/120 at |σ| = 98.8).
+- Cell by cell, the cells with large |σ| have large margins, or are excluded exactly and uniformly in ε. That uses
+  B(P), B_full and the per-cell PAVA, or the favourable-logit profile, none of which pays ε|σ|⁵.
+- The expansion is used only where |σ| is moderate. There the first-order shift of the difference is small, because the
+  competitor's L₁ is close to the branch's.
+- Once the outer link stops binding, the next limits are the ring and PD links. Those still use §16's crude first-order
+  bounds on S_R = 5.16 and S_U = 4.86.
+
+**What the outer link alone reaches** (`outer_scan_19.json`, sub-interval k = 19; EXPLORATORY, not part of the theorem).
+
+| ε | 10⁻⁴ | 10⁻³ | 3·10⁻³ | 6·10⁻³ |
+|---|---|---|---|---|
+| certified | yes | yes | yes | yes |
+| seconds | 1.7 | 2.2 | 3.8 | 5.4 |
+| cells by sep / fav / iso-cell | 2,764 / 67 / 0 | 8,508 / 463 / 0 | 8,767 / 1,947 / 0 | 7,912 / 3,253 / 127 |
+
+- A run at 10⁻² was stopped after about 20 minutes without a verdict. The per-cell PAVA loop dominated.
+- **Before** the sep and fav tests were added, ε = 10⁻⁴ FAILED. The live cells were at p ≈ 17.9, q ≈ 33 and p ≈ 18, q ≈ 39,
+  just below P_iso. There L\*_0 ≈ 1,900–2,800, but the second-order term ε²C ~ ε²·4·10¹² is meaningless, because
+  u = √ε σ ~ 0.7.
+- That band is the large-|σ| obstruction of §20.2. It is closed by the exact favourable-logit bound, not by a sharper
+  set.
+
+**What would enlarge ε₀ further (U2).**
+- **PD and ring at second order.** Re-certify the Hessian PD on U and the ring gradient with Inflated2-type enclosures,
+  in interval arithmetic over sub-boxes, rather than §16.2's entry bounds. The ε-shifts are then ε·(∂_ε of the Hessian
+  and gradient) ± ε²(…). That should lift both links toward the outer link's ≥ 6·10⁻³.
+- **The hard cap of this route is Lemma G2's ε ≤ 0.0462.** Above it, the t-range of |w₁| ≤ W can meet two fold windows,
+  and the single-fold localisation fails at its step 2. So ε_max = 0.6 cannot be reached by perturbing the limit
+  certificate, even cell by cell. U2 needs a multi-fold finite-ε localisation, and per-a or ε-interval certificates of
+  the §5 kind.
+
+### 20.7 What is proved, certified or argued
+
+| item | status |
+|---|---|
+| Lemma U1, U1′ (pointwise remainders, O(ε²), all σ, all ε > 0) | **proved**; checked at 80 digits (max ratio 0.9999991) |
+| Lemma U2 (profiled remainder, C explicit; \|L₁\| ≤ A·mean\|r − c\|) | **proved**; checked on constructed cases |
+| r_max closed form | **proved** (elementary); checked on a grid |
+| L₁, C at θ_c | float with the 10⁻⁹ allowance (producer standard) |
+| margin m ∈ [1.0301·10⁻⁴, 4.7027·10⁻³] near the switch | **certified** (producer float B&B + allowance); lower end ≥ 2.706·10⁻⁴ **checked in Arb** |
+| ε₀ = 1.5·10⁻¹² for one margin vs the uniform perturbation of the difference | **proved** given m |
+| Lemma G2 for ε ≤ 0.0462 | proved (§16.1), with W(s, a) evaluated in floats on a 10⁻⁴ grid; monotonicity in ε argued |
+| B(P) table, B_full, per-cell PAVA | **exact** (integer block sums, 50-digit logs) |
+| sep and fav lower bounds | **proved** (Lemma G1 + §5.0's argument + convexity) |
+| ε-uniform outer exclusion, 40 sub-intervals at ε₀ = 4.1·10⁻⁶ | **certified, float with allowance** (τ = 10⁻⁷ on top of 10⁻⁹); **not yet Arb-checked** (U3) |
+| ring and PD links at ε₀ | **proved** from certified margins (§16.2's bounds) |
+| switch box and gap sign over [0.66, 0.71] at ε₀ | **certified** (mpmath interval arithmetic, 30 digits; second-order inflation) |
+| φ_ε's critical points within 0.01 + 2√2ε₀ of ±√2 | argued (as in §16.3: ±arccos(1/a)/√ε = ±√2(1 − 5ε/12 + …)) |
+| Theorem U1 | holds given the rows above; fully certified once U3 confirms the outer exclusion in Arb |
+| outer link alone up to ≥ 6·10⁻³ | **exploratory** (k = 19 only) |
+
+### 20.8 Export needed for the independent Arb checker (U3; not run here)
+
+- **The claim per sub-interval k**:
+  - the A-interval, θ_c, ε₀, P = 24, ρ = 0.15, τ;
+  - the branch-side constants: bu₀, L₁,bu, C_bu, BU. These are to be re-derived in Arb from L\*_0, L₁ and C at θ_c at
+    both endpoints;
+  - the B(P) table and B_full;
+  - the six test formulas exactly as in §20.5.
+  - Each `outer_eps_4.1e-6_kNN.json` carries these. It also records the SHA-256 of `certv2_annulus_parts.csv`,
+    `mn2_bounds.csv` and `constants.json`.
+- **Leaves**:
+  - k = 19 and 20 have `…_leaves.npz` (p, q, hp, hq, test, D), with a file SHA-256 and an array SHA-256;
+  - the other 38 record the array SHA-256 of the in-memory leaves, so a re-run can be compared bit for bit.
+- **The checker should**:
+  - recompute BU in Arb;
+  - check each leaf's test in Arb, either replaying the leaves or by a fresh search as Track 4 did;
+  - check that the leaves tile K(24) ∩ {p ≥ 0} minus the 0.15 box (quadtree coverage);
+  - re-evaluate the B(P) table.
+- **The Krawczyk part** is already in interval arithmetic, so an Arb re-run of it is optional.
+- **Not exported**: the exploratory scan.
+
 ## 21. Track K: small-scale compactness for Theorem 1, sine family, width 1, on all three objectives (2026-10-15)
 
 **Status, stated per part.** Theory only; no training, no seeds. Every number below is from `src/small_scale_k.py` →

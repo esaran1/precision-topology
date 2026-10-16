@@ -1093,6 +1093,13 @@ PRODUCERS = {
     "trackA/forecasts.sha256": ("trackA_causal", "finalize", "full", ""),
     "trackA/observed.jsonl": ("trackA_causal", "observe", "full", ""),
     "trackA/scores.json": ("trackA_score", "score", "full", ""),   # post-registration plumbing fix (author 2026-10-10)
+    # Track U, step U1 (math note §20, 2026-10-15): src/uniform_eps.py
+    "uniform_eps/constants.json": ("uniform_eps", "run_constants", "full", ""),
+    "uniform_eps/outer_eps_4.1e-6_k19.json": ("uniform_eps", "run_outer", "full", ""),
+    "uniform_eps/outer_eps_4.1e-6_k20.json": ("uniform_eps", "run_outer", "full", ""),
+    "uniform_eps/links_eps_4.1e-6.json": ("uniform_eps", "run_links", "full", ""),
+    "uniform_eps/outer_scan_19.json": ("uniform_eps", "run_outer_scan", "full", ""),
+    "uniform_eps/summary.json": ("uniform_eps", "run_summary", "full", ""),
 }
 
 _WRITE_CALL = ("to_csv(", "to_parquet(", "write_text(", "DictWriter(", "csv.writer(",
@@ -2871,6 +2878,36 @@ def discussion_phase_checks() -> None:
     chk("§16 subintervals", float(LG["gap"]["n_subintervals"]), 110.0, 0)
     chk("§16 switch A lo", LG["switch_box"]["A_range"][0], 0.684945, 6e-7)
     chk("§16 switch A hi", LG["switch_box"]["A_range"][1], 0.685945, 6e-7)
+
+    print("math note §20 (Track U, U1: uniform-in-eps local to global)")
+    UC = json.loads((R / "uniform_eps" / "constants.json").read_text())
+    US = json.loads((R / "uniform_eps" / "summary.json").read_text())
+    UL = json.loads((R / "uniform_eps" / "links_eps_4.1e-6.json").read_text())
+    chk("§20 Theorem U1 holds", float(US["theorem_U1_holds"] and US["eps0_matches_rule"]), 1.0, 0)
+    chk("§20 eps0", US["eps0"], 4.1e-6, 0)
+    chk("§20 binding link PD", float(US["binding_link"] == "pd"), 1.0, 0)
+    chk("§20 PD eps limit", US["pd_eps_limit"], 5.17e-6, 6e-9)
+    chk("§20 ring eps limit", US["ring_eps_limit"], 7.38e-6, 6e-9)
+    chk("§20 outer sub-intervals certified", float(sum(json.loads((R / "uniform_eps" / f"outer_eps_4.1e-6_k{k:02d}.json")
+                                                         .read_text())["certified"] for k in range(40))), 40.0, 0)
+    chk("§20 outer leaves", float(US["outer_leaves_total"]), 1567287.0, 0)
+    chk("§20 localisation slack", US["localisation_slack"], 0.02993, 6e-6)
+    chk("§20 ring slack", UL["ring"]["slack"], 1.456e-3, 6e-7)
+    chk("§20 PD slack", UL["pd"]["slack"], 0.00981, 6e-6)
+    chk("§20 switch boxes", float(UL["switch"]["n_boxes"]), 110.0, 0)
+    chk("§20 gap max left", UL["switch"]["max_G_hi_left"], -2.30e-4, 6e-7)
+    chk("§20 gap min right", UL["switch"]["min_G_lo_right"], 7.36e-4, 6e-7)
+    chk("§20 margin lower (k=20)", UC["margin"]["m_lower"], 1.0301e-4, 6e-9)
+    chk("§20 margin upper", UC["margin"]["m_upper"], 4.7027e-3, 6e-8)
+    chk("§20 margin Arb", UC["margin"]["m_lower_arb"], 2.706e-4, 6e-8)
+    chk("§20 uniform eps0", UC["uniform_eps0_producer_margin"]["eps0"], 1.5e-12, 0)
+    chk("§20 uniform root", UC["uniform_eps0_producer_margin"]["root"], 1.9143e-12, 6e-17)
+    chk("§20 uniform eps0 (Arb margin)", UC["uniform_eps0_arb_margin"]["eps0"], 4e-12, 0)
+    chk("§20 L1 at branch", UC["uniform_eps0_producer_margin"]["L1_branch_hi"], 0.08292, 6e-6)
+    chk("§20 C at branch", UC["uniform_eps0_producer_margin"]["C_branch"], 2.744, 6e-4)
+    chk("§20 G2 range", UC["G2_range"]["eps"], 0.0462, 0)
+    chk("§20 U1 spot check ratio", UC["lemma_U1_spot_check_max_ratio"], 0.9999991, 6e-8)
+    chk("§20 B(18)", UC["B_table"][0][1], 0.35296, 6e-6)
 
     print("math note §17 (small-scale compactness)")
     SS = json.loads((R / "small_scale_compactness.json").read_text())["ledger"]
