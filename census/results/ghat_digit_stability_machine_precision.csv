@@ -12,12 +12,18 @@ K domain: identity max relative error,5e-14,False
 k = 1 check max diff,1e-10,False
 k = 1 check max diff,1e-10,False
 Track 5 Krawczyk A* lo,1e-13,True
+§20 uniform root,6e-17,False
 §17 C identity max abs err,6e-17,False
 §21 K D_lo continuous,1e-10,False
 §21 K s1 float a=1.30,6e-24,False
 §21 K float 2 + D(pi/q) upper,6e-23,False
 §21 K s1 exact a=1.30,6e-11,False
 §21 K exact max float deviation,6e-19,False
+§22 W2 D_lo,1e-10,False
+§22 W2 Pa kappa*,6e-11,False
+§22 W2 Pa b*,6e-11,False
+§22 W2 Pa logistic radius,6e-18,False
+§22 W2 Pan m,1e-12,False
 T4 outer annulus min margin at A lo 0.68625,1e-12,False
 T4 limit solve margin 1.05875 lo,6e-10,False
 T4 limit solve margin 1.05875 hi,6e-10,False
