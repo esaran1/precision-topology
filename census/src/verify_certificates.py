@@ -1746,6 +1746,555 @@ def track4_solve_limit(verbose=True, workers=1):
     return res
 
 
+# ------------------------------------------------------------------------------------------ Track U, step U2: ε-interval units
+# check_u2_unit (results/uniform_eps/U2_design.md §5, author-approved 2026-10-16).  Written for this checker only: it shares
+# no code with the producer (src/u2_sample.py) and imports nothing from src/.  Everything is re-derived here in Arb.
+#
+# The rescaled feature at a = 1 + ε, u = √ε σ, written through EVEN entire kernels of v = u² = ε σ² (never through √ε, so
+# every enclosure is valid on ε-balls that contain 0, where φ_0 = h):
+#     φ    = −σ + (1+ε) σ³ Gt(v),          Gt = (u − sin u)/u³  = Σ_m (−1)^m v^m/(2m+3)!
+#     φ_σ  = −1 + (1+ε) σ² J(v),           J  = (1 − cos u)/u²  = Σ_m (−1)^m v^m/(2m+2)!
+#     φ_σσ = (1+ε) σ S(v),                 S  = sin u / u       = Σ_m (−1)^m v^m/(2m+1)!
+#     φ_ε  = σ³ Gt(v) + (1+ε) σ⁵ K1(v),    K1 = Gt′(u)/(2u)     = Σ_m (−1)^{m+1}(m+1) v^m/(2m+5)!
+#     φ_εε = 2σ⁵ K1(v) + (1+ε) σ⁷ K2(v),   K2 = K1′(u)/(2u)     = Σ_m (−1)^m (m+1)(m+2) v^m/(2m+7)!
+# (derivation: φ = (u − (1+ε) sin u)/ε^{3/2}; ∂_ε u = u/(2ε); each series is the Taylor series of its closed form.)
+# Series evaluation: |c_{m+1}|/|c_m| <= 3/((2m+2)(2m+3)) for all five kernels (the polynomial factors grow by at most 3),
+# so once 3V/((2M+2)(2M+3)) <= 1/2 with V >= |v|, the tail after M terms is at most 2|c_M| V^M (a geometric majorant).
+# The series is used for v < U2_V_SERIES (= 400, |u| < 20: Horner on a v-ball has mild dependency loss, and 80 bits carry
+# the largest term, ~e^20); closed forms only where v is certainly >= U2_V_SERIES (there u − sin u etc. lose little to
+# dependency); a v-ball straddling the threshold is split.
+_U2_KERNELS = {
+    "Gt": (lambda m: (-1) ** m, lambda m: 1, lambda m: 2 * m + 3),
+    "J": (lambda m: (-1) ** m, lambda m: 1, lambda m: 2 * m + 2),
+    "S": (lambda m: (-1) ** m, lambda m: 1, lambda m: 2 * m + 1),
+    "K1": (lambda m: (-1) ** (m + 1), lambda m: m + 1, lambda m: 2 * m + 5),
+    "K2": (lambda m: (-1) ** m, lambda m: (m + 1) * (m + 2), lambda m: 2 * m + 7),
+}
+
+
+U2_V_SERIES = 400
+
+
+def _ival(lo, hi):
+    """The ball containing [lo, hi] for Arb (or float) endpoints, exactly."""
+    lo, hi = arb(lo), arb(hi)
+    return (lo + hi) / 2 + arb(0, ((hi - lo) / 2).upper())
+
+
+def _sq_nonneg(t):
+    """t² as a ball with a nonnegative lower end (t·t of a ball straddling 0 would include negatives)."""
+    a, b = lo_(t), hi_(t)                            # exact endpoints, so every comparison below is decided
+    m = abs(a) if bool(abs(a) >= abs(b)) else abs(b)
+    if bool(a <= 0) and bool(b >= 0):
+        mn = arb(0)
+    else:
+        mn = abs(a) if bool(abs(a) <= abs(b)) else abs(b)
+    return _ival(mn * mn, m * m)
+
+
+def _pow(v, k):
+    """v**k by repeated products (python-flint's arb ** int is NaN on a ball containing 0)."""
+    out = arb(1)
+    for _ in range(k):
+        out = out * v
+    return out
+
+
+def _kernel_series(name, v):
+    sgn, P, k = _U2_KERNELS[name]
+    a, b = abs(lo_(v)), abs(hi_(v))
+    V = a if bool(a >= b) else b
+    M = 4
+    while not bool(3 * V <= arb((2 * M + 2) * (2 * M + 3)) / 2):
+        M += 1
+        if M > 5000:
+            return arb("nan")
+    eps_tail = arb(2) ** -100                        # then extend until the geometric tail is negligible
+    while bool(2 * arb(P(M)) / arb.fac_ui(k(M)) * _pow(V, M) > eps_tail) and M < 5000:
+        M += 1
+    acc = arb(0)
+    for m in reversed(range(M)):
+        acc = acc * v + arb(sgn(m) * P(m)) / arb.fac_ui(k(m))
+    tail = 2 * arb(P(M)) / arb.fac_ui(k(M)) * _pow(V, M)
+    return acc + arb(0, tail.upper())
+
+
+def _kernel_closed(name, v):
+    u = v.sqrt()                                     # v certainly >= U2_V_SERIES here (or >= 1 in the tests)
+    s, c = u.sin(), u.cos()
+    if name == "Gt":
+        return (u - s) / (u * u * u)
+    if name == "J":
+        return (1 - c) / (u * u)
+    if name == "S":
+        return s / u
+    u3, u4, u5 = _pow(u, 3), _pow(u, 4), _pow(u, 5)
+    g1 = (1 - c) / u3 - 3 * (u - s) / u4                              # Gt′(u)
+    if name == "K1":
+        return g1 / (2 * u)
+    g2 = s / u3 - 6 * (1 - c) / u4 + 12 * (u - s) / u5                # Gt″(u)
+    return (g2 / (2 * u) - g1 / (2 * u * u)) / (2 * u)               # K2 = K1′/(2u), K1′ = Gt″/(2u) − Gt′/(2u²)
+
+
+def u2_kernel(name, v):
+    """Ball enclosing kernel(v′) for every v′ in the ball v (v′ = ε σ² >= 0 in use; series valid for any real v′)."""
+    one = arb(U2_V_SERIES)
+    if not v.is_finite():
+        return arb("nan")
+    if bool(v >= one):
+        return _kernel_closed(name, v)
+    if bool(v < one):
+        return _kernel_series(name, v)
+    a = _kernel_series(name, _ival(lo_(v), U2_V_SERIES))      # straddles the threshold: split it
+    b = _kernel_closed(name, _ival(U2_V_SERIES, hi_(v)))
+    return _ival(min(lo_(a), lo_(b)), max(hi_(a), hi_(b)))
+
+
+class U2Act:
+    """φ_ε(σ) − c (and its derivatives) for every ε in the ball E (E may contain 0), the interface of FA/HAct.
+    c: a per-cell constant (exact double), the HShift idea: the logit A(φ − c) + b′ is the same profiled model."""
+
+    def __init__(self, E, c=0.0):
+        self.E = arb(E)
+        self.cc = arb(c)
+        self.cf = float(c)
+        self.ef = float(self.E.mid())
+        self.twopi = None
+
+    def _v(self, t):
+        return self.E * _sq_nonneg(t)
+
+    def f(self, t):
+        v = self._v(t)
+        return -t + (1 + self.E) * t * _sq_nonneg(t) * u2_kernel("Gt", v) - self.cc
+
+    def df(self, t):
+        return -1 + (1 + self.E) * _sq_nonneg(t) * u2_kernel("J", self._v(t))
+
+    def d2f(self, t):
+        return (1 + self.E) * t * u2_kernel("S", self._v(t))
+
+    def de(self, t):
+        t2 = _sq_nonneg(t); v = self.E * t2
+        return t * t2 * u2_kernel("Gt", v) + (1 + self.E) * t * t2 * t2 * u2_kernel("K1", v)
+
+    def dee(self, t):
+        t2 = _sq_nonneg(t); v = self.E * t2
+        return 2 * t * t2 * t2 * u2_kernel("K1", v) + (1 + self.E) * t * t2 * t2 * t2 * u2_kernel("K2", v)
+
+    def np_f(self, t):
+        """Float φ at mid ε (heuristics only: proposes points, never decides)."""
+        e = max(self.ef, 0.0)
+        if e < 1e-12:
+            return -t + t ** 3 / 6 - self.cf
+        u = math.sqrt(e) * t
+        return (u - (1 + e) * np.sin(u)) / e ** 1.5 - self.cf
+
+    def range(self, tlo, thi):
+        """Rigorous [min, max] over [tlo, thi] for every ε in E: the ball evaluation on the whole interval."""
+        v = self.f(_ival(tlo, thi))
+        if not v.is_finite():
+            return arb("-inf"), arb("inf")
+        return lo_(v), hi_(v)
+
+
+def u2_slabs_closed_ok(slabs):
+    """F2: the ε-slabs are closed intervals [e_k, e_{k+1}] that share endpoints exactly (floats compared exactly)."""
+    if not slabs:
+        return False
+    for i, (lo, hi) in enumerate(slabs):
+        if not (lo < hi):
+            return False
+        if i and slabs[i - 1][1] != lo:
+            return False
+    return True
+
+
+def _u2_obj(x, y, A, E, c=0.0):
+    return Objective(x, y, arb(A), None, act=U2Act(E, c))
+
+
+def _u2_grad_eps(obj, W, B, Bb):
+    """Ball of ∂_ε L* = A·mean((σ(z) − y)·φ_ε) over the cell W × B with b* ∈ Bb (envelope theorem)."""
+    acc = arb(0)
+    for xi, yi in zip(obj.X, obj.Y):
+        t = W * xi + B
+        z = obj.s * obj.fa.f(t) + Bb
+        acc += (1 / (1 + (-z).exp()) - yi) * obj.fa.de(t)
+    return obj.s * acc / obj.n
+
+
+def _u2_curv_eps(obj, W, B, A_hi, cshift):
+    """Upper bound of |∂²_ε L*| over the cell and the obj's (A, E) balls: ¼A²·mean((φ_ε − c)²) + A·mean|φ_εε| (the
+    profiled second derivative is A²·(a weighted variance of φ_ε, weights σ′ <= ¼) + A·mean((σ − y) φ_εε))."""
+    s1 = arb(0); s2 = arb(0)
+    for xi in obj.X:
+        t = W * xi + B
+        s1 += _sq_nonneg(obj.fa.de(t) - arb(cshift))
+        d = obj.fa.dee(t)
+        s2 += max(abs(lo_(d)), abs(hi_(d)))
+    A = arb(A_hi)
+    return hi_(A * A * s1 / (4 * obj.n) + A * s2 / obj.n)
+
+
+def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, rho=0.15, max_depth=10,
+                 max_evals=200_000, region=None, n_eps=1, B_table=None, B_full=None, target=0.0, witness_from_depth=2):
+    """Re-search of the outer exclusion of one U2 unit, in Arb: for every θ in the regime's domain outside the closed rho
+    box around θ_c, every A in [A_lo, A_hi] and every ε in [e_lo, e_hi]:  L*_ε(θ; A) − L*_ε(θ_c; A) > target.
+    The ε-interval is split into n_eps closed pieces; on each piece E = [ε_c ± h_ε] a cell passes by
+      (direct)  the cell's Arb lower bound with ε as a ball > the branch's Arb upper bound with ε as a ball, or
+      (taylor)  D(ε_c) − h_ε·|∂_ε D(ε_c)| − ½ h_ε²·sup|∂²_ε D| > target, with D(ε_c) from the point-ε cell lower bound and
+                the convexity-in-A branch bound, ∂_ε D enclosed at ε_c on the cell and at θ_c, sup|∂²_ε D| from
+                _u2_curv_eps on both;
+      (iso / full, regime R only, Lemma G2, exact PAVA bounds B(P), B_full passed in as Arb balls).
+    Domain: R: K(P) ∩ {p >= 0} (Lemma G2, ε <= 0.0462); O: 0 <= p <= W(s_min, a_max)/√e_lo, |q| <= π/√e_lo (§5.0 lemma,
+    one b₁-period for every ε in the slab).  Verdicts 'pass' / 'fail' (a witness point that beats the branch) / 'unresolved'."""
+    ctx.prec = PREC
+    t0 = time.time()
+    xf, yf = np.asarray(x, float), np.asarray(y, float)
+    p0, q0 = float(centre[0]), float(centre[1])
+    assert 0 < A_lo < A_hi and 0 <= e_lo < e_hi
+    Ab = _ival(A_lo, A_hi)
+    if regime == "R":
+        assert e_hi <= 0.0462
+        pl0, ph0, ql0, qh0 = region if region is not None else (0.0, P, -52.0, 52.0)
+    else:
+        assert e_lo > 0
+        W = lemma_W(xf, yf, A_lo / e_hi ** 1.5, 1 + e_hi)
+        pmax = W / math.sqrt(e_lo) * (1 + 1e-12) + 1e-12
+        qmax = math.pi / math.sqrt(e_lo) * (1 + 1e-12) + 1e-12
+        n_p, n_q = math.ceil(pmax / h0), math.ceil(qmax / h0)
+        pl0, ph0, ql0, qh0 = region if region is not None else (0.0, n_p * h0, -n_q * h0, n_q * h0)
+        assert bool(arb(ph0) * arb(e_lo).sqrt() >= arb(W)) or region is not None
+        assert bool(arb(qh0) * arb(e_lo).sqrt() >= arb.pi()) or region is not None
+    edges = [e_lo + (e_hi - e_lo) * i / n_eps for i in range(n_eps)] + [e_hi]
+    stats = {"evals": 0, "direct": 0, "taylor": 0, "iso": 0, "full": 0, "dropped_in_box": 0, "dropped_outside_K": 0,
+             "max_depth": 0, "witness_tries": 0}
+    witness, unresolved, marg = None, [], math.inf
+    for ie in range(n_eps):
+        el, eh = edges[ie], edges[ie + 1]
+        ec, he = 0.5 * (el + eh), 0.5 * (eh - el)
+        Ept, Eb = arb(ec), _ival(el, eh)
+        # branch side
+        U_pt, U_E, L_pt = [], [], []
+        for A_k in (A_lo, A_hi):
+            for EE, store in ((Ept, U_pt), (Eb, U_E)):
+                o = _u2_obj(xf, yf, A_k, EE)
+                Bb, _ = o.b_bracket(arb(p0), arb(q0))
+                if Bb is None:
+                    return {"verdict": "unresolved", "note": "branch bias not bracketed"}
+                store.append(arb(hi_(o.upper_at(p0, q0, float(Bb.mid())))))
+            o = _u2_obj(xf, yf, A_k, Ept)
+            L_pt.append(arb(lo_(o.lower_bound(p0, q0, 0.0, 0.0))))
+        br_pt, br_E = max(U_pt[0], U_pt[1]), max(U_E[0], U_E[1])
+        ob = Objective(xf, yf, Ab, None, act=U2Act(Ept))
+        Bb_c, _ = ob.b_bracket(arb(p0), arb(q0))
+        if Bb_c is None:
+            return {"verdict": "unresolved", "note": "branch bias not bracketed (A ball)"}
+        G_b = _u2_grad_eps(ob, arb(p0), arb(q0), Bb_c)
+        scb = p0 * xf + q0
+        ob_E = Objective(xf, yf, Ab, None, act=U2Act(Eb))
+        cbe = float(np.median(np.array([float(ob_E.fa.de(arb(float(s))).mid()) for s in scb])))
+        C_b = _u2_curv_eps(ob_E, arb(p0), arb(q0), A_hi, cbe)
+        iso_P = None
+        if regime == "R" and B_table:
+            ok = [Pk for Pk, Bk in B_table if bool(Bk > br_E + arb(target))]
+            iso_P = min(ok) if ok else None
+        full_ok = regime == "R" and B_full is not None and bool(B_full > br_E + arb(target))
+        n_p, n_q = int(round((ph0 - pl0) / h0)), int(round((qh0 - ql0) / h0))
+        stack = [(pl0 + a * h0, pl0 + (a + 1) * h0, ql0 + b * h0, ql0 + (b + 1) * h0, 0)
+                 for a in range(n_p) for b in range(n_q)]
+        while stack:
+            pl, ph, ql, qh, depth = stack.pop()
+            if _inside_closed_box(pl, ph, ql, qh, p0, q0, rho):
+                stats["dropped_in_box"] += 1; continue
+            if regime == "R" and _disjoint_from_K(pl, ph, ql, qh):
+                stats["dropped_outside_K"] += 1; continue
+            if iso_P is not None and pl >= iso_P:
+                stats["iso"] += 1; continue
+            pc, qc, hp, hq = 0.5 * (pl + ph), 0.5 * (ql + qh), 0.5 * (ph - pl), 0.5 * (qh - ql)
+            if full_ok:                                   # every point's σ-range certainly outside (−2√2, 2√2)
+                r8 = 2 * arb(2).sqrt()
+                def _out8(xi):
+                    lo = arb(pl) * arb(xi) if xi >= 0 else arb(ph) * arb(xi)
+                    hi = arb(ph) * arb(xi) if xi >= 0 else arb(pl) * arb(xi)
+                    return bool(lo + arb(ql) >= r8) or bool(hi + arb(qh) <= -r8)
+                if all(_out8(float(xi)) for xi in xf):
+                    stats["full"] += 1; continue
+            if stats["evals"] >= max_evals:
+                unresolved.append((pl, ph, ql, qh, ie, "evaluation cap")); continue
+            stats["evals"] += 1
+            stats["max_depth"] = max(stats["max_depth"], depth)
+            sc = pc * xf + qc
+            ok = False
+            # (direct) ε as a ball
+            cE = U2Act(Eb).np_f(sc)
+            o = Objective(xf, yf, Ab, None, act=U2Act(Eb, float(np.median(cE))))
+            lb = o.lower_bound(pc, qc, hp, hq)
+            if lb is not None and bool(lb > br_E + arb(target)):
+                stats["direct"] += 1; ok = True
+                marg = min(marg, float_down(lo_(lb) - hi_(br_E)))
+            if not ok:
+                # (taylor) point ε_c, then the ε-derivative and the ε-curvature
+                cP = U2Act(Ept).np_f(sc)
+                o = Objective(xf, yf, Ab, None, act=U2Act(Ept, float(np.median(cP))))
+                lbp = o.lower_bound(pc, qc, hp, hq)
+                if lbp is not None:
+                    Wc, Bc = _ival(pl, ph), _ival(ql, qh)
+                    Bcell, _ = o.b_bracket(Wc, Bc)
+                    if Bcell is not None:
+                        G_c = _u2_grad_eps(o, Wc, Bc, Bcell)
+                        oE = Objective(xf, yf, Ab, None, act=U2Act(Eb))
+                        cse = float(np.median(np.array([float(oE.fa.de(arb(float(s))).mid()) for s in sc])))
+                        C_c = _u2_curv_eps(oE, Wc, Bc, A_hi, cse)
+                        dG = G_c - G_b
+                        bound = lbp - br_pt - arb(he) * max(abs(lo_(dG)), abs(hi_(dG))) - arb(he) ** 2 / 2 * (C_c + C_b)
+                        if bool(bound > arb(target)):
+                            stats["taylor"] += 1; ok = True
+                            marg = min(marg, float_down(lo_(bound)))
+            if ok:
+                continue
+            if depth >= witness_from_depth and _point_outside_box(pc, qc, p0, q0, rho):
+                for k, A_k in enumerate((A_lo, A_hi)):
+                    act = U2Act(Ept)
+                    z0 = A_k * act.np_f(pc * xf + qc)
+                    z0 = z0 - np.median(z0)
+                    lo, hi = -float(np.abs(z0).max()) - 50.0, float(np.abs(z0).max()) + 50.0
+                    for _ in range(200):
+                        mm = 0.5 * (lo + hi)
+                        vv = np.exp(-np.logaddexp(0, -(z0 + mm))).mean() - yf.mean()
+                        lo, hi = (mm, hi) if vv < 0 else (lo, mm)
+                    zz = z0 + 0.5 * (lo + hi)
+                    if float((np.logaddexp(0, zz) - yf * zz).mean()) < float(L_pt[k].mid()) + 1e-6:
+                        stats["witness_tries"] += 1
+                        ow = _u2_obj(xf, yf, A_k, Ept)
+                        Bw, _ = ow.b_bracket(arb(pc), arb(qc))
+                        if Bw is not None:
+                            up = arb(hi_(ow.upper_at(pc, qc, float(Bw.mid()))))
+                            if bool(up < L_pt[k] + arb(target)):
+                                witness = {"p": pc, "q": qc, "A": A_k, "eps": ec, "L_upper": float_up(up),
+                                           "branch_lower": float_down(lo_(L_pt[k]))}
+                                break
+                if witness is not None:
+                    break
+            if depth < max_depth:
+                stack += [(a0, a1, b0, b1, depth + 1) for a0, a1 in ((pl, pc), (pc, ph)) for b0, b1 in ((ql, qc), (qc, qh))]
+            else:
+                unresolved.append((pl, ph, ql, qh, ie, "depth cap"))
+        if witness is not None:
+            break
+    verdict = "fail" if witness is not None else ("pass" if not unresolved else "unresolved")
+    return {"verdict": verdict, "witness": witness, "unresolved_n": len(unresolved), "unresolved_first": unresolved[:10],
+            **stats, "min_margin_certified": marg if verdict == "pass" else None, "eps": [e_lo, e_hi], "n_eps": n_eps,
+            "A": [A_lo, A_hi], "regime": regime, "centre": [p0, q0], "rho": rho, "seconds": time.time() - t0}
+
+
+def u2_ring_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=0.05, rho_out=0.15, side=0.0125, max_depth=5, n_eps=1,
+                boxes=None):
+    """No critical point of L*_ε(·; A) in the ring rho_in <= |θ − θ_c|_∞ <= rho_out, for every A in [A_lo, A_hi] and ε in
+    [e_lo, e_hi]: every box (×A ball × ε ball) has b* bracketed and 0 ∉ ∂_p L* or 0 ∉ ∂_q L* (Arb); split up to max_depth.
+    boxes: optional list of (cp, cq, half) offsets from θ_c (tests / replay); default the full ring tiling."""
+    ctx.prec = PREC
+    t0 = time.time()
+    xf, yf = np.asarray(x, float), np.asarray(y, float)
+    p0, q0 = float(centre[0]), float(centre[1])
+    pad = 1e-12
+    if boxes is None:
+        n = int(round(2 * rho_out / side))
+        boxes = [(-rho_out + (i + 0.5) * side, -rho_out + (j + 0.5) * side, side / 2) for i in range(n) for j in range(n)]
+    edges = [e_lo + (e_hi - e_lo) * i / n_eps for i in range(n_eps)] + [e_hi]
+    n_box, left, gmin, dmax = 0, [], math.inf, 0
+    for ie in range(n_eps):
+        obj = Objective(xf, yf, _ival(A_lo, A_hi), None, act=U2Act(_ival(edges[ie], edges[ie + 1])))
+        cells, depth = list(boxes), 0
+        while cells and depth <= max_depth:
+            nxt = []
+            for cp, cq, hh in cells:
+                if abs(cp) + hh <= rho_in - pad and abs(cq) + hh <= rho_in - pad:
+                    continue
+                n_box += 1
+                Pb = _ival(p0 + cp - hh - pad, p0 + cp + hh + pad); Qb = _ival(q0 + cq - hh - pad, q0 + cq + hh + pad)
+                Bb, Z = obj.b_bracket(Pb, Qb)
+                ok = False
+                if Bb is not None:
+                    _, gp, gq = obj.value_and_grad(Pb, Qb, Bb, Z)
+                    ok = (not gp.contains(0)) or (not gq.contains(0))
+                    if ok:
+                        mag = max(0 if gp.contains(0) else float(min(abs(lo_(gp)), abs(hi_(gp))).mid()),
+                                  0 if gq.contains(0) else float(min(abs(lo_(gq)), abs(hi_(gq))).mid()))
+                        gmin = min(gmin, mag)
+                if not ok:
+                    h2 = hh / 2
+                    nxt += [(cp + dx * h2, cq + dy * h2, h2) for dx in (-1, 1) for dy in (-1, 1)]
+            cells, depth = nxt, depth + 1
+            dmax = max(dmax, depth - 1)
+        left += cells
+    return {"certified": not left, "boxes": n_box, "left": len(left), "grad_lower": gmin, "max_depth": dmax,
+            "eps": [e_lo, e_hi], "A": [A_lo, A_hi], "seconds": time.time() - t0}
+
+
+def u2_pd_box_arb(x, y, pl, ph, ql, qh, A_lo, A_hi, e_lo, e_hi, c=0.0):
+    """PD of the (p, q, b) Hessian of L (minus c·I) over box × A ball × ε ball × b* bracket (Sylvester on the Arb
+    enclosure)."""
+    ctx.prec = PREC
+    obj = Objective(np.asarray(x, float), np.asarray(y, float), _ival(A_lo, A_hi), None, act=U2Act(_ival(e_lo, e_hi)))
+    Pb, Qb, A = _ival(pl, ph), _ival(ql, qh), _ival(A_lo, A_hi)
+    Bb, _ = obj.b_bracket(Pb, Qb)
+    if Bb is None:
+        return {"b_ok": False, "pd": False}
+    H = [[arb(0)] * 3 for _ in range(3)]
+    for xi, yi in zip(obj.X, obj.Y):
+        sg = Pb * xi + Qb
+        z = A * obj.fa.f(sg) + Bb
+        S = 1 / (1 + (-z).exp()); w = S * (1 - S); res = S - yi
+        f1, f2 = obj.fa.df(sg), obj.fa.d2f(sg)
+        dz = [A * f1 * xi, A * f1, arb(1)]
+        d2 = {(0, 0): A * f2 * xi * xi, (0, 1): A * f2 * xi, (1, 1): A * f2}
+        for i in range(3):
+            for j in range(3):
+                H[i][j] += w * dz[i] * dz[j] + res * d2.get((min(i, j), max(i, j)), arb(0))
+    n = obj.n
+    M = [[H[i][j] / n - (arb(repr(c)) if i == j else 0) for j in range(3)] for i in range(3)]
+    m1 = M[0][0]
+    m2 = M[0][0] * M[1][1] - M[0][1] * M[1][0]
+    m3 = (M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0])
+          + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]))
+    return {"b_ok": True, "pd": bool(m1 > 0 and m2 > 0 and m3 > 0)}
+
+
+def u2_pd_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_u=0.05, split=4, max_depth=4, c=0.0):
+    """PD on the rho_u box around θ_c for every A, ε in the unit: split × split sub-boxes, each split in four up to
+    max_depth if Sylvester fails."""
+    t0 = time.time()
+    p0, q0 = float(centre[0]), float(centre[1])
+    h = rho_u / split
+    cells = [(p0 - rho_u + (2 * i + 1) * h, q0 - rho_u + (2 * j + 1) * h, h, 0) for i in range(split) for j in range(split)]
+    n_box, failed = 0, []
+    while cells:
+        pc, qc, hh, d = cells.pop()
+        n_box += 1
+        r = u2_pd_box_arb(x, y, pc - hh, pc + hh, qc - hh, qc + hh, A_lo, A_hi, e_lo, e_hi, c)
+        if r["pd"]:
+            continue
+        if d >= max_depth:
+            failed.append((pc, qc, hh)); continue
+        h2 = hh / 2
+        cells += [(pc + dx * h2, qc + dy * h2, h2, d + 1) for dx in (-1, 1) for dy in (-1, 1)]
+    return {"pd": not failed, "boxes": n_box, "failed": failed[:10], "seconds": time.time() - t0}
+
+
+def u2_system_arb(X, xs, ys, act, A_par=None, with_gap=False, want_J=True):
+    """(∂_p L, ∂_q L, ∂_b L[, G]) with L = mean softplus(z) − y z, z = A φ_ε(p x + q) + b, every ε in act.E, and the
+    active gap G = φ(q − 1.2p) − φ(q + 0.8p); the Jacobian in (p, q, b[, A]).  A_par: the A ball when A is a parameter."""
+    p, q, b = X[0], X[1], X[2]
+    A = X[3] if with_gap else A_par
+    n = len(xs)
+    k = 4 if with_gap else 3
+    F = [arb(0)] * 3
+    J = [[arb(0)] * k for _ in range(3)]
+    for xi, yi in zip(xs, ys):
+        sg = p * xi + q
+        f0, f1 = act.f(sg), act.df(sg)
+        z = A * f0 + b
+        S = 1 / (1 + (-z).exp()); res = S - yi
+        dz = [A * f1 * xi, A * f1, arb(1)]
+        for i in range(3):
+            F[i] += res * dz[i]
+        if not want_J:
+            continue
+        w = S * (1 - S)
+        f2 = act.d2f(sg)
+        d2 = [[A * f2 * xi * xi, A * f2 * xi, arb(0)], [A * f2 * xi, A * f2, arb(0)], [arb(0), arb(0), arb(0)]]
+        for i in range(3):
+            for j in range(3):
+                J[i][j] += w * dz[i] * dz[j] + res * d2[i][j]
+            if with_gap:
+                dA = [f1 * xi, f1, arb(0)]
+                J[i][3] += w * f0 * dz[i] + res * dA[i]
+    F = [f / n for f in F]
+    sO, sI = q - arb("1.2") * p, q + arb("0.8") * p
+    if with_gap:
+        F.append(act.f(sO) - act.f(sI))
+    if not want_J:
+        return F
+    J = [[J[i][j] / n for j in range(k)] for i in range(3)]
+    if with_gap:
+        J.append([-arb("1.2") * act.df(sO) - arb("0.8") * act.df(sI), act.df(sO) - act.df(sI), arb(0), arb(0)])
+    return F, J
+
+
+def u2_active_pair(P, Q, act):
+    """(valid, G ball) over the box P × Q (balls), every ε in act.E: the class gap min_O φ − max_I φ equals the active pair
+    φ(q − 1.2p) − φ(q + 0.8p) when (i) φ is convex on the inner σ-window (φ_σσ = (1+ε)σ·S(v) > 0 there), so its max is at
+    an end; (ii) φ is concave on the negative outer window (φ_σσ < 0), so its min is at an end; (iii) φ_σ > 0 on the
+    positive outer window, so its min is the left end; and the active ends strictly dominate the other ends."""
+    def win(x1, x2):
+        return _ival(min(lo_(P * x1 + Q), lo_(P * x2 + Q)), max(hi_(P * x1 + Q), hi_(P * x2 + Q)))
+    I, On, Op = win(-0.8, 0.8), win(-2.0, -1.2), win(1.2, 2.0)
+    ok = bool(act.d2f(I) > 0) and bool(act.d2f(On) < 0) and bool(act.df(Op) > 0)
+    phi = lambda xx: act.f(P * arb(repr(xx)) + Q)
+    I_act, I_oth = phi(0.8), phi(-0.8)
+    O_act, O_m2, O_p1 = phi(-1.2), phi(-2.0), phi(1.2)
+    ok = ok and bool(I_act > I_oth) and bool(O_act < O_m2) and bool(O_act < O_p1)
+    return ok, O_act - I_act
+
+
+def u2_switch_arb(x, y, e_lo, e_hi, Z, rows, J_tube, U_boxes=None):
+    """The switch of one slab, replayed from the producer's published boxes (data): Z = 4 intervals (p, q, b, A); rows =
+    [{A_lo, A_hi, box: 3 intervals}] covering J_tube.  Checks in Arb with ε as a ball: Krawczyk on Z (unique zero of
+    (∇L, G)) with the active pair valid on Z; for each row, Krawczyk on its box with A as a ball parameter (unique critical
+    point), the gap's sign on the Krawczyk image (left of Z_A: < 0; right: > 0; inside: the image lies in Z's θ-range);
+    the rows tile J_tube exactly; optionally each image lies in its sub-interval's U box (U_boxes: list of (A_lo, A_hi,
+    p0, q0, rho_u))."""
+    ctx.prec = PREC
+    t0 = time.time()
+    xs = [arb(float(v)) for v in np.asarray(x, float)]; ys = [int(v) for v in np.asarray(y, float)]
+    act = U2Act(_ival(e_lo, e_hi))
+    zt = [0.5 * (a + b) for a, b in Z]; zr = [0.5 * (b - a) for a, b in Z]
+    okZ, KZ, XZ, _ = krawczyk_arb(lambda X, Jf=True: u2_system_arb(X, xs, ys, act, with_gap=True, want_J=Jf), zt, zr)
+    actZ, _ = u2_active_pair(XZ[0], XZ[1], act)
+    ZA = (Z[3][0], Z[3][1])
+    out = {"Z_krawczyk": bool(okZ), "Z_active_pair": bool(actZ), "rows": len(rows)}
+    cover = abs(rows[0]["A_lo"] - J_tube[0]) == 0 and abs(rows[-1]["A_hi"] - J_tube[1]) == 0 and \
+        all(rows[i]["A_hi"] == rows[i + 1]["A_lo"] for i in range(len(rows) - 1))
+    bad = []
+    for r in rows:
+        Ab = _ival(r["A_lo"], r["A_hi"])
+        bt = [0.5 * (a + b) for a, b in r["box"]]; br = [0.5 * (b - a) for a, b in r["box"]]
+        ok, Kb, Xb, _ = krawczyk_arb(lambda X, Jf=True: u2_system_arb(X, xs, ys, act, A_par=Ab, want_J=Jf), bt, br)
+        good = bool(ok)
+        if good:
+            left, right = r["A_hi"] <= ZA[0], r["A_lo"] >= ZA[1]
+            if left or right:
+                v, G = u2_active_pair(Xb[0], Xb[1], act)
+                good = v and (bool(G < 0) if left else bool(G > 0))
+            else:
+                good = all(bool(lo_(Xb[i]) > lo_(XZ[i])) and bool(hi_(Xb[i]) < hi_(XZ[i])) for i in range(3))
+        if good and U_boxes is not None:
+            for (al, ah, pu, qu, ru) in U_boxes:
+                if al <= r["A_lo"] and r["A_hi"] <= ah:
+                    good = bool(lo_(Xb[0]) > pu - ru) and bool(hi_(Xb[0]) < pu + ru) and \
+                        bool(lo_(Xb[1]) > qu - ru) and bool(hi_(Xb[1]) < qu + ru)
+                    break
+        if not good:
+            bad.append((r["A_lo"], r["A_hi"]))
+    out.update({"covered": bool(cover), "bad_rows": bad[:10], "n_bad": len(bad), "seconds": time.time() - t0})
+    out["pass"] = bool(okZ and actZ and cover and not bad)
+    return out
+
+
+def check_u2_unit(header, x, y, B_table=None, B_full=None, outer_kw=None, ring_kw=None, pd_kw=None):
+    """One U2 unit (header: dict with eps, A, centre, regime), re-searched in Arb (the primary route): outer exclusion,
+    ring and PD.  Data x, y are passed in (the driver hash-checks them).  Returns the verdicts and timings."""
+    (e_lo, e_hi), (A_lo, A_hi), c, reg = header["eps"], header["A"], header["centre"], header["regime"]
+    res = {"header": header}
+    res["outer"] = u2_outer_arb(x, y, c, A_lo, A_hi, e_lo, e_hi, reg, B_table=B_table, B_full=B_full, **(outer_kw or {}))
+    res["ring"] = u2_ring_arb(x, y, c, A_lo, A_hi, e_lo, e_hi, **(ring_kw or {}))
+    res["pd"] = u2_pd_arb(x, y, c, A_lo, A_hi, e_lo, e_hi, **(pd_kw or {}))
+    res["pass"] = res["outer"]["verdict"] == "pass" and res["ring"]["certified"] and res["pd"]["pd"]
+    return res
+
+
 def check(name):
     kind = json.loads((CERTS / f"{name}.json").read_text()).get("kind")
     return {"ghat_enclosure": check_ghat, "limit_status": check_limit, "finite_a_solve": check_solve}.get(kind, check_finite)(name)
