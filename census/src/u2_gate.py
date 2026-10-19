@@ -24,7 +24,8 @@ import sys
 import time
 from pathlib import Path
 
-DEFAULT_DIR = Path(__file__).resolve().parents[1] / "results" / "uniform_eps" / "u2_sample"
+DEFAULT_DIR = Path(os.environ.get("U2_GATE_DIR") or
+                   Path(__file__).resolve().parents[1] / "results" / "uniform_eps" / "u2_sample")
 GATE_LOG = DEFAULT_DIR / "gate_entries.jsonl"
 LAUNCH_LOG = DEFAULT_DIR / "launches.jsonl"
 MAX_AGE_S = 600.0

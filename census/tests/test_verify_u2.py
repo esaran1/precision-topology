@@ -229,7 +229,7 @@ def test_switch_shear_pass(xy, sheared_slab):
 
 def test_switch_shear_fail_on_a_displaced_Z_or_a_gap_in_the_tiling(xy, sheared_slab):
     x, y = xy
-    Z = dict(sheared_slab["Z"]); Z["xt"] = list(Z["xt"]); Z["xt"][0] += 5 * Z["R"][0]       # the zero is not in this box
+    Z = dict(sheared_slab["Z"]); Z["xt"] = list(Z["xt"]); Z["xt"][0] += 0.2      # beyond the inflation cap (0.05)
     r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, Z, sheared_slab["rows_boxes"], sheared_slab["J_tube"])
     assert not r["pass"] and not r["Z_krawczyk"]
     rows = [dict(rr) for rr in sheared_slab["rows_boxes"]]
@@ -243,3 +243,53 @@ def test_switch_shear_undecided_on_a_too_wide_slab(xy, sheared_slab):
     x, y = xy
     r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-3, sheared_slab["Z"], sheared_slab["rows_boxes"], sheared_slab["J_tube"])
     assert not r["pass"]
+
+
+def test_coupled_bound_pass_fail_undecided(xy, branch):
+    """Proposition 23.3 (math note §23) on ε-intervals that contain 0."""
+    x, y = xy
+    c, A_lo, A_hi = branch
+    p0, q0 = c
+    # pass: a cell well outside the 0.15 box
+    lb = vc.u2_coupled_lower(x, y, p0 + 0.5, q0 + 0.25, 0.03125, 0.03125, A_lo, A_hi, 0.0, 1e-3, p0, q0)
+    assert lb is not None and bool(lb > 0)
+    # fail: the 'branch' point moved by 0.3, the cell contains the true minimiser -- the bound must not be positive
+    lb = vc.u2_coupled_lower(x, y, p0, q0, 0.01, 0.01, A_lo, A_hi, 0.0, 1e-3, p0 + 0.3, q0)
+    assert lb is None or not bool(lb > 0)
+    # undecided: a cell next to the box over a too-wide ε-interval
+    lb = vc.u2_coupled_lower(x, y, p0 + 0.16, q0, 0.01, 0.01, A_lo, A_hi, 0.0, 0.2, p0, q0)
+    assert lb is None or not bool(lb > 0)
+
+
+def test_coupled_bound_is_below_sampled_differences(xy, branch):
+    """The bound is below the float difference D at sampled points of its box (a soundness spot check)."""
+    from src.u2_sample import point_eval
+    x, y = xy
+    c, A_lo, A_hi = branch
+    p0, q0 = c
+    pc, qc, h = p0 + 0.3, q0 - 0.2, 0.0625
+    lb = vc.u2_coupled_lower(x, y, pc, qc, h, h, A_lo, A_hi, 0.0, 2e-3, p0, q0)
+    rng = np.random.default_rng(5)
+    for _ in range(20):
+        p, q = pc + rng.uniform(-h, h), qc + rng.uniform(-h, h)
+        A, e = rng.uniform(A_lo, A_hi), rng.uniform(0.0, 2e-3)
+        d = point_eval([p], [q], A, e, x, y)[0][0] - point_eval([p0], [q0], A, e, x, y)[0][0]
+        assert float(lb.mid()) <= d + 1e-9
+
+
+def test_switch_replay_uses_its_own_radii(xy, sheared_slab):
+    """Zeroing every published radius changes nothing: the checker inflates its own."""
+    x, y = xy
+    Z = dict(sheared_slab["Z"]); Z["R"] = [0.0] * 4
+    rows = [dict(rr, R=[0.0] * 3) for rr in sheared_slab["rows_boxes"]]
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, Z, rows, sheared_slab["J_tube"])
+    assert r["pass"], r
+
+
+def test_ring_fast_first_then_fallback(xy, branch):
+    x, y = xy
+    c, A_lo, A_hi = branch
+    r = vc.u2_ring_fast_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, boxes=[(0.1, 0.0, 0.00625), (-0.1375, 0.1375, 0.00625)])
+    assert r["certified"] and r["fast"] + r["fallback"] == 2
+    bad = vc.u2_ring_fast_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, rho_in=0.0, boxes=[(0.0, 0.0, 0.002)])
+    assert not bad["certified"] and bad["fallback"] == 1

@@ -601,3 +601,108 @@ all certified by the checker:
   - O ≈ 3–4 min per slab, about 1 h for 19 slabs;
   - R above the window ≈ 25 min per slab, ≈ 3.5 h for 8 slabs;
   - R below the window: infeasible without a new bound.
+
+## 8. The producer run over [0, 0.6] (run1), the three checker pieces, and the checker re-projection (2026-10-18/19)
+
+**Everything in §8.1 is PRODUCER-ONLY and has NOT been independently checked.** It is float arithmetic at the producer
+standard, not a certificate, and is labelled that way in every record and export. Nothing in it is reported as certified.
+
+### 8.1 run1: the producer over ε ∈ [0, 0.6] at 3 workers (`run1_specs.json`; `units/run1/`; `run1_w*.jsonl`)
+
+**Layout:** 27 closed ε-slabs sharing their endpoints, × 40 A-sub-intervals = 1,080 units, plus the sheared switch for
+each slab.
+- R: 6 slabs of width 0.005 on [0, 0.03], then [0.03, 0.04] and [0.04, 0.0462].
+- O: slabs of width 0.03 on [0.0462, 0.5862], then [0.5862, 0.6].
+
+**Run:**
+- Workers launched at 22:58, each after its own gate.
+- They were restarted at 23:08 with the outer ε-split rule, because slab [0.005, 0.01] failed on its unsplit units.
+- They finished at 00:29. Wall time was about 1.5 h; the summed per-slab time is 12,200 s after the restart.
+- The watchdog never fired.
+
+**Producer result** (not independently checked): every unit and every slab's switch passed the producer's tests, and no
+unit failed after splitting.
+
+| link | result |
+|---|---|
+| outer exclusion | 1,080 / 1,080 units |
+| outer ε-splits | 13 units of slab [0.005, 0.01] needed one halving into two 0.0025 halves |
+| ring | 1,080 / 1,080 (first-order 3-D form wherever the Lipschitz form failed) |
+| PD | 1,080 / 1,080 |
+| switch | 27 / 27 slabs, 269 sheared sub-slabs, widths 0.0019–0.0069 |
+
+**Thin PD margins at large ε** (producer λ_lower):
+
+| slab | λ_lower ≥ |
+|---|---|
+| [0.0762, 0.1062] | 9.6·10⁻⁷ |
+| [0.4362, 0.4662] | 3.7·10⁻⁷ |
+| [0.4662, 0.4962] | 9.5·10⁻⁸ |
+| [0.5562, 0.5862] | **1.3·10⁻⁸** |
+
+**Peak RSS:** 1.62 GB per worker.
+
+**Exports** (each file labelled PRODUCER-ONLY):
+
+| export | size |
+|---|---|
+| outer leaves, 1,070 npz (the split units export none) | 65 MB, including the ring boxes |
+| Lipschitz ring boxes (200 units) | 21 MB |
+| switch sub-slab files | 13 MB |
+| unit records | 35 MB |
+| **total** | ≈ 113 MB |
+
+### 8.2 The three checker pieces (independent of the producer: `src/verify_certificates.py`, additions only)
+
+- **(a) The coupled second-order cell bound:** `u2_coupled_lower`, math note §23 (Proposition 23.3, every step labelled).
+  Its remainders are Arb sup-balls of the kernel functions: no grid envelopes. It is the first test in `u2_outer_arb`.
+- **(b) The checker's own box radii in the switch replay:** `u2_krawczyk_shear_inflate`. It starts Z from the §16.3
+  method radii and the rows from 10⁻⁷, and grows them by 1.5 × the Krawczyk image. The producer's radii are ignored (a test
+  zeroes them).
+- **(c) The ring:** `u2_ring_fast_arb` runs the direct gradient-ball test first and the first-order 3-D form only for the
+  tiles it leaves open.
+- **Fixes found on the way, in the switch replay:**
+  - The active-pair test checked convexity of the whole inner window, which fails once the window reaches σ < 0.3. It now
+    checks "φ decreasing on [σ_lo, 0.3], convex on [0.3, σ_hi]", piecewise on 16 sub-intervals.
+  - The gap at ε_c is now enclosed in centred (mean-value) form.
+- **Tests:** `tests/test_verify_u2.py` and `tests/test_u2_entrypoints.py` (with the earlier U2 tests, 52 passed). They
+  include pass, fail and undecided cases on ε-intervals that contain 0, and a sampled soundness check of (a).
+
+### 8.3 Checker timing on run1's real exports (3 processes, each gated; Arb at 80 bits)
+
+| unit | outer re-search | ring (fast first) | PD |
+|---|---|---|---|
+| R [0, 0.005], k = 20 | **pass**, 1,672 evaluations (1,325 coupled), 738 s | 512/512 tiles by the fast test, 13 s | 16 boxes, 0.7 s |
+| O [0.1962, 0.2262], k = 20 | **pass**, 1,465 evaluations (1,091 coupled), 914 s | 512/512 fast, 19 s | 268 boxes, 17.5 s |
+| O [0.5862, 0.6], k = 0 | **pass**, 7,477 evaluations (5,317 coupled), 6,081 s | 512/512 fast, 19 s | 80 boxes, 5.5 s |
+| R [0.03, 0.04], k = 20 | still running when stopped: **≥ 2.9 h** | — | — |
+| O [0.5562, 0.5862], k = 20 | still running when stopped: **≥ 2.9 h** | — | — |
+| O [0.5862, 0.6], k = 39 | still running when stopped: **≥ 1.2 h** | — | — |
+
+- **Peak RSS per checker process:** 0.04–0.05 GB.
+- **Switch replay** (first sub-slab of R [0, 0.005] and O [0.1962, 0.2262]): Z's Krawczyk test passes and so does the
+  active pair (after the fix), but **most rows fail**.
+  - On [0, 0.0025]: 111 of 188 rows fail. The reasons are 73–95 failed sign checks and 16–18 failed Z-containment checks.
+  - Letting the checker halve failing rows six more times did not help: 5,194 failing pieces after 5,162 splits, 40 min.
+    So the cause is not the row width; it is the checker's gap and containment enclosures.
+  - **The switch replay is UNRESOLVED.**
+- **PD on every unit of [0.5562, 0.6]:** see §8.4.
+
+### 8.4 PD on [0.5562, 0.6] (the producer's thinnest PD margins)
+
+**The checker's PD test (Sylvester's criterion on Arb Hessian enclosures) passes on all 80 units of [0.5562, 0.5862] and
+[0.5862, 0.6]** (`chkPD.json`).
+- These include the producer's thinnest PD margin, λ ≥ 1.3·10⁻⁸.
+- Cost: 16,640 boxes in 1,077 s in total, at most 22 s per unit.
+- The sampled ring tiles there (8 per unit) all passed the fast test.
+
+### 8.5 Checker re-projection: ABOVE 48 h at 3 workers (stop and report, as instructed)
+
+- **Measured outer re-search cost per unit:** 12–101 min on the three units that finished, and at least 72–174 min on the
+  three that were stopped. Ring and PD add ≤ 0.5 min.
+- **Lower bound** from the cheapest unit (12.6 min): 1,080 × 12.6 min ≈ 227 h at 1 worker, ≈ **76 h at 3 workers**.
+- **From the six sampled units** (mean ≥ 92 min, counting the unfinished units at their elapsed times): ≈ 1,650 h at 1
+  worker, ≈ **550 h at 3 workers**.
+- **The switch replay is not yet feasible:** its rows do not certify.
+- **Peak memory per checker worker:** ≤ 0.05 GB. Memory does not bind; 3 workers fit easily.
+- **The checker was not run** over the producer output. Per the author's rule, it goes to a cluster.

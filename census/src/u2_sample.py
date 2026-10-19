@@ -890,6 +890,13 @@ def probe(e_lo, e_hi, regime, fracs, n_sub, x, y, cons, export=None, do_links=Fa
     ks = sorted({min(n_sub - 1, int(fr * n_sub)) for fr in fracs})
     units = [(f"{prefix}_k{k:03d}", (lambda k=k: _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export,
                                                              do_links, max_rounds, max_cells, max_seconds))) for k in ks]
+    for key, _ in units:                                  # a stored failure from before the split rule is redone
+        r_ = store.get(key)
+        if r_ is not None and not r_.get("certified") and not r_.get("split_done"):
+            try:
+                store.path(key).rename(store.path(key).with_suffix(".superseded"))
+            except OSError:
+                pass
     out = run_units(store, units)
     return [out[key] for key, _ in units]
 
@@ -929,12 +936,30 @@ def _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export, do_l
         res["seconds"] = time.time() - t0
         res["k"], res["n_sub"], res["tube"], res["A_switch_float"] = k, n_sub, list(J), float(vs[2])
         res["n_leaves"] = sum(res["stats"][s] for s in ("iso", "full", "pert", "fav"))
+        res["split_done"] = True
+        if not res["certified"]:
+            # the outer link on closed ε-sub-slabs (halved on failure, down to 1/16 of the slab), same θ_c and A
+            first_fail = {k_: res.get(k_) for k_ in ("worst_live", "timed_out", "rounds")}
+            def outer_run(lo, hi, cap):
+                r_, _ = outer_unit(lo, hi, A_lo, A_hi, tuple(c), x, y, regime, cons, record=False,
+                                   max_rounds=max_rounds, max_cells=max_cells, max_seconds=cap)
+                return {k_: r_.get(k_) for k_ in ("certified", "worst_live", "timed_out", "rounds", "evaluations")} | \
+                    {"n_leaves": sum(r_["stats"][s] for s in ("iso", "full", "pert", "fav"))}
+            t1 = time.time()
+            lv_o = certify_split(e_lo, e_hi, outer_run, max_seconds, (e_hi - e_lo) / 16)
+            res["outer_split"] = {"first_attempt": first_fail, "n_subslabs": len(lv_o),
+                                  "subslabs": [[a_, b_, c_, r_.get("worst_live")] for a_, b_, c_, r_ in lv_o],
+                                  "seconds": time.time() - t1,
+                                  "n_leaves": sum(r_.get("n_leaves", 0) for *_, r_ in lv_o)}
+            res["certified"] = all(c_ for _, _, c_, _ in lv_o)
+            lv = []                                       # leaves of split units are not exported (re-search is primary)
         if export is not None and lv:
             arr = np.concatenate(lv)
             path = OUT / f"{export}_k{k:03d}.npz"
-            np.savez_compressed(path, **{f: np.ascontiguousarray(arr[f]) for f in arr.dtype.names})
+            np.savez_compressed(path, check_status=np.array(CHECK_LABEL["check_status"]),
+                                **{f: np.ascontiguousarray(arr[f]) for f in arr.dtype.names})
             (OUT / f"{export}_k{k:03d}.meta.json").write_text(json.dumps({"eps": [e_lo, e_hi], "A": [A_lo, A_hi],
-                "centre": list(map(float, c)), "regime": regime, "fields": list(arr.dtype.names)}))
+                "centre": list(map(float, c)), "regime": regime, "fields": list(arr.dtype.names), **CHECK_LABEL}))
             res["export"] = {"file": path.name, "bytes": path.stat().st_size, "sha256": _sha(path),
                              "leaves": int(len(arr)), "bytes_per_leaf": path.stat().st_size / max(1, len(arr))}
         if do_links:
@@ -968,7 +993,7 @@ def _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export, do_l
                            "seconds": time.time() - t1}
             if rb:
                 path = OUT / f"{export}_k{k:03d}_ring.npz"
-                np.savez_compressed(path, boxes=np.concatenate(rb))
+                np.savez_compressed(path, boxes=np.concatenate(rb), check_status=np.array(CHECK_LABEL["check_status"]))
                 res["ring"]["export"] = {"file": path.name, "bytes": path.stat().st_size, "sha256": _sha(path),
                                          "boxes": int(sum(len(b_) for b_ in rb))}
         res["rss_gb"] = rss_gb()
@@ -977,7 +1002,10 @@ def _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export, do_l
         return res
 
 
-def run_probes(spec_file, out_name):
+CHECK_LABEL = {"check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"}
+
+
+def run_probes(spec_file, out_name, worker=0, n_workers=1):
     """spec_file: JSON list of {e_lo, e_hi, regime, fracs, n_sub, export?, links?, switch?}.  Resumable at the UNIT
     level (u2_store): every A-sub-interval unit and every switch sub-slab is stored atomically on completion under
     u2_sample/units/<out_name>/, and a restart skips them; the per-spec JSONL line is a summary written last."""
@@ -985,17 +1013,19 @@ def run_probes(spec_file, out_name):
     x, y = pop()
     cons = json.loads((RESULTS / "uniform_eps" / "constants.json").read_text())
     specs = json.loads(Path(spec_file).read_text())
-    out = OUT / f"{out_name}.jsonl"
+    out = OUT / (f"{out_name}.jsonl" if n_workers == 1 else f"{out_name}_w{worker}.jsonl")
     done = set()
     if out.exists():
         done = {json.loads(l)["spec_index"] for l in out.read_text().splitlines() if l.strip()}
     for i, sp in enumerate(specs):
+        if i % n_workers != worker:                       # this worker's share of the slabs
+            continue
         if i in done:
             continue
         t0 = time.time()
-        rec = {"spec_index": i, "spec": sp}
+        rec = {"spec_index": i, "spec": sp, **CHECK_LABEL}
         try:
-            ust = UnitStore(OUT / "units" / out_name)
+            ust = UnitStore(OUT / "units" / out_name, extra=CHECK_LABEL)
             if sp.get("A_rel"):                           # item 4: widening the window (outer exclusion only, sampled)
                 rec["wide"] = probe_wide(sp["e_lo"], sp["e_hi"], sp["regime"], sp["A_rel"], x, y, cons, ust,
                                          f"s{i:03d}_wide", sp.get("max_seconds", 300.0))
@@ -1014,7 +1044,7 @@ def run_probes(spec_file, out_name):
                 exl = sw.pop("export_leaves", [])
                 if sp.get("export") and exl:
                     path = OUT / f"{sp['export']}_switch.json"
-                    path.write_text(json.dumps(exl, default=float))
+                    path.write_text(json.dumps({**CHECK_LABEL, "sub_slabs": exl}, default=float))
                     sw["export"] = {"file": path.name, "bytes": path.stat().st_size, "sha256": _sha(path)}
                 rec["switch"] = sw
         except Exception as ex:                       # a probe that breaks is recorded, not fatal
@@ -1568,7 +1598,7 @@ if __name__ == "__main__":
         print(f"REFUSED: {ex}", flush=True)
         sys.exit(3)
     if sys.argv[1] == "probes":
-        run_probes(sys.argv[2], sys.argv[3])
+        run_probes(sys.argv[2], sys.argv[3], *(int(v) for v in sys.argv[4:6]))
     elif sys.argv[1] == "stages":
         rec = run_stages(float(sys.argv[2]), float(sys.argv[3]), sys.argv[4], float(sys.argv[5]), int(sys.argv[6]),
                          stages=tuple(sys.argv[7].split(",")) if len(sys.argv) > 7 else ("outer", "ring", "pd", "switch"))

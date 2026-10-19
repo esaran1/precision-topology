@@ -19,9 +19,11 @@ def _safe(key):
 
 
 class UnitStore:
-    def __init__(self, root):
+    def __init__(self, root, extra=None):
+        """extra: fields merged into every stored record (e.g. the check status label)."""
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
+        self.extra = dict(extra or {})
 
     def path(self, key):
         return self.root / f"{_safe(key)}.json"
@@ -40,6 +42,8 @@ class UnitStore:
 
     def put(self, key, rec):
         p = self.path(key)
+        if self.extra and isinstance(rec, dict):
+            rec = {**rec, **self.extra}
         fd, tmp = tempfile.mkstemp(prefix=".tmp_", suffix=".json", dir=self.root)
         try:
             with os.fdopen(fd, "w") as fh:

@@ -1945,9 +1945,132 @@ def _u2_curv_eps(obj, W, B, A_hi, cshift):
     return hi_(A * A * s1 / (4 * obj.n) + A * s2 / obj.n)
 
 
+def _absmax(b):
+    """An upper bound of |v| over the ball b (an exact Arb endpoint)."""
+    a, c = abs(lo_(b)), abs(hi_(b))
+    return a if bool(a >= c) else c
+
+
+def _u2_point_grads(xf, yf, P, Q, A, act, cA=0.0, cE=0.0):
+    """At the point (P, Q) (balls), A (ball) and every ε in act.E: an Arb bracket of b* and balls of ∂_pL*, ∂_qL*,
+    ∂_AL*, ∂_εL* by the envelope theorem.  ∂_A L* = mean((σ − y)(φ − cA)) and ∂_ε L* = A·mean((σ − y)(φ_ε − cE)) for
+    any constants cA, cE, because mean(σ(z) − y) = 0 at b*.  Returns (Bb, [gp, gq, gA, gE]) or (None, None)."""
+    obj = Objective(xf, yf, A, None, act=act)
+    Bb, _ = obj.b_bracket(P, Q)
+    if Bb is None:
+        return None, None
+    g = [arb(0)] * 4
+    cA, cE = arb(repr(float(cA))), arb(repr(float(cE)))
+    for xi, yi in zip(obj.X, obj.Y):
+        sg = P * xi + Q
+        f0 = act.f(sg)
+        z = A * f0 + Bb
+        res = 1 / (1 + (-z).exp()) - yi
+        f1 = act.df(sg)
+        g[0] += res * A * f1 * xi
+        g[1] += res * A * f1
+        g[2] += res * (f0 - cA)
+        g[3] += res * A * (act.de(sg) - cE)
+    return Bb, [v / obj.n for v in g]
+
+
+def u2_coupled_lower(xf, yf, pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, pb, qb, xs=None, ys=None):
+    """The coupled second-order bound of math note §23 (Proposition 23.3): for every (p, q) in the cell [pc ± hp] ×
+    [qc ± hq], A in [A_lo, A_hi] and ε in [e_lo, e_hi],
+        D := L*_ε(p, q; A) − L*_ε(pb, qb; A)
+          >= D(v_c) − |∂_pD|h_p − |∂_qD|h_q − |∂_AD|h_A − |∂_εD|h_ε − ½(M_comp + M_br)
+    with everything at the centre v_c = (pc, qc, A_c, ε_c) enclosed in Arb at that point, and the remainders
+      M_comp = mean_i sup_B Σ_ab |∂_ab z̃_i| h_a h_b  (z̃ = A(φ − φ(q_c; ε)) + b′, Lemma 23.2(i)),
+      M_br   = ¼ mean_i sup (h_A|φ_i − c1| + h_ε A_hi|φ_ε,i − c2|)² + mean_i sup (2h_A h_ε|φ_ε,i| + h_ε² A_hi|φ_εε,i|)
+               (Lemma 23.2(ii), at the branch point),
+    every sup a ball evaluation over the cell's σ-balls, the A-ball and the ε-ball (U2Act; no envelope).
+    Returns an Arb lower bound of D over the box (an exact endpoint), or None if a bracket fails."""
+    xs = xs if xs is not None else [arb(float(v)) for v in xf]
+    ys = ys if ys is not None else [int(v) for v in yf]
+    n = len(xs)
+    Ac, ec = 0.5 * (A_lo + A_hi), 0.5 * (e_lo + e_hi)
+    hA, he = 0.5 * (A_hi - A_lo), 0.5 * (e_hi - e_lo)
+    Apt, Ept, Ab, Eb = arb(repr(float(Ac))), arb(repr(float(ec))), _ival(A_lo, A_hi), _ival(e_lo, e_hi)
+    sc = pc * np.asarray(xf, float) + qc
+    sb = pb * np.asarray(xf, float) + qb
+    shift_c = float(np.median(U2Act(Ept).np_f(sc)))
+    shift_b = float(np.median(U2Act(Ept).np_f(sb)))
+    # centre values: competitor lower bound, branch upper bound, gradients (Lemma 23.1)
+    oc = Objective(xf, yf, Apt, None, act=U2Act(Ept, shift_c))
+    Lc = oc.lower_bound(pc, qc, 0.0, 0.0)
+    ob = Objective(xf, yf, Apt, None, act=U2Act(Ept, shift_b))
+    Bbr, _ = ob.b_bracket(arb(repr(float(pb))), arb(repr(float(qb))))
+    if Lc is None or Bbr is None:
+        return None
+    Lb = arb(hi_(ob.upper_at(pb, qb, float(Bbr.mid()))))
+    actp = U2Act(Ept)
+    fe_c = [float(v.mid()) for v in (actp.de(arb(repr(float(t)))) for t in sc[::40])]
+    cEc = float(np.median(fe_c))
+    fe_b = [float(v.mid()) for v in (actp.de(arb(repr(float(t)))) for t in sb[::40])]
+    cEb = float(np.median(fe_b))
+    _, gc = _u2_point_grads(xf, yf, arb(repr(float(pc))), arb(repr(float(qc))), Apt, actp, shift_c, cEc)
+    _, gb = _u2_point_grads(xf, yf, arb(repr(float(pb))), arb(repr(float(qb))), Apt, actp, shift_b, cEb)
+    if gc is None or gb is None:
+        return None
+    first = _absmax(gc[0]) * arb(hp) + _absmax(gc[1]) * arb(hq) + _absmax(gc[2] - gb[2]) * arb(hA) \
+        + _absmax(gc[3] - gb[3]) * arb(he)
+    # competitor remainder, Lemma 23.2(i), with the per-cell shift c(ε) = φ(q_c; ε)
+    actE = U2Act(Eb)
+    Qc = arb(repr(float(qc)))
+    fe_q, fee_q = actE.de(Qc), actE.dee(Qc)
+    P, Q = _ival(pc - hp, pc + hp), _ival(qc - hq, qc + hq)
+    Mc = arb(0)
+    AhB = arb(repr(float(A_hi)))
+    for xi in xs:
+        sg = P * xi + Q
+        d = abs(xi) * arb(hp) + arb(hq)
+        t = AhB * _absmax(actE.d2f(sg)) * d * d + 2 * _absmax(actE.df(sg)) * d * arb(hA) \
+            + 2 * AhB * _absmax(actE.dse(sg)) * d * arb(he) + 2 * _absmax(actE.de(sg) - fe_q) * arb(hA) * arb(he) \
+            + AhB * _absmax(actE.dee(sg) - fee_q) * arb(he) * arb(he)
+        Mc += t
+    Mc = Mc / n
+    # branch remainder, Lemma 23.2(ii)
+    Pb, Qb = arb(repr(float(pb))), arb(repr(float(qb)))
+    c1 = shift_b
+    Mb1 = arb(0); Mb2 = arb(0)
+    for xi in xs:
+        sg = Pb * xi + Qb
+        u = arb(hA) * _absmax(actE.f(sg) - arb(repr(c1))) + arb(he) * AhB * _absmax(actE.de(sg) - arb(repr(cEb)))
+        Mb1 += u * u
+        Mb2 += 2 * arb(hA) * arb(he) * _absmax(actE.de(sg)) + arb(he) * arb(he) * AhB * _absmax(actE.dee(sg))
+    Mb = Mb1 / (4 * n) + Mb2 / n
+    D = arb(lo_(Lc)) - Lb - first - (Mc + Mb) / 2
+    return lo_(D)
+
+
+def u2_ring_fast_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=0.05, rho_out=0.15, side=0.0125, boxes=None,
+                     fast_depth=2):
+    """Ring with the fast direct test first (u2_ring_arb: the profiled gradient's Arb ball over box × A × ε, split up to
+    fast_depth) and the first-order 3-D form (u2_ring3d_arb) only for the tiles the fast test leaves open."""
+    t0 = time.time()
+    if boxes is None:
+        n = int(round(2 * rho_out / side))
+        g = -rho_out + (np.arange(n) + 0.5) * side
+        boxes = [(float(a), float(b), side / 2) for a in g for b in g
+                 if max(abs(a), abs(b)) + side / 2 > rho_in + 1e-12]
+    n_fast, n_slow, left = 0, 0, []
+    for bx in boxes:
+        r = u2_ring_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=rho_in, rho_out=rho_out, boxes=[bx],
+                        max_depth=fast_depth)
+        if r["certified"]:
+            n_fast += 1
+            continue
+        r3 = u2_ring3d_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=rho_in, rho_out=rho_out, boxes=[bx])
+        n_slow += 1
+        if not r3["certified"]:
+            left.append(bx)
+    return {"certified": not left, "tiles": len(boxes), "fast": n_fast, "fallback": n_slow, "left": len(left),
+            "first_left": left[:3], "seconds": time.time() - t0}
+
+
 def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, rho=0.15, max_depth=10,
                  max_evals=200_000, region=None, n_eps=1, B_table=None, B_full=None, target=0.0, witness_from_depth=2,
-                 eps_split_from_depth=4, max_eps_depth=8):
+                 eps_split_from_depth=4, max_eps_depth=8, use_coupled=True):
     """Re-search of the outer exclusion of one U2 unit, in Arb: for every θ in the regime's domain outside the closed rho
     box around θ_c, every A in [A_lo, A_hi] and every ε in [e_lo, e_hi]:  L*_ε(θ; A) − L*_ε(θ_c; A) > target.
     The ε-interval is split into n_eps closed pieces; on each piece E = [ε_c ± h_ε] a cell passes by
@@ -1980,9 +2103,10 @@ def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, r
         assert bool(arb(qh0) * arb(e_lo).sqrt() >= arb.pi()) or region is not None
     edges = [e_lo + (e_hi - e_lo) * i / n_eps for i in range(n_eps)] + [e_hi]
     stats = {"evals": 0, "direct": 0, "taylor": 0, "iso": 0, "full": 0, "dropped_in_box": 0, "dropped_outside_K": 0,
-             "max_depth": 0, "witness_tries": 0, "eps_splits": 0, "max_eps_depth": 0}
+             "max_depth": 0, "witness_tries": 0, "eps_splits": 0, "max_eps_depth": 0, "coupled": 0}
     witness, unresolved, marg = None, [], math.inf
     cache = {}
+    xs_arb = [arb(float(v)) for v in xf]; ys_int = [int(v) for v in yf]
 
     def branch(el, eh):
         """Branch-side Arb quantities on the closed ε-piece [el, eh] (cached)."""
@@ -2056,9 +2180,15 @@ def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, r
         stats["max_eps_depth"] = max(stats["max_eps_depth"], ed)
         sc = pc * xf + qc
         ok = False
+        if use_coupled:                                   # Proposition 23.3 (math note §23)
+            el_, eh_ = el, eh
+            cl = u2_coupled_lower(xf, yf, pc, qc, hp, hq, A_lo, A_hi, el_, eh_, p0, q0, xs=xs_arb, ys=ys_int)
+            if cl is not None and bool(cl > arb(target)):
+                stats["coupled"] += 1; ok = True
+                marg = min(marg, float_down(cl))
         cE = U2Act(br["Eb"]).np_f(sc)
         o = Objective(xf, yf, Ab, None, act=U2Act(br["Eb"], float(np.median(cE))))
-        lb = o.lower_bound(pc, qc, hp, hq)
+        lb = o.lower_bound(pc, qc, hp, hq) if not ok else None
         if lb is not None and bool(lb > br["br_E"] + arb(target)):
             stats["direct"] += 1; ok = True
             marg = min(marg, float_down(lo_(lb) - hi_(br["br_E"])))
@@ -2338,11 +2468,33 @@ def u2_active_pair(P, Q, act):
     def win(x1, x2):
         return _ival(min(lo_(P * x1 + Q), lo_(P * x2 + Q)), max(hi_(P * x1 + Q), hi_(P * x2 + Q)))
     I, On, Op = win(-0.8, 0.8), win(-2.0, -1.2), win(1.2, 2.0)
-    ok = bool(act.d2f(I) > 0) and bool(act.d2f(On) < 0) and bool(act.df(Op) > 0)
+    # inner window: φ decreasing on [σ_lo, c] and convex on [c, σ_hi] (c = 0.3) gives its max at an end; when σ_lo >= c
+    # convexity alone suffices.  (φ_σ < 0 on |σ| < σ* = arccos(1/a)/√ε, which exceeds 1.1 for every ε <= 0.6.)
+    c_ = arb("0.3")
+
+    def _all_sign(fn, a, b, sgn, pieces=16):
+        """fn > 0 (sgn = 1) or < 0 (sgn = −1) on [a, b], checked on `pieces` closed sub-intervals (ball evaluation)."""
+        if not bool(b > a):
+            return True
+        for j in range(pieces):
+            v = fn(_ival(a + (b - a) * j / pieces, a + (b - a) * (j + 1) / pieces))
+            if not (bool(v > 0) if sgn > 0 else bool(v < 0)):
+                return False
+        return True
+    if bool(lo_(I) >= c_):
+        inner_ok = _all_sign(act.d2f, lo_(I), hi_(I), 1)
+    else:
+        inner_ok = _all_sign(act.df, lo_(I), c_, -1) and (bool(hi_(I) <= c_) or _all_sign(act.d2f, c_, hi_(I), 1))
+    conds = {"inner_convex": inner_ok, "neg_outer_concave": _all_sign(act.d2f, lo_(On), hi_(On), -1),
+             "pos_outer_increasing": _all_sign(act.df, lo_(Op), hi_(Op), 1)}
+    u2_active_pair.last = conds
+    ok = all(conds.values())
     phi = lambda xx: act.f(P * arb(repr(xx)) + Q)
     I_act, I_oth = phi(0.8), phi(-0.8)
     O_act, O_m2, O_p1 = phi(-1.2), phi(-2.0), phi(1.2)
-    ok = ok and bool(I_act > I_oth) and bool(O_act < O_m2) and bool(O_act < O_p1)
+    dom = {"I_dominates": bool(I_act > I_oth), "O_below_m2": bool(O_act < O_m2), "O_below_p1": bool(O_act < O_p1)}
+    u2_active_pair.last = {**conds, **dom}
+    ok = ok and all(dom.values())
     return ok, O_act - I_act
 
 
@@ -2413,7 +2565,7 @@ def _u2_dE_arb(X, xs, ys, act, A_par=None, with_gap=False):
     return D
 
 
-def u2_krawczyk_shear_arb(xs, ys, xt, R, X1, e_lo, e_hi, A_par=None, with_gap=True):
+def u2_krawczyk_shear_arb(xs, ys, xt, R, X1, e_lo, e_hi, A_par=None, with_gap=True, want_kmax=False):
     """Sheared Krawczyk in Arb: for every ε in E = [e_lo, e_hi], with x̃(ε) = xt + (ε − ε_c)·X1 (X1 any float vector,
     e.g. the producer's predicted ε-dependence -- the test is valid for every choice), the offset box [−R, R] around
     x̃(ε) contains a unique zero of Φ(·; ε) if
@@ -2433,18 +2585,39 @@ def u2_krawczyk_shear_arb(xs, ys, xt, R, X1, e_lo, e_hi, A_par=None, with_gap=Tr
     Xb = [Xs[i] + arb(0, float(R[i])) for i in range(k)]
     _, Jb = u2_system_arb(Xb, xs, ys, act_E, A_par=A_par, with_gap=with_gap)
     Jm = np.array([[_mid(Jb[i][j]) for j in range(k)] for i in range(k)])
-    if not np.isfinite(Jm).all():
-        return False, Xb
+    if not np.isfinite(Jm).all() or abs(np.linalg.det(Jm)) < 1e-300:
+        return (False, Xb, [math.inf] * k) if want_kmax else (False, Xb)
     Y = np.linalg.inv(Jm)
     Ya = [[arb(repr(float((Y[i, j])))) for j in range(k)] for i in range(k)]
     ok = True
+    kmax = []
     for i in range(k):
         acc = -sum((Ya[i][j] * Ft[j] for j in range(k)), arb(0))
         for j in range(k):
             cij = arb(1 if i == j else 0) - sum((Ya[i][l] * Jb[l][j] for l in range(k)), arb(0))
             acc += cij * arb(0, float(R[j]))
         ok = ok and bool(lo_(acc) > -arb(float(R[i]))) and bool(hi_(acc) < arb(float(R[i])))
+        kmax.append(float_up(_absmax(acc)) if acc.is_finite() else math.inf)
+    if want_kmax:
+        return ok, Xb, kmax
     return ok, Xb
+
+
+def u2_krawczyk_shear_inflate(xs, ys, xt, X1, e_lo, e_hi, A_par=None, with_gap=True, r0=1e-7, iters=15, cap=0.05):
+    """The checker's OWN radii: start from r0 and grow r to 1.5 × the Krawczyk image until the test contracts (at most
+    `iters` times, radii <= cap).  Only the centre xt and the shear X1 are taken from the producer (as data); any
+    centre and shear give a valid test.  Returns (ok, radii, hull balls)."""
+    k = len(xt)
+    r = [float(v) for v in r0] if isinstance(r0, (list, tuple)) else [float(r0)] * k
+    Xb = None
+    for _ in range(iters):
+        ok, Xb, km = u2_krawczyk_shear_arb(xs, ys, xt, r, X1, e_lo, e_hi, A_par=A_par, with_gap=with_gap, want_kmax=True)
+        if ok:
+            return True, r, Xb
+        r = [max(r[i], 1.5 * km[i]) for i in range(k)]
+        if not all(math.isfinite(v) for v in r) or max(r) > cap:
+            break
+    return False, r, Xb
 
 
 def u2_gap_shear_arb(xt, R, X1, e_lo, e_hi):
@@ -2456,16 +2629,24 @@ def u2_gap_shear_arb(xt, R, X1, e_lo, e_hi):
     Ph = P + arb(0, abs(he * X1[0])); Qh = Q + arb(0, abs(he * X1[1]))
     sO, sI = (lambda PP, QQ: (QQ - arb("1.2") * PP, QQ + arb("0.8") * PP))(P, Q)
     hO, hI = Qh - arb("1.2") * Ph, Qh + arb("0.8") * Ph
-    G0 = act_c.f(sO) - act_c.f(sI)
+    # G at ε_c on the box in centred (mean-value) form: G(centre) + ∇G(box)·[−R, R]
+    Pc, Qc = arb(repr(float(xt[0]))), arb(repr(float(xt[1])))
+    Gc = act_c.f(Qc - arb("1.2") * Pc) - act_c.f(Qc + arb("0.8") * Pc)
+    gpb = -arb("1.2") * act_c.df(sO) - arb("0.8") * act_c.df(sI)
+    gqb = act_c.df(sO) - act_c.df(sI)
+    G0_mv = Gc + gpb * arb(0, float(R[0])) + gqb * arb(0, float(R[1]))
+    G0_bx = act_c.f(sO) - act_c.f(sI)
+    G0 = G0_mv if bool(G0_mv.rad() < G0_bx.rad()) else G0_bx
     gp = -arb("1.2") * act_E.df(hO) - arb("0.8") * act_E.df(hI)
     gq = act_E.df(hO) - act_E.df(hI)
     T = gp * arb(repr(float((X1[0])))) + gq * arb(repr(float((X1[1])))) + act_E.de(hO) - act_E.de(hI)
     return G0 + arb(0, he) * T
 
 
-def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube):
+def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
     """The switch of one ε-slab with SHEARED boxes (U2_design.md, item 3), replayed from the producer's published data
-    (Z = {xt, R, X1} for (p, q, b, A); rows = [{A_lo, A_hi, xt, R, X1}] tiling J_tube), all in Arb:
+    (Z = {xt, X1} for (p, q, b, A); rows = [{A_lo, A_hi, xt, X1}] tiling J_tube; the producer's radii are ignored: the
+    checker inflates its own, u2_krawczyk_shear_inflate), all in Arb:
       Z: sheared Krawczyk (unique zero of (∇L, G) in Z(ε) for every ε) and the active pair valid on Z's hull;
       each row: sheared Krawczyk with A as a ball (the unique critical point θ*(A, ε) in the row box for every ε);
       Z's A-range moves: L(ε) = A_Z − R_A + (ε − ε_c)A′, U(ε) = A_Z + R_A + (ε − ε_c)A′ (A′ = Z's X1[3]); the slab is cut
@@ -2476,17 +2657,23 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube):
     t0 = time.time()
     xs = [arb(float(v)) for v in np.asarray(x, float)]; ys = [int(v) for v in np.asarray(y, float)]
     ec, he = 0.5 * (e_lo + e_hi), 0.5 * (e_hi - e_lo)
-    zt, RZ, X1Z = Z["xt"], Z["R"], Z["X1"]
-    okZ, XbZ = u2_krawczyk_shear_arb(xs, ys, zt, RZ, X1Z, e_lo, e_hi, with_gap=True)
+    zt, X1Z = Z["xt"], Z["X1"]                         # the producer's radii Z["R"] are NOT used
+    # start from the §16.3 switch-box radii (a method constant of this checker, not the producer's output) and inflate
+    okZ, RZ, XbZ = u2_krawczyk_shear_inflate(xs, ys, zt, X1Z, e_lo, e_hi, with_gap=True, r0=[6e-4, 6e-4, 2e-4, 5e-4])
     actZ, _ = u2_active_pair(XbZ[0], XbZ[1], U2Act(_ival(e_lo, e_hi)))
+    actZ_why = dict(getattr(u2_active_pair, "last", {}))
     cover = rows[0]["A_lo"] == J_tube[0] and rows[-1]["A_hi"] == J_tube[1] and \
         all(rows[i]["A_hi"] == rows[i + 1]["A_lo"] for i in range(len(rows) - 1))
     A_Z, R_A, A1 = zt[3], RZ[3], X1Z[3]
     bad = []
-    for r in rows:
-        xt, R, X1 = r["xt"], r["R"], r["X1"]
+    queue = [(r, 0) for r in rows]
+    n_split = 0
+    while queue:
+        r, rdepth = queue.pop(0)
+        xt, X1 = r["xt"], r["X1"]                      # the producer's radii r["R"] are NOT used
         a_lo, a_hi = r["A_lo"], r["A_hi"]
-        ok, _ = u2_krawczyk_shear_arb(xs, ys, xt, R, X1, e_lo, e_hi, A_par=_ival(a_lo, a_hi), with_gap=False)
+        ok, R, _ = u2_krawczyk_shear_inflate(xs, ys, xt, X1, e_lo, e_hi, A_par=_ival(a_lo, a_hi), with_gap=False)
+        why = None if ok else "krawczyk"
         if ok:
             cuts = [e_lo, e_hi]
             if A1 != 0:
@@ -2514,6 +2701,8 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube):
                         dlt = abs(arb(repr(float(xt[i]))) - arb(repr(float(zt[i]))) + arb(repr(float(em - ec))) * (arb(repr(float(X1[i]))) - arb(repr(float(X1Z[i]))))) \
                             + arb(repr(float(ho))) * abs(arb(repr(float(X1[i]))) - arb(repr(float(X1Z[i])))) + arb(float(R[i]))
                         ok = ok and bool(dlt < arb(float(RZ[i])))
+                    if not ok and why is None:
+                        why = "in_Z"
                 for need_sign in signs:
                     if not ok:
                         break
@@ -2522,11 +2711,23 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube):
                     act_ok, _ = u2_active_pair(arb(repr(float(xm[0]))) + arb(0, float(R[0]) + abs(ho * X1[0])),
                                                arb(repr(float(xm[1]))) + arb(0, float(R[1]) + abs(ho * X1[1])),
                                                U2Act(_ival(lo_o, hi_o)))
+                    if not act_ok and why is None:
+                        why = "active"
+                    elif not (bool(G < 0) if need_sign < 0 else bool(G > 0)) and why is None:
+                        why = "sign"
                     ok = ok and act_ok and (bool(G < 0) if need_sign < 0 else bool(G > 0))
+        if not ok and why in ("sign", "in_Z") and rdepth < max_row_depth:
+            # the checker's own refinement: halve the row's A-range (same data centre and shear; Krawczyk re-inflates)
+            m_ = 0.5 * (a_lo + a_hi)
+            queue[:0] = [({**r, "A_lo": a_lo, "A_hi": m_}, rdepth + 1), ({**r, "A_lo": m_, "A_hi": a_hi}, rdepth + 1)]
+            n_split += 1
+            continue
         if not ok:
-            bad.append((a_lo, a_hi))
+            bad.append((a_lo, a_hi, why))
     res = {"Z_krawczyk": bool(okZ), "Z_active_pair": bool(actZ), "covered": bool(cover), "rows": len(rows),
-           "n_bad": len(bad), "bad_rows": bad[:10], "seconds": time.time() - t0}
+           "n_bad": len(bad), "bad_rows": bad[:10], "seconds": time.time() - t0,
+           "bad_reasons": {k: sum(1 for b_ in bad if b_[2] == k) for k in ("krawczyk", "in_Z", "active", "sign")},
+           "Z_active_pair_conditions": actZ_why, "Z_radii": [float(v) for v in RZ], "row_splits": n_split}
     res["pass"] = bool(okZ and actZ and cover and not bad)
     return res
 

@@ -1,0 +1,86 @@
+[
+ {
+  "B_table_seconds": 1.4383180141448975
+ },
+ {
+  "unit": "run1_s26_k000.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8935786965166873,
+    0.8952710804116053
+   ],
+   "centre": [
+    1.422209484766247,
+    1.1872486646264193
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 7477,
+   "direct": 68,
+   "taylor": 0,
+   "iso": 0,
+   "full": 0,
+   "dropped_in_box": 13,
+   "dropped_outside_K": 0,
+   "max_depth": 7,
+   "witness_tries": 0,
+   "eps_splits": 474,
+   "max_eps_depth": 6,
+   "coupled": 5317,
+   "min_margin_certified": 7.934597535711553e-05,
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "n_eps": 1,
+   "A": [
+    0.8935786965166873,
+    0.8952710804116053
+   ],
+   "regime": "O",
+   "centre": [
+    1.422209484766247,
+    1.1872486646264193
+   ],
+   "rho": 0.15,
+   "seconds": 6080.765200853348,
+   "seconds_per_eval": 0.8132626990575562
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 18.874663829803467,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036864577792584896
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.474410057067871
+  },
+  "rss_gb": 0.043426513671875
+ }
+]

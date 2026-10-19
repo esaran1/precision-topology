@@ -1,0 +1,4165 @@
+[
+ {
+  "B_table_seconds": 1.4043049812316895
+ },
+ {
+  "unit": "run1_s25_k000.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8858521445247568,
+    0.8875298947984779
+   ],
+   "centre": [
+    1.4294174666286714,
+    1.1927445759849733
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28397536277770996,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035496920347213745
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.432441234588623
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k001.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8875298947984779,
+    0.8892076450721991
+   ],
+   "centre": [
+    1.428985082132563,
+    1.1922902577627235
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27584266662597656,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03448033332824707
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.508102893829346
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k002.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8892076450721991,
+    0.8908853953459202
+   ],
+   "centre": [
+    1.428554061347242,
+    1.1918373944107574
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29601097106933594,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03700137138366699
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 22.3292076587677
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k003.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8908853953459202,
+    0.8925631456196413
+   ],
+   "centre": [
+    1.4281243978510831,
+    1.191385979236306
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27680516242980957,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.034600645303726196
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 22.12495493888855
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k004.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8925631456196413,
+    0.8942408958933624
+   ],
+   "centre": [
+    1.427696085263271,
+    1.1909360055883664
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2834141254425049,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03542676568031311
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.677141189575195
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k005.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8942408958933624,
+    0.8959186461670836
+   ],
+   "centre": [
+    1.427269117243475,
+    1.1904874668573737
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2914259433746338,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036428242921829224
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.82432198524475
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k006.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8959186461670836,
+    0.8975963964408047
+   ],
+   "centre": [
+    1.426843487491526,
+    1.190040356474874
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29065799713134766,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03633224964141846
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.921571016311646
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k007.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8975963964408047,
+    0.8992741467145258
+   ],
+   "centre": [
+    1.426419189747096,
+    1.1895946679132032
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2837190628051758,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03546488285064697
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.758745670318604
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k008.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.8992741467145258,
+    0.900951896988247
+   ],
+   "centre": [
+    1.4259962177893806,
+    1.1891503946851651
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28764986991882324,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035956233739852905
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.795634984970093
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k009.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.900951896988247,
+    0.902629647261968
+   ],
+   "centre": [
+    1.4255745654367853,
+    1.1887075303437165
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2883942127227783,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03604927659034729
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.739827871322632
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k010.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.902629647261968,
+    0.9043073975356892
+   ],
+   "centre": [
+    1.4251542265466148,
+    1.1882660684816515
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28661394119262695,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03582674264907837
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.765509843826294
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k011.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9043073975356892,
+    0.9059851478094103
+   ],
+   "centre": [
+    1.4247351950147629,
+    1.1878260027312917
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28815412521362305,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03601926565170288
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.772555112838745
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k012.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9059851478094103,
+    0.9076628980831315
+   ],
+   "centre": [
+    1.4243174647754098,
+    1.1873873267641788
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.286517858505249,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03581473231315613
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.439268112182617
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k013.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9076628980831315,
+    0.9093406483568526
+   ],
+   "centre": [
+    1.4239010298007184,
+    1.186950034290768
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2771189212799072,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0346398651599884
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.89875316619873
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k014.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9093406483568526,
+    0.9110183986305737
+   ],
+   "centre": [
+    1.423485884100534,
+    1.1865141190601256
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2966949939727783,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03708687424659729
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.825143575668335
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k015.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9110183986305737,
+    0.9126961489042948
+   ],
+   "centre": [
+    1.4230720217220896,
+    1.1860795748596322
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2767210006713867,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03459012508392334
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.839766025543213
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k016.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9126961489042948,
+    0.9143738991780159
+   ],
+   "centre": [
+    1.4226594367497103,
+    1.1856463955146819
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28572988510131836,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035716235637664795
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.654908895492554
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k017.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9143738991780159,
+    0.9160516494517371
+   ],
+   "centre": [
+    1.4222481233045232,
+    1.1852145748883918
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29448699951171875,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036810874938964844
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.72209405899048
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k018.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9160516494517371,
+    0.9177293997254582
+   ],
+   "centre": [
+    1.4218380755441684,
+    1.184784106881309
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2810490131378174,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03513112664222717
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 22.087419033050537
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k019.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9177293997254582,
+    0.9194071499991794
+   ],
+   "centre": [
+    1.4214292876625136,
+    1.1843549854311224
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29032230377197266,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03629028797149658
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.778693199157715
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k020.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9194071499991794,
+    0.9210849002729005
+   ],
+   "centre": [
+    1.4210217538893715,
+    1.1839272045123768
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28213024139404297,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03526628017425537
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.518712759017944
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k021.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9210849002729005,
+    0.9227626505466215
+   ],
+   "centre": [
+    1.420615468490219,
+    1.1835007581361907
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2824549674987793,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03530687093734741
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.784428119659424
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k022.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9227626505466215,
+    0.9244404008203427
+   ],
+   "centre": [
+    1.420210425765919,
+    1.1830756403499736
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2815251350402832,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0351906418800354
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.655513048171997
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k023.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9244404008203427,
+    0.9261181510940638
+   ],
+   "centre": [
+    1.4198066200524464,
+    1.1826518452371495
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2819859981536865,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035248249769210815
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.714386224746704
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k024.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9261181510940638,
+    0.927795901367785
+   ],
+   "centre": [
+    1.4194040457206154,
+    1.1822293669168813
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.26705193519592285,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.033381491899490356
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.682883977890015
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k025.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.927795901367785,
+    0.9294736516415061
+   ],
+   "centre": [
+    1.4190026971758078,
+    1.181808199543797
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2817831039428711,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03522288799285889
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.80101990699768
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k026.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9294736516415061,
+    0.9311514019152272
+   ],
+   "centre": [
+    1.4186025688577084,
+    1.1813883373077205
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29170799255371094,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03646349906921387
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.91775107383728
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k027.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9311514019152272,
+    0.9328291521889484
+   ],
+   "centre": [
+    1.418203655240037,
+    1.1809697744334022
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.30507683753967285,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.038134604692459106
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.70686388015747
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k028.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9328291521889484,
+    0.9345069024626694
+   ],
+   "centre": [
+    1.4178059508302878,
+    1.1805525051802548
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2767491340637207,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03459364175796509
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.444188117980957
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k029.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9345069024626694,
+    0.9361846527363906
+   ],
+   "centre": [
+    1.4174094501694687,
+    1.180136523842089
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28614091873168945,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03576761484146118
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.685537099838257
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k030.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9361846527363906,
+    0.9378624030101117
+   ],
+   "centre": [
+    1.4170141478318434,
+    1.179721824746853
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2880392074584961,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03600490093231201
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.553580045700073
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k031.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9378624030101117,
+    0.9395401532838329
+   ],
+   "centre": [
+    1.4166200384246763,
+    1.1793084022563758
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2783522605895996,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03479403257369995
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.444725036621094
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k032.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9395401532838329,
+    0.941217903557554
+   ],
+   "centre": [
+    1.4162271165879792,
+    1.1788962507661085
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27698302268981934,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03462287783622742
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.708335161209106
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k033.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.941217903557554,
+    0.9428956538312752
+   ],
+   "centre": [
+    1.4158353769942607,
+    1.1784853647048725
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2751579284667969,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03439474105834961
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.525780200958252
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k034.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9428956538312752,
+    0.9445734041049962
+   ],
+   "centre": [
+    1.4154448143482778,
+    1.1780757385346072
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28674983978271484,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035843729972839355
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.654610872268677
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k035.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9445734041049962,
+    0.9462511543787173
+   ],
+   "centre": [
+    1.4150554233867911,
+    1.177667366750122
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.3015401363372803,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.037692517042160034
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.61953091621399
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k036.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9462511543787173,
+    0.9479289046524385
+   ],
+   "centre": [
+    1.4146671988783184,
+    1.1772602438788484
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2736480236053467,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.034206002950668335
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.47683095932007
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k037.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9479289046524385,
+    0.9496066549261596
+   ],
+   "centre": [
+    1.4142801356228951,
+    1.176854364480595
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2748129367828369,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.034351617097854614
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.623767137527466
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k038.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9496066549261596,
+    0.9512844051998808
+   ],
+   "centre": [
+    1.4138942284518339,
+    1.1764497231473063
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2856111526489258,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03570139408111572
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.87381386756897
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s25_k039.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9512844051998808,
+    0.9529621554736019
+   ],
+   "centre": [
+    1.4135094722274884,
+    1.1760463145028222
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2960340976715088,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0370042622089386
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 21.469473123550415
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k000.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8935786965166873,
+    0.8952710804116053
+   ],
+   "centre": [
+    1.422209484766247,
+    1.1872486646264193
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27501487731933594,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03437685966491699
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.119291067123413
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k001.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8952710804116053,
+    0.8969634643065232
+   ],
+   "centre": [
+    1.421778552185276,
+    1.1867958489656598
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2811241149902344,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0351405143737793
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.295951843261719
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k002.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8969634643065232,
+    0.8986558482014412
+   ],
+   "centre": [
+    1.4213489771181758,
+    1.186344481659115
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2787787914276123,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03484734892845154
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.172991037368774
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k003.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8986558482014412,
+    0.9003482320963592
+   ],
+   "centre": [
+    1.4209207531909047,
+    1.1858945560635437
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29434919357299805,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036793649196624756
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.160965919494629
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k004.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9003482320963592,
+    0.9020406159912772
+   ],
+   "centre": [
+    1.4204938740697413,
+    1.1854460655769528
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2810699939727783,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03513374924659729
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.218253135681152
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k005.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9020406159912772,
+    0.9037329998861952
+   ],
+   "centre": [
+    1.4200683334609623,
+    1.1849990036382743
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2799959182739258,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03499948978424072
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.143269062042236
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k006.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9037329998861952,
+    0.905425383781113
+   ],
+   "centre": [
+    1.4196441251105265,
+    1.1845533637270467
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2864513397216797,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03580641746520996
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.246021032333374
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k007.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.905425383781113,
+    0.907117767676031
+   ],
+   "centre": [
+    1.4192212428037594,
+    1.1841091393630978
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2929396629333496,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0366174578666687
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.383028984069824
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k008.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.907117767676031,
+    0.908810151570949
+   ],
+   "centre": [
+    1.4187996803650427,
+    1.1836663241062317
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2815968990325928,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0351996123790741
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.187985181808472
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k009.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.908810151570949,
+    0.9105025354658669
+   ],
+   "centre": [
+    1.4183794316575062,
+    1.1832249115559177
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28888392448425293,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036110490560531616
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.1258649826049805
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k010.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9105025354658669,
+    0.9121949193607849
+   ],
+   "centre": [
+    1.417960490582722,
+    1.182784895350983
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2903139591217041,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03628924489021301
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.203986883163452
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k011.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9121949193607849,
+    0.9138873032557029
+   ],
+   "centre": [
+    1.4175428510804018,
+    1.1823462691693076
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2928619384765625,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03660774230957031
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.0820300579071045
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k012.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9138873032557029,
+    0.9155796871506209
+   ],
+   "centre": [
+    1.4171265071280978,
+    1.181909026727522
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28555917739868164,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035694897174835205
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.230924129486084
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k013.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9155796871506209,
+    0.9172720710455389
+   ],
+   "centre": [
+    1.4167114527409053,
+    1.1814731617807082
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29450511932373047,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03681313991546631
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.159903049468994
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k014.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9172720710455389,
+    0.9189644549404568
+   ],
+   "centre": [
+    1.4162976819711688,
+    1.1810386681221037
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28995609283447266,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03624451160430908
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.2001800537109375
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k015.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9189644549404568,
+    0.9206568388353747
+   ],
+   "centre": [
+    1.4158851889081907,
+    1.1806055395828061
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.272014856338501,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03400185704231262
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.152401924133301
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k016.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9206568388353747,
+    0.9223492227302927
+   ],
+   "centre": [
+    1.415473967677943,
+    1.180173770031484
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28841114044189453,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036051392555236816
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.184129953384399
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k017.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9223492227302927,
+    0.9240416066252106
+   ],
+   "centre": [
+    1.415064012442781,
+    1.1797433533740873
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2906191349029541,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03632739186286926
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.197487831115723
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k018.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9240416066252106,
+    0.9257339905201286
+   ],
+   "centre": [
+    1.4146553174011594,
+    1.179314283553561
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29486513137817383,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03685814142227173
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.1700968742370605
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k019.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9257339905201286,
+    0.9274263744150466
+   ],
+   "centre": [
+    1.414247876787353,
+    1.1788865545495637
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28441286087036133,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035551607608795166
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.238687038421631
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k020.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9274263744150466,
+    0.9291187583099646
+   ],
+   "centre": [
+    1.4138416848711781,
+    1.178460160378186
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28957700729370117,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036197125911712646
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.16100001335144
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k021.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9291187583099646,
+    0.9308111422048826
+   ],
+   "centre": [
+    1.4134367359577171,
+    1.1780350950916716
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27817296981811523,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.034771621227264404
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.178548812866211
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k022.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9308111422048826,
+    0.9325035260998005
+   ],
+   "centre": [
+    1.4130330243870453,
+    1.177611352778144
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2917900085449219,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036473751068115234
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.1234290599823
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k023.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9325035260998005,
+    0.9341959099947185
+   ],
+   "centre": [
+    1.4126305445339604,
+    1.1771889275613314
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2848501205444336,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0356062650680542
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.260515213012695
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k024.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9341959099947185,
+    0.9358882938896365
+   ],
+   "centre": [
+    1.4122292908077163,
+    1.1767678136002975
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2947359085083008,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.0368419885635376
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.084649085998535
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k025.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9358882938896365,
+    0.9375806777845543
+   ],
+   "centre": [
+    1.4118292576517555,
+    1.1763480050891733
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2793760299682617,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.034922003746032715
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.295475006103516
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k026.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9375806777845543,
+    0.9392730616794723
+   ],
+   "centre": [
+    1.4114304395434472,
+    1.1759294962568905
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29199695587158203,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.036499619483947754
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.269176959991455
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k027.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9392730616794723,
+    0.9409654455743903
+   ],
+   "centre": [
+    1.4110328309938267,
+    1.1755122813669197
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29613184928894043,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.037016481161117554
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.1003429889678955
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k028.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9409654455743903,
+    0.9426578294693083
+   ],
+   "centre": [
+    1.410636426547338,
+    1.1750963547170088
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28258800506591797,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035323500633239746
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.211606025695801
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k029.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9426578294693083,
+    0.9443502133642263
+   ],
+   "centre": [
+    1.4102412207815762,
+    1.1746817106389247
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.3002300262451172,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03752875328063965
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.362847089767456
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k030.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9443502133642263,
+    0.9460425972591442
+   ],
+   "centre": [
+    1.4098472083070361,
+    1.1742683434981973
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2804291248321533,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035053640604019165
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.23807692527771
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k031.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9460425972591442,
+    0.9477349811540622
+   ],
+   "centre": [
+    1.4094543837668598,
+    1.1738562476938648
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28368711471557617,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03546088933944702
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.106492280960083
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k032.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9477349811540622,
+    0.9494273650489802
+   ],
+   "centre": [
+    1.4090627418365886,
+    1.1734454176582239
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28180623054504395,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03522577881813049
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.142723083496094
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k033.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9494273650489802,
+    0.9511197489438981
+   ],
+   "centre": [
+    1.408672277223916,
+    1.1730358478565788
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.27405595779418945,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03425699472427368
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.281542062759399
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k034.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9511197489438981,
+    0.952812132838816
+   ],
+   "centre": [
+    1.408282984668443,
+    1.172627532786995
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.30458903312683105,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03807362914085388
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.210498094558716
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k035.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.952812132838816,
+    0.954504516733734
+   ],
+   "centre": [
+    1.407894858941438,
+    1.1722204669800544
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.287548303604126,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03594353795051575
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.244992971420288
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k036.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.954504516733734,
+    0.956196900628652
+   ],
+   "centre": [
+    1.4075078948455944,
+    1.1718146449986129
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.3063971996307373,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03829964995384216
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.274812936782837
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k037.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.956196900628652,
+    0.95788928452357
+   ],
+   "centre": [
+    1.4071220872147945,
+    1.1714100614375587
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.28192806243896484,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035241007804870605
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.23486590385437
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k038.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.95788928452357,
+    0.9595816684184879
+   ],
+   "centre": [
+    1.4067374309138734,
+    1.1710067109235756
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.2872040271759033,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035900503396987915
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.186342239379883
+  },
+  "rss_gb": 0.042205810546875
+ },
+ {
+  "unit": "run1_s26_k039.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9595816684184879,
+    0.9612740523134059
+   ],
+   "centre": [
+    1.4063539208383862,
+    1.170604588114906
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "skipped",
+   "evals": 0,
+   "seconds": 0.0,
+   "seconds_per_eval": 0.0
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 8,
+   "fast": 8,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 0.29071688652038574,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.03633961081504822
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 5.188751697540283
+  },
+  "rss_gb": 0.042205810546875
+ }
+]

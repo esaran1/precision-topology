@@ -3412,3 +3412,122 @@ m ≠ 0 whose windows have −2, 2 ∈ O and ±0.8 ∈ I: P_a, P_an, or a Track 
       cases;
     - the s_u formula;
     - the committed numbers.
+
+## 23. Track U, step U2: the independent checker's coupled second-order cell bound (derivation; 2026-10-18)
+
+**Status.**
+- This section **derives** the cell bound used by `check_u2_unit`'s outer re-search (`u2_coupled_lower` in
+  `src/verify_certificates.py`). It is evaluated entirely in Arb ball arithmetic, with no grid envelope.
+- **No certificate rests on it yet:** the U2 checker has not been run over the producer's output.
+
+**Setting** (§1, §20.1).
+- σ = px + q. The feature φ_ε(σ) is written through the even entire kernels of v = εσ² of `U2_design.md` §5.1.
+- The logit is z_i = A·φ_ε(σ_i) + b, the loss is ℓ(z, y) = log(1 + eᶻ) − yz, and L\*(w) = min_b (1/n)Σᵢ ℓ(z_i + b, y_i).
+- The variables are w = (p, q, A, ε).
+- **Unit:** a box B = {|w_a − w_{c,a}| ≤ h_a} with centre w_c = (p_c, q_c, A_c, ε_c). θ_b = (p_b, q_b) is a fixed
+  branch point.
+- **Claim:** D(w) := L\*(p, q; A, ε) − L\*(p_b, q_b; A, ε) > 0 on B.
+
+### 23.1 Lemma 23.1 (gradient; envelope theorem)
+
+**Statement.** Let b\*(w) be the unique minimiser in b (strict convexity: both classes are present), and let
+e_i = s(z_i + b\*) − y_i, with s the logistic function. Then:
+- **(i)** ∂_a L\* = (1/n)Σᵢ e_i·∂_a z_i;
+- **(ii)** Σᵢ e_i = 0.
+
+Hence, for any constants c_A and c_ε:
+- **(iii)** ∂_A L\* = (1/n)Σᵢ e_i(φ_i − c_A);
+- **(iv)** ∂_ε L\* = (A/n)Σᵢ e_i(∂_εφ_i − c_ε).
+
+*Proof.*
+- Step 1. (ii) is the first-order condition in b.
+- Step 2. (i): L\*(w) = L(w, b\*(w)) and ∂_b L = 0 at b\*, so the chain rule leaves only the explicit ∂_a.
+- Step 3. (iii) and (iv) follow from (i) by subtracting c·Σᵢe_i = 0. ∎
+
+**In Arb.** b\* is bracketed by the monotone bracket of `Objective.b_bracket`. Every e_i is then a ball containing its
+value at b\*, so each sum in (i)–(iv) is a ball that contains the gradient.
+
+### 23.2 Lemma 23.2 (the profiled Hessian, and two one-sided bounds)
+
+**Statement.** Let g_i = ∇_w z_i, s′_i = s(1 − s) at z_i + b\*, and ḡ = Σᵢ s′_i g_i / Σᵢ s′_i. Then:
+
+  **∇²L\* = (1/n)Σᵢ s′_i (g_i − ḡ)(g_i − ḡ)ᵀ + (1/n)Σᵢ e_i ∇²z_i.**   (23.1)
+
+Consequently, for every direction δ:
+- **(i)** δᵀ∇²L\*δ ≥ −(1/n)Σᵢ |δᵀ∇²z_i δ| ≥ −(1/n)Σᵢ Σ_{a,b} |∂_ab z_i|·|δ_a||δ_b|;
+- **(ii)** δᵀ∇²L\*δ ≤ ¼·(1/n)Σᵢ (δ·g_i − c)² + (1/n)Σᵢ |δᵀ∇²z_i δ|, for every constant c.
+
+*Proof.*
+- Step 1. Differentiate (i) of Lemma 23.1 along w, with b\* = b\*(w):
+  ∇²L\* = (1/n)Σ s′_i g_i(g_i + ∇b\*)ᵀ + (1/n)Σ e_i ∇²z_i. This uses ∂_b z_i = 1 and ∂_b∇z_i = 0, since z is affine in b.
+- Step 2. Differentiate (ii): Σ s′_i(g_i + ∇b\*) = 0, so ∇b\* = −ḡ.
+- Step 3. Σ s′_i ḡ(g_i − ḡ)ᵀ = ḡ(Σ s′_i g_i − ḡ Σ s′_i)ᵀ = 0. Subtracting it from Step 1 gives (23.1).
+- Step 4. (i): the first term of (23.1) is positive semidefinite, and |e_i| ≤ 1.
+- Step 5. (ii): the first term is (1/n)·S·Var_w(δ·g), with S = Σ s′_i and weights s′_i/S. A weighted variance is at most
+  the weighted mean square about any c. Since s′_i ≤ ¼, that is at most ¼·(1/n)Σ(δ·g_i − c)². The second term is at
+  most (1/n)Σ|δᵀ∇²z_i δ|. ∎
+
+**The second derivatives of z = Aφ + b** (φ = φ_ε(σ), σ = px + q):
+
+| | ∂_pp | ∂_pq | ∂_qq | ∂_pA | ∂_qA | ∂_AA | ∂_pε | ∂_qε | ∂_Aε | ∂_εε |
+|---|---|---|---|---|---|---|---|---|---|---|
+| z | Aφ_σσx² | Aφ_σσx | Aφ_σσ | φ_σx | φ_σ | 0 | Aφ_σεx | Aφ_σε | φ_ε | Aφ_εε |
+
+**Lemma 23.2′ (a per-cell shift).**
+- **Statement.** For any C² function c(ε), L\* is unchanged when z_i is replaced by z̃_i = A(φ_i − c(ε)) + b′.
+- *Proof.* b′ = b + A·c(ε) runs over ℝ as b does, so the minimum over b is the same. ∎
+- **Use.** The checker applies Lemma 23.2(i) to z̃ with c(ε) = φ_ε(q_c), the feature at the cell's x = 0 value. Then
+  ∂_Aε z̃_i = φ_ε(σ_i) − φ_ε(q_c) and ∂_εε z̃_i = A(φ_εε(σ_i) − φ_εε(q_c)); the other entries are unchanged.
+- **Why it helps.** At cells where all the σ_i are close to q_c, both differences are small. That is the large-|σ|,
+  small-p situation in which the uncentred bound failed (`U2_design.md` §2).
+
+### 23.3 Proposition 23.3 (the coupled cell bound)
+
+**Statement.** For every w ∈ B,
+
+  D(w) ≥ D(w_c) − Σ_a |∂_a D(w_c)|·h_a − ½(M_comp + M_br),
+
+where:
+- ∂_p D = ∂_p L\*(p_c, q_c), and likewise ∂_q D;
+- ∂_A D = ∂_A L\*(p_c, q_c) − ∂_A L\*(p_b, q_b), and likewise ∂_ε D (the branch term depends on (A, ε) only);
+- M_comp ≥ (1/n)Σᵢ sup_B Σ_{a,b} |∂_ab z̃_i| h_a h_b (Lemma 23.2′ at the cell);
+- M_br ≥ ¼(1/n)Σᵢ sup (h_A|φ_i − c₁| + h_ε A_hi|φ_ε,i − c₂|)² + (1/n)Σᵢ sup (2h_A h_ε |φ_ε,i| + h_ε² A_hi|φ_εε,i|).
+  The sups are over A ∈ [A_lo, A_hi] and ε ∈ [ε_c ± h_ε] at σ_i = p_b x_i + q_b; c₁ and c₂ are any constants.
+
+*Proof.*
+- Step 1. D is C² on B: L\* is C^∞, since b\* is a C^∞ function by the implicit-function theorem, and the strict
+  convexity in b gives ∂_bb L > 0.
+- Step 2. Taylor's theorem with the Lagrange remainder along the segment from w_c to w gives
+  D(w) = D(w_c) + ∇D(w_c)·δ + ½δᵀ∇²D(ξ)δ, with δ = w − w_c and ξ on the segment.
+- Step 3. ∇D(w_c)·δ ≥ −Σ_a |∂_a D(w_c)|·h_a, since |δ_a| ≤ h_a.
+- Step 4. ∇²D(ξ) = ∇²L\*(ξ) − ∇²_{(A,ε)}L\*(θ_b; ξ_A, ξ_ε).
+  - The first term is bounded below by Lemma 23.2(i), applied to z̃ by Lemma 23.2′, with |δ_a| ≤ h_a: it is at least −M_comp.
+  - The second is bounded above by Lemma 23.2(ii) with δ = (0, 0, δ_A, δ_ε). There δ·g_i = δ_Aφ_i + δ_ε A φ_ε,i, and the
+    constant is chosen as c = δ_A c₁ + δ_ε A c₂, a constant over i for each fixed δ and ξ. So
+    |δ·g_i − c| ≤ h_A|φ_i − c₁| + h_ε A_hi|φ_ε,i − c₂|. The ∇²z terms in (A, ε) are φ_ε and Aφ_εε (table above). So the
+    second term is at most M_br.
+- Step 5. Collect the pieces. ∎
+
+**Evaluation in Arb** (`u2_coupled_lower`).
+- **D(w_c):** the lower end of the checker's point bound of L\*(p_c, q_c; A_c, ε_c) (`Objective.lower_bound` at zero
+  width), minus the upper end of L(p_b, q_b, b̂; A_c, ε_c), which is at least L\*(θ_b).
+- **The gradients:** Lemma 23.1 at the two points, with b\* bracketed.
+- **M_comp and M_br:** each sup is a ball evaluation of `U2Act.d2f`, `df`, `dse`, `de` and `dee` on the cell's σ-balls
+  σ_i ∈ [p_c ± h_p]x_i + [q_c ± h_q], the ε-ball and A_hi.
+  - The kernels are series in v = εσ² with a geometric tail bound, and closed forms for v ≥ 400 (§5.1 of the design page).
+  - They therefore enclose every ε in the ball, **including ε = 0**.
+  - The term |φ_ε(σ_i) − φ_ε(q_c)| is the absolute value of a ball difference.
+- **Decision:** a cell passes when the resulting Arb lower bound of D is > 0, or > a stated target.
+
+### 23.4 What is and is not claimed
+
+**Proved** (above): Lemma 23.1, Lemma 23.2, Lemma 23.2′ and Proposition 23.3.
+
+**Not claimed:**
+- that the bound is sharp;
+- that the checker's re-search with it terminates on every unit. That is measured (`U2_design.md` §7), not proved.
+
+**Constructed tests** (`tests/test_verify_u2.py`):
+- **pass:** a cell outside the box, on an ε-interval that contains 0;
+- **fail:** the shifted-centre case, where the true minimiser is in the cell and the bound must not exceed 0;
+- **undecided:** a cell next to the box with a too-wide ε-interval, where the bound is ≤ 0 although the claim may hold.

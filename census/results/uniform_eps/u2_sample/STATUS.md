@@ -113,3 +113,39 @@ Every complete JSONL line was written in one piece after its spec finished.
   - `checker_timing.json`, `checker_timing2.json` and `checker_timing3.json` are runs of the checker before it split ε per
     cell. They were superseded and are not used.
 - **No process of mine is running.**
+
+## Full producer run (author's instruction, 2026-10-18 22:50): run1
+- **Disk thresholds, all set by the author:**
+  - 19 GB at 2026-10-18 14:00 ("just continue");
+  - 15 GB at 15:40 ("you can go to 15 gb");
+  - kept at 15 GB at 22:50 ("keep 15").
+- **Rule for this run:** a worker starts only after a separate gate step shows ≥ 15 GB free. The watchdog SIGSTOPs a
+  worker when free disk falls below 15 GB (15,728,640 KB).
+- **The earlier pauses at 15 GB came from the threshold itself, not from checks that were too rare.** The watchdog polls
+  RSS and free disk **every 2 s**, so free disk can fall only by what is written in 2 s before the pause. The sample jobs
+  write at most a few MB, so this interval is short enough.
+- **Specs:** `run1_specs.json`, 27 closed ε-slabs sharing their endpoints, covering [0, 0.6]:
+  - R: [0, 0.03] in steps of 0.005, then [0.03, 0.04] and [0.04, 0.0462];
+  - O: from 0.0462 in steps of 0.03, the last slab [0.5862, 0.6].
+  - Each slab: 40 A-sub-intervals (outer + ring + PD, with exports) and the sheared switch.
+- **Workers:** 3, round-robin over the slabs (worker w runs slabs i ≡ w mod 3). Each worker launch has its own gate
+  entry. Units are in `units/run1/`, summaries in `run1_w{0,1,2}.jsonl`.
+- **Every record and export is labelled "PRODUCER-ONLY: not independently checked".**
+- **2026-10-18 23:07: the three workers were stopped (SIGTERM) and restarted with a new rule for the outer link.** A
+  failing outer unit is now retried on closed ε-sub-slabs, halving down to 1/16 of the slab.
+  - Reason: on slab [0.005, 0.01] the outer exclusion failed on every A-sub-interval tried so far, at the large-|σ| band
+    p ≈ 18.75, q ≈ −40.3.
+  - The two unit results stored as failures before this rule are kept, renamed to `*.superseded`. The certified units
+    were kept and are skipped on restart.
+- **2026-10-19 03:25: checker timing processes chkA, chkB and chkC stopped on purpose (SIGTERM).** The projection had already
+  exceeded the author's 48 h limit at 3 workers.
+  - Still running when stopped: run1_s06 k20 (≥ 2.9 h), run1_s25 k20 (≥ 2.9 h) and run1_s26 k39 (≥ 1.2 h). Their elapsed
+    times are reported as lower bounds.
+  - The completed units are in chkA.json, chkB.json and chkC.json.
+- **2026-10-19 04:45: run1 complete. Every unit and every slab passed the producer's tests (PRODUCER-ONLY: not
+  independently checked).**
+  - The checker pieces (a), (b) and (c) are written and tested.
+  - Checker timings are in `chkA.json`, `chkB.json`, `chkC.json`, `chkPD.json`, and `chkSW*.json` (switch replay
+    diagnoses).
+  - **The checker re-projection is above 48 h at 3 workers, so the checker was NOT run** over the producer output.
+  - No process of mine is running.
