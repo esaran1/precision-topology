@@ -1,0 +1,247 @@
+[
+ {
+  "B_table_seconds": 1.4120361804962158
+ },
+ {
+  "unit": "run1_s00_k020.meta.json",
+  "header": {
+   "eps": [
+    0.0,
+    0.005
+   ],
+   "A": [
+    0.6861334384947827,
+    0.6873855068132039
+   ],
+   "centre": [
+    1.6665894857079613,
+    1.3681080266974828
+   ],
+   "regime": "R",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 1602,
+   "direct": 225,
+   "taylor": 7,
+   "iso": 204,
+   "full": 4,
+   "dropped_in_box": 24,
+   "dropped_outside_K": 1160,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 5,
+   "max_eps_depth": 2,
+   "coupled": 1243,
+   "min_margin_certified": 0.00024316654247755076,
+   "eps": [
+    0.0,
+    0.005
+   ],
+   "n_eps": 1,
+   "A": [
+    0.6861334384947827,
+    0.6873855068132039
+   ],
+   "regime": "R",
+   "centre": [
+    1.6665894857079613,
+    1.3681080266974828
+   ],
+   "rho": 0.15,
+   "seconds": 1138.2141666412354,
+   "seconds_per_eval": 0.7104957344826688
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 18.265822887420654,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.035675435326993465
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 16,
+   "failed": [],
+   "seconds": 1.0455410480499268
+  },
+  "rss_gb": 0.0437164306640625
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 188,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 72.6534469127655,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.0,
+    0.0025
+   ],
+   "n_sub_slabs_in_file": 2,
+   "prefix": "run1_s00",
+   "rss_gb": 0.0437164306640625
+  }
+ },
+ {
+  "unit": "run1_s06_k020.meta.json",
+  "header": {
+   "eps": [
+    0.03,
+    0.04
+   ],
+   "A": [
+    0.7007774513264128,
+    0.7020562422959865
+   ],
+   "centre": [
+    1.6483627114695039,
+    1.3546241981183185
+   ],
+   "regime": "R",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 1925,
+   "direct": 14,
+   "taylor": 6,
+   "iso": 0,
+   "full": 8,
+   "dropped_in_box": 17,
+   "dropped_outside_K": 1160,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 55,
+   "max_eps_depth": 2,
+   "coupled": 1724,
+   "min_margin_certified": 0.0004101677672319589,
+   "eps": [
+    0.03,
+    0.04
+   ],
+   "n_eps": 1,
+   "A": [
+    0.7007774513264128,
+    0.7020562422959865
+   ],
+   "regime": "R",
+   "centre": [
+    1.6483627114695039,
+    1.3546241981183185
+   ],
+   "rho": 0.15,
+   "seconds": 1342.2284789085388,
+   "seconds_per_eval": 0.6972615474849553
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 21.944918155670166,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.04286116827279329
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 52,
+   "failed": [],
+   "seconds": 4.195240020751953
+  },
+  "rss_gb": 0.0437164306640625
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 189,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 92.06865000724792,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.03,
+    0.0325
+   ],
+   "n_sub_slabs_in_file": 4,
+   "prefix": "run1_s06",
+   "rss_gb": 0.0437164306640625
+  }
+ }
+]

@@ -1760,9 +1760,11 @@ def track4_solve_limit(verbose=True, workers=1):
 # (derivation: φ = (u − (1+ε) sin u)/ε^{3/2}; ∂_ε u = u/(2ε); each series is the Taylor series of its closed form.)
 # Series evaluation: |c_{m+1}|/|c_m| <= 3/((2m+2)(2m+3)) for all five kernels (the polynomial factors grow by at most 3),
 # so once 3V/((2M+2)(2M+3)) <= 1/2 with V >= |v|, the tail after M terms is at most 2|c_M| V^M (a geometric majorant).
-# The series is used for v < U2_V_SERIES (= 400, |u| < 20: Horner on a v-ball has mild dependency loss, and 80 bits carry
-# the largest term, ~e^20); closed forms only where v is certainly >= U2_V_SERIES (there u − sin u etc. lose little to
-# dependency); a v-ball straddling the threshold is split.
+# The series is used for v < U2_V_SERIES (= 16, |u| < 4); closed forms where v is certainly >= U2_V_SERIES; a v-ball
+# straddling the threshold is split.  (History: the threshold was 1 -- too low, the closed forms lose width to
+# dependency near u = 1 -- then 400, which made Horner on WIDE v-balls blow up at large v: the width of a ball Horner
+# evaluation grows like Σ|c_m|((V + w)^m − V^m) ~ e^{√V}·w while the kernel itself decays like a power of 1/v.  This was
+# the term that dominated the checker's cell remainder M_comp at large |σ|; math note §23.5.)
 _U2_KERNELS = {
     "Gt": (lambda m: (-1) ** m, lambda m: 1, lambda m: 2 * m + 3),
     "J": (lambda m: (-1) ** m, lambda m: 1, lambda m: 2 * m + 2),
@@ -1773,7 +1775,7 @@ _U2_KERNELS = {
 }
 
 
-U2_V_SERIES = 400
+U2_V_SERIES = 16
 
 
 def _ival(lo, hi):
@@ -1794,7 +1796,15 @@ def _sq_nonneg(t):
 
 
 def _pow(v, k):
-    """v**k by repeated products (python-flint's arb ** int is NaN on a ball containing 0)."""
+    """v**k.  For a ball certainly > 0, by its exact endpoints ([lo^k, hi^k], monotone; midpoint-radius products of a
+    wide ball can drift below 0 and turn a later division into NaN -- found 2026-10-19).  Otherwise by repeated products
+    (python-flint's arb ** int is NaN on a ball containing 0)."""
+    if bool(v > 0):
+        a, b = lo_(v), hi_(v)
+        pa, pb = arb(1), arb(1)
+        for _ in range(k):
+            pa, pb = pa * a, pb * b
+        return _ival(lo_(pa), hi_(pb))
     out = arb(1)
     for _ in range(k):
         out = out * v
@@ -1824,19 +1834,19 @@ def _kernel_closed(name, v):
     u = v.sqrt()                                     # v certainly >= U2_V_SERIES here (or >= 1 in the tests)
     s, c = u.sin(), u.cos()
     if name == "Gt":
-        return (u - s) / (u * u * u)
+        return (u - s) / _pow(u, 3)
     if name == "J":
-        return (1 - c) / (u * u)
+        return (1 - c) / _pow(u, 2)
     if name == "S":
         return s / u
     u3, u4, u5 = _pow(u, 3), _pow(u, 4), _pow(u, 5)
     if name == "JJ":
-        return (s / (u * u) - 2 * (1 - c) / u3) / (2 * u)
+        return (s / _pow(u, 2) - 2 * (1 - c) / u3) / (2 * u)
     g1 = (1 - c) / u3 - 3 * (u - s) / u4                              # Gt′(u)
     if name == "K1":
         return g1 / (2 * u)
     g2 = s / u3 - 6 * (1 - c) / u4 + 12 * (u - s) / u5                # Gt″(u)
-    return (g2 / (2 * u) - g1 / (2 * u * u)) / (2 * u)               # K2 = K1′/(2u), K1′ = Gt″/(2u) − Gt′/(2u²)
+    return (g2 / (2 * u) - g1 / (2 * _pow(u, 2))) / (2 * u)         # K2 = K1′/(2u), K1′ = Gt″/(2u) − Gt′/(2u²)
 
 
 def u2_kernel(name, v):
@@ -1850,6 +1860,8 @@ def u2_kernel(name, v):
         return _kernel_series(name, v)
     a = _kernel_series(name, _ival(lo_(v), U2_V_SERIES))      # straddles the threshold: split it
     b = _kernel_closed(name, _ival(U2_V_SERIES, hi_(v)))
+    if not (a.is_finite() and b.is_finite()):                # never let a NaN half be dropped by min/max
+        return arb("nan")
     return _ival(min(lo_(a), lo_(b)), max(hi_(a), hi_(b)))
 
 
@@ -1946,7 +1958,9 @@ def _u2_curv_eps(obj, W, B, A_hi, cshift):
 
 
 def _absmax(b):
-    """An upper bound of |v| over the ball b (an exact Arb endpoint)."""
+    """An upper bound of |v| over the ball b (an exact Arb endpoint); +inf for a non-finite ball (never a NaN dropped)."""
+    if not b.is_finite():
+        return arb("inf")
     a, c = abs(lo_(b)), abs(hi_(b))
     return a if bool(a >= c) else c
 
@@ -1974,7 +1988,7 @@ def _u2_point_grads(xf, yf, P, Q, A, act, cA=0.0, cE=0.0):
     return Bb, [v / obj.n for v in g]
 
 
-def u2_coupled_lower(xf, yf, pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, pb, qb, xs=None, ys=None):
+def u2_coupled_lower(xf, yf, pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, pb, qb, xs=None, ys=None, terms=None):
     """The coupled second-order bound of math note §23 (Proposition 23.3): for every (p, q) in the cell [pc ± hp] ×
     [qc ± hq], A in [A_lo, A_hi] and ε in [e_lo, e_hi],
         D := L*_ε(p, q; A) − L*_ε(pb, qb; A)
@@ -2040,6 +2054,13 @@ def u2_coupled_lower(xf, yf, pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, pb, qb, xs=
         Mb2 += 2 * arb(hA) * arb(he) * _absmax(actE.de(sg)) + arb(he) * arb(he) * AhB * _absmax(actE.dee(sg))
     Mb = Mb1 / (4 * n) + Mb2 / n
     D = arb(lo_(Lc)) - Lb - first - (Mc + Mb) / 2
+    if terms is not None:                                # term-by-term diagnosis (widths and values)
+        f = lambda v: float(v.mid()) if hasattr(v, "mid") else float(v)
+        terms.update({"D_centre": f(arb(lo_(Lc)) - Lb), "Lc_lower": f(lo_(Lc)), "Lc_radius": f(Lc.rad()),
+                      "Lb_upper": f(Lb), "gp_h": f(_absmax(gc[0]) * arb(hp)), "gq_h": f(_absmax(gc[1]) * arb(hq)),
+                      "gA_h": f(_absmax(gc[2] - gb[2]) * arb(hA)), "gE_h": f(_absmax(gc[3] - gb[3]) * arb(he)),
+                      "gA_diff_radius": f((gc[2] - gb[2]).rad()), "gE_diff_radius": f((gc[3] - gb[3]).rad()),
+                      "half_M_comp": f(Mc / 2), "half_M_br": f(Mb / 2), "D_lower": f(lo_(D))})
     return lo_(D)
 
 
@@ -2070,7 +2091,7 @@ def u2_ring_fast_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=0.05, rho_out=
 
 def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, rho=0.15, max_depth=10,
                  max_evals=200_000, region=None, n_eps=1, B_table=None, B_full=None, target=0.0, witness_from_depth=2,
-                 eps_split_from_depth=4, max_eps_depth=8, use_coupled=True):
+                 eps_split_from_depth=4, max_eps_depth=8, use_coupled=True, cells=None, max_seconds=None):
     """Re-search of the outer exclusion of one U2 unit, in Arb: for every θ in the regime's domain outside the closed rho
     box around θ_c, every A in [A_lo, A_hi] and every ε in [e_lo, e_hi]:  L*_ε(θ; A) − L*_ε(θ_c; A) > target.
     The ε-interval is split into n_eps closed pieces; on each piece E = [ε_c ± h_ε] a cell passes by
@@ -2149,9 +2170,12 @@ def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, r
             branch(edges[ie], edges[ie + 1])
     except RuntimeError as ex:
         return {"verdict": "unresolved", "note": str(ex)}
-    n_p, n_q = int(round((ph0 - pl0) / h0)), int(round((qh0 - ql0) / h0))
-    stack = [(pl0 + a * h0, pl0 + (a + 1) * h0, ql0 + b * h0, ql0 + (b + 1) * h0, 0, edges[ie], edges[ie + 1], 0)
-             for ie in range(n_eps) for a in range(n_p) for b in range(n_q)]
+    if cells is not None:                                 # replay: the given cells (geometry only) are the start
+        stack = [(c_[0], c_[1], c_[2], c_[3], 0, edges[ie], edges[ie + 1], 0) for ie in range(n_eps) for c_ in cells]
+    else:
+        n_p, n_q = int(round((ph0 - pl0) / h0)), int(round((qh0 - ql0) / h0))
+        stack = [(pl0 + a * h0, pl0 + (a + 1) * h0, ql0 + b * h0, ql0 + (b + 1) * h0, 0, edges[ie], edges[ie + 1], 0)
+                 for ie in range(n_eps) for a in range(n_p) for b in range(n_q)]
     r8 = 2 * arb(2).sqrt()
     while stack:
         pl, ph, ql, qh, depth, el, eh, ed = stack.pop()
@@ -2173,8 +2197,8 @@ def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, r
                 return bool(lo + arb(ql) >= r8) or bool(hi + arb(qh) <= -r8)
             if all(_out8(float(xi)) for xi in xf):
                 stats["full"] += 1; continue
-        if stats["evals"] >= max_evals:
-            unresolved.append((pl, ph, ql, qh, el, eh, "evaluation cap")); continue
+        if stats["evals"] >= max_evals or (max_seconds is not None and time.time() - t0 > max_seconds):
+            unresolved.append((pl, ph, ql, qh, el, eh, "evaluation or time cap")); continue
         stats["evals"] += 1
         stats["max_depth"] = max(stats["max_depth"], depth)
         stats["max_eps_depth"] = max(stats["max_eps_depth"], ed)
@@ -2251,6 +2275,139 @@ def u2_outer_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, regime, P=24.0, h0=1.0, r
     return {"verdict": verdict, "witness": witness, "unresolved_n": len(unresolved), "unresolved_first": unresolved[:10],
             **stats, "min_margin_certified": marg if verdict == "pass" else None, "eps": [e_lo, e_hi], "n_eps": n_eps,
             "A": [A_lo, A_hi], "regime": regime, "centre": [p0, q0], "rho": rho, "seconds": time.time() - t0}
+
+
+def u2_leaf_cells(L, p_lo=0.0):
+    """The producer's exported leaves (p, q, hp, hq) read as GEOMETRY ONLY: each is mapped to integer quadtree indices
+    (level, i, j) of a dyadic grid with base half-widths (hp0, hq0) = the largest leaf half-widths and origin (p_lo, q_lo);
+    nothing of the producer's bounds is used.  Returns (grid, keys) with grid = (hp0, hq0, q_lo, n_p, n_q)."""
+    p, q, hp, hq = (np.asarray(L[k], float) for k in ("p", "q", "hp", "hq"))
+    hp0, hq0 = float(hp.max()), float(hq.max())
+    lev = np.rint(np.log2(hp0 / hp)).astype(int)
+    assert np.allclose(hp * 2.0 ** lev, hp0, rtol=1e-12) and np.allclose(hq * 2.0 ** lev, hq0, rtol=1e-12)
+    q_lo = float((q - hq).min())
+    i = np.rint((p - hp - p_lo) / (2 * hp)).astype(np.int64)
+    j = np.rint((q - hq - q_lo) / (2 * hq)).astype(np.int64)
+    assert np.allclose(p_lo + (2 * i + 1) * hp, p, atol=1e-9) and np.allclose(q_lo + (2 * j + 1) * hq, q, atol=1e-9)
+    n_p = int(round((float((p + hp).max()) - p_lo) / (2 * hp0)))
+    n_q = int(round((float((q + hq).max()) - q_lo) / (2 * hq0)))
+    return (hp0, hq0, q_lo, n_p, n_q, p_lo), list(zip(lev.tolist(), i.tolist(), j.tolist()))
+
+
+def _cell_edges(grid, key, pad=4):
+    """Float edges of the exact dyadic cell `key`, widened outward by `pad` ulps (a superset of the exact cell)."""
+    hp0, hq0, q_lo, n_p, n_q, p_lo = grid
+    l, i, j = key
+    wp, wq = 2 * hp0 / 2 ** l, 2 * hq0 / 2 ** l
+    pl, ph, ql, qh = p_lo + i * wp, p_lo + (i + 1) * wp, q_lo + j * wq, q_lo + (j + 1) * wq
+    for _ in range(pad):
+        pl, ql = math.nextafter(pl, -math.inf), math.nextafter(ql, -math.inf)
+        ph, qh = math.nextafter(ph, math.inf), math.nextafter(qh, math.inf)
+    return max(pl, p_lo) if p_lo == 0.0 else pl, ph, ql, qh
+
+
+def u2_leaf_coverage(grid, keys, centre, rho):
+    """The leaves tile the grid rectangle except for cells inside the closed rho box around centre: every level-0 cell
+    is a leaf, or splits into four covered children, or (not containing any leaf) lies in the closed box (exact
+    rational test).  Returns (ok, n_box_cells)."""
+    hp0, hq0, q_lo, n_p, n_q, p_lo = grid
+    leaves = set(keys)
+    if len(leaves) != len(keys):
+        return False, 0
+    internal = set()
+    for (l, i, j) in keys:
+        for up in range(1, l + 1):
+            internal.add((l - up, i >> up, j >> up))
+    if leaves & internal:
+        return False, 0                                  # a leaf with a leaf descendant
+    box_cells = [0]
+
+    def covered(l, i, j):
+        k = (l, i, j)
+        if k in leaves:
+            return True
+        if k in internal:
+            return all(covered(l + 1, 2 * i + a, 2 * j + b) for a in (0, 1) for b in (0, 1))
+        wp, wq = 2 * hp0 / 2 ** l, 2 * hq0 / 2 ** l
+        from fractions import Fraction as Fr
+        pl, ph = Fr(p_lo) + i * Fr(wp), Fr(p_lo) + (i + 1) * Fr(wp)
+        ql, qh = Fr(q_lo) + j * Fr(wq), Fr(q_lo) + (j + 1) * Fr(wq)
+        ok = pl >= Fr(centre[0]) - Fr(rho) and ph <= Fr(centre[0]) + Fr(rho) and \
+            ql >= Fr(centre[1]) - Fr(rho) and qh <= Fr(centre[1]) + Fr(rho)
+        box_cells[0] += ok
+        return ok
+    import sys as _s
+    _s.setrecursionlimit(max(10000, _s.getrecursionlimit()))
+    ok = all(covered(0, i, j) for i in range(n_p) for j in range(n_q))
+    return ok, box_cells[0]
+
+
+def u2_outer_replay(x, y, header, L, B_table=None, B_full=None, max_seconds=600.0, min_width_frac=1 / 16,
+                    fallback_seconds=1800.0):
+    """Outer exclusion of one unit by REPLAY with refinement (the author's step 3): the producer's leaves are taken as
+    geometry only (u2_leaf_cells); the checker verifies that they tile its own domain rectangle except the closed box,
+    that the rectangle contains the regime's domain, and each cell by its OWN Arb bounds (coupled / direct / iso / full),
+    subdividing in θ and ε on failure (u2_outer_arb with the cells as start).  A unit not finished within max_seconds is
+    split in ε (halves, down to min_width_frac of the slab), and as a last resort re-searched from scratch (time cap
+    fallback_seconds).  Trusts none of the producer's bounds."""
+    t0 = time.time()
+    (e_lo, e_hi), (A_lo, A_hi), c, reg = header["eps"], header["A"], header["centre"], header["regime"]
+    xf, yf = np.asarray(x, float), np.asarray(y, float)
+    grid, keys = u2_leaf_cells(L)
+    hp0, hq0, q_lo, n_p, n_q, p_lo = grid
+    ok_cov, n_box = u2_leaf_coverage(grid, keys, c, 0.15)
+    p_hi_r, q_lo_r = p_lo + n_p * 2 * hp0, q_lo
+    q_hi_r = q_lo + n_q * 2 * hq0
+    # the regime's domain, rounded OUTWARD to floats (an Arb-certified superset)
+    if reg == "R":
+        Qb = 2 * arb(2).sqrt() + 2 * arb(24)
+        P_t, Q_t = 24.0, float_up(Qb)
+    else:
+        W = lemma_W(xf, yf, A_lo / e_hi ** 1.5, 1 + e_hi)
+        se = arb(repr(float(e_lo))).sqrt()
+        P_t, Q_t = float_up(arb(W) / se), float_up(arb.pi() / se)
+    cells = [_cell_edges(grid, k) for k in keys]
+    # strips between the leaf rectangle and the domain (rounding-level, or wider), checked like any other cell
+    strips = []
+    if P_t > p_hi_r:
+        strips.append((p_hi_r, P_t, min(q_lo_r, -Q_t), max(q_hi_r, Q_t)))
+    if -Q_t < q_lo_r:
+        strips.append((p_lo, max(p_hi_r, P_t), -Q_t, q_lo_r))
+    if Q_t > q_hi_r:
+        strips.append((p_lo, max(p_hi_r, P_t), q_hi_r, Q_t))
+    for (a0, a1, b0, b1) in strips:                       # chunk each strip to the grid's base cell size
+        na, nb = max(1, math.ceil((a1 - a0) / (2 * hp0))), max(1, math.ceil((b1 - b0) / (2 * hq0)))
+        for ia in range(na):
+            for ib in range(nb):
+                cells.append((a0 + (a1 - a0) * ia / na if ia else a0, a1 if ia == na - 1 else a0 + (a1 - a0) * (ia + 1) / na,
+                              b0 + (b1 - b0) * ib / nb if ib else b0, b1 if ib == nb - 1 else b0 + (b1 - b0) * (ib + 1) / nb))
+    res = {"coverage_ok": bool(ok_cov), "box_cells": n_box, "leaves": len(keys), "strips": strips, "pieces": []}
+    if not ok_cov:
+        res.update(verdict="fail-structure", seconds=time.time() - t0)
+        return res
+
+    def run(lo, hi, cap):
+        r = u2_outer_arb(xf, yf, c, A_lo, A_hi, lo, hi, reg, B_table=B_table, B_full=B_full, cells=cells,
+                         max_seconds=cap, max_evals=10 ** 9)
+        return {k: r.get(k) for k in ("verdict", "evals", "coupled", "direct", "taylor", "iso", "full", "eps_splits",
+                                      "max_depth", "unresolved_n", "witness")} | {"eps": [lo, hi], "seconds": r["seconds"]}
+
+    def go(lo, hi):
+        r = run(lo, hi, max_seconds)
+        if r["verdict"] == "pass" or r["verdict"] == "fail":
+            res["pieces"].append(r); return
+        if (hi - lo) / 2 >= min_width_frac * (e_hi - e_lo):
+            m_ = 0.5 * (lo + hi); go(lo, m_); go(m_, hi); return
+        rf = u2_outer_arb(xf, yf, c, A_lo, A_hi, lo, hi, reg, B_table=B_table, B_full=B_full, max_seconds=fallback_seconds,
+                          max_evals=10 ** 9)                  # the re-search fallback
+        res["pieces"].append({**{k: rf.get(k) for k in ("verdict", "evals", "unresolved_n")}, "eps": [lo, hi],
+                              "seconds": rf["seconds"], "fallback": True})
+    go(e_lo, e_hi)
+    vs = [p_["verdict"] for p_ in res["pieces"]]
+    res["verdict"] = "fail" if "fail" in vs else ("pass" if all(v == "pass" for v in vs) else "unresolved")
+    res["evals"] = sum(p_.get("evals") or 0 for p_ in res["pieces"])
+    res["seconds"] = time.time() - t0
+    return res
 
 
 def u2_ring_arb(x, y, centre, A_lo, A_hi, e_lo, e_hi, rho_in=0.05, rho_out=0.15, side=0.0125, max_depth=5, n_eps=1,
@@ -2643,7 +2800,24 @@ def u2_gap_shear_arb(xt, R, X1, e_lo, e_hi):
     return G0 + arb(0, he) * T
 
 
-def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
+def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0, return_rows=False,
+                        z_scales=(1, 2, 4, 8)):
+    """The switch replay, with the checker's own choice of Z's starting radii: if rows fail only because their boxes are
+    not inside Z's box, the replay is repeated with Z's starting radii scaled by the next factor (a larger Z is still a
+    valid Krawczyk box when its test contracts).  See _u2_switch_shear_once."""
+    base = [float(v) for v in __import__("os").environ.get("U2_CHK_ZR0", "6e-4,6e-4,2e-4,5e-4").split(",")]
+    res = None
+    for sc in z_scales:
+        res = _u2_switch_shear_once(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth, return_rows,
+                                    [sc * v for v in base])
+        res["z_scale"] = sc
+        reasons = res.get("bad_reasons", {})
+        if res["pass"] or not res["Z_krawczyk"] or any(reasons.get(k, 0) for k in ("krawczyk", "active", "sign")):
+            break
+    return res
+
+
+def _u2_switch_shear_once(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth, return_rows, r0Z):
     """The switch of one ε-slab with SHEARED boxes (U2_design.md, item 3), replayed from the producer's published data
     (Z = {xt, X1} for (p, q, b, A); rows = [{A_lo, A_hi, xt, X1}] tiling J_tube; the producer's radii are ignored: the
     checker inflates its own, u2_krawczyk_shear_inflate), all in Arb:
@@ -2659,7 +2833,7 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
     ec, he = 0.5 * (e_lo + e_hi), 0.5 * (e_hi - e_lo)
     zt, X1Z = Z["xt"], Z["X1"]                         # the producer's radii Z["R"] are NOT used
     # start from the §16.3 switch-box radii (a method constant of this checker, not the producer's output) and inflate
-    okZ, RZ, XbZ = u2_krawczyk_shear_inflate(xs, ys, zt, X1Z, e_lo, e_hi, with_gap=True, r0=[6e-4, 6e-4, 2e-4, 5e-4])
+    okZ, RZ, XbZ = u2_krawczyk_shear_inflate(xs, ys, zt, X1Z, e_lo, e_hi, with_gap=True, r0=r0Z)
     actZ, _ = u2_active_pair(XbZ[0], XbZ[1], U2Act(_ival(e_lo, e_hi)))
     actZ_why = dict(getattr(u2_active_pair, "last", {}))
     cover = rows[0]["A_lo"] == J_tube[0] and rows[-1]["A_hi"] == J_tube[1] and \
@@ -2667,6 +2841,7 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
     A_Z, R_A, A1 = zt[3], RZ[3], X1Z[3]
     bad = []
     queue = [(r, 0) for r in rows]
+    row_log = []
     n_split = 0
     while queue:
         r, rdepth = queue.pop(0)
@@ -2681,6 +2856,12 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
                     t = ec + (edge_A - A_Z - off) / A1
                     if e_lo < t < e_hi:
                         cuts.append(t)
+            # each crossing t of a row edge with L or U gets a sliver [t − δ, t + δ] of its own (classified as partly
+            # outside: box in Z AND the side's sign); the pieces between slivers then classify strictly, without the
+            # equality at t defeating the ball comparisons
+            dlt_e = 1e-6 * (e_hi - e_lo)                  # >> the 30-bit precision of Arb radii (rad ~ 1e-9 rel.)
+            inner_cuts = [t for t in cuts if e_lo < t < e_hi]
+            cuts = [e_lo, e_hi] + [v for t in inner_cuts for v in (max(e_lo, t - dlt_e), min(e_hi, t + dlt_e))]
             cuts = sorted(cuts)
             for lo_o, hi_o in zip(cuts[:-1], cuts[1:]):
                 if not ok or hi_o <= lo_o:
@@ -2708,6 +2889,12 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
                         break
                     xm = [xt[0] + (em - ec) * X1[0], xt[1] + (em - ec) * X1[1]]
                     G = u2_gap_shear_arb(xm, R, X1, lo_o, hi_o)
+                    if return_rows:
+                        row_log.append({"A": [a_lo, a_hi], "piece": [lo_o, hi_o], "need_sign": need_sign,
+                                        "Lb": [float(lo_(Lb).mid()), float(hi_(Lb).mid())],
+                                        "Ub": [float(lo_(Ub).mid()), float(hi_(Ub).mid())], "cuts": [float(c) for c in cuts],
+                                        "G": [float(lo_(G).mid()), float(hi_(G).mid())], "R_checker": [float(v) for v in R],
+                                        "xm": [float(v) for v in xm], "X1": [float(v) for v in X1]})
                     act_ok, _ = u2_active_pair(arb(repr(float(xm[0]))) + arb(0, float(R[0]) + abs(ho * X1[0])),
                                                arb(repr(float(xm[1]))) + arb(0, float(R[1]) + abs(ho * X1[1])),
                                                U2Act(_ival(lo_o, hi_o)))
@@ -2729,7 +2916,34 @@ def u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, max_row_depth=0):
            "bad_reasons": {k: sum(1 for b_ in bad if b_[2] == k) for k in ("krawczyk", "in_Z", "active", "sign")},
            "Z_active_pair_conditions": actZ_why, "Z_radii": [float(v) for v in RZ], "row_splits": n_split}
     res["pass"] = bool(okZ and actZ and cover and not bad)
+    if return_rows:
+        res["row_log"] = row_log
+        res["bad_all"] = bad
     return res
+
+
+def u2_switch_shear_split(x, y, e_lo, e_hi, Z, rows, J_tube, max_eps_depth=3, _depth=0):
+    """The switch replay on [e_lo, e_hi], split in ε by the CHECKER when needed: the claim on a sub-slab follows from the
+    same claim on each closed half.  The producer's data (centres at the sub-slab's ε_c, shears X1) are re-centred to
+    each half's midpoint along their own shear (any centre gives a valid test).  A half is split again (to
+    max_eps_depth) only when it fails on Z-containment of rows alone."""
+    r = u2_switch_shear_arb(x, y, e_lo, e_hi, Z, rows, J_tube, z_scales=(1, 2))
+    reasons = r.get("bad_reasons", {})
+    # split when the failure is one a narrower ε-interval can cure: Z's own tests, or rows' Z-containment
+    only_inZ = (not r["pass"]) and not any(reasons.get(k, 0) for k in ("krawczyk", "active", "sign"))
+    if r["pass"] or _depth >= max_eps_depth or not only_inZ:
+        return {"pass": r["pass"], "leaves": [{"eps": [e_lo, e_hi], **{k: r.get(k) for k in ("pass", "n_bad",
+                "bad_reasons", "z_scale", "seconds")}}]}
+    ec = 0.5 * (e_lo + e_hi)
+    out = {"pass": True, "leaves": []}
+    for lo, hi in ((e_lo, ec), (ec, e_hi)):
+        em = 0.5 * (lo + hi)
+        Zh = {**Z, "xt": [Z["xt"][i] + (em - ec) * Z["X1"][i] for i in range(4)]}
+        rh = [{**rr, "xt": [rr["xt"][i] + (em - ec) * rr["X1"][i] for i in range(3)]} for rr in rows]
+        sub = u2_switch_shear_split(x, y, lo, hi, Zh, rh, J_tube, max_eps_depth, _depth + 1)
+        out["pass"] = out["pass"] and sub["pass"]
+        out["leaves"] += sub["leaves"]
+    return out
 
 
 def check_u2_unit(header, x, y, B_table=None, B_full=None, outer_kw=None, ring_kw=None, pd_kw=None):

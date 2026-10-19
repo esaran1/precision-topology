@@ -1,0 +1,247 @@
+[
+ {
+  "B_table_seconds": 1.560225248336792
+ },
+ {
+  "unit": "run1_s13_k020.meta.json",
+  "header": {
+   "eps": [
+    0.1962,
+    0.2262
+   ],
+   "A": [
+    0.7773332834249658,
+    0.778751774818077
+   ],
+   "centre": [
+    1.5603001664674903,
+    1.2890588052649674
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 887,
+   "direct": 0,
+   "taylor": 0,
+   "iso": 0,
+   "full": 0,
+   "dropped_in_box": 21,
+   "dropped_outside_K": 0,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 4,
+   "max_eps_depth": 2,
+   "coupled": 682,
+   "min_margin_certified": 7.326927068434447e-05,
+   "eps": [
+    0.1962,
+    0.2262
+   ],
+   "n_eps": 1,
+   "A": [
+    0.7773332834249658,
+    0.778751774818077
+   ],
+   "regime": "O",
+   "centre": [
+    1.5603001664674903,
+    1.2890588052649674
+   ],
+   "rho": 0.15,
+   "seconds": 888.6962411403656,
+   "seconds_per_eval": 1.0019123349947752
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 31.457002878189087,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.06143945874646306
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 268,
+   "failed": [],
+   "seconds": 27.25903630256653
+  },
+  "rss_gb": 0.0421905517578125
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 174,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 109.32245087623596,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.1962,
+    0.198075
+   ],
+   "n_sub_slabs_in_file": 16,
+   "prefix": "run1_s13",
+   "rss_gb": 0.0421905517578125
+  }
+ },
+ {
+  "unit": "run1_s25_k020.meta.json",
+  "header": {
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "A": [
+    0.9194071499991794,
+    0.9210849002729005
+   ],
+   "centre": [
+    1.4210217538893715,
+    1.1839272045123768
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 683,
+   "direct": 0,
+   "taylor": 0,
+   "iso": 0,
+   "full": 0,
+   "dropped_in_box": 19,
+   "dropped_outside_K": 0,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 0,
+   "max_eps_depth": 0,
+   "coupled": 525,
+   "min_margin_certified": 0.0002403372722091401,
+   "eps": [
+    0.5562,
+    0.5862
+   ],
+   "n_eps": 1,
+   "A": [
+    0.9194071499991794,
+    0.9210849002729005
+   ],
+   "regime": "O",
+   "centre": [
+    1.4210217538893715,
+    1.1839272045123768
+   ],
+   "rho": 0.15,
+   "seconds": 690.394119977951,
+   "seconds_per_eval": 1.0108259443308214
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 38.44735288619995,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.07509248610585928
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 336,
+   "failed": [],
+   "seconds": 38.847190618515015
+  },
+  "rss_gb": 0.0421905517578125
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 179,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 130.49161005020142,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.5562,
+    0.5580750000000001
+   ],
+   "n_sub_slabs_in_file": 16,
+   "prefix": "run1_s25",
+   "rss_gb": 0.0421905517578125
+  }
+ }
+]

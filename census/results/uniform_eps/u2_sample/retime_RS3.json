@@ -1,0 +1,349 @@
+[
+ {
+  "B_table_seconds": 1.554995059967041
+ },
+ {
+  "unit": "run1_s26_k000.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.8935786965166873,
+    0.8952710804116053
+   ],
+   "centre": [
+    1.422209484766247,
+    1.1872486646264193
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 585,
+   "direct": 0,
+   "taylor": 0,
+   "iso": 0,
+   "full": 0,
+   "dropped_in_box": 13,
+   "dropped_outside_K": 0,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 0,
+   "max_eps_depth": 0,
+   "coupled": 453,
+   "min_margin_certified": 0.00013995679019036965,
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "n_eps": 1,
+   "A": [
+    0.8935786965166873,
+    0.8952710804116053
+   ],
+   "regime": "O",
+   "centre": [
+    1.422209484766247,
+    1.1872486646264193
+   ],
+   "rho": 0.15,
+   "seconds": 615.2153179645538,
+   "seconds_per_eval": 1.0516501161787244
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 32.145339250564575,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.06278386572375894
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 9.471457958221436
+  },
+  "rss_gb": 0.041168212890625
+ },
+ {
+  "unit": "run1_s26_k039.meta.json",
+  "header": {
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "A": [
+    0.9595816684184879,
+    0.9612740523134059
+   ],
+   "centre": [
+    1.4063539208383862,
+    1.170604588114906
+   ],
+   "regime": "O",
+   "fields": [
+    "p",
+    "q",
+    "hp",
+    "hq",
+    "reason",
+    "D"
+   ],
+   "check_status": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)"
+  },
+  "input_label": "PRODUCER-ONLY: not independently checked (float, producer standard; not a certificate)",
+  "outer": {
+   "verdict": "pass",
+   "witness": null,
+   "unresolved_n": 0,
+   "evals": 601,
+   "direct": 0,
+   "taylor": 0,
+   "iso": 0,
+   "full": 0,
+   "dropped_in_box": 29,
+   "dropped_outside_K": 0,
+   "max_depth": 5,
+   "witness_tries": 0,
+   "eps_splits": 0,
+   "max_eps_depth": 0,
+   "coupled": 461,
+   "min_margin_certified": 0.0011478796830284585,
+   "eps": [
+    0.5862,
+    0.6
+   ],
+   "n_eps": 1,
+   "A": [
+    0.9595816684184879,
+    0.9612740523134059
+   ],
+   "regime": "O",
+   "centre": [
+    1.4063539208383862,
+    1.170604588114906
+   ],
+   "rho": 0.15,
+   "seconds": 624.2580018043518,
+   "seconds_per_eval": 1.0386988382767917
+  },
+  "ring_fast": {
+   "certified": true,
+   "tiles": 512,
+   "fast": 512,
+   "fallback": 0,
+   "left": 0,
+   "first_left": [],
+   "seconds": 31.575237035751343,
+   "tiles_total": 512,
+   "seconds_per_tile": 0.06167038483545184
+  },
+  "pd": {
+   "pd": true,
+   "boxes": 80,
+   "failed": [],
+   "seconds": 9.399386167526245
+  },
+  "rss_gb": 0.041168212890625
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 382,
+   "n_bad": 279,
+   "bad_rows": [
+    [
+     0.9231954760474709,
+     0.9233015885085666,
+     "in_Z"
+    ],
+    [
+     0.9233015885085666,
+     0.9233811728543884,
+     "in_Z"
+    ],
+    [
+     0.9233811728543884,
+     0.9234607572002101,
+     "in_Z"
+    ],
+    [
+     0.9234607572002101,
+     0.9235204454595765,
+     "in_Z"
+    ],
+    [
+     0.9235204454595765,
+     0.9235801337189429,
+     "in_Z"
+    ],
+    [
+     0.9235801337189429,
+     0.9236248999134676,
+     "in_Z"
+    ],
+    [
+     0.9236248999134676,
+     0.9236696661079924,
+     "in_Z"
+    ],
+    [
+     0.9236696661079924,
+     0.9237368153997796,
+     "in_Z"
+    ],
+    [
+     0.9237368153997796,
+     0.9237871773686199,
+     "in_Z"
+    ],
+    [
+     0.9237871773686199,
+     0.9238249488452501,
+     "in_Z"
+    ]
+   ],
+   "seconds": 294.65482115745544,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 279,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006573822940939584,
+    0.0006,
+    0.0008738153769630064,
+    0.002263031016810415
+   ],
+   "row_splits": 0,
+   "pass": false,
+   "sub_slab": [
+    0.5862,
+    0.5931
+   ],
+   "n_sub_slabs_in_file": 2,
+   "prefix": "run1_s26",
+   "rss_gb": 0.041168212890625
+  }
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 381,
+   "n_bad": 277,
+   "bad_rows": [
+    [
+     0.9256597802641654,
+     0.9257746643821974,
+     "in_Z"
+    ],
+    [
+     0.9257746643821974,
+     0.9258608274707213,
+     "in_Z"
+    ],
+    [
+     0.9258608274707213,
+     0.9259469905592452,
+     "in_Z"
+    ],
+    [
+     0.9259469905592452,
+     0.9260116128756382,
+     "in_Z"
+    ],
+    [
+     0.9260116128756382,
+     0.9260762351920312,
+     "in_Z"
+    ],
+    [
+     0.9260762351920312,
+     0.9261247019293259,
+     "in_Z"
+    ],
+    [
+     0.9261247019293259,
+     0.9261731686666207,
+     "in_Z"
+    ],
+    [
+     0.9261731686666207,
+     0.9262458687725628,
+     "in_Z"
+    ],
+    [
+     0.9262458687725628,
+     0.9263003938520193,
+     "in_Z"
+    ],
+    [
+     0.9263003938520193,
+     0.9263412876616117,
+     "in_Z"
+    ]
+   ],
+   "seconds": 287.2454631328583,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 277,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006535894590345411,
+    0.0006,
+    0.0008728353136583338,
+    0.0022617531885779575
+   ],
+   "row_splits": 0,
+   "pass": false,
+   "sub_slab": [
+    0.5931,
+    0.6
+   ],
+   "n_sub_slabs_in_file": 2,
+   "prefix": "run1_s26",
+   "rss_gb": 0.041168212890625
+  }
+ }
+]

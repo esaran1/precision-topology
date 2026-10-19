@@ -1,0 +1,85 @@
+[
+ {
+  "B_table_seconds": 1.5194268226623535
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 188,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 42.20245409011841,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.0,
+    0.0025
+   ],
+   "n_sub_slabs_in_file": 2,
+   "prefix": "run1_s00",
+   "rss_gb": 0.040863037109375
+  }
+ },
+ {
+  "switch": {
+   "Z_krawczyk": true,
+   "Z_active_pair": true,
+   "covered": true,
+   "rows": 174,
+   "n_bad": 0,
+   "bad_rows": [],
+   "seconds": 61.23635196685791,
+   "bad_reasons": {
+    "krawczyk": 0,
+    "in_Z": 0,
+    "active": 0,
+    "sign": 0
+   },
+   "Z_active_pair_conditions": {
+    "inner_convex": true,
+    "neg_outer_concave": true,
+    "pos_outer_increasing": true,
+    "I_dominates": true,
+    "O_below_m2": true,
+    "O_below_p1": true
+   },
+   "Z_radii": [
+    0.0006,
+    0.0006,
+    0.0002,
+    0.0005
+   ],
+   "row_splits": 0,
+   "pass": true,
+   "sub_slab": [
+    0.1962,
+    0.198075
+   ],
+   "n_sub_slabs_in_file": 16,
+   "prefix": "run1_s13",
+   "rss_gb": 0.040863037109375
+  }
+ }
+]

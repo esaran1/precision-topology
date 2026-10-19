@@ -149,3 +149,17 @@ Every complete JSONL line was written in one piece after its spec finished.
     diagnoses).
   - **The checker re-projection is above 48 h at 3 workers, so the checker was NOT run** over the producer output.
   - No process of mine is running.
+
+## 2026-10-19: the author's four steps (option (a), deadline 2026-10-30)
+- **The 1,080-unit run1 result is still PRODUCER ONLY, NOT INDEPENDENTLY CHECKED.**
+- **Step 1 (soundness):** 570 points at 60 digits. No producer problem was found. The mismatches were a checker
+  piece-classification bug, now fixed.
+- **Step 2 (width):** the checker's M_comp blew up through Horner on wide v-balls (math note §23.5). Fixed by the series
+  threshold 16. A NaN-dropping power and union bug in the checker kernels was also fixed. **Every checker result from
+  before the fix is VOID** and has been redone.
+- **Step 3 (replay):** implemented, treating leaves as geometry only, with coverage checked by the checker. It measured
+  slower than re-search, so re-search is primary. 13 units (s01 k000–k012) have no valid leaf export, about 1.3 MB to
+  regenerate.
+- **Step 4 (timing):** six units and six switch sub-slabs all pass in the checker after the fixes.
+  - The projection is ≈ 290 core-h, ≈ 96 h wall at 3 workers, above 48 h.
+  - **STOP, for a cluster allocation.**

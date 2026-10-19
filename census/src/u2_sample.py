@@ -1482,6 +1482,37 @@ def switch_unit_shear(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4),
             "rows_boxes": [{k: r_[k] for k in ("A_lo", "A_hi", "xt", "R", "X1")} for r_ in rows]}
 
 
+def outer_cell_terms(pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, centre, x, y):
+    """The producer's (pert) cell bound of outer_unit, term by term, for one cell (diagnosis only)."""
+    Ac, ec = 0.5 * (A_lo + A_hi), 0.5 * (e_lo + e_hi)
+    hA, he = 0.5 * (A_hi - A_lo), 0.5 * (e_hi - e_lo)
+    br = branch_side(centre[0], centre[1], A_lo, A_hi, e_lo, e_hi, x, y)
+    ax = np.abs(x)
+    S = pc * x[None, :] + qc
+    d = ax[None, :] * hp + hq
+    Smin = np.maximum(np.abs(S) - d, 0.0); Smax = np.abs(S) + d
+    f = feats(S, ec)
+    L, b, r = profile_z0(Ac * f["phi"], y)
+    gp = Ac * (r * f["phi_s"] * x[None, :]).mean(axis=1)
+    gq = Ac * (r * f["phi_s"]).mean(axis=1)
+    gA = (r * f["phi"]).mean(axis=1)
+    ge = Ac * (r * f["phi_e"]).mean(axis=1)
+    sd = sup_derivs(Smin, Smax, e_lo, e_hi)
+    qc_ = np.array([[qc]])
+    dsig = np.abs(S - qc_) + d
+    hl, hh_ = np.minimum(S - d, qc_), np.maximum(S + d, qc_)
+    Hmin = np.where((hl <= 0) & (hh_ >= 0), 0.0, np.minimum(np.abs(hl), np.abs(hh_)))
+    sh = sup_derivs(Hmin, np.maximum(np.abs(hl), np.abs(hh_)), e_lo, e_hi)
+    ce = np.minimum(sd["e"], sh["se"] * dsig); cee = np.minimum(sd["ee"], sh["see"] * dsig)
+    T = A_hi * sd["ss"] * d ** 2 + 2 * sd["s"] * d * hA + 2 * A_hi * sd["se"] * d * he + 2 * ce * hA * he + A_hi * cee * he * he
+    out = {"D_centre": float(L[0] - br["Lb"]), "gp_h": float(abs(gp[0]) * hp), "gq_h": float(abs(gq[0]) * hq),
+           "gA_h": float(abs(gA[0] - br["gAb"]) * hA), "gE_h": float(abs(ge[0] - br["geb"]) * he),
+           "half_M_comp": float(0.5 * T.mean()), "half_M_br": float(br["curv_b"])}
+    out["D_lower"] = out["D_centre"] - out["gp_h"] - out["gq_h"] - out["gA_h"] - out["gE_h"] - out["half_M_comp"] \
+        - out["half_M_br"] - 2 * SAFETY
+    return out
+
+
 def run_stages(e_lo, e_hi, regime, frac, n_sub, stages=("outer", "ring", "pd", "switch"), max_seconds=300.0):
     """One unit, stage by stage, with the peak RSS reached after each stage (diagnosis of the 3 GB excursion)."""
     x, y = pop()

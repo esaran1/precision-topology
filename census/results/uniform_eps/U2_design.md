@@ -706,3 +706,112 @@ unit failed after splitting.
 - **The switch replay is not yet feasible:** its rows do not certify.
 - **Peak memory per checker worker:** ≤ 0.05 GB. Memory does not bind; 3 workers fit easily.
 - **The checker was not run** over the producer output. Per the author's rule, it goes to a cluster.
+
+## 9. The checker after the author's four steps (2026-10-19). The 1,080-unit result is still PRODUCER ONLY, NOT INDEPENDENTLY CHECKED.
+
+### 9.1 Step 1: soundness first. No producer problem
+
+**What was checked** (`u2_sample/soundness_switch.json`, `src/u2_soundness.py`):
+- 20 switch-replay rows that had failed, spread over six sub-slabs from ε = 0 to ε ≈ 0.56.
+- For each row, the active gap was evaluated at 60 digits, at the centre and four corners of each sheared box and at
+  three ε per piece. That is 570 points in all.
+- The 60-digit values come from mpmath and the closed form of φ_ε (h at ε = 0), a code path shared with neither the
+  producer nor the checker.
+
+**Result:**
+- **Every point lies inside the producer's enclosure.**
+- On the 270 points where the producer's enclosure has a definite sign, **every sign agrees**.
+- The 61 "wrong-sign" points all lie on pieces where the producer's enclosure contains 0, so the producer claims no
+  sign there.
+
+**Cause: a checker bug.** It cut each row's ε-range at the crossings with Z's moving A-range, then classified each piece
+with ball comparisons taken over the whole piece. At a crossing, the comparison is an equality, which the ball cannot
+decide. So the checker demanded a sign exactly on pieces where the switch passes through the row.
+
+**Fix:**
+- Each crossing gets a sliver [t − δ, t + δ] of its own, with δ = 10⁻⁶·Δε, large enough for the 30-bit Arb radii. In
+  the sliver the row must lie in Z AND carry the side's sign.
+- The pieces between slivers then classify strictly.
+- After the fix the replay **passes** on the first sub-slab of [0, 0.005], [0.03, 0.04], [0.1962, 0.2262] and
+  [0.5562, 0.5862].
+
+### 9.2 Step 2: where the width came from, term by term (`u2_sample/terms_outer*.json`)
+
+On 40 outer cells from four units, three of which had not finished before:
+- the centre value D(w_c) and all four first-order terms are equal in producer and checker;
+- **only the checker's remainder M_comp blew up**, by up to 250× at large |σ|.
+
+**Cause** (math note §23.5, Lemma 23.4): Horner on a wide v-ball. The series was used up to v = 400, and the width of a
+ball Horner evaluation grows like e^{√V}·w, while the kernel decays.
+
+**Fix:** series only for v < 16; closed forms above.
+
+**Second checker bug found on the way:**
+- **What:** a midpoint-radius power u⁵ of a wide positive ball reached 0, a division gave NaN, and `min`/`max` dropped
+  the NaN half of a split ball. That is an unsound, too-narrow kernel enclosure.
+- **Fix:** powers of positive balls are taken from their endpoints; any non-finite half makes the result non-finite;
+  `_absmax` of a non-finite ball is +∞. A regression test covers it.
+- **Consequence: every checker number produced before this fix is VOID, and has been redone.** That covers the §8.3–8.4
+  timings, the PD pass on [0.5562, 0.6] and the earlier switch-replay results.
+
+**After both fixes:**
+- the checker's M_comp is within 3.3× of the producer's on every one of the 40 cells, and smaller near the box;
+- the checker's lower bound of D is positive on every cell.
+
+### 9.3 Step 3: outer exclusion, replay with refinement (`u2_outer_replay`, `u2_leaf_cells`, `u2_leaf_coverage`)
+
+**The producer's leaves are used as GEOMETRY ONLY. The checker trusts none of the producer's bounds.**
+- **Indices:** each leaf (p, q, h_p, h_q) is mapped to integer quadtree indices of a dyadic grid.
+- **Tiling:** the checker verifies, in exact integers and exact rationals, that the leaves tile its own grid rectangle
+  except for cells inside the closed 0.15 box.
+- **Domain:** the rectangle is compared with the regime's domain, rounded outward in Arb. Any rounding-level strip
+  between the two becomes extra cells.
+- **Cells:** every cell is checked by the checker's own Arb bounds (coupled, direct, iso, full), subdivided in θ and
+  then ε on failure.
+- **Time caps:** a unit gets a time cap with ε-splitting, then the re-search as a fallback.
+
+**Exports.** run1 has valid leaf exports for 1,067 of the 1,080 units. Missing are the **13 units of slab
+[0.005, 0.01] that were split in ε** (s01 k000–k012). The files present for k000–k002 are stale, from their failed first
+attempt. Regenerating all 13 is about 1.3 MB.
+
+**Measured: replay is slower than re-search here.**
+- A rescaled-regime unit has about 39k producer leaves, at about 0.4 s each. Started at leaf level, that is hours per
+  unit, so the replay timing runs were stopped at 30 min.
+- The re-search starts from coarse cells and certifies large regions in one evaluation.
+- So **re-search is the primary route, and replay is kept as the code path for units whose re-search fails.**
+
+### 9.4 Step 4: re-timed on run1's real exports after all fixes (3 gated processes, Arb 80 bits)
+
+| unit | outer re-search | ring (fast first) | PD | switch sub-slab replay |
+|---|---|---|---|---|
+| R [0, 0.005], k = 20 | pass, 1,602 evaluations, 1,138 s | 512/512 fast, 20 s | 1.0 s | [0, 0.0025]: **pass**, 73 s |
+| R [0.03, 0.04], k = 20 (was ≥ 2.9 h) | pass, 1,925 evaluations, 1,342 s | 512/512, 20 s | 4.2 s | first: **pass**, 92 s |
+| O [0.1962, 0.2262], k = 20 | pass, 887 evaluations, 889 s | 512/512, 31 s | 27 s | first: **pass**, 109 s |
+| O [0.5562, 0.5862], k = 20 (was ≥ 2.9 h) | pass, 683 evaluations, 690 s | 512/512, 41 s | 39 s | first: **pass**, 130 s |
+| O [0.5862, 0.6], k = 0 (was 6,081 s) | pass, 585 evaluations, 615 s | 512/512, 31 s | 9.5 s | see below |
+| O [0.5862, 0.6], k = 39 (was ≥ 1.2 h) | pass, 601 evaluations, 624 s | 512/512, 31 s | 9.4 s | see below |
+
+- **Switch on [0.5862, 0.6]:** its two sub-slabs (width 0.0069) need the checker's own ε-split (`u2_switch_shear_split`).
+  **Both pass**: each is split into two halves and takes about 1,100 s.
+- **Peak RSS:** ≤ 0.05 GB per checker process.
+
+### 9.5 Re-projection (core-hours and wall time). Above 48 h at 3 workers: STOP and report for a cluster allocation
+
+**Outer re-search, measured per unit:** 615–1,342 s.
+- Rescaled-regime units: 1,240 s on average, × 320 units ≈ 110 core-h.
+- Original-coordinate units: 705 s on average, × 760 units ≈ 149 core-h.
+
+**The other links:**
+- Ring (fast test first) and PD: about 45 s per unit, × 1,080 ≈ 13.5 core-h.
+- Switch: 269 producer sub-slabs at about 70 s to 1,100 s each. Assuming about 200 s on average, ≈ 15 core-h.
+
+**Total ≈ 290 core-hours.**
+- **≈ 96 h wall at the 3-worker cap**, which is above the author's 48 h limit. **The checker is NOT run locally.**
+- Peak memory ≤ 0.05 GB per process, so a cluster node can run many workers.
+- At 32 cores: ≈ 9 h wall.
+
+**Inputs a cluster run needs:**
+- the population certificate file (hash-checked);
+- run1's unit headers and switch exports (≈ 13 MB);
+- the 1,067 leaf files, needed only for the replay fallback (≈ 65 MB);
+- the 13 units of s01 k000–k012, which go by re-search (no leaves needed).

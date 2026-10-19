@@ -3531,3 +3531,44 @@ where:
 - **pass:** a cell outside the box, on an ε-interval that contains 0;
 - **fail:** the shifted-centre case, where the true minimiser is in the cell and the bound must not exceed 0;
 - **undecided:** a cell next to the box with a too-wide ε-interval, where the bound is ≤ 0 although the claim may hold.
+
+### 23.5 Where the checker's remainder blew up, and the fix (2026-10-19)
+
+**Diagnosis** (`results/uniform_eps/u2_sample/terms_outer.json`).
+- On 40 outer cells from four units (three of which had not finished), the producer's cell bound and the checker's
+  Proposition 23.3 were compared term by term.
+- **D(w_c) and the four first-order terms agree** to the printed digits.
+- **M_comp:**
+  - near the 0.15 box the checker's value is smaller than the producer's (4.2·10⁻³ against 5.4·10⁻³);
+  - at large |σ| it is up to 250 times larger (for example 4.75·10³ against 18.9; 27.1 against 0.10), and D's lower
+    bound turns negative.
+- So the term that blows up is the ball enclosure of the kernels inside M_comp at large v = εσ².
+
+**Lemma 23.4 (width of a Horner ball evaluation).**
+- **Statement.** Let k(v) = Σ_m c_m v^m and let v range over the ball [V − w, V + w], V ≥ w. Then Horner's rule in ball
+  arithmetic returns a ball whose radius is at least Σ_m |c_m|((V + w)^m − V^m) − (rounding). For the five kernels this is
+  of order e^{√V}·w/√V, while |k(v)| ≤ C·v^{−1} (Gt, J), C·v^{−1/2} (S) or C·v^{−2} (K1, K2).
+- *Proof.*
+  - Step 1. Each Horner step acc ← acc·v + c_m multiplies a ball by the ball v. The radius of a product is at least
+    |mid acc|·w + |mid v|·rad acc.
+  - Step 2. By induction, the radius after the last step is at least the radius of the polynomial with |c_m| evaluated
+    on [V, V + w] minus its value at V. The alternating signs, which make k small, do not cancel in the radius.
+  - Step 3. Σ |c_m| v^m equals the even part of the Taylor series of the corresponding entire function at u = √v, with all
+    signs made positive. This is of the order of cosh √v or sinh(√v)/√v, which gives the stated growth.
+  - Step 4. The decay of k: Gt = 1/u² − sin u/u³; S = sin u/u; and K1, K2 by differentiating these closed forms. ∎
+- **Consequence.** At V ≈ 90 (|σ| ≈ 50, ε ≈ 0.035) and w ≈ 2, the ball is about e^{9.5}·2/9.5 ≈ 3·10³ times wider than the
+  kernel's range. That is the observed blow-up.
+
+**Fix (checker only).**
+- The series is used only for v < 16, where e^{√16} = e⁴ ≈ 55 bounds the inflation factor.
+- The closed forms (§5.1 of the design page) are used for v ≥ 16. For u = √v ≥ 4 none of their terms cancel
+  catastrophically: each is a bounded trigonometric factor times a negative power of u, so their ball width is of order
+  the derivative times w.
+- A v-ball straddling 16 is split.
+- **Tests** (`tests/test_verify_u2.py`):
+  - series and closed forms agree at v = 16 and v = 400;
+  - a ball straddling 16 encloses its point values;
+  - on the wide ball v ∈ [80, 100], the enclosure of Gt, K1 and K2 is within 50 times the range of their point values;
+  - all the earlier 60-digit enclosure tests, including on ε-balls that contain 0.
+
+**What is unchanged.** Proposition 23.3 and its proof. Only the evaluation of the sups in M_comp and M_br changes.

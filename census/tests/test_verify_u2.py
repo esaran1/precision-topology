@@ -94,11 +94,28 @@ def test_closed_form_and_series_agree_across_v_equal_one():
         c = vc.u2_kernel(name, vc._ival(0.5, 3.0))
         for v in (0.5, 1.0, 2.0, 3.0):
             assert c.overlaps(vc.u2_kernel(name, arb(v)))
-        a4, b4 = vc._kernel_series(name, arb(400)), vc._kernel_closed(name, arb(400))
-        assert a4.overlaps(b4)                                  # the series/closed-form switch point
-        c = vc.u2_kernel(name, vc._ival(350.0, 450.0))           # a ball straddling it is split
-        for v in (350.0, 400.0, 450.0):
+        for vs_ in (16.0, 400.0):
+            a4, b4 = vc._kernel_series(name, arb(vs_)), vc._kernel_closed(name, arb(vs_))
+            assert a4.overlaps(b4)                              # the series/closed-form switch point (16) and beyond
+        c = vc.u2_kernel(name, vc._ival(10.0, 30.0))             # a ball straddling it is split
+        for v in (10.0, 16.0, 30.0):
             assert c.overlaps(vc.u2_kernel(name, arb(v)))
+
+
+def test_kernel_ball_width_does_not_blow_up_at_large_v():
+    """The width that dominated M_comp (math note §23.5): on a wide ball at large v, the enclosure stays within a modest
+    factor of the range of the point values on a fine grid (Arb point evaluations)."""
+    from mpmath import mp, mpf, sin, cos, sqrt
+    for name in ("Gt", "K1", "K2"):
+        b = vc.u2_kernel(name, vc._ival(80.0, 100.0))
+        width = float(b.upper() - b.lower())
+        with mp.workdps(40):
+            vals = []
+            for k in range(201):
+                vv = mpf(80) + mpf(20) * k / 200
+                vals.append(float(vc._kernel_closed(name, arb(float(vv))).mid()))
+        true = max(vals) - min(vals)
+        assert width < 50 * max(true, 1e-12) + 1e-9, (name, width, true)
 
 
 def test_nan_propagates_to_a_conservative_range():
@@ -293,3 +310,77 @@ def test_ring_fast_first_then_fallback(xy, branch):
     assert r["certified"] and r["fast"] + r["fallback"] == 2
     bad = vc.u2_ring_fast_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, rho_in=0.0, boxes=[(0.0, 0.0, 0.002)])
     assert not bad["certified"] and bad["fallback"] == 1
+
+
+@pytest.fixture(scope="module")
+def producer_leaves(xy, branch):
+    """A producer outer unit's leaves (geometry only, for the replay tests), ε in [0, 1e-3]."""
+    import json as _j
+    from src import u2_sample as m
+    x, y = xy
+    c, A_lo, A_hi = branch
+    cons = _j.loads((m.RESULTS / "uniform_eps" / "constants.json").read_text())
+    r, lv = m.outer_unit(0.0, 1e-3, A_lo, A_hi, c, x, y, "R", cons, record=True)
+    assert r["certified"]
+    arr = np.concatenate(lv)
+    return {k: np.asarray(arr[k]) for k in ("p", "q", "hp", "hq")}
+
+
+def test_leaf_coverage_pass_and_fail(producer_leaves, branch):
+    c, _, _ = branch
+    grid, keys = vc.u2_leaf_cells(producer_leaves)
+    ok, nbox = vc.u2_leaf_coverage(grid, keys, c, 0.15)
+    assert ok and nbox > 0
+    ok2, _ = vc.u2_leaf_coverage(grid, keys[:-1], c, 0.15)                 # a missing leaf: a hole outside the box
+    assert not ok2
+    ok3, _ = vc.u2_leaf_coverage(grid, keys + [keys[0]], c, 0.15)          # a duplicated leaf
+    assert not ok3
+
+
+def test_replay_cells_pass_fail_undecided(xy, branch, producer_leaves):
+    """Replay of a few producer leaves near the box with the checker's own bounds (geometry only)."""
+    x, y = xy
+    c, A_lo, A_hi = branch
+    grid, keys = vc.u2_leaf_cells(producer_leaves)
+    cells = [vc._cell_edges(grid, k) for k in keys]
+    near = [cl for cl in cells if 0.16 < max(abs(0.5 * (cl[0] + cl[1]) - c[0]), abs(0.5 * (cl[2] + cl[3]) - c[1])) < 0.4][:6]
+    r = vc.u2_outer_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, "R", cells=near, max_evals=2000)
+    assert r["verdict"] == "pass", r
+    rf = vc.u2_outer_arb(x, y, (c[0] + 0.3, c[1]), A_lo, A_hi, 0.0, 1e-3, "R",
+                         cells=[(c[0] - 0.05, c[0] + 0.05, c[1] - 0.05, c[1] + 0.05)], max_evals=2000)
+    assert rf["verdict"] in ("fail", "unresolved") and rf["verdict"] != "pass"
+    ru = vc.u2_outer_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, "R", cells=near, max_evals=1, max_depth=0)
+    assert ru["verdict"] == "unresolved"
+
+
+
+def test_kernel_never_drops_a_nan_half_and_wide_powers_stay_positive():
+    """Found 2026-10-19: a midpoint-radius power of a wide positive ball could reach 0, a division gave NaN, and min/max
+    dropped the NaN half of a split ball (an unsound, too-narrow enclosure).  Now: powers of positive balls by their
+    endpoints, and any non-finite half makes the whole result non-finite."""
+    u = vc._ival(4.0, 5.48)
+    assert bool(vc._pow(u, 5) > 0)
+    for name in ("Gt", "J", "S", "K1", "K2", "JJ"):
+        b = vc.u2_kernel(name, vc._ival(10.0, 30.0))
+        assert b.is_finite()
+        for v in (10.0, 13.0, 16.0, 22.0, 30.0):
+            assert b.overlaps(vc.u2_kernel(name, arb(v))), (name, v)
+    assert not vc._absmax(arb("nan")).is_finite()
+
+
+def test_switch_split_recenters_halves_and_passes(xy, sheared_slab):
+    """The checker's own ε-split of a switch sub-slab: halves re-centred along the published shears still pass."""
+    x, y = xy
+    r = vc.u2_switch_shear_split(x, y, 0.0, 3e-4, sheared_slab["Z"], sheared_slab["rows_boxes"], sheared_slab["J_tube"],
+                                 max_eps_depth=0)
+    assert r["pass"] and len(r["leaves"]) == 1
+
+
+def test_switch_piece_slivers_at_crossings(xy, sheared_slab):
+    """Rows whose ε-range crosses Z's moving A-range (the 2026-10-19 classification bug) are decided: no sign is
+    demanded on pieces where the row lies inside Z; the replay passes and logs the sliver pieces."""
+    x, y = xy
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, sheared_slab["Z"], sheared_slab["rows_boxes"], sheared_slab["J_tube"],
+                               return_rows=True)
+    assert r["pass"]
+    assert all(p_["need_sign"] in (-1, 1) for p_ in r["row_log"])
