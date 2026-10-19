@@ -28,6 +28,9 @@ def _exact(sig, eps, which):
                 c = (-1) ** m * s ** (2 * m + 2) / mp.factorial(2 * m + 2); g = e ** m * (1 + e)
             elif which == "d2f":
                 c = (-1) ** m * s ** (2 * m + 1) / mp.factorial(2 * m + 1); g = e ** m * (1 + e)
+            elif which == "dse":
+                c = (-1) ** m * s ** (2 * m + 2) / mp.factorial(2 * m + 2)
+                g = (m * e ** (m - 1) if m else 0) + (m + 1) * e ** m
             elif which == "de":
                 c = (-1) ** m * s ** (2 * m + 3) / mp.factorial(2 * m + 3)
                 g = (m * e ** (m - 1) if m else 0) + (m + 1) * e ** m
@@ -54,7 +57,7 @@ def _in(ball, val):
     return lo - tol <= v <= hi + tol
 
 
-@pytest.mark.parametrize("which", ["f", "df", "d2f", "de", "dee"])
+@pytest.mark.parametrize("which", ["f", "df", "d2f", "de", "dee", "dse"])
 def test_activation_encloses_60_digit_values_on_balls_containing_zero(which):
     rng = np.random.default_rng(3)
     for _ in range(25):
@@ -79,12 +82,12 @@ def test_activation_never_takes_sqrt_of_eps():
     """A ball reaching slightly negative ε (rounding of a ball at 0) stays finite: no √ε is ever formed."""
     act = vc.U2Act(arb(0, 1e-6))
     for t in (arb(2.0), vc._ival(-3, 3), vc._ival(0.1, 0.2)):
-        for fn in (act.f, act.df, act.d2f, act.de, act.dee):
+        for fn in (act.f, act.df, act.d2f, act.de, act.dee, act.dse):
             assert fn(t).is_finite()
 
 
 def test_closed_form_and_series_agree_across_v_equal_one():
-    for name in ("Gt", "J", "S", "K1", "K2"):
+    for name in ("Gt", "J", "S", "K1", "K2", "JJ"):
         a = vc._kernel_series(name, arb(1))
         b = vc._kernel_closed(name, arb(1))
         assert a.overlaps(b)
@@ -191,3 +194,52 @@ def test_switch_krawczyk_pass_and_fail(xy):
     shifted = [zf[0] + 5e-3, zf[1], zf[2], zf[3]]
     ok2, *_ = vc.krawczyk_arb(fun, shifted, [6e-4, 6e-4, 2e-4, 5e-4])
     assert not ok2
+
+
+def test_ring3d_first_order_pass_fail_undecided(xy, branch):
+    """The first-order-in-ε ring (u2_ring3d_arb): passes on ring boxes over an ε-interval [0, 1e-2] that contains 0;
+    never certifies a box containing the critical point; a too-small evaluation cap leaves it undecided."""
+    x, y = xy
+    c, A_lo, A_hi = branch
+    ok = vc.u2_ring3d_arb(x, y, c, A_lo, A_hi, 0.0, 1e-2, boxes=[(0.1, 0.0, 0.00625), (-0.1375, 0.1375, 0.00625)])
+    assert ok["certified"], ok
+    bad = vc.u2_ring3d_arb(x, y, c, A_lo, A_hi, 0.0, 1e-3, rho_in=0.0, boxes=[(0.0, 0.0, 0.002)], max_depth=1)
+    assert not bad["certified"]
+    und = vc.u2_ring3d_arb(x, y, c, A_lo, A_hi, 0.0, 1e-2, boxes=[(0.1, 0.0, 0.00625)], max_evals=1)
+    assert not und["certified"] and und["left"] >= 1
+
+
+@pytest.fixture(scope="module")
+def sheared_slab(xy):
+    """Producer data for one sheared switch slab ε ∈ [0, 3e-4] (contains 0), on a narrow A-tube around the switch."""
+    from src.u2_sample import switch_unit_shear, tube
+    x, y = xy
+    vs, J = tube(1.5e-4, x, y)
+    Jn = (vs[2] - 0.003, vs[2] + 0.003)
+    r = switch_unit_shear(0.0, 3e-4, Jn, x, y, vs)
+    assert r["unique_sign_change"], r
+    return r
+
+
+def test_switch_shear_pass(xy, sheared_slab):
+    x, y = xy
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, sheared_slab["Z"], sheared_slab["rows_boxes"], sheared_slab["J_tube"])
+    assert r["pass"], r
+
+
+def test_switch_shear_fail_on_a_displaced_Z_or_a_gap_in_the_tiling(xy, sheared_slab):
+    x, y = xy
+    Z = dict(sheared_slab["Z"]); Z["xt"] = list(Z["xt"]); Z["xt"][0] += 5 * Z["R"][0]       # the zero is not in this box
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, Z, sheared_slab["rows_boxes"], sheared_slab["J_tube"])
+    assert not r["pass"] and not r["Z_krawczyk"]
+    rows = [dict(rr) for rr in sheared_slab["rows_boxes"]]
+    rows[3]["A_hi"] = rows[3]["A_hi"] - 1e-6                                               # a gap in the A-tiling
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-4, sheared_slab["Z"], rows, sheared_slab["J_tube"])
+    assert not r["pass"] and not r["covered"]
+
+
+def test_switch_shear_undecided_on_a_too_wide_slab(xy, sheared_slab):
+    """The same published boxes over a ten-times wider ε-interval [0, 3e-3]: the Krawczyk tests no longer contract."""
+    x, y = xy
+    r = vc.u2_switch_shear_arb(x, y, 0.0, 3e-3, sheared_slab["Z"], sheared_slab["rows_boxes"], sheared_slab["J_tube"])
+    assert not r["pass"]

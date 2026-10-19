@@ -745,6 +745,20 @@ def gap_on_box(P, Q, e_lo, e_hi, delta=0.01):
     return bool(geo and dom), (O_act[0] - I_act[1], O_act[1] - I_act[0])
 
 
+def gap_on_box_mv(P, Q, e_lo, e_hi, delta=0.01):
+    """As gap_on_box (same validity tests), with G in first-order form in ε:
+    G(θ, ε) ∈ G(box, ε_c) + [−h, h]·(φ_ε(σ_O) − φ_ε(σ_I))(box, E)  (mean value in ε at fixed θ)."""
+    valid, _ = gap_on_box(P, Q, e_lo, e_hi, delta)
+    ec, he = 0.5 * (e_lo + e_hi), 0.5 * (e_hi - e_lo)
+    So = _sig_interval(_iv(*P), _iv(*Q), np.array([-1.2])); Si = _sig_interval(_iv(*P), _iv(*Q), np.array([0.8]))
+    oc = feat5(So[0], So[1], ec, ec); ic = feat5(Si[0], Si[1], ec, ec)
+    oE = feat5(So[0], So[1], e_lo, e_hi); iE = feat5(Si[0], Si[1], e_lo, e_hi)
+    G0 = _isub(oc[0], ic[0])
+    dG = _isub(oE[3], iE[3])
+    G = _iadd(G0, _iv_scale(dG, he))
+    return valid, (float(G[0][0]), float(G[1][0]))
+
+
 def switch_float(e, x, y, v0):
     """Float Newton for (p, q, A) with ∇_θ L* = 0 and G = 0 on the active pair, at ε."""
     v = np.array(v0, float)
@@ -765,7 +779,10 @@ def switch_float(e, x, y, v0):
     return v, Fv(v)[1]
 
 
-def switch_unit(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4), max_boxes=4000):
+def switch_unit(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4), max_boxes=4000, form="mv"):
+    """form 'zeroth' (the first version: G enclosed with ε as an interval; initial row radius includes 2·Δε) or 'mv'
+    (item-3 fix: G in first-order form in ε, G ∈ G(X, ε_c) + [−h, h]·(φ_ε(σ_O) − φ_ε(σ_I)) over X × E, and row boxes
+    started small and grown only by ε-inflation)."""
     ec = 0.5 * (e_lo + e_hi)
     vs, bs = switch_float(ec, x, y, v0)
     zf = [vs[0], vs[1], bs, vs[2]]
@@ -802,7 +819,7 @@ def switch_unit(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4), max_b
         xt = [v[0], v[1], bb[0]]
         Aint = _iv(a_lo, a_hi)
         fun = lambda Xb, Jf=True: system_iv(Xb, Aint, e_lo, e_hi, x, y, False, Jf)
-        rd = [1e-6 + 0.5 * (a_hi - a_lo) + 2 * (e_hi - e_lo)] * 3
+        rd = [1e-6 + 0.5 * (a_hi - a_lo) + 2 * (e_hi - e_lo)] * 3 if form == "zeroth" else [1e-7] * 3
         ok, Kb = False, None
         for _ in range(12):
             ok, Kb = krawczyk_iv(fun, xt, rd)
@@ -813,7 +830,8 @@ def switch_unit(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4), max_b
                 break
         within = ZA[0] - 1e-15 <= a_lo and a_hi <= ZA[1] + 1e-15
         if ok:
-            act, (glo, ghi) = gap_on_box(Kb[0], Kb[1], e_lo, e_hi)
+            act, (glo, ghi) = gap_on_box(Kb[0], Kb[1], e_lo, e_hi) if form == "zeroth" else \
+                gap_on_box_mv(Kb[0], Kb[1], e_lo, e_hi)
         else:
             act, glo, ghi = False, np.nan, np.nan
         sign = (-1 if ghi < 0 else 1 if glo > 0 else 0) if (ok and act) else None
@@ -924,7 +942,14 @@ def _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export, do_l
             def ring_run(lo, hi, cap):
                 rec_ = [] if export is not None else None
                 r_ = ring_unit(lo, hi, A_lo, A_hi, tuple(c), x, y, record=rec_)
-                return {"certified": r_["ring_ok"], "rec": rec_, "sub": [lo, hi], **r_}
+                r_ = {"certified": r_["ring_ok"], "rec": rec_, "sub": [lo, hi], "method": "lipschitz", **r_}
+                if not r_["certified"]:                   # item 3: the first-order (mean-value) form in ε, 3-D in (p, q, b)
+                    _, b_, *_ = point_eval([c[0]], [c[1]], 0.5 * (A_lo + A_hi), 0.5 * (lo + hi), x, y)
+                    t_ = time.time()
+                    r3 = ring3d((c[0], c[1], b_[0]), A_lo, A_hi, lo, hi, x, y, "mv")
+                    r_ = {"certified": r3["certified"], "rec": None, "sub": [lo, hi], "method": "mv3d",
+                          "lipschitz_boxes": r_["boxes"], "seconds_mv3d": time.time() - t_, **r3}
+                return r_
             def pd_run(lo, hi, cap):
                 r_ = pd_unit(lo, hi, A_lo, A_hi, tuple(c), x, y)
                 return {"certified": r_["pd_ok"], **r_}
@@ -935,6 +960,7 @@ def _probe_unit(k, e_lo, e_hi, regime, n_sub, J, w, vs, x, y, cons, export, do_l
                     rb = [np.c_[b_, np.full((len(b_), 2), r_["sub"])] for _, _, c_, r_ in lv_ if c_ and r_.get("rec")
                           for b_ in r_["rec"]]
                 res[nm] = {"ok": all(c_ for _, _, c_, _ in lv_), "n_subslabs": len(lv_),
+                           "methods": sorted({r_.get("method", "-") for _, _, _, r_ in lv_}),
                            "subslab_widths": sorted({hi - lo for lo, hi, _, _ in lv_}),
                            "boxes": sum(r_.get("boxes", 0) for _, _, _, r_ in lv_),
                            "margin_lower": min((r_.get("grad_margin_lower", r_.get("lam_lower", math.inf))
@@ -1011,7 +1037,7 @@ def _cur_rss_gb():
 
 
 def switch_split(e_lo, e_hi, J_tube, x, y, v0, min_width=1e-5, max_seconds=1800.0, keep_rows=False, store=None,
-                 prefix="sw"):
+                 prefix="sw", form="shear"):
     """switch_unit on closed ε-sub-slabs: a sub-slab whose switch part fails is halved (recursively, to min_width).
     store: each sub-slab's result is a unit (stored atomically, skipped on a restart)."""
     t0 = time.time()
@@ -1024,7 +1050,7 @@ def switch_split(e_lo, e_hi, J_tube, x, y, v0, min_width=1e-5, max_seconds=1800.
         r = store.get(key) if store is not None else None
         if r is None:
             t1 = time.time()
-            r = switch_unit(lo, hi, J_tube, x, y, v0)
+            r = (switch_unit if form == "zeroth" else switch_unit_shear)(lo, hi, J_tube, x, y, v0)
             r["seconds"] = time.time() - t1
             if not keep_rows:
                 r = {k: v for k, v in r.items() if k != "rows_boxes"}
@@ -1189,13 +1215,13 @@ def krawczyk_modes(xc, rad, e_lo, e_hi, x, y, mode, A_iv=None, with_gap=True, A_
         if ok:
             return True, r, {"iterations": it + 1, "X1": X1.tolist(), "seg": seg}
         r = [max(r[i], 1.5 * max(abs(K[i][0]), abs(K[i][1]))) for i in range(k)]
-        if not all(np.isfinite(r)) or max(r[i] / rad[i] for i in range(k)) > 50:
+        if not all(np.isfinite(r)) or max(r) > 0.05:
             break
     return False, r, {"X1": X1.tolist(), "seg": seg}
 
 
 def ring3d(centre3, A_lo, A_hi, e_lo, e_hi, x, y, mode, side=0.0125, rho_in=RHO_U, rho_out=RHO, max_depth=4,
-           max_boxes=400_000):
+           max_boxes=60_000):
     """No zero of F = ∇_{p,q,b} L in the ring rho_in <= |θ − θ_c(ε, A)|_∞ <= rho_out(+shear), any b, A, ε: boxes in
     (ψ_p, ψ_q, β) are excluded if 0 ∉ F̃_p, F̃_q or F̃_b, with
       F̃ ∈ F(θ_c + ψ, b_c + β; A_c, ε_c) + [−h_ε, h_ε]·T_ε + [−h_A, h_A]·T_A,
@@ -1295,6 +1321,135 @@ def run_diag(cases, out_name):
         rec["rss_gb"] = rss_gb()
         st.put(key, rec)
         print(key, {k_: rec[k_] for k_ in rec if k_ in ("ok", "certified", "boxes", "left", "seconds")}, flush=True)
+
+
+def run_switch_widths(eps_list, widths, out_name):
+    """Slab width the switch part needs at each ε: switch_unit on [ε, ε + w] for w in `widths` (descending), stopping
+    at the first that passes (resumable per (ε, w))."""
+    from .u2_store import UnitStore
+    x, y = pop()
+    st = UnitStore(OUT / "units" / out_name)
+    for e in eps_list:
+        for w in widths:
+            key = f"sw_{e!r}_{w!r}"
+            r = st.get(key)
+            if r is None:
+                lo, hi = e, min(0.6, e + w)
+                if hi - lo < w * 0.999:
+                    lo = hi - w
+                vs, J = tube(0.5 * (lo + hi), x, y)
+                t0 = time.time()
+                r = (switch_unit_shear if os.environ.get("U2_SWITCH_FORM") == "shear" else switch_unit)(lo, hi, J, x, y, vs)
+                r = {k: v for k, v in r.items() if k not in ("rows_boxes", "Z")}
+                r.update({"eps": [lo, hi], "w": w, "seconds": time.time() - t0, "rss_gb": rss_gb()})
+                st.put(key, r)
+                print(key, r.get("unique_sign_change"), r.get("n_boxes"), round(r["seconds"], 1), flush=True)
+            if r.get("unique_sign_change"):
+                break
+
+
+def gap_sheared(xt, R, X1, e_lo, e_hi):
+    """G(θ, ε) for θ in the sheared box θ(ε) = xt + (ε − ε_c)·X1 + [−R, R] (p, q components):
+    G ∈ G(xt ± R, ε_c) + [−h, h]·(∇_θG·X1 + ∂_εG)(hull × E)."""
+    ec, he = 0.5 * (e_lo + e_hi), 0.5 * (e_hi - e_lo)
+    P, Q = _iv(xt[0] - R[0], xt[0] + R[0]), _iv(xt[1] - R[1], xt[1] + R[1])
+    Ph = _iv(xt[0] - R[0] - he * abs(X1[0]), xt[0] + R[0] + he * abs(X1[0]))
+    Qh = _iv(xt[1] - R[1] - he * abs(X1[1]), xt[1] + R[1] + he * abs(X1[1]))
+    def f5(PP, QQ, xx, lo, hi):
+        Sc, d = _sig_interval(PP, QQ, np.array([xx]))
+        return feat5(Sc, d, lo, hi)
+    oc, ic = f5(P, Q, -1.2, ec, ec), f5(P, Q, 0.8, ec, ec)
+    oh, ih = f5(Ph, Qh, -1.2, e_lo, e_hi), f5(Ph, Qh, 0.8, e_lo, e_hi)
+    G0 = _isub(oc[0], ic[0])
+    gp = _isub(iscal(-1.2, *oh[1]), iscal(0.8, *ih[1]))
+    gq = _isub(oh[1], ih[1])
+    T = _iadd(_iadd(iscal(float(X1[0]), *gp), iscal(float(X1[1]), *gq)), _isub(oh[3], ih[3]))
+    G = _iadd(G0, _iv_scale(T, he))
+    return float(G[0][0]), float(G[1][0])
+
+
+def switch_unit_shear(e_lo, e_hi, J_tube, x, y, v0, rz=(6e-4, 6e-4, 2e-4, 5e-4), max_boxes=4000):
+    """Item 3 (a): the switch with SHEARED boxes.  Z follows x̃(ε) = x̃ + (ε − ε_c)·X1 (X1 = −J⁻¹∂_εΦ, its A-part the
+    predicted A′ = A*·c_s at first order), so only the offset is certified; each branch row follows its own 3-var shear.
+    A row is 'left' if it lies left of Z's A-range for every ε, 'right' likewise; a row whose A-range meets Z's (moving)
+    A-range for some ε must have its sheared box inside Z's sheared θ-range for every ε AND, where it can also lie
+    outside, a decided sign."""
+    ec, he = 0.5 * (e_lo + e_hi), 0.5 * (e_hi - e_lo)
+    vs, bs = switch_float(ec, x, y, v0)
+    zf = [vs[0], vs[1], bs, vs[2]]
+    okZ, RZ, infoZ = krawczyk_modes(zf, list(rz), e_lo, e_hi, x, y, "shear")
+    if not okZ:
+        return {"switch_box_ok": False, "unique_sign_change": False, "form": "shear", "rad": RZ}
+    X1Z = infoZ["X1"]; segZ = infoZ["seg"]
+    actZ, _ = gap_on_box((zf[0] - RZ[0] - segZ[0], zf[0] + RZ[0] + segZ[0]),
+                         (zf[1] - RZ[1] - segZ[1], zf[1] + RZ[1] + segZ[1]), e_lo, e_hi)
+    A_Z, R_A, dA = zf[3], RZ[3], he * abs(X1Z[3])
+    out_lo, out_hi, in_lo, in_hi = A_Z - R_A - dA, A_Z + R_A + dA, A_Z - R_A + dA, A_Z + R_A - dA
+    edges = [J_tube[0]]
+    while edges[-1] < out_lo - 1e-15:
+        edges.append(min(out_lo, edges[-1] + min(2e-3, max(2e-5, 0.25 * (out_lo - edges[-1])))))
+    nin = max(1, int(math.ceil((out_hi - out_lo) / 2e-5)))
+    edges += [out_lo + (out_hi - out_lo) * i / nin for i in range(1, nin + 1)]
+    while edges[-1] < J_tube[1] - 1e-15:
+        edges.append(min(J_tube[1], edges[-1] + min(2e-3, max(2e-5, 0.25 * (edges[-1] - out_hi) + 2e-5))))
+    queue = [(edges[i], edges[i + 1]) for i in range(len(edges) - 1)]
+    rows, v = [], np.array([vs[0], vs[1]])
+    while queue and len(rows) < max_boxes:
+        a_lo, a_hi = queue.pop(0)
+        Ac = 0.5 * (a_lo + a_hi)
+        v = branch_point(Ac, ec, x, y, start=v)
+        _, bb, *_ = point_eval([v[0]], [v[1]], Ac, ec, x, y)
+        xt = [v[0], v[1], bb[0]]
+        ok, R, info = krawczyk_modes(xt, [1e-7] * 3, e_lo, e_hi, x, y, "shear", A_iv=_iv(a_lo, a_hi), with_gap=False)
+        left, right = a_hi <= out_lo + 1e-15, a_lo >= out_hi - 1e-15
+        inner = in_lo <= a_lo and a_hi <= in_hi
+        sign, inZ = None, False
+        if ok:
+            X1 = info["X1"]
+            glo, ghi = gap_sheared(xt, R, X1, e_lo, e_hi)
+            sign = -1 if ghi < 0 else 1 if glo > 0 else 0
+            inZ = all(abs(xt[i] - zf[i]) + he * abs(X1[i] - X1Z[i]) + R[i] < RZ[i] for i in range(3))
+        if ok and (left or right) and sign == 0 and a_hi - a_lo > 1e-7:
+            m_ = 0.5 * (a_lo + a_hi); queue[:0] = [(a_lo, m_), (m_, a_hi)]; continue
+        band_ok = False
+        if ok and not left and not right and not inner:
+            # Z's A-range moves with ε: L(ε) = A_Z − R_A + (ε − ε_c)A′, U(ε) = A_Z + R_A + (ε − ε_c)A′.  Cut the slab
+            # where a row edge meets L or U; on each piece the row is entirely left (sign −), entirely right (sign +),
+            # entirely inside (its box in Z's box) or partly outside (box in Z's box AND the side's sign).
+            A1 = X1Z[3]
+            cuts = [e_lo, e_hi]
+            if abs(A1) > 0:
+                for edge_A, off in ((a_lo, -R_A), (a_hi, -R_A), (a_lo, R_A), (a_hi, R_A)):
+                    t = ec + (edge_A - A_Z - off) / A1
+                    if e_lo < t < e_hi:
+                        cuts.append(t)
+            cuts = sorted(cuts)
+            band_ok = True
+            for lo_o, hi_o in zip(cuts[:-1], cuts[1:]):
+                if hi_o - lo_o <= 0:
+                    continue
+                em, ho = 0.5 * (lo_o + hi_o), 0.5 * (hi_o - lo_o)
+                Lm, Um = A_Z - R_A + (em - ec) * A1, A_Z + R_A + (em - ec) * A1
+                need_in = not (a_hi < Lm or a_lo > Um)
+                need_sign = -1 if a_lo < Lm else (1 if a_hi > Um else 0)
+                if need_in:
+                    band_ok = band_ok and all(abs(xt[i_] + (em - ec) * X1[i_] - zf[i_] - (em - ec) * X1Z[i_])
+                                              + ho * abs(X1[i_] - X1Z[i_]) + R[i_] < RZ[i_] for i_ in range(3))
+                if need_sign:
+                    g_ = gap_sheared([xt[0] + (em - ec) * X1[0], xt[1] + (em - ec) * X1[1]], R, X1, lo_o, hi_o)
+                    band_ok = band_ok and ((need_sign < 0 and g_[1] < 0) or (need_sign > 0 and g_[0] > 0))
+        good = ok and ((left and sign == -1) or (right and sign == 1) or
+                       (not left and not right and ((inZ and (inner or sign in (-1, 1))) or band_ok)))
+        rows.append({"A_lo": a_lo, "A_hi": a_hi, "ok": ok, "sign": sign, "inZ": inZ, "good": bool(good),
+                     "xt": [float(t) for t in xt], "R": [float(t) for t in R],
+                     "X1": [float(t) for t in info.get("X1", [0, 0, 0])]})
+    unique = bool(okZ and actZ and not queue and all(r_["good"] for r_ in rows))
+    return {"switch_box_ok": True, "active_pair_Z": bool(actZ), "form": "shear", "Z_A_moving": [out_lo, out_hi],
+            "n_boxes": len(rows), "n_bad": sum(not r_["good"] for r_ in rows), "unique_sign_change": unique,
+            "first_bad": [{k: r_[k] for k in ("A_lo", "A_hi", "ok", "sign", "inZ")} for r_ in rows if not r_["good"]][:3],
+            "Z": {"xt": [float(t) for t in zf], "R": [float(t) for t in RZ], "X1": [float(t) for t in X1Z]},
+            "J_tube": list(J_tube),
+            "rows_boxes": [{k: r_[k] for k in ("A_lo", "A_hi", "xt", "R", "X1")} for r_ in rows]}
 
 
 def run_stages(e_lo, e_hi, regime, frac, n_sub, stages=("outer", "ring", "pd", "switch"), max_seconds=300.0):
@@ -1419,6 +1574,9 @@ if __name__ == "__main__":
                          stages=tuple(sys.argv[7].split(",")) if len(sys.argv) > 7 else ("outer", "ring", "pd", "switch"))
         (OUT / f"stages_{sys.argv[4]}_{sys.argv[2]}_{sys.argv[3]}_c{BOX_CHUNK}.json").write_text(
             json.dumps(rec, indent=1, default=float))
+    elif sys.argv[1] == "swwidth":
+        run_switch_widths([float(v) for v in sys.argv[2].split(",")], [float(v) for v in sys.argv[3].split(",")],
+                          sys.argv[4])
     elif sys.argv[1] == "diag":
         run_diag(json.loads(Path(sys.argv[2]).read_text()), sys.argv[3])
     elif sys.argv[1] == "ascan":

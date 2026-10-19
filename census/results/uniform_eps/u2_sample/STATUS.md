@@ -99,3 +99,17 @@ Every complete JSONL line was written in one piece after its spec finished.
 - **Reason:** the author lowered the threshold and said to proceed with the work. Free disk was about 17 GB.
 - **State at the change:** suite part 1 had passed at 14:13 (1497 passed, 1 skipped, exit 0). The certificates test was
   waiting on the 19 GB gate.
+
+## Update (2026-10-18, about 21:40): sampling and timing complete (NO full run)
+- **Done:** the memory measurement, the item-3 diagnosis and implementation, the ε = 0.1 scan, all 40 A-sub-intervals on
+  four slabs, the checker timings (including the thin-margin ring boxes), the widening sample and the projection. All are
+  in U2_design.md §7.
+- **Disk pauses:** the checker timing was paused twice by the watchdog (free disk < 15 GB). Each time it was resumed after
+  a separate passing gate. The timing jobs that were stopped on purpose (checker outer at 12,000 evaluations; the earlier
+  uncapped runs) are recorded as such in §7.5.
+- **Trustworthy unit results:** `units/probes6`, `units/swwidth1`–`swwidth6`, `units/diag1`, `units/ascan_w0.1`,
+  `units/stages_*`, plus `checker_timing4.json` (O outer), `checker_timing5.json` (links) and `checker_thin.json`.
+  - `swwidth1`–`swwidth5` used earlier versions of the switch code; their labels say which.
+  - `checker_timing.json`, `checker_timing2.json` and `checker_timing3.json` are runs of the checker before it split ε per
+    cell. They were superseded and are not used.
+- **No process of mine is running.**

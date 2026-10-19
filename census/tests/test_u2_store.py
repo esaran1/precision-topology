@@ -85,7 +85,7 @@ def test_switch_split_is_unit_resumable(tmp_path, monkeypatch):
     def fake_switch(lo, hi, *a):                                # certifies sub-slabs of width <= 0.25e-3
         calls.append((lo, hi))
         return {"unique_sign_change": hi - lo <= 0.25e-3 + 1e-15, "n_boxes": 1}
-    monkeypatch.setattr(m, "switch_unit", fake_switch)
+    monkeypatch.setattr(m, "switch_unit_shear", fake_switch)
     st = us.UnitStore(tmp_path)
     r1 = m.switch_split(0.0, 1e-3, (0.66, 0.71), None, None, None, store=st, prefix="sw")
     n1 = len(calls)

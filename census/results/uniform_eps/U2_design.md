@@ -441,3 +441,163 @@ point θ outside the box has an Arb upper bound below the branch's Arb lower bou
    - The thin margin, about 2·10⁻⁶ against gradients of about 10⁻², means the Arb checker's ring boxes will need their own
      subdivision.
 6. **This page.**
+
+## 7. Restart results (2026-10-18; sample only, NO full run)
+
+All runs below are one process, nice 15, one thread. Each was preceded by its own gate step; the disk thresholds were set
+by the author for this phase (see STATUS.md). Unit results are in `u2_sample/units/*`, the logs in `u2_sample/*.log`.
+
+### 7.1 Memory (spec 11: ε ∈ [0.0352, 0.0452], R, k = 0)
+
+| stage | result | time |
+|---|---|---|
+| outer | certified | 2.8 s |
+| ring (Lipschitz) | fails at this width, quickly | 1,536 boxes, 0.22 s |
+| PD | passes | 80 boxes, 0.10 s |
+| switch | the first version's switch needs ≤ 3.9·10⁻⁵ sub-slabs | stopped at its 1,800 s cap |
+
+- **Peak RSS: 1.00 GB for the whole process, imports included**, against 3.73 GB before the 256-box cap.
+- Peak RSS over every later sample run: 1.15 GB (all-40 runs) and 1.51 GB (widening units).
+
+### 7.2 Item 3: diagnosis of the switch and ring failures
+
+**Switch box Z alone** (4-variable Krawczyk at the slab's float switch point):
+
+| ε-slab | plain | first-order (mv) | sheared |
+|---|---|---|---|
+| [0, 10⁻³] | pass | pass | pass |
+| [0, 10⁻²] | fail | fail | fail |
+
+**The whole switch part** (Z plus the branch rows that sign the gap):
+- The first version, and the mv form, need sub-slabs ≤ 3·10⁻⁵ at every ε tested (0 to 0.59). The cause is in the branch
+  rows: the row boxes must contain the branch for every ε in the slab, so their gap enclosure is too wide near Z.
+- **The sheared form** (`switch_unit_shear`) follows the branch along its predicted ε-dependence. Z's A-range is treated
+  as moving, and the band rows are decided ε-piece by ε-piece. Widths that pass:
+
+| ε | 0 | 0.035 | 0.1 | 0.3 | 0.59 |
+|---|---|---|---|---|---|
+| widest sub-slab that passes | 3·10⁻³ | 3·10⁻³ | 5·10⁻³ | 5·10⁻³ | 5·10⁻³ |
+| seconds per sub-slab | about 2 | 2 | 2–3 | 3 | 3 |
+
+  On [0, 10⁻²] it **fails** (Z does not contract).
+- **Neither form passes on [0, 10⁻²].** The sheared form is implemented and in use. The switch slab widths needed are:
+  3·10⁻³ for ε < 0.1 and 5·10⁻³ for ε ≥ 0.1, which is about 134 switch sub-slabs over [0, 0.6].
+
+**Ring:**
+
+| ε-slab | Lipschitz | first-order 3-D in (p, q, b) | sheared 3-D |
+|---|---|---|---|
+| [0, 10⁻³] | pass | pass | pass |
+| [0, 10⁻²] | fail | pass | pass |
+| [0.0352, 0.0452] (spec 11) | fail | pass | pass |
+
+- The first-order 3-D form takes about 11 s per unit.
+
+**Implemented on both sides, with no shared code** (tests: `tests/test_u2_shear.py` and `tests/test_verify_u2.py`, all on
+ε-intervals that contain 0):
+- **Producer:** `switch_unit_shear`, now the default in `switch_split`; `ring3d` (mv), used as the fallback when the
+  Lipschitz ring fails; `gap_sheared`; `krawczyk_modes`.
+- **Checker:** `u2_ring3d_arb` (first-order form in ε); `u2_switch_shear_arb` (sheared Krawczyk in Arb with the
+  producer's shear vector taken as data; any vector gives a valid test); `U2Act.dse` and the JJ kernel.
+- 42 of the new tests pass.
+
+### 7.3 The ε-slab width 0.1 scan (slab [0.1, 0.2], original-coordinate domain, 40 A-sub-intervals, 30 s cap)
+
+**All 40 fail**, each at the time cap. The live cell is the same in all of them: the domain corner p ≈ 6.26 ≈ p_max,
+q ≈ −9.92 ≈ −π/√ε_lo, with lower bound D ≈ −19 to −20. So at width 0.1 the obstruction is the edge of the large-|σ|
+domain, not the branch.
+
+### 7.4 All 40 A-sub-intervals on four slabs (producer; `probes6.jsonl`)
+
+| slab | outer | outer time (total / median) | leaves | ring | PD | switch | total |
+|---|---|---|---|---|---|---|---|
+| R [0, 0.005] | 40/40 | 138 s / 3.5 s | 1.57M | 40/40 (mv3d), 488 s | 40/40, 5 s, λ ≥ 0.026 | 2 sub-slabs, 7 s | 640 s |
+| R [0.0362, 0.0462] | 40/40 | 115 s | 1.57M | 40/40, 377 s | 40/40, 5 s, λ ≥ 1.6·10⁻⁵ | 4 sub-slabs, 13 s | 509 s |
+| O [0.30, 0.33] | 40/40 | 11 s | 49k | 40/40, 331 s | 40/40, 88 s (2 sub-slabs) | 16 sub-slabs, 94 s | 524 s |
+| O [0.57, 0.60] | 40/40 | 13 s | 41k | 40/40, 459 s | 40/40, 313 s, **λ ≥ 4.7·10⁻⁷** | 16 sub-slabs, 93 s | 877 s |
+
+- **The PD margin is thin at large ε** (λ ≥ 4.7·10⁻⁷ on [0.57, 0.60]).
+- Every ring unit needed the mv3d form; the Lipschitz form failed at these widths.
+
+### 7.5 Checker (check_u2_unit itself; Arb, 80 bits)
+
+**Outer re-search** (the primary route): 0.29–0.47 s per cell evaluation.
+- On the O unit [0.30, 0.33], k = 20: **unresolved after 12,000 evaluations** (≈ 1.5 h). 6,303 cells passed by the direct
+  ε-ball bound, 0 by the Taylor test, and 5,394 ε-splits were made.
+- The first version, which split ε only by depth, did no better (unresolved after 12,000 evaluations).
+- On the R unit: unresolved after 3,000 evaluations (1,000 s).
+- **Cause:** the checker's cell bound is the existing first-order `Objective.lower_bound` with A and ε as balls. Near the
+  box, the ε-ball loses the cancellation that the producer's coupled second-order bound keeps.
+- **As written, the re-search is not feasible at the producer's slab widths.**
+
+**Ring, first-order 3-D in Arb:** 0.51–0.85 s per tile, so 512 tiles is 4–7 min per unit. All 16 sampled tiles per unit
+certified.
+
+**Thin-margin ring boxes:** the 10 thinnest producer boxes of two units (producer margins 1.8·10⁻⁶ to 6.8·10⁻⁵) were
+all certified by the checker:
+
+| form | certified | seconds per box |
+|---|---|---|
+| ball form (`u2_ring_arb`) | 10/10 | 0.024 |
+| first-order 3-D | 10/10 | 0.47 |
+
+**PD:** 0.7 s (R) to 21 s (O, 320 boxes) per unit.
+
+**Switch replay** (`u2_switch_shear_arb`, on the first sub-slab of each export):
+- Z's Krawczyk test passes on both. On the O sub-slab, the active pair is not certified on Z's hull.
+- **Most rows fail**: 109 of 188 (R) and 165 of 176 (O), at 22–35 s per sub-slab.
+- It passes on the narrow-tube test slab [0, 3·10⁻⁴]. The replay uses the producer's radii as they are; it needs its own
+  radius inflation, or narrower sub-slabs.
+
+### 7.6 Projection (NOT a full run; for the author's decision)
+
+**Slabs:**
+- R: 5·10⁻³ slabs on [0, 0.03] (6), then 10⁻² on [0.03, 0.0462] (2). That is 8 slabs.
+- O: 0.03 slabs on [0.0462, 0.6]. That is 19 slabs.
+- In total 27 slabs × 40 A-sub-intervals = 1,080 units, plus about 134 switch sub-slabs.
+
+**Producer:**
+- Measured cost per slab: 509–877 s, all links included. That gives about 8 × 600 s + 19 × 700 s ≈ **5 h at one worker**.
+  With up to 1.5× for splits, ≤ 7.5 h.
+- At the 3-worker cap: ≈ 1.7–2.5 h.
+
+**Memory:**
+- Peak RSS ≤ 1.51 GB per worker (measured).
+- Each worker stays well under the 3 GB rule. Three workers need about 4.5 GB, which fits when the memory gate passes
+  (≥ 25 % of 16 GB free). **3 workers fit; the 3-worker cap binds.**
+
+**Exports:**
+
+| part | size |
+|---|---|
+| R outer leaves (~105 KB per unit × 320) | ≈ 34 MB |
+| O outer leaves (~5 KB per unit × 760) | ≈ 4 MB |
+| switch sub-slabs (~50 KB × 134) | ≈ 7 MB |
+| Lipschitz ring boxes where used (~52 KB per unit) | ≤ 56 MB |
+| mv3d ring box lists, if exported for replay (~100 KB per unit) | ≈ 110 MB |
+| **total** | **≲ 0.2 GB on disk**, against 15–19 GB free |
+
+**Checker (measured unit costs):**
+- **Outer: ≥ 1.5 h per unit and still unresolved**, so ≥ 1,600 h for 1,080 units. **Infeasible as written.**
+- Ring: 4–7 min per unit, ≈ 100 h.
+- PD: ≤ 21 s per unit, ≈ 3 h.
+- Switch: currently fails most rows.
+- **What would make it feasible:**
+  1. the producer's coupled second-order cell bound (difference to the branch, gradients in θ, A and ε at the cell centre,
+     curvature from Arb sup-balls), derived independently in Arb;
+  2. the checker's own Krawczyk radius inflation in the switch replay;
+  3. the ball-form ring (0.024 s per box) as the first try, with the 3-D form only as the fallback.
+
+  Each of these is code still to write; none has been timed.
+
+**Widening the window to [0.5 A_ε, 2 A_ε]** (outer exclusion only; sampled at r = 0.5, 0.75, 1.5, 2):
+- **Above the window:** cheap. R: 2.3–2.4 s per unit. O: 0.2 s per unit.
+- **Below the window, O:** cheap, 0.2–0.3 s per unit.
+- **Below the window, R (r = 0.5, 0.75 at ε ∈ [0, 0.005]): fails at the 300 s cap.** The live cell is the K(24) corner
+  (p ≈ 24, q ≈ −50.8): at lower A the branch bound rises above the B(P) table's exclusion. That region would need a new
+  bound.
+- **Unit count:** the window is ≈ 20× wider, so about 800 A-sub-intervals per slab.
+- **Projected producer cost of the widening:**
+  - O ≈ 3–4 min per slab, about 1 h for 19 slabs;
+  - R above the window ≈ 25 min per slab, ≈ 3.5 h for 8 slabs;
+  - R below the window: infeasible without a new bound.
