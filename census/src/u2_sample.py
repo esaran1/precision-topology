@@ -1513,6 +1513,41 @@ def outer_cell_terms(pc, qc, hp, hq, A_lo, A_hi, e_lo, e_hi, centre, x, y):
     return out
 
 
+def run_releaf(store_name, keys, prefix_out):
+    """Regenerate the leaf exports of ε-split outer units (the producer side; PRODUCER-ONLY): for each stored unit
+    record, rerun outer_unit on each certified ε-sub-slab with recording, and export one npz + meta per sub-slab
+    (<prefix_out>_kNNN_e<j>.npz).  A stale export of the unit's failed first attempt, if present, is renamed *.stale."""
+    from .u2_store import UnitStore
+    x, y = pop()
+    cons = json.loads((RESULTS / "uniform_eps" / "constants.json").read_text())
+    st = UnitStore(OUT / "units" / store_name, extra=CHECK_LABEL)
+    for key in keys:
+        r = st.get(key)
+        k = r["k"]
+        old = OUT / f"{prefix_out}_k{k:03d}.npz"
+        if old.exists():
+            old.rename(old.with_suffix(".npz.stale"))
+            m_ = OUT / f"{prefix_out}_k{k:03d}.meta.json"
+            if m_.exists():
+                m_.rename(m_.with_suffix(".json.stale"))
+        subs = r["outer_split"]["subslabs"] if "outer_split" in r else [[r["eps"][0], r["eps"][1], True, None]]
+        for j, (lo, hi, ok, _) in enumerate(subs):
+            done = OUT / f"{prefix_out}_k{k:03d}_e{j}.meta.json"
+            if done.exists():
+                continue
+            t0 = time.time()
+            res, lv = outer_unit(lo, hi, r["A"][0], r["A"][1], tuple(r["centre"]), x, y, r["regime"], cons, record=True,
+                                 max_rounds=8, max_seconds=600.0)
+            arr = np.concatenate(lv)
+            path = OUT / f"{prefix_out}_k{k:03d}_e{j}.npz"
+            np.savez_compressed(path, check_status=np.array(CHECK_LABEL["check_status"]),
+                                **{f: np.ascontiguousarray(arr[f]) for f in arr.dtype.names})
+            done.write_text(json.dumps({"eps": [lo, hi], "A": r["A"], "centre": r["centre"], "regime": r["regime"],
+                                        "fields": list(arr.dtype.names), "certified": res["certified"],
+                                        "parent_unit": key, **CHECK_LABEL}))
+            print(key, j, lo, hi, res["certified"], len(arr), round(time.time() - t0, 1), flush=True)
+
+
 def run_stages(e_lo, e_hi, regime, frac, n_sub, stages=("outer", "ring", "pd", "switch"), max_seconds=300.0):
     """One unit, stage by stage, with the peak RSS reached after each stage (diagnosis of the 3 GB excursion)."""
     x, y = pop()
@@ -1635,6 +1670,8 @@ if __name__ == "__main__":
                          stages=tuple(sys.argv[7].split(",")) if len(sys.argv) > 7 else ("outer", "ring", "pd", "switch"))
         (OUT / f"stages_{sys.argv[4]}_{sys.argv[2]}_{sys.argv[3]}_c{BOX_CHUNK}.json").write_text(
             json.dumps(rec, indent=1, default=float))
+    elif sys.argv[1] == "releaf":
+        run_releaf(sys.argv[2], sys.argv[3].split(","), sys.argv[4])
     elif sys.argv[1] == "swwidth":
         run_switch_widths([float(v) for v in sys.argv[2].split(",")], [float(v) for v in sys.argv[3].split(",")],
                           sys.argv[4])

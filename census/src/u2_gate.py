@@ -35,12 +35,22 @@ class GateRefused(RuntimeError):
     pass
 
 
-def measure():
-    out = subprocess.run(["memory_pressure", "-Q"], capture_output=True, text=True).stdout
-    free = float(re.search(r"free percentage:\s*([0-9.]+)%", out).group(1))
-    sw = subprocess.run(["sysctl", "vm.swapusage"], capture_output=True, text=True).stdout
-    swap_free = float(re.search(r"free = ([0-9.]+)M", sw).group(1))
-    st = os.statvfs("/")
+def measure(path="/"):
+    """macOS: memory_pressure's free percentage and vm.swapusage; Linux: MemAvailable/MemTotal and SwapFree from
+    /proc/meminfo.  Disk: free space of the filesystem holding `path`."""
+    if sys.platform == "darwin":
+        out = subprocess.run(["memory_pressure", "-Q"], capture_output=True, text=True).stdout
+        free = float(re.search(r"free percentage:\s*([0-9.]+)%", out).group(1))
+        sw = subprocess.run(["sysctl", "vm.swapusage"], capture_output=True, text=True).stdout
+        swap_free = float(re.search(r"free = ([0-9.]+)M", sw).group(1))
+    else:
+        info = {}
+        for line in Path("/proc/meminfo").read_text().splitlines():
+            k, v = line.split(":", 1)
+            info[k.strip()] = float(v.split()[0])           # kB
+        free = 100.0 * info["MemAvailable"] / info["MemTotal"]
+        swap_free = info.get("SwapFree", 0.0) / 1024.0
+    st = os.statvfs(path)
     disk_gb = st.f_bavail * st.f_frsize / 2 ** 30
     return {"mem_free_pct": free, "swap_free_mb": swap_free, "disk_free_gb": disk_gb}
 
@@ -105,16 +115,17 @@ def require_gate(label, gate_log=GATE_LOG, launch_log=LAUNCH_LOG, max_age_s=MAX_
 
 
 def main(argv):
-    if argv[0] != "gate":
-        raise SystemExit("usage: python -m src.u2_gate gate <label> [--disk-gb X]")
-    disk = float(argv[argv.index("--disk-gb") + 1]) if "--disk-gb" in argv else 20.0
+    if not argv or argv[0] != "gate":
+        raise SystemExit("usage: python -m src.u2_gate gate <label> [--disk-gb X] [--swap-mb Y] [--mem-pct Z]")
+    opt = lambda k, d: float(argv[argv.index(k) + 1]) if k in argv else d
+    disk, swap, mem = opt("--disk-gb", 20.0), opt("--swap-mb", 500.0), opt("--mem-pct", 25.0)
     label = argv[1] if len(argv) > 1 else ""
-    m = measure()
-    ok = evaluate(m, disk_gb=disk)
+    m = measure(str(DEFAULT_DIR) if DEFAULT_DIR.exists() else "/")
+    ok = evaluate(m, mem_pct=mem, swap_mb=swap, disk_gb=disk)
     write_entry(label, m, ok)
     print(f"{time.strftime('%Y-%m-%d %H:%M:%S')} gate '{label}' free={m['mem_free_pct']:.0f}% "
-          f"swap_free={m['swap_free_mb']:.0f}M disk_free={m['disk_free_gb']:.1f}G (need {disk:g}G) -> "
-          f"{'PASS' if ok else 'FAIL'}")
+          f"swap_free={m['swap_free_mb']:.0f}M disk_free={m['disk_free_gb']:.1f}G (need {disk:g}G, swap {swap:g}M, "
+          f"mem {mem:g}%) -> {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 
 

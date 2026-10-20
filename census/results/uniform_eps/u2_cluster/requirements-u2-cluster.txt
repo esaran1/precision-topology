@@ -1,0 +1,7 @@
+# Track U, U2 cluster run: the checker needs only these (plus the standard library).
+# Local environment: CPython 3.11.7, macOS-26.3-arm64 (the reference verdicts were produced there).
+# VM: CPython 3.11.x on Linux x86_64. Wheels are platform-specific, so the --hash lines are generated ON THE VM before
+# the run (see VM_COMMANDS.md, step 2) and committed back. The run script also refuses unless the imported versions
+# equal these pins exactly.
+numpy==2.4.6
+python-flint==0.9.0

@@ -1,0 +1,14 @@
+{
+ "platform": "darwin",
+ "verdicts": {
+  "s000_k020": true,
+  "s006_k020": true,
+  "s013_k020": true,
+  "s025_k020": true,
+  "s026_k039": true
+ },
+ "versions": {
+  "numpy": "2.4.6",
+  "python-flint": "0.9.0"
+ }
+}

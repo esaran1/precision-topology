@@ -815,3 +815,33 @@ attempt. Regenerating all 13 is about 1.3 MB.
 - run1's unit headers and switch exports (≈ 13 MB);
 - the 1,067 leaf files, needed only for the replay fallback (≈ 65 MB);
 - the 13 units of s01 k000–k012, which go by re-search (no leaves needed).
+
+## 10. NaN audit, the regenerated leaves, and the cluster package (2026-10-19)
+
+**NaN audit** (`results/certificate_audit.md`, "NaN audit"):
+- The affected helpers (`_pow`, `u2_kernel`'s split union, `_absmax`) first appear in bd1083e and 3ce551d
+  (2026-10-18/19), and only U2 code calls them.
+- `git diff 69af96f 0f3b252` on the checker is one insertion hunk: every older function is unchanged.
+- Every earlier check, from the paper-submitted-v5 checker through Track 4, used only older functions. Their range
+  functions are NaN-guarded since 12c79ea, or cannot produce NaN.
+- **No earlier verdict is affected; none needed a re-run.** The U2 checker results from before the fix were already
+  voided and redone.
+
+**Leaves for the 13 ε-split units** (s01 k000–k012): regenerated per sub-slab, as `run1_s01_kNNN_e{0,1}.npz` plus meta
+(26 files, about 39k leaves each). The stale files from the failed first attempts are renamed `*.stale`. All are
+PRODUCER-ONLY.
+
+**Cluster package** (`results/uniform_eps/u2_cluster/`):
+- `jobs.json`: 1,080 units and 269 switch sub-slabs.
+- `MANIFEST.sha256`: every input export, the checker source, the run script, the verify-back script, the gate and store
+  helpers, the version pins, jobs.json and the reference verdicts.
+- `BUNDLE_FILES.txt`: the inputs that are not in git.
+- `requirements-u2-cluster.txt`: numpy 2.4.6 and python-flint 0.9.0. The run script refuses on any other version, and
+  the wheel hashes are generated on the VM, since wheels are platform-specific.
+- `src/u2_cluster_run.py`, in this order:
+  - verifies every manifest hash first and the pinned versions; refuses without a separate gate entry;
+  - phase reference: the 5 units must match the laptop's verdicts exactly, else it stops with exit 4;
+  - phase full: refuses unless the reference phase matched against this manifest;
+  - each job writes one atomic result file; resumable.
+- `src/u2_cluster_verify.py`: the local verify-back.
+- `VM_COMMANDS.md`: the author's command sequence.

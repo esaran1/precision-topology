@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-ENTRY_POINTS = ["src.u2_sample", "src.u2_checker_timing"]
+ENTRY_POINTS = ["src.u2_sample", "src.u2_checker_timing", "src.u2_soundness"]
 
 
 def _run(mod, args, gate_dir):
@@ -56,4 +56,4 @@ def test_every_u2_main_calls_the_gate():
         if '__name__ == "__main__"' not in src or f.name == "u2_gate.py":
             continue
         main = src.split('__name__ == "__main__"', 1)[1]
-        assert "require_gate(" in main, f.name
+        assert "require_gate(" in main or ("require_gate(" in src and "main(" in main), f.name

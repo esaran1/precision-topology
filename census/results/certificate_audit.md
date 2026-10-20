@@ -224,3 +224,40 @@ The driver is `src/track4_certs.py`; `certificate_checks/track4_summary.json` co
   and the localisation at finite ε. Only its outer-margin input is confirmed, in (a).
 - The limit and finite-a transversality statements are not checked (see (b)).
 - The convexity-in-A lemma and the localisation lemmas are used as proved in the math note, not machine-checked.
+
+## NaN audit (2026-10-19): the "dropped half of a split ball" bug found in the U2 checker
+
+**The bug** (fixed in 0f3b252). It needed three new U2 helpers together:
+- `_pow`: a midpoint-radius power of a wide positive ball can reach 0, and a later division then gives NaN;
+- `u2_kernel`: the union of a v-ball split at the series/closed-form threshold took `min`/`max` of the two halves'
+  endpoints, so a NaN half was silently dropped;
+- `_absmax`: returned a finite value for a NaN ball.
+
+**Where it came from.** `git log -S` on `src/verify_certificates.py`:
+- `def u2_kernel` and `def _pow` first appear in **bd1083e (2026-10-18)**, and `def _absmax` in **3ce551d (2026-10-19)**.
+- They are called only from the U2 functions (U2Act, u2_*), which were added in the same commits.
+- `git diff 69af96f 0f3b252` on this file is **one insertion hunk and no changed line**: every function that existed at
+  Track 4 (69af96f, 2026-09-29) is byte-identical today.
+- No paper-submitted* tag contains any of the three helpers. The tags up to v4.2 contain no checker at all; v5
+  (2026-09-26) contains the checker without them.
+
+**Every earlier check, by function and code path.** None executed the affected code.
+
+| check (record) | date | functions used | can the pattern occur? |
+|---|---|---|---|
+| finite-a glob brackets ×12 (`verify_certificates_finite.log`, bcdcaef1) | 09-24 | check_finite → Objective (FA), FA.range, gap_bounds, t_interval | no: FA.f = t + a·sin t has no power, division, log or sqrt of a ball that can contain 0, so no candidate can be NaN |
+| Ĝ enclosures ×13 (`ghat_*.json`, ab5f473) | 09-24/25 | check_ghat → _oriented_gap_*, FA.range, range_inner, tiling | no: the same FA candidates, which are finite |
+| limit status A_lo / A_hi (`limit_A_*.json`, 6575e94) | 09-25 | check_limit → HAct, localisation_bounds, PAVA | HAct used `**` (NaN on a ball containing 0). Fixed by 12c79ea (09-25 10:50), with a NaN guard in every range function; the A_lo run made before the fix was declared void and rerun (this audit file, "Limit-switch checks") |
+| K = sup G₀ (`K_base*.json`, 3e554ac) | 09-25 | check_K → g0_upper, _h_attained (guarded), _k_cells | no: _h_attained returns ±∞ on any non-finite candidate; the other operands are polynomials of finite balls |
+| c₁ Krawczyk, PD, ring (`c1_krawczyk.json`, `pd_*.json`, `ring_*.json`, 4eec460) | 09-25 | switch_system_arb, krawczyk_arb, _pd_box, _ring_interval | no min/max over possibly-NaN balls; the divisions are by 1 + e^{−z} ≥ 1 and by n |
+| c₁ follow-up ×10 (`c1_followup_checks.json`, ae6a0ce, 8a603e3) | 09-25/26 | check_finite (FA) | no (as for the finite-a brackets) |
+| Track 4 outer exclusion ×41, solve brackets limit ×2 and finite ×12 (69af96f) | 09-28/29 | outer_exclusion_arb (HShift ⊂ HAct, guarded), limit_solve_end, region_excluded_arb, check_solve | no: every range function used is guarded since 12c79ea; the HShift power-free polynomial has no division |
+| U2 checker timings before 0f3b252 (chkA/B/C/PD/SW*) | 10-18/19 | U2 functions | **yes: already declared VOID and redone** (U2_design.md §9.2) |
+
+**Conclusion.**
+- No earlier certificate check could have executed the affected code. It did not exist before bd1083e, and the older
+  functions are unchanged.
+- The same pattern (min/max over possibly-NaN balls) is guarded in every older range function. It has been guarded since
+  12c79ea, whose pre-fix run was already voided and rerun.
+- So no earlier verdict is affected and no re-run is needed. The U2 checker results from before the fix were voided and
+  redone.

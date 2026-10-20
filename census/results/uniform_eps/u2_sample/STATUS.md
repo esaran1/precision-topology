@@ -163,3 +163,15 @@ Every complete JSONL line was written in one piece after its spec finished.
 - **Step 4 (timing):** six units and six switch sub-slabs all pass in the checker after the fixes.
   - The projection is ≈ 290 core-h, ≈ 96 h wall at 3 workers, above 48 h.
   - **STOP, for a cluster allocation.**
+
+## 2026-10-19 (evening): NaN audit, regenerated leaves, cluster package
+- **NaN audit:** no earlier certificate check could have executed the affected code (see `certificate_audit.md`). No
+  verdict changes; no re-run was needed.
+- **Leaves:** 26 per-sub-slab leaf files were regenerated for s01 k000–k012. The stale first-attempt files are renamed
+  `*.stale`.
+- **Cluster package:** `results/uniform_eps/u2_cluster/` (MANIFEST sha256
+  3a7a2f778b8d3bf420c84e88da0bf8f39e73651aece75d527f762ff9fa6ab33d).
+  - The 5 local reference units (s000_k020, s006_k020, s013_k020, s025_k020, s026_k039) all passed in the checker, in
+    642–1,374 s each at ≤ 0.045 GB.
+  - The 1,080-unit result stays **PRODUCER ONLY, NOT INDEPENDENTLY CHECKED** until the cluster run and its verify-back
+    pass.
