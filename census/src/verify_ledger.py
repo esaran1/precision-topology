@@ -617,6 +617,7 @@ def main() -> None:
     phase3_checks()
     phase1b_checks()
     phase2c_checks()
+    rebuttal_input_checks()
 
     provenance_check()
 
@@ -3956,6 +3957,141 @@ def phase2c_checks() -> None:
         chk(f"P2C pooled {k} n", float(J["pooled"][k]["summary"]["n"]), float(n), 0)
     chk("P2C κχ cells for the simplicity-bias benchmark",
         float(sum(c["setting"] == "simplicity bias" and c["quantity"] == "kappa_chi" for c in J["cells"])), 0.0, 0)
+
+
+def rebuttal_input_checks() -> None:
+    """Rebuttal revision (2026-11-14): every post-submission number cited in results/rebuttal/partB_input_blocks.md
+    with an [L: RB-nn] tag, recomputed from the committed score artifacts.  Reads only; no registered file changes."""
+    print("Rebuttal input blocks (RB-nn tags in results/rebuttal/partB_input_blocks.md)")
+    J_ = lambda rel: json.loads((R / rel).read_text())
+    C = J_("phase1c/scores.json")["arms"]
+
+    def crit(tag, c, n, c1, c2, c3, c4=None, tol3=6e-4):
+        chk(f"{tag} n", float(c["C1"]["n"]), float(n), 0)
+        chk(f"{tag} crossing within", float(c["C1"]["n_within"]), float(c1), 0)
+        chk(f"{tag} lag within", float(c["C2"]["n_within"]), float(c2), 0)
+        chk(f"{tag} median ratio", float(c["C3"]["median_ratio"]), float(c3), tol3)
+        if c4 is not None:
+            chk(f"{tag} C4 lo", float(c["C4"]["ci95"][0]), c4[0], 0.06)
+            chk(f"{tag} C4 hi", float(c["C4"]["ci95"][1]), c4[1], 0.06)
+
+    oth = lambda arm: C[arm]["DESCRIPTIVE"]["other_f"]
+    chk("RB-01 W1 registered f", float(C["W1"]["f"]), 0.90, 0)
+    crit("RB-01 W1", C["W1"], 84, 84, 84, 1.169, (-79.9, -76.6))
+    chk("RB-01 W1 band lo", float(C["W1"]["C3"]["band"][0]), 0.80, 1e-12)
+    chk("RB-01 W1 band hi", float(C["W1"]["C3"]["band"][1]), 1.20, 1e-12)
+    E = J_("phase1a/summary.json")["settings"]["w1_sgd_run"]["est"]
+    chk("RB-01 W1 est-seed median ratio f=0.90 (seen before f and band were set)",
+        float(E["0.9"]["ratio_r_obs_over_r_fc"]["median"]), 1.172, 6e-4)
+    chk("RB-01 W1 est-seed median ratio f=0.95", float(E["0.95"]["ratio_r_obs_over_r_fc"]["median"]), 1.094, 6e-4)
+    chk("RB-02 W1 other f", float(oth("W1")["f"]), 0.95, 0)
+    crit("RB-02 W1 f=0.95", oth("W1")["criteria_stats"], 84, 84, 84, 1.094)
+    for arm, tag, n, c3, c4, n_o, c1_o, c4_o in (
+            ("G", "RB-03", 79, 0.995, (-34.8, -27.1), 79, 9, None),
+            ("T", "RB-04", 101, 0.979, (-13.7, -9.2), 101, 0, (25.1, 31.3)),
+            ("Tp", "RB-05", 120, 1.016, (-46.6, -41.6), 120, 0, None)):
+        chk(f"{tag} {arm} registered f", float(C[arm]["f"]), 0.95, 0)
+        chk(f"{tag} {arm} outcome PASS", float(C[arm]["outcome"] == "PASS"), 1.0, 0)
+        c1 = {"G": 74}.get(arm, n)
+        crit(f"{tag} {arm}", C[arm], n, c1, c1, c3, c4)
+        o = oth(arm)
+        chk(f"{tag} {arm} other f", float(o["f"]), 0.90, 0)
+        cs = o["criteria_stats"]
+        chk(f"{tag} {arm} f=0.90 crossing within", float(cs["C1"]["n_within"]), float(c1_o), 0)
+        chk(f"{tag} {arm} f=0.90 crossing FAIL", float(cs["C1"]["verdict"] == "FAIL"), 1.0, 0)
+        chk(f"{tag} {arm} f=0.90 lag within", float(cs["C2"]["n_within"]), float(c1), 0)
+        if c4_o:
+            chk(f"{tag} {arm} f=0.90 C4 lo", float(cs["C4"]["ci95"][0]), c4_o[0], 0.06)
+            chk(f"{tag} {arm} f=0.90 C4 hi", float(cs["C4"]["ci95"][1]), c4_o[1], 0.06)
+    chk("RB-03 G f=0.90 median ratio", float(oth("G")["criteria_stats"]["C3"]["median_ratio"]), 1.022, 6e-4)
+    chk("RB-04 T runs", float(C["T"]["n_runs"]), 200.0, 0)
+    chk("RB-05 Tp sign test PASS", float(C["Tp"]["S"]["verdict"] == "PASS"), 1.0, 0)
+    for arm in C:
+        chk(f"RB-0x {arm} NaN recomputations differing", float(C[arm]["n_nan_recompute_differs"]), 0.0, 0)
+
+    T = J_("trackA/scores.json")
+    chk("RB-07 a=1.77 outcome PASS", float(T["outcome"] == "PASS" or "PASS" in str(T["outcome"])), 1.0, 0)
+    crit("RB-07 a=1.77", T, 98, 93, 93, 0.940, (-59.3, -47.4))
+    chk("RB-07 a=1.77 misses", float(T["n_scored_miss"]), 3.0, 0)
+    d95 = T["DESCRIPTIVE"]["f_0.95_primary_rule"]["criteria_at_pilot_tolerances_IN_SAMPLE"]
+    chk("RB-07 a=1.77 f=0.95 crossing within", float(d95["C1"]["n_within"]), 92.0, 0)
+    chk("RB-07 a=1.77 f=0.95 lag within", float(d95["C2"]["n_within"]), 92.0, 0)
+    chk("RB-07 a=1.77 f=0.95 median ratio", float(d95["C3"]["median_ratio"]), 0.970, 6e-4)
+
+    B = J_("phase1b/summary.json")["arms"]
+    for arm, tag, key, n, c1, c2, c3, miss in (
+            ("track_a/sgd", "RB-08 a=1.65 SGD f=0.90", "at_f", 63, 63, 63, 1.216, 0),
+            ("track_a/adam", "RB-08 a=1.65 Adam f=0.90", "at_f", 74, 39, 43, 1.158, 8),
+            ("track_a/sgd", "RB-08 a=1.65 SGD f=0.95", "at_f_other_DESCRIPTIVE", 63, 63, 63, 1.123, 0),
+            ("track_a/adam", "RB-08 a=1.65 Adam f=0.95", "at_f_other_DESCRIPTIVE", 74, 34, 46, 1.067, 7),
+            ("track2a/adam", "RB-09 a=1.85 Adam f=0.90", "at_f", 75, 55, 55, 1.354, 19),
+            ("track2a/adam", "RB-09 a=1.85 Adam f=0.95", "at_f_other_DESCRIPTIVE", 75, 61, 60, 1.209, 14)):
+        o = B[arm][key]
+        crit(tag, o.get("criteria") or o, n, c1, c2, c3)
+        chk(f"{tag} misses", float(o["n_scored_miss"]), float(miss), 0)
+    chk("RB-08 a=1.65 f", float(B["track_a/sgd"]["f"]), 0.90, 0)
+    chk("RB-08 a=1.65 SGD median-ratio FAIL", float(B["track_a/sgd"]["at_f"]["criteria"]["C3"]["verdict"] == "FAIL"), 1.0, 0)
+    for arm, tag, rho, n, verdict in (("track_a/sgd", "SGD", 0.995, 63, "PASS"), ("track_a/adam", "Adam", 0.218, 66, "FAIL")):
+        L3 = B[arm]["at_f"]["registered_criteria_on_r_fc"]["L3"]
+        chk(f"RB-08 a=1.65 {tag} causal Spearman", float(L3["spearman"]), rho, 6e-4)
+        chk(f"RB-08 a=1.65 {tag} causal Spearman n", float(L3["n"]), float(n), 0)
+        chk(f"RB-08 a=1.65 {tag} causal ordering {verdict}", float(L3["verdict"] == verdict), 1.0, 0)
+    E1 = T["DESCRIPTIVE"]["ext_1c"]
+    e1 = E1["criteria_at_pilot_tolerances_IN_SAMPLE"]
+    chk("RB-07 a=1.77 1C extrapolation misses", float(E1["n_miss"]), 21.0, 0)
+    chk("RB-07 a=1.77 1C extrapolation n", float(e1["C1"]["n"]), 98.0, 0)
+    chk("RB-07 a=1.77 1C extrapolation crossing within", float(e1["C1"]["n_within"]), 77.0, 0)
+    chk("RB-07 a=1.77 1C extrapolation lag within", float(e1["C2"]["n_within"]), 67.0, 0)
+    chk("RB-07 a=1.77 1C extrapolation median ratio", float(e1["C3"]["median_ratio"]), 1.252, 6e-4)
+
+    K = J_("phase2c/kappa_chi_map.json")["pooled"]
+    for key, frac, n in (("width-1 sine | Adam", 0.73, 408), ("width-1 sine | SGD", 0.89, 207),
+                         ("width-1 GELU | Adam", 1.0, 114), ("band task in R^d | Adam", 1.0, 705),
+                         ("width 2 | Adam", 0.12, 75)):
+        chk(f"RB-10 {key} n", float(K[key]["summary"]["n"]), float(n), 0)
+        chk(f"RB-10 {key} frac |kx| <= 0.1", float(K[key]["summary"]["frac_abs_le_0.1"]), frac, 0.006)
+
+    A2 = J_("phase2a/scores.json")["criteria"]
+    chk("RB-11 2A fold criterion within", float(A2["F"]["n_within"]), 22.0, 0)
+    chk("RB-11 2A delay exponent", float(A2["E"]["slope"]), 0.698, 6e-4)
+
+    P2 = J_("phase2b/scores.json")["arms"]["out16"]
+    chk("RB-12 2B n", float(P2["n_seeds"]), 80.0, 0)
+    chk("RB-12 2B matched-scale smallest lower end", float(min(P2["criteria"]["R_s"]["lower"])), 0.118, 6e-4)
+    chk("RB-12 2B matched-loss accuracy smallest lower end", float(min(P2["criteria"]["R_l_acc"]["lower"])), 0.031, 6e-4)
+    D2 = J_("phase2b/scores.json")["DESCRIPTIVE"]["arms"]["out16"]
+    chk("RB-12 2B step cost to 3s*", float(D2["steps_ratio_vs_arm1"]["scale_3s*"]["median"]), 12.35, 0.006)
+    chk("RB-12 2B matched steps rho2", float(D2["paired_vs_arm1"]["match_step|rho2"]["median"]), -0.240, 6e-4)
+
+    P3 = J_("phase3/scores.json")
+    Q, S_ = P3["arms"]["Q"], P3["arms"]["S"]
+    crit("RB-13 width-4 Q", Q, 112, 110, 107, 1.0014, tol3=6e-5)
+    crit("RB-13 width-4 S", S_, 119, 119, 117, 1.0297, tol3=6e-5)
+    chk("RB-13 Q crossing tolerance", float(Q["tau_cross"]), 125.0, 0)
+    chk("RB-13 Q median predicted lag", float(Q["validity_inputs"]["median_abs_predicted_lag_steps"]), 87.0, 0.5)
+    chk("RB-13 random holds", float(P3["collapse_random_holds_T4"]["n_random_holds"]), 710.0, 0)
+    chk("RB-13 genuine four-unit", float(P3["collapse_random_holds_T4"]["n_genuine_four_unit_unplaced"]), 0.0, 0)
+    chk("RB-13 f", float(Q["f"]), 0.95, 0)
+
+    L = J_("trackL/scores.json")["arms"]
+    for i, v in enumerate((-0.0015, -0.0051, -0.0099)):
+        chk(f"RB-14 Track L R lower {i}", float(L["out16"]["criterion"]["lower"][i]), v, 6e-5)
+    chk("RB-14 Track L R FAIL", float(L["out16"]["criterion"]["verdict"] == "FAIL"), 1.0, 0)
+    chk("RB-14 Track L n", float(min(L["out16"]["criterion"]["n_both"])), 40.0, 0)
+
+    H = J_("phase2a_ps2/scores.json")["criteria"]["H"]
+    chk("RB-15 per-seed H no-crossing", float(H["n_no_crossing_to_1.25sF"]), 23.0, 0)
+    chk("RB-15 per-seed H n", float(H["n"]), 30.0, 0)
+
+    FP_ = J_("final_posthoc.json")["part1_delay_law"]["by_eps_source"]["eps_fc"]
+    chk("RB-16 per-seed exponents below 2/3", float(FP_["n_below_2_3"]), 7.0, 0)
+    chk("RB-16 per-seed exponent SD", float(FP_["slope_sd"]), 0.031, 6e-4)
+
+    LN = json.loads((R / "designs" / "trackLN_explore" / "LN_summary.json").read_text())["arms"]["out16"]["levels"]
+    # gate (1) is defined at the three loss levels only (trackL_results.md §5); "end" is not a gate level
+    costs = sorted(float(LN[k]["step_cost"]["median"]) for k in ("bce_0.6", "bce_0.3", "bce_0.03"))
+    chk("RB-17 LayerNorm step cost min", costs[0], 1.00, 0.006)
+    chk("RB-17 LayerNorm step cost max", costs[-1], 1.09, 0.006)
 
 
 def provenance_check() -> None:

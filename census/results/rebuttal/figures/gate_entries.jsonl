@@ -1,0 +1,5 @@
+{"time": 1794694112.982198, "pid": 73525, "label": "figures_rebuttal render", "ok": true, "mem_free_pct": 38.0, "swap_free_mb": 709.38, "disk_free_gb": 11.73483657836914}
+{"time": 1794694233.4577842, "pid": 74020, "label": "figures_rebuttal render 2 (layout fixes)", "ok": true, "mem_free_pct": 34.0, "swap_free_mb": 1436.69, "disk_free_gb": 10.594841003417969}
+{"time": 1794694266.323495, "pid": 74174, "label": "figures_rebuttal render 3 (scope layout)", "ok": true, "mem_free_pct": 38.0, "swap_free_mb": 1500.69, "disk_free_gb": 10.56881332397461}
+{"time": 1794694311.6694121, "pid": 74310, "label": "figures_rebuttal render 4 (lag off-scale)", "ok": true, "mem_free_pct": 37.0, "swap_free_mb": 1433.19, "disk_free_gb": 10.592235565185547}
+{"time": 1794694401.404754, "pid": 74764, "label": "figures_rebuttal render 5 (captions)", "ok": true, "mem_free_pct": 42.0, "swap_free_mb": 1277.88, "disk_free_gb": 11.545364379882812}

@@ -1,0 +1,196 @@
+{
+ "mechanism": {
+  "1.3": {
+   "s_switch": 4.956250000000001,
+   "n_cross": 38,
+   "n_path": 47,
+   "cross_below_bound": 1.0
+  },
+  "1.5": {
+   "s_switch": 2.53125,
+   "n_cross": 38,
+   "n_path": 47,
+   "cross_below_bound": 1.0
+  }
+ },
+ "switch_law": {
+  "n_finite": 6,
+  "n_small": 5,
+  "max_abs_rel_dev_from_law": 0.02646463426643053,
+  "A_lo": 0.6812499999999999,
+  "A_hi": 0.6875,
+  "A_star": 0.6854452375756535,
+  "c_s": 0.662154709395519
+ },
+ "lag_causal": {
+  "sgd_158": {
+   "r_obs": 84,
+   "r_fc": 84,
+   "n_scored": 84,
+   "n_miss": 0,
+   "f": 0.9,
+   "c1_within": 84,
+   "median_ratio": 1.1693926388821412
+  },
+  "sgd_165": {
+   "r_obs": 63,
+   "r_fc": 63,
+   "n_scored": 63,
+   "n_miss": 0,
+   "f": 0.9,
+   "c1_within": 63,
+   "median_ratio": 1.2164073916748177
+  },
+  "adam_177": {
+   "r_obs": 95,
+   "r_fc": 95,
+   "n_scored": 98,
+   "n_miss": 3,
+   "f": 0.9,
+   "c1_within": 93,
+   "median_ratio": 0.9396891684045983
+  },
+  "adam_165": {
+   "r_obs": 66,
+   "r_fc": 66,
+   "n_scored": 74,
+   "n_miss": 8,
+   "f": 0.9,
+   "c1_within": 39,
+   "median_ratio": 1.1580195762776477
+  },
+  "off_scale": {
+   "sgd_158": [],
+   "sgd_165": [],
+   "adam_177": [
+    [
+     -0.5300358104644419,
+     0.09874878503467621
+    ]
+   ],
+   "adam_165": []
+  }
+ },
+ "scope": {
+  "forecasts": [
+   {
+    "label": "width-1 GELU, warm start",
+    "k": 74,
+    "n": 79,
+    "f": 0.95,
+    "k90": 9,
+    "n90": 79,
+    "f90": 0.9
+   },
+   {
+    "label": "width-2, output LR \u00f71024",
+    "k": 101,
+    "n": 101,
+    "f": 0.95,
+    "k90": 0,
+    "n90": 101,
+    "f90": 0.9
+   },
+   {
+    "label": "width-2, branch-point start",
+    "k": 120,
+    "n": 120,
+    "f": 0.95,
+    "k90": 0,
+    "n90": 120,
+    "f90": 0.9
+   },
+   {
+    "label": "width-4, branch-point start",
+    "k": 110,
+    "n": 112,
+    "f": 0.95,
+    "k90": null,
+    "n90": null,
+    "f90": null
+   },
+   {
+    "label": "width-4, branch-point start, sign",
+    "k": 119,
+    "n": 119,
+    "f": 0.95,
+    "k90": null,
+    "n90": null,
+    "f90": null
+   },
+   {
+    "label": "tanh width-4, delay (22 rates)",
+    "k": 22,
+    "n": 22,
+    "f": 0.95,
+    "k90": null,
+    "n90": null,
+    "f90": null
+   }
+  ],
+  "standard": [
+   {
+    "label": "width-1 sine, Adam",
+    "k": 297,
+    "n": 408,
+    "frac": 0.7279411764705882
+   },
+   {
+    "label": "width-1 sine, SGD",
+    "k": 184,
+    "n": 207,
+    "frac": 0.8888888888888888
+   },
+   {
+    "label": "width-1 GELU, Adam",
+    "k": 114,
+    "n": 114,
+    "frac": 1.0
+   },
+   {
+    "label": "band task, Adam",
+    "k": 705,
+    "n": 705,
+    "frac": 1.0
+   },
+   {
+    "label": "width-2 sine, Adam",
+    "k": 9,
+    "n": 75,
+    "frac": 0.12
+   }
+  ],
+  "mlp": [
+   {
+    "arm": "output LR \u00f716",
+    "level": "loss 0.6",
+    "median": 0.0,
+    "lo": -0.0015306174755096436,
+    "hi": 0.0005102157592773438,
+    "n": 40
+   },
+   {
+    "arm": "output LR \u00f716",
+    "level": "loss 0.3",
+    "median": 0.0028061270713806152,
+    "lo": -0.005102068185806274,
+    "hi": 0.009948968887329102,
+    "n": 40
+   },
+   {
+    "arm": "output LR \u00f716",
+    "level": "loss 0.03",
+    "median": -0.003571420907974243,
+    "lo": -0.009948968887329102,
+    "hi": 0.0007652938365936279,
+    "n": 40
+   }
+  ]
+ },
+ "layout": {
+  "mechanism": [],
+  "switch_law": [],
+  "lag_causal": [],
+  "scope": []
+ }
+}
