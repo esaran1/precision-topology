@@ -3686,6 +3686,34 @@ def phase2a_ps2_checks() -> None:
 P3_PIN = {"Q": ("PASS", 112, 115), "S": ("PASS", 119, 120), "T4": ("PASS", 95, 95)}
 
 
+ANON_REGISTERED = "anonymised_registered.json"      # present only in the review supplement (written by its builder)
+
+
+def registration_with_anonymised(mod) -> None:
+    """mod.assert_registration(), unchanged, unless the review supplement's record of anonymised registered files exists
+    (results/anonymised_registered.json; author's decision 2026-11-14).  Then the same checks run here, in the same
+    order, with one exception: a file named in that record must have exactly the registered SHA-256 recorded for it
+    in the manifest AND exactly the shipped SHA-256 recorded for it.  Any other mismatch fails as before."""
+    ex = R / ANON_REGISTERED
+    if not ex.exists():
+        mod.assert_registration()
+        return
+    rec = {e["path"]: e for e in json.loads(ex.read_text())["files"]}
+    m = mod.OUT / "registration.sha256"
+    for ln in m.read_text().splitlines():
+        h, rel = ln.split()
+        got = mod._sha(mod.ROOT / rel)
+        if rel in rec:
+            ok = h == rec[rel]["registered_sha256"] and got == rec[rel]["shipped_sha256"]
+            assert ok, f"anonymised registered file does not match its record: {rel}"
+            chk(f"anonymised registered file matches its record: {rel}", 1.0, 1.0, 0)
+        else:
+            assert got == h, f"registration hash mismatch: {rel}"
+    mod._assert_committed(m)
+    mod._assert_committed(mod.OUT / "registration_stamp.txt")
+    assert (mod.OUT / "registration_stamp.txt.ots").exists(), "no OpenTimestamps proof yet: no registered training"
+
+
 def phase3_checks() -> None:
     """Phase 3 (registration 7a9d791, stamp 2bcbda1, OpenTimestamps 16a46bb): the registration and forecast asserts;
     every seed exactly once in each runs file; every forecast read only rows < t_c and its NaN recomputation was
@@ -3696,7 +3724,7 @@ def phase3_checks() -> None:
     if not (P3.OUT / "scores.json").exists():
         return
     print("Phase 3: the lag law at width 4 on the asymmetric windows")
-    P3.assert_registration()
+    registration_with_anonymised(P3)
     P3._assert_forecasts()
     fr = json.loads((P3.OUT / "frozen.json").read_text())
     c = fr["collapse_random_holds_T4"]
