@@ -81,6 +81,9 @@ failures next to the passes whenever the registered f was 0.95 (block 3, table 3
 - "The small-scale minimiser is the cosine at α\*" without "on the continuous windows". On the 800-point quadrature
   the literal s → 0 limit is the aliased weight.
 - "Width-two minimisers exist at small scale on asymmetric windows." The infimum is not attained.
+- "The minimiser crosses the placement bound at the switch scale" or "training crosses at the switch scale" (the
+  mechanism figure). The minimiser falls below the bound a/1.4 well before the switch (at R/R_glob ≈ 0.54 and 0.76),
+  and the bound is necessary, not sufficient `[L: submitted]`. Training crosses after the switch, by the lag (block 3).
 
 ---
 
@@ -170,6 +173,9 @@ band.
 | width-2 sine, output learning rate ÷1024, 200 seeds (101 reached the tested branch) | 101/101 | 101/101 | 0.979 ([0.90, 1.10]) | **PASS** `[L: RB-04]` | **0/101 (fails)**; lag 101/101 |
 | width-2 sine, output learning rate ÷4096, branch-point start, 120 seeds | 120/120 | 120/120 | 1.016 ([0.90, 1.10]) | **PASS** `[L: RB-05]` | **0/120 (fails)**; lag 120/120 |
 
+- **Say.** The forecasters are optimizer-specific. The SGD forecaster (the one that passes at a = 1.58), applied to
+  the a = 1.77 Adam runs, misses: median ratio 1.252, 67 of 98 within the lag tolerance, and 21 of 98 runs with no
+  forecast at all (descriptive) `[L: RB-07]`. The a = 1.77 pass uses a separate Adam forecaster (§3.2a).
 - **Say.** At f = 0.90 the lag forecasts still pass in all three settings, but the crossing-step forecasts fail. A
   forecast made earlier has to extrapolate further, and the step error grows faster than the lag error. The
   post hoc horizon analysis (Figure 4) shows how this error grows with f; label it post hoc.
