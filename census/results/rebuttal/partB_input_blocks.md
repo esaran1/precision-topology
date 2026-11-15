@@ -177,8 +177,18 @@ band.
   the a = 1.77 Adam runs, misses: median ratio 1.252, 67 of 98 within the lag tolerance, and 21 of 98 runs with no
   forecast at all (descriptive) `[L: RB-07]`. The a = 1.77 pass uses a separate Adam forecaster (§3.2a).
 - **Say.** At f = 0.90 the lag forecasts still pass in all three settings, but the crossing-step forecasts fail. A
-  forecast made earlier has to extrapolate further, and the step error grows faster than the lag error. The
-  post hoc horizon analysis (Figure 4) shows how this error grows with f; label it post hoc.
+  forecast made earlier has to extrapolate further, and the step error grows faster than the lag error.
+- **Say (post hoc horizon analysis, figure `fig_horizon`; existing runs only, f = 0.80–0.98, frozen forecaster).**
+  - **Width-one SGD:** the crossing-step forecast is within tolerance in every run from f = 0.84 (84/84 at a = 1.58;
+    63/63 at a = 1.65). At f = 0.80 it is within tolerance in 0/84 and 2/63 runs `[L: RB-19]`.
+  - **Outside width-one sine:** it fails at every f up to 0.92 (GELU 60/79; width two 0/101 and 0/120). It reaches
+    80% only from f = 0.94 (GELU 74/79; width two with slowed output 95/101) or 0.95 (width two from a branch point,
+    120/120) `[L: RB-19]`. So for the three passes outside width one, the forecast holds only close to the switch.
+  - **Adam:** the Adam-specific forecaster at a = 1.77 is within tolerance in 77–93 of 98 runs across the whole grid.
+    The SGD forecaster on the a = 1.65 Adam runs never exceeds 39/74 `[L: RB-19]`.
+  - **Checks:** the NaN recomputation is identical in every run at every f. At each set's own f, the stored forecasts
+    and the committed verdict numbers are reproduced exactly `[L: RB-19]`.
+  - **Do not say** that the forecasts outside width-one sine are early warnings: they hold only from f ≥ 0.94.
 - **Say.** The registered tests at a = 1.65 and the registered Adam ordering test at a = 1.85 read each run at or after
   its crossing, so they are not forecasts. Their per-run accuracy claims are withdrawn. Their causal re-scores are
   reported as above, failures included.

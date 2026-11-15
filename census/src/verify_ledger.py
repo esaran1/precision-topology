@@ -1020,6 +1020,8 @@ PRODUCERS = {
     "fold_next_order_compare.json": ("fold_next_order", "compare", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
     "rebuttal/arm36/arm36_causal.json": ("posthoc_36arm", "summarize", "full", ""),   # POST HOC (2026-11-14)
+    "rebuttal/horizon/horizon.csv": ("posthoc_horizon", "score", "full", ""),          # POST HOC (2026-11-14)
+    "rebuttal/horizon/horizon.json": ("posthoc_horizon", "score", "full", ""),
     "rebuttal/arm36/arm36_causal.csv": ("posthoc_36arm", "summarize", "full", ""),
     "rebuttal/arm36/parts_0of1.jsonl": ("posthoc_36arm", "<module>", "full", "appended by run()"),
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
@@ -4097,6 +4099,36 @@ def rebuttal_input_checks() -> None:
     chk("RB-17 LayerNorm step cost max", costs[-1], 1.09, 0.006)
 
     arm36_checks()
+    horizon_checks()
+
+
+def horizon_checks() -> None:
+    """POST HOC forecast-horizon analysis on existing runs (results/rebuttal/horizon/; RB-19; Figure fig_horizon)."""
+    print("Forecast horizon (POST HOC; RB-19)")
+    H = pd.read_csv(R / "rebuttal" / "horizon" / "horizon.csv")
+    J = json.loads((R / "rebuttal" / "horizon" / "horizon.json").read_text())
+    cell = lambda k, f: H[(H["set"] == k) & (H.f.round(2) == f)].iloc[0]
+    for k, f, kk, n in (("W1", 0.80, 0, 84), ("W1", 0.82, 69, 84), ("W1", 0.84, 84, 84), ("A165_sgd", 0.80, 2, 63),
+                        ("A165_sgd", 0.82, 63, 63), ("A177", 0.80, 77, 98), ("A177", 0.90, 93, 98),
+                        ("A165_adam", 0.90, 39, 74), ("G", 0.90, 9, 79), ("G", 0.92, 60, 79), ("G", 0.94, 74, 79),
+                        ("T", 0.92, 0, 101), ("T", 0.94, 95, 101), ("T", 0.95, 101, 101), ("Tp", 0.92, 0, 120),
+                        ("Tp", 0.94, 88, 120), ("Tp", 0.95, 120, 120)):
+        c = cell(k, f)
+        chk(f"RB-19 {k} f={f:.2f} crossing within", float(c.C1_n_within), float(kk), 0)
+        chk(f"RB-19 {k} f={f:.2f} scored", float(c.n_scored), float(n), 0)
+    chk("RB-19 A165_adam max crossing within over f", float(H[H["set"] == "A165_adam"].C1_n_within.max()), 39.0, 0)
+    chk("RB-19 A177 min crossing within over f", float(H[H["set"] == "A177"].C1_n_within.min()), 77.0, 0)
+    for k in ("W1", "A165_sgd"):
+        chk(f"RB-19 {k} all within for f >= 0.84", float((H[(H["set"] == k) & (H.f >= 0.839)].C1_frac_within == 1).all()), 1.0, 0)
+    chk("RB-19 NaN recomputations differing (all sets, all f)", float(H.nan_recompute_differs.sum()), 0.0, 0)
+    chk("RB-19 f grid", float(len(J["fgrid"])), 11.0, 0)
+    rep = J["forecast_reproduction"]
+    chk("RB-19 stored forecasts reproduced at the used f (all sets)",
+        float(all(v["forecast_equal_at_used_f"] == v["n_ok"] == v["n_rows"] for v in rep.values())), 1.0, 0)
+    chk("RB-19 committed verdict numbers reproduced at the used f (all sets)",
+        float(all(all(v.values()) for v in J["score_reproduction_at_used_f"].values())), 1.0, 0)
+    for k, tau in (("W1", 10), ("A177", 10), ("G", 10), ("T", 15), ("Tp", 30)):
+        chk(f"RB-19 {k} crossing tolerance", float(H[H["set"] == k].C1_tau.iloc[0]), float(tau), 0)
 
 
 def arm36_checks() -> None:

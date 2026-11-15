@@ -20,13 +20,16 @@ the set's own scoring function, unchanged:
 Before the grid is trusted, every forecast at the f values each set stored (registered f and its other f) must equal
 the stored forecast field for field (phase1c.same_forecast), and the score at the registered f must reproduce the
 committed verdict numbers.  Machine rules: launched only after a separate gate step (src.u2_gate gate, logs in
-results/rebuttal/horizon/); 3 worker processes, nice 15, one thread; between units the parent waits while memory free
-< 25 %, swap free < 500 MB or disk free < 15 GB (logged); a worker stops above 3 GB RSS; resumable (parts.jsonl).
+results/rebuttal/horizon/); 2 worker processes, nice 15, one thread; between units the parent waits while memory free
+< 25 %, swap free < 500 MB or disk free < 10 GB (logged); a worker stops above 3 GB RSS; resumable (parts.jsonl).
 
-    python -m src.u2_gate gate horizon --disk-gb 15        (U2_GATE_DIR=results/rebuttal/horizon; its own step)
+    python -m src.u2_gate gate horizon --disk-gb 10        (U2_GATE_DIR=results/rebuttal/horizon; its own step)
     python -m src.posthoc_horizon run                      (after the gate; detached)
     python -m src.posthoc_horizon score                    (-> horizon.csv, horizon.json)
     python -m src.posthoc_horizon figure                   (-> results/rebuttal/figures/fig_horizon.pdf/.png)
+
+Artifacts (paths under results/, for the ledger's provenance check): rebuttal/horizon/horizon.csv and
+rebuttal/horizon/horizon.json (score); results/rebuttal/figures/fig_horizon.pdf/.png (figure).
 """
 from __future__ import annotations
 
@@ -492,9 +495,9 @@ def figure():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     rows = list(csv.DictReader(open(OUT / "horizon.csv")))
-    plt.rcParams.update({"font.size": 8, "axes.titlesize": 9, "axes.labelsize": 8, "legend.fontsize": 7.5,
+    plt.rcParams.update({"font.size": 8, "axes.titlesize": 9, "axes.labelsize": 8, "legend.fontsize": 8,
                          "xtick.labelsize": 8, "ytick.labelsize": 8, "font.family": "DejaVu Sans"})
-    fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.6), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(5.5, 3.5), sharey=True)
     for ax, (title, sets) in zip(axes, PANELS):
         for k in sets:
             rs = sorted((r for r in rows if r["set"] == k), key=lambda r: float(r["f"]))
@@ -504,7 +507,8 @@ def figure():
             p = np.where(n > 0, kk / np.maximum(n, 1), np.nan)
             lo, hi = np.array([wilson(a, b) for a, b in zip(kk, n)]).T
             col, mk = STYLE[k]
-            ax.errorbar(f, p, yerr=[p - lo, hi - p], color=col, marker=mk, ms=3.5, lw=1.0, capsize=1.5, elinewidth=0.7,
+            ax.errorbar(f, p, yerr=[np.clip(p - lo, 0, None), np.clip(hi - p, 0, None)],   # rounding at p = 0 or 1
+                         color=col, marker=mk, ms=3.5, lw=1.0, capsize=1.5, elinewidth=0.7,
                         label=SET_LABEL[k])
             fu = F_USED[k]
             j = int(np.argmin(np.abs(f - fu)))
@@ -514,7 +518,7 @@ def figure():
         ax.set_xlabel("cutoff fraction f")
         ax.set_xticks([0.80, 0.85, 0.90, 0.95])
         ax.set_ylim(-0.03, 1.03)
-        ax.legend(loc="lower right", frameon=False, handlelength=1.6)
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), frameon=False, handlelength=1.6)   # below: never over data
     axes[0].set_ylabel("fraction of runs with the\ncrossing step within tolerance")
     fig.text(0.995, 0.995, "post hoc", ha="right", va="top", fontsize=8, style="italic", color="0.3")
     fig.tight_layout(rect=(0, 0, 1, 0.97))

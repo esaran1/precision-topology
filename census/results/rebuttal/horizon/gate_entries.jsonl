@@ -1,0 +1,5 @@
+{"time": 1794694521.322776, "pid": 75234, "label": "horizon", "ok": true, "mem_free_pct": 41.0, "swap_free_mb": 1373.88, "disk_free_gb": 11.540279388427734}
+{"time": 1794712486.499415, "pid": 5835, "label": "horizon score", "ok": true, "mem_free_pct": 39.0, "swap_free_mb": 705.19, "disk_free_gb": 11.123092651367188}
+{"time": 1794712496.213104, "pid": 7445, "label": "horizon figure", "ok": true, "mem_free_pct": 39.0, "swap_free_mb": 729.19, "disk_free_gb": 11.122966766357422}
+{"time": 1794712517.224064, "pid": 10957, "label": "horizon figure retry", "ok": true, "mem_free_pct": 37.0, "swap_free_mb": 737.19, "disk_free_gb": 11.121749877929688}
+{"time": 1794712537.870323, "pid": 14078, "label": "horizon figure layout", "ok": true, "mem_free_pct": 35.0, "swap_free_mb": 598.62, "disk_free_gb": 11.121402740478516}
