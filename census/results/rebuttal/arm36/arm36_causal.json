@@ -1,0 +1,85 @@
+{
+ "label": "POST HOC: the 36-arm agreement re-scored with the frozen causal forecaster (rebuttal, 2026-11-14)",
+ "n_rows": 1750,
+ "n_error_rows": 0,
+ "errors": [],
+ "primary": "f = 0.9, adam_P = rule_point",
+ "overall": {
+  "f=0.9, adam_P=rule_point": {
+   "n_arms": 36,
+   "n_arms_defined": 36,
+   "n_arms_within_5pct": 5,
+   "ratio_of_medians_min": 0.6898244484817032,
+   "ratio_of_medians_max": 1.3238199618753934,
+   "n_runs": 1750,
+   "n_scored": 1750,
+   "n_forecast": 1745,
+   "n_miss": 5,
+   "frac_scored_runs_within_10pct": 0.11371428571428571,
+   "n_nan_differs": 0,
+   "n_replay_not_ok": 45
+  },
+  "f=0.9, adam_P=cutoff": {
+   "n_arms": 36,
+   "n_arms_defined": 36,
+   "n_arms_within_5pct": 15,
+   "ratio_of_medians_min": 0.9472131120594581,
+   "ratio_of_medians_max": 1.2795297312559961,
+   "n_runs": 1750,
+   "n_scored": 1750,
+   "n_forecast": 1742,
+   "n_miss": 8,
+   "frac_scored_runs_within_10pct": 0.6268571428571429,
+   "n_nan_differs": 0,
+   "n_replay_not_ok": 45
+  },
+  "f=0.95, adam_P=rule_point": {
+   "n_arms": 36,
+   "n_arms_defined": 36,
+   "n_arms_within_5pct": 9,
+   "ratio_of_medians_min": 0.6712746697029368,
+   "ratio_of_medians_max": 1.1896772644818745,
+   "n_runs": 1750,
+   "n_scored": 1750,
+   "n_forecast": 1747,
+   "n_miss": 3,
+   "frac_scored_runs_within_10pct": 0.12914285714285714,
+   "n_nan_differs": 0,
+   "n_replay_not_ok": 45
+  },
+  "f=0.95, adam_P=cutoff": {
+   "n_arms": 36,
+   "n_arms_defined": 36,
+   "n_arms_within_5pct": 19,
+   "ratio_of_medians_min": 0.9720591535928627,
+   "ratio_of_medians_max": 1.1850713931288097,
+   "n_runs": 1750,
+   "n_scored": 1750,
+   "n_forecast": 1740,
+   "n_miss": 10,
+   "frac_scored_runs_within_10pct": 0.8154285714285714,
+   "n_nan_differs": 0,
+   "n_replay_not_ok": 45
+  }
+ },
+ "inputs_sha256": {
+  "results/linear_response/compare_runs.csv": "6cb31206e112fac59f9887907592e21b3d1def2542b4c401e73141a27665f30a",
+  "results/linear_response/compare_arms.csv": "32e0fc63edf355065155002b7c250a37f70bc5570fa43660f1d3a549ef22ecb8",
+  "results/lag_law/kappa.csv": "be37681649a5a3919be4fc43225e1bad0703f38022c99bf2ef970fd6ef6f7425",
+  "results/lag_law/predictions.csv": "af6bb137774474e939b1f8bc78e0cc54b7980f51ecd99db426f54993fd732ed2",
+  "results/lag_test_runs.csv": "318ecb2a25a657c1f4c6fb7d2d7defc18746bc065b291e898f84f31a80969bf8",
+  "results/lag_test2_runs.csv": "fc6a4936c53af4bd5c3ee45606d3fca16ccc854a701fe799bd4cf04b4a5b91fd",
+  "results/residual_mechanism_parts.csv": "48d948229ad0130f46d010e1a725124c8501282494e21fb71fe7a609d9fec200",
+  "results/sgd_own_runs.csv": "ccfad3f88a86b118f77f77f1125ed9324cb84e30907f5559968d5b2516ded965",
+  "results/ts_test/runs.csv": "2c77ede245ded9462b0be56a4f32f41ae8b8fad4d8df3732a99b5c1961a8f6c8",
+  "src/causal_forecast.py": "d6039f50c202531b6f255fb90af185a0df867232eaafbde12db881efb3a1750f",
+  "src/linear_response.py": "4bfba7c79d59c4caf9c341c9fb5cfb33e796627b41701efc20d2053627513df4",
+  "src/phase1b.py": "2a253783ac1f2ca0ebc430f03257c30018f72c7b770f436fb63f4db175ab275a",
+  "src/phase1c.py": "b85375fe493682fed9ec548f344b4ea5ab66debc3fa1aaee1d4c15a35ac025a3",
+  "src/posthoc_36arm.py": "68fe53768af98a0cacf0dd05e9da2471adf95e964424f59ac6fe4cec64f9e3ad"
+ },
+ "parts_sha256": {
+  "parts_0of1.jsonl": "14e7fe93aa39559e920515a644db1c83b50ec773b538bd6286fbde2fc26a5a57"
+ },
+ "git_head": "bb36f2074fad60c131902523610a99afa583c19b"
+}

@@ -59,6 +59,9 @@ Machine rules: launched only after a separate, logged gate entry (src/u2_gate, U
     U2_GATE_DIR=results/rebuttal/arm36 python -m src.u2_gate gate "arm36 run" --disk-gb 15     # its own step
     U2_GATE_DIR=results/rebuttal/arm36 python -m src.posthoc_36arm run [k i]                  # worker i of k
     U2_GATE_DIR=results/rebuttal/arm36 python -m src.posthoc_36arm summarize                  # csv + json + README
+
+Artifacts (paths under results/, for the ledger's provenance check): rebuttal/arm36/parts_0of1.jsonl (run,
+appended per run), rebuttal/arm36/arm36_causal.csv and rebuttal/arm36/arm36_causal.json (summarize).
 """
 
 from __future__ import annotations

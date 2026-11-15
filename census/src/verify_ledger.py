@@ -1019,6 +1019,9 @@ PRODUCERS = {
     "fold_next_order.json": ("fold_next_order", "predict", "full", ""),
     "fold_next_order_compare.json": ("fold_next_order", "compare", "full", ""),
     # Phase 3 (width 4 on the asymmetric windows; design approved 2026-10-06): src/phase3_w4.py
+    "rebuttal/arm36/arm36_causal.json": ("posthoc_36arm", "summarize", "full", ""),   # POST HOC (2026-11-14)
+    "rebuttal/arm36/arm36_causal.csv": ("posthoc_36arm", "summarize", "full", ""),
+    "rebuttal/arm36/parts_0of1.jsonl": ("posthoc_36arm", "<module>", "full", "appended by run()"),
     "phase3/seed_scan.json": ("phase3_w4", "scan", "full", ""),
     "phase3/landscape.json": ("phase3_w4", "landscape", "full", ""),
     "phase3/pilot_frozen_parts.jsonl": ("phase3_w4", "pilot_freeze", "full", ""),
@@ -4092,6 +4095,47 @@ def rebuttal_input_checks() -> None:
     costs = sorted(float(LN[k]["step_cost"]["median"]) for k in ("bce_0.6", "bce_0.3", "bce_0.03"))
     chk("RB-17 LayerNorm step cost min", costs[0], 1.00, 0.006)
     chk("RB-17 LayerNorm step cost max", costs[-1], 1.09, 0.006)
+
+    arm36_checks()
+
+
+def arm36_checks() -> None:
+    """POST HOC causal re-score of the 36-arm trajectory-integrated agreement (results/rebuttal/arm36/; RB-18)."""
+    print("36-arm causal re-score (POST HOC; RB-18)")
+    A = json.loads((R / "rebuttal" / "arm36" / "arm36_causal.json").read_text())
+    chk("RB-18 primary is f=0.90, Adam P at rule point", float(A["primary"] == "f = 0.9, adam_P = rule_point"), 1.0, 0)
+    chk("RB-18 error rows", float(A["n_error_rows"]), 0.0, 0)
+    for key, w5, lo, hi, f10, miss in (("f=0.9, adam_P=rule_point", 5, 0.690, 1.324, 0.114, 5),
+                                       ("f=0.95, adam_P=cutoff", 19, 0.972, 1.185, 0.815, 10)):
+        o = A["overall"][key]
+        chk(f"RB-18 {key} arms", float(o["n_arms_defined"]), 36.0, 0)
+        chk(f"RB-18 {key} runs scored", float(o["n_scored"]), 1750.0, 0)
+        chk(f"RB-18 {key} arms within 5%", float(o["n_arms_within_5pct"]), float(w5), 0)
+        chk(f"RB-18 {key} arm ratio min", float(o["ratio_of_medians_min"]), lo, 6e-4)
+        chk(f"RB-18 {key} arm ratio max", float(o["ratio_of_medians_max"]), hi, 6e-4)
+        chk(f"RB-18 {key} runs within 10%", float(o["frac_scored_runs_within_10pct"]), f10, 6e-4)
+        chk(f"RB-18 {key} misses", float(o["n_miss"]), float(miss), 0)
+        chk(f"RB-18 {key} NaN recomputations differing", float(o["n_nan_differs"]), 0.0, 0)
+    C = pd.read_csv(R / "rebuttal" / "arm36" / "arm36_causal.csv")
+    P = C[(C.f == 0.9) & (C.adam_P == "rule_point")]
+    chk("RB-18 primary arms with crossing within 10 steps in >= 80%", float((P.C1_frac_cross_within_10 >= 0.8).sum()), 2.0, 0)
+    chk("RB-18 submitted path-conditioned arm ratio max", float(P.submitted_path_conditioned_ratio_of_medians_full7.max()), 1.046, 6e-4)
+    chk("RB-18 primary scored runs with an intervention after the rule point",
+        float(P.n_intervention_after_rule.sum()), 768.0, 0)
+    rows = [json.loads(l) for l in (R / "rebuttal" / "arm36" / "parts_0of1.jsonl").read_text().splitlines() if l.strip()]
+    cr = pd.read_csv(R / "linear_response" / "compare_runs.csv", float_precision="round_trip")
+    key = lambda s, a, seed, arm: (s, round(float(a), 2), int(seed), str(arm))
+    cm = {key(*k): v for k, v in zip(zip(cr["set"], cr.a, cr.seed, cr.arm), cr.s_max)}
+    bad = [r for r in rows if not r.get("replay_s_max_ok")]
+    rel = max(abs(r["s_max"] - cm[key(r["set"], r["a"], r["seed"], r["arm"])]) / cm[key(r["set"], r["a"], r["seed"], r["arm"])]
+              for r in bad)
+    chk("RB-18 replays with s_max not bit-equal", float(len(bad)), 45.0, 0)
+    chk("RB-18 those replays: largest relative s_max difference below 1e-15", float(rel < 1e-15), 1.0, 0)
+    chk("RB-18 replays with n_steps not equal", float(sum(not r.get("replay_n_steps_ok") for r in rows)), 0.0, 0)
+    chk("RB-18 observed crossing index check", float(all(r.get("obs_index_ok", True) for r in rows)), 1.0, 0)
+    arms = {(r["set"], round(float(r["a"]), 2), str(r["arm"])): r.get("opt") for r in rows}
+    chk("RB-18 arms", float(len(arms)), 36.0, 0)
+    chk("RB-18 Adam arms", float(sum(v == "adam" for v in arms.values())), 34.0, 0)
 
 
 def provenance_check() -> None:

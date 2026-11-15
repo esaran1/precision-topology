@@ -247,8 +247,12 @@ They differ in the following ways.
 - "The lag law is proved for Adam" or "for the tested runs."
 - "κχ ≲ 0.1 is the validity boundary." The upper cells were unresolved, so it is a bound on where it holds, not a
   located boundary.
-- "The trajectory-integrated prediction brings every arm within 5%" as a forecast. That agreement is path-conditioned
-  (see the 36-arm note when it is ready).
+- "The trajectory-integrated prediction brings every arm within 5%" as a forecast. That agreement is path-conditioned:
+  it integrates along each run's measured output-scale path. Re-scored with the frozen causal forecaster (post hoc;
+  f = 0.90, Adam P at the rule point, fixed before the outcome), 5 of 36 arm medians are within 5% (arm ratios
+  0.690–1.324) and 11.4% of 1,750 runs are within 10% `[L: RB-18]`. 34 of the 36 arms are Adam runs, and in 768 runs an
+  intervention happens after the rule point `[L: RB-18]`. If the agreement is kept, call it "path-conditioned, not a
+  forecast" and give the causal result beside it.
 
 ---
 

@@ -1,0 +1,4 @@
+{"time": 1794694488.339288, "pid": 75117, "label": "posthoc_36arm run worker 0 of 1", "gate_time": 1794694483.2129338, "gate_pid": 75099}
+{"time": 1794694517.727085, "pid": 75209, "label": "posthoc_36arm run worker 0 of 1", "gate_time": 1794694513.341698, "gate_pid": 75185}
+{"time": 1794702751.2004852, "pid": 85776, "label": "posthoc_36arm run worker 0 of 1", "gate_time": 1794702745.058343, "gate_pid": 85747}
+{"time": 1794706007.918438, "pid": 23448, "label": "posthoc_36arm run worker 0 of 1", "gate_time": 1794706002.6312718, "gate_pid": 23420}

@@ -1,0 +1,5 @@
+{"time": 1794694483.2129338, "pid": 75099, "label": "arm36 run", "ok": true, "mem_free_pct": 44.0, "swap_free_mb": 1341.88, "disk_free_gb": 11.54317855834961}
+{"time": 1794694513.341698, "pid": 75185, "label": "arm36 run (retry after nice fix)", "ok": true, "mem_free_pct": 45.0, "swap_free_mb": 1365.88, "disk_free_gb": 11.541778564453125}
+{"time": 1794702745.058343, "pid": 85747, "label": "arm36 run (resume after disk stop)", "ok": true, "mem_free_pct": 40.0, "swap_free_mb": 1542.19, "disk_free_gb": 10.292991638183594}
+{"time": 1794706002.6312718, "pid": 23420, "label": "arm36 run (resume 2)", "ok": true, "mem_free_pct": 35.0, "swap_free_mb": 874.75, "disk_free_gb": 11.235530853271484}
+{"time": 1794707975.2304902, "pid": 55213, "label": "arm36 summarize", "ok": true, "mem_free_pct": 43.0, "swap_free_mb": 1543.0, "disk_free_gb": 10.142200469970703}
